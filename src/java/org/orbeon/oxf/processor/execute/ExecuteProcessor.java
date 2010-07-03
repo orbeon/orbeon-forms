@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
@@ -249,8 +250,9 @@ public class ExecuteProcessor extends ProcessorImpl {
     /**
      * Case where an output must be generated.
      */
+    @Override
     public ProcessorOutput createOutput(final String outputName) {
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), outputName) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ExecuteProcessor.this, outputName) {
             public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 final State state = (State) getState(pipelineContext);
                 if (!state.isRead) {
@@ -275,10 +277,12 @@ public class ExecuteProcessor extends ProcessorImpl {
     /**
      * Case where no output is generated.
      */
+    @Override
     public void start(PipelineContext pipelineContext) {
         doIt(pipelineContext, null, null);
     }
 
+    @Override
     public void reset(PipelineContext pipelineContext) {
         setState(pipelineContext, new State());
     }

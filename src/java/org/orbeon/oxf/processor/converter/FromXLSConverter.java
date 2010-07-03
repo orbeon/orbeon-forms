@@ -22,10 +22,9 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -50,7 +49,7 @@ public class FromXLSConverter extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(FromXLSConverter.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 try {

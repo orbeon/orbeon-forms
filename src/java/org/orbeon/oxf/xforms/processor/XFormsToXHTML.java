@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.*;
@@ -35,7 +36,6 @@ import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
 import java.util.List;
 
@@ -96,7 +96,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // o stage1 is the processor automatically inserted below for the purpose of handling dependencies
             // o stage2 is the actual oxf:xforms-to-xhtml which actually does XForms processing
             final ProcessorInput originalInput = super.createInput(inputName);
-            return new DependenciesProcessorInput(inputName, originalInput) {
+            return new DependenciesProcessorInput(XFormsToXHTML.this, inputName, originalInput) {
                 @Override
                 protected URIProcessorOutputImpl.URIReferences getURIReferences(PipelineContext pipelineContext) {
                     // Return dependencies object, set by stage2 before reading its input
@@ -121,6 +121,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         public Stage1CacheableState stage1CacheableState;
     }
 
+    private static final boolean DO_TEST_STATE = false;
+    private static Stage2CacheableState TEST_STATE;
+
     private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
@@ -130,8 +133,11 @@ public class XFormsToXHTML extends ProcessorImpl {
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
         final boolean[] cachedInput = new boolean[] { false } ;
 
-        // Read and try to cache the complete XForms+XHTML document with annotations
-        final Stage2CacheableState stage2CacheableState = (Stage2CacheableState) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT),
+        final Stage2CacheableState stage2CacheableState;
+        if (TEST_STATE == null) {
+
+            // Read and try to cache the complete XForms+XHTML document with annotations
+            stage2CacheableState = (Stage2CacheableState) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT),
                 new CacheableInputReader() {
                     public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
@@ -184,11 +190,18 @@ public class XFormsToXHTML extends ProcessorImpl {
                     public void storedInCache() {
                         cachedInput[0] = true;
                     }
-                });
+                }, false);
+
+            TEST_STATE = DO_TEST_STATE ? stage2CacheableState : null;
+
+        } else {
+            stage2CacheableState = TEST_STATE;
+        }
 
         try {
             // Create containing document if not done yet
             if (containingDocument[0] == null) {
+                assert !cachedInput[0];
                 // In this case, we found the static state and more in the cache, but we must now create a new XFormsContainingDocument from this information
                 indentedLogger.logDebug("", "annotated document and static state obtained from cache; creating XForms document.");
 
@@ -196,6 +209,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
                 containingDocument[0] = new XFormsContainingDocument(pipelineContext, stage2CacheableState.getXFormsStaticState(), uriResolver);
             } else {
+                assert cachedInput[0];
                 indentedLogger.logDebug("", "annotated document and static state not obtained from cache.");
             }
 

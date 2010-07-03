@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.test;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -49,7 +48,7 @@ public class TestScriptProcessor extends ProcessorImpl {
         public ExternalContext externalContext;
     }
 
-
+    @Override
     public void start(PipelineContext pipelineContext) {
         // Read configuration script
         Document config = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
@@ -210,37 +209,35 @@ public class TestScriptProcessor extends ProcessorImpl {
     }
 
     private static class OutputProcessor extends ProcessorImpl {
-        public void start(PipelineContext pipelineContext) {
-        }
+
+        @Override
+        public void start(PipelineContext pipelineContext) {}
 
         public void readCacheInputWithValue(PipelineContext pipelineContext, String inputName, final String value) {
 
-            ProcessorInput input = getInputByName(inputName);
-            ProcessorOutput output = input.getOutput();
+            final ProcessorInput input = getInputByName(inputName);
 
-            if (output instanceof CacheableInputOutput) {
-                // As for KeyValidity as does ProcessorImpl.readCacheInputAsObject()
-                KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
-                // Read input in every case (we ignore the content)
-                readInputAsSAX(pipelineContext, input, new XMLReceiverAdapter());
+            // As for KeyValidity as does ProcessorImpl.readCacheInputAsObject()
+            KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
+            // Read input in every case (we ignore the content)
+            readInputAsSAX(pipelineContext, input, new XMLReceiverAdapter());
 
-                // Cache result if possible, asking again for KeyValidity if needed
-                if (keyValidity == null)
-                    keyValidity = getInputKeyValidity(pipelineContext, input);
+            // Cache result if possible, asking again for KeyValidity if needed
+            if (keyValidity == null)
+                keyValidity = getInputKeyValidity(pipelineContext, input);
 
-                if (keyValidity == null)
-                    throw new OXFException("Cannot cache value '" + value + "' from output '" + inputName + "'.");
-
-                ObjectCache.instance().add(pipelineContext, keyValidity.key, keyValidity.validity, value);
-            } else {
+            if (keyValidity == null)
                 throw new OXFException("Cannot cache value '" + value + "' from output '" + inputName + "'.");
-            }
+
+            ObjectCache.instance().add(pipelineContext, keyValidity.key, keyValidity.validity, value);
         }
 
+        @Override
         public boolean isInputInCache(PipelineContext pipelineContext, String inputName) {
             return super.isInputInCache(pipelineContext, inputName);
         }
 
+        @Override
         public KeyValidity getInputKeyValidity(PipelineContext context, String inputName) {
             return super.getInputKeyValidity(context, inputName);
         }
@@ -255,6 +252,7 @@ public class TestScriptProcessor extends ProcessorImpl {
             return ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
         }
 
+        @Override
         public Document readInputAsDOM4J(PipelineContext context, String inputName) {
             return super.readInputAsDOM4J(context, inputName);
         }

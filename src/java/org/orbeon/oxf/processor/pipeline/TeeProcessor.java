@@ -14,16 +14,13 @@
 package org.orbeon.oxf.processor.pipeline;
 
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -34,7 +31,7 @@ import org.xml.sax.SAXException;
  */
 public class TeeProcessor extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(TeeProcessor.class);
+    private static final Logger logger = LoggerFactory.createLogger(TeeProcessor.class);
     private Exception creationException;
     private Exception resetException;
     private ProcessorKey resetProcessorKey;
@@ -50,6 +47,7 @@ public class TeeProcessor extends ProcessorImpl {
     /**
      * Standard createOutput().
      */
+    @Override
     public ProcessorOutput createOutput(String name) {
         return createOutput(name, false);
     }
@@ -58,20 +56,22 @@ public class TeeProcessor extends ProcessorImpl {
      * Tee-specific createOutput().
      */
     public ProcessorOutput createOutput(String name, boolean isMultipleReads) {
-        final ProcessorOutput output = new TeeProcessorOutputImpl(getClass(), name, isMultipleReads);
+        final ProcessorOutput output = new TeeProcessorOutputImpl(name, isMultipleReads);
         addOutput(name, output);
         return output;
     }
 
-    public class TeeProcessorOutputImpl extends ProcessorImpl.ProcessorOutputImpl {
+    public class TeeProcessorOutputImpl extends ProcessorOutputImpl {
 
         private boolean isMultipleReads;
 
-        private TeeProcessorOutputImpl(Class clazz, String name, boolean isMultipleReads) {
-            super(clazz, name);
+        private TeeProcessorOutputImpl(String name, boolean isMultipleReads) {
+            super(TeeProcessor.this, name);
             this.isMultipleReads = isMultipleReads;
+
         }
 
+        @Override
         public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
             try {
                 final State state = (State) getState(context);
@@ -129,36 +129,39 @@ public class TeeProcessor extends ProcessorImpl {
             }
         }
 
-        public OutputCacheKey getKeyImpl(PipelineContext context) {
+        @Override
+        public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
             final State state;
             try {
-                state = (State) getState(context);
+                state = (State) getState(pipelineContext);
             } catch (OXFException e) {
                 if (logger.isDebugEnabled()) {
                     logger.error("creation", creationException);
                     logger.error("reset", resetException);
-                    logger.error("current processor key: " + getProcessorKey(context));
+                    logger.error("current processor key: " + getProcessorKey(pipelineContext));
                     logger.error("reset processor key: " + resetProcessorKey);
                 }
                 throw e;
             }
             if (state.outputCacheKey == null) {
                 final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
-                state.outputCacheKey = (output instanceof CacheableInputOutput) ? ((CacheableInputOutput) output).getKey(context) : null;
+                state.outputCacheKey = output.getKey(pipelineContext);
             }
             return state.outputCacheKey;
         }
 
-        public Object getValidityImpl(PipelineContext context) {
-            final State state = (State) getState(context);
+        @Override
+        public Object getValidityImpl(PipelineContext pipelineContext) {
+            final State state = (State) getState(pipelineContext);
             if (state.validity == null) {
                 final ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
-                state.validity = (output instanceof CacheableInputOutput) ? ((CacheableInputOutput) output).getValidity(context) : null;
+                state.validity = output.getValidity(pipelineContext);
             }
             return state.validity;
         }
     }
 
+    @Override
     public void reset(PipelineContext context) {
         if (logger.isDebugEnabled()) {
             resetException = new Exception(Integer.toString(hashCode()));

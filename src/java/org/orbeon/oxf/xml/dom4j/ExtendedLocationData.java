@@ -141,6 +141,7 @@ public class ExtendedLocationData extends LocationData {
         return parameters;
     }
 
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder(super.toString());
         final String parametersString = getParametersString();

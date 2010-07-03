@@ -16,7 +16,9 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.proxy.ProxyServiceDelegate;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.SAXException;
 
@@ -79,9 +81,10 @@ public class ProxyProcessor extends ProcessorImpl implements ProcessorFactory {
             }
         }
 
+        @Override
         public ProcessorOutput createOutput(String name) {
             final String _name = name;
-            ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+            final ProcessorOutput output = new CacheableTransformerOutputImpl(ProxyProcessor.this, name) {
                 public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                     try {
                         if (!started)
@@ -101,6 +104,7 @@ public class ProxyProcessor extends ProcessorImpl implements ProcessorFactory {
             return output;
         }
 
+        @Override
         public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
             if (started)
                 throw new OXFException("Concrete ProxyService Processor already started");
@@ -117,7 +121,7 @@ public class ProxyProcessor extends ProcessorImpl implements ProcessorFactory {
             }
 
             // Call EJB to get outputs
-            Context jndiContext = (Context) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.JNDI_CONTEXT);
+            Context jndiContext = (Context) context.getAttribute(ProcessorService.JNDI_CONTEXT);
             ProxyServiceDelegate proxyService = new ProxyServiceDelegate(jndiContext);
             proxyService.setJNDIName(jndiName);
             proxyService.setInputs(inputs);
@@ -125,6 +129,7 @@ public class ProxyProcessor extends ProcessorImpl implements ProcessorFactory {
             started = true;
         }
 
+        @Override
         public void reset(org.orbeon.oxf.pipeline.api.PipelineContext context) {
             started = false;
         }

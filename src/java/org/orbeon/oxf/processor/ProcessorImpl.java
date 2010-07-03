@@ -14,28 +14,22 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
-import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.impl.*;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -62,17 +56,36 @@ public abstract class ProcessorImpl implements Processor {
 
     private static final List<ProcessorInput> EMPTY_INPUT_LIST = Collections.emptyList();
 
+    public static int PROCESSOR_SEQUENCE_NUMBER = 0;
+
+    private final int sequenceNumber;
+
     private String id;
     private QName name;
-    private Map<String, List<ProcessorInput>> inputMap = new LinkedHashMap<String, List<ProcessorInput>>();
-    private Map<String, ProcessorOutput> outputMap = new LinkedHashMap<String, ProcessorOutput>();
+
+    private final Map<String, List<ProcessorInput>> inputMap = new LinkedHashMap<String, List<ProcessorInput>>();
+    private final Map<String, ProcessorOutput> outputMap = new LinkedHashMap<String, ProcessorOutput>();
     private int outputCount = 0;
-    private List<ProcessorInputOutputInfo> inputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
-    private List<ProcessorInputOutputInfo> outputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
+
+    private final List<ProcessorInputOutputInfo> inputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
+    private final List<ProcessorInputOutputInfo> outputsInfo = new ArrayList<ProcessorInputOutputInfo>(0);
 
     private LocationData locationData;
-    public static final String PROCESSOR_INPUT_SCHEME_OLD = "oxf:";
+
     public static final String PROCESSOR_INPUT_SCHEME = "input:";
+
+    /**
+     * This is for internal pipeline engine use.
+     */
+    protected static final String PARENT_PROCESSORS = "parent-processors";
+
+    protected ProcessorImpl() {
+        sequenceNumber = PROCESSOR_SEQUENCE_NUMBER++;
+    }
+
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
 
     /**
      * Return a property set for this processor.
@@ -106,12 +119,12 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public ProcessorInput getInputByName(String name) {
-        List l = (List) inputMap.get(name);
-        if (l == null)
+        final List<ProcessorInput> inputs =  inputMap.get(name);
+        if (inputs == null)
             throw new ValidationException("Cannot find input \"" + name + "\"", getLocationData());
-        if (l.size() != 1)
+        if (inputs.size() != 1)
             throw new ValidationException("Found more than one input \"" + name + "\"", getLocationData());
-        return (ProcessorInput) l.get(0);
+        return inputs.get(0);
     }
 
     public List<ProcessorInput> getInputsByName(String name) {
@@ -146,152 +159,13 @@ public abstract class ProcessorImpl implements Processor {
             final ProcessorInput inputValData = validatorProcessor.createInput(INPUT_DATA);
             final ProcessorOutput outputValData = validatorProcessor.createOutput(OUTPUT_DATA);
 
-            input = new DelegatingProcessorInput(name, inputValData, outputValData);
+            input = new DelegatingProcessorInput(this, name, inputValData, outputValData);
         } else {
-            input = new ProcessorInputImpl(ProcessorImpl.this.getClass(), name);
+            input = new ProcessorInputImpl(this, name);
         }
 
         addInput(name, input);
         return input;
-    }
-
-    public class DelegatingProcessorInput implements ProcessorInput {
-
-        private final String originalName;
-        private ProcessorInput delegateInput;
-        private ProcessorOutput delegateOutput;
-
-        public DelegatingProcessorInput(String originalName, ProcessorInput delegateInput, ProcessorOutput delegateOutput) {
-            this.originalName = originalName;
-            this.delegateInput = delegateInput;
-            this.delegateOutput = delegateOutput;
-        }
-
-        protected DelegatingProcessorInput(String originalName) {
-            this.originalName = originalName;
-        }
-
-        public void setDelegateInput(ProcessorInput delegateInput) {
-            this.delegateInput = delegateInput;
-        }
-
-        public void setDelegateOutput(ProcessorOutput delegateOutput) {
-            this.delegateOutput = delegateOutput;
-        }
-
-        public void setOutput(ProcessorOutput output) {
-            delegateInput.setOutput(output);
-        }
-
-        public ProcessorOutput getOutput() {
-            // Not sure why the input validation stuff expects another output here. For now, allow caller to specify
-            // which output is returned. Once we are confident, switch to delegateInput.getOutput().
-            return delegateOutput;
-//            return delegateInput.getOutput();
-        }
-
-        public String getSchema() {
-            return delegateInput.getSchema();
-        }
-
-        public void setSchema(String schema) {
-            delegateInput.setSchema(schema);
-        }
-
-        public Class getProcessorClass() {
-            return ProcessorImpl.this.getClass();
-        }
-
-        public String getName() {
-            return originalName;
-        }
-
-        public void setDebug(String debugMessage) {
-            delegateInput.setDebug(debugMessage);
-        }
-
-        public void setLocationData(LocationData locationData) {
-            delegateInput.setLocationData(locationData);
-        }
-
-        public String getDebugMessage() {
-            return delegateInput.getDebugMessage();
-        }
-
-        public LocationData getLocationData() {
-            return delegateInput.getLocationData();
-        }
-
-        public void setBreakpointKey(BreakpointKey breakpointKey) {
-            delegateInput.setBreakpointKey(breakpointKey);
-        }
-    };
-
-    /**
-     * This special input is able to handle dependencies on URLs.
-     */
-    protected abstract class DependenciesProcessorInput extends DelegatingProcessorInput {
-
-        // Custom processor handling input dependencies
-        private final ProcessorImpl dependencyProcessor = new ProcessorImpl() {
-            @Override
-            public ProcessorOutput createOutput(String outputName) {
-                final ProcessorOutput output = new URIProcessorOutputImpl(this, outputName, INPUT_CONFIG) {
-                    @Override
-                    protected void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
-                        final boolean[] foundInCache = new boolean[] { false };
-                        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                            @Override
-                            public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
-                                // Read the input directly into the output
-                                readInputAsSAX(pipelineContext, processorInput, xmlReceiver);
-
-                                // Return dependencies object
-                                return getURIReferences(pipelineContext);
-                            }
-
-                            @Override
-                            public void foundInCache() {
-                                foundInCache[0] = true;
-                            }
-                        });
-
-                        // Finding the dependencies in cache doesn't mean we don't read to the output: after all,
-                        // we were asked to.
-                        if (foundInCache[0]) {
-                            readInputAsSAX(pipelineContext, getInputByName(INPUT_CONFIG), xmlReceiver);
-                        }
-                    }
-                };
-                addOutput(outputName, output);
-                return output;
-            }
-        };
-
-        public DependenciesProcessorInput(String originalName, ProcessorInput originalInput) {
-            super(originalName);
-
-            // Create data input and output
-            final ProcessorInput dependencyInput = dependencyProcessor.createInput(INPUT_CONFIG);
-            final ProcessorOutput dependencyOutput = dependencyProcessor.createOutput(OUTPUT_DATA);
-
-            setDelegateInput(dependencyInput);
-            setDelegateOutput(dependencyOutput);
-
-            // Connect output of dependency processor to original input
-            {
-                dependencyOutput.setInput(originalInput);
-                originalInput.setOutput(dependencyOutput);
-            }
-        }
-
-        /**
-         * Get URI references on which this input depends. This is called right after the original input has been read.
-         *
-         * @param pipelineContext   current context
-         * @return                  URI references
-         */
-        protected abstract URIProcessorOutputImpl.URIReferences getURIReferences(PipelineContext pipelineContext);
     }
 
     public void addInput(String inputName, ProcessorInput input) {
@@ -343,16 +217,12 @@ public abstract class ProcessorImpl implements Processor {
         inputsInfo.add(inputInfo);
     }
 
-    protected void removeInputInfo(ProcessorInputOutputInfo inputInfo) {
-        inputsInfo.remove(inputInfo);
-    }
-
     protected void addOutputInfo(ProcessorInputOutputInfo outputInfo) {
         outputsInfo.add(outputInfo);
     }
 
-    protected void removeOutputInfo(ProcessorInputOutputInfo outputInfo) {
-        outputsInfo.remove(outputInfo);
+    public Set<String> getInputNames() {
+        return inputMap.keySet();
     }
 
     public List<ProcessorInputOutputInfo> getInputsInfo() {
@@ -380,70 +250,11 @@ public abstract class ProcessorImpl implements Processor {
         return Collections.unmodifiableMap(outputMap);
     }
 
-    public ProcessorInputOutputInfo getOutputInfo(String name) {
-        for (Iterator i = outputsInfo.iterator(); i.hasNext();) {
-            ProcessorInputOutputInfo outputInfo = (ProcessorInputOutputInfo) i.next();
-            if (outputInfo.getName().equals(name))
-                return outputInfo;
-        }
-        return null;
-    }
-
-
-    public void checkSockets() {
-
-        // FIXME: This method is never called and it cannot work correctly
-        // right now as some processor (pipeline, aggregator) are not exposing their
-        // interface correctly. This will be fixed when we implement the full
-        // delegation model.
-
-        throw new UnsupportedOperationException();
-
-        // Check that each connection has a corresponding socket info
-//        for (int io = 0; io < 2; io++) {
-//            for (Iterator i = (io == 0 ? inputMap : outputMap).keySet().iterator(); i.hasNext();) {
-//                String inputName = (String) i.next();
-//                boolean found = false;
-//                for (Iterator j = socketInfo.iterator(); j.hasNext();) {
-//                    ProcessorInputOutputInfo socketInfo = (ProcessorInputOutputInfo) j.next();
-//                    if (socketInfo.getType() ==
-//                            (io == 0 ? ProcessorInputOutputInfo.INPUT_TYPE : ProcessorInputOutputInfo.OUTPUT_TYPE)
-//                            && socketInfo.getName().equals(inputName)) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//                if (!found)
-//                    throw new ValidationException("Processor does not support " + (io == 0 ? "input" : "output") +
-//                            " with name " + inputName, getLocationData());
-//            }
-//        }
-    }
-
     /**
      * The fundamental read method based on SAX.
      */
     protected static void readInputAsSAX(PipelineContext context, final ProcessorInput input, XMLReceiver xmlReceiver) {
-//        if (input instanceof ProcessorInputImpl) {
-//            input.getOutput().read(context, new SimpleForwardingXMLReceiver(contentHandler) {
-//                private Locator locator;
-//                public void setDocumentLocator(Locator locator) {
-//                    this.locator = locator;
-//                    super.setDocumentLocator(locator);
-//                }
-//
-//                public void startDocument() throws SAXException {
-//                    // Try to get the system id and set it on the input
-//                    if (locator != null && locator.getSystemId() != null) {
-////                        System.out.println("Got system id: " + locator.getSystemId());
-//                        ((ProcessorInputImpl) input).setSystemId(locator.getSystemId());
-//                    }
-//                    super.startDocument();
-//                }
-//            });
-//        } else {
-            input.getOutput().read(context, xmlReceiver);
-//        }
+        input.getOutput().read(context, xmlReceiver);
     }
 
     protected void readInputAsSAX(PipelineContext context, String inputName, XMLReceiver xmlReceiver) {
@@ -474,9 +285,9 @@ public abstract class ProcessorImpl implements Processor {
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 
-    protected Document readInputAsDOM(PipelineContext context, String inputName) {
-        return readInputAsDOM(context, getInputByName(inputName));
-    }
+//    protected Document readInputAsDOM(PipelineContext context, String inputName) {
+//        return readInputAsDOM(context, getInputByName(inputName));
+//    }
 
     protected org.dom4j.Document readInputAsDOM4J(PipelineContext context, String inputName) {
         return readInputAsDOM4J(context, getInputByName(inputName));
@@ -516,140 +327,108 @@ public abstract class ProcessorImpl implements Processor {
      * @return        The object returned by the reader (either directly returned,
      *                or from the cache)
      */
-    protected Object readCacheInputAsObject(PipelineContext context, ProcessorInput input, CacheableInputReader reader) {
-        // Get associated output
-        ProcessorOutput output = input.getOutput();
+    protected Object readCacheInputAsObject(PipelineContext pipelineContext, ProcessorInput input, CacheableInputReader reader) {
+        return readCacheInputAsObject(pipelineContext, input, reader, false);
+    }
 
-        String debugInfo = logger.isDebugEnabled()
+    protected Object readCacheInputAsObject(PipelineContext pipelineContext, ProcessorInput input, CacheableInputReader reader, boolean logCache) {
+
+        // Get associated output
+        final ProcessorOutput output = input.getOutput();
+
+        final String debugInfo = logger.isDebugEnabled()
                 ? "[" + output.getName() + ", " + output.getProcessorClass() + ", "
                 + input.getName() + ", " + input.getProcessorClass() + "]"
                 : null;
 
-        if (output instanceof CacheableInputOutput) {
-            // Get cache instance
-            final Cache cache = ObjectCache.instance();
+        // Get cache instance
+        final Cache cache = ObjectCache.instance();
 
-            // Check in cache first
-            KeyValidity keyValidity = getInputKeyValidity(context, input);
-            if (keyValidity != null) {
-                final Object inputObject = cache.findValid(context, keyValidity.key, keyValidity.validity);
-                if (inputObject != null) {
-                    // Return cached object
-                    if (logger.isDebugEnabled())
-                        logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + inputObject);
-                    reader.foundInCache();
-                    return inputObject;
-                }
+        // Check in cache first
+        KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
+        
+//        if (logCache) {
+//            if (keyValidity != null && keyValidity.key != null) {
+//                final CacheEntry cacheEntry = cache.findAny(pipelineContext, keyValidity.key);
+//                if (cacheEntry != null) {
+//                    // Found entry but with different validity
+//                    logger.info(CacheKey.toXMLString(keyValidity.key, cacheEntry.validity));
+//                } else {
+//                    logger.info("no entry in cache for key");
+//                }
+//            } else {
+//                logger.info("no key");
+//            }
+//        }
+
+        if (keyValidity != null && keyValidity.key != null && keyValidity.validity != null) {
+            // We got a key and a validity
+            final Object inputObject = cache.findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+            if (inputObject != null) {
+                // Return cached object
+                if (logger.isDebugEnabled())
+                    logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + inputObject);
+
+                reader.foundInCache();
+                return inputObject;
             }
-
-            // Result was not found in cache, read result
+//            else if (logCache) {
+//                // Try to see if something is in the cache for this key
+//
+//                final CacheEntry cacheEntry = cache.findAny(pipelineContext, keyValidity.key);
+//                if (cacheEntry != null) {
+//                    // Found entry but with different validity
+//                    logger.info(CacheKey.toXMLString(keyValidity.key, cacheEntry.validity));
+//                }
+//            }
+        }
 
 //            final long startTime = System.nanoTime();
 
+        if (logger.isDebugEnabled())
+            logger.debug("Cache " + debugInfo + ": READING.");
+
+        final Object result = reader.read(pipelineContext, input);
+
+        // Cache new result if possible, asking again for KeyValidity if needed
+        if (keyValidity == null || keyValidity.key == null || keyValidity.validity == null)
+            keyValidity = getInputKeyValidity(pipelineContext, input);
+
+        if (keyValidity != null && keyValidity.key != null && keyValidity.validity != null) {
             if (logger.isDebugEnabled())
-                logger.debug("Cache " + debugInfo + ": READING.");
-            final Object result = reader.read(context, input);
+                logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
 
-            // Cache new result if possible, asking again for KeyValidity if needed
-            if (keyValidity == null)
-                keyValidity = getInputKeyValidity(context, input);
-
-            if (keyValidity != null) {
-                if (logger.isDebugEnabled())
-                    logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
-                cache.add(context, keyValidity.key, keyValidity.validity, result);
+            cache.add(pipelineContext, keyValidity.key, keyValidity.validity, result);
 
 //                System.out.println("Cache cost: " + (System.nanoTime() - startTime));
 
-                reader.storedInCache();
-            }
+//                logger.info(CacheKey.toXMLString(keyValidity.key));
 
-            return result;
-        } else {
-            if (logger.isDebugEnabled())
-                logger.debug("Cache " + debugInfo + ": source never cacheable. READING.");
-            // Never read from cache
-            return reader.read(context, input);
+            reader.storedInCache();
         }
+
+        return result;
     }
 
-    protected Object getCachedInputAsObject(PipelineContext pipelineContext, ProcessorInput processorInput) {
-        // Get associated output
-        final ProcessorOutput output = processorInput.getOutput();
-
-        if (output instanceof CacheableInputOutput) {
-            // Get cache instance
-            final Cache cache = ObjectCache.instance();
-
-            // Check cache
-            final KeyValidity keyValidity = getInputKeyValidity(pipelineContext, processorInput);
-            if (keyValidity != null) {
-                return cache.findValid(pipelineContext, keyValidity.key, keyValidity.validity);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private void addSelfAsParent(PipelineContext context) {
-        Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
-        if (parents == null) {
-            parents = new Stack<ProcessorImpl>();
-            context.setAttribute(PipelineContext.PARENT_PROCESSORS, parents);
-        }
-        parents.push(this);
-    }
-
-    private void removeSelfAsParent(PipelineContext context) {
-        Stack parents = (Stack) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
-        if (parents.peek() != this)
-            throw new ValidationException("Current processor should be on top of the stack", getLocationData());
-        parents.pop();
-    }
-
-    /**
-     * For use in processor that contain other processors.
-     * Consider the current processor as the parent of the processors on which
-     * we call read/start.
-     */
-    protected void executeChildren(PipelineContext context, Runnable runnable) {
-        addSelfAsParent(context);
-        try {
-            runnable.run();
-        } finally {
-            removeSelfAsParent(context);
-        }
-    }
-
-    /**
-     * For use in processor that contain other processors.
-     * Consider the current processor as a child or at the same level of the
-     * processors on which we call read/start.
-     */
-    protected static void executeParents(PipelineContext context, Runnable runnable) {
-        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
-        final ProcessorImpl thisPipelineProcessor = parents.peek();
-        thisPipelineProcessor.removeSelfAsParent(context);
-        try {
-            runnable.run();
-        } finally {
-            thisPipelineProcessor.addSelfAsParent(context);
-        }
-    }
-
-    protected static Object getParentState(final PipelineContext context) {
-        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
-        final ProcessorImpl parent = parents.peek();
-        final Object[] result = new Object[1];
-        executeParents(context, new Runnable() {
-            public void run() {
-                result[0] = parent.getState(context);
-            }
-        });
-        return result[0];
-    }
+//    protected Object getCachedInputAsObject(PipelineContext pipelineContext, ProcessorInput processorInput) {
+//        // Get associated output
+//        final ProcessorOutput output = processorInput.getOutput();
+//
+//        if (output instanceof CacheableInputOutput) {
+//            // Get cache instance
+//            final Cache cache = ObjectCache.instance();
+//
+//            // Check cache
+//            final KeyValidity keyValidity = getInputKeyValidity(pipelineContext, processorInput);
+//            if (keyValidity != null) {
+//                return cache.findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+//            } else {
+//                return null;
+//            }
+//        } else {
+//            return null;
+//        }
+//    }
 
     /**
      * This method is used to retrieve the state information set with setState().
@@ -692,71 +471,8 @@ public abstract class ProcessorImpl implements Processor {
      * called on other processors. (The key returned by getProcessorKey can be used after read/start is called.)
      */
     protected ProcessorKey getProcessorKey(PipelineContext context) {
-        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PipelineContext.PARENT_PROCESSORS);
+        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PARENT_PROCESSORS);
         return new ProcessorKey(parents);
-    }
-
-    public class ProcessorKey {
-
-        private int hash = 0;
-        private List<ProcessorImpl> processors;
-
-        public ProcessorKey(Stack<ProcessorImpl> parents) {
-            processors = (parents == null ? new ArrayList<ProcessorImpl>() : new ArrayList<ProcessorImpl>(parents));
-            processors.add(ProcessorImpl.this);
-            // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
-            for (int i = 0; i < processors.size(); i++) {
-                Object processor = processors.get(i);
-                hash += processor.hashCode() * 31;
-            }
-        }
-
-        public int hashCode() {
-            return hash;
-        }
-
-        private List<ProcessorImpl> getProcessors() {
-            return processors;
-        }
-
-        public boolean equals(Object other) {
-            final List<ProcessorImpl> otherProcessors = ((ProcessorKey) other).getProcessors();
-            int processorsSize = processors.size();
-            if (processorsSize != otherProcessors.size())
-                return false;
-            // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
-            for (int i = 0; i < processorsSize; i++) {
-                if (processors.get(i) != otherProcessors.get(i))
-                    return false;
-            }
-//            Iterator j = ((ProcessorKey) other).getProcessors().iterator();
-//            for (Iterator i = processors.iterator(); i.hasNext();) {
-//                if (!j.hasNext())
-//                    return false;
-//                if (i.next() != j.next())
-//                    return false;
-//            }
-            return true;
-//            return other instanceof ProcessorKey
-//                    ? CollectionUtils.isEqualCollection(getProcessors(), ((ProcessorKey) other).getProcessors())
-//                    : false;
-        }
-
-        public String toString() {
-            FastStringBuffer result = null;
-            for (Processor processor: processors) {
-                if (result == null) {
-                    result = new FastStringBuffer(hash + ": [");
-                } else {
-                    result.append(", ");
-                }
-                result.append(Integer.toString(processor.hashCode()));
-                result.append(": ");
-                result.append(processor.getClass().getName());
-            }
-            result.append("]");
-            return result.toString();
-        }
     }
 
     public void start(PipelineContext pipelineContext) {
@@ -790,486 +506,26 @@ public abstract class ProcessorImpl implements Processor {
      * Check if the given URI is referring to a processor input.
      */
     public static boolean isProcessorInputScheme(String uri) {
-        // NOTE: The check on the hash is for backward compatibility
-        return uri.startsWith("#")
-                || (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/"))
-                || (uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD) && !uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD + "/"));
+        return uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/");
     }
 
     /**
      * Return the input name if the URI is referring to a processor input, null otherwise.
      */
     public static String getProcessorInputSchemeInputName(String uri) {
-        if (uri.startsWith("#")) {
-            // NOTE: The check on the hash is for backward compatibility
-            return uri.substring(1);
-        } else if (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/")) {
+        if (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/")) {
             return uri.substring(PROCESSOR_INPUT_SCHEME.length());
-        } else if (uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD) && !uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD + "/")) {
-            return uri.substring(PROCESSOR_INPUT_SCHEME_OLD.length());
         } else {
             return null;
         }
     }
 
-    /**
-     * Basic implementation of ProcessorInput.
-     */
-    public static class ProcessorInputImpl implements ProcessorInput {
-
-        private final Class clazz;
-        private final String name;
-
-        private ProcessorOutput output;
-        private String id;
-        private String schema;
-        private String debugMessage;
-        private LocationData locationData;
-        private String systemId;
-        private BreakpointKey breakpointKey;
-
-        public ProcessorInputImpl(Class clazz, String name) {
-            this.clazz = clazz;
-            this.name = name;
-        }
-
-        public ProcessorOutput getOutput() {
-            return output;
-        }
-
-        public void setOutput(ProcessorOutput output) {
-            this.output = output;
-        }
-
-        public Class getProcessorClass() {
-            return clazz;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getSchema() {
-            return schema;
-        }
-
-        public void setSchema(String schema) {
-            this.schema = schema;
-        }
-
-        public String getDebugMessage() {
-            return debugMessage;
-        }
-
-        public void setLocationData(LocationData locationData) {
-            this.locationData = locationData;
-        }
-
-        public LocationData getLocationData() {
-            return locationData;
-        }
-
-        public void setDebug(String debugMessage) {
-            this.debugMessage = debugMessage;
-        }
-
-        public String getSystemId() {
-            return systemId;
-        }
-
-        public void setSystemId(String systemId) {
-            this.systemId = systemId;
-        }
-
-        public void setBreakpointKey(BreakpointKey breakpointKey) {
-            this.breakpointKey = breakpointKey;
-        }
+    public static OutputCacheKey getInputKey(PipelineContext context, ProcessorInput input) {
+        return input.getOutput().getKey(context);
     }
 
-    /**
-     * Basic implementation of ProcessorOutput.
-     */
-    public abstract static class ProcessorOutputImpl implements ProcessorOutput, CacheableInputOutput {
-
-        private final Class clazz;
-        private final String name;
-
-        private ProcessorInput input;
-        private String id;
-        private String schema;
-        private String debugMessage;
-        private LocationData locationData;
-        private BreakpointKey breakpointKey;
-
-        public ProcessorOutputImpl(Class clazz, String name) {
-            this.clazz = clazz;
-            this.name = name;
-        }
-
-        public void setInput(ProcessorInput input) {
-            this.input = input;
-        }
-
-        public ProcessorInput getInput() {
-            return input;
-        }
-
-        public Class getProcessorClass() {
-            return clazz;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getSchema() {
-            return schema;
-        }
-
-        public void setSchema(String schema) {
-            this.schema = schema;
-        }
-
-        public String getDebugMessage() {
-            return debugMessage;
-        }
-
-        public LocationData getLocationData() {
-            return locationData;
-        }
-
-        public void setDebug(String debugMessage) {
-            this.debugMessage = debugMessage;
-        }
-
-        public void setLocationData(LocationData locationData) {
-            this.locationData = locationData;
-        }
-
-        public void setBreakpointKey(BreakpointKey breakpointKey) {
-            this.breakpointKey = breakpointKey;
-        }
-
-        protected abstract void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver);
-
-        protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
-            return null;
-        }
-
-        protected Object getValidityImpl(PipelineContext pipelineContext) {
-            return null;
-        }
-
-        /**
-         * All the methods implemented here should never be called.
-         */
-        private abstract class ProcessorFilter implements ProcessorOutput, CacheableInputOutput {
-            public void setInput(ProcessorInput processorInput) {
-            }
-
-            public ProcessorInput getInput() {
-                return null;
-            }
-
-            public void setSchema(String schema) {
-            }
-
-            public String getSchema() {
-                return null;
-            }
-
-            public Class getProcessorClass() {
-                return null;
-            }
-
-            public String getId() {
-                return null;
-            }
-
-            public String getName() {
-                return null;
-            }
-
-            public void setDebug(String debugMessage) {
-            }
-
-            public String getDebugMessage() {
-                return null;
-            }
-
-            public void setLocationData(LocationData locationData) {
-            }
-
-            public LocationData getLocationData() {
-                return null;
-            }
-
-            public void setBreakpointKey(BreakpointKey breakpointKey) {
-            }
-
-            public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                throw new OXFException("This method should never be called!!!");
-            }
-        }
-
-        /**
-         * Constructor takes: (1) the input and output of a processor and (2) a
-         * "previousOutput". It connects the input to the previousOutput and
-         * when read, reads the output.
-         *
-         * Semantic: creates an output that is just like previousOutput on which
-         * a processor is applies.
-         */
-        private class ConcreteProcessorFilter extends ProcessorFilter {
-
-            private ProcessorOutput processorOutput;
-            private ProcessorOutput previousProcessorOutput;
-
-            private class ForwarderProcessorOutput extends ProcessorFilter {
-                public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                    previousProcessorOutput.read(pipelineContext, xmlReceiver);
-                }
-
-                public OutputCacheKey getKey(PipelineContext pipelineContext) {
-                    return previousProcessorOutput instanceof CacheableInputOutput
-                            ? ((CacheableInputOutput) previousProcessorOutput).getKey(pipelineContext) : null;
-                }
-
-                public Object getValidity(PipelineContext pipelineContext) {
-                    return previousProcessorOutput instanceof CacheableInputOutput
-                            ? ((CacheableInputOutput) previousProcessorOutput).getValidity(pipelineContext) : null;
-                }
-
-            }
-
-            public ConcreteProcessorFilter(ProcessorInput processorInput,
-                                           ProcessorOutput processorOutput,
-                                           final ProcessorOutput previousOutput) {
-                this.processorOutput = processorOutput;
-                this.previousProcessorOutput = previousOutput;
-                processorInput.setOutput(new ForwarderProcessorOutput());
-            }
-
-            public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                processorOutput.read(pipelineContext, xmlReceiver);
-            }
-
-            public OutputCacheKey getKey(PipelineContext pipelineContext) {
-                return processorOutput instanceof CacheableInputOutput
-                        ? ((CacheableInputOutput) processorOutput).getKey(pipelineContext) : null;
-            }
-
-            public Object getValidity(PipelineContext pipelineContext) {
-                return processorOutput instanceof CacheableInputOutput
-                        ? ((CacheableInputOutput) processorOutput).getValidity(pipelineContext) : null;
-            }
-        }
-
-        private ProcessorFilter createFilter() {
-
-            // Get inspector instance
-
-            // Final filter (i.e. at the top, executed last)
-            ProcessorFilter filter = new ProcessorFilter() {
-                public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                    // Read the current processor output
-                    readImpl(pipelineContext, xmlReceiver);
-                }
-
-                public OutputCacheKey getKey(PipelineContext pipelineContext) {
-                    return getKeyImpl(pipelineContext);
-                }
-
-                public Object getValidity(PipelineContext pipelineContext) {
-                    return getValidityImpl(pipelineContext);
-                }
-            };
-
-            // Handle debug
-            if (getDebugMessage() != null || (getInput() != null && getInput().getDebugMessage() != null)) {
-                ProcessorFactory debugProcessorFactory = ProcessorFactoryRegistry.lookup(XMLConstants.DEBUG_PROCESSOR_QNAME);
-                if (debugProcessorFactory == null)
-                    throw new OXFException("Cannot find debug processor factory for QName: " + XMLConstants.DEBUG_PROCESSOR_QNAME);
-
-                for (int i = 0; i < 2; i++) {
-                    String debugMessage = i == 0 ? getDebugMessage() :
-                            getInput() == null ? null : getInput().getDebugMessage();
-                    LocationData debugLocationData = i == 0 ? getLocationData() :
-                            getInput() == null ? null : getInput().getLocationData();
-                    if (debugMessage != null) {
-                        Processor debugProcessor = debugProcessorFactory.createInstance();
-                        debugProcessor.createInput(INPUT_DATA);
-                        debugProcessor.createOutput(OUTPUT_DATA);
-
-                        // Create config document for Debug processor
-                        final org.dom4j.Document debugConfigDocument;
-                        {
-                            debugConfigDocument = new NonLazyUserDataDocument();
-                            Element configElement = debugConfigDocument.addElement("config");
-                            configElement.addElement("message").addText(debugMessage);
-                            if (debugLocationData != null) {
-                                Element systemIdElement = configElement.addElement("system-id");
-                                if (debugLocationData.getSystemID() != null)
-                                    systemIdElement.addText(debugLocationData.getSystemID());
-                                configElement.addElement("line").addText(Integer.toString(debugLocationData.getLine()));
-                                configElement.addElement("column").addText(Integer.toString(debugLocationData.getCol()));
-                            }
-                        }
-                        final DOMGenerator dg = new DOMGenerator
-                            ( debugConfigDocument, "debug filter"
-                              , DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
-                        PipelineUtils.connect( dg, "data", debugProcessor, "config");
-                        final ProcessorOutput dbgOut
-                            = debugProcessor.getOutputByName( OUTPUT_DATA );
-                        final ProcessorInput dbgIn = debugProcessor.getInputByName( INPUT_DATA );
-                        filter = new ConcreteProcessorFilter( dbgIn, dbgOut, filter );
-                    }
-                }
-            }
-
-            // The PropertySet can be null during properties initialization. This should be one of the
-            // rare places where this should be tested on.
-            PropertySet propertySet = Properties.instance().getPropertySet();
-
-            // Create and hook-up output validation processor if needed
-            Boolean isOutputValidation = (propertySet == null) ? null : propertySet.getBoolean(USER_VALIDATION_FLAG, true);
-            if (isOutputValidation != null && isOutputValidation.booleanValue() && getSchema() != null) {
-                Processor outputValidator = new MSVValidationProcessor(getSchema());
-                // Create data input and output
-                ProcessorInput input = outputValidator.createInput(INPUT_DATA);
-                ProcessorOutput output = outputValidator.createOutput(OUTPUT_DATA);
-                // Create and connect config input
-                Processor resourceGenerator = PipelineUtils.createURLGenerator(getSchema());
-                PipelineUtils.connect(resourceGenerator, OUTPUT_DATA, outputValidator, MSVValidationProcessor.INPUT_SCHEMA);
-                PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA,
-                        outputValidator, INPUT_CONFIG);
-                filter = new ConcreteProcessorFilter(input, output, filter);
-            }
-
-            // Hook-up input validation processor if needed
-            Boolean isInputValidation = isOutputValidation;
-            if (isInputValidation != null && isInputValidation.booleanValue() &&
-                    getInput() != null && getInput().getSchema() != null) {
-                Processor inputValidator = new MSVValidationProcessor(getInput().getSchema());
-                // Create data input and output
-                ProcessorInput input = inputValidator.createInput(INPUT_DATA);
-                ProcessorOutput output = inputValidator.createOutput(OUTPUT_DATA);
-                // Create and connect config input
-
-                Processor resourceGenerator = PipelineUtils.createURLGenerator(getInput().getSchema());
-                PipelineUtils.connect(resourceGenerator, OUTPUT_DATA, inputValidator, MSVValidationProcessor.INPUT_SCHEMA);
-                PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA,
-                    inputValidator, INPUT_CONFIG);
-                filter = new ConcreteProcessorFilter(input, output, filter);
-            }
-
-            // Perform basic inspection of SAX events
-            Boolean isSAXInspection = (propertySet == null) ? null : propertySet.getBoolean(SAX_INSPECTION_FLAG, false);
-            if (isSAXInspection != null && isSAXInspection.booleanValue()) {
-                final ProcessorFilter previousFilter = filter;
-                filter = new ProcessorFilter() {
-                    public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                        InspectingContentHandler inspectingContentHandler = new InspectingContentHandler(xmlReceiver);
-                        previousFilter.read(pipelineContext, inspectingContentHandler);
-                    }
-
-                    public OutputCacheKey getKey(PipelineContext pipelineContext) {
-                        return previousFilter.getKey(pipelineContext);
-                    }
-
-                    public Object getValidity(PipelineContext pipelineContext) {
-                        return previousFilter.getValidity(pipelineContext);
-                    }
-                };
-            }
-
-            return filter;
-        }
-
-        /**
-         * NOTE: We should never use processor instance variables. Here, the creation may not be thread safe in that
-         * the filter may be initialized several times. This should not be a real problem, and the execution should not
-         * be problematic either. It may be safer to synchronize getFilter().
-         */
-        ProcessorFilter filter = null;
-
-        private ProcessorFilter getFilter() {
-            if (filter == null)
-                filter = createFilter();
-            return filter;
-        }
-
-        public final void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-            final Trace trc = pipelineContext.getTrace();
-            final TraceInfo tinf;
-            if (trc == null) {
-                tinf = null;
-            } else {
-                final String sysID;
-                final int line;
-                if (breakpointKey == null) {
-                    final Class cls = getClass();
-                    sysID = cls.getName() + " " + this + " " + getName() + " " + getId();
-                    line = -1;
-                } else {
-                    sysID = breakpointKey.getSystemId();
-                    line = breakpointKey.getLine();
-                }
-                tinf = new TraceInfo(sysID, line);
-                trc.add(tinf);
-            }
-            try {
-                getFilter().read(pipelineContext, xmlReceiver);
-            } catch (AbstractMethodError e) {
-                logger.error(e);
-            } catch (Exception e) {
-                throw ValidationException.wrapException(e, getLocationData());
-            } finally {
-                if (tinf != null) tinf.end = System.currentTimeMillis();
-            }
-        }
-
-        public final OutputCacheKey getKey(PipelineContext pipelineContext) {
-            return getFilter().getKey(pipelineContext);
-        }
-
-        public final Object getValidity(PipelineContext pipelineContext) {
-            return getFilter().getValidity(pipelineContext);
-        }
-
-        public final KeyValidity getKeyValidityImpl(PipelineContext context) {
-            final OutputCacheKey outputCacheKey = getKeyImpl(context);
-            if (outputCacheKey == null) return null;
-            final Object outputCacheValidity = getValidityImpl(context);
-            if (outputCacheValidity == null) return null;
-            return new KeyValidity(outputCacheKey, outputCacheValidity);
-        }
-    }
-
-    protected static OutputCacheKey getInputKey(PipelineContext context, ProcessorInput input) {
-        final ProcessorOutput output = input.getOutput();
-        return (output instanceof CacheableInputOutput) ? ((CacheableInputOutput) output).getKey(context) : null;
-    }
-
-    protected static Object getInputValidity(PipelineContext context, ProcessorInput input) {
-        final ProcessorOutput output = input.getOutput();
-        return (output instanceof CacheableInputOutput) ? ((CacheableInputOutput) output).getValidity(context) : null;
+    public static Object getInputValidity(PipelineContext context, ProcessorInput input) {
+        return input.getOutput().getValidity(context);
     }
 
     /**
@@ -1279,12 +535,10 @@ public abstract class ProcessorImpl implements Processor {
      */
     protected boolean isInputInCache(PipelineContext context, ProcessorInput input) {
         final KeyValidity keyValidity = getInputKeyValidity(context, input);
-        if (keyValidity == null)
-            return false;
-        return ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
+        return keyValidity != null && ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
     }
 
-    protected boolean isInputInCache(PipelineContext context, String inputName) {
+    public boolean isInputInCache(PipelineContext context, String inputName) {
         return isInputInCache(context, getInputByName(inputName));
     }
 
@@ -1311,290 +565,102 @@ public abstract class ProcessorImpl implements Processor {
         return getInputKeyValidity(context, getInputByName(inputName));
     }
 
-    /**
-     * Implementation of a caching transformer output that assumes that an output simply depends on
-     * all the inputs plus optional local information.
-     *
-     * It is possible to implement local key and validity information as well, that represent data
-     * not coming from an XML input. If any input is connected to an output that is not cacheable,
-     * a null key is returned.
-     *
-     * Use DigestTransformerOutputImpl whenever possible.
-     */
-    public abstract class CacheableTransformerOutputImpl extends ProcessorOutputImpl {
-        public CacheableTransformerOutputImpl(Class clazz, String name) {
-            super(clazz, name);
-        }
-
-        /**
-         * Processor outputs that use the local key/validity feature must
-         * override this method and return true.
-         */
-        protected boolean supportsLocalKeyValidity() {
-            return false;
-        }
-
-        protected CacheKey getLocalKey(PipelineContext pipelineContext) {
-            throw new UnsupportedOperationException();
-        }
-
-        protected Object getLocalValidity(PipelineContext pipelineContext) {
-            throw new UnsupportedOperationException();
-        }
-
-        public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
-
-            // NOTE: This implementation assumes that there is only one input with a given name
-
-            // Create input information
-            final Set entrySet = getConnectedInputs().entrySet();
-            final int keyCount = entrySet.size() + (supportsLocalKeyValidity() ? 1 : 0);
-            final CacheKey[] outputKeys = new CacheKey[keyCount];
-
-            int keyIndex = 0;
-            for (Iterator i = entrySet.iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final List currentInputs = (List) currentEntry.getValue();
-//                int inputIndex = 0;
-//                for (Iterator j = currentInputs.iterator(); j.hasNext(); inputIndex++) {
-                for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-//                    if (inputIndex > 0)
-//                        logger.info("CacheableTransformerOutputImpl: processor " + getProcessorClass().getName() + " has more than 1 input called " + getName());
-                    final OutputCacheKey outputKey = getInputKey(pipelineContext, (ProcessorInput) j.next());
-                    if (outputKey == null) return null;
-                    outputKeys[keyIndex++] = outputKey;
-                }
-            }
-
-            // Add local key if needed
-            if (supportsLocalKeyValidity()) {
-                CacheKey localKey = getLocalKey(pipelineContext);
-                if (localKey == null) return null;
-                outputKeys[keyIndex++] = localKey;
-            }
-
-            // Concatenate current processor info and input info
-            final Class processorClass = getProcessorClass();
-            final String outputName = getName();
-            return new CompoundOutputCacheKey(processorClass, outputName, outputKeys);
-        }
-
-        public Object getValidityImpl(PipelineContext pipelineContext) {
-            final List<Object> validityObjects = new ArrayList<Object>();
-
-            final Map inputsMap = getConnectedInputs();
-            for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
-                final List currentInputs = (List) inputsMap.get(i.next());
-                for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-                    final Object validity = getInputValidity(pipelineContext, (ProcessorInput) j.next());
-                    if (validity == null)
-                        return null;
-                    validityObjects.add(validity);
-                }
-            }
-
-            // Add local validity if needed
-            if (supportsLocalKeyValidity()) {
-                final Object localValidity = getLocalValidity(pipelineContext);
-                if (localValidity == null) return null;
-                validityObjects.add(localValidity);
-            }
-
-            return validityObjects;
-        }
-    }
-
-    /**
-     * Implementation of a caching transformer output that assumes that an output simply depends on
-     * all the inputs plus optional local information that can be digested.
-     */
-    public abstract class DigestTransformerOutputImpl extends CacheableTransformerOutputImpl {
-
-        private final Long DEFAULT_VALIDITY = new Long(0);
-
-        public DigestTransformerOutputImpl(Class clazz, String name) {
-            super(clazz, name);
-        }
-
-        protected final boolean supportsLocalKeyValidity() {
-            return true;
-        }
-
-        protected CacheKey getLocalKey(PipelineContext pipelineContext) {
-            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
-                String key = (String) i.next();
-                if (!isInputInCache(pipelineContext, key))// NOTE: We don't really support multiple inputs with the same name.
-                    return null;
-            }
-            return getFilledOutState(pipelineContext).key;
-        }
-
-        protected final Object getLocalValidity(PipelineContext pipelineContext) {
-            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
-                String key = (String) i.next();
-                if (!isInputInCache(pipelineContext, key))// NOTE: We don't really support multiple inputs with the same name.
-                    return null;
-            }
-            return getFilledOutState(pipelineContext).validity;
-        }
-
-        /**
-         * Fill-out user data into the state, if needed. Return caching information.
-         *
-         * @param pipelineContext the current PipelineContext
-         * @param digestState state set during processor start() or reset()
-         * @return false if private information is known that requires disabling caching, true otherwise
-         */
-        protected abstract boolean fillOutState(PipelineContext pipelineContext, DigestState digestState);
-
-        /**
-         * Compute a digest of the internal document on which the output depends.
-         *
-         * @param digestState state set during processor start() or reset()
-         * @return the digest
-         */
-        protected abstract byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState);
-
-        protected final DigestState getFilledOutState(PipelineContext pipelineContext) {
-            // This is called from both readImpl and getLocalValidity. Based on the assumption that
-            // a getKeyImpl will be followed soon by a readImpl if it fails, we compute key,
-            // validity, and user-defined data.
-
-            DigestState state = (DigestState) getState(pipelineContext);
-
-            // Create request document
-            boolean allowCaching = fillOutState(pipelineContext, state);
-
-            // Compute key and validity if possible
-            if ((state.validity == null || state.key == null) && allowCaching) {
-                // Compute digest
-                if (state.digest == null) {
-                    state.digest = computeDigest(pipelineContext, state);
-                }
-                // Compute local key
-                if (state.key == null) {
-                    state.key = new InternalCacheKey(ProcessorImpl.this, "requestHash", new String(state.digest));
-                }
-                // Compute local validity
-                if (state.validity == null) {
-                    state.validity = DEFAULT_VALIDITY; // HACK so we don't recurse at the next line
-                    OutputCacheKey outputCacheKey = getKeyImpl(pipelineContext);
-                    if (outputCacheKey != null) {
-                        Cache cache = ObjectCache.instance();
-                        DigestValidity digestValidity = (DigestValidity) cache.findValid(pipelineContext, outputCacheKey, DEFAULT_VALIDITY);
-                        if (digestValidity != null && Arrays.equals(state.digest, digestValidity.digest)) {
-                            state.validity = digestValidity.lastModified;
-                        } else {
-                            Long currentValidity = new Long(System.currentTimeMillis());
-                            cache.add(pipelineContext, outputCacheKey, DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity));
-                            state.validity = currentValidity;
-                        }
-                    } else {
-                        state.validity = null; // HACK restore
-                    }
-                }
-            }
-
-            return state;
-        }
-    }
-
-    /**
-     * Cache an object associated with a given processor output.
-     *
-     * @param pipelineContext   current PipelineContext
-     * @param processorOutput   output to associate with
-     * @param keyName           key for the object to cache
-     * @param creator           creator for the object
-     * @return                  created object if caching was possible, null otherwise
-     */
-    protected Object getCacheOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, OutputObjectCreator creator) {
-
-        final KeyValidity outputKeyValidity = processorOutput.getKeyValidityImpl(pipelineContext);
-        if (outputKeyValidity != null) {
-            // Output is cacheable
-
-            // Get cache instance
-            final Cache cache = ObjectCache.instance();
-
-            // Check in cache first
-            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
-            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
-                    new CacheKey[] { outputKeyValidity.key, internalCacheKey } );
-
-            final List<Object> compoundValidities = new ArrayList<Object>();
-            compoundValidities.add(outputKeyValidity.validity);
-            compoundValidities.add(new Long(0));
-
-            final Object cachedObject = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
-            if (cachedObject != null) {
-                // Found it
-                creator.foundInCache();
-                return cachedObject;
-            } else {
-                // Not found, call method to create object
-                final Object readObject = creator.create(pipelineContext, processorOutput);
-                cache.add(pipelineContext, compoundCacheKey, compoundValidities, readObject);
-                return readObject;
-            }
-        } else {
-            creator.unableToCache();
-            return null;
-        }
-    }
-
-    /**
-     * Get a cached object associated with a given processor output.
-     *
-     * @param pipelineContext   current PipelineContext
-     * @param processorOutput   output to associate with
-     * @param keyName           key for the object to cache
-     * @return                  cached object if object found, null otherwise
-     */
-    protected Object getOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName) {
-        final KeyValidity outputKeyValidityImpl = processorOutput.getKeyValidityImpl(pipelineContext);
-        if (outputKeyValidityImpl != null) {
-            // Output is cacheable
-
-            // Get cache instance
-            final Cache cache = ObjectCache.instance();
-
-            // Check in cache first
-            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
-            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
-                    new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
-
-            final List<Object> compoundValidities = new ArrayList<Object>();
-            compoundValidities.add(outputKeyValidityImpl.validity);
-            compoundValidities.add(new Long(0));
-
-            return cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
-        } else {
-            return null;
-        }
-    }
-
-    protected Object getOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, KeyValidity outputKeyValidityImpl) {
-        if (outputKeyValidityImpl != null) {
-            // Output is cacheable
-
-            // Get cache instance
-            final Cache cache = ObjectCache.instance();
-
-            // Check in cache first
-            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
-            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
-                    new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
-
-            final List<Object> compoundValidities = new ArrayList<Object>();
-            compoundValidities.add(outputKeyValidityImpl.validity);
-            compoundValidities.add(new Long(0));
-
-            return cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
-        } else {
-            return null;
-        }
-    }
+//    /**
+//     * Cache an object associated with a given processor output.
+//     *
+//     * @param pipelineContext   current PipelineContext
+//     * @param processorOutput   output to associate with
+//     * @param keyName           key for the object to cache
+//     * @param creator           creator for the object
+//     * @return                  created object if caching was possible, null otherwise
+//     */
+//    protected Object getCacheOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, OutputObjectCreator creator) {
+//
+//        final KeyValidity outputKeyValidity = processorOutput.getKeyValidityImpl(pipelineContext);
+//        if (outputKeyValidity != null) {
+//            // Output is cacheable
+//
+//            // Get cache instance
+//            final Cache cache = ObjectCache.instance();
+//
+//            // Check in cache first
+//            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+//            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+//                    new CacheKey[] { outputKeyValidity.key, internalCacheKey } );
+//
+//            final List<Object> compoundValidities = new ArrayList<Object>();
+//            compoundValidities.add(outputKeyValidity.validity);
+//            compoundValidities.add(new Long(0));
+//
+//            final Object cachedObject = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+//            if (cachedObject != null) {
+//                // Found it
+//                creator.foundInCache();
+//                return cachedObject;
+//            } else {
+//                // Not found, call method to create object
+//                final Object readObject = creator.create(pipelineContext, processorOutput);
+//                cache.add(pipelineContext, compoundCacheKey, compoundValidities, readObject);
+//                return readObject;
+//            }
+//        } else {
+//            creator.unableToCache();
+//            return null;
+//        }
+//    }
+//
+//    /**
+//     * Get a cached object associated with a given processor output.
+//     *
+//     * @param pipelineContext   current PipelineContext
+//     * @param processorOutput   output to associate with
+//     * @param keyName           key for the object to cache
+//     * @return                  cached object if object found, null otherwise
+//     */
+//    protected Object getOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName) {
+//        final KeyValidity outputKeyValidityImpl = processorOutput.getKeyValidityImpl(pipelineContext);
+//        if (outputKeyValidityImpl != null) {
+//            // Output is cacheable
+//
+//            // Get cache instance
+//            final Cache cache = ObjectCache.instance();
+//
+//            // Check in cache first
+//            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+//            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+//                    new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
+//
+//            final List<Object> compoundValidities = new ArrayList<Object>();
+//            compoundValidities.add(outputKeyValidityImpl.validity);
+//            compoundValidities.add(new Long(0));
+//
+//            return cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+//        } else {
+//            return null;
+//        }
+//    }
+//
+//    protected Object getOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, KeyValidity outputKeyValidityImpl) {
+//        if (outputKeyValidityImpl != null) {
+//            // Output is cacheable
+//
+//            // Get cache instance
+//            final Cache cache = ObjectCache.instance();
+//
+//            // Check in cache first
+//            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+//            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+//                    new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
+//
+//            final List<Object> compoundValidities = new ArrayList<Object>();
+//            compoundValidities.add(outputKeyValidityImpl.validity);
+//            compoundValidities.add(new Long(0));
+//
+//            return cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+//        } else {
+//            return null;
+//        }
+//    }
 
     /**
      * Find the last modified timestamp of a particular input.
@@ -1644,20 +710,60 @@ public abstract class ProcessorImpl implements Processor {
         }
     }
 
-    private static class DigestValidity {
-        public DigestValidity(byte[] digest, Long lastModified) {
-            this.digest = digest;
-            this.lastModified = lastModified;
+    protected class ProcessorKey {
+
+        private int hash = 0;
+        private List<ProcessorImpl> processors;
+
+        public ProcessorKey(Stack<ProcessorImpl> parents) {
+            processors = (parents == null ? new ArrayList<ProcessorImpl>() : new ArrayList<ProcessorImpl>(parents));
+            processors.add(ProcessorImpl.this);
+            // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
+            for (int i = 0; i < processors.size(); i++) {
+                Object processor = processors.get(i);
+                hash += processor.hashCode() * 31;
+            }
         }
 
-        public byte[] digest;
-        public Long lastModified;
-    }
+        public int hashCode() {
+            return hash;
+        }
 
-    protected static class DigestState {
-        public byte[] digest;
-        public CacheKey key;
-        public Object validity;
+        private List<ProcessorImpl> getProcessors() {
+            return processors;
+        }
+
+        public boolean equals(Object other) {
+            if (!(other instanceof ProcessorKey))
+                return false;
+
+            final List<ProcessorImpl> otherProcessors = ((ProcessorKey) other).getProcessors();
+            int processorsSize = processors.size();
+            if (processorsSize != otherProcessors.size())
+                return false;
+            // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
+            for (int i = 0; i < processorsSize; i++) {
+                if (processors.get(i) != otherProcessors.get(i))
+                    return false;
+            }
+            return true;
+        }
+
+        public String toString() {
+            FastStringBuffer result = null;
+            for (Processor processor: processors) {
+                if (result == null) {
+                    result = new FastStringBuffer(hash + ": [");
+                } else {
+                    result.append(", ");
+                }
+                result.append(Integer.toString(processor.hashCode()));
+                result.append(": ");
+                result.append(processor.getClass().getName());
+            }
+            result.append("]");
+            return result.toString();
+        }
     }
 
     public static class KeyValidity {

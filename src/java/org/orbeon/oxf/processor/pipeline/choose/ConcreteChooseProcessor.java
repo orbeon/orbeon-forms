@@ -15,13 +15,13 @@ package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
@@ -116,41 +116,36 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         return outputsById;
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
         final String _name = name;
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ConcreteChooseProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
-                State state = (State) getState(context);
+                final State state = (State) getState(context);
                 if (!state.started)
                     start(context);
-                ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
+                final ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
                 branchOutput.read(context, xmlReceiver);
             }
 
-            protected OutputCacheKey getKeyImpl(PipelineContext context) {
-                if (isInputInCache(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT)) {
-                    State state = (State) getState(context);
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                if (isInputInCache(pipelineContext, AbstractChooseProcessor.CHOOSE_DATA_INPUT)) {
+                    final State state = (State) getState(pipelineContext);
                     if (!state.started)
-                        start(context);
-                    ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
-                    if (branchOutput instanceof CacheableInputOutput)
-                        return ((CacheableInputOutput) branchOutput).getKey(context);
-                    else
-                        return null;
+                        start(pipelineContext);
+                    return state.selectedBranchOutputs.get(_name).getKey(pipelineContext);
                 } else
                     return null;
             }
 
-            protected Object getValidityImpl(PipelineContext context) {
-                if (isInputInCache(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT)) {
-                    State state = (State) getState(context);
+            @Override
+            protected Object getValidityImpl(PipelineContext pipelineContext) {
+                if (isInputInCache(pipelineContext, AbstractChooseProcessor.CHOOSE_DATA_INPUT)) {
+                    final State state = (State) getState(pipelineContext);
                     if (!state.started)
-                        start(context);
-                    ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
-                    if (branchOutput instanceof CacheableInputOutput)
-                        return ((CacheableInputOutput) branchOutput).getValidity(context);
-                    else
-                        return null;
+                        start(pipelineContext);
+                    return state.selectedBranchOutputs.get(_name).getValidity(pipelineContext);
                 } else
                     return null;
             }
@@ -159,6 +154,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         return output;
     }
 
+    @Override
     public void start(PipelineContext pipelineContext) {
         final State state = (State) getState(pipelineContext);
         if (state.started)
@@ -254,6 +250,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         }
     }
 
+    @Override
     public void reset(PipelineContext context) {
         setState(context, new State());
     }

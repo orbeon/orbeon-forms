@@ -28,6 +28,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -45,8 +46,9 @@ public class TaminoQueryProcessor extends TaminoProcessor {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(TaminoQueryProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Read configuration
@@ -117,72 +119,86 @@ public class TaminoQueryProcessor extends TaminoProcessor {
             return null;
         }
 
+        @Override
         public void characters(char ch[], int start, int length)
                 throws SAXException {
             this.contentHandler.characters(ch, start, length);
         }
 
+        @Override
         public void endDocument()
                 throws SAXException {
             this.contentHandler.endDocument();
             documentStarted = false;
         }
 
+        @Override
         public void endElement(String uri, String localName, String qName)
                 throws SAXException {
             this.contentHandler.endElement(uri, localName, qName);
         }
 
+        @Override
         public void endPrefixMapping(String prefix)
                 throws SAXException {
             this.contentHandler.endPrefixMapping(prefix);
         }
 
+        @Override
         public void error(SAXParseException e)
                 throws SAXException {
             throw new OXFException(e);
         }
 
+        @Override
         public void fatalError(SAXParseException e)
                 throws SAXException {
             throw new OXFException(e);
         }
 
+        @Override
         public void ignorableWhitespace(char ch[], int start, int length)
                 throws SAXException {
             this.contentHandler.ignorableWhitespace(ch, start, length);
         }
 
+        @Override
         public void notationDecl(String name, String publicId, String systemId)
                 throws SAXException {
 
         }
 
+        @Override
         public void processingInstruction(String target, String data)
                 throws SAXException {
             this.contentHandler.processingInstruction(target, data);
         }
 
+        @Override
         public InputSource resolveEntity(String publicId, String systemId)
                 throws SAXException {
             return null;
         }
 
+        @Override
         public void setDocumentLocator(Locator locator) {
             this.contentHandler.setDocumentLocator(locator);
         }
 
+        @Override
         public void skippedEntity(String name)
                 throws SAXException {
             this.contentHandler.skippedEntity(name);
         }
 
+        @Override
         public void startDocument()
                 throws SAXException {
             this.contentHandler.startDocument();
             documentStarted = true;
         }
 
+        @Override
         public void startElement(String uri, String localName,
                                  String qName, Attributes attributes)
                 throws SAXException {
@@ -194,16 +210,19 @@ public class TaminoQueryProcessor extends TaminoProcessor {
             this.contentHandler.startElement(uri, localName, qName, attributes);
         }
 
+        @Override
         public void startPrefixMapping(String prefix, String uri)
                 throws SAXException {
             this.contentHandler.startPrefixMapping(prefix, uri);
         }
 
+        @Override
         public void unparsedEntityDecl(String name, String publicId,
                                        String systemId, String notationName)
                 throws SAXException {
         }
 
+        @Override
         public void warning(SAXParseException e)
                 throws SAXException {
             throw new OXFException(e);

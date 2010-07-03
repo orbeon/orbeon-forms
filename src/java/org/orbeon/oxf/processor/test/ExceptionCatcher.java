@@ -16,10 +16,9 @@ package org.orbeon.oxf.processor.test;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.ExceptionGenerator;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
 
@@ -34,8 +33,9 @@ public class ExceptionCatcher extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(ExceptionCatcher.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Try to read input in SAX store

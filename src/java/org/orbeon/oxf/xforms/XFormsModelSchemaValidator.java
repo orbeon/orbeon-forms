@@ -48,9 +48,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -164,6 +162,7 @@ public class XFormsModelSchemaValidator {
 
     private static class SchemaKey extends CacheKey {
         final int hash;
+
         final URL url;
 
         SchemaKey(final URL u) {
@@ -172,19 +171,26 @@ public class XFormsModelSchemaValidator {
             hash = url.hashCode();
         }
 
+        @Override
         public int hashCode() {
             return hash;
         }
 
-        public boolean equals(final Object rhsObj) {
+        @Override
+        public boolean equals(final Object other) {
             final boolean ret;
-            if (rhsObj instanceof SchemaKey) {
-                final SchemaKey rhs = (SchemaKey) rhsObj;
+            if (other instanceof SchemaKey) {
+                final SchemaKey rhs = (SchemaKey) other;
                 ret = url.equals(rhs.url);
             } else {
                 ret = false;
             }
             return ret;
+        }
+
+        @Override
+        public void toXML(ContentHandlerHelper helper, Object validities) {
+            helper.element("url", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "url", url.toExternalForm() });
         }
     }
 

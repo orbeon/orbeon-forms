@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.NamespaceSupport3;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -41,8 +42,9 @@ public class QNameConverter extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(QNameConverter.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 // Read config input
@@ -75,6 +77,7 @@ public class QNameConverter extends ProcessorImpl {
 
                     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
+                    @Override
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
                         namespaceSupport.startElement();
                         if (config.matchURI == null || config.matchURI.equals(uri)) {
@@ -113,6 +116,7 @@ public class QNameConverter extends ProcessorImpl {
                         }
                     }
 
+                    @Override
                     public void endElement(String uri, String localname, String qName) throws SAXException {
                         if (config.matchURI == null || config.matchURI.equals(uri)) {
                             int colonIndex = qName.indexOf(':');
@@ -151,11 +155,13 @@ public class QNameConverter extends ProcessorImpl {
                         namespaceSupport.endElement();
                     }
 
+                    @Override
                     public void startPrefixMapping(String prefix, String uri) throws SAXException {
                         namespaceSupport.startPrefixMapping(prefix, uri);
                         super.startPrefixMapping(prefix, uri);
                     }
 
+                    @Override
                     public void endPrefixMapping(String prefix) throws SAXException {
                         super.endPrefixMapping(prefix);
                     }

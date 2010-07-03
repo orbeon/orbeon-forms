@@ -16,6 +16,7 @@ package org.orbeon.oxf.servlet;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.processor.ServletFilterGenerator;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.webapp.WebAppContext;
@@ -86,12 +87,12 @@ public class OrbeonServletFilterDelegate implements Filter {
 
         // Add filter chain to the pipeline context for use by the ServletFilterGenerator
         PipelineContext pipelineContext = new PipelineContext();
-        pipelineContext.setAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.FILTER_CHAIN, chain);
+        pipelineContext.setAttribute(ServletFilterGenerator.FILTER_CHAIN, chain);
 
         // Process the regular pipeline
         try {
             ExternalContext externalContext = new ServletExternalContext(servletContext, pipelineContext, webAppContext.getServletInitParametersMap(), (HttpServletRequest) request, (HttpServletResponse) response);
-            processorService.service(true, externalContext, pipelineContext);
+            processorService.service(externalContext, pipelineContext);
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));
         }

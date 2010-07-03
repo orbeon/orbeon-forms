@@ -66,4 +66,6 @@
 
     <!--<property as="xs:boolean" processor-name="oxf:xml-converter"       name="serialize-xml-11" value="true"/>-->
 
+    <!--<property as="xs:NCName"    name="oxf.pipeline.trace.class"    value="org.orbeon.oxf.processor.trace.SystemOutTrace"/>-->
+
 </properties>

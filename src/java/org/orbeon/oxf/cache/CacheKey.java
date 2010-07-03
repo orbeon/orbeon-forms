@@ -13,6 +13,12 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+
 import java.io.Serializable;
 
 public abstract class CacheKey implements Serializable {
@@ -22,11 +28,28 @@ public abstract class CacheKey implements Serializable {
     public Class getClazz() { return clazz; }
     public void setClazz(Class clazz) { this.clazz = clazz; }
 
-    public boolean equals(Object obj) {
-        return obj instanceof CacheKey && this.clazz.equals(((CacheKey) obj).clazz);
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof CacheKey && this.clazz.equals(((CacheKey) other).clazz);
     }
 
+    @Override
     public int hashCode() {
         return clazz.hashCode();
+    }
+
+    public abstract void toXML(ContentHandlerHelper helper, Object validities);
+
+    public static String toXMLString(CacheKey cacheKey, Object validities) {
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
+        final LocationDocumentResult result = new LocationDocumentResult();
+        identity.setResult(result);
+
+        final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
+        helper.startDocument();
+        cacheKey.toXML(helper, validities);
+        helper.endDocument();
+
+        return Dom4jUtils.domToPrettyString(result.getDocument());
     }
 }

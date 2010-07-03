@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 
 /**
  * The Identity processor produces on its data output the document received on the data input.
@@ -28,17 +29,19 @@ public class IdentityProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(IdentityProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 readInputAsSAX(context, INPUT_DATA, xmlReceiver);
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return getInputKey(context, getInputByName(INPUT_DATA));
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                return getInputKey(pipelineContext, getInputByName(INPUT_DATA));
             }
 
-            public Object getValidityImpl(PipelineContext context) {
-                return getInputValidity(context, getInputByName(INPUT_DATA));
+            @Override
+            public Object getValidityImpl(PipelineContext pipelineContext) {
+                return getInputValidity(pipelineContext, getInputByName(INPUT_DATA));
             }
         };
         addOutput(name, output);

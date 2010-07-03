@@ -18,6 +18,7 @@ import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 
@@ -33,7 +34,7 @@ public abstract class MatchProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(MatchProcessor.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 try {

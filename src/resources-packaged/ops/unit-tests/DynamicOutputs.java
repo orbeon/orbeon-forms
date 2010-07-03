@@ -14,8 +14,8 @@
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -31,7 +31,7 @@ public class DynamicOutputs extends ProcessorImpl {
 
     public ProcessorOutput createOutput(final String name) {
 
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(DynamicOutputs.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 readInputAsSAX(context, "my-input", new SimpleForwardingXMLReceiver(xmlReceiver) {
                     private int level = 0;

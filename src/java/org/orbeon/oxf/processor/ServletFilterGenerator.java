@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -31,16 +32,17 @@ import java.io.IOException;
 public class ServletFilterGenerator extends ProcessorImpl {
 
     public static final String SERVLET_FILTER_NAMESPACE_URI = "http://www.orbeon.org/oxf/servlet-filter";
+    public static final String FILTER_CHAIN = "filter-chain"; // used by ServletFilterGenerator and OPSServletFilter
 
     public ServletFilterGenerator() {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ServletFilterGenerator.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
-                final FilterChain chain = (FilterChain) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.FILTER_CHAIN);
+                final FilterChain chain = (FilterChain) context.getAttribute(FILTER_CHAIN);
 
                 ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
                 ServletRequest request = (ServletRequest) externalContext.getNativeRequest();

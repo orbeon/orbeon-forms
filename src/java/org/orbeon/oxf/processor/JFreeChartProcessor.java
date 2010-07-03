@@ -21,9 +21,8 @@ import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.servlet.ServletUtilities;
 import org.jfree.data.general.Dataset;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -46,7 +45,7 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
 
 
     public ProcessorOutput createOutput(String name) {
-        return new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        return new ProcessorOutputImpl(JFreeChartProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 JFreeChartSerializer.ChartConfig chartConfig = readChartConfig(context);
                 ChartInfo info = createChart(context, chartConfig);

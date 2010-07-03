@@ -20,9 +20,11 @@ import org.dom4j.Document;
 import org.iso_relax.verifier.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ExceptionWrapperXMLReceiver;
@@ -114,9 +116,10 @@ public class MSVValidationProcessor extends ProcessorImpl {
         this.schemaId = schemaId;
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            protected void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final XMLReceiver xmlReceiver) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(MSVValidationProcessor.this, name) {
+            protected void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
                     // read config input ot determine of we should decorate or not
                     final Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);

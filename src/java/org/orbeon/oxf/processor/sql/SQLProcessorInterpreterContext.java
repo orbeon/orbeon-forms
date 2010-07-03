@@ -59,6 +59,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     private List executionContextStack;
     private List currentNodes;
     private List currentFunctions = new ArrayList();
+    public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context"; // used by SQLProcessor and related
 
     public SQLProcessorInterpreterContext(PropertySet propertySet) {
         this.propertySet = propertySet;
@@ -461,10 +462,10 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     }
 
     private Context getContext(PipelineContext pipelineContext) {
-        Context context = (Context) pipelineContext.getAttribute(PipelineContext.SQL_PROCESSOR_CONTEXT);
+        Context context = (Context) pipelineContext.getAttribute(SQL_PROCESSOR_CONTEXT);
         if (context == null) {
             context = new Context();
-            pipelineContext.setAttribute(PipelineContext.SQL_PROCESSOR_CONTEXT, context);
+            pipelineContext.setAttribute(SQL_PROCESSOR_CONTEXT, context);
         }
         return context;
     }

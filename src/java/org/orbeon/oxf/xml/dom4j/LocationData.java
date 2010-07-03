@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
 
@@ -62,8 +61,9 @@ public class LocationData {
     public int getLine() { return line; }
     public int getCol() { return col; }
 
+    @Override
     public String toString() {
-        final FastStringBuffer sb = new FastStringBuffer("");
+        final StringBuilder sb = new StringBuilder();
         final boolean hasLine;
         if (getLine() > 0) {
             sb.append("line ");

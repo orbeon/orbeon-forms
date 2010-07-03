@@ -14,5 +14,5 @@
 package org.orbeon.oxf.processor;
 
 public interface ProcessorFactory {
-    public Processor createInstance();
+    Processor createInstance();
 }

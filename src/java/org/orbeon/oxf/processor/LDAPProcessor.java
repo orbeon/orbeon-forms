@@ -18,7 +18,9 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -62,8 +64,8 @@ public class LDAPProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, XMLReceiver xmlReceiver) {
+        final ProcessorOutput output = new ProcessorOutputImpl(LDAPProcessor.this, name) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Read configuration
                     Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
@@ -110,7 +112,7 @@ public class LDAPProcessor extends ProcessorImpl {
                     });
 
                     Command command = (Command) readCacheInputAsObject(context, getInputByName(INPUT_FILTER), new CacheableInputReader() {
-                        public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                        public Object read(PipelineContext context, ProcessorInput input) {
                             Command command;
                             Document filterDoc = readInputAsDOM4J(context, input);
                             String filterNodeName = filterDoc.getRootElement().getName();

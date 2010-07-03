@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.ForwardingXMLReader;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
@@ -119,7 +120,7 @@ public class TransformerURIResolver implements URIResolver {
             }
 
             final URIResolverListener uriResolverListener =
-                    (URIResolverListener) pipelineContext.getAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER);
+                    (URIResolverListener) pipelineContext.getAttribute(XSLTTransformer.XSLT_STYLESHEET_URI_LISTENER);
             if (uriResolverListener != null) {
 
                 // Also send data to listener, if there is one

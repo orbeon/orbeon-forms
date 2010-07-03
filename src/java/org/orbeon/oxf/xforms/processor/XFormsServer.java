@@ -21,9 +21,8 @@ import org.orbeon.oxf.externalcontext.ResponseAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
@@ -87,8 +86,9 @@ public class XFormsServer extends ProcessorImpl {
     /**
      * Case where an XML response must be generated.
      */
+    @Override
     public ProcessorOutput createOutput(final String outputName) {
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), outputName) {
+        final ProcessorOutput output = new ProcessorOutputImpl(XFormsServer.this, outputName) {
             public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 doIt(pipelineContext, xmlReceiver);
             }
@@ -208,7 +208,7 @@ public class XFormsServer extends ProcessorImpl {
                 final boolean isNoscript = containingDocument.getStaticState().isNoscript();
 
                 // Set URL rewriter resource path information based on information in static state
-                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
+                pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
                 // Set XPath configuration
                 pipelineContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, containingDocument.getStaticState().getXPathConfiguration());
 

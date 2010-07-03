@@ -19,9 +19,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Response;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.portlet.PortletExternalContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -845,7 +844,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
     @Override
     public ProcessorOutput createOutput(final String name) {
 
-        final ProcessorOutput processorOutput = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput processorOutput = new CacheableTransformerOutputImpl(AbstractRewrite.this, name) {
 
             /**
              * Creates a StatefulHandler and uses that to translate the events from the input, rewrite-in, and then

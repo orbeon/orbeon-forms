@@ -32,6 +32,7 @@ import java.util.Map;
 public class DatabaseContext {
 
     private static Logger logger = LoggerFactory.createLogger(DatabaseContext.class);
+    public static final String DATASOURCE_CONTEXT = "datasource-context"; // used by DatabaseContext
 
     /**
      * Get a connection valid for this pipeline execution, given a JDBC JNDI name.
@@ -142,10 +143,10 @@ public class DatabaseContext {
     }
 
     private static Context getContext(PipelineContext pipelineContext) {
-        Context context = (Context) pipelineContext.getAttribute(PipelineContext.DATASOURCE_CONTEXT);
+        Context context = (Context) pipelineContext.getAttribute(DATASOURCE_CONTEXT);
         if (context == null) {
             context = new Context();
-            pipelineContext.setAttribute(PipelineContext.DATASOURCE_CONTEXT, context);
+            pipelineContext.setAttribute(DATASOURCE_CONTEXT, context);
         }
         return context;
     }

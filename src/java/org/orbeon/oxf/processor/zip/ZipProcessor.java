@@ -18,10 +18,8 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -43,8 +41,9 @@ public class ZipProcessor extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ZipProcessor.this, name) {
 
             String fileName = null;
             int statusCode = -1;
@@ -66,6 +65,7 @@ public class ZipProcessor extends ProcessorImpl {
                             StringBuffer uri;
 
                             // Get the file name, store it
+                            @Override
                             public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
                                 if ("file".equals(localName)) {
                                     name = atts.getValue("name");
@@ -80,12 +80,14 @@ public class ZipProcessor extends ProcessorImpl {
                             }
 
                             // Get the URI to the file, store it
+                            @Override
                             public void characters(char ch[], int start, int length) throws SAXException {
                                 if (uri != null)
                                     uri.append(ch, start, length);
                             }
 
                             // Process file
+                            @Override
                             public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
                                 try {
                                     if ("file".equals(localName)) {

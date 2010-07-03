@@ -15,6 +15,7 @@ package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ServletURLRewriter implements URLRewriter {
     @SuppressWarnings("unchecked")
     private List<URLRewriterUtils.PathMatcher> getPathMatchers() {
         if (pathMatchers == null) {
-            pathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            pathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
             if (pathMatchers == null)
                 pathMatchers = URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
         }

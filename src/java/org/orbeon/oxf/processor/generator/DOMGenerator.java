@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -111,12 +112,15 @@ public final class DOMGenerator extends ProcessorImpl {
             super(DOMGenerator.class, OUTPUT_DATA, id);
         }
 
+        @Override
         public String toString() {
             return "DocKey [ " + super.toString() + " ]";
         }
 
-        public boolean equals(final Object rhsObj) {
-            return rhsObj == this;
+        @Override
+        public boolean equals(final Object other) {
+            // ???
+            return other == this;
         }
     }
 
@@ -184,10 +188,11 @@ public final class DOMGenerator extends ProcessorImpl {
         this(id, v, new TinyTreeSourceFactory(makeCopyDoc(nodeInfo), sid));
     }
 
+    @Override
     public ProcessorOutput createOutput(final String nm) {
 
         final Class clazz = getClass();
-        final ProcessorOutput ret = new ProcessorImpl.CacheableTransformerOutputImpl(clazz, nm) {
+        final ProcessorOutput ret = new CacheableTransformerOutputImpl(DOMGenerator.this, nm) {
             public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 // NOTE: source cannot be an instance var.  Reason is that the XMLReader it
                 // will create is stateful.  ( Meaning that if it used by multiple threads
@@ -195,10 +200,12 @@ public final class DOMGenerator extends ProcessorImpl {
                 TransformerUtils.sourceToSAX(sourceFactory.makeSource(), xmlReceiver);
             }
 
-            public OutputCacheKey getKeyImpl(final PipelineContext pipelineContext) {
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
                 return key;
             }
 
+            @Override
             public Object getValidityImpl(final PipelineContext pipelineContext) {
                 return validity;
             }

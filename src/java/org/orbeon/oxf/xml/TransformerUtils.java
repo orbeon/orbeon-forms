@@ -232,8 +232,8 @@ public class TransformerUtils {
      * @throws TransformerException
      */
     public static Document domToDom4jDocument(org.w3c.dom.Node node) throws TransformerException {
-        Transformer identity = getIdentityTransformer();
-        LocationDocumentResult documentResult = new LocationDocumentResult();
+        final Transformer identity = getIdentityTransformer();
+        final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.transform(new DOMSource(node), documentResult);
         return documentResult.getDocument();
     }

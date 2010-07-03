@@ -17,9 +17,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 
 import javax.portlet.PortletPreferences;
@@ -36,7 +35,7 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(PortletPreferencesGenerator.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 

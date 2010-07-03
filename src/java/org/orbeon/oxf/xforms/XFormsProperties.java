@@ -286,6 +286,8 @@ public class XFormsProperties {
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
+    public static final String PIPELINE_TRACE_CLASS_PROPERTY = XFORMS_PROPERTY_PREFIX + "pipeline.trace.class";
+
     // == Global properties ============================================================================================
     /**
      * Return a PropertyDefinition given a property name.

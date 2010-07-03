@@ -27,6 +27,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -183,7 +184,7 @@ public class OPS {
         } catch (NamingException e) {
             throw new OXFException(e);
         }
-        pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
+        pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
         try {
             // 7. Run the pipeline from the processor definition created earlier. An ExternalContext

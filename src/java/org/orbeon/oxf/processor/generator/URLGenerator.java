@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
@@ -246,6 +247,7 @@ public class URLGenerator extends ProcessorImpl {
             return cacheUseLocalCache;
         }
 
+        @Override
         public String toString() {
             return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + isValidating() + "|" + isHandleXInclude() + "|" + isForceContentType()
                     + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + tidyConfig + "]";
@@ -261,8 +263,9 @@ public class URLGenerator extends ProcessorImpl {
         public URIReferences uriReferences;
     }
 
+    @Override
     public ProcessorOutput createOutput(final String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(URLGenerator.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 makeSureStateIsSet(pipelineContext);
@@ -497,12 +500,14 @@ public class URLGenerator extends ProcessorImpl {
                 }
             }
 
+            @Override
             public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
                 makeSureStateIsSet(pipelineContext);
                 try {
-                    ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
-                    if (configURIReferences == null)
+                    final ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
+                    if (configURIReferences == null) {
                         return null;
+                    }
 
                     final int keyCount = 1 + ((localConfigURIReferences == null) ? 1 : 0)
                             + ((configURIReferences.uriReferences != null) ? configURIReferences.uriReferences.references.size() : 0);
@@ -512,7 +517,9 @@ public class URLGenerator extends ProcessorImpl {
                     int keyIndex = 0;
                     if (localConfigURIReferences == null) {
                         KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
-                        if (configKeyValidity == null) return null;
+                        if (configKeyValidity == null) {
+                            return null;
+                        }
                         outputKeys[keyIndex++] = configKeyValidity.key;
                     }
                     // Handle main document and config
@@ -529,6 +536,7 @@ public class URLGenerator extends ProcessorImpl {
                 }
             }
 
+            @Override
             public Object getValidityImpl(PipelineContext pipelineContext) {
                 makeSureStateIsSet(pipelineContext);
                 try {
@@ -606,12 +614,13 @@ public class URLGenerator extends ProcessorImpl {
                     return localConfigURIReferences;
 
                 // Make sure the config input is cacheable
-                KeyValidity keyValidity = getInputKeyValidity(context, INPUT_CONFIG);
-                if (keyValidity == null)
+                final KeyValidity keyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                if (keyValidity == null) {
                     return null;
+                }
 
                 // Try to find resource manager key in cache
-                ConfigURIReferences config = (ConfigURIReferences) ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity);
+                final ConfigURIReferences config = (ConfigURIReferences) ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity);
                 if (logger.isDebugEnabled()) {
                     if (config != null)
                         logger.debug("Config found: " + config.toString());
@@ -948,6 +957,7 @@ public class URLGenerator extends ProcessorImpl {
             setState(pipelineContext, new URLGeneratorState());
     }
 
+    @Override
     public void reset(PipelineContext pipelineContext) {
         setState(pipelineContext, new URLGeneratorState());
     }

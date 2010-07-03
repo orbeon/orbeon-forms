@@ -13,44 +13,69 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+
+import java.util.*;
+
 public class CompoundOutputCacheKey extends OutputCacheKey {
 
-    private final java.util.List keys;
+    private final List<CacheKey> keys;
+
     private final int hash;
 
-    public CompoundOutputCacheKey(final Class c, final String onam, final CacheKey[] kys) {
-        super(c, onam);
-        if (kys == null) {
+    public CompoundOutputCacheKey(final Class clazz, final String outputName, final CacheKey[] keys) {
+        super(clazz, outputName);
+        if (keys == null) {
             throw new IllegalArgumentException("key must not be null");
         }
-        keys = new java.util.ArrayList(kys.length);
-        for (int i = 0; i < kys.length; i++) {
-            keys.add(kys[i]);
-        }
+        this.keys = new ArrayList<CacheKey>(keys.length);
+        this.keys.addAll(Arrays.asList(keys));
+
         int tmp = 1;
         tmp += 31 * tmp + super.hashCode();
         tmp += 31 * tmp + outputName.hashCode();
-        tmp += 31 * tmp + keys.hashCode();
+        tmp += 31 * tmp + this.keys.hashCode();
+
         hash = tmp;
     }
 
-    public boolean equals(final Object rhsObj) {
-        boolean ret = this == rhsObj;
-        done : if (!ret) {
-            ret = rhsObj instanceof CompoundOutputCacheKey && super.equals(rhsObj);
+    @Override
+    public boolean equals(final Object other) {
+        boolean ret = this == other;
+        done:
+        if (!ret) {
+            ret = other instanceof CompoundOutputCacheKey && super.equals(other);
             if (!ret) break done;
-            final CompoundOutputCacheKey rhs = (CompoundOutputCacheKey) rhsObj;
+            final CompoundOutputCacheKey rhs = (CompoundOutputCacheKey) other;
             ret = keys.equals(rhs.keys);
         }
         return ret;
     }
 
+    @Override
     public int hashCode() {
         return hash;
     }
 
+    @Override
     public String toString() {
         return "CompoundOutputCacheKey [class: " + CacheUtils.getShortClassName(getClazz())
                 + ", outputName: " + outputName + ", key: " + keys + "]";
+    }
+
+    @Override
+    public void toXML(ContentHandlerHelper helper, Object validities) {
+
+        final List validitiesList = (List) validities;
+        final Iterator validitiesIterator = (validitiesList != null) ? validitiesList.iterator() : null;
+
+        helper.startElement("output", new String[] { "class", getClazz().getName(), "name", outputName });
+        if (keys != null) {
+            for (final CacheKey key : keys) {
+                final Object childValidity = (validitiesIterator != null) ? validitiesIterator.next() : null;
+                key.toXML(helper, childValidity);
+            }
+        }
+        helper.endElement();
     }
 }

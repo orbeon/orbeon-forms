@@ -19,16 +19,6 @@
     <!--<property as="xs:string"  name="oxf.cache.display-statistics"                    value="cache.main cache.xpath xforms.cache.documents xforms.cache.shared-instances"/>-->
     <!--<property as="xs:boolean" name="oxf.xforms.test.ajax"                            value="false"/>-->
 
-    <!-- XPL profiling support -->
-    <!-- Currently one of org.orbeon.oxf.processor.NetworkTrace,
-                          org.orbeon.oxf.processor.StdOutTrace,
-                          org.orbeon.oxf.processor.SessionTrace -->
-    <!--<property as="xs:NCName"    name="processor.trace"    value="org.orbeon.oxf.processor.SessionTrace"/>-->
-    <!-- Host for NetworkTrace. Default is localhost. -->
-    <!--<property as="xs:NMTOKEN"    name="processor.trace.host"    value="localhost"/>-->
-    <!-- Port for NetworkTrace. Default is 9191 -->
-    <!--<property as="xs:nonNegativeInteger"    name="processor.trace.port"    value="9999"/>-->
-
     <xi:include href="oxf:/config/properties-base.xml"/>
     <xi:include href="oxf:/config/properties-xforms.xml"/>
     <xi:include href="oxf:/config/properties-form-runner.xml"/>

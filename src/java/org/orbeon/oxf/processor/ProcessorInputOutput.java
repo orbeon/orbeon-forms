@@ -17,7 +17,13 @@ import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
- * Why ProcessorInput and ProcessorOutput should not have a reference to their
+ * Base interface for processor input and outputs.
+ *
+ * NOTE 2010-07-05: the comment below is older than 2004-08-21 and is likely quite out of date. Most if not all
+ * ProcessorOutput implementations either store a reference to their pipeline, or are inner classes of a pipeline. Could
+ * this still apply to inputs but not outputs?
+ *
+ * "Why ProcessorInput and ProcessorOutput should not have a reference to their
  * corresponding processor?
  *
  * Some processors (A) create those objects and store them in cache. They can
@@ -37,24 +43,21 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
  * executed, the ProcessorOutput, also called "internal top output", find the
  * containing processor by using the processors stack stored in the
  * PipelineContext. Then the ProcessorOutput can read from the appropriate
- * input of the containing processor.
+ * input of the containing processor."
  */
 public interface ProcessorInputOutput {
-    public String getSchema();
 
-    public void setSchema(String schema);
+    String getName();
+    Class getProcessorClass();
 
-    public Class getProcessorClass();
+    void setLocationData(LocationData locationData);
+    LocationData getLocationData();
 
-    public String getName();
+    void setSchema(String schema);
+    String getSchema();
 
-    public void setDebug(String debugMessage);
+    void setDebug(String debugMessage);
+    String getDebugMessage();
 
-    public void setLocationData(LocationData locationData);
-
-    public String getDebugMessage();
-
-    public LocationData getLocationData();
-
-    public void setBreakpointKey(BreakpointKey breakpointKey);
+    void setBreakpointKey(BreakpointKey breakpointKey);
 }

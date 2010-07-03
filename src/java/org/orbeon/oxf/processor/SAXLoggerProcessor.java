@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
@@ -34,17 +35,19 @@ public class SAXLoggerProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(SAXLoggerProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 readInputAsSAX(context, INPUT_DATA, new DebugXMLReceiver(xmlReceiver));
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return getInputKey(context, getInputByName(INPUT_DATA));
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                return getInputKey(pipelineContext, getInputByName(INPUT_DATA));
             }
 
-            public Object getValidityImpl(PipelineContext context) {
-                return getInputValidity(context, getInputByName(INPUT_DATA));
+            @Override
+            public Object getValidityImpl(PipelineContext pipelineContext) {
+                return getInputValidity(pipelineContext, getInputByName(INPUT_DATA));
             }
         };
         addOutput(name, output);

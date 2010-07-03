@@ -11,11 +11,15 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.cache;
+package org.orbeon.oxf.processor.impl;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+public class DigestValidity {
 
-public interface CacheableInputOutput {
-    OutputCacheKey getKey(PipelineContext pipelineContext);
-    Object getValidity(PipelineContext pipelineContext);
+    public final byte[] digest;
+    public final Long lastModified;
+
+    public DigestValidity(byte[] digest, Long lastModified) {
+        this.digest = digest;
+        this.lastModified = lastModified;
+    }
 }

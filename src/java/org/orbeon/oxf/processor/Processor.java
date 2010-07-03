@@ -17,8 +17,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base interface implemented by all processors.
@@ -35,13 +34,13 @@ public interface Processor {
      *
      * @return the identifier of this processor
      */
-    public String getId();
+    String getId();
 
     /**
      * @param id  the new id of this processor
      * @see #getId()
      */
-    public void setId(String id);
+    void setId(String id);
 
     /**
      * When this processor is created based on a declaration in an XML document, the LocationData
@@ -51,13 +50,13 @@ public interface Processor {
      *
      * @return the LocationData for this processor
      */
-    public LocationData getLocationData();
+    LocationData getLocationData();
 
     /**
      * @param locationData  the new LocationData of this processor
      * @see #getLocationData()
      */
-    public void setLocationData(LocationData locationData);
+    void setLocationData(LocationData locationData);
 
     /**
      * Name of the processor, if it has been created by a factory and that factory has a name. The
@@ -65,13 +64,13 @@ public interface Processor {
      *
      * @return The name of this processor
      */
-    public QName getName();
+    QName getName();
 
     /**
      * @param  name  The new name of this processor
      * @see #getName()
      */
-    public void setName(QName name);
+    void setName(QName name);
 
     /**
      * Creates a new input on this processor. The new input can then be connected to the output of
@@ -81,7 +80,7 @@ public interface Processor {
      * @param   name  Name of the input to create
      * @return  The newly created input
      */
-    public ProcessorInput createInput(String name);
+    ProcessorInput createInput(String name);
 
     /**
      * Deletes an input previously created with <code>createInput(String
@@ -90,7 +89,7 @@ public interface Processor {
      * @param  name  Name of the input to delete
      * @see    #createInput(java.lang.String)
      */
-    public void deleteInput(ProcessorInput name);
+    void deleteInput(ProcessorInput name);
 
     /**
      * @param   name  Name of the input
@@ -99,7 +98,7 @@ public interface Processor {
      *          if there is no existing input with this name.
      * @see     #createInput(java.lang.String)
      */
-    public ProcessorInput getInputByName(String name);
+    ProcessorInput getInputByName(String name);
 
     /**
      * Creates a new output on this processor. The output can then be connected
@@ -109,7 +108,7 @@ public interface Processor {
      * @param   name  Name of the output to create.  null is allowed.
      * @return  The newly created output
      */
-    public ProcessorOutput createOutput(String name);
+    ProcessorOutput createOutput(String name);
 
     /**
      * Deletes an output previously created with <code>createOutput(String
@@ -118,7 +117,7 @@ public interface Processor {
      * @param  output  Name of the output to delete
      * @see    #createOutput(java.lang.String)
      */
-    public void deleteOutput(ProcessorOutput output);
+    void deleteOutput(ProcessorOutput output);
 
     /**
      * @param   name  Name of the output
@@ -127,21 +126,26 @@ public interface Processor {
      *          <code>null</code> if there is no existing output with this name.
      * @see     #createOutput(java.lang.String)
      */
-    public ProcessorOutput getOutputByName(String name);
+    ProcessorOutput getOutputByName(String name);
 
     /**
      * @return  A list of <code>ProcessorInputOutputInfo</code> objects
      *          corresponding to the inputs that can be created on this
      *          processor. This exposes the "input API" of this processor.
      */
-    public List getInputsInfo();
+    List<ProcessorInputOutputInfo> getInputsInfo();
 
     /**
      * @return  A list of <code>ProcessorInputOutputInfo</code> objects
      *          corresponding to the outputs that can be created on this
      *          processor. This exposes the "outputs API" of this processor.
      */
-    public List getOutputsInfo();
+    List<ProcessorInputOutputInfo> getOutputsInfo();
+
+    /**
+     * @return Names of all the inputs connected to this processor.
+     */
+    Set<String> getInputNames();
 
     /**
      * @return  A read-only Map containing all the inputs currently connected
@@ -150,7 +154,7 @@ public interface Processor {
      *          more <code>ProcessorInput</code> objects. This is particularly
      *          useful to detect whether optional inputs are connected.
      */
-    public Map getConnectedInputs();
+    Map<String, List<ProcessorInput>> getConnectedInputs();
 
     /**
      * @return  A read-only Map containing all the outputs currently connected
@@ -159,7 +163,24 @@ public interface Processor {
      *          more <code>ProcessorOutput</code> objects. This is particularly
      *          useful to detect whether optional outputs are connected.
      */
-    public Map getConnectedOutputs();
+    Map<String, ProcessorOutput> getConnectedOutputs();
+
+    /**
+     * TODO
+     *
+     * @param context
+     * @param inputName
+     * @return
+     */
+    boolean isInputInCache(PipelineContext context, String inputName);
+
+    /**
+     * TODO
+     *
+     * @param pipelineContext
+     * @return
+     */
+    Object getState(PipelineContext pipelineContext);
 
     /**
      * This method is called to trigger the execution of this processor. This
@@ -169,7 +190,7 @@ public interface Processor {
      *
      * @param  context  Context in which the processor is executed
      */
-    public void start(PipelineContext context);
+    void start(PipelineContext context);
 
     /**
      * Resets the processor. This method is called before the processor is
@@ -178,5 +199,10 @@ public interface Processor {
      *
      * @param context Context in which the processor is executed
      */
-    public void reset(PipelineContext context);
+    void reset(PipelineContext context);
+
+    /**
+     * TODO
+     */
+    int getSequenceNumber();
 }

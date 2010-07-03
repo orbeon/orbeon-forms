@@ -19,8 +19,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 /**
- * ContentHandlerAdapter implements the ContentHandler interface. Its methods don't do anything
- * but can be overridden.
+ * Adapter for XMLReceiver. Methods don't do anything but can be overridden.
  */
 public class XMLReceiverAdapter implements XMLReceiver {
     public void characters(char ch[], int start, int length) throws SAXException {

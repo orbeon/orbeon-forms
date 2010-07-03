@@ -128,7 +128,7 @@ public class OrbeonServletDelegate extends HttpServlet {
             // Run service
             PipelineContext pipelineContext = new PipelineContext();
             ExternalContext externalContext = new ServletExternalContext(getServletContext(), pipelineContext, webAppContext.getServletInitParametersMap(), request, response);
-            processorService.service(true, externalContext, pipelineContext);
+            processorService.service(externalContext, pipelineContext);
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));
         }

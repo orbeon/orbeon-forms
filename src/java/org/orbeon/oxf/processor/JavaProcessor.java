@@ -25,6 +25,8 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -61,20 +63,22 @@ public class JavaProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(final String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(JavaProcessor.this, name) {
 
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 getInput(context).getOutput().read(context, xmlReceiver);
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return isInputInCache(context, INPUT_CONFIG)
-                        ? getInputKey(context, getInput(context)) : null;
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                return isInputInCache(pipelineContext, INPUT_CONFIG)
+                        ? getInputKey(pipelineContext, getInput(pipelineContext)) : null;
             }
 
-            public Object getValidityImpl(PipelineContext context) {
-                return isInputInCache(context, INPUT_CONFIG)
-                        ? getInputValidity(context, getInput(context)) : null;
+            @Override
+            public Object getValidityImpl(PipelineContext pipelineContext) {
+                return isInputInCache(pipelineContext, INPUT_CONFIG)
+                        ? getInputValidity(pipelineContext, getInput(pipelineContext)) : null;
             }
 
             private ProcessorInput getInput(PipelineContext context) {
@@ -87,6 +91,7 @@ public class JavaProcessor extends ProcessorImpl {
         return output;
     }
 
+    @Override
     public void start(PipelineContext context) {
         State state = (State) getState(context);
         if (!state.started) {
@@ -115,7 +120,7 @@ public class JavaProcessor extends ProcessorImpl {
 
                     // Delegate
                     ProcessorInput userProcessorInput = processor.createInput(inputName);
-                    ProcessorOutput topOutput = new ProcessorImpl.ProcessorOutputImpl(getClass(), inputName) {
+                    ProcessorOutput topOutput = new ProcessorOutputImpl(JavaProcessor.this, inputName) {
                         protected void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                             javaProcessorInput.getOutput().read(context, xmlReceiver);
                         }
@@ -134,7 +139,7 @@ public class JavaProcessor extends ProcessorImpl {
                 String outputName = i.next();
 
                 ProcessorOutput processorOutput = processor.createOutput(outputName);
-                ProcessorInput bottomInput = new ProcessorImpl.ProcessorInputImpl(getClass(), outputName);
+                ProcessorInput bottomInput = new ProcessorInputImpl(this, outputName);
                 processorOutput.setInput(bottomInput);
                 bottomInput.setOutput(processorOutput);
                 state.bottomInputs.put(outputName, bottomInput);
@@ -452,6 +457,7 @@ public class JavaProcessor extends ProcessorImpl {
         return classpath.length() == 0 ? null : classpath.toString();
     }
 
+    @Override
     public void reset(PipelineContext context) {
         setState(context, new State());
     }

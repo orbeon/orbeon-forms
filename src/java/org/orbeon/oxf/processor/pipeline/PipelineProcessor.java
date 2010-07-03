@@ -24,6 +24,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.choose.AbstractChooseProcessor;
 import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
@@ -79,19 +81,22 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         this(createConfigFromAST(astPipeline));
     }
 
+    @Override
     public ProcessorOutput createOutput(final String name) {
 
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(PipelineProcessor.this, name) {
 
-            public void readImpl(final PipelineContext context, final XMLReceiver xmlReceiver) {
-                final ProcessorInput bottomInput = getInput(context);
+            public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
+                final ProcessorInput bottomInput = getInput(pipelineContext);
+
                 if (bottomInput.getOutput() == null)
                     throw new ValidationException("Pipeline output '" + name +
                             "' is not connected to a processor output in pipeline",
                             PipelineProcessor.this.getLocationData());
-                executeChildren(context, new Runnable() {
+
+                executeChildren(pipelineContext, new Runnable() {
                     public void run() {
-                        readInputAsSAX(context, bottomInput, xmlReceiver);
+                        readInputAsSAX(pipelineContext, bottomInput, xmlReceiver);
                     }
                 });
             }
@@ -101,15 +106,17 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
              * we return the key of the bottomInput corresponding to this
              * output.
              */
-            public OutputCacheKey getKeyImpl(final PipelineContext context) {
-                if (configFromAST == null && !isInputInCache(context, INPUT_CONFIG))
+            @Override
+            public OutputCacheKey getKeyImpl(final PipelineContext pipelineContext) {
+
+                if (configFromAST == null && !isInputInCache(pipelineContext, INPUT_CONFIG))
                     return null;
-                final ProcessorInput bottomInput = getInput(context);
+
+                final ProcessorInput bottomInput = getInput(pipelineContext);
                 final OutputCacheKey[] bottomInputKey = new OutputCacheKey[1];
-                executeChildren(context, new Runnable() {
+                executeChildren(pipelineContext, new Runnable() {
                     public void run() {
-                        bottomInputKey[0] = (bottomInput != null)
-                                ? getInputKey(context, bottomInput) : null;
+                        bottomInputKey[0] = (bottomInput != null) ? getInputKey(pipelineContext, bottomInput) : null;
                     }
                 });
                 return bottomInputKey[0];
@@ -118,29 +125,33 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             /**
              * Similar to getKey (above), but for the validity.
              */
-            public Object getValidityImpl(final PipelineContext context) {
-                if (configFromAST == null && !isInputInCache(context, INPUT_CONFIG))
+            @Override
+            public Object getValidityImpl(final PipelineContext pipelineContext) {
+
+                if (configFromAST == null && !isInputInCache(pipelineContext, INPUT_CONFIG))
                     return null;
-                final ProcessorInput bottomInput = getInput(context);
+                
+                final ProcessorInput bottomInput = getInput(pipelineContext);
                 final Object[] bottomInputValidity = new Object[1];
-                executeChildren(context, new Runnable() {
+                executeChildren(pipelineContext, new Runnable() {
                     public void run() {
-                        bottomInputValidity[0] = (bottomInput != null)
-                                ? getInputValidity(context, bottomInput) : null;
+                        bottomInputValidity[0] = (bottomInput != null) ? getInputValidity(pipelineContext, bottomInput) : null;
                     }
                 });
                 return bottomInputValidity[0];
             }
 
-            private ProcessorInput getInput(PipelineContext context) {
-                State state = (State) getState(context);
+            private ProcessorInput getInput(PipelineContext pipelineContext) {
+                State state = (State) getState(pipelineContext);
                 if (!state.started)
-                    start(context);
-                final ProcessorInput bottomInput = (ProcessorInput) state.nameToBottomInputMap.get( name );
+                    start(pipelineContext);
+                final ProcessorInput bottomInput = state.nameToBottomInputMap.get( name );
+
                 if (bottomInput == null) {
                     throw new ValidationException("There is no <param type=\"output\" name=\""
                             + name + "\"/>", getLocationData());
                 }
+
                 return bottomInput;
             }
         };
@@ -159,8 +170,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         astPipeline.getIdInfo();
 
         // Create new configuration object
-        PipelineConfig config = new PipelineConfig();
-        PipelineBlock block = new PipelineBlock();
+        final PipelineConfig config = new PipelineConfig();
+        final PipelineBlock block = new PipelineBlock();
 
         // Create socket info for each param
         for (Iterator i = astPipeline.getParams().iterator(); i.hasNext();) {
@@ -168,12 +179,12 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
             // Create internal top output/bottom input for this param
             if (param.getType() == ASTParam.INPUT) {
-                InternalTopOutput internalTopOutput = new InternalTopOutput(param.getName(), param.getLocationData());
+                final InternalTopOutput internalTopOutput = new InternalTopOutput(param.getName(), param.getLocationData());
                 block.declareOutput(param.getNode(), param.getName(), internalTopOutput);
                 config.declareTopOutput(param.getName(), internalTopOutput);
                 setDebugAndSchema(internalTopOutput, param);
             } else {
-                ProcessorInput internalBottomInput = new InternalBottomInput(param.getName());
+                final ProcessorInput internalBottomInput = new InternalBottomInput(param.getName());
                 block.declareBottomInput(param.getNode(), param.getName(), internalBottomInput);
                 config.declareBottomInput(param.getName(), internalBottomInput);
                 setDebugAndSchema(internalBottomInput, param);
@@ -378,9 +389,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 final ASTForEach forEach = (ASTForEach) statement;
                 final LocationData forEachLocationData = forEach.getLocationData();
                 final AbstractProcessor forEachAbstractProcessor = new AbstractForEachProcessor(forEach, astPipeline.getValidity());
-                final ConcreteForEachProcessor forEachProcessor =
-                        (ConcreteForEachProcessor) forEachAbstractProcessor.createInstance();
-                processor = forEachProcessor;
+
+                processor = (ConcreteForEachProcessor) forEachAbstractProcessor.createInstance();
 
                 // Connect special $data input (document on which the decision is made, or iterated on)
                 final ProcessorInput pin = block.connectProcessorToHref(forEach.getNode(), processor,
@@ -447,17 +457,19 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             PipelineReader pipelineReader = new PipelineReader();
             ProcessorInput pipelineReaderInput = pipelineReader.createInput("pipeline");
 
-            pipelineReaderInput.setOutput(new ProcessorImpl.ProcessorOutputImpl(getClass(), "dummy") {
+            pipelineReaderInput.setOutput(new ProcessorOutputImpl(PipelineProcessor.this, "dummy") {
                 public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                     ProcessorImpl.readInputAsSAX(context, _configInput, xmlReceiver);
                 }
 
-                public OutputCacheKey getKeyImpl(PipelineContext context) {
-                    return getInputKey(context, _configInput);
+                @Override
+                public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                    return getInputKey(pipelineContext, _configInput);
                 }
 
-                public Object getValidityImpl(PipelineContext context) {
-                    return getInputValidity(context, _configInput);
+                @Override
+                public Object getValidityImpl(PipelineContext pipelineContext) {
+                    return getInputValidity(pipelineContext, _configInput);
                 }
 
             });
@@ -546,15 +558,15 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     }
 
     /**
-     * Those are the "artificial" outputs sitting at the "top" of the pipeline
-     * to which the "top processors" are connected.
+     * "Artificial" output sitting at the "top" of the pipeline to which the "top processors" are connected.
      */
-    public static class InternalTopOutput extends ProcessorImpl.ProcessorOutputImpl {
+    public static class InternalTopOutput extends ProcessorOutputImpl {
 
         private LocationData locationData;
 
         public InternalTopOutput(String name, LocationData locationData) {
-            super(null, name);
+            // Don't pass a processor instance to the constructor
+            super(PipelineProcessor.class, name);
             this.locationData = locationData;
         }
 
@@ -569,42 +581,49 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             });
         }
 
-        public OutputCacheKey getKeyImpl(final PipelineContext context) {
+        @Override
+        public OutputCacheKey getKeyImpl(final PipelineContext pipelineContext) {
             final OutputCacheKey[] key = new OutputCacheKey[1];
-            final State state = (State) getParentState(context);
-            executeParents(context, new Runnable() {
+            final State state = (State) getParentState(pipelineContext);
+            executeParents(pipelineContext, new Runnable() {
                 public void run() {
-                    key[0] = getInputKey(context, getPipelineInputFromState(state));
+                    key[0] = getInputKey(pipelineContext, getPipelineInputFromState(state));
                 }
             });
             return key[0];
         }
 
-        public Object getValidityImpl(final PipelineContext context) {
+        @Override
+        public Object getValidityImpl(final PipelineContext pipelineContext) {
             final Object[] obj = new Object[1];
-            final State state = (State) getParentState(context);
-            executeParents(context, new Runnable() {
+            final State state = (State) getParentState(pipelineContext);
+            executeParents(pipelineContext, new Runnable() {
                 public void run() {
-                    obj[0] = getInputValidity(context, getPipelineInputFromState(state));
+                    obj[0] = getInputValidity(pipelineContext, getPipelineInputFromState(state));
                 }
             });
             return obj[0];
         }
 
         private ProcessorInput getPipelineInputFromState(State state) {
-            List pipelineInputs = (List) state.pipelineInputs.get(getName());
+            final List<ProcessorInput> pipelineInputs = state.pipelineInputs.get(getName());
             if (pipelineInputs == null)
                 throw new ValidationException("Pipeline input \"" + getName() + "\" is not connected", locationData);
-            return (ProcessorInput) ((List) state.pipelineInputs.get(getName())).get(0);
+            return state.pipelineInputs.get(getName()).get(0);
         }
     }
 
-    public static class InternalBottomInput extends ProcessorImpl.ProcessorInputImpl {
+    /**
+     * "Artificial" input sitting at the "bottom" of the pipeline.
+     */
+    public static class InternalBottomInput extends ProcessorInputImpl {
         public InternalBottomInput(String name) {
+            // Don't pass a processor instance to the constructor
             super(PipelineProcessor.class, name);
         }
     }
 
+    @Override
     public void start(final PipelineContext context) {
         // Check that we are not already started
         State state = (State) getState(context);
@@ -625,8 +644,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         // Reset processors
         executeChildren(context, new Runnable() {
             public void run() {
-                for (Iterator i = config.getProcessors().iterator(); i.hasNext();) {
-                    ((Processor) i.next()).reset(context);
+                for (final Processor processor : config.getProcessors()) {
+                    processor.reset(context);
                 }
             }
         });
@@ -653,22 +672,23 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         }
     }
 
+    @Override
     public void reset(final PipelineContext context) {
         setState(context, new State());
     }
 
-    /**
-     * FIXME - We can't really do this until we have the config. The way we
-     * implement this is going to change when we introduce abstract processors.
-     */
-    public void checkSockets() {
-        // nop
-    }
+//    /**
+//     * FIXME - We can't really do this until we have the config. The way we
+//     * implement this is going to change when we introduce abstract processors.
+//     */
+//    public void checkSockets() {
+//        // nop
+//    }
 
     private static class State {
-        public Map nameToBottomInputMap = new HashMap();
+        public Map<String, ProcessorInput> nameToBottomInputMap = new HashMap<String, ProcessorInput>();
         public boolean started = false;
-        public Map pipelineInputs = new HashMap();
+        public Map<String, List<ProcessorInput>> pipelineInputs = new HashMap<String, List<ProcessorInput>>();
     }
 
     private List breakpoints;
@@ -681,5 +701,65 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
     public List getBreakpoints() {
         return breakpoints;
+    }
+
+    private void addSelfAsParent(PipelineContext pipelineContext) {
+        Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) pipelineContext.getAttribute(PARENT_PROCESSORS);
+        if (parents == null) {
+            parents = new Stack<ProcessorImpl>();
+            pipelineContext.setAttribute(PARENT_PROCESSORS, parents);
+        }
+        parents.push(this);
+    }
+
+    private void removeSelfAsParent(PipelineContext pipelineContext) {
+        Stack parents = (Stack) pipelineContext.getAttribute(PARENT_PROCESSORS);
+        if (parents.peek() != this)
+            throw new ValidationException("Current processor should be on top of the stack", getLocationData());
+        parents.pop();
+    }
+
+    /**
+     * For use in processor that contain other processors.
+     *
+     * Consider the current processor as the parent of the processors on which
+     * we call read/start.
+     */
+    private void executeChildren(PipelineContext context, Runnable runnable) {
+        addSelfAsParent(context);
+        try {
+            runnable.run();
+        } finally {
+            removeSelfAsParent(context);
+        }
+    }
+
+    /**
+     * For use in processor that contain other processors.
+     *
+     * Consider the current processor as a child or at the same level of the
+     * processors on which we call read/start.
+     */
+    private static void executeParents(PipelineContext pipelineContext, Runnable runnable) {
+        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) pipelineContext.getAttribute(PARENT_PROCESSORS);
+        final PipelineProcessor thisPipelineProcessor = (PipelineProcessor) parents.peek();
+        thisPipelineProcessor.removeSelfAsParent(pipelineContext);
+        try {
+            runnable.run();
+        } finally {
+            thisPipelineProcessor.addSelfAsParent(pipelineContext);
+        }
+    }
+
+    private static Object getParentState(final PipelineContext pipelineContext) {
+        final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) pipelineContext.getAttribute(PARENT_PROCESSORS);
+        final ProcessorImpl parent = parents.peek();
+        final Object[] result = new Object[1];
+        executeParents(pipelineContext, new Runnable() {
+            public void run() {
+                result[0] = parent.getState(pipelineContext);
+            }
+        });
+        return result[0];
     }
 }

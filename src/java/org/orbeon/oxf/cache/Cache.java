@@ -23,6 +23,7 @@ public interface Cache {
     void remove(PropertyContext propertyContext, CacheKey key);
     int removeAll(PropertyContext propertyContext);
     Object findValid(PropertyContext propertyContext, CacheKey key, Object validity);
+    CacheEntry findAny(PropertyContext propertyContext, CacheKey key);
     Iterator iterateCacheKeys(PropertyContext propertyContext);
     Iterator iterateCacheObjects(PropertyContext propertyContext);
     void setMaxSize(PropertyContext propertyContext, int maxSize);

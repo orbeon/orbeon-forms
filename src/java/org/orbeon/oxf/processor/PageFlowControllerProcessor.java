@@ -68,6 +68,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
     public static final String XFORMS_SUBMISSION_PATH_PROPERTY_NAME = "xforms-submission-path";
     public static final String XFORMS_SUBMISSION_PATH_DEFAULT_VALUE = "/xforms-server-submit";
+    public static final String PATH_MATCHERS = "path-matchers"; // used by PageFlowController
 
     static {
         Element trueConfigElement = new NonLazyUserDataElement( "config");
@@ -452,17 +453,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // actually know what a "resource" is.
         final List<URLRewriterUtils.PathMatcher> pathMatchers = pageFlow.getPathMatchers();
         if (pathMatchers != null && pathMatchers.size() > 0) {
-            final List<URLRewriterUtils.PathMatcher> existingPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            final List<URLRewriterUtils.PathMatcher> existingPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PATH_MATCHERS);
             if (existingPathMatchers == null) {
                 // Set if we are the first
-                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, pathMatchers);
+                pipelineContext.setAttribute(PATH_MATCHERS, pathMatchers);
             } else {
                 // Add if we come after others (in case of nested page flows)
                 final List<URLRewriterUtils.PathMatcher> allMatchers = new ArrayList<URLRewriterUtils.PathMatcher>() {{
                     addAll(existingPathMatchers);
                     addAll(pathMatchers);
                 }};
-                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, Collections.unmodifiableList(allMatchers));
+                pipelineContext.setAttribute(PATH_MATCHERS, Collections.unmodifiableList(allMatchers));
             }
         }
 
@@ -494,7 +495,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             rootElement.addElement("version").addText(HTMLSerializer.DEFAULT_VERSION);
                         addInput(new ASTInput("config", config));
                         addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
-                        //setLocationData(xxx);
+                        //setLocationData(TODO);
                     }});
                 }});
                 addWhen(new ASTWhen());
@@ -986,7 +987,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("config", transformConfig));// transform
                 addInput(new ASTInput("instance", new ASTHrefId(paramedInstance)));// source-instance
                 addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));// destination-instance
-                //addInput(new ASTInput("request-instance", new ASTHrefId(requestInstance)));// params-instance xxx
+                //addInput(new ASTInput("request-instance", new ASTHrefId(requestInstance)));// params-instance TODO
                 if (actionData != null)
                     addInput(new ASTInput("action", new ASTHrefId(actionData)));// action
                 else

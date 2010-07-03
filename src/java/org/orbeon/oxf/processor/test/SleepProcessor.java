@@ -18,9 +18,8 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.SAXStore;
 
 /**
@@ -35,8 +34,9 @@ public class SleepProcessor extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(SleepProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     final SAXStore inputStore = new SAXStore();
@@ -50,10 +50,12 @@ public class SleepProcessor extends ProcessorImpl {
                 }
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return getInputKey(context, getInputByName(INPUT_DATA));
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                return getInputKey(pipelineContext, getInputByName(INPUT_DATA));
             }
 
+            @Override
             public Object getValidityImpl(PipelineContext context) {
                 return getInputValidity(context, getInputByName(INPUT_DATA));
             }

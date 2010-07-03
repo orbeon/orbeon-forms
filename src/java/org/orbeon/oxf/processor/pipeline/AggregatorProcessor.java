@@ -14,26 +14,19 @@
 package org.orbeon.oxf.processor.pipeline;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.cache.CacheKey;
-import org.orbeon.oxf.cache.CompoundOutputCacheKey;
-import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AggregatorProcessor extends ProcessorImpl {
 
@@ -45,8 +38,9 @@ public class AggregatorProcessor extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(AggregatorProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 try {
@@ -103,16 +97,17 @@ public class AggregatorProcessor extends ProcessorImpl {
                 }
             }
 
+            @Override
             public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
 
                 // Create input information
-                final List keys = new ArrayList();
-                final Map inputsMap = getConnectedInputs();
-                for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
-                    final List currentInputs = (List) inputsMap.get(i.next());
-                    for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-                        final OutputCacheKey outputKey = getInputKey(pipelineContext, (ProcessorInput) j.next());
-                        if (outputKey == null) return null;
+                final List<CacheKey> keys = new ArrayList<CacheKey>();
+                for (final List<ProcessorInput> inputs : getConnectedInputs().values()) {
+                    for (final ProcessorInput input : inputs) {
+                        final OutputCacheKey outputKey = getInputKey(pipelineContext, input);
+                        if (outputKey == null) {
+                            return null;
+                        }
                         keys.add(outputKey);
                     }
                 }
@@ -120,7 +115,9 @@ public class AggregatorProcessor extends ProcessorImpl {
                 // Add local key if needed
                 if (supportsLocalKeyValidity()) {
                     final CacheKey localKey = getLocalKey(pipelineContext);
-                    if (localKey == null) return null;
+                    if (localKey == null) {
+                        return null;
+                    }
                     keys.add(localKey);
                 }
 
@@ -129,6 +126,7 @@ public class AggregatorProcessor extends ProcessorImpl {
                 keys.toArray(outputKeys);
                 final Class processorClass = getProcessorClass();
                 final String outputName = getName();
+
                 return new CompoundOutputCacheKey(processorClass, outputName, outputKeys);
             }
         };

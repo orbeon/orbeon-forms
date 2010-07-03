@@ -53,7 +53,8 @@ public class ProcessorService {
 
     public static final String HTTP_ACCEPT_METHODS_PROPERTY = "oxf.http.accept-methods";
 
-    public static final String OXF_EXCEPTION = "oxf-exception";
+    public static final String JNDI_CONTEXT = "jndi-context";
+    public static final String THROWABLE = "throwable";
 
     public static Logger logger = LoggerFactory.createLogger(ProcessorService.class);
 
@@ -63,6 +64,7 @@ public class ProcessorService {
 
     private Processor mainProcessor;
     private Processor errorProcessor;
+
 
     public ProcessorService() {
     }
@@ -90,22 +92,20 @@ public class ProcessorService {
         }
     }
 
-    public void service(boolean addClient, ExternalContext externalContext, PipelineContext pipelineContext) {
+    public void service(ExternalContext externalContext, PipelineContext pipelineContext) {
 
         // NOTE: Should this just be available from the ExternalContext?
-        pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
+        pipelineContext.setAttribute(JNDI_CONTEXT, jndiContext);
 
         try {
             // Run the processor
             InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, logger);
         } catch (Throwable e) {
             // Something bad happened
-            // Store the exception; needed if we are in a portlet
-            ExternalContext.Request request = externalContext.getRequest();
-            request.getAttributesMap().put(OXF_EXCEPTION, e);
+
             // Try to start the error pipeline if the response has not been committed yet
             try {
-                ExternalContext.Response response = externalContext.getResponse();
+                final ExternalContext.Response response = externalContext.getResponse();
                 if (response != null) {
                     if (!response.isCommitted()) {
                         serviceError(externalContext, e);
@@ -122,11 +122,11 @@ public class ProcessorService {
     private void serviceError(ExternalContext externalContext, Throwable throwable) throws IOException {
         if (errorProcessor != null) {
             // Create pipeline context
-            PipelineContext pipelineContext = new PipelineContext();
-            pipelineContext.setAttribute(PipelineContext.THROWABLE, throwable);
-//            pipelineContext.setAttribute(PipelineContext.LOCATION_DATA, locationData);
+            final PipelineContext pipelineContext = new PipelineContext();
+            final Throwable rootThrowable = OXFException.getRootThrowable(throwable);
+            pipelineContext.setAttribute(THROWABLE, rootThrowable);
             // NOTE: Should this just be available from the ExternalContext?
-            pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
+            pipelineContext.setAttribute(JNDI_CONTEXT, jndiContext);
             try {
                 // Make sure we generate something clean
                 externalContext.getResponse().reset();

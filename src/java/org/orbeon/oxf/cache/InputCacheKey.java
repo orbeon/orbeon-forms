@@ -14,11 +14,13 @@
 package org.orbeon.oxf.cache;
 
 import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 
 public class InputCacheKey extends CacheKey {
 
     private String inputName;
     private OutputCacheKey outputKey;
+
     private int hash;
 
     public InputCacheKey(ProcessorInput input, OutputCacheKey outputKey) {
@@ -32,13 +34,15 @@ public class InputCacheKey extends CacheKey {
     public OutputCacheKey getOutputKey() { return outputKey; }
     public void setOutputKey(OutputCacheKey outputKey) { this.outputKey = outputKey; }
 
-    public boolean equals(Object obj) {
-        return obj instanceof InputCacheKey
-                && super.equals(obj)
-                && ((InputCacheKey) obj).inputName.equals(inputName)
-                && ((InputCacheKey) obj).outputKey.equals(outputKey);
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof InputCacheKey
+                && super.equals(other)
+                && ((InputCacheKey) other).inputName.equals(inputName)
+                && ((InputCacheKey) other).outputKey.equals(outputKey);
     }
 
+    @Override
     public int hashCode() {
         if (hash == 0) {
             int hash = 1;
@@ -50,9 +54,17 @@ public class InputCacheKey extends CacheKey {
         return hash;
     }
 
+    @Override
     public String toString() {
         return "InputCacheKey [class: " + CacheUtils.getShortClassName(getClazz())
                 + ", inputName: " + getInputName()
                 + ", " + getOutputKey().toString() + "]";
+    }
+
+    @Override
+    public void toXML(ContentHandlerHelper helper, Object validities) {
+        helper.startElement("input", new String[] { "class", getClazz().getName(), "name", inputName } );
+        outputKey.toXML(helper, validities);
+        helper.endElement();
     }
 }

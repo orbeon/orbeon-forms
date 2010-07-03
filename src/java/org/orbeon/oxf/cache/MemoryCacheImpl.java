@@ -17,10 +17,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.iterators.TransformIterator;
 import org.orbeon.oxf.util.PropertyContext;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Very simple cache implementation.
@@ -183,6 +180,11 @@ public class MemoryCacheImpl implements Cache {
                 ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementMissCount();
             return null;
         }
+    }
+
+    public CacheEntry findAny(PropertyContext propertyContext, CacheKey key) {
+        // Don't update statistics here
+        return keyToEntryMap.get(key);
     }
 
     public synchronized void setMaxSize(PropertyContext propertyContext, int maxSize) {

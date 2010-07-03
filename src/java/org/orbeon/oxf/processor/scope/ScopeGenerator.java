@@ -22,6 +22,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.DigestState;
+import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -51,7 +53,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new DigestTransformerOutputImpl(ScopeGenerator.this, name) {
             public void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 try {
                     State state = (State) getFilledOutState(pipelineContext);

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.NamingConvention;
 import org.xml.sax.ContentHandler;
 
@@ -62,8 +63,9 @@ public abstract class SimpleProcessor extends ProcessorImpl {
     /**
      * Create an output. Delegate processing to the appropriate generateXXX() method.
      */
+    @Override
     public ProcessorOutput createOutput(final String name) {
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(SimpleProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     final Method method = outputToMethod.get(name);

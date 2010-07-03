@@ -21,6 +21,8 @@ import org.exolab.castor.xml.Marshaller;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.DigestState;
+import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -153,7 +155,7 @@ public class BeanGenerator extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
+        ProcessorOutput output = new DigestTransformerOutputImpl(BeanGenerator.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     State state = (State) getFilledOutState(pipelineContext);

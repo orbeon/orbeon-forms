@@ -17,10 +17,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -43,11 +43,12 @@ public class ExceptionGenerator extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ExceptionGenerator.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 // Get top throwable
-                Throwable throwable = (Throwable) context.getAttribute(PipelineContext.THROWABLE);
+                Throwable throwable = (Throwable) context.getAttribute(ProcessorService.THROWABLE);
                 // Throwable is mandatory
                 if (throwable == null)
                     throw new OXFException("Missing throwable object in ExceptionGenerator");

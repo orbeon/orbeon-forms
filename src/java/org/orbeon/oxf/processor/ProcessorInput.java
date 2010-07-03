@@ -13,7 +13,12 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+
 public interface ProcessorInput extends ProcessorInputOutput {
+
+    Processor getProcessor(PipelineContext pipelineContext);
+
     void setOutput(ProcessorOutput output);
     ProcessorOutput getOutput();
 }

@@ -686,8 +686,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 unwrappedRequest.getPortlet2ExternalContext().getRenderResponse());
 
         // Forward portlet config to new pipeline context
-        pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG,
-                unwrappedRequest.getPortlet2ExternalContext().getPipelineContext().getAttribute(PipelineContext.PORTLET_CONFIG));
+        pipelineContext.setAttribute(OrbeonPortlet2Delegate.PORTLET_CONFIG,
+                unwrappedRequest.getPortlet2ExternalContext().getPipelineContext().getAttribute(OrbeonPortlet2Delegate.PORTLET_CONFIG));
     }
 
     Portlet2ExternalContext(PipelineContext pipelineContext, ExternalContext.Request request, ExternalContext.Response response) {

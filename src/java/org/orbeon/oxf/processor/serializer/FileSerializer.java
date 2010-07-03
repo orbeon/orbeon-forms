@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.properties.PropertySet;
@@ -193,6 +194,7 @@ public class FileSerializer extends ProcessorImpl {
         }
     }
 
+    @Override
     public void start(PipelineContext context) {
         try {
             // Read config
@@ -280,9 +282,10 @@ public class FileSerializer extends ProcessorImpl {
     /**
      * Case where a response must be generated.
      */
+    @Override
     public ProcessorOutput createOutput(String name) {
 
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(FileSerializer.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 OutputStream fileOutputStream = null;
                 try {

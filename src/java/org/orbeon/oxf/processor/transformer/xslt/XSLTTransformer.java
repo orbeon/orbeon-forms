@@ -25,6 +25,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.properties.PropertySet;
@@ -89,6 +91,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     private static final String INPUT_TRANSFORMER = "transformer";
     // This input determines attributes to set on the TransformerFactory
     private static final String INPUT_ATTRIBUTES = "attributes";
+    public static final String XSLT_STYLESHEET_URI_LISTENER = "xslt-stylesheet-uri-listener"; // used by XSLTTransformer
 
     public XSLTTransformer(String schemaURI) {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, schemaURI));
@@ -98,8 +101,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(XSLTTransformer.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 // Get URI references from cache
@@ -219,6 +223,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // uses the Copy() instruction. It may be that the source is then
                         // incorrect, but we haven't traced this further. It may also simply be a
                         // bug in Saxon.
+                        @Override
                         public void startPrefixMapping(String s, String s1) throws SAXException {
                             if ("xmlns".equals(s)) {
                                 // TODO: This may be an old Saxon bug which doesn't occur anymore. Try to see if it occurs again.
@@ -228,6 +233,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             super.startPrefixMapping(s, s1);
                         }
 
+                        @Override
                         public void setDocumentLocator(final Locator locator) {
                             this.inputLocator = locator;
                             if (smartOutputLocation) {
@@ -241,6 +247,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         }
 
+                        @Override
                         public void startDocument() throws SAXException {
                             // Try to set fallback Locator
                             if (((outputLocator != null && outputLocator.getSystemId() == null) || (inputLocator != null && inputLocator.getSystemId() == null))
@@ -251,6 +258,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             super.startDocument();
                         }
 
+                        @Override
                         public void endDocument() throws SAXException {
                             if (endDocumentCalled()) {
                                 // Hack to test if Saxon outputs more than one endDocument() event
@@ -260,6 +268,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             super.endDocument();
                         }
 
+                        @Override
                         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
                             if (outputLocator != null) {
                                 final LocationData locationData = findSourceElementLocationData(uri, localname);
@@ -272,7 +281,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         }
 
-
+                        @Override
                         public void endElement(String uri, String localname, String qName) throws SAXException {
                             if (outputLocator != null) {
                                 // Here we do a funny thing: since Saxon does not provide location data on endElement(), we use that of startElement()
@@ -286,6 +295,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         }
 
+                        @Override
                         public void characters(char[] chars, int start, int length) throws SAXException {
                             if (outputLocator != null) {
                                 final LocationData locationData = findSourceCharacterLocationData();
@@ -422,23 +432,25 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 }
             }
 
+            @Override
             protected boolean supportsLocalKeyValidity() {
                 return true;
             }
 
+            @Override
             protected CacheKey getLocalKey(PipelineContext context) {
                 try {
-                    KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                    final KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);
                     if (uriReferences == null || uriReferences.hasDynamicDocumentReferences)
                         return null;
-                    List<CacheKey> keys = new ArrayList<CacheKey>();
+                    final List<CacheKey> keys = new ArrayList<CacheKey>();
                     keys.add(configKeyValidity.key);
-                    List<URIReference> allURIReferences = new ArrayList<URIReference>();
+                    final List<URIReference> allURIReferences = new ArrayList<URIReference>();
                     allURIReferences.addAll(uriReferences.stylesheetReferences);
                     allURIReferences.addAll(uriReferences.documentReferences);
                     for (Iterator<URIReference> i = allURIReferences.iterator(); i.hasNext();) {
-                        URIReference uriReference = i.next();
+                        final URIReference uriReference = i.next();
                         keys.add(new InternalCacheKey(XSLTTransformer.this, "xsltURLReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
                     }
                     return new InternalCacheKey(XSLTTransformer.this, keys);
@@ -447,20 +459,21 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 }
             }
 
+            @Override
             protected Object getLocalValidity(PipelineContext context) {
                 try {
-                    KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
-                    URIReferences uriReferences = getURIReferences(context, configKeyValidity);
+                    final KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                    final URIReferences uriReferences = getURIReferences(context, configKeyValidity);
                     if (uriReferences == null || uriReferences.hasDynamicDocumentReferences)
                         return null;
-                    List validities = new ArrayList();
+                    final List validities = new ArrayList();
                     validities.add(configKeyValidity.validity);
-                    List<URIReference> allURIReferences = new ArrayList<URIReference>();
+                    final List<URIReference> allURIReferences = new ArrayList<URIReference>();
                     allURIReferences.addAll(uriReferences.stylesheetReferences);
                     allURIReferences.addAll(uriReferences.documentReferences);
                     for (Iterator<URIReference> i = allURIReferences.iterator(); i.hasNext();) {
-                        URIReference uriReference = i.next();
-                        Processor urlGenerator = new URLGenerator(URLFactory.createURL(uriReference.context, uriReference.spec));
+                        final URIReference uriReference = i.next();
+                        final Processor urlGenerator = new URLGenerator(URLFactory.createURL(uriReference.context, uriReference.spec));
                         validities.add(((ProcessorOutputImpl) urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));
                     }
                     return validities;
@@ -480,15 +493,15 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     if (configKeyValidity == null)
                         return null;
 
-                    List<CacheKey> keys = new ArrayList<CacheKey>();
-                    List<Object> validities = new ArrayList<Object>();
+                    final List<CacheKey> keys = new ArrayList<CacheKey>();
+                    final List<Object> validities = new ArrayList<Object>();
                     keys.add(configKeyValidity.key);
                     validities.add(configKeyValidity.validity);
                     for (Iterator<URIReference> i = uriReferences.stylesheetReferences.iterator(); i.hasNext();) {
-                        URIReference uriReference = i.next();
-                        URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
+                        final URIReference uriReference = i.next();
+                        final URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
                         keys.add(new InternalCacheKey(XSLTTransformer.this, "xsltURLReference", url.toExternalForm()));
-                        Processor urlGenerator = new URLGenerator(url);
+                        final Processor urlGenerator = new URLGenerator(url);
                         validities.add(((ProcessorOutputImpl) urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));//FIXME: can we do better? See URL generator.
                     }
 
@@ -519,6 +532,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         {
                             xsltXMLReceivers.add(topStylesheetXMLReceiver);
                             final XMLReader xmlReader = new ProcessorOutputXMLReader(pipelineContext, getInputByName(INPUT_CONFIG).getOutput()) {
+                                @Override
                                 public void setContentHandler(ContentHandler handler) {
                                     super.setContentHandler(new TeeXMLReceiver(Arrays.asList(topStylesheetXMLReceiver, new SimpleForwardingXMLReceiver(handler))));
                                 }
@@ -527,7 +541,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         // Put listener in context that will be called by URI resolved
-                        pipelineContext.setAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER, new URIResolverListener() {
+                        pipelineContext.setAttribute(XSLT_STYLESHEET_URI_LISTENER, new URIResolverListener() {
                             public XMLReceiver getXMLReceiver() {
                                 StylesheetForwardingXMLReceiver xmlReceiver = new StylesheetForwardingXMLReceiver();
                                 xsltXMLReceivers.add(xmlReceiver);
@@ -767,17 +781,19 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             return systemId;
         }
 
+        @Override
         public void setDocumentLocator(Locator locator) {
             this.locator = locator;
             super.setDocumentLocator(locator);
         }
 
-
+        @Override
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
             namespaces.startPrefixMapping(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         }
 
+        @Override
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
             namespaces.startElement();
             // Save system id
@@ -848,16 +864,18 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             super.startElement(uri, localname, qName, attributes);
         }
 
-
+        @Override
         public void endElement(String uri, String localname, String qName) throws SAXException {
             super.endElement(uri, localname, qName);
             namespaces.endElement();
         }
 
+        @Override
         public void endDocument() throws SAXException {
             super.endDocument();
         }
 
+        @Override
         public void startDocument() throws SAXException {
             super.startDocument();
         }

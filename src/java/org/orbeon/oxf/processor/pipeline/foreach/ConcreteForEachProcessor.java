@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor.pipeline.foreach;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -24,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.TeeProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
@@ -86,7 +86,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
 
         // Connect special "$current" input which produces the document selected by the iteration
         final ProcessorInput iterationInput = forEachBlockProcessor.createInput(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
-        final ProcessorOutput currentOutput = new IterationProcessorOutput(AbstractForEachProcessor.class, AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
+        final ProcessorOutput currentOutput = new IterationProcessorOutput(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
         currentOutput.setInput(iterationInput);
         iterationInput.setOutput(currentOutput);
 
@@ -113,8 +113,9 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         }
     }
 
+    @Override
     public ProcessorOutput createOutput(final String name) {
-        final ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ConcreteForEachProcessor.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     final State state = (State) getState(pipelineContext);
@@ -173,13 +174,15 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
              * unexpected. Maybe an an API that combines reading the output and reading the
              * key/validity would solve this problem.
              */
-            protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
                 return null;
             }
 
             /**
              * For each is not cacheable. See comment in getKeyImpl().
              */
+            @Override
             protected Object getValidityImpl(PipelineContext pipelineContext) {
                 return null;
             }
@@ -201,7 +204,6 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
                 if (output instanceof TeeProcessor.TeeProcessorOutputImpl) {
                     final TeeProcessor.TeeProcessorOutputImpl teeOutput = (TeeProcessor.TeeProcessorOutputImpl) output;
                     teeOutput.doneReading(pipelineContext);
-//                    System.out.println("xxx telling TeeProcessor that we are done reading after " + iterationCount + " iterations for input " + input.getName());
                 }
             }
         }
@@ -249,6 +251,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
                 select, namespaceContext, getLocationData());
     }
 
+    @Override
     public void start(PipelineContext pipelineContext) {
         final State state = (State) getState(pipelineContext);
 
@@ -314,7 +317,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
      */
     private class ForwardingProcessorOutput extends ProcessorOutputImpl {
         public ForwardingProcessorOutput(String name) {
-            super(ConcreteForEachProcessor.class, name);
+            super(ConcreteForEachProcessor.this, name);
         }
 
         protected void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
@@ -322,11 +325,13 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             ConcreteForEachProcessor.this.readInputAsSAX(pipelineContext, getName(), xmlReceiver);
         }
 
-        protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+        @Override
+        public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
             // NOTE: this means that the execution of the pipeline block is not cacheable. Should improve?
             return null;
         }
 
+        @Override
         protected Object getValidityImpl(PipelineContext pipelineContext) {
             // NOTE: this means that the execution of the pipeline block is not cacheable. Should improve?
             return null;
@@ -338,8 +343,8 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
      */
     private class IterationProcessorOutput extends ProcessorOutputImpl {
 
-        public IterationProcessorOutput(Class<AbstractForEachProcessor> clazz, String name) {
-            super(clazz, name);
+        public IterationProcessorOutput(String name) {
+            super(ConcreteForEachProcessor.this, name);
         }
 
         protected void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
@@ -347,14 +352,16 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             state.domGenerator.getOutputByName(OUTPUT_DATA).read(pipelineContext, xmlReceiver);
         }
 
-        protected OutputCacheKey getKeyImpl(PipelineContext context) {
-            final State state = (State) getState(context);
-            return ((CacheableInputOutput) state.domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
+        @Override
+        public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+            final State state = (State) getState(pipelineContext);
+            return state.domGenerator.getOutputByName(OUTPUT_DATA).getKey(pipelineContext);
         }
 
-        protected Object getValidityImpl(PipelineContext context) {
-            final State state = (State) getState(context);
-            return ((CacheableInputOutput) state.domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
+        @Override
+        protected Object getValidityImpl(PipelineContext pipelineContext) {
+            final State state = (State) getState(pipelineContext);
+            return state.domGenerator.getOutputByName(OUTPUT_DATA).getValidity(pipelineContext);
         }
     }
 
@@ -365,6 +372,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         DOMGenerator domGenerator;
     }
 
+    @Override
     public void reset(PipelineContext pipelineContext) {
         setState(pipelineContext, new State());
     }

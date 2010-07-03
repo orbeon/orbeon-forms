@@ -26,10 +26,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -69,7 +71,7 @@ public class DelegationProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(DelegationProcessor.this, name) {
             public void readImpl(final PipelineContext context, final XMLReceiver xmlReceiver) {
                 final List<ServiceDefinition> services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
 
@@ -370,7 +372,7 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         if (service.type == ServiceDefinition.STATELESS_EJB_TYPE) {
                                             // Call EJB method
-                                            final Context jndiContext = (Context) context.getAttribute(PipelineContext.JNDI_CONTEXT);
+                                            final Context jndiContext = (Context) context.getAttribute(ProcessorService.JNDI_CONTEXT);
                                             if (jndiContext == null)
                                                 throw new ValidationException("JNDI context not found in pipeline context.", new LocationData(locator));
                                             final Object home = jndiContext.lookup(service.jndiName);

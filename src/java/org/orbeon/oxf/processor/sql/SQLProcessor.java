@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.sql.interpreters.*;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -104,9 +105,10 @@ public class SQLProcessor extends ProcessorImpl {
 //        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
         // This will be called only if there is an output
-        ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(SQLProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 execute(context, xmlReceiver);
             }
@@ -115,6 +117,7 @@ public class SQLProcessor extends ProcessorImpl {
         return output;
     }
 
+    @Override
     public void start(PipelineContext context) {
         // This will be called only if no output is connected
         execute(context, new XMLReceiverAdapter());
@@ -169,6 +172,7 @@ public class SQLProcessor extends ProcessorImpl {
                             }
                             return false;
                         }
+                        @Override
                         public void visit(Element element) {
                             // Don't touch text within sql:text elements
                             if (!SQL_NAMESPACE_URI.equals(element.getNamespaceURI()) || !"text".equals(element.getName())) {
@@ -293,6 +297,7 @@ public class SQLProcessor extends ProcessorImpl {
             addElementHandler(new ConfigInterpreter(interpreterContext), SQL_NAMESPACE_URI, "config");
         }
 
+        @Override
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
             try {
                 namespaceSupport.pushContext();
@@ -303,6 +308,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void endElement(String uri, String localname, String qName) throws SAXException {
             try {
                 super.endElement(uri, localname, qName);
@@ -313,6 +319,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
             try {
                 super.startPrefixMapping(prefix, uri);
@@ -323,6 +330,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void characters(char[] chars, int start, int length) throws SAXException {
             try {
                 super.characters(chars, start, length);
@@ -332,6 +340,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void endDocument() throws SAXException {
             try {
                 super.endDocument();
@@ -341,6 +350,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
             try {
                 super.ignorableWhitespace(chars, start, length);
@@ -350,6 +360,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void processingInstruction(String s, String s1) throws SAXException {
             try {
                 super.processingInstruction(s, s1);
@@ -359,6 +370,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void skippedEntity(String s) throws SAXException {
             try {
                 super.skippedEntity(s);
@@ -368,6 +380,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void startDocument() throws SAXException {
             try {
                 super.startDocument();
@@ -377,6 +390,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void endPrefixMapping(String s) throws SAXException {
             try {
                 super.endPrefixMapping(s);
@@ -386,6 +400,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public Locator getDocumentLocator() {
             try {
                 return super.getDocumentLocator();
@@ -395,6 +410,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
         }
 
+        @Override
         public void setDocumentLocator(Locator locator) {
             try {
                 super.setDocumentLocator(locator);
@@ -488,6 +504,7 @@ public class SQLProcessor extends ProcessorImpl {
             addElementHandler(new AttributeInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "attribute");
         }
 
+        @Override
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
             if (forwardingLevel == -1 && elementHandlers.size() > 0) {
                 final String key = "{" + uri + "}" + localname;
@@ -516,6 +533,7 @@ public class SQLProcessor extends ProcessorImpl {
             level++;
         }
 
+        @Override
         public void endElement(String uri, String localname, String qName) throws SAXException {
             level--;
             if (forwardingLevel == level) {
@@ -563,6 +581,7 @@ public class SQLProcessor extends ProcessorImpl {
             this.forward = forward;
         }
 
+        @Override
         public void setDocumentLocator(Locator locator) {
             this.documentLocator = locator;
             super.setDocumentLocator(locator);
@@ -572,6 +591,7 @@ public class SQLProcessor extends ProcessorImpl {
             return documentLocator;
         }
 
+        @Override
         public void startPrefixMapping(String s, String s1) throws SAXException {
             super.startPrefixMapping(s, s1);
         }
@@ -597,6 +617,7 @@ public class SQLProcessor extends ProcessorImpl {
                 return null;
         }
 
+        @Override
         public void characters(char[] chars, int start, int length) throws SAXException {
             if (currentHandler == null) {
                 // Output only if the string is non-blank [FIXME: Incorrect white space handling!]

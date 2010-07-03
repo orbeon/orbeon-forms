@@ -18,10 +18,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.SAXException;
 
-public class SAXStoreGenerator extends org.orbeon.oxf.processor.ProcessorImpl {
+public class SAXStoreGenerator extends ProcessorImpl {
 
     private SAXStore saxStore;
     private OutputCacheKey key;
@@ -37,9 +39,10 @@ public class SAXStoreGenerator extends org.orbeon.oxf.processor.ProcessorImpl {
         this.validity = validity;
     }
 
-    public org.orbeon.oxf.processor.ProcessorOutput createOutput(String name) {
-        org.orbeon.oxf.processor.ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
+    @Override
+    public ProcessorOutput createOutput(String name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(SAXStoreGenerator.this, name) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     if (saxStore != null) {
                         saxStore.replay(xmlReceiver);
@@ -51,11 +54,13 @@ public class SAXStoreGenerator extends org.orbeon.oxf.processor.ProcessorImpl {
                 }
             }
 
-            public OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
                 return key;
             }
 
-            public Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+            @Override
+            public Object getValidityImpl(PipelineContext pipelineContext) {
                 return validity;
             }
         };

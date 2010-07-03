@@ -14,39 +14,57 @@
 package org.orbeon.oxf.processor.test;
 
 import org.apache.log4j.Logger;
+import org.orbeon.oxf.cache.InputCacheKey;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 
 public class CacheViewProcessor extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(CacheViewProcessor.class);
+    private static Logger logger = LoggerFactory.createLogger(CacheViewProcessor.class);
 
     public CacheViewProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
         addInputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(final String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(CacheViewProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
-                KeyValidity keyValidity = getInputKeyValidity(context, getInputByName(INPUT_DATA));
+
+                final ProcessorInput input = getInputByName(INPUT_DATA);
+
+                final OutputCacheKey outputCacheKey = getInputKey(context, input);
+                if (outputCacheKey != null) {
+                    final InputCacheKey inputCacheKey = new InputCacheKey(input, outputCacheKey);
+
+                    logger.info(inputCacheKey);
+
+                    final Object inputValidity = getInputValidity(context, input);
+                    if (inputValidity != null) {
+                        logger.info(inputValidity);
+                    } else {
+                        logger.info("validity is null");
+                    }
+                } else {
+                    logger.info("key is null");
+                }
                 
-                logger.info(keyValidity == null ? "Key and validity are null"
-                        : "Key:\n" + keyValidity.key + "\nValidity:\n" + keyValidity.validity);
                 readInputAsSAX(context, INPUT_DATA, xmlReceiver);
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return getInputKey(context, getInputByName(INPUT_DATA));
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                return getInputKey(pipelineContext, getInputByName(INPUT_DATA));
             }
 
-            public Object getValidityImpl(PipelineContext context) {
-                return getInputValidity(context, getInputByName(INPUT_DATA));
+            @Override
+            public Object getValidityImpl(PipelineContext pipelineContext) {
+                return getInputValidity(pipelineContext, getInputByName(INPUT_DATA));
             }
         };
         addOutput(name, output);

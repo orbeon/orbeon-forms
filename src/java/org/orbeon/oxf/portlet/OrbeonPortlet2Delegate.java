@@ -57,6 +57,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
 
     // Servlet context initialization parameters set in web.xml
     private Map contextInitParameters = null;
+    public static final String PORTLET_CONFIG = "portlet-config"; // used only for pipelines called within portlets
 
     public void init() throws PortletException {
         // NOTE: Here we assume that an Orbeon Forms WebAppContext context has already
@@ -164,9 +165,9 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
 
             // Call service
             final PipelineContext pipelineContext = new PipelineContext();
-            pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
+            pipelineContext.setAttribute(PORTLET_CONFIG, getPortletConfig());
             final Portlet2ExternalContext externalContext = new Portlet2ExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, actionRequest);
-            processorService.service(true, externalContext, pipelineContext);
+            processorService.service(externalContext, pipelineContext);
 
             // Check whether a redirect was issued, or some output was generated
             Portlet2ExternalContext.BufferedResponse bufferedResponse = (Portlet2ExternalContext.BufferedResponse) externalContext.getResponse();
@@ -224,9 +225,9 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
             } else {
                 // Call service
                 PipelineContext pipelineContext = new PipelineContext();
-                pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
+                pipelineContext.setAttribute(PORTLET_CONFIG, getPortletConfig());
                 ExternalContext externalContext = new Portlet2ExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, request, response);
-                processorService.service(true, externalContext, pipelineContext);
+                processorService.service(externalContext, pipelineContext);
                 // TEMP: The response is also buffered, because our
                 // rewriting algorithm only operates on Strings for now.
                 Portlet2ExternalContext.DirectResponseTemp directResponse
@@ -245,9 +246,9 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
         try {
             // Call service
             final PipelineContext pipelineContext = new PipelineContext();
-            pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
+            pipelineContext.setAttribute(PORTLET_CONFIG, getPortletConfig());
             final ExternalContext externalContext = new Portlet2ExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, request, response);
-            processorService.service(true, externalContext, pipelineContext);
+            processorService.service(externalContext, pipelineContext);
             // TEMP: The response is also buffered, because our
             // rewriting algorithm only operates on Strings for now.
             final Portlet2ExternalContext.DirectResponseTemp directResponse
@@ -319,7 +320,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
         // Create new external context and call service
         final PipelineContext pipelineContext = new PipelineContext();
         final Portlet2ExternalContext externalContext = new Portlet2ExternalContext(pipelineContext, request, response);
-        externalContext.getProcessorService().service(true, externalContext, externalContext.getPipelineContext());
+        externalContext.getProcessorService().service(externalContext, externalContext.getPipelineContext());
     }
 
     /**
@@ -330,7 +331,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
         // Create new external context and call service
         final PipelineContext pipelineContext = new PipelineContext();
         final Portlet2ExternalContext externalContext = new Portlet2ExternalContext(pipelineContext, request, response);
-        externalContext.getProcessorService().service(true, externalContext, externalContext.getPipelineContext());
+        externalContext.getProcessorService().service(externalContext, externalContext.getPipelineContext());
     }
 
     public void destroy() {

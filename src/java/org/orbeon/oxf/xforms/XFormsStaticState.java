@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.*;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.*;
@@ -314,7 +314,7 @@ public class XFormsStaticState {
                 }
             } else {
                 // Otherwise use matchers from the pipeline context
-                this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) propertyContext.getAttribute(PipelineContext.PATH_MATCHERS);
+                this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
             }
         }
 

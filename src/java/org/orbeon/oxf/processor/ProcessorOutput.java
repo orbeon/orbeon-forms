@@ -13,12 +13,19 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 
 public interface ProcessorOutput extends ProcessorReader, ProcessorInputOutput {
-    void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver);
+
+    String getId();
+    Processor getProcessor(PipelineContext pipelineContext);
+
     void setInput(ProcessorInput processorInput);
     ProcessorInput getInput();
-    String getId();
+
+    void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver);
+    OutputCacheKey getKey(PipelineContext pipelineContext);
+    Object getValidity(PipelineContext pipelineContext);
 }

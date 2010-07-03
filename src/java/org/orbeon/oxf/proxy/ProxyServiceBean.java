@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.SAXStore;
 
 import javax.naming.Context;
@@ -43,7 +44,7 @@ public class ProxyServiceBean extends SessionBeanAdapter {
             // Create processor
             Context jndiContext = new InitialContext();
             org.orbeon.oxf.pipeline.api.PipelineContext pipelineContext = new org.orbeon.oxf.pipeline.api.PipelineContext();
-            pipelineContext.setAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.JNDI_CONTEXT, jndiContext);
+            pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
             Processor processor = ProcessorFactoryRegistry.lookup(jndiName).createInstance();
 
             // Connect inputs

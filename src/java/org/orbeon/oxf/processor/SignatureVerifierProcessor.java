@@ -18,6 +18,7 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -44,7 +45,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
 
 
     public ProcessorOutput createOutput(String name) {
-        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(SignatureVerifierProcessor.this, name) {
             public void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
                     final Document pubDoc = readCacheInputAsDOM4J(context, INPUT_PUBLIC_KEY);

@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -41,8 +42,9 @@ public class NewServletIncludeGenerator extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(NewServletIncludeGenerator.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 // Read config
@@ -142,53 +144,67 @@ class ServletIncludeResponseWrapper extends ResponseWrapper {
         super(response);
     }
 
+    @Override
     public OutputStream getOutputStream() {
         return streamInterceptor.getOutputStream();
     }
 
+    @Override
     public PrintWriter getWriter() {
         if (printWriter == null)
             printWriter = new PrintWriter(streamInterceptor.getWriter());
         return printWriter;
     }
 
+    @Override
     public boolean isCommitted() {
         return false;
     }
 
+    @Override
     public void reset() {
     }
 
+    @Override
     public void sendError(int len) {
         // NOTE: Should do something?
     }
 
+    @Override
     public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
     }
 
+    @Override
     public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
     }
 
+    @Override
     public void setResourceCaching(long lastModified, long expires) {
     }
 
+    @Override
     public void setContentLength(int len) {
     }
 
+    @Override
     public void setContentType(String contentType) {
         streamInterceptor.setEncoding(NetUtils.getContentTypeCharset(contentType));
         streamInterceptor.setContentType(NetUtils.getContentTypeMediaType(contentType));
     }
 
+    @Override
     public void setHeader(String name, String value) {
     }
 
+    @Override
     public void addHeader(String name, String value) {
     }
 
+    @Override
     public void setStatus(int status) {
     }
 
+    @Override
     public void setTitle(String title) {
     }
 

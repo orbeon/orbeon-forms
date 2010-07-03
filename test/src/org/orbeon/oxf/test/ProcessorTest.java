@@ -30,6 +30,7 @@ import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -80,7 +81,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
             ResourceManager resourceManager = ResourceManagerWrapper.instance();
             pipelineContext = new PipelineContext();
             jndiContext = new InitialContext();
-            pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
+            pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
             // Initialize log4j with a DOMConfiguration
             LoggerFactory.initLogger();
@@ -314,7 +315,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 for (; executionCount < REPEAT_COUNT; executionCount++) {
                     // Create pipeline context
                     final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-                    pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
+                    pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
                     // Get ExternalContext
                     final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);

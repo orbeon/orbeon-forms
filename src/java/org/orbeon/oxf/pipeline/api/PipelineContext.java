@@ -14,6 +14,7 @@
 package org.orbeon.oxf.pipeline.api;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.PropertyContext;
@@ -26,53 +27,10 @@ import java.util.*;
  */
 public class PipelineContext implements PropertyContext {
 
-    public static class TraceInfo {
-        public final long start;
-        public long end;
-        public final String systemID;
-        public final int line;
-
-        public TraceInfo(final long start, final String systemID, final int line) {
-            this.start = start;
-            this.systemID = systemID;
-            this.line = line;
-        }
-
-        public TraceInfo(final String systemID, final int line) {
-            this.start = System.currentTimeMillis();
-            this.systemID = systemID;
-            this.line = line;
-        }
-
-        public String toString() {
-            return systemID + ":( " + start + " " + end + " )";
-        }
-    }
-
     /**
      * Key name for the EXTERNAL_CONTEXT attribute of type ExternalContext.
      */
     public static final String EXTERNAL_CONTEXT = "external-context";
-
-    /**
-     * This is for internal pipeline engine use.
-     */
-    public static final String PARENT_PROCESSORS = "parent-processors";
-
-    /**
-     * Throwable passed set by ProcessorService.
-     */
-    public static final String THROWABLE = "throwable";
-
-    // TODO: All those definitions should not be in PipelineContext
-    public static final String PATH_MATCHERS = "path-matchers"; // used by PageFlowController
-    public static final String XSLT_STYLESHEET_URI_LISTENER = "xslt-stylesheet-uri-listener"; // used by XSLTTransformer
-    public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context"; // used by RequestGenerator
-    public static final String FILTER_CHAIN = "filter-chain"; // used by ServletFilterGenerator and OPSServletFilter
-    public static final String PORTLET_CONFIG = "portlet-config"; // used only for pipelines called within portlets
-    public static final String JNDI_CONTEXT = "context"; // used by Delegation processor and related
-    public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context"; // used by SQLProcessor and related
-    public static final String DATASOURCE_CONTEXT = "datasource-context"; // used by DatabaseContext
 
     /**
      * ContextListener interface to listen on PipelineContext events.
@@ -87,8 +45,7 @@ public class PipelineContext implements PropertyContext {
     }
 
     /**
-     * ContextListener adapter class to faciliate implementations of the ContextListener
-     * interface.
+     * ContextListener adapter class to facilitate implementations of the ContextListener interface.
      */
     public static class ContextListenerAdapter implements ContextListener {
         public void contextDestroyed(boolean success) {
@@ -97,50 +54,89 @@ public class PipelineContext implements PropertyContext {
 
     public interface Trace extends ContextListener {
         void setPipelineContext(PipelineContext pipelineContext);
-        void add(final TraceInfo tinf);
+        TraceEntry getTraceEntry(ProcessorOutputImpl processorOutputImpl);
     }
 
     private Map<Object, Object> attributes = new HashMap<Object, Object>();
-
     private List<ContextListener> listeners;
-
     private boolean destroyed;
+    private Trace trace;
+    private boolean traceStopped;
 
-    private final Trace trace;
+//    private boolean keyDebugging;
+//
+//    public boolean isKeyDebugging() {
+//        return keyDebugging;
+//    }
+//
+//    public void setKeyDebugging(boolean keyDebugging) {
+//        this.keyDebugging = keyDebugging;
+//    }
 
+    /**
+     * Create a new pipeline context.
+     */
     public PipelineContext() {
-        final Properties properties = org.orbeon.oxf.properties.Properties.instance();
-        if (properties != null) {
-            final PropertySet propertySet = properties.getPropertySet();
-            if (propertySet != null) {
-                final String traceClass = propertySet.getNCName("processor.trace");
-                if (traceClass == null) {
-                    trace = null;
-                } else {
-                    Throwable t = null;
-                    Trace trace = null;
-                    try {
-                        final Class clazz = Class.forName(traceClass);
-                        trace = (Trace) clazz.newInstance();
-                        trace.setPipelineContext(this);
-                    } catch (final Exception e) {
-                        t = e;
-                    }
-                    this.trace = trace;
-                    if (t != null) {
-                        throw new OXFException(t);
-                    }
-                }
-            } else {
-                trace = null;
-            }
+        // Use global property
+        startTrace("oxf.pipeline.trace.class");
+    }
+
+    /**
+     * Start a trace using the class from the given global property name if present.
+     *
+     * @param propertyName  property name containing a class name
+     * @return              true iif new trace was started
+     */
+    public boolean startTrace(String propertyName) {
+        if (trace == null) { // don't create if already present
+            final Properties properties = Properties.instance();
+            trace = createTraceIfNeeded(properties, propertyName);
+            return trace != null;
         } else {
-            trace = null;
+            return false;
         }
     }
 
-    public Trace getTrace() {
+    /**
+     * Stop the trace for the remaining duration of this context.
+     */
+    public void stopTrace() {
+        if (trace != null)
+            traceStopped = true;
+    }
+
+    private Trace createTraceIfNeeded(Properties properties, String propertyName) {
+        if (properties != null) {
+            final PropertySet propertySet = properties.getPropertySet();
+            if (propertySet != null) {
+                final String traceClass = propertySet.getNCName(propertyName);
+                if (traceClass != null) {
+                    return createTrace(traceClass);
+                }
+            }
+        }
+        return null;
+    }
+
+    private Trace createTrace(String traceClass) {
+        Trace trace;
+        try {
+            final Class clazz = Class.forName(traceClass);
+            trace = (Trace) clazz.newInstance();
+            trace.setPipelineContext(this);
+        } catch (final Exception e) {
+            throw new OXFException(e);
+        }
         return trace;
+    }
+
+    /**
+     * Return the trace for update if available.
+     *
+     * @return trace
+     */
+    public Trace getTraceForUpdate() {
+        return traceStopped ? null : trace;
     }
 
     /**

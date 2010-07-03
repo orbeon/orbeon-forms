@@ -13,39 +13,54 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+
 public class SimpleOutputCacheKey extends OutputCacheKey {
 
     private final String key;
     private final int hash;
 
-    public SimpleOutputCacheKey( final Class c, final String onam, String k ) {
-        super( c, onam );
-        key = k;
-        if ( key == null ) throw new IllegalArgumentException( "key must not be null" );
+    public SimpleOutputCacheKey(final Class clazz, final String outputName, String key) {
+        super(clazz, outputName);
+        this.key = key;
+
+        if (this.key == null)
+            throw new IllegalArgumentException("key must not be null");
+
         int tmp = 1;
         tmp += 31 * tmp + super.hashCode();
         tmp += 31 * tmp + outputName.hashCode();
-        tmp += 31 * tmp + key.hashCode();
+        tmp += 31 * tmp + this.key.hashCode();
+
         hash = tmp;
     }
 
-    public boolean equals( final Object rhsObj ) {
-        boolean ret = this == rhsObj;
-        done : if ( !ret ) {
-            ret = rhsObj instanceof SimpleOutputCacheKey && super.equals( rhsObj );
-            if ( !ret ) break done;
-            final SimpleOutputCacheKey rhs = ( SimpleOutputCacheKey )rhsObj;
-            ret = key.equals( rhs.key );
+    @Override
+    public boolean equals(final Object other) {
+        boolean ret = this == other;
+        done:
+        if (!ret) {
+            ret = other instanceof SimpleOutputCacheKey && super.equals(other);
+            if (!ret) break done;
+            final SimpleOutputCacheKey rhs = (SimpleOutputCacheKey) other;
+            ret = key.equals(rhs.key);
         }
         return ret;
     }
 
+    @Override
     public int hashCode() {
         return hash;
     }
 
+    @Override
     public String toString() {
         return "SimpleOutputCacheKey [class: " + CacheUtils.getShortClassName(getClazz())
-                + ", outputName: " + outputName + ", key: " + key + "]"; 
+                + ", outputName: " + outputName + ", key: " + key + "]";
+    }
+
+    @Override
+    public void toXML(ContentHandlerHelper helper, Object validities) {
+        helper.element("output", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "name", outputName, "key", key });
     }
 }

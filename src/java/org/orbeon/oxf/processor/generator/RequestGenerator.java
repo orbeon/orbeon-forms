@@ -23,9 +23,9 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.DigestState;
+import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.NetUtils;
@@ -97,6 +97,7 @@ public class RequestGenerator extends ProcessorImpl {
     private static final String FILE_ITEM_ELEMENT = "request:file-item";
     private static final String PARAMETER_NAME_ATTRIBUTE = "parameter-name";
     private static final String PARAMETER_POSITION_ATTRIBUTE = "parameter-position";
+    public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context"; // used by RequestGenerator
 
 //    private static final Map prefixes = new HashMap();
 //
@@ -111,7 +112,7 @@ public class RequestGenerator extends ProcessorImpl {
 
     @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new DigestTransformerOutputImpl(RequestGenerator.this, name) {
             public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 final State state = (State) getFilledOutState(pipelineContext);
                 // Transform the resulting document into SAX
@@ -532,10 +533,10 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private static Context getContext(PipelineContext pipelineContext) {
-        Context context = (Context) pipelineContext.getAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT);
+        Context context = (Context) pipelineContext.getAttribute(REQUEST_GENERATOR_CONTEXT);
         if (context == null) {
             context = new Context();
-            pipelineContext.setAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT, context);
+            pipelineContext.setAttribute(REQUEST_GENERATOR_CONTEXT, context);
         }
         return context;
     }

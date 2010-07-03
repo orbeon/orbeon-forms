@@ -17,9 +17,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 
@@ -55,10 +54,11 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
      * case, the converter exposes a "data" output, and the processor's start() method is not
      * called.
      */
+    @Override
     public ProcessorOutput createOutput(String name) {
         if (!name.equals(OUTPUT_DATA))
             throw new OXFException("Invalid output created: " + name);
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new CacheableTransformerOutputImpl(HttpBinarySerializer.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 // Create OutputStream that converts to Base64
                 ContentHandlerOutputStream outputStream = new ContentHandlerOutputStream(xmlReceiver);

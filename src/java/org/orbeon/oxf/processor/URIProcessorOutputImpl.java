@@ -18,6 +18,7 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
@@ -38,7 +39,7 @@ import java.util.Map;
  *
  * Usage: an URIReferences object must be cached as an object associated with the config input.
  */
-public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutputImpl {
+public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
     public static Logger logger = LoggerFactory.createLogger(URIProcessorOutputImpl.class);
 
@@ -47,7 +48,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     private URIReferences localConfigURIReferences = null; // TODO: NIY
 
     public URIProcessorOutputImpl(ProcessorImpl processorImpl, String name, String configInputName) {
-        super(processorImpl.getClass(), name);
+        super(processorImpl, name);
         this.processorImpl = processorImpl;
         this.configInputName = configInputName;
     }
@@ -57,7 +58,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 //        }
 
     @Override
-    protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+    public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
         final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
 //            log("uriReferences: " + uriReferences);
         if (uriReferences == null)
@@ -238,6 +239,11 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
         // Make sure the config input is cacheable
         final ProcessorImpl.KeyValidity keyValidity = processorImpl.getInputKeyValidity(pipelineContext, configInputName);
+
+        if (keyValidity == null && pipelineContext.getTraceForUpdate() != null) {
+            processorImpl.getInputKeyValidity(pipelineContext, configInputName);
+        }
+
         if (keyValidity == null)
             return null;
 

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.InspectingContentHandler;
 
 public class SAXInspectorProcessor extends ProcessorImpl {
@@ -26,15 +27,17 @@ public class SAXInspectorProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorOutputImpl(SAXInspectorProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 readInputAsSAX(context, INPUT_DATA, new InspectingContentHandler(xmlReceiver));
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return getInputKey(context, getInputByName(INPUT_DATA));
+            @Override
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                return getInputKey(pipelineContext, getInputByName(INPUT_DATA));
             }
 
+            @Override
             public Object getValidityImpl(PipelineContext context) {
                 return getInputValidity(context, getInputByName(INPUT_DATA));
             }

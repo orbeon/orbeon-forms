@@ -14,7 +14,7 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
-    
+
     <p:param name="source" type="input"/>
     <p:param name="language-pair" type="input"/>
     <p:param name="data" type="output"/>
@@ -54,7 +54,7 @@
         <p:input name="data" href="#google-translation"/>
         <p:input name="config">
             <data xsl:version="2.0">
-                <xsl:variable name="after-opening-quote" select="substring-after(., '&quot;trans&quot;:&quot;')"/>
+                <xsl:variable name="after-opening-quote" select="substring-after(., '[[[&quot;')"/>
                 <xsl:variable name="before-closing-quote" select="substring-before($after-opening-quote, '&quot;,&quot;')"/>
                 <xsl:variable name="replace-escaped-quotes" select="replace($before-closing-quote, '\\&quot;', '&quot;')"/>
                 <xsl:value-of select="$replace-escaped-quotes"/>

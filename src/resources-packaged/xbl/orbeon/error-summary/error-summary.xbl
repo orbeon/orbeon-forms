@@ -47,7 +47,7 @@
                 <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
                 <xxforms:script>
                     <![CDATA[
-                    
+
                     var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this)[0];
                     var observers = ORBEON.xforms.Document.getValue(observersElement.id).split(" ");
 
@@ -57,7 +57,9 @@
                         var controlElements = YAHOO.util.Dom.getElementsByClassName("xforms-control", null, observerElement);
                         for (var i = 0; i < controlElements.length; i++) {
                             var controlElement = controlElements[i];
-                            YAHOO.util.Dom.addClass(controlElement, "xforms-visited")
+                            YAHOO.util.Dom.addClass(controlElement, "xforms-visited");
+                            if (ORBEON.util.Dom.hasClass(controlElement, "xforms-invalid"))
+                                ORBEON.util.Dom.addClass(controlElement, "xforms-invalid-visited");
                         }
                         var activeAlertElements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active", null, observerElement);
                         for (var i = 0; i < activeAlertElements.length; i++) {
@@ -84,7 +86,8 @@
                         var controlElements = YAHOO.util.Dom.getElementsByClassName("xforms-control", null, observerElement);
                         for (var i = 0; i < controlElements.length; i++) {
                             var controlElement = controlElements[i];
-                            YAHOO.util.Dom.removeClass(controlElement, "xforms-visited")
+                            YAHOO.util.Dom.removeClass(controlElement, "xforms-visited");
+                            YAHOO.util.Dom.removeClass(controlElement, "xforms-invalid-visited");
                         }
                         var activeAlertElements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active-visited", null, observerElement);
                         for (var i = 0; i < activeAlertElements.length; i++) {

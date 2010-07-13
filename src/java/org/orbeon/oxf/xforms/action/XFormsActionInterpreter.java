@@ -213,7 +213,8 @@ public class XFormsActionInterpreter {
                 // Gotta iterate
 
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
-                // NOTE: It's not 100% how @context and @xxforms:iterate should interact here
+                // NOTE: It's not 100% how @context and @xxforms:iterate should interact here. Right now @xxforms:iterate overrides @context,
+                // i.e. @context is evaluated first, and @xxforms:iterate sets a new context for each iteration
                 final XFormsContextStack.BindingContext actionBindingContext = actionBlockContextStack.popBinding();
                 final Map<String, String> namespaceContext = container.getNamespaceMappings(actionElement);
                 {
@@ -227,7 +228,8 @@ public class XFormsActionInterpreter {
                     final String nodesetAttribute = actionElement.attributeValue("nodeset");
                     final String bindAttribute = actionElement.attributeValue("bind");
 
-                    final int iterationCount = actionBlockContextStack.getCurrentNodeset().size();
+                    final List<Item> currentNodeset = actionBlockContextStack.getCurrentNodeset();
+                    final int iterationCount = currentNodeset.size();
                     for (int index = 1; index <= iterationCount; index++) {
 
                         // Push iteration
@@ -237,7 +239,7 @@ public class XFormsActionInterpreter {
                         // TODO: function context
                         actionBlockContextStack.pushBinding(propertyContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext, getSourceEffectiveId(actionElement), actionScope);
 
-                        final Item overriddenContextNodeInfo = actionBlockContextStack.getCurrentSingleItem();
+                        final Item overriddenContextNodeInfo = currentNodeset.get(index - 1);
                         runSingleIteration(propertyContext, event, eventObserver, actionElement, actionNamespaceURI,
                                 actionName, actionScope, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 

@@ -1284,4 +1284,73 @@
         </output>
     </test>
 
+    <test description="Interaction of context and xxforms:iterate" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+                <xhtml:head>
+                    <xforms:model>
+                        <xforms:instance id="instance">
+                            <instance>
+                                <nested/>
+                                <one-line/>
+                                <no-insert/>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-model-construct-done">
+
+                            <!-- Straight forward insert -->
+                            <xforms:action xxforms:iterate="for $i in (1 to 3) return .">
+                                <xforms:insert context="nested" origin="xxforms:element('item')"/>
+                            </xforms:action>
+
+                            <!-- Does the same thing as the previous, in one line (the iterate doesn't change the context of the insert since it return ".") -->
+                            <xforms:insert ev:event="xforms-model-construct-done" context="one-line"
+                                    xxforms:iterate="for $i in (1 to 3) return ."
+                                    origin="xxforms:element('item')"/>
+
+                            <!-- This should not do any insert as the iterate changes the context to a simple type -->
+                            <xforms:insert ev:event="xforms-model-construct-done" context="no-insert"
+                                    xxforms:iterate="for $i in (1 to 3) return 42"
+                                    origin="xxforms:element('item')"/>
+
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="xf-1">
+                                <instance>
+                                    <nested>
+                                        <item/>
+                                        <item/>
+                                        <item/>
+                                    </nested>
+                                    <one-line>
+                                        <item/>
+                                        <item/>
+                                        <item/>
+                                    </one-line>
+                                    <no-insert/>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

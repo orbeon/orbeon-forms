@@ -41,7 +41,12 @@
                     *zoom: 1;
                     *display: inline;
                     vertical-align: middle;
-                    *margin: 0 0 1px 0;
+                    <!-- The following fixes:
+                         [ #315153 ] IE 6/7: fr:button border is cut when in table with cellpadding="0"
+                         http://forge.ow2.org/tracker/index.php?func=detail&aid=315153&group_id=168&atid=350207
+                         This issue cannot be reproduced on IE8 in IE7 mode.
+                         We only want to override the margin-bottom here, not other margins declared in button.css. -->
+                    *margin-bottom: 1px;
                 }
             </xbl:style>
         </xbl:resources>

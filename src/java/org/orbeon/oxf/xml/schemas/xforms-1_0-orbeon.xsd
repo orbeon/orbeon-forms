@@ -921,7 +921,7 @@
             <xsd:sequence>
 
                 <xsd:element ref="xforms:label" minOccurs="0"/>
-                <xsd:sequence maxOccurs="unbounded">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:choice>
                         <xsd:group ref="xforms:Form.Controls"/>
                         <xsd:element ref="xforms:group"/>

@@ -45,6 +45,17 @@ html body .xforms-form br.xforms-disabled,
     display: none;
 }
 
+html body .xforms-form .xforms-disabled a,
+    html body .xforms-form a.xforms-disabled,
+    html body .xforms-form .xforms-case-deselected a,
+    html body .xforms-form a.xforms-case-deselected {
+
+    /* Prevent links from being able to get the focus. See bug:
+       [ #315198 ] Non-relevant links and minimal triggers can get the focus
+       http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
+    display: none;
+}
+
 html body .xforms-form input.xforms-disabled,
     html body .xforms-form select.xforms-disabled,
     html body .xforms-form button.xforms-disabled,

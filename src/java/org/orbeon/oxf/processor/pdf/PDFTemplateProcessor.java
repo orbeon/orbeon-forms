@@ -13,40 +13,30 @@
  */
 package org.orbeon.oxf.processor.pdf;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
+import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.FloatValue;
 import org.orbeon.saxon.value.Int64Value;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
@@ -193,7 +183,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element),
+        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue,  new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)),
                 variableToValueMap, functionLibrary, functionContext, null, (LocationData) element.getData());
     }
 
@@ -262,7 +252,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
             if ((elementPage != null) && !Integer.toString(groupContext.pageNumber).equals(elementPage))
                 continue;
 
-            final Map<String, String> namespaceMap = Dom4jUtils.getNamespaceContextNoDefault(currentElement);
+            final NamespaceMapping namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(currentElement));
+
             final String elementName = currentElement.getName();
             if (elementName.equals("group")) {
                 // Handle group
@@ -271,7 +262,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
 
                 final String ref = currentElement.attributeValue("ref");
                 if (ref != null) {
-                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                    final NodeInfo newContextNode = (NodeInfo) XPathCache.evaluateSingle(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, ref, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                     if (newContextNode == null)
                         continue;
@@ -308,7 +299,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                 // Handle repeat
 
                 final String nodeset = currentElement.attributeValue("nodeset");
-                final List iterations = XPathCache.evaluate(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, nodeset, namespaceMap,
+                final List iterations = XPathCache.evaluate(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, nodeset, namespaceMapping,
                         variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                 final String offsetXString = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, currentElement.attributeValue("offset-x"));
@@ -336,8 +327,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                     final String value = currentElement.attributeValue("value") == null ? currentElement.attributeValue("ref") : currentElement.attributeValue("value");
                     // Get value from instance
 
-                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
-                    final String fieldName = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, fieldNameStr, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                    final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                    final String fieldName = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, fieldNameStr, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
                     groupContext.acroFields.setField(fieldName, text);
 
                 } else {
@@ -364,7 +355,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                         final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
 
                         // Get value from instance
-                        final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                        final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                         // Iterate over characters and print them
                         if (text != null) {
@@ -391,7 +382,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
 
                 final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
                 final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
-                final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMap, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                final String text = XPathCache.evaluateAsString(pipelineContext, groupContext.contextNodeSet, groupContext.contextPosition, value, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
 
                 final FontAttributes fontAttributes = getFontAttributes(currentElement, pipelineContext, groupContext, variableToValueMap, contextNode);
                 final BaseFont baseFont = BaseFont.createFont(fontAttributes.fontFamily, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);

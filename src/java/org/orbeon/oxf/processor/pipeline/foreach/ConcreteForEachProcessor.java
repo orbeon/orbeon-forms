@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.foreach;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -30,6 +28,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -44,7 +43,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
     private final Processor forEachBlockProcessor;
     private final ProcessorOutput iterationOutput;
     private final String select;
-    private final Map<String, String> namespaceContext;
+    private final NamespaceMapping namespaceContext;
     private String rootLocalName;
     private String rootQName;
     private String rootNamespaceURI;
@@ -94,7 +93,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         iterationOutput = forEachBlockProcessor.createOutput(idOrRef);
 
         select = forEachAST.getSelect();
-        namespaceContext = Dom4jUtils.getNamespaceContextNoDefault((Element) forEachAST.getNode());
+        namespaceContext = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault((Element) forEachAST.getNode()));
         if (forEachAST.getRoot() != null) {
             rootQName = forEachAST.getRoot();
             int columnPosition = rootQName.indexOf(':');
@@ -105,7 +104,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             } else {
                 // Extract prefix, find namespace URI
                 final String prefix = rootQName.substring(0, columnPosition);
-                rootNamespaceURI = namespaceContext.get(prefix);
+                rootNamespaceURI = namespaceContext.mapping.get(prefix);
                 if (rootNamespaceURI == null)
                     throw new ValidationException("Prefix '" + prefix + "' used in root attribute is undefined", forEachAST.getLocationData());
                 rootLocalName = rootQName.substring(columnPosition + 1);

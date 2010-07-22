@@ -15,12 +15,10 @@ package org.orbeon.oxf.processor;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.PrefixedQName;
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.*;
 import org.apache.axis.soap.SOAPConstants;
 import org.dom4j.*;
+import org.dom4j.Text;
 import org.dom4j.io.DOMReader;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -28,22 +26,15 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
-import org.orbeon.oxf.util.JMSUtils;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -513,7 +504,7 @@ public class DelegationProcessor extends ProcessorImpl {
                 String select = operationElement.attributeValue("select");
                 if (select != null) {
                     operation.select = select;
-                    operation.selectNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(operationElement);
+                    operation.selectNamespaceContext = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(operationElement));
                 }
             }
         }
@@ -546,6 +537,6 @@ public class DelegationProcessor extends ProcessorImpl {
         public String soapAction;
         public String encodingStyle;
         public String select;
-        public Map<String,String> selectNamespaceContext;
+        public NamespaceMapping selectNamespaceContext;
     }
 }

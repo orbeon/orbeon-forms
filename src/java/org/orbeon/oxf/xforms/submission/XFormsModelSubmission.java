@@ -23,35 +23,24 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
+import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.*;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -713,7 +702,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // XPath function library and namespace mappings
         final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
-        final Map<String, String> prefixToURIMap = container.getNamespaceMappings(submissionElement);
+        final NamespaceMapping namespaceMapping = container.getNamespaceMappings(submissionElement);
 
         // XPath context
         XPathCache.XPathContext xpathContext;
@@ -736,7 +725,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             submissionElementContextItem = bindingContext.getContextItem();
             // NOTE: Current instance may be null if the document submitted is not part of an instance
             refInstance = bindingContext.getInstance();
-            xpathContext = new XPathCache.XPathContext(prefixToURIMap, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
+            xpathContext = new XPathCache.XPathContext(namespaceMapping, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
         }
 
         public SubmissionParameters(PropertyContext propertyContext, String eventName) {
@@ -771,7 +760,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             {
                 // Resolved method AVT
                 final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtMethod);
-                resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName, true));
+                resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, resolvedMethodQName, true));
 
                 // Get actual method based on the method attribute
                 actualHttpMethod = getActualHttpMethod(resolvedMethod);

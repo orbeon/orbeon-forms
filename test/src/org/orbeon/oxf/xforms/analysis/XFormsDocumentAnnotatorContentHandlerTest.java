@@ -21,6 +21,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -29,9 +30,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.Assert.*;
 
@@ -48,60 +47,31 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     @Test
     public void testFormNamespaceElements() {
 
-        final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
-        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(new XFormsAnnotatorContentHandler.Metadata(new IdGenerator(), mappings));
+        final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata(new IdGenerator());
+        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(metadata);
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false, false);
 
         // Test that ns information is provided for those elements
-        Map<String, String> result = mappings.get("output-in-title");
-        assertNotNull(result);
-
-        result = mappings.get("html");
-        assertNotNull(result);
-        
-        result = mappings.get("main-instance");
-        assertNotNull(result);
-
-        result = mappings.get("dateTime-component");
-        assertNotNull(result);
-
-        result = mappings.get("dateTime1-control");
-        assertNotNull(result);
-
-        result = mappings.get("value1-control");
-        assertNotNull(result);
-
-        result = mappings.get("output-in-label");
-        assertNotNull(result);
-
-        result = mappings.get("img-in-label");
-        assertNotNull(result);
-
-        result = mappings.get("span");
-        assertNotNull(result);
+        assertNotNull(metadata.getNamespaceMapping("output-in-title").mapping);
+        assertNotNull(metadata.getNamespaceMapping("html").mapping);
+        assertNotNull(metadata.getNamespaceMapping("main-instance").mapping);
+        assertNotNull(metadata.getNamespaceMapping("dateTime-component").mapping);
+        assertNotNull(metadata.getNamespaceMapping("dateTime1-control").mapping);
+        assertNotNull(metadata.getNamespaceMapping("value1-control").mapping);
+        assertNotNull(metadata.getNamespaceMapping("output-in-label").mapping);
+        assertNotNull(metadata.getNamespaceMapping("img-in-label").mapping);
+        assertNotNull(metadata.getNamespaceMapping("span").mapping);
 
         // Test that ns information is NOT provided for those elements (because processed as part of shadow tree processing)
-        result = mappings.get("instance-in-xbl");
-        assertNull(result);
-
-        result = mappings.get("div-in-xbl");
-        assertNull(result);
+        assertNull(metadata.getNamespaceMapping("instance-in-xbl"));
+        assertNull(metadata.getNamespaceMapping("div-in-xbl"));
 
         // Test that ns information is NOT provided for those elements (because in instances or schemas)
-        result = mappings.get("instance-root");
-        assertNull(result);
-
-        result = mappings.get("instance-value");
-        assertNull(result);
-
-        result = mappings.get("xbl-instance-root");
-        assertNull(result);
-
-        result = mappings.get("xbl-instance-value");
-        assertNull(result);
-
-        result = mappings.get("schema-element");
-        assertNull(result);
+        assertNull(metadata.getNamespaceMapping("instance-root"));
+        assertNull(metadata.getNamespaceMapping("instance-value"));
+        assertNull(metadata.getNamespaceMapping("xbl-instance-root"));
+        assertNull(metadata.getNamespaceMapping("xbl-instance-value"));
+        assertNull(metadata.getNamespaceMapping("schema-element"));
     }
 
     // Test that xxforms:attribute elements with @id and @for were created for
@@ -109,13 +79,13 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     public void testXXFormsAttribute() {
 
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
-        final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
+        final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
         final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata, Dom4jUtils.createElement("dummy"))
                 .annotateShadowTree(document, "", false);
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 
         // Check there is an xxforms:attribute for "html" with correct name
-        List result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'html']", BASIC_NAMESPACE_MAPPINGS, null, null, null, null, null);
+        List result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -124,7 +94,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         assertEquals("lang", resultElement.attributeValue("name"));
 
         // Check there is an xxforms:attribute for "span" with correct name
-        result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'span']", BASIC_NAMESPACE_MAPPINGS, null, null, null, null, null);
+        result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());

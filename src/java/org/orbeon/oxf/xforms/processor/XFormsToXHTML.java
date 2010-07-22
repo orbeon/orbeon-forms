@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
@@ -154,7 +151,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                             final LocationDocumentResult documentResult = new LocationDocumentResult();
                             identity.setResult(documentResult);
 
-                            final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
+                            final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
                             final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
 
                             // Store dependencies container in state before reading
@@ -302,7 +299,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Set caching dependencies for XBL inclusions
         {
-            final XFormsAnnotatorContentHandler.Metadata metadata = containingDocument.getStaticState().getMetadata();
+            final XFormsStaticState.Metadata metadata = containingDocument.getStaticState().getMetadata();
             final List<String> includes = metadata.getBindingsIncludes();
             if (includes != null) {
                 for (final String include: includes) {

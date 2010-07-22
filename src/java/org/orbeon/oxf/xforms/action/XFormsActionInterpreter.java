@@ -17,9 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsVariableControl;
@@ -28,15 +26,13 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Execute a top-level XForms action and the included nested actions if any.
@@ -148,10 +144,10 @@ public class XFormsActionInterpreter {
     /**
      * Return the namespace mappings for the given action element.
      *
-     * @param actionElement Element to get namespace mapping for
-     * @return              Map<String prefix, String uri>
+     * @param actionElement element to get namespace mapping for
+     * @return              mapping
      */
-    public Map<String, String> getNamespaceMappings(Element actionElement) {
+    public NamespaceMapping getNamespaceMappings(Element actionElement) {
         return container.getNamespaceMappings(actionElement);
     }
 
@@ -216,12 +212,12 @@ public class XFormsActionInterpreter {
                 // NOTE: It's not 100% how @context and @xxforms:iterate should interact here. Right now @xxforms:iterate overrides @context,
                 // i.e. @context is evaluated first, and @xxforms:iterate sets a new context for each iteration
                 final XFormsContextStack.BindingContext actionBindingContext = actionBlockContextStack.popBinding();
-                final Map<String, String> namespaceContext = container.getNamespaceMappings(actionElement);
+                final NamespaceMapping namespaceMapping = container.getNamespaceMappings(actionElement);
                 {
                     final String contextAttribute = actionElement.attributeValue("context");
                     final String modelAttribute = actionElement.attributeValue("model");
                     // TODO: function context
-                    actionBlockContextStack.pushBinding(propertyContext, null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceContext, getSourceEffectiveId(actionElement), actionScope);
+                    actionBlockContextStack.pushBinding(propertyContext, null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope);
                 }
                 {
                     final String refAttribute = actionElement.attributeValue("ref");
@@ -237,7 +233,7 @@ public class XFormsActionInterpreter {
 
                         // Then we also need to push back binding attributes, excluding @context and @model
                         // TODO: function context
-                        actionBlockContextStack.pushBinding(propertyContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext, getSourceEffectiveId(actionElement), actionScope);
+                        actionBlockContextStack.pushBinding(propertyContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope);
 
                         final Item overriddenContextNodeInfo = currentNodeset.get(index - 1);
                         runSingleIteration(propertyContext, event, eventObserver, actionElement, actionNamespaceURI,
@@ -438,7 +434,7 @@ public class XFormsActionInterpreter {
             if (bindingContext.getSingleItem() == null)
                 return null;
 
-            final Map<String, String> prefixToURIMap = getNamespaceMappings(actionElement);
+            final NamespaceMapping namespaceMapping = getNamespaceMappings(actionElement);
             final LocationData locationData = (LocationData) actionElement.getData();
 
             // Setup function context
@@ -446,7 +442,7 @@ public class XFormsActionInterpreter {
 
             resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(propertyContext, bindingContext.getNodeset(),
                         bindingContext.getPosition(), actionBlockContextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                        functionContext, prefixToURIMap, locationData, attributeValue);
+                        functionContext, namespaceMapping, locationData, attributeValue);
 
             // Restore function context
             actionBlockContextStack.returnFunctionContext();

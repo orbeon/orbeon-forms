@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.VisitorSupport;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -24,6 +21,7 @@ import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -31,9 +29,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Convert an XForms instance into a list of parameters.
@@ -81,7 +77,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         String excludeRef = refAttribute.getValue();
                         PooledXPathExpression xpath = XPathCache.getXPathExpression(pipelineContext, instanceWrapper.getConfiguration(),
                                 instanceWrapper.wrap(instance), excludeRef,
-                                Dom4jUtils.getNamespaceContextNoDefault(paramElement), getLocationData());
+                                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(paramElement)), getLocationData());
                         try {
                             markedNodes.add(xpath.evaluateSingle());
                         } finally {

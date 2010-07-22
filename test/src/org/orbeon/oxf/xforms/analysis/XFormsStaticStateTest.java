@@ -16,26 +16,20 @@ package org.orbeon.oxf.xforms.analysis;
 import org.dom4j.Document;
 import org.junit.Test;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
-import javax.xml.transform.sax.TransformerHandler;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
@@ -369,7 +363,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
 
-        final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
+        final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
         final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
 
         // Read the input through the annotator and gather namespace mappings

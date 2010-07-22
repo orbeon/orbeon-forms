@@ -26,10 +26,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
+import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -222,11 +220,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     /**
      * Return the namespace mappings associated with the given element. The element must be part of this container.
      *
-     * @param element       Element to get namespace mapping for
-     * @return              Map<String prefix, String uri>
+     * @param element       element to get namespace mapping for
+     * @return              mapping
      */
-    public Map<String, String> getNamespaceMappings(Element element) {
-        return containingDocument.getStaticState().getNamespaceMappings(fullPrefix, element);
+    public NamespaceMapping getNamespaceMappings(Element element) {
+        return containingDocument.getStaticState().getNamespaceMapping(fullPrefix, element);
     }
 
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {

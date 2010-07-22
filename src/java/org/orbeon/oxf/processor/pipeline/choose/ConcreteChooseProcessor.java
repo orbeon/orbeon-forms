@@ -23,9 +23,8 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -40,7 +39,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
     // Created when constructed
     private LocationData locationData;
     private List branchConditions;
-    private List branchNamespaces;
+    private List<NamespaceMapping> branchNamespaces;
     private List branchProcessors;
     private Set outputsById;
     private Set outputsByParamRef;
@@ -61,7 +60,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
      *                          pipeline outputs
      */
     public ConcreteChooseProcessor(String id, LocationData locationData,
-                                   List branchConditions, List branchNamespaces, List branchProcessors,
+                                   List branchConditions, List<NamespaceMapping> branchNamespaces, List branchProcessors,
                                    Set inputs, Set outputsById, Set outputsByParamRef) {
         setId(id);
         this.locationData = locationData;
@@ -187,7 +186,9 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 hrefDocumentInfo = readCacheInputAsTinyTree(pipelineContext, configuration, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
             }
             PooledXPathExpression expression = null;
-            final Map namespaces = (Map) branchNamespaces.get(branchIndex);
+            final NamespaceMapping namespaces = branchNamespaces.get(branchIndex);
+
+
             try {
                 expression = XPathCache.getXPathExpression(pipelineContext, hrefDocumentInfo.getConfiguration(),
                         hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null,

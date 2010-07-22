@@ -16,21 +16,16 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.saxon.om.*;
 
 import java.util.*;
 
@@ -242,8 +237,8 @@ public class XFormsContextStack {
         final String model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
-        final Map<String, String> bindingElementNamespaceContext = container.getNamespaceMappings(bindingElement);
-        pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext, sourceEffectiveId, scope);
+        final NamespaceMapping bindingElementNamespaceMapping = container.getNamespaceMappings(bindingElement);
+        pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);
     }
 
     private BindingContext getBindingContext(XBLBindings.Scope scope) {
@@ -265,7 +260,7 @@ public class XFormsContextStack {
     }
 
     public void pushBinding(PropertyContext propertyContext, String ref, String context, String nodeset, String modelId, String bindId,
-                            Element bindingElement, Map<String, String> bindingElementNamespaceContext, String sourceEffectiveId, XBLBindings.Scope scope) {
+                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindings.Scope scope) {
 
         // Get location data for error reporting
         final LocationData locationData = (bindingElement == null)
@@ -369,7 +364,7 @@ public class XFormsContextStack {
                         if (context != null) {
                             // Push model and context
                             pushTemporaryContext(currentBindingContext, baseBindingContext, baseBindingContext.getSingleItem());// provide context information for the context() function
-                            pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceContext, sourceEffectiveId, scope);
+                            pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
                             hasOverriddenContext = true;
                             final BindingContext newBindingContext = getCurrentBindingContext();
                             contextItem = newBindingContext.getSingleItem();
@@ -377,7 +372,7 @@ public class XFormsContextStack {
                             evaluationContextBinding = newBindingContext;
                         } else if (isNewModel) {
                             // Push model only
-                            pushBinding(propertyContext, null, null, null, modelId, null, null, bindingElementNamespaceContext, sourceEffectiveId, scope);
+                            pushBinding(propertyContext, null, null, null, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
                             hasOverriddenContext = false;
                             final BindingContext newBindingContext = getCurrentBindingContext();
                             contextItem = newBindingContext.getSingleItem();
@@ -433,7 +428,7 @@ public class XFormsContextStack {
                             functionContext.setModel(evaluationContextBinding.model);
 
                             newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationNodeset, evaluationPosition,
-                                    ref != null ? ref : nodeset, bindingElementNamespaceContext, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                    ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                     functionContext, null, locationData);
 
                             if (!isDefaultContext) {
@@ -459,7 +454,7 @@ public class XFormsContextStack {
                                 functionContext.setModel(evaluationContextBinding.model);
 
                                 newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
-                                        ref != null ? ref : nodeset, bindingElementNamespaceContext, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                        ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                         functionContext, null, locationData);
 
                                 popBinding();
@@ -500,7 +495,7 @@ public class XFormsContextStack {
 
                     } else if (context != null) {
                         // Only the context has changed, and possibly the model
-                        pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceContext, sourceEffectiveId, scope);
+                        pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
                         {
                             newNodeset = getCurrentNodeset();
                             newPosition = getCurrentPosition();

@@ -38,7 +38,7 @@ public class Select1Analysis extends ControlAnalysis {
         // don't check things like event handlers. Also check for AVTs ion @class and @style.
         final boolean hasNonStaticItem = (Boolean) XPathCache.evaluateSingle(propertyContext, controlNodeInfo,
                 "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]])",
-                XFormsStaticState.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+                XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
         // Remember information
         this.isMultiple = element.getName().equals("select");

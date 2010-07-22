@@ -18,8 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -88,7 +87,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
     private final boolean isTopLevel;
     private final ExternalContext externalContext;
-    private final XFormsAnnotatorContentHandler.Metadata metadata;
+    private final XFormsStaticState.Metadata metadata;
     private final boolean ignoreRootElement;
 
     private Stack<URI> xmlBaseStack = new Stack<URI>();
@@ -108,7 +107,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
      * @param metadata          metadata
      */
     public XFormsExtractorContentHandler(ExternalContext externalContext, XMLReceiver xmlReceiver,
-                                         XFormsAnnotatorContentHandler.Metadata metadata) {
+                                         XFormsStaticState.Metadata metadata) {
         super(xmlReceiver);
 
         this.isTopLevel = true;
@@ -152,7 +151,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
      * @param ignoreRootElement whether root element must just be skipped
      * @param baseURI           base URI
      */
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, XFormsAnnotatorContentHandler.Metadata metadata,
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, XFormsStaticState.Metadata metadata,
                                          boolean ignoreRootElement, String baseURI) {
         super(xmlReceiver);
 

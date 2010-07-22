@@ -14,26 +14,19 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.SingletonIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.Int64Value;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -107,7 +100,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
                         sb.toString(), false, false);
 
                 return XPathCache.evaluateAsExtent(getPipelineContext(), Collections.singletonList(headersDocument), 1,
-                        "/headers/header", XFormsConstants.EMPTY_NAMESPACE_MAPPING, null, null, null, null, getLocationData()).iterate();
+                        "/headers/header", NamespaceMapping.EMPTY_MAPPING, null, null, null, null, getLocationData()).iterate();
             } else {
                 // No headers
                 return EmptyIterator.getInstance();

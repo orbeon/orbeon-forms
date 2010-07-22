@@ -17,19 +17,12 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
@@ -63,7 +56,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
     private final boolean portlet;
 
 
-    private final Metadata metadata;
+    private final XFormsStaticState.Metadata metadata;
     private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
@@ -91,112 +84,6 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
     private boolean inLHHA;         // whether we are in LHHA (meaningful only if inPreserve == true)
     private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
 
-    public static class Metadata {
-        public final IdGenerator idGenerator;
-        public final Map<String, Map<String, String>> namespaceMappings;
-        public final Map<String, SAXStore.Mark> marks = new HashMap<String, SAXStore.Mark>();
-
-        private Map<String, Set<String>> xblBindings;       // Map<String uri, <String localname>>
-        private Map<String, String> automaticMappings;      // ns URI -> directory name
-        private List<String> bindingIncludes;    // list of paths
-
-        // Initial
-        public Metadata() {
-            this.idGenerator = new IdGenerator();
-            this.namespaceMappings = new HashMap<String, Map<String, String>>();
-        }
-
-        // When restoring state
-        public Metadata(IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
-            this.idGenerator = idGenerator;
-            this.namespaceMappings = namespaceMappings;
-        }
-
-        public boolean hasTopLevelMarks() {
-            for (final String prefixedId: marks.keySet()) {
-                if (prefixedId.equals(XFormsUtils.getStaticIdFromId(prefixedId)))
-                    return true;
-            }
-            return false;
-        }
-
-        private void readAutomaticXBLMappingsIfNeeded() {
-            if (automaticMappings == null) {
-
-                final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
-                final List<String> propertyNames = propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX);
-                automaticMappings = propertyNames.size() > 0 ? new HashMap<String, String>() : Collections.<String, String>emptyMap();
-
-                for (final String propertyName: propertyNames) {
-                    final String prefix = propertyName.substring(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX.length());
-                    automaticMappings.put(propertySet.getString(propertyName), prefix);
-                }
-            }
-        }
-
-        private String getAutomaticXBLMappingPath(String uri, String localname) {
-            if (automaticMappings == null) {
-                readAutomaticXBLMappingsIfNeeded();
-            }
-
-            final String prefix = automaticMappings.get(uri);
-            if (prefix != null) {
-                // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
-                final String path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl";
-                return (ResourceManagerWrapper.instance().exists(path)) ? path : null;
-            } else {
-                return null;
-            }
-        }
-
-        private boolean isXBLBindingCheckAutomaticBindings(String uri, String localname) {
-            // Is this already registered?
-            if (this.isXBLBinding(uri, localname))
-                return true;
-
-            // If not, check if it exists as automatic binding
-            final String path = getAutomaticXBLMappingPath(uri, localname);
-            if (path != null) {
-                // Remember as binding
-                storeXBLBinding(uri, localname);
-
-                // Remember to include later
-                if (bindingIncludes == null)
-                    bindingIncludes = new ArrayList<String>();
-                bindingIncludes.add(path);
-
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public boolean isXBLBinding(String uri, String localname) {
-            if (xblBindings == null)
-                return false;
-
-            final Set<String> localnamesMap = xblBindings.get(uri);
-            return localnamesMap != null && localnamesMap.contains(localname);
-        }
-
-        private void storeXBLBinding(String bindingURI, String localname) {
-            if (xblBindings == null)
-                xblBindings = new HashMap<String, Set<String>>();
-
-            Set<String> localnamesSet = xblBindings.get(bindingURI);
-            if (localnamesSet == null) {
-                localnamesSet = new HashSet<String>();
-                xblBindings.put(bindingURI, localnamesSet);
-            }
-
-            localnamesSet.add(localname);
-        }
-
-        public List<String> getBindingsIncludes() {
-            return bindingIncludes;
-        }
-    }
-
     /**
      * Constructor for top-level document.
      *
@@ -204,7 +91,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
      * @param externalContext       external context
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(SAXStore saxStore, ExternalContext externalContext, Metadata metadata) {
+    public XFormsAnnotatorContentHandler(SAXStore saxStore, ExternalContext externalContext, XFormsStaticState.Metadata metadata) {
         this(saxStore, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata);
     }
 
@@ -216,7 +103,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
      * @param portlet               whether we are in portlet mode
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(XMLReceiver xmlReceiver, String containerNamespace, boolean portlet, Metadata metadata) {
+    public XFormsAnnotatorContentHandler(XMLReceiver xmlReceiver, String containerNamespace, boolean portlet, XFormsStaticState.Metadata metadata) {
         super(xmlReceiver);
 
         this.containerNamespace = containerNamespace;
@@ -234,7 +121,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
      *
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(Metadata metadata) {
+    public XFormsAnnotatorContentHandler(XFormsStaticState.Metadata metadata) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.containerNamespace = "";
@@ -497,7 +384,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
         // Re-add standard "xml" prefix mapping
         // TODO: WHY?
         namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
-        metadata.namespaceMappings.put(id, namespaces);
+        metadata.addNamespaceMapping(id, namespaces);
     }
 
     protected void addMark(String id, SAXStore.Mark mark) {
@@ -619,7 +506,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
         metadata.idGenerator.add(newIdAttribute[0]);
 
         // Gather namespace information if there is an id
-        if (metadata.namespaceMappings != null && (isGenerateIds || idIndex != -1)) {
+        if (isGenerateIds || idIndex != -1) {
             addNamespaces(newIdAttribute[0]);
         }
 

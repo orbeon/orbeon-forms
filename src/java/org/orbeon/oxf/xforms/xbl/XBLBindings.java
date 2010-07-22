@@ -14,40 +14,23 @@
 package org.orbeon.oxf.xforms.xbl;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.Text;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.analysis.controls.ContainerAnalysis;
-import org.orbeon.oxf.xforms.control.XFormsComponentControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.Attributes;
@@ -192,10 +175,10 @@ public class XBLBindings {
      *
      * As of 2009-09-14, we use an IdGenerator shared among top-level and all XBL bindings.
      */
-    private XFormsAnnotatorContentHandler.Metadata metadata;
+    private XFormsStaticState.Metadata metadata;
 
     public XBLBindings(IndentedLogger indentedLogger, XFormsStaticState staticState,
-                       XFormsAnnotatorContentHandler.Metadata metadata, Element staticStateElement) {
+                       XFormsStaticState.Metadata metadata, Element staticStateElement) {
 
         this.staticState = staticState;
         this.metadata = metadata;
@@ -288,7 +271,7 @@ public class XBLBindings {
                 // For now, only handle "prefix|name" selectors
                 // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
                 final QName currentQNameMatch
-                        = Dom4jUtils.extractTextValueQName(staticState.getNamespaceMappings("", currentBindingElement), currentElementAttribute.replace('|', ':'), true);
+                        = Dom4jUtils.extractTextValueQName(staticState.getNamespaceMapping("", currentBindingElement).mapping, currentElementAttribute.replace('|', ':'), true);
 
                 // Create and remember factory for this QName
                 xblComponentsFactories.put(currentQNameMatch,

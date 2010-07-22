@@ -20,15 +20,10 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.ExpressionVisitor;
-import org.orbeon.saxon.expr.StaticContext;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.om.ValueRepresentation;
@@ -38,9 +33,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.QNameValue;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base class for all XForms functions.
@@ -194,10 +187,10 @@ abstract public class XFormsFunction extends SystemFunction {
 
                 final XFormsContextStack contextStack = getContextStack(xpathContext);
                 // TODO: function context should directly provide BindingContext
-                final Map namespaceMappings = getXBLContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
+                final NamespaceMapping namespaceMapping = getXBLContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
 
                 // Get QName URI
-                final String qNameURI = (String) namespaceMappings.get(prefix);
+                final String qNameURI = namespaceMapping.mapping.get(prefix);
                 if (qNameURI == null)
                     throw new OXFException("Namespace prefix not in space for QName: " + qNameString);
 

@@ -27,21 +27,15 @@ import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.FastStringBuffer;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.SAXException;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class XPathProcessor extends ProcessorImpl {
 
@@ -75,7 +69,7 @@ public class XPathProcessor extends ProcessorImpl {
                             namespaces.put(namespaceElement.attributeValue("prefix"),
                                     namespaceElement.attributeValue("uri"));
                         }
-                        return new Config(namespaces, (String) config.selectObject("string(/config/xpath)"));
+                        return new Config(new NamespaceMapping(namespaces), (String) config.selectObject("string(/config/xpath)"));
                     }
                 });
 
@@ -153,10 +147,10 @@ public class XPathProcessor extends ProcessorImpl {
     }
 
     protected static class Config {
-        private final Map<String, String> namespaces;
+        private final NamespaceMapping namespaces;
         private final String expression;
 
-        public Config(Map<String, String> namespaces, String expression) {
+        public Config(NamespaceMapping namespaces, String expression) {
             this.namespaces = namespaces;
             this.expression = expression;
         }
@@ -165,7 +159,7 @@ public class XPathProcessor extends ProcessorImpl {
             return expression;
         }
 
-        public Map<String, String> getNamespaces() {
+        public NamespaceMapping getNamespaces() {
             return namespaces;
         }
     }

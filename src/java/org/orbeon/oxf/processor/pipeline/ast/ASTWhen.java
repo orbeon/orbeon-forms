@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.processor.pipeline.ast;
 
+import org.orbeon.oxf.xml.NamespaceMapping;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ASTWhen extends ASTNodeContainer {
 
     private String test;
-    private Map namespaces;
+    private NamespaceMapping namespaces;
     private List<ASTStatement> statements = new ArrayList<ASTStatement>();
 
     public ASTWhen() {
@@ -39,11 +39,11 @@ public class ASTWhen extends ASTNodeContainer {
         this.test = test;
     }
 
-    public Map getNamespaces() {
-        return namespaces == null ? Collections.EMPTY_MAP : namespaces;
+    public NamespaceMapping getNamespaces() {
+        return namespaces == null ? NamespaceMapping.EMPTY_MAPPING : namespaces;
     }
 
-    public void setNamespaces(Map<String, String> namespaces) {
+    public void setNamespaces(NamespaceMapping namespaces) {
         this.namespaces = namespaces;
     }
 

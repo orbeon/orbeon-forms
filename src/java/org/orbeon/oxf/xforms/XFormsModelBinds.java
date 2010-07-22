@@ -14,42 +14,28 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.collections.map.CompositeMap;
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.sxpath.IndependentContext;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.type.BuiltInAtomicType;
-import org.orbeon.saxon.type.BuiltInType;
-import org.orbeon.saxon.type.ConversionResult;
-import org.orbeon.saxon.type.ValidationFailure;
-import org.orbeon.saxon.value.BooleanValue;
-import org.orbeon.saxon.value.QNameValue;
-import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.type.*;
+import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.*;
@@ -304,8 +290,8 @@ public class XFormsModelBinds {
             return (required != null) ? BooleanValue.get(required) : null;
         } else if (mipType.equals(XFormsConstants.TYPE_QNAME)) {
             // Type
-            final Map<String, String> namespaceMap = container.getNamespaceMappings(bind.getBindElement());
-            final QName type = evaluateTypeQName(bind, namespaceMap);
+            final NamespaceMapping namespaceMapping = container.getNamespaceMappings(bind.getBindElement());
+            final QName type = evaluateTypeQName(bind, namespaceMapping.mapping);
             return (type != null) ? new QNameValue(type.getNamespacePrefix(), type.getNamespaceURI(), type.getName(), null) : null;
         } else if (mipType.equals(XFormsConstants.CONSTRAINT_QNAME)) {
             // Constraint
@@ -429,7 +415,7 @@ public class XFormsModelBinds {
                                 // Output type MIP as an exploded QName
                                 final String typeMip = currentBind.getType();
                                 if (typeMip != null) {
-                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(currentModel.getXBLContainer().getNamespaceMappings(currentBind.getBindElement()), typeMip, false);
+                                    final QName typeMipQName = Dom4jUtils.extractTextValueQName(currentModel.getXBLContainer().getNamespaceMappings(currentBind.getBindElement()).mapping, typeMip, false);
                                     mipFound = appendNameValue(sb, mipFound, "type", Dom4jUtils.qNameToExplodedQName(typeMipQName), null);
                                 }
 
@@ -852,7 +838,7 @@ public class XFormsModelBinds {
     private void handleValidationBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Set<String> invalidInstances) {
 
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-        final Map<String, String> namespaceMap = container.getNamespaceMappings(bind.getBindElement());
+        final NamespaceMapping namespaceMapping = container.getNamespaceMappings(bind.getBindElement());
 
         // Current validity value
         // NOTE: This may have been set by schema validation earlier in the validation process
@@ -877,8 +863,8 @@ public class XFormsModelBinds {
                     xpathEvaluator = new XPathEvaluator();
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
                     final IndependentContext context = (IndependentContext) xpathEvaluator.getStaticContext();
-                    for (String prefix: namespaceMap.keySet()) {
-                        context.declareNamespace(prefix, namespaceMap.get(prefix));
+                    for (final Map.Entry<String, String> entry : namespaceMapping.mapping.entrySet()) {
+                        context.declareNamespace(entry.getKey(), entry.getValue());
                     }
                 } catch (Exception e) {
                     throw ValidationException.wrapException(e, bind.getLocationData());
@@ -888,7 +874,7 @@ public class XFormsModelBinds {
 
                 {
                     // Get type namespace and local name
-                    final QName typeQName = evaluateTypeQName(bind, namespaceMap);
+                    final QName typeQName = evaluateTypeQName(bind, namespaceMapping.mapping);
 
                     final String typeNamespaceURI = typeQName.getNamespaceURI();
                     final String typeLocalname = typeQName.getName();
@@ -964,7 +950,7 @@ public class XFormsModelBinds {
                             }
                         } else if (typeLocalname.equals("xpath2")) {
                             // xxforms:xpath2 type
-                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(containingDocument.getStaticState().getXPathConfiguration(), nodeValue, namespaceMap)) {
+                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(containingDocument.getStaticState().getXPathConfiguration(), nodeValue, namespaceMapping)) {
                                 isValid = false;
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                             }

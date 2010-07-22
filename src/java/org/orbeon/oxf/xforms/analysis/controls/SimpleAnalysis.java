@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -248,7 +246,7 @@ public class SimpleAnalysis {
         // Create new expression
         // TODO: get expression from pool and pass in-scope variables (probably more efficient)
         final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString,
-                staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
+                staticState.getMetadata().getNamespaceMapping(prefixedId), XFormsContainingDocument.getFunctionLibrary());
         // Analyse it
         return new XPathAnalysis(staticState, expression, xpathString, baseAnalysis, inScopeVariables, scope, modelPrefixedId, getDefaultInstancePrefixedId());
 

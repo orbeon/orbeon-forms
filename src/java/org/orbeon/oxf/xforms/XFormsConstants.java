@@ -27,7 +27,6 @@ import java.util.*;
 public class XFormsConstants {
 
     public static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
-    public static final Map<String, String> EMPTY_NAMESPACE_MAPPING = Collections.emptyMap();
 
     public static final Set<String> ALLOWED_XXFORMS_ELEMENTS = new HashSet<String>();
     public static final Set<String> ALLOWED_EXFORMS_ELEMENTS = new HashSet<String>();

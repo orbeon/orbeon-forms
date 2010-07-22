@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.*;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.*;
@@ -91,7 +92,7 @@ public class XFormsStaticState {
     // Static analysis
     private boolean isAnalyzed;                                             // whether this document has been analyzed already
 
-    private XFormsAnnotatorContentHandler.Metadata metadata;
+    private Metadata metadata;
 
     // Event handlers
     private Set<String> eventNames;                                         // used event names
@@ -123,13 +124,16 @@ public class XFormsStaticState {
     // Components
     private XBLBindings xblBindings;
 
-    public static final Map<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
-
+    public static final NamespaceMapping BASIC_NAMESPACE_MAPPING;
     static {
-        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
-        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
-        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
-        BASIC_NAMESPACE_MAPPINGS.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
+        final Map basicMapping = new HashMap<String, String>();
+
+        basicMapping.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+        basicMapping.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
+        basicMapping.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
+        basicMapping.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
+
+        BASIC_NAMESPACE_MAPPING = new NamespaceMapping(basicMapping);
     }
 
     /**
@@ -141,7 +145,7 @@ public class XFormsStaticState {
      * @param metadata              metadata or null if not available
      * @param annotatedDocument     SAXStore containing the XHTML for noscript mode, null if not available
      */
-    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, XFormsAnnotatorContentHandler.Metadata metadata, SAXStore annotatedDocument) {
+    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, SAXStore annotatedDocument) {
         // Set XPath configuration
         propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
         initialize(propertyContext, staticStateDocument, metadata, annotatedDocument, null);
@@ -170,7 +174,7 @@ public class XFormsStaticState {
         return xpathConfiguration;
     }
 
-    public XFormsAnnotatorContentHandler.Metadata getMetadata() {
+    public Metadata getMetadata() {
         return metadata;
     }
 
@@ -200,7 +204,7 @@ public class XFormsStaticState {
      * @param encodedStaticState    existing serialization of static state, null if not available
      */
     private void initialize(PropertyContext propertyContext, Document staticStateDocument,
-                            XFormsAnnotatorContentHandler.Metadata metadata,
+                            Metadata metadata,
                             SAXStore xhtmlDocument, String encodedStaticState) {
 
         indentedLogger.startHandleOperation("", "initializing static state");
@@ -242,8 +246,7 @@ public class XFormsStaticState {
                 assert lastId != null;
                 idGenerator = new IdGenerator(Integer.parseInt(lastId));
             }
-            final Map<String, Map<String, String>> namespacesMap = new HashMap<String, Map<String, String>>();
-            this.metadata = new XFormsAnnotatorContentHandler.Metadata(idGenerator, namespacesMap);
+            this.metadata = new Metadata(idGenerator);
             try {
 //                if (xhtmlDocument == null) {
                 // Recompute from staticStateDocument
@@ -525,7 +528,7 @@ public class XFormsStaticState {
         final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance) and exists(@id)]";
 
         final List scripts = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
-                BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+                BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
         if (scripts.size() > 0) {
             if (xxformsScripts == null)
@@ -834,27 +837,28 @@ public class XFormsStaticState {
      * as the mapping is considered transient and not sharable among pages.
      *
      * @param prefix
-     * @param element       Element to get namespace mapping for
-     * @return              Map<String prefix, String uri>
+     * @param element       element to get namespace mapping for
+     * @return              mapping
      */
-    public Map<String, String> getNamespaceMappings(String prefix, Element element) {
+    public NamespaceMapping getNamespaceMapping(String prefix, Element element) {
         final String id = XFormsUtils.getElementStaticId(element);
         if (id != null) {
             // There is an id attribute
-            final String prefixedId = (prefix != null) ? prefix + id : id; 
-            final Map<String, String> cachedMap = metadata.namespaceMappings.get(prefixedId);
+            final String prefixedId = (prefix != null) ? prefix + id : id;
+            final NamespaceMapping cachedMap = metadata.getNamespaceMapping(prefixedId);
             if (cachedMap != null) {
                 return cachedMap;
             } else {
                 indentedLogger.logDebug("", "namespace mappings not cached",
                         "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element));
-                return Dom4jUtils.getNamespaceContextNoDefault(element);
+                // TODO: this case should not be allowed at all
+                return new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element));
             }
         } else {
             // No id attribute
             indentedLogger.logDebug("", "namespace mappings not available because element doesn't have an id attribute",
                     "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element));
-            return Dom4jUtils.getNamespaceContextNoDefault(element);
+            return new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element));
         }
     }
 
@@ -977,7 +981,7 @@ public class XFormsStaticState {
 
         // Get all candidate elements
         final List actionHandlers = XPathCache.evaluate(propertyContext, documentInfo,
-                xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+                xpathExpression, BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
         final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
         final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getTopLevelScope() : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
@@ -1282,7 +1286,7 @@ public class XFormsStaticState {
                 // Search for xxforms:offline which are not within instances
                 for (final DocumentWrapper currentDocumentInfo: documentInfos) {
                     hasOfflineSupport |= (Boolean) XPathCache.evaluateSingle(propertyContext, currentDocumentInfo,
-                            "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
+                            "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPING,
                             null, null, null, null, locationData);
 
                     if (hasOfflineSupport) {
@@ -1295,27 +1299,27 @@ public class XFormsStaticState {
                 // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online, xxforms:offline and xxforms:offline-save actions
                 final List onlineTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
                     null, null, null, null, locationData);
 
                 final List offlineTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xxforms:offline return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
                     null, null, null, null, locationData);
 
                 final List offlineSaveTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xxforms:offline-save return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
                     null, null, null, null, locationData);
 
                 offlineInsertTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xforms:insert return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
                     null, null, null, null, locationData);
 
                 final List offlineDeleteTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xforms:delete return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
+                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
                     null, null, null, null, locationData);
 
                 for (Object onlineTriggerId: onlineTriggerIds) {
@@ -1373,7 +1377,7 @@ public class XFormsStaticState {
 
         final List modelElements = XPathCache.evaluate(pipelineContext, compactShadowTreeWrapper,
                 "//xforms:model[not(ancestor::xforms:instance)]",
-                BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+                BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
         if (modelElements.size() > 0) {
             for (Object modelElement : modelElements) {
@@ -1680,4 +1684,150 @@ public class XFormsStaticState {
     // depend on the context, as well as prevent evaluations within non-relevant content by other means.
 //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
     public final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) DUMMY_CONTEXT);
+
+    public static class Metadata {
+        public final IdGenerator idGenerator;
+        public final Map<String, SAXStore.Mark> marks = new HashMap<String, SAXStore.Mark>();
+
+        private final Map<String, NamespaceMapping> namespaceMappings = new HashMap<String, NamespaceMapping>();
+        private final Map<String, NamespaceMapping> hashes = new LinkedHashMap<String, NamespaceMapping>();
+
+        private Map<String, Set<String>> xblBindings;       // Map<String uri, <String localname>>
+        private Map<String, String> automaticMappings;      // ns URI -> directory name
+        private List<String> bindingIncludes;    // list of paths
+
+        // Initial
+        public Metadata() {
+            this(new IdGenerator());
+        }
+
+        // When restoring state
+        public Metadata(IdGenerator idGenerator) {
+            this.idGenerator = idGenerator;
+        }
+
+        public void addNamespaceMapping(String prefixedId, Map<String, String> mapping) {
+
+            // Sort mapping by prefix
+            final TreeMap<String, String> sorted = new TreeMap<String, String>();
+            sorted.putAll(mapping);
+
+            // Create hash for this mapping
+            final String hexHash = NamespaceMapping.hashMapping(sorted);
+
+            // Add if needed
+            final NamespaceMapping existingMap = hashes.get(hexHash);
+            if (existingMap != null) {
+                // Keep existing map
+
+                // Map id to existing map
+                namespaceMappings.put(prefixedId, existingMap);
+            } else {
+                 // Put new map
+                final NamespaceMapping newMap = new NamespaceMapping(hexHash, sorted);
+                hashes.put(hexHash, newMap);
+
+                // Remember mapping for id
+                namespaceMappings.put(prefixedId, newMap);
+            }
+        }
+
+        public NamespaceMapping getNamespaceMapping(String prefixedId) {
+            return namespaceMappings.get(prefixedId);
+        }
+
+        public void debugReadOut() {
+            System.out.println("Number of different namespace mappings: " + hashes.size());
+            for (final Map.Entry<String, NamespaceMapping> entry : hashes.entrySet()) {
+                System.out.println("   hash: " + entry.getKey());
+                for (final Map.Entry<String, String> mapping: entry.getValue().mapping.entrySet()) {
+                    System.out.println("     hash: " + mapping.getKey() + " -> " + mapping.getValue());
+                }
+            }
+        }
+
+        public boolean hasTopLevelMarks() {
+            for (final String prefixedId: marks.keySet()) {
+                if (prefixedId.equals(XFormsUtils.getStaticIdFromId(prefixedId)))
+                    return true;
+            }
+            return false;
+        }
+
+        private void readAutomaticXBLMappingsIfNeeded() {
+            if (automaticMappings == null) {
+
+                final PropertySet propertySet = Properties.instance().getPropertySet();
+                final List<String> propertyNames = propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX);
+                automaticMappings = propertyNames.size() > 0 ? new HashMap<String, String>() : Collections.<String, String>emptyMap();
+
+                for (final String propertyName: propertyNames) {
+                    final String prefix = propertyName.substring(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX.length());
+                    automaticMappings.put(propertySet.getString(propertyName), prefix);
+                }
+            }
+        }
+
+        private String getAutomaticXBLMappingPath(String uri, String localname) {
+            if (automaticMappings == null) {
+                readAutomaticXBLMappingsIfNeeded();
+            }
+
+            final String prefix = automaticMappings.get(uri);
+            if (prefix != null) {
+                // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
+                final String path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl";
+                return (ResourceManagerWrapper.instance().exists(path)) ? path : null;
+            } else {
+                return null;
+            }
+        }
+
+        public boolean isXBLBindingCheckAutomaticBindings(String uri, String localname) {
+            // Is this already registered?
+            if (this.isXBLBinding(uri, localname))
+                return true;
+
+            // If not, check if it exists as automatic binding
+            final String path = getAutomaticXBLMappingPath(uri, localname);
+            if (path != null) {
+                // Remember as binding
+                storeXBLBinding(uri, localname);
+
+                // Remember to include later
+                if (bindingIncludes == null)
+                    bindingIncludes = new ArrayList<String>();
+                bindingIncludes.add(path);
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public boolean isXBLBinding(String uri, String localname) {
+            if (xblBindings == null)
+                return false;
+
+            final Set<String> localnamesMap = xblBindings.get(uri);
+            return localnamesMap != null && localnamesMap.contains(localname);
+        }
+
+        public void storeXBLBinding(String bindingURI, String localname) {
+            if (xblBindings == null)
+                xblBindings = new HashMap<String, Set<String>>();
+
+            Set<String> localnamesSet = xblBindings.get(bindingURI);
+            if (localnamesSet == null) {
+                localnamesSet = new HashSet<String>();
+                xblBindings.put(bindingURI, localnamesSet);
+            }
+
+            localnamesSet.add(localname);
+        }
+
+        public List<String> getBindingsIncludes() {
+            return bindingIncludes;
+        }
+    }
 }

@@ -24,18 +24,12 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
-import org.orbeon.saxon.value.CalendarValue;
-import org.orbeon.saxon.value.DateValue;
+import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.TimeValue;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an xforms:input control.
@@ -450,9 +444,6 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     private String formatSubValue(PipelineContext pipelineContext, String valueType, String value) {
-        // Assume xs: prefix for default formats
-        final Map<String, String> prefixToURIMap = new HashMap<String, String>();
-        prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
         final Map<String, ValueRepresentation> variables = new HashMap<String, ValueRepresentation>();
         variables.put("v", new StringValue(value));
@@ -468,7 +459,7 @@ public class XFormsInputControl extends XFormsValueControl {
                             + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
                             + "', 'en', (), ()) else $v";
 
-            return evaluateAsString(pipelineContext, boundItem, xpathExpression, prefixToURIMap, variables);
+            return evaluateAsString(pipelineContext, boundItem, xpathExpression, FORMAT_NAMESPACE_MAPPING, variables);
         }
     }
 

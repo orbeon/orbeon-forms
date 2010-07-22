@@ -21,10 +21,7 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
@@ -36,10 +33,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -47,25 +41,16 @@ import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
-import java.util.zip.CRC32;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPInputStream;
+import java.util.zip.*;
 
 public class XFormsUtils {
 
@@ -956,19 +941,19 @@ public class XFormsUtils {
      * @param variableToValueMap variables
      * @param functionLibrary    XPath function library to use
      * @param functionContext    context object to pass to the XForms function
-     * @param prefixToURIMap     namespace mappings
+     * @param namespaceMapping   namespace mappings
      * @param locationData       LocationData for error reporting
      * @param attributeValue     attribute value
      * @return                   resolved attribute value
      */
     public static String resolveAttributeValueTemplates(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, Map<String, ValueRepresentation> variableToValueMap,
                                                         FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
-                                                        Map<String, String> prefixToURIMap, LocationData locationData, String attributeValue) {
+                                                        NamespaceMapping namespaceMapping, LocationData locationData, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(propertyContext, contextItems, contextPosition, attributeValue, prefixToURIMap,
+        return XPathCache.evaluateAsAvt(propertyContext, contextItems, contextPosition, attributeValue, namespaceMapping,
                 variableToValueMap, functionLibrary, functionContext, null, locationData);
     }
 
@@ -1293,17 +1278,17 @@ public class XFormsUtils {
     /**
      * Return whether the given string contains a well-formed XPath 2.0 expression.
      *
-     * @param xpathString   string to check
-     * @param namespaceMap  in-scope namespaces
-     * @return              true iif the given string contains well-formed XPath 2.0
+     * @param xpathString       string to check
+     * @param namespaceMapping  in-scope namespaces
+     * @return                  true iif the given string contains well-formed XPath 2.0
      */
-    public static boolean isXPath2Expression(Configuration configuration, String xpathString, Map<String, String> namespaceMap) {
+    public static boolean isXPath2Expression(Configuration configuration, String xpathString, NamespaceMapping namespaceMapping) {
         // Empty string is never well-formed XPath
         if (xpathString.trim().length() == 0)
             return false;
 
         try {
-            XPathCache.checkXPathExpression(configuration, xpathString, namespaceMap, XFormsContainingDocument.getFunctionLibrary());
+            XPathCache.checkXPathExpression(configuration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary());
         } catch (Exception e) {
             // Ideally we would like the parser to not throw as this is time-consuming, but not sure ho.w to achieve that
             return false;

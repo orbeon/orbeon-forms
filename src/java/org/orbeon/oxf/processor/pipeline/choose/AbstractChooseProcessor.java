@@ -1,26 +1,25 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.processor.AbstractProcessor;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -154,7 +153,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
         // For each branch, create a new pipeline processor
         final List branchProcessors = new ArrayList();
         final List branchConditions = new ArrayList();
-        final List branchNamespaces = new ArrayList();
+        final List<NamespaceMapping> branchNamespaces = new ArrayList<NamespaceMapping>();
 
         for (Iterator astIterator = chooseAST.getWhen().iterator(); astIterator.hasNext();) {
             final ASTWhen astWhen = (ASTWhen) astIterator.next();
@@ -162,11 +161,11 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
             // Save condition
             branchConditions.add(astWhen.getTest());
             // Get namespaces declared at this point in the pipeline
-            if (astWhen.getNode() != null && astWhen.getNamespaces().size() != 0) {
+            if (astWhen.getNode() != null && astWhen.getNamespaces().mapping.size() != 0) {
                 throw new ValidationException("ASTWhen cannot have both a node and namespaces defined", astWhen.getLocationData());
             }
             branchNamespaces.add(astWhen.getNode() != null
-                    ? Dom4jUtils.getNamespaceContextNoDefault((Element) astWhen.getNode())
+                    ? new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault((Element) astWhen.getNode()))
                     : astWhen.getNamespaces());
 
             // Add an identity processor to connect the output of the branch to

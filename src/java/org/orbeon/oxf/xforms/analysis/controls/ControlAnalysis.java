@@ -13,21 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.Text;
+import org.dom4j.*;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -158,7 +150,7 @@ public class ControlAnalysis extends SimpleAnalysis {
             // xforms:output controls. Also check for AVTs ion @class and @style.
             return (Boolean) XPathCache.evaluateSingle(propertyContext, lhhaNodeInfo,
                     "exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]])",
-                    XFormsStaticState.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, getLocationData());
+                    XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, getLocationData());
         }
 
         public LocationData getLocationData() {

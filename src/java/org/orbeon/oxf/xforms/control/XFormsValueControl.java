@@ -23,14 +23,12 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Base class for all controls that hold a value.
@@ -136,15 +134,19 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         // the controls as dirty, and they will be evaluated when necessary later.
     }
 
+    protected static final NamespaceMapping FORMAT_NAMESPACE_MAPPING;
+    static {
+        final Map mapping = new HashMap<String, String>();
+        // Assume xs: prefix for default formats
+        mapping.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+        FORMAT_NAMESPACE_MAPPING = new NamespaceMapping(mapping);
+    }
+
     protected String getValueUseFormat(PropertyContext propertyContext, String format) {
 
         final String result;
         if (format == null) {
             // Try default format for known types
-
-            // Assume xs: prefix for default formats
-            final Map<String, String> prefixToURIMap = new HashMap<String, String>();
-            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
 
             // Format according to type
             final String typeName = getBuiltinTypeName();
@@ -156,7 +158,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
             if (format != null) {
                 result = evaluateAsString(propertyContext, getBoundItem(), format,
-                        prefixToURIMap, getContextStack().getCurrentVariables());
+                        FORMAT_NAMESPACE_MAPPING, getContextStack().getCurrentVariables());
             } else {
                 result = null;
             }

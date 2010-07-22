@@ -27,6 +27,7 @@ import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.SAXException;
@@ -42,7 +43,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     public final static String CONTROLLER_NAMESPACE_URI = "http://www.orbeon.com/oxf/controller";
     private final static Document TRUE_DOCUMENT = new NonLazyUserDataDocument();
     private final static Document FALSE_DOCUMENT = new NonLazyUserDataDocument();
-    private final static Map<String, String> NAMESPACES_WITH_XSI_AND_XSLT = new HashMap<String, String>();
+    private final static NamespaceMapping NAMESPACES_WITH_XSI_AND_XSLT;
     public final static String EXTRACT_INSTANCE_XPATH
             = "/*/*[local-name() = 'instance' and namespace-uri() = '" + XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
 
@@ -79,8 +80,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         falseConfigElement.setText("false");
         FALSE_DOCUMENT.setRootElement(falseConfigElement);
 
-        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE);
+        final Map<String, String> mapping = new HashMap<String, String>();
+        mapping.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+        mapping.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE);
+
+        NAMESPACES_WITH_XSI_AND_XSLT = new NamespaceMapping(mapping);
     }
 
     public PageFlowControllerProcessor() {
@@ -666,7 +670,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (foundActionWithoutWhen[0])
                             throw new ValidationException("Unreachable <action>", (LocationData) actionElement.getData());
                         setTest(whenAttribute);
-                        setNamespaces(Dom4jUtils.getNamespaceContextNoDefault(actionElement));
+                        setNamespaces(new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(actionElement)));
                         setLocationData((LocationData) actionElement.getData());
                     } else {
                         foundActionWithoutWhen[0] = true;
@@ -734,7 +738,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addWhen(new ASTWhen() {{
                                     if (resultWhenAttribute != null) {
                                         setTest(resultWhenAttribute);
-                                        setNamespaces(Dom4jUtils.getNamespaceContextNoDefault(resultElement));
+                                        setNamespaces(new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(resultElement)));
                                         final String[] locationParams =
                                                 new String[]{"page id", pageElement.attributeValue("id"), "when", resultWhenAttribute};
                                         setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", resultElement, locationParams, true));

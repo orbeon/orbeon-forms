@@ -19,27 +19,19 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ForwardingXMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.xml.sax.Attributes;
@@ -422,7 +414,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public String getAppearance() {
         if (appearance == null) {
-            final QName qName = Dom4jUtils.extractTextValueQName(container.getNamespaceMappings(controlElement),
+            final QName qName = Dom4jUtils.extractTextValueQName(container.getNamespaceMappings(controlElement).mapping,
                     controlElement.attributeValue(XFormsConstants.APPEARANCE_QNAME.getName()), true);
             appearance = Dom4jUtils.qNameToExplodedQName(qName);
         }
@@ -808,12 +800,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param propertyContext       current context
      * @param contextItem           context item
      * @param xpathString           XPath expression
-     * @param prefixToURIMap        namespace mappings to use
+     * @param namespaceMapping      namespace mappings to use
      * @param variableToValueMap    variables to use
      * @return                      value, or null if cannot be computed
      */
     protected String evaluateAsString(PropertyContext propertyContext, Item contextItem, String xpathString,
-                                      Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap) {
+                                      NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap) {
 
         if (contextItem == null) {
             // TODO: in the future we should be able to try evaluating anyway
@@ -827,7 +819,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Evaluate
             try {
                 return XPathCache.evaluateAsString(propertyContext, contextItem,
-                                xpathString, prefixToURIMap, variableToValueMap,
+                                xpathString, namespaceMapping, variableToValueMap,
                                 XFormsContainingDocument.getFunctionLibrary(),
                                 getFunctionContext(), null, getLocationData());
             } catch (Exception e) {
@@ -860,9 +852,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Return the namespace mappings for this control.
      *
-     * @return              Map<String prefix, String uri>
+     * @return              mapping
      */
-    public Map<String, String> getNamespaceMappings() {
+    public NamespaceMapping getNamespaceMappings() {
         return container.getNamespaceMappings(controlElement);
     }
 

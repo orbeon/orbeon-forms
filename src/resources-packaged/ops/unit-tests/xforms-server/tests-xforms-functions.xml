@@ -1699,4 +1699,62 @@
         </output>
     </test>
 
+    <test description="xxforms:message-format()" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                        xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <file>0</file>
+                                <file>1</file>
+                                <file>1273</file>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1"
+                                   value="xxforms:message-format('At {2,time,short} on {2,date,long}, we detected {1,number,integer} spaceships on the planet {0}.',
+                                            ('Mars', 3, xs:dateTime('2010-07-23T19:25:13-07:00')))"/>
+
+                    <xforms:repeat ref="file">
+                        <xforms:output id="output2"
+                                       value="xxforms:message-format('There {0,choice,0#are no files|1#is one file|1&lt;are {0,number,integer} files}.', xs:integer(.))"/> 
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <file>0</file>
+                                    <file>1</file>
+                                    <file>1273</file>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-1" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">At 7:25 PM on July 23, 2010, we detected 3 spaceships on the planet Mars.</xxf:control>
+                        <xxf:control id="output2·1">There are no files.</xxf:control>
+                        <xxf:control id="output2·2">There is one file.</xxf:control>
+                        <xxf:control id="output2·3">There are 1,273 files.</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

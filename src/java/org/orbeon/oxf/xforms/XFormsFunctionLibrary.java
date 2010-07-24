@@ -17,22 +17,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.function.*;
 import org.orbeon.oxf.xforms.function.Current;
 import org.orbeon.oxf.xforms.function.Last;
-import org.orbeon.oxf.xforms.function.exforms.EXFormsReadonly;
-import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
-import org.orbeon.oxf.xforms.function.exforms.EXFormsRequired;
-import org.orbeon.oxf.xforms.function.exforms.EXFormsSort;
+import org.orbeon.oxf.xforms.function.exforms.*;
 import org.orbeon.oxf.xforms.function.xxforms.*;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
-import org.orbeon.saxon.expr.StaticProperty;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.*;
-import org.orbeon.saxon.om.NamespaceConstant;
-import org.orbeon.saxon.om.StandardNames;
-import org.orbeon.saxon.om.StructuredQName;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.type.BuiltInAtomicType;
-import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.type.Type;
+import org.orbeon.saxon.type.*;
 import org.orbeon.saxon.value.SequenceType;
 import org.orbeon.saxon.value.Value;
 
@@ -369,6 +360,11 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 2, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
+
+        // xxforms:message-format()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}message-format", XXFormsMessageFormat.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE, null);
 
         // === XSLT 2.0 function
         e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);

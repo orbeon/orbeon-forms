@@ -717,7 +717,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     protected String evaluateAvt(PropertyContext propertyContext, String attributeValue) {
 
-        if (attributeValue.indexOf('{') == -1) {
+        if (!XFormsUtils.maybeAVT(attributeValue)) {
             // Definitely not an AVT
 
             return attributeValue;

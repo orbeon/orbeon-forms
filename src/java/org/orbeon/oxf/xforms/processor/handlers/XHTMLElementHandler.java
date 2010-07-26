@@ -17,9 +17,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
 /**
  * Handle xhtml:* for handling AVTs as well as rewriting @id and @for.
@@ -47,7 +45,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                 final int attributesCount = attributes.getLength();
                 for (int i = 0; i < attributesCount; i++) {
                     final String attributeValue = attributes.getValue(i);
-                    if (attributeValue.indexOf('{') != -1) {
+                    if (XFormsUtils.maybeAVT(attributeValue)) {
                         // This is an AVT most likely
                         found = true;
 

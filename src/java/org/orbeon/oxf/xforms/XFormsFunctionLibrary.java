@@ -361,10 +361,14 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 2, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
-        // xxforms:message-format()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}message-format", XXFormsMessageFormat.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        // xxforms:format-message()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}format-message", XXFormsMessageFormat.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE, null);
+
+        // xxforms:lang()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}lang", XXFormsLang.class, 0, 0, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // === XSLT 2.0 function
         e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);

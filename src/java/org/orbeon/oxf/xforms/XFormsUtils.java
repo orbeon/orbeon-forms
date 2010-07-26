@@ -25,6 +25,7 @@ import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
@@ -1020,12 +1021,12 @@ public class XFormsUtils {
     }
 
     /**
-     * Return an element's xml:base value, checking ancestors as well.
+     * Return an element's static xml:lang value, checking ancestors as well.
      *
      * @param element   element to check
-     * @return          xml:base value or null if not found
+     * @return          xml:lang value or null if not found
      */
-    public static String resolveXMLang(Element element) {
+    private static String resolveXMLang(Element element) {
         // Allow for null Element
         if (element == null)
             return null;
@@ -1033,14 +1034,31 @@ public class XFormsUtils {
         // Collect xml:base values
         Element currentElement = element;
         do {
-            final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_LANG_QNAME);
-            if (xmlBaseAttribute != null)
-                return xmlBaseAttribute;
+            final String xmlLangAttribute = currentElement.attributeValue(XMLConstants.XML_LANG_QNAME);
+            if (xmlLangAttribute != null)
+                return xmlLangAttribute;
             currentElement = currentElement.getParent();
         } while(currentElement != null);
 
         // Not found
         return null;
+    }
+
+    public static String resolveXMLangHandleAVTs(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element element) {
+        final String xmlLang = resolveXMLang(element);
+        // No xml:lang or plain static xml:lang
+        if (xmlLang == null || !xmlLang.startsWith("#"))
+            return xmlLang;
+
+        // If this starts with "#", this is a reference to a control
+        // NOTE: For now, this is a control's static id and works only for top-level AVTs
+        final String attributeControlStaticId; {
+            final ControlAnalysis controlAnalysis = containingDocument.getStaticState().getAttributeControl(xmlLang.substring(1), "xml:lang");
+            attributeControlStaticId = controlAnalysis.element.attributeValue("id");
+        }
+
+        final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlStaticId);
+        return attributeControl.getExternalValue(propertyContext);
     }
 
     /**
@@ -1415,7 +1433,7 @@ public class XFormsUtils {
                         final String currentAttributeValue = currentAttribute.getValue();
 
                         final String resolvedValue;
-                        if (hostLanguageAVTs && currentAttributeValue.indexOf('{') != -1) {
+                        if (hostLanguageAVTs && maybeAVT(currentAttributeValue)) {
                             // This is an AVT, use attribute control to produce the output
                             final XXFormsAttributeControl attributeControl
                                     = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue);
@@ -1464,6 +1482,10 @@ public class XFormsUtils {
 
     public static String escapeJavaScript(String value) {
         return StringUtils.replace(StringUtils.replace(StringUtils.replace(value, "\\", "\\\\"), "\"", "\\\""), "\n", "\\n");
+    }
+
+    public static boolean maybeAVT(String attributeValue) {
+        return attributeValue.indexOf('{') != -1;
     }
 
     /**

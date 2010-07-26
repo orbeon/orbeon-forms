@@ -87,7 +87,7 @@ public class ControlAnalysis extends SimpleAnalysis {
                                     for (final Attribute currentAttribute: attributes) {
                                         final String currentAttributeValue = currentAttribute.getValue();
 
-                                        if (hostLanguageAVTs && currentAttributeValue.indexOf('{') != -1) {
+                                        if (hostLanguageAVTs && XFormsUtils.maybeAVT(currentAttributeValue)) {
                                             // TODO: check for AVTs
                                             analyses.add(null);
                                         }

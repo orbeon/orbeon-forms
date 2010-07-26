@@ -422,10 +422,8 @@ public class XFormsActionInterpreter {
             return null;
 
         // Whether this can't be an AVT
-        final boolean maybeAvt = attributeValue.indexOf('{') != -1;
-
         final String resolvedAVTValue;
-        if (maybeAvt) {
+        if (XFormsUtils.maybeAVT(attributeValue)) {
             // We have to go through AVT evaluation
             final XFormsContextStack.BindingContext bindingContext = actionBlockContextStack.getCurrentBindingContext();
 

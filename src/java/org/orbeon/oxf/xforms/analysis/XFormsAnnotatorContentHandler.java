@@ -260,7 +260,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
                         if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
                             // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                             final String attributeValue = attributes.getValue(i);
-                            if (attributeValue.indexOf('{') != -1) {
+                            if (XFormsUtils.maybeAVT(attributeValue)) {
                                 // This is an AVT
                                 final String attributeName = attributes.getQName(i);// use qualified name for xml:lang
 
@@ -360,7 +360,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
                 if ("".equals(currentAttributeURI) || XMLConstants.XML_URI.equals(currentAttributeURI)) {
                     // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
                     final String attributeValue = attributes.getValue(i);
-                    if (attributeValue.indexOf('{') != -1) {
+                    if (XFormsUtils.maybeAVT(attributeValue)) {
                         // This is an AVT
                         return true;
                     }

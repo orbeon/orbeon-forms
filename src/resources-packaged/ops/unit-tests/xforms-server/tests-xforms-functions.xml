@@ -1661,8 +1661,7 @@
     <test description="xxforms:evaluate-avt() doesn't cause 'invalid slot for variable' error in Saxon" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                        xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -1699,11 +1698,10 @@
         </output>
     </test>
 
-    <test description="xxforms:message-format()" name="oxf:pipeline">
+    <test description="xxforms:format-message()" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                        xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -1717,12 +1715,12 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:output id="output1"
-                                   value="xxforms:message-format('At {2,time,short} on {2,date,long}, we detected {1,number,integer} spaceships on the planet {0}.',
+                                   value="xxforms:format-message('At {2,time,short} on {2,date,long}, we detected {1,number,integer} spaceships on the planet {0}.',
                                             ('Mars', 3, xs:dateTime('2010-07-23T19:25:13-07:00')))"/>
 
                     <xforms:repeat ref="file">
                         <xforms:output id="output2"
-                                       value="xxforms:message-format('There {0,choice,0#are no files|1#is one file|1&lt;are {0,number,integer} files}.', xs:integer(.))"/> 
+                                       value="xxforms:format-message('There {0,choice,0#are no files|1#is one file|1&lt;are {0,number,integer} files}.', xs:integer(.))"/> 
                     </xforms:repeat>
                 </xhtml:body>
             </xhtml:html>
@@ -1751,6 +1749,142 @@
                         <xxf:control id="output2·1">There are no files.</xxf:control>
                         <xxf:control id="output2·2">There is one file.</xxf:control>
                         <xxf:control id="output2·3">There are 1,273 files.</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:format-message() with top-level static xml:lang" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xml:lang="fr">
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1"
+                                   value="xxforms:format-message('A {2,time,short} le {2,date,long}, nous avons détecté {1,number,integer} vaisseaux spatiaux sur la planète {0}.',
+                                            ('Mars', 3, xs:dateTime('2010-07-23T19:25:13-07:00')))"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">A 19:25 le 23 juillet 2010, nous avons détecté 3 vaisseaux spatiaux sur la planète Mars.</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:format-message() with top-level AVT xml:lang" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xml:lang="{.}">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <lang>zh</lang>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1"
+                                   value="xxforms:format-message('{2,time,short} {2,date,long}', ('Mars', 3, xs:dateTime('2010-07-23T19:25:13-07:00')))"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <lang>zh</lang>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">zh</xxf:attribute>
+                        <xxf:control id="output1">下午7:25 2010年7月23日</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Simple xxforms:lang() on controls" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group xml:lang="it">
+                        <xforms:output id="output1" value="xxforms:lang()"/>
+                        <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">it</xxf:control>
+                        <xxf:control id="output2">zh</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:lang() on controls with AVT on xhtml:html" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xml:lang="{'it'}">
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group>
+                        <xforms:output id="output1" value="xxforms:lang()"/>
+                        <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
+                        <xxf:control id="output1">it</xxf:control>
+                        <xxf:control id="output2">zh</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -19,18 +19,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandler;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.FastStringBuffer;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
@@ -263,7 +255,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 final String value;
                 if (attributeValue != null) {
 
-                    if (attributeValue.indexOf('{') == -1) {
+                    if (!XFormsUtils.maybeAVT(attributeValue)) {
                         // Definitely not an AVT
                         value = attributeValue;
                     } else {

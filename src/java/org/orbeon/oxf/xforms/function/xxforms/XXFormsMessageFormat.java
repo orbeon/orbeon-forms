@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -41,8 +43,24 @@ public class XXFormsMessageFormat extends XFormsFunction {
             }
         }
 
-        final MessageFormat format = new MessageFormat(template);
-        // TODO: format.setLocale() with locale obtained from xml:lang, including AVT
+        // Create format
+        final MessageFormat format;
+
+        // Find xml:lang and set locale if any
+        final String lang = XFormsUtils.resolveXMLangHandleAVTs(getOrCreatePipelineContext(), getContainingDocument(xpathContext), getSourceElement(xpathContext));
+        if (lang != null) {
+            // Really not sure how xml:lang should be parsed, see:
+            //
+            // http://www.w3.org/International/articles/language-tags/
+            // http://sites.google.com/site/openjdklocale/design-specification
+            // IETF BCP 47: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+
+            // Use Saxon utility for now
+            format = new MessageFormat(template, Configuration.getLocale(lang));
+        } else {
+            format  = new MessageFormat(template);
+        }
+
         return StringValue.makeStringValue(format.format(arguments.toArray()));
     }
 }

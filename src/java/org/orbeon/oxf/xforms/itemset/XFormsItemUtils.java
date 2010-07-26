@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.itemset;
 import org.dom4j.Element;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.Select1Analysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -270,7 +268,7 @@ public class XFormsItemUtils {
             }
 
             private void addAttributeAVTValue(Element itemChoiceItemsetElement, String attributeName, String attributeValue, String elementEffectiveId, Map<String, String> result) {
-                if (attributeValue.indexOf('{') == -1) {
+                if (!XFormsUtils.maybeAVT(attributeValue)) {
                     // Definitely not an AVT
                     result.put(attributeName, attributeValue);
                 } else {

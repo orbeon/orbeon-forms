@@ -90,7 +90,19 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private final XFormsStaticState.Metadata metadata;
     private final boolean ignoreRootElement;
 
-    private Stack<URI> xmlBaseStack = new Stack<URI>();
+    private static class XMLBaseLang {
+        public final String id;
+        public final URI xmlBase;
+        public final String xmlLang;
+
+        private XMLBaseLang(String id, URI xmlBase, String xmlLang) {
+            this.id = id;
+            this.xmlBase = xmlBase;
+            this.xmlLang = xmlLang;
+        }
+    }
+
+    private Stack<XMLBaseLang> xmlBaseLangStack = new Stack<XMLBaseLang>();
     private XFormsConstants.DeploymentType deploymentType;
     private String requestContextPath;
 
@@ -130,14 +142,14 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         try {
             final String rootXMLBase;
             {
-                // It is possible to override the base URI by setting a request attribute. This is used by OPSXFormsFilter.
+                // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
                 final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
                 if (rendererBaseURI != null)
                     rootXMLBase = rendererBaseURI;
                 else
                     rootXMLBase = request.getRequestPath();
             }
-            xmlBaseStack.push(new URI(null, null, rootXMLBase, null));
+            xmlBaseLangStack.push(new XMLBaseLang(null, new URI(null, null, rootXMLBase, null), null));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }
@@ -162,7 +174,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
         try {
             assert baseURI != null;
-            xmlBaseStack.push(new URI(null, null, baseURI, null));
+            xmlBaseLangStack.push(new XMLBaseLang(null, new URI(null, null, baseURI, null), null));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }
@@ -178,7 +190,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
             if (externalContext != null) {// null in case of nested document (XBL templates)
                 // Add xml:base attribute
-                attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL((xmlBaseStack.get(0)).toString()));
+                attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL((xmlBaseLangStack.get(0)).toString()));
                 // Add deployment attribute
                 attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, deploymentType.name());
                 // Add context path attribute
@@ -254,18 +266,36 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
 
 
-        // Handle xml:base
+        // Handle outer xml:base and xml:lang
         if (!inXFormsOrExtension) {
             final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
-            if (xmlBaseAttribute == null) {
-                xmlBaseStack.push(xmlBaseStack.peek());
+            final String xmlLangAttribute = attributes.getValue(XMLConstants.XML_URI, "lang");
+            if (xmlBaseAttribute == null && xmlLangAttribute == null) {
+                xmlBaseLangStack.push(xmlBaseLangStack.peek());
             } else {
-                try {
-                    final URI currentXMLBaseURI = xmlBaseStack.peek();
-                    xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)).normalize());// normalize to remove "..", etc.
-                } catch (URISyntaxException e) {
-                    throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                final XMLBaseLang currentXMLBaseLang = xmlBaseLangStack.peek();
+
+                final URI newBase;
+                if (xmlBaseAttribute != null) {
+                    try {
+                        // Resolve
+                        newBase = currentXMLBaseLang.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize();// normalize to remove "..", etc.
+                    } catch (URISyntaxException e) {
+                        throw new ValidationException("Error creating URI from: '" + xmlBaseLangStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                    }
+                } else {
+                    newBase = currentXMLBaseLang.xmlBase;
                 }
+
+                final String newLang;
+                if (xmlLangAttribute != null) {
+                    // Override
+                    newLang = xmlLangAttribute;
+                } else {
+                    newLang = currentXMLBaseLang.xmlLang;
+                }
+
+                xmlBaseLangStack.push(new XMLBaseLang(attributes.getValue("", "id"), newBase, newLang));
             }
         }
 
@@ -297,6 +327,22 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
                 // Add xml:base on element
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
+
+                // Add xml:lang on element if found
+                final String xmlLang = xmlBaseLangStack.peek().xmlLang;
+                if (xmlLang != null) {
+                    final String newXMLLang;
+                    if (XFormsUtils.maybeAVT(xmlLang)) {
+                        // In this case there is a control representing the AVT
+                        // Put a special value for xml:lang so we know where to find the dynamic value
+                        newXMLLang = "#" + xmlBaseLangStack.peek().id;
+                    } else {
+                        // No AVT
+                        newXMLLang = xmlLang;
+                    }
+
+                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "lang", newXMLLang);
+                }
 
                 sendStartPrefixMappings();
             }
@@ -349,7 +395,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     }
 
     private String getCurrentBaseURI() {
-        final URI currentXMLBaseURI = xmlBaseStack.peek();
+        final URI currentXMLBaseURI = xmlBaseLangStack.peek().xmlBase;
         return currentXMLBaseURI.toString();
     }
 
@@ -412,7 +458,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         }
 
         if (!inXFormsOrExtension) {
-            xmlBaseStack.pop();
+            xmlBaseLangStack.pop();
         }
 
         namespaceSupport.endElement();

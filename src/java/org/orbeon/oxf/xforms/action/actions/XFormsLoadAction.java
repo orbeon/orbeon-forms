@@ -18,10 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -74,7 +71,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Use resource attribute
 
             // NOP if there is an AVT but no context node
-            if (bindingContext.getSingleItem() == null && resourceAttributeValue.indexOf('{') != -1)
+            if (bindingContext.getSingleItem() == null && XFormsUtils.maybeAVT(resourceAttributeValue))
                 return;
 
             // Resolve AVT

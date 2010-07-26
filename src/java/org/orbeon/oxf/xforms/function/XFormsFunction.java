@@ -70,11 +70,7 @@ abstract public class XFormsFunction extends SystemFunction {
     }
 
     protected Element getSourceElement(XPathContext xpathContext) {
-        final String sourceEffectiveId = getSourceEffectiveId(xpathContext);
-        if (sourceEffectiveId != null)
-            return getContainingDocument(xpathContext).getStaticState().getControlElement(XFormsUtils.getPrefixedId(sourceEffectiveId));
-        else
-            return null;
+        return getContext(xpathContext).getSourceElement();
     }
 
     protected String getSourceEffectiveId(XPathContext xpathContext) {
@@ -119,6 +115,7 @@ abstract public class XFormsFunction extends SystemFunction {
         private final XFormsContextStack contextStack;
 
         private String sourceEffectiveId;
+        private Element sourceElement;
         private XFormsModel model;
 
         // Constructor for XBLContainer and XFormsActionInterpreter
@@ -163,6 +160,14 @@ abstract public class XFormsFunction extends SystemFunction {
 
         public void setSourceEffectiveId(String sourceEffectiveId) {
             this.sourceEffectiveId = sourceEffectiveId;
+        }
+
+        public Element getSourceElement() {
+            return sourceElement;
+        }
+
+        public void setSourceElement(Element sourceElement) {
+            this.sourceElement = sourceElement;
         }
     }
 

@@ -1698,6 +1698,99 @@
         </output>
     </test>
 
+    <test description="Simple xxforms:lang() on controls and actions" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <langs>
+                                <lang/>
+                                <lang/>
+                            </langs>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group xml:lang="it">
+                        <xforms:output id="output1" value="xxforms:lang()"/>
+                        <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
+
+                        <xforms:setvalue ev:event="xforms-enabled" ref="lang[1]" value="xxforms:lang()"/>
+                        <xforms:setvalue ev:event="xforms-enabled" ref="lang[2]" value="xxforms:lang()" xml:lang="fr"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <langs>
+                                    <lang>it</lang>
+                                    <lang>fr</lang>
+                                </langs>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">it</xxf:control>
+                        <xxf:control id="output2">zh</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:lang() with top-level AVT xml:lang" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xml:lang="{instance()}">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <lang/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group>
+                        <xforms:output id="output1" value="xxforms:lang()"/>
+                        <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
+
+                        <xforms:setvalue ev:event="xforms-enabled" ref="instance()" value="xxforms:lang()" xml:lang="it"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <lang>it</lang>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
+                        <xxf:control id="output1">it</xxf:control>
+                        <xxf:control id="output2">zh</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="xxforms:format-message()" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1819,72 +1912,6 @@
                     <xxf:control-values>
                         <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">zh</xxf:attribute>
                         <xxf:control id="output1">下午7:25 2010年7月23日</xxf:control>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
-
-    <test description="Simple xxforms:lang() on controls" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model"/>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group xml:lang="it">
-                        <xforms:output id="output1" value="xxforms:lang()"/>
-                        <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
-                    </xforms:group>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances/>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="output1">it</xxf:control>
-                        <xxf:control id="output2">zh</xxf:control>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
-
-    <test description="xxforms:lang() on controls with AVT on xhtml:html" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                        xml:lang="{'it'}">
-                <xhtml:head>
-                    <xforms:model id="model"/>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group>
-                        <xforms:output id="output1" value="xxforms:lang()"/>
-                        <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
-                    </xforms:group>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances/>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
-                        <xxf:control id="output1">it</xxf:control>
-                        <xxf:control id="output2">zh</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

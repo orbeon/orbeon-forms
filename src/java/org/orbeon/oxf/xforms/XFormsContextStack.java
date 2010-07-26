@@ -77,12 +77,14 @@ public class XFormsContextStack {
 
     public XFormsFunction.Context getFunctionContext(String sourceEffectiveId) {
         functionContext.setSourceEffectiveId(sourceEffectiveId);
+        functionContext.setSourceElement(getCurrentBindingContext().controlElement);
         functionContext.setModel(getCurrentBindingContext().model);
         return functionContext;
     }
 
     public void returnFunctionContext() {
         functionContext.setSourceEffectiveId(null);
+        functionContext.setSourceElement(null);
     }
 
     /**

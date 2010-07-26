@@ -33,7 +33,7 @@ public class XXFormsLang extends XFormsFunction {
 
         final Element element;
         if (elementId == null) {
-            // This is obtained from sourceEffectiveId
+            // Get element on which the expression is used
             element = getSourceElement(xpathContext);
         } else {
             // Do a bit more work to find current scope first

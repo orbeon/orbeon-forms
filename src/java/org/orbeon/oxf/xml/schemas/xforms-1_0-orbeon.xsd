@@ -884,7 +884,7 @@
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="group">
-        <xsd:complexType>
+        <xsd:complexType mixed="true">
             <xsd:sequence>
                 <xsd:element ref="xforms:label" minOccurs="0"/>
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
@@ -899,7 +899,6 @@
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:sequence>
-
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>

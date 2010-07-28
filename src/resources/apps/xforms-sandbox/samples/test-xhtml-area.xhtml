@@ -12,7 +12,8 @@
                 <instance>
                     <relevant>false</relevant>
                     <readonly>false</readonly>
-                    <text>toto</text>
+                    <text>Initial</text>
+                    <input/>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="text" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
@@ -28,11 +29,13 @@
                 name: "XHTML Editor",
 
                 /**
+                 * [ #315215 ] RTE: if disabled when the page loads, it is readonly when it becomes enabled
+                 * http://forge.ow2.org/tracker/index.php?func=detail&aid=315215&group_id=168&atid=350207
+                 *
                  * We started adding disabled="" on form controls in non-relevant sections, so those controls wouldn't
                  * "steal" the focus. However this causes a problem for the HTML area: if the <textarea> is disabled,
-                 * the RTE is initialized in a disabled mode by YUI. To fix this, when the RTE become relevant, we must
-                 * call the RTE code to make it non-disabled, otherwise the RTE shows as read-only. This checks that the
-                 * RTE is not in read-only mode after it becomes relevant.
+                 * the RTE is initialized in a disabled mode by YUI. To fix this, we set disabled="false" before
+                 * initializing the RTE, so the RTE doesn't set it in readonly mode.
                  */
                 testBecomesRelevant: function() {
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -40,6 +43,34 @@
                     }, function() {
                         var maskedEditor = YAHOO.util.Dom.getElementsByClassName("yui-editor-masked", null, "html-editor");
                         YAHOO.util.Assert.areEqual(0, maskedEditor.length, "editor should not be masked");
+                        var newValue = ORBEON.xforms.Controls.getCurrentValue(YAHOO.util.Dom.get("html-editor"));
+                        YAHOO.util.Assert.areEqual("Initial", newValue, "RTE content set based on value received from server");
+                    });
+                },
+
+                /**
+                 * [ #315218 ] RTE: JS exception when readonly MIP changes
+                 * http://forge.ow2.org/tracker/index.php?func=detail&aid=315218&group_id=168&atid=350207
+                 *
+                 * The code switching the HTML editor to read-only mode used to only work for the FCK editor. This checks
+                 * that we can switch back and forth between the RTE being readonly and non-readonly.
+                 */
+                testReadonlyChange: function() {
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        // Switch to readonly mode
+                        YAHOO.util.UserAction.click("toggle-readonly");
+                    }, function() {
+                        // Check the editor is greyed out
+                        var maskedEditor = YAHOO.util.Dom.getElementsByClassName("yui-editor-masked", null, "html-editor");
+                        YAHOO.util.Assert.areEqual(1, maskedEditor.length, "editor should be masked");
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            // Switch back to non-readonly mode
+                            YAHOO.util.UserAction.click("toggle-readonly");
+                        }, function() {
+                            // Check the editor is not greyed out
+                            var maskedEditor = YAHOO.util.Dom.getElementsByClassName("yui-editor-masked", null, "html-editor");
+                            YAHOO.util.Assert.areEqual(0, maskedEditor.length, "editor should be masked");
+                        });
                     });
                 }
             }));
@@ -56,16 +87,25 @@
         </xhtml:script>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group>
+        <xhtml:div>
             <xforms:trigger appearance="minimal" id="toggle-relevant">
                 <xforms:label>Toggle relevant</xforms:label>
                 <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
             </xforms:trigger> |
-            <xforms:trigger appearance="minimal">
+            <xforms:trigger appearance="minimal" id="toggle-readonly">
                 <xforms:label>Toggle readonly</xforms:label>
                 <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+            </xforms:trigger> |
+            <xforms:trigger appearance="minimal" id="set-value">
+                <xforms:label>Set value</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="text">New value</xforms:setvalue>
             </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
             <xforms:textarea ref="text" mediatype="text/html" id="html-editor"/>
-        </xforms:group>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:output ref="text" id="output-from-editor"/>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

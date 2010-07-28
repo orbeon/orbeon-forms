@@ -2340,12 +2340,6 @@ ORBEON.xforms.Controls = {
                 }
             }
 
-            if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
-                    && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")
-                    && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
-                ORBEON.widgets.RTE.setRelevant(control, isRelevant);
-            }
-
             // Add/remove the disabled attribute on form controls
             var formFieldDisabled = ! isRelevant || ORBEON.xforms.Controls.isReadonly(control);
             function handleFormElement(element) {
@@ -2432,13 +2426,12 @@ ORBEON.xforms.Controls = {
             ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea") && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
-            var htmlEditor = FCKeditorAPI.GetInstance(control.name);
-            if (isReadonly) {
-                htmlEditor.ToolbarSet.Collapse();
-                    // TO-DO
+            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+                ORBEON.widgets.RTE.setReadonly(control, isReadonly);
             } else {
-                htmlEditor.ToolbarSet.Expand();
-                    // TO-DO
+                var htmlEditor = FCKeditorAPI.GetInstance(control.name);
+                if (isReadonly) htmlEditor.ToolbarSet.Collapse();
+                else htmlEditor.ToolbarSet.Expand();
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
@@ -4448,6 +4441,8 @@ ORBEON.widgets.RTE = function() {
             // Create RTE object
             var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("textarea")[0] : control;
+            // Make sure that textarea is not disabled, otherwise RTE renders it in read-only mode
+            textarea.disabled = false;
             var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
 
             // Register event listener for user interacting with the control
@@ -4546,15 +4541,17 @@ ORBEON.widgets.RTE = function() {
             }
         },
 
-        setRelevant: function(control, isRelevant) {
+        /**
+         * XForms readonly == RTE disabled configuration attribute.
+         */
+        setReadonly: function(control, isReadonly) {
             var yuiRTE = rteEditors[control.id];
-            yuiRTE.set("disabled", ! isRelevant);
+            yuiRTE.set("disabled", isReadonly);
         }
     };
 
     return PUBLIC;
 }();
-
 
 ORBEON.xforms.Init = {
 

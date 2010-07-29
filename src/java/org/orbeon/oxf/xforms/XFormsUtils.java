@@ -25,7 +25,6 @@ import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
@@ -1018,47 +1017,6 @@ public class XFormsUtils {
         } catch (URISyntaxException e) {
             throw new ValidationException("Error while resolving URI: " + uri, e, (element != null) ? (LocationData) element.getData() : null);
         }
-    }
-
-    /**
-     * Return an element's static xml:lang value, checking ancestors as well.
-     *
-     * @param element   element to check
-     * @return          xml:lang value or null if not found
-     */
-    private static String resolveXMLang(Element element) {
-        // Allow for null Element
-        if (element == null)
-            return null;
-
-        // Collect xml:base values
-        Element currentElement = element;
-        do {
-            final String xmlLangAttribute = currentElement.attributeValue(XMLConstants.XML_LANG_QNAME);
-            if (xmlLangAttribute != null)
-                return xmlLangAttribute;
-            currentElement = currentElement.getParent();
-        } while(currentElement != null);
-
-        // Not found
-        return null;
-    }
-
-    public static String resolveXMLangHandleAVTs(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element element) {
-        final String xmlLang = resolveXMLang(element);
-        // No xml:lang or plain static xml:lang
-        if (xmlLang == null || !xmlLang.startsWith("#"))
-            return xmlLang;
-
-        // If this starts with "#", this is a reference to a control
-        // NOTE: For now, this is a control's static id and works only for top-level AVTs
-        final String attributeControlStaticId; {
-            final ControlAnalysis controlAnalysis = containingDocument.getStaticState().getAttributeControl(xmlLang.substring(1), "xml:lang");
-            attributeControlStaticId = controlAnalysis.element.attributeValue("id");
-        }
-
-        final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlStaticId);
-        return attributeControl.getExternalValue(propertyContext);
     }
 
     /**

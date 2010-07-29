@@ -1791,6 +1791,63 @@
         </output>
     </test>
 
+    <test description="xxforms:lang() and XBL" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                        xml:lang="{instance()}">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <lang>it</lang>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group>
+                                    <!-- TODO: The variable value is evaluated when bindings are evaluated, so this won't work as expected -->
+                                    <!--<xxforms:variable id="lang" name="lang" select="xxforms:lang()"/>-->
+                                    <!--<xforms:output id="output1" value="$lang"/>-->
+
+                                    <xforms:output id="output1" value="xxforms:lang()"/>
+                                    <xforms:output id="output2" value="xxforms:lang()" xml:lang="zh"/>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo-1"/>
+                    <fr:foo id="my-foo-2" xml:lang="es"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <lang>it</lang>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
+                        <xxf:control id="my-foo-1$output1">it</xxf:control>
+                        <xxf:control id="my-foo-1$output2">zh</xxf:control>
+                        <xxf:control id="my-foo-2$output1">es</xxf:control>
+                        <xxf:control id="my-foo-2$output2">zh</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="xxforms:format-message()" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">

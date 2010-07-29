@@ -773,6 +773,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return staticId;
     }
 
+    public String getPrefixedId() {
+        return prefixedId;
+    }
+
     public String getEffectiveId() {
         return effectiveId;
     }

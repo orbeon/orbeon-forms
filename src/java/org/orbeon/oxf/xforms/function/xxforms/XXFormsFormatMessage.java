@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.XPathContext;
@@ -26,7 +25,7 @@ import org.orbeon.saxon.value.Value;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
-public class XXFormsMessageFormat extends XFormsFunction {
+public class XXFormsFormatMessage extends XFormsFunction {
 
     @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
@@ -47,7 +46,7 @@ public class XXFormsMessageFormat extends XFormsFunction {
         final MessageFormat format;
 
         // Find xml:lang and set locale if any
-        final String lang = XFormsUtils.resolveXMLangHandleAVTs(getOrCreatePipelineContext(), getContainingDocument(xpathContext), getSourceElement(xpathContext));
+        final String lang = XXFormsLang.resolveXMLangHandleAVTs(getOrCreatePipelineContext(), getContainingDocument(xpathContext), getSourceElement(xpathContext));
         if (lang != null) {
             // Really not sure how xml:lang should be parsed, see:
             //

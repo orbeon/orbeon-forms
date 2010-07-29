@@ -14,10 +14,15 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -43,8 +48,71 @@ public class XXFormsLang extends XFormsFunction {
             element = containingDocument.getStaticState().getControlElement(elementPrefixedId);
         }
 
-        final String lang = XFormsUtils.resolveXMLangHandleAVTs(getOrCreatePipelineContext(), containingDocument, element);
+        final String lang = resolveXMLangHandleAVTs(getOrCreatePipelineContext(), getXBLContainer(xpathContext), element);
 
         return (lang == null) ? null : StringValue.makeStringValue(lang);
+    }
+
+    /**
+     * Return an element's static xml:lang value, checking ancestors as well.
+     *
+     * @param element   element to check
+     * @return          xml:lang value or null if not found
+     */
+    private static String resolveXMLang(Element element) {
+        // Allow for null Element
+        if (element == null)
+            return null;
+
+        // Collect xml:lang values
+        Element currentElement = element;
+        do {
+            final String xmlLangAttribute = currentElement.attributeValue(XMLConstants.XML_LANG_QNAME);
+            if (xmlLangAttribute != null)
+                return xmlLangAttribute;
+            currentElement = currentElement.getParent();
+        } while(currentElement != null);
+
+        // Not found
+        return null;
+    }
+
+    /**
+     * Resolve an element's dynamic xml:lang value. This resolves top-level AVTs and goes over XBL container boundaries.
+     *
+     * @param propertyContext   current context
+     * @param xblContainer      current XBL container
+     * @param element           element within XBL container
+     * @return                  xml:lang value, or null if not found
+     */
+    public static String resolveXMLangHandleAVTs(PropertyContext propertyContext, XBLContainer xblContainer, Element element) {
+
+        // Resolve static value
+        final String xmlLang = resolveXMLang(element);
+
+        if (xmlLang == null && xblContainer.getParentXBLContainer() == null) {
+            // We are at the top-level and nothing was found
+            return null;
+        } else if (xmlLang == null) {
+            // We are not at the top-level, so try parent container
+            return resolveXMLangHandleAVTs(propertyContext, xblContainer.getParentXBLContainer(),
+                    xblContainer.getContainingDocument().getStaticState().getControlElement(xblContainer.getPrefixedId()));
+        } else if (!xmlLang.startsWith("#")) {
+            // Found static value
+            return xmlLang;
+        } else {
+            // If this starts with "#", this is a reference to a control (set in XFormsExtractorContentHandler)
+            // NOTE: For now, this is a control's static id and works only for top-level AVTs
+
+            final XFormsContainingDocument containingDocument = xblContainer.getContainingDocument();
+
+            final String attributeControlStaticId; {
+                final ControlAnalysis controlAnalysis = containingDocument.getStaticState().getAttributeControl(xmlLang.substring(1), "xml:lang");
+                attributeControlStaticId = controlAnalysis.element.attributeValue("id");
+            }
+
+            final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlStaticId);
+            return attributeControl.getExternalValue(propertyContext);
+        }
     }
 }

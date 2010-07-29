@@ -362,7 +362,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 2, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:format-message()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}format-message", XXFormsMessageFormat.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}format-message", XXFormsFormatMessage.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE, null);
 

@@ -718,8 +718,7 @@
             <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
             <delete-service>Are you sure you want to delete service</delete-service>
             <delete-action>Are you sure you want to delete action</delete-action>
-            <control-will-be-deleted> control will be deleted.</control-will-be-deleted>
-            <controls-will-be-deleted> controls will be deleted.</controls-will-be-deleted>
+            <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
             <publish-form>Are you sure you want to publish this form? This will override the existing form with the following properties:</publish-form>
             <publish-success>The form was published successfully.</publish-success>
             <publish-error>There was an error during form publishing.</publish-error>
@@ -1436,8 +1435,7 @@
             <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
             <delete-service>Etes-vous sûr de vouloir supprimer le service</delete-service>
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
-            <control-will-be-deleted> contrôle sera supprimé.</control-will-be-deleted>
-            <controls-will-be-deleted> contrôles seront supprimés.</controls-will-be-deleted>
+            <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
             <publish-success>Le formulaire a été publié avec succès.</publish-success>
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>

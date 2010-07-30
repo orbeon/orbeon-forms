@@ -495,11 +495,8 @@
                                                         <!-- Show confirmation dialog -->
                                                         <xxforms:show ev:event="DOMActivate" dialog="fb-confirmation-dialog">
                                                             <xxforms:context name="fr:message"
-                                                                             select="concat($form-resources/messages/delete-section,
-                                                                                        for $c in count(context()/*/*:tr/*:td[*])
-                                                                                            return if ($c > 1) then concat(' ', $c, $form-resources/messages/controls-will-be-deleted)
-                                                                                                   else if ($c > 0) then concat(' ', $c, $form-resources/messages/control-will-be-deleted)
-                                                                                                   else '')"/>
+                                                                             select="concat($form-resources/messages/delete-section, ' ',
+                                                                                        xxforms:format-message($form-resources/messages/controls-will-be-deleted, count(context()/*/*:tr/*:td[*])))"/>
                                                             <xxforms:context name="fr:confirmation-target" select="'fb-top-level-section-block'"/>
                                                         </xxforms:show>
                                                     </xforms:trigger>
@@ -597,10 +594,8 @@
                                                                                             <!-- Ask confirmation -->
                                                                                             <xxforms:show dialog="fb-confirmation-dialog">
                                                                                                 <xxforms:context name="fr:message"
-                                                                                                     select="concat($form-resources/messages/delete-grid,
-                                                                                                                if ($count > 1) then concat(' ', $count, $form-resources/messages/controls-will-be-deleted)
-                                                                                                                else if ($count > 0) then concat(' ', $count, $form-resources/messages/control-will-be-deleted)
-                                                                                                                else '')"/>
+                                                                                                     select="concat($form-resources/messages/delete-grid, ' ',
+                                                                                                                xxforms:format-message($form-resources/messages/controls-will-be-deleted, $count))"/>
                                                                                                 <xxforms:context name="fr:confirmation-target" select="'fb-delete-grid-trigger'"/>
                                                                                             </xxforms:show>
                                                                                         </xforms:action>
@@ -701,10 +696,8 @@
                                                                                                 <!-- Ask confirmation -->
                                                                                                 <xxforms:show dialog="fb-confirmation-dialog">
                                                                                                     <xxforms:context name="fr:message"
-                                                                                                         select="concat($form-resources/messages/delete-column,
-                                                                                                                    if ($count > 1) then concat(' ', $count, $form-resources/messages/controls-will-be-deleted)
-                                                                                                                    else if ($count > 0) then concat(' ', $count, $form-resources/messages/control-will-be-deleted)
-                                                                                                                    else '')"/>
+                                                                                                         select="concat($form-resources/messages/delete-column, ' ',
+                                                                                                                    xxforms:format-message($form-resources/messages/controls-will-be-deleted, $count))"/>
                                                                                                     <xxforms:context name="fr:confirmation-target" select="'fb-delete-column-trigger'"/>
                                                                                                 </xxforms:show>
                                                                                             </xforms:action>
@@ -794,10 +787,8 @@
                                                                                                     <!-- Ask confirmation -->
                                                                                                     <xxforms:show dialog="fb-confirmation-dialog">
                                                                                                         <xxforms:context name="fr:message"
-                                                                                                             select="concat($form-resources/messages/delete-row,
-                                                                                                                        if ($count > 1) then concat(' ', $count, $form-resources/messages/controls-will-be-deleted)
-                                                                                                                        else if ($count > 0) then concat(' ', $count, $form-resources/messages/control-will-be-deleted)
-                                                                                                                        else '')"/>
+                                                                                                             select="concat($form-resources/messages/delete-row, ' ',
+                                                                                                                        xxforms:format-message($form-resources/messages/controls-will-be-deleted, $count))"/>
                                                                                                         <xxforms:context name="fr:confirmation-target" select="'fb-delete-row-trigger'"/>
                                                                                                     </xxforms:show>
                                                                                                 </xforms:action>

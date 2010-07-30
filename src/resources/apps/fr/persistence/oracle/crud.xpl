@@ -78,7 +78,7 @@
                      -->
                     <xsl:copy-of select="doc('input:instance')"/>
                 </document>
-                <timestamp><xsl:value-of select="adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration('PT0H'))"/></timestamp>
+                <timestamp><xsl:value-of select="current-dateTime()"/></timestamp>
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
                 <app><xsl:value-of select="$matcher-groups[1]"/></app>
@@ -253,7 +253,7 @@
                                                 insert into <xsl:value-of select="$table-name"/>
                                                     (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
                                                 select
-                                                    created, 
+                                                    created,
                                                     <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                     app, form, <xsl:if test="$is-data">document_id,</xsl:if>

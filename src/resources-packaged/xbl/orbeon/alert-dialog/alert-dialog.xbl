@@ -27,7 +27,6 @@
 
     <xbl:binding id="fr-alert-dialog" element="fr|alert-dialog">
         <xbl:resources>
-            <xbl:style src="/ops/yui/alert-dialog/assets/skins/sam/alert-dialog.css"/>
             <xbl:style src="/xbl/orbeon/alert-dialog/alert-dialog.css"/>
         </xbl:resources>
         <xbl:handlers>

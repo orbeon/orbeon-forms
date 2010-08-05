@@ -1749,6 +1749,9 @@ ORBEON.xforms.Controls = {
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
                 var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 return image.src;
+            } else if (ORBEON.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
+                // Download link don't really have a value
+                return null;
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 return control.innerHTML;
             } else {

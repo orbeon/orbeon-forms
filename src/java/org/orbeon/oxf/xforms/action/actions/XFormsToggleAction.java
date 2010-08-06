@@ -17,9 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
@@ -46,7 +44,7 @@ public class XFormsToggleAction extends XFormsAction {
 
         final String caseStaticId;
         if (bindingContext.getSingleItem() != null) {
-            caseStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, caseAttribute, true);
+            caseStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, caseAttribute);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
             caseStaticId = caseAttribute;

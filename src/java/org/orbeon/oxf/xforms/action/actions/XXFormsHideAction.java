@@ -38,7 +38,7 @@ public class XXFormsHideAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve attribute as AVTs
-        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog", true);
+        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog");
         if (dialogStaticId == null) {
             // TODO: Should we try to find the dialog containing the action, of the dialog containing the observer or the target causing this event?
         }

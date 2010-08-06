@@ -39,16 +39,16 @@ public class XXFormsShowAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve all attributes as AVTs
-        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog", true);
+        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog");
         final String effectiveNeighborId;
         {
-            final String neighborStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "neighbor", true);
+            final String neighborStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "neighbor");
             final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborStaticId != null) ? actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, neighborStaticId) : null);
             effectiveNeighborId = (effectiveNeighbor != null) ? effectiveNeighbor.getEffectiveId() : null;
         }
         final boolean constrainToViewport;
         {
-            final String constrain = actionInterpreter.resolveAVT(propertyContext, actionElement, "constrain", false);
+            final String constrain = actionInterpreter.resolveAVT(propertyContext, actionElement, "constrain");
             constrainToViewport = !"false".equals(constrain);
         }
 

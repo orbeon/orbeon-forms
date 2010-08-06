@@ -15,12 +15,9 @@ package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
@@ -39,8 +36,7 @@ public class XXFormsListModels extends XFormsFunction {
             final List<StringValue> modelIds = new ArrayList<StringValue>(models.size());
 
             for (final XFormsModel model: models) {
-                // Tricky: we return a de-namespaced id, which seems to be the best thing to do
-                modelIds.add(new StringValue(XFormsUtils.deNamespaceId(containingDocument, model.getEffectiveId())));
+                modelIds.add(new StringValue(model.getEffectiveId()));
             }
 
             return new ListIterator(modelIds);

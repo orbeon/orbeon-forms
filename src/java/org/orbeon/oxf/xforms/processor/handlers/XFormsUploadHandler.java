@@ -16,12 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -139,6 +135,6 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 
     @Override
     public String getForEffectiveId() {
-        return XFormsUtils.appendToEffectiveId(getEffectiveId(), "$xforms-input");
+        return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(getEffectiveId(), "$xforms-input"));
     }
 }

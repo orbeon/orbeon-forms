@@ -4572,7 +4572,9 @@ ORBEON.xforms.Init = {
              * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
              * just registering the event handler on the window object.
              */
-            resourcesBaseURL: ORBEON.xforms.Globals.resourcesBaseURL,   // base URL for resources e.g. /context[/version]
+            //XXX
+            ns : {},                                                    // Namespace of ids (for portlets)
+            resourcesBaseURL: ORBEON.xforms.Globals.resourcesBaseURL,   // Base URL for resources e.g. /context[/version]
             xformsServerURL: ORBEON.xforms.Globals.xformsServerURL,     // XForms Server URL
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
@@ -4673,6 +4675,8 @@ ORBEON.xforms.Init = {
             // If this is an XForms form, proceed with initialization
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
                 var formID = document.forms[formIndex].id;
+                //XXX
+                ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
 
                 // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
                 // interaction with the form before it is initialized
@@ -5075,6 +5079,8 @@ ORBEON.xforms.Init = {
                 }
             }
         }
+        //XXX
+//        ORBEON.xforms.Globals.xformsServerURL = "http://localhost:8080/mywebapp/web/guest/testorbeon?p_p_id=OrbeonFormsPortlet_WAR_orbeon_INSTANCE_v6BJ&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_count=1&_OrbeonFormsPortlet_WAR_orbeon_INSTANCE_v6BJ_orbeon.path=%2Fxforms-server%2F&_OrbeonFormsPortlet_WAR_orbeon_INSTANCE_v6BJ_orbeon.path=%2Fxforms-calculator%2F";
     },
 
     _autoComplete: function(autoComplete) {
@@ -5837,11 +5843,10 @@ ORBEON.xforms.Server = {
                             requestDocumentString.push('</xxforms:initial-dynamic-state>\n');
                         }
 
-
                         // Keep track of the events we have handled, so we can later remove them from the queue
                         var handledEvents = [];
 
-                        // Add server-events, if any. Server execpts server-events in a separate elements before the
+                        // Add server-events, if any. Server excepts server-events in a separate elements before the
                         // <xxforms:action> which contains all the <xxforms:event>.
                         for (var i = 0; i < ORBEON.xforms.Globals.eventQueue.length; i++) {
                             var event = ORBEON.xforms.Globals.eventQueue[i];
@@ -5939,6 +5944,8 @@ ORBEON.xforms.Server = {
             YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
+            //XXX
+            var formID = ORBEON.xforms.Globals.requestForm.id;
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
         }
     },
@@ -7424,7 +7431,7 @@ ORBEON.xforms.Server = {
                         element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
                         if (element == null) {
                             // If everything else has failed, the id might be an xforms:repeat id!
-                            element = YAHOO.util.Dom.get('repeat-begin-' + id);
+                            element = YAHOO.util.Dom.get("repeat-begin-" + id);
                         }
                     }
                 }
@@ -8265,7 +8272,7 @@ function xformsArrayContains(array, element) {
 function xformsLog(object) {
     var debugDiv = ORBEON.util.Dom.getElementById("xforms-debug");
     if (debugDiv == null) {
-        // Figure out width and heigh of visible part of the page
+        // Figure out width and height of visible part of the page
         var visibleWidth;
         var visibleHeight;
         if (navigator.appName.indexOf("Microsoft") != -1) {

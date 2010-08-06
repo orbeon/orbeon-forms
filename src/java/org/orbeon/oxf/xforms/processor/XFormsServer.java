@@ -486,7 +486,7 @@ public class XFormsServer extends ProcessorImpl {
         // Get event target
         final XFormsEventTarget eventTarget;
         {
-            final Object eventTargetObject = containingDocument.getObjectByEffectiveId(targetEffectiveId);
+            final Object eventTargetObject = containingDocument.getObjectByEffectiveId(XFormsUtils.deNamespaceId(containingDocument, targetEffectiveId));
             if (!(eventTargetObject instanceof XFormsEventTarget)) {
                 if (indentedLogger.isDebugEnabled()) {
                     indentedLogger.logDebug(XFormsContainingDocument.EVENT_LOG_TYPE, "ignoring client event with invalid target id", "target id", targetEffectiveId, "event name", eventName);
@@ -544,7 +544,7 @@ public class XFormsServer extends ProcessorImpl {
         // Get other event target
         final XFormsEventTarget otherEventTarget;
         {
-            final Object otherEventTargetObject = (otherControlEffectiveId == null) ? null : containingDocument.getObjectByEffectiveId(otherControlEffectiveId);
+            final Object otherEventTargetObject = (otherControlEffectiveId == null) ? null : containingDocument.getObjectByEffectiveId(XFormsUtils.deNamespaceId(containingDocument, otherControlEffectiveId));
             if (otherEventTargetObject == null) {
                 otherEventTarget = null;
             } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
@@ -833,11 +833,11 @@ public class XFormsServer extends ProcessorImpl {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffIndexState(ch, initialControlTree.getInitialMinimalRepeatIdToIndex(staticState),
+                        diffIndexState(ch, containingDocument, initialControlTree.getInitialMinimalRepeatIdToIndex(staticState),
                                 currentControlTree.getMinimalRepeatIdToIndex(staticState));
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
-                        diffIndexState(ch, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticState),
+                        diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticState),
                                 xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState));
                     }
                 }
@@ -884,7 +884,7 @@ public class XFormsServer extends ProcessorImpl {
                 {
                     final List<XFormsContainingDocument.Script> scripts = containingDocument.getScriptsToRun();
                     if (scripts != null) {
-                        outputScriptsInfo(ch, scripts);
+                        outputScriptsInfo(ch, containingDocument, scripts);
                     }
                 }
 
@@ -892,7 +892,7 @@ public class XFormsServer extends ProcessorImpl {
                 {
                     final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId();
                     if (focusEffectiveControlId != null) {
-                        outputFocusInfo(ch, focusEffectiveControlId);
+                        outputFocusInfo(ch, containingDocument, focusEffectiveControlId);
                     }
                 }
 
@@ -900,7 +900,7 @@ public class XFormsServer extends ProcessorImpl {
                 {
                     final String helpEffectiveControlId = containingDocument.getClientHelpEffectiveControlId();
                     if (helpEffectiveControlId != null) {
-                        outputHelpInfo(ch, helpEffectiveControlId);
+                        outputHelpInfo(ch, containingDocument, helpEffectiveControlId);
                     }
                 }
 
@@ -961,7 +961,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void diffIndexState(ContentHandlerHelper ch, Map<String, Integer> initialRepeatIdToIndex,
+    private static void diffIndexState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map<String, Integer> initialRepeatIdToIndex,
                                        Map<String, Integer> currentRepeatIdToIndex) {
         if (currentRepeatIdToIndex.size() != 0) {
             boolean found = false;
@@ -979,7 +979,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                            new String[] {"id", repeatId, "old-index", (oldIndex != null) ? oldIndex.toString() : "0", "new-index", newIndex.toString()});
+                            new String[] {"id", XFormsUtils.namespaceId(containingDocument, repeatId), "old-index", (oldIndex != null) ? oldIndex.toString() : "0", "new-index", newIndex.toString()});
                 }
             }
             if (found)
@@ -1049,24 +1049,24 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputScriptsInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Script> scripts) {
+    public static void outputScriptsInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Script> scripts) {
         for (XFormsContainingDocument.Script script: scripts) {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
                     new String[]{
                             "name", script.getFunctionName(),
-                            "target-id", script.getEvent().getTargetObject().getEffectiveId(),
-                            "observer-id", script.getEventObserver().getEffectiveId()
+                            "target-id", XFormsUtils.namespaceId(containingDocument, script.getEvent().getTargetObject().getEffectiveId()),
+                            "observer-id", XFormsUtils.namespaceId(containingDocument, script.getEventObserver().getEffectiveId())
                     });
         }
     }
 
-    private static void outputFocusInfo(ContentHandlerHelper ch, String focusEffectiveControlId) {
+    private static void outputFocusInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String focusEffectiveControlId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "setfocus",
-                new String[]{"control-id", focusEffectiveControlId});
+                new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, focusEffectiveControlId)});
     }
 
-    private static void outputHelpInfo(ContentHandlerHelper ch, String helpEffectiveControlId) {
+    private static void outputHelpInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String helpEffectiveControlId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "help",
-                new String[]{"control-id", helpEffectiveControlId});
+                new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, helpEffectiveControlId)});
     }
 }

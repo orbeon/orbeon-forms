@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,7 +17,6 @@ import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsModelBinds;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
@@ -27,7 +26,7 @@ public class XXFormsEvaluateBindProperty extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         // Get bind id
-        final String bindId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
+        final String bindId = argument[0].evaluateAsString(xpathContext).toString();
 
         // Get MIP QName
         final QName mipQName = getQNameFromExpression(xpathContext, argument[1]);

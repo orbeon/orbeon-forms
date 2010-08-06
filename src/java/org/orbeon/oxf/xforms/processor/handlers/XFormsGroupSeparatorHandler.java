@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
@@ -70,7 +71,8 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                     // Delimiter: begin group
                     if (isMustGenerateBeginEndDelimiters) {
                         outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), firstDelimiterClasses, "group-begin-" + effectiveId);
+                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), firstDelimiterClasses,
+                                "group-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
                     }
                 }
             });
@@ -101,7 +103,8 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
             final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
             if (isMustGenerateBeginEndDelimiters) {
                 outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveId);
+                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end",
+                        "group-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
         } else if (isDisabled(control)) {
             // In noscript, group was not visible, restore output

@@ -207,8 +207,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 replace = submissionElement.attributeValue("replace");
 
                 if (replace.equals("instance")) {
-                    replaceInstanceId = XFormsUtils.namespaceId(containingDocument, submissionElement.attributeValue("instance"));
-                    xxfReplaceInstanceId = XFormsUtils.namespaceId(containingDocument, submissionElement.attributeValue(XFormsConstants.XXFORMS_INSTANCE_QNAME));
+                    replaceInstanceId = submissionElement.attributeValue("instance");
+                    xxfReplaceInstanceId = submissionElement.attributeValue(XFormsConstants.XXFORMS_INSTANCE_QNAME);
                 }
             }
             if (submissionElement.attributeValue("separator") != null) {

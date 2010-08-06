@@ -19,12 +19,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -277,7 +273,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     private String getFirstInputEffectiveId(String effectiveId) {
         if (!isBoolean) {
             // Do as if this was in a component, noscript has to handle that
-            return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
+            return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1"));
         } else {
             return null;
         }
@@ -286,7 +282,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     private String getSecondInputEffectiveId(String effectiveId) {
         if (isDateTime) {
             // Do as if this was in a component, noscript has to handle that
-            return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
+            return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2"));
         } else {
             return null;
         }

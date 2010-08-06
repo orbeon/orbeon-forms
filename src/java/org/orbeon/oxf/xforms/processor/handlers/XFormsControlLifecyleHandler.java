@@ -18,12 +18,8 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -281,7 +277,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             reusableAttributes.clear();
             containerAttributes = reusableAttributes;
             if (addId)
-                containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)));
+                containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)));
         } else {
             containerAttributes = getContainerAttributes(uri, localname, attributes);
         }
@@ -329,6 +325,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         // Default:
         // o new layout: point to foo$bar$$c.1-2-3
         // o old layout: point to foo$bar.1-2-3
-        return handlerContext.isSpanHTMLLayout() ? getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : effectiveId;
+        return handlerContext.isSpanHTMLLayout() ? getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : effectiveId;
     }
 }

@@ -456,14 +456,14 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
                 newIdAttributeUnprefixed = metadata.idGenerator.getNextId();
-                newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
+                newIdAttribute[0] = newIdAttributeUnprefixed;
                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
                 attributes = newAttributes;
             } else if (portlet) {
                 // Then we must prefix the existing id
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
                 newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
-                newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
+                newIdAttribute[0] = newIdAttributeUnprefixed;
                 newAttributes.setValue(idIndex, newIdAttribute[0]);
                 attributes = newAttributes;
             } else {
@@ -482,7 +482,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 if (observerIndex != -1) {
                     final AttributesImpl newAttributes = new AttributesImpl(attributes);
                     String newObserverAttributeUnprefixed = newAttributes.getValue(observerIndex);
-                    newAttributes.setValue(observerIndex, containerNamespace + newObserverAttributeUnprefixed);
+                    newAttributes.setValue(observerIndex, newObserverAttributeUnprefixed);
                     attributes = newAttributes;
                 }
             }

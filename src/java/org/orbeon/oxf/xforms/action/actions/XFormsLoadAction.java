@@ -41,16 +41,16 @@ public class XFormsLoadAction extends XFormsAction {
 
         final String showAttribute;
         {
-            final String rawShowAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "show", false);
+            final String rawShowAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "show");
             showAttribute = (rawShowAttribute == null) ? "replace" : rawShowAttribute;
             if (!("replace".equals(showAttribute) || "new".equals(showAttribute)))
                 throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
         }
         final boolean doReplace = "replace".equals(showAttribute);
-        final String target = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_TARGET_QNAME, false);
-        final String urlType = actionInterpreter.resolveAVT(propertyContext, actionElement, XMLConstants.FORMATTING_URL_TYPE_QNAME, false);
+        final String target = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_TARGET_QNAME);
+        final String urlType = actionInterpreter.resolveAVT(propertyContext, actionElement, XMLConstants.FORMATTING_URL_TYPE_QNAME);
         final boolean urlNorewrite = XFormsUtils.resolveUrlNorewrite(actionElement);
-        final boolean isShowProgress = !"false".equals(actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false));
+        final boolean isShowProgress = !"false".equals(actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
         // "If both are present, the action has no effect."
         final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
@@ -75,7 +75,7 @@ public class XFormsLoadAction extends XFormsAction {
                 return;
 
             // Resolve AVT
-            final String resolvedResource = actionInterpreter.resolveAVT(propertyContext, actionElement, "resource", false);
+            final String resolvedResource = actionInterpreter.resolveAVT(propertyContext, actionElement, "resource");
             final String encodedResource = NetUtils.encodeHRRI(resolvedResource, true);
             resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?

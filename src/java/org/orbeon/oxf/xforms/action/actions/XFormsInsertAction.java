@@ -26,15 +26,11 @@ import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.BooleanValue;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 9.3.5 The insert Element
@@ -56,7 +52,7 @@ public class XFormsInsertAction extends XFormsAction {
         final String contextAttribute = actionElement.attributeValue("context");
 
         // Extension: allow position to be an AVT
-        final String resolvedPositionAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "position", false);
+        final String resolvedPositionAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "position");
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {

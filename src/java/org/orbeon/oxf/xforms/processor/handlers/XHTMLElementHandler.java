@@ -82,7 +82,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
 
                 if (found) {
                     // Update the value of the id attribute
-                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
+                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
                 }
             }
 
@@ -90,7 +90,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                 // Id was not replaced as part of AVT processing
 
                 // Update the value of the id attribute
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
         }
 

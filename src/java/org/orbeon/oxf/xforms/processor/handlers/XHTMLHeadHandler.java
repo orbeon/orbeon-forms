@@ -27,13 +27,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.Serializable;
@@ -158,7 +154,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         idsForAppearanceOrMediatypeList = new ArrayList<String>();
                         listForControlNameMap.put(controlAppearanceOrMediatype, idsForAppearanceOrMediatypeList);
                     }
-                    idsForAppearanceOrMediatypeList.add(control.getEffectiveId());
+                    idsForAppearanceOrMediatypeList.add(XFormsUtils.namespaceId(containingDocument, control.getEffectiveId()));
                 }
                 return true;
             }
@@ -399,7 +395,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 // Initial setfocus if present
                 if (focusElementId != null) {
                     sb.append("ORBEON.xforms.Controls.setFocus(\"");
-                    sb.append(focusElementId);
+                    sb.append(XFormsUtils.namespaceId(containingDocument, focusElementId));
                     sb.append("\");");
                 }
 
@@ -409,9 +405,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         sb.append("ORBEON.xforms.Server.callUserScript(\"");
                         sb.append(script.getFunctionName());
                         sb.append("\",\"");
-                        sb.append(script.getEvent().getTargetObject().getEffectiveId());
+                        sb.append(XFormsUtils.namespaceId(containingDocument, script.getEvent().getTargetObject().getEffectiveId()));
                         sb.append("\",\"");
-                        sb.append(script.getEventObserver().getEffectiveId());
+                        sb.append(XFormsUtils.namespaceId(containingDocument, script.getEventObserver().getEffectiveId()));
                         sb.append("\");");
                     }
                 }
@@ -441,11 +437,11 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 if (dialogsToOpen.size() > 0) {
                     for (final XXFormsDialogControl dialogControl: dialogsToOpen) {
                         sb.append("ORBEON.xforms.Controls.showDialog(\"");
-                        sb.append(dialogControl.getEffectiveId());
+                        sb.append(XFormsUtils.namespaceId(containingDocument, dialogControl.getEffectiveId()));
                         sb.append("\", ");
                         if (dialogControl.getNeighborControlId() != null) {
                             sb.append('"');
-                            sb.append(dialogControl.getNeighborControlId());
+                            sb.append(XFormsUtils.namespaceId(containingDocument, dialogControl.getNeighborControlId()));
                             sb.append('"');
                         } else {
                             sb.append("null");

@@ -16,13 +16,8 @@ package org.orbeon.oxf.xforms.function;
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.PathMap;
-import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.SingletonIterator;
+import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
@@ -44,7 +39,7 @@ public class Instance extends XFormsFunction {
         {
             if (instanceIdExpression != null) {
                 final String tempId = instanceIdExpression.evaluateAsString(xpathContext).toString().trim();
-                instanceId = (StringUtils.isNotBlank(tempId)) ? XFormsUtils.namespaceId(getContainingDocument(xpathContext), tempId) : null;
+                instanceId = (StringUtils.isNotBlank(tempId)) ? tempId : null;
             } else {
                 instanceId = null;
             }

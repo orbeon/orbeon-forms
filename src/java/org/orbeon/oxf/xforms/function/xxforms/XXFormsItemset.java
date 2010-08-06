@@ -14,14 +14,11 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.ExpressionTool;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
@@ -32,7 +29,7 @@ public class XXFormsItemset extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
         // Get control
         final Expression controlStaticIdExpression = argument[0];
-        final String controlStaticId = (controlStaticIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), controlStaticIdExpression.evaluateAsString(xpathContext));
+        final String controlStaticId = (controlStaticIdExpression == null) ? null : controlStaticIdExpression.evaluateAsString(xpathContext).toString();
         final Object object = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId, null);
 
         if (object instanceof XFormsSelect1Control && ((XFormsSelect1Control) object).isRelevant()) {// only try if the control is relevant

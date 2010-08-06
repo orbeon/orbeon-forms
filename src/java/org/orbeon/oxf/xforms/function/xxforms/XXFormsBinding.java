@@ -14,10 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -30,7 +27,7 @@ public class XXFormsBinding extends XFormsFunction {
 
         // Get control id
         final Expression controlIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String controlStaticId = (controlIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), controlIdExpression.evaluateAsString(xpathContext));
+        final String controlStaticId = (controlIdExpression == null) ? null : controlIdExpression.evaluateAsString(xpathContext).toString();
 
         if (controlStaticId == null)
             return EmptyIterator.getInstance();

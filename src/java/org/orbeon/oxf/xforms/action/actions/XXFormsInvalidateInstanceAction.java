@@ -34,8 +34,8 @@ public class XXFormsInvalidateInstanceAction extends XFormsAction {
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Evaluate AVTs
-        final String resourceURI = actionInterpreter.resolveAVT(propertyContext, actionElement, "resource", false);
-        final String handleXIncludeString = actionInterpreter.resolveAVT(propertyContext, actionElement, "xinclude", false);
+        final String resourceURI = actionInterpreter.resolveAVT(propertyContext, actionElement, "resource");
+        final String handleXIncludeString = actionInterpreter.resolveAVT(propertyContext, actionElement, "xinclude");
 
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
         final IndentedLogger indentedLogger = actionInterpreter.getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);

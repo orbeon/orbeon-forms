@@ -465,12 +465,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // NOTE: Templates for full items are output globally in XHTMLBodyHandler
     }
 
-    public static void outputItemFullTemplate(PipelineContext pipelineContext, HandlerContext handlerContext,
+    public static void outputItemFullTemplate(PipelineContext pipelineContext,HandlerContext handlerContext,
                                               ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
                                               XFormsContainingDocument containingDocument,
                                               AttributesImpl reusableAttributes, Attributes attributes, String templateId,
                                               String effectiveId, boolean isMultiple, String fullItemType) throws SAXException {
         reusableAttributes.clear();
+//        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.getContainingDocument(), templateId));
+        // Client queries template by id without namespace, so output that. Not ideal as all ids should be namespaced.
         reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, templateId);
         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-template");
 
@@ -506,7 +508,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         // xhtml:span enclosing input and label
         final String itemClasses = getItemClasses(item, isSelected ? "xforms-selected" : "xforms-deselected");
-        final AttributesImpl spanAttributes = getAttributes(reusableAttributes, XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+        final AttributesImpl spanAttributes = getAttributes(containingDocument, reusableAttributes, XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to span
         addItemAttributes(item, spanAttributes);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
@@ -523,7 +525,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId));
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
 
                 // Get group name from selection control if possible, otherwise use effective id

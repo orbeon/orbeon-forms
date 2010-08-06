@@ -18,10 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.ContentHandlerWriter;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -30,10 +27,7 @@ import org.orbeon.oxf.xml.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ControlsComparator {
 
@@ -350,7 +344,7 @@ public class ControlsComparator {
             controller.setElementHandlerContext(handlerContext);
 
             attributesImpl.clear();
-            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId()));
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "inner-html", attributesImpl);
             {
                 // Replay into SAX pipeline
@@ -374,7 +368,7 @@ public class ControlsComparator {
             final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-                    new String[] { "id", templateId, "parent-indexes", parentIndexes, "count", "" + count });
+                    new String[] { "id", XFormsUtils.namespaceId(containingDocument, templateId), "parent-indexes", parentIndexes, "count", "" + count });
         }
     }
 
@@ -387,7 +381,7 @@ public class ControlsComparator {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
                     new String[] {
                             // Get prefixed id without suffix as templates are global
-                            "id", repeatControl.getPrefixedId(),
+                            "id", XFormsUtils.namespaceId(containingDocument, repeatControl.getPrefixedId()),
                             "parent-indexes", parentIndexes,
                             "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
                     });

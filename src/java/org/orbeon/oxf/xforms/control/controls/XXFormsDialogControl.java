@@ -16,8 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -27,10 +26,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents an extension xxforms:dialog control.
@@ -253,9 +249,9 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         // NOTE: At this point, this uses visible/hidden. But we could also handle this with relevant="true|false".
         final String neighbor = getNeighborControlId();
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
-                "id", getEffectiveId(),
+                "id", XFormsUtils.namespaceId(containingDocument, getEffectiveId()),
                 "visibility", isVisible() ? "visible" : "hidden",
-                (neighbor != null && isVisible()) ? "neighbor" : null, neighbor,
+                (neighbor != null && isVisible()) ? "neighbor" : null, XFormsUtils.namespaceId(containingDocument, neighbor),
                 isVisible() ? "constrain" : null, Boolean.toString(isConstrainToViewport())
         });
     }

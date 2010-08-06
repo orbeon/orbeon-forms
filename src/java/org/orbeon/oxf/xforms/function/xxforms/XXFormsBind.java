@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,13 +15,10 @@ package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsModelBinds;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.util.Collections;
@@ -36,7 +33,7 @@ public class XXFormsBind extends XFormsFunction {
 
         // Get bind id
         final Expression bindIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String bindId = (bindIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), bindIdExpression.evaluateAsString(xpathContext));
+        final String bindId = (bindIdExpression == null) ? null : bindIdExpression.evaluateAsString(xpathContext).toString();
 
         // Get bind nodeset
         final XFormsContextStack contextStack = getContextStack(xpathContext);

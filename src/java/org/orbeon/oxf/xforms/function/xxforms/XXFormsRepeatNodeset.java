@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -35,9 +34,9 @@ public class XXFormsRepeatNodeset extends XFormsFunction {
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
         final String repeatId;
         if (contextIdExpression == null) {
-            repeatId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), contextStack.getEnclosingRepeatId());
+            repeatId = contextStack.getEnclosingRepeatId();
         } else {
-            repeatId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
+            repeatId = contextIdExpression.evaluateAsString(xpathContext).toString();
         }
 
         // Get repeat node-set for given id

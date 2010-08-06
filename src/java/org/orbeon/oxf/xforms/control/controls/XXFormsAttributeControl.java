@@ -143,14 +143,14 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         boolean doOutputElement = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, attributeControl2.getEffectiveId());
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, attributeControl2.getEffectiveId()));
 
         // The client does not store an HTML representation of the xxforms:attribute control, so we
         // have to output these attributes.
         {
             // HTML element id
             final String effectiveFor2 = attributeControl2.getEffectiveForAttribute();
-            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
+            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", XFormsUtils.namespaceId(containingDocument, effectiveFor2), isNewlyVisibleSubtree, false);
         }
 
         {

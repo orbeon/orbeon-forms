@@ -1265,7 +1265,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         boolean added = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getEffectiveId());
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, getEffectiveId()));
 
         // Class attribute
         added |= addAjaxClass(attributesImpl, isNewlyVisibleSubtree, other, this);
@@ -1464,7 +1464,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                     final AttributesImpl attributesImpl = new AttributesImpl();
                     // Control id
-                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId()));
 
                     // The client does not store an HTML representation of the xxforms:attribute control, so we
                     // have to output these attributes.

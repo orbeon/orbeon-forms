@@ -413,10 +413,9 @@ public class XFormsActionInterpreter {
      * @param propertyContext   current context
      * @param actionElement     action element
      * @param attributeValue    raw value to resolve
-     * @param isNamespace       whether to namespace the resulting value
      * @return                  resolved attribute value
      */
-    public String resolveAVTProvideValue(PropertyContext propertyContext, Element actionElement, String attributeValue, boolean isNamespace) {
+    public String resolveAVTProvideValue(PropertyContext propertyContext, Element actionElement, String attributeValue) {
 
         if (attributeValue == null)
             return null;
@@ -449,7 +448,7 @@ public class XFormsActionInterpreter {
             resolvedAVTValue = attributeValue;
         }
 
-        return isNamespace ? XFormsUtils.namespaceId(containingDocument, resolvedAVTValue) : resolvedAVTValue;
+        return resolvedAVTValue;
     }
 
     /**
@@ -458,16 +457,15 @@ public class XFormsActionInterpreter {
      * @param propertyContext   current context
      * @param actionElement     action element
      * @param attributeName     QName of the attribute containing the value
-     * @param isNamespace       whether to namespace the resulting value
      * @return                  resolved attribute value
      */
-    public String resolveAVT(PropertyContext propertyContext, Element actionElement, QName attributeName, boolean isNamespace) {
+    public String resolveAVT(PropertyContext propertyContext, Element actionElement, QName attributeName) {
         // Get raw attribute value
         final String attributeValue = actionElement.attributeValue(attributeName);
         if (attributeValue == null)
             return null;
 
-        return resolveAVTProvideValue(propertyContext, actionElement, attributeValue, isNamespace);
+        return resolveAVTProvideValue(propertyContext, actionElement, attributeValue);
     }
 
     /**
@@ -476,16 +474,15 @@ public class XFormsActionInterpreter {
      * @param propertyContext   current context
      * @param actionElement     action element
      * @param attributeName     name of the attribute containing the value
-     * @param isNamespace       whether to namespace the resulting value
      * @return                  resolved attribute value
      */
-    public String resolveAVT(PropertyContext propertyContext, Element actionElement, String attributeName, boolean isNamespace) {
+    public String resolveAVT(PropertyContext propertyContext, Element actionElement, String attributeName) {
         // Get raw attribute value
         final String attributeValue = actionElement.attributeValue(attributeName);
         if (attributeValue == null)
             return null;
 
-        return resolveAVTProvideValue(propertyContext, actionElement, attributeValue, isNamespace);
+        return resolveAVTProvideValue(propertyContext, actionElement, attributeValue);
     }
 
     /**
@@ -501,7 +498,7 @@ public class XFormsActionInterpreter {
         final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
 
         // Get indexes as space-separated list
-        final String repeatIndexes = resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
+        final String repeatIndexes = resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME);
         if (StringUtils.isBlank(repeatIndexes)) {
             // Most common case: resolve effective id based on source and target
             return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);

@@ -48,7 +48,7 @@ public class XFormsSetindexAction extends XFormsAction {
             return;
 
         // Get repeat static id
-        final String repeatStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, repeatAttribute, true);
+        final String repeatStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, repeatAttribute);
 
         // Determine index
         final String indexXPath = actionElement.attributeValue("index");

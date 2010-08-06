@@ -15,12 +15,11 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xml.DeferredXMLReceiver;
-import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -66,7 +65,8 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
                 // Delimiter: begin repeat
                 if (isMustGenerateBeginEndDelimiters) {
                     outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-begin-" + effectiveId);
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end",
+                            "repeat-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
                     outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                             outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
                 }
@@ -166,7 +166,8 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
         // Delimiter: end repeat
         if (outputInterceptor != null && isMustGenerateBeginEndDelimiters) {
             outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-end-" + effectiveId);
+                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end",
+                    "repeat-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
         }
     }
 

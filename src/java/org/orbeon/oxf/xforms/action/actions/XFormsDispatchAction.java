@@ -21,10 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventFactory;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
@@ -53,14 +50,14 @@ public class XFormsDispatchAction extends XFormsAction {
         final String resolvedNewEventName;
         {
             // Resolve AVT
-            resolvedNewEventName = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventNameAttributeValue, false);
+            resolvedNewEventName = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventNameAttributeValue);
             if (resolvedNewEventName == null)
                 return;
         }
         final String resolvedNewEventTargetStaticId;
         {
             // Resolve AVT
-            resolvedNewEventTargetStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventTargetIdValue, true);
+            resolvedNewEventTargetStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventTargetIdValue);
             if (resolvedNewEventTargetStaticId == null)
                 return;
         }
@@ -70,20 +67,20 @@ public class XFormsDispatchAction extends XFormsAction {
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventBubblesString = actionInterpreter.resolveAVT(propertyContext, actionElement, "bubbles", false);
+            final String newEventBubblesString = actionInterpreter.resolveAVT(propertyContext, actionElement, "bubbles");
             newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString);
         }
         final boolean newEventCancelable;
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventCancelableString = actionInterpreter.resolveAVT(propertyContext, actionElement, "cancelable", false);
+            final String newEventCancelableString = actionInterpreter.resolveAVT(propertyContext, actionElement, "cancelable");
             newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString);
         }
         final int resolvedDelay;
         {
             // Resolve AVT
-            final String delayString = actionInterpreter.resolveAVT(propertyContext, actionElement, "delay", false);
+            final String delayString = actionInterpreter.resolveAVT(propertyContext, actionElement, "delay");
             resolvedDelay = (delayString == null || delayString.equals("")) ? 0 : Integer.parseInt(delayString);
         }
 
@@ -123,12 +120,12 @@ public class XFormsDispatchAction extends XFormsAction {
             // Whether to tell the client to show a progress indicator when sending this event
             final boolean showProgress;
             {
-                final String showProgressString = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false);
+                final String showProgressString = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME);
                 showProgress = !"false".equals(showProgressString);
             }
             final String progressMessage;
             if (showProgress) {
-                progressMessage = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME, false);
+                progressMessage = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME);
             } else {
                 progressMessage = null;
             }

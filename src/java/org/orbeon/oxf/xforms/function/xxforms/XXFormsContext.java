@@ -14,14 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.SingletonIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
@@ -35,7 +31,7 @@ public class XXFormsContext extends XFormsFunction {
 
         // Get context id
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), contextIdExpression.evaluateAsString(xpathContext));
+        final String contextId = (contextIdExpression == null) ? null : contextIdExpression.evaluateAsString(xpathContext).toString();
 
         // Get context item for id
         final XFormsContextStack contextStack = getContextStack(xpathContext);

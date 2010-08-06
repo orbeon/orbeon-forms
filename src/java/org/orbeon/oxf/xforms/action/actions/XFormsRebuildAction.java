@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -38,7 +37,7 @@ public class XFormsRebuildAction extends XFormsAction {
         final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
+        final String modelId = actionElement.attributeValue("model");
         final XFormsModel model = actionInterpreter.resolveModel(propertyContext, actionElement, modelId);
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation

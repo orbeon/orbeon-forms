@@ -19,9 +19,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -46,7 +44,7 @@ public class XFormsSendAction extends XFormsAction {
         final String resolvedSubmissionStaticId;
         {
             // Resolve AVT
-            resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, submissionId, true);
+            resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, submissionId);
             if (resolvedSubmissionStaticId == null)
                 return;
         }

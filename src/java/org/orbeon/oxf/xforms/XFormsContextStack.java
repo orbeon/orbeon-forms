@@ -236,8 +236,8 @@ public class XFormsContextStack {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
-        final String model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
-        final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
+        final String model = bindingElement.attributeValue("model");
+        final String bind = bindingElement.attributeValue("bind");
 
         final NamespaceMapping bindingElementNamespaceMapping = container.getNamespaceMappings(bindingElement);
         pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);

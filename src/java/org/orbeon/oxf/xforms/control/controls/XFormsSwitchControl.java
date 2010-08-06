@@ -17,9 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -29,10 +27,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an xforms:switch container control.
@@ -255,7 +250,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                 final String selectedCaseEffectiveId = getSelectedCaseEffectiveId();
                 assert selectedCaseEffectiveId != null;
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                        "id", selectedCaseEffectiveId,
+                        "id", XFormsUtils.namespaceId(containingDocument, selectedCaseEffectiveId),
                         "visibility", "visible"
                 });
 
@@ -264,7 +259,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                     final String previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl);
                     assert previousSelectedCaseId != null;
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                            "id", previousSelectedCaseId,
+                            "id", XFormsUtils.namespaceId(containingDocument, previousSelectedCaseId),
                             "visibility", "hidden"}
                     );
                 } else {
@@ -275,7 +270,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                         for (final XFormsCaseControl caseControl: children) {
                             if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                                        "id", caseControl.getEffectiveId(),
+                                        "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId()),
                                         "visibility", "hidden"
                                 });
                             }

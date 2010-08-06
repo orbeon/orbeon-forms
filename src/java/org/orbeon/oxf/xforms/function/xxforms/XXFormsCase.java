@@ -28,7 +28,7 @@ public class XXFormsCase  extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final String switchStaticId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
+        final String switchStaticId = argument[0].evaluateAsString(xpathContext).toString();
 
         final Object switchControl = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), switchStaticId, null);
 

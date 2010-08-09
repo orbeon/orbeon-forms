@@ -90,6 +90,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
         final String listenerSessionKey = getListenerSessionKey(containingDocument);
+        final String uuid = containingDocument.getUUID();
         if (sessionAttributes.get(listenerSessionKey) == null) {
 
             // Remove from cache when session expires
@@ -97,7 +98,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 public void sessionDestroyed() {
                     // NOTE: Don't use PropertyContext provided above here, it must be let go.
                     indentedLogger.logDebug(LOG_TYPE, "Removing document from cache following session expiration.");
-                    XFormsDocumentCache.instance().removeDocument(new PipelineContext(), containingDocument);
+                    final PipelineContext pipelineContext = new PipelineContext();
+                    final XFormsContainingDocument containingDocument = XFormsDocumentCache.instance().getDocument(pipelineContext, uuid);
+                    if (containingDocument != null)
+                        XFormsDocumentCache.instance().removeDocument(pipelineContext, containingDocument);
                 }
             };
 

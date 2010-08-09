@@ -93,7 +93,7 @@
                     </xforms:group>
                 </xsl:template>
 
-                <!-- Placed enclosing repeas and group in outer scope -->
+                <!-- Placed enclosing repeats and group in outer scope -->
                 <xsl:template match="/*/xforms:repeat | /*/xforms:group">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>

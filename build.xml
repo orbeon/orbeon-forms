@@ -74,7 +74,7 @@
         <include name="activation-1_0_2.jar"/>
         <include name="jtidy-8.0-20060801.131059-3.jar"/>
         <include name="tagsoup-1.2.jar"/>
-        <include name="saxon-9-1-0-8_orbeon_20100413.jar"/>
+        <include name="saxon-9-1-0-8_orbeon_20100810.jar"/>
         <include name="batik-all-1_6.jar"/>
         <include name="avalon-framework-4_2_0.jar"/>
         <include name="fop-0_93.jar"/>

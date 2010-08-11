@@ -22,23 +22,20 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
-import org.orbeon.oxf.xforms.state.XFormsState;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
-import org.orbeon.oxf.xforms.submission.SubmissionResult;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.state.*;
+import org.orbeon.oxf.xforms.submission.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -118,6 +115,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private XFormsStaticState xformsStaticState;
     private XFormsControls xformsControls;
 
+    // Request information
+    private XFormsConstants.DeploymentType deploymentType;
+    private String requestContextPath;
+    private String requestPath;
+    private String containerType;
+    private String containerNamespace;
+    private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
+
     // Client state
     private XFormsModelSubmission activeSubmissionFirstPass;
     private Callable<SubmissionResult> replaceAllCallable;
@@ -144,6 +149,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Create an XFormsContainingDocument from an XFormsStaticState object.
      *
+     * Used by XFormsToXHTML.
+     *
      * @param pipelineContext           current context
      * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
@@ -156,6 +163,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
         // Create UUID for this document instance
         this.uuid = UUIDUtils.createPseudoUUID();
+
+        // Initialize request information
+        {
+            initializeRequestInformation(pipelineContext);
+            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+        }
 
         indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
         {
@@ -183,36 +196,75 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         indentedLogger.endHandleOperation();
     }
 
+    private void initializeRequestInformation(PipelineContext pipelineContext) {
+        final ExternalContext.Request request = XFormsUtils.getExternalContext(pipelineContext).getRequest();
+
+        // Remember if filter provided separate deployment information
+        final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
+        this.deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
+                    : "integrated".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.integrated
+                    : XFormsConstants.DeploymentType.plain;
+
+        // Try to get request context path
+        this.requestContextPath = request.getClientContextPath("/");
+
+        // Base URI for path resolution
+        {
+            // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
+            final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
+            // NOTE: We used to have response.rewriteRenderURL() on this, but why?
+            if (rendererBaseURI != null)
+                this.requestPath = rendererBaseURI;
+            else
+                this.requestPath = request.getRequestPath();
+        }
+
+        this.containerType = request.getContainerType();
+        this.containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace(), "");
+    }
+
     /**
      * Restore an XFormsContainingDocument from XFormsState only.
+     *
+     * Used by XFormsStateManager.
      *
      * @param pipelineContext   current context
      * @param xformsState       XFormsState containing static and dynamic state
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
-        this(pipelineContext, xformsState,  null);
-    }
-
-    /**
-     * Restore an XFormsContainingDocument from XFormsState and XFormsStaticState.
-     *
-     * @param pipelineContext         current context
-     * @param xformsState             static and dynamic state information
-     * @param xformsStaticState       static state object, or null if not available
-     */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, XFormsStaticState xformsStaticState) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
-        if (xformsStaticState != null) {
-            // Use passed static state object
-            indentedLogger.startHandleOperation("initialization", "restoring containing document (static state object provided).");
-            this.xformsStaticState = xformsStaticState;
-        } else {
-            // Create static state object
-            // TODO: Handle caching of XFormsStaticState object? Anything that can be done here?
-            indentedLogger.startHandleOperation("initialization", "restoring containing document (static state object not provided).");
-            this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
+        // Create static state object
+        {
+            final String staticStateDigest = xformsState.getStaticStateDigest();
+
+            if (staticStateDigest != null) {
+                final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, staticStateDigest);
+                if (cachedState != null) {
+                    // Found static state in cache
+                    indentedLogger.logDebug("", "found static state by digest in cache");
+                    this.xformsStaticState = cachedState;
+                } else {
+                    // Not found static state in cache, create static state from input
+                    indentedLogger.logDebug("", "did not find static state by digest in cache");
+                    this.xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDigest, xformsState.getStaticState());
+
+                    // Store in cache
+                    XFormsStaticStateCache.instance().storeDocument(pipelineContext, this.xformsStaticState);
+                }
+
+                assert this.xformsStaticState.isServerStateHandling();
+            } else {
+                // Not digest provided, create static state from input
+                indentedLogger.logDebug("", "did not find static state by digest in cache");
+                this.xformsStaticState = new XFormsStaticState(pipelineContext, null, xformsState.getStaticState());
+
+                assert this.xformsStaticState.isClientStateHandling();
+            }
         }
+
+        indentedLogger.startHandleOperation("initialization", "restoring containing document (static state object not provided).");
+
         {
             // Make sure there is location data
             setLocationData(this.xformsStaticState.getLocationData());
@@ -269,6 +321,47 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return xformsControls;
     }
 
+    public XFormsConstants.DeploymentType getDeploymentType() {
+        return deploymentType;
+    }
+
+    /**
+     * Return the context path of the request that generated the XForms page.
+     */
+    public String getRequestContextPath() {
+        return requestContextPath;
+    }
+
+    /**
+     * Return the path of the request that generated the XForms page.
+     */
+    public String getRequestPath() {
+        return requestPath;
+    }
+
+    /**
+     * Return the container type that generated the XForms page, either "servlet" or "portlet".
+     */
+    public String getContainerType() {
+        return containerType;
+    }
+
+    /**
+     * Return the container namespace that generated the XForms page. Always "" for servlets.
+     */
+    public String getContainerNamespace() {
+        return containerNamespace;
+    }
+
+    /**
+     * Return path matchers for versioned resources mode.
+     *
+     * @return  List of PathMatcher
+     */
+    public List<URLRewriterUtils.PathMatcher> getVersionedPathMatchers() {
+        return versionedPathMatchers;
+    }
+
     /**
      * Return dependencies implementation.
      */
@@ -297,20 +390,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public Map<String, String> getScripts() {
         return xformsStaticState.getScripts();
-    }
-
-    /**
-     * Return the container type that generate the XForms page, either "servlet" or "portlet".
-     */
-    public String getContainerType() {
-        return xformsStaticState.getContainerType();
-    }
-
-    /**
-     * Return the container namespace that generate the XForms page. Always "" for servlets.
-     */
-    public String getContainerNamespace() {
-        return xformsStaticState.getContainerNamespace();
     }
 
     /**
@@ -1209,6 +1288,21 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             dynamicStateElement.addAttribute("uuid", uuid);
             dynamicStateElement.addAttribute("sequence", Integer.toString(changeSequence));
 
+            // Add request information
+            dynamicStateElement.addAttribute("deployment-type", deploymentType.name());
+            dynamicStateElement.addAttribute("request-context-path", requestContextPath);
+            dynamicStateElement.addAttribute("request-path", requestPath);
+            dynamicStateElement.addAttribute("container-type", containerType);
+            dynamicStateElement.addAttribute("container-namespace", containerNamespace);
+
+            // Remember versioned paths
+            if (versionedPathMatchers != null && versionedPathMatchers.size() > 0) {
+                final Element matchersElement = dynamicStateElement.addElement("matchers");
+                for (final URLRewriterUtils.PathMatcher pathMatcher: versionedPathMatchers) {
+                    matchersElement.add(pathMatcher.serialize());
+                }
+            }
+
             // Serialize instances
             {
                 final Element instancesElement = dynamicStateElement.addElement("instances");
@@ -1236,26 +1330,53 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private void restoreDynamicState(PipelineContext pipelineContext, String encodedDynamicState) {
 
         // Get dynamic state document
-        final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
+        final Element dynamicStateElement = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState).getRootElement();
 
         // XXX DEBUG
 //        System.out.println("RESTORE: " + Dom4jUtils.domToPrettyString(dynamicStateDocument));
 
         // Restore UUIDs
-        this.uuid = dynamicStateDocument.getRootElement().attributeValue("uuid");
-        this.changeSequence = Integer.parseInt(dynamicStateDocument.getRootElement().attributeValue("sequence"));
+
+        this.uuid = dynamicStateElement.attributeValue("uuid");
+        this.changeSequence = Integer.parseInt(dynamicStateElement.attributeValue("sequence"));
 
         indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid,
                 "change sequence", Integer.toString(this.changeSequence));
 
+        // Restore request information
+        if (dynamicStateElement.attribute("deployment-type") != null) {
+            // Normal case where information below was previously serialized
+            this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicStateElement.attributeValue("deployment-type"));
+            this.requestContextPath = dynamicStateElement.attributeValue("request-context-path");
+            this.requestPath = dynamicStateElement.attributeValue("request-path");
+            this.containerType = dynamicStateElement.attributeValue("container-type");
+            this.containerNamespace = dynamicStateElement.attributeValue("container-namespace");
+        } else {
+            // Use information from the request
+            // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
+            initializeRequestInformation(pipelineContext);
+        }
+
+        // Restore versioned paths matchers if present
+        {
+            final Element matchersElement = dynamicStateElement.element("matchers");
+            if (matchersElement != null) {
+                final List<Element> matchersElements = Dom4jUtils.elements(matchersElement, "matcher");
+                this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
+                for (final Element currentMatcherElement: matchersElements) {
+                    versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
+                }
+            }
+        }
+
         // Restore models state
         {
             // Store instances state in PipelineContext for use down the line
-            final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
+            final Element instancesElement = dynamicStateElement.element("instances");
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, instancesElement);
 
             // Create XForms controls and models
-            createControlsAndModels(pipelineContext);
+            createControlsAndModels();
 
             // Restore top-level models state, including instances
             restoreModelsState(pipelineContext);
@@ -1264,7 +1385,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Restore controls state
         {
             // Store serialized control state for retrieval later
-            final Map serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateDocument.getRootElement());
+            final Map serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateElement);
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
 
             xformsControls.initializeState(pipelineContext);
@@ -1294,7 +1415,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // This is called upon the first creation of the XForms engine or for testing only
 
         // Create XForms controls and models
-        createControlsAndModels(pipelineContext);
+        createControlsAndModels();
 
         // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
         // order to optimize events
@@ -1332,10 +1453,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
 
-    private void createControlsAndModels(PipelineContext pipelineContext) {
-
-        // Gather static analysis information
-        xformsStaticState.analyzeIfNecessary(pipelineContext);
+    private void createControlsAndModels() {
 
         // Create XForms controls
         xformsControls = new XFormsControls(this);

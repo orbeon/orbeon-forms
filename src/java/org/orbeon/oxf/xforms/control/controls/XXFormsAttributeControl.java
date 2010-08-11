@@ -20,9 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
@@ -111,7 +109,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         if ("src".equals(nameAttribute)) {
             // TODO: make sure this is on xhtml:img!
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(propertyContext, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue(propertyContext);

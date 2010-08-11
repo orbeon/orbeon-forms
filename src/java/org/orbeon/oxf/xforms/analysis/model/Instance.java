@@ -15,13 +15,9 @@ package org.orbeon.oxf.xforms.analysis.model;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -52,7 +48,7 @@ public class Instance {
     public final String dependencyURL;
 
 
-    public Instance(PropertyContext propertyContext, Element element) {
+    public Instance(Element element) {
 
         this.element = element;
         this.staticId = XFormsUtils.getElementStaticId(element);
@@ -95,10 +91,7 @@ public class Instance {
 
         if (unresolvedInstanceSource != null && ProcessorImpl.getProcessorInputSchemeInputName(unresolvedInstanceSource) == null) {
             // Resolve to absolute URL
-            instanceSource = XFormsUtils.resolveServiceURL(propertyContext, element, unresolvedInstanceSource,
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
-            dependencyURL = instanceSource;
-
+            instanceSource = dependencyURL = unresolvedInstanceSource;
         } else if (unresolvedInstanceSource != null) {
             // input:*
             instanceSource = unresolvedInstanceSource;

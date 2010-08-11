@@ -17,12 +17,24 @@ package org.orbeon.oxf.xforms.state;
  * Encoded combination of static an dynamic state that fully represents an XForms document's current state.
  */
 public class XFormsState {
-    private String staticState;
-    private String dynamicState;
+    private final String staticStateDigest;
+    private final String staticState;
+    private final String dynamicState;
 
-    public XFormsState(String staticState, String dynamicState) {
+    public XFormsState(String staticStateDigest, String staticState, String dynamicState) {
+        this.staticStateDigest = staticStateDigest;
         this.staticState = staticState;
         this.dynamicState = dynamicState;
+    }
+
+    public XFormsState(String staticState, String dynamicState) {
+        this.staticStateDigest = null;
+        this.staticState = staticState;
+        this.dynamicState = dynamicState;
+    }
+
+    public String getStaticStateDigest() {
+        return staticStateDigest;
     }
 
     public String getStaticState() {

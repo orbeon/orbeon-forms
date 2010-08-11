@@ -23,9 +23,8 @@
             <xsl:apply-templates select="context:decodeXML(normalize-space(.))"/>
         </xsl:copy>
     </xsl:template>
-    <!-- Filter out @uuid and @sequence so that unit tests are reproducible -->
-    <xsl:template match="/dynamic-state/@uuid"/>
-    <xsl:template match="/dynamic-state/@sequence"/>
+    <!-- Filter out attributes on dynamic-state element so that unit tests are reproducible -->
+    <xsl:template match="/dynamic-state/@*"/>
     <xsl:template match="instances/instance">
         <xsl:copy>
             <xsl:copy-of select="@*"/>

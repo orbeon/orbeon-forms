@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
+import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xml.*;
@@ -364,15 +365,16 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         identity.setResult(documentResult);
 
         final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
-        final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
+        final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
+        final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata));
 
         // Read the input through the annotator and gather namespace mappings
         XMLUtils.urlToSAX(documentURL, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata), false, false, false);
 
+        final String digest = NumberUtils.toHexString(digestContentHandler.getResult());
+
         // Get static state document and create static state object
         final Document staticStateDocument = documentResult.getDocument();
-        final XFormsStaticState staticState = new XFormsStaticState(pipelineContext, staticStateDocument, metadata, annotatedSAXStore);
-        staticState.analyzeIfNecessary(pipelineContext);
-        return staticState;
+        return new XFormsStaticState(pipelineContext, staticStateDocument, digest, metadata, annotatedSAXStore);
     }
 }

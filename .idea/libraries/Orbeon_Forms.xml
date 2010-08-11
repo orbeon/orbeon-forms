@@ -8,8 +8,8 @@
       <root url="http://www.jfree.org/jfreechart/api/javadoc" />
     </JAVADOC>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../Saxon" />
-      <root url="file://$PROJECT_DIR$/../Xerces/src" />
+      <root url="file://$USER_HOME$/Orbeon/Saxon" />
+      <root url="file://$USER_HOME$/Orbeon/Xerces/src" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/oracle" recursive="false" />

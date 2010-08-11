@@ -897,7 +897,7 @@ public class XFormsModelBinds {
                         // xforms:dayTimeDuration, xforms:yearMonthDuration, xforms:email, xforms:card-number
                         if (xformsValidator == null) {
                             xformsValidator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd");
-                            xformsValidator.loadSchemas(propertyContext);
+                            xformsValidator.loadSchemas(propertyContext, containingDocument);
                         }
 
                         final String validationError =

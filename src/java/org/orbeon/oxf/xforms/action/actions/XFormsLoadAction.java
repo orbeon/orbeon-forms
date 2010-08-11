@@ -101,11 +101,11 @@ public class XFormsLoadAction extends XFormsAction {
             if ("resource".equals(urlType) || isPortlet && !doReplace) {
                 // Load as resource URL
                 // In a portlet, there is not much sense in opening a new portlet "window", so in this case we open as a resource URL
-                externalURL = XFormsUtils.resolveResourceURL(propertyContext, currentElement, value,
+                externalURL = XFormsUtils.resolveResourceURL(propertyContext, containingDocument, currentElement, value,
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             } else {
                 // Load as render URL
-                externalURL = XFormsUtils.resolveRenderURL(isPortlet, propertyContext, currentElement, value);
+                externalURL = XFormsUtils.resolveRenderURL(propertyContext, containingDocument, isPortlet, currentElement, value);
             }
         }
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortlet, isShowProgress);

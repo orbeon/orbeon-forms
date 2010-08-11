@@ -52,14 +52,13 @@
                                     </static-state>
                                 </xsl:document>
                             </xsl:variable>
-                            <!--<xsl:copy-of select="$static-state"/>-->
                             <xsl:value-of select="context:encodeXML($static-state)"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
                             <xsl:if test="doc('input:instances')/instances/instance">
                                 <xsl:variable name="dynamic-state" as="document-node()">
                                     <xsl:document>
-                                        <dynamic-state uuid="{$uuid}" sequence="0" xmlns="">
+                                        <dynamic-state xmlns="" uuid="{$uuid}" sequence="0">
                                             <instances>
                                                 <xsl:for-each select="doc('input:instances')/instances/instance">
                                                     <xsl:copy>

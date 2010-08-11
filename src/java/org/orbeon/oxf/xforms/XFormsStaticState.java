@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.*;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -57,11 +56,12 @@ public class XFormsStaticState {
     private static final Logger logger = LoggerFactory.createLogger(XFormsStaticState.class);
     private final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
-    private boolean initialized;
+    public static final int DIGEST_LENGTH = 32; // 128-bit MD5 digest -> 32 hex digits
 
-    private String uuid;
-    private String encodedStaticState;      // encoded state
-    private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
+    private String digest;                          // digest of the static state data
+    private String encodedStaticState;              // encoded state
+    private boolean encodedStaticStateAvailable;    // whether the encoded state is available
+    private Document staticStateDocument;           // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
     // Global static-state Saxon Configuration
     // Would be nice to have one per static state maybe, but expressions in XPathCache are shared so NamePool must be shared
@@ -69,7 +69,7 @@ public class XFormsStaticState {
     private DocumentWrapper documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument(), null, xpathConfiguration);
 
     private Document controlsDocument;                                      // controls document
-    private SAXStore xhtmlDocument;                                         // entire XHTML document for noscript mode only
+    private SAXStore xhtmlDocument;                                         // entire XHTML document (for noscript mode and full updates only)
 
     // Static representation of models and instances
     private LinkedHashMap<XBLBindings.Scope, List<Model>> modelsByScope = new LinkedHashMap<XBLBindings.Scope, List<Model>>();
@@ -80,17 +80,7 @@ public class XFormsStaticState {
     private final Map<String, Object> nonDefaultProperties = new HashMap<String, Object>(); // Map of property name to property value (String, Integer, Boolean)
     private final Set<String> allowedExternalEvents = new HashSet<String>();        // Set<String eventName>
 
-    private XFormsConstants.DeploymentType deploymentType;
-    private String requestContextPath;
-    private String baseURI;
-    private String containerType;
-    private String containerNamespace;
     private LocationData locationData;
-
-    private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
-
-    // Static analysis
-    private boolean isAnalyzed;                                             // whether this document has been analyzed already
 
     private Metadata metadata;
 
@@ -142,13 +132,14 @@ public class XFormsStaticState {
      *
      * @param propertyContext       current context
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
+     * @param digest                digest of the static state document
      * @param metadata              metadata or null if not available
      * @param annotatedDocument     SAXStore containing the XHTML for noscript mode, null if not available
      */
-    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, SAXStore annotatedDocument) {
+    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata, SAXStore annotatedDocument) {
         // Set XPath configuration
         propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
-        initialize(propertyContext, staticStateDocument, metadata, annotatedDocument, null);
+        initialize(propertyContext, staticStateDocument, digest, metadata, annotatedDocument, null);
     }
 
     /**
@@ -156,9 +147,10 @@ public class XFormsStaticState {
      * a serialized form.
      *
      * @param propertyContext       current context
-     * @param encodedStaticState    encoded static state
+     * @param staticStateDigest     digest of the static state if known
+     * @param encodedStaticState    encoded static state (digest + serialized XML)
      */
-    public XFormsStaticState(PropertyContext propertyContext, String encodedStaticState) {
+    public XFormsStaticState(PropertyContext propertyContext, String staticStateDigest, String encodedStaticState) {
 
         // Set XPath configuration
         propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
@@ -167,7 +159,9 @@ public class XFormsStaticState {
         final Document staticStateDocument = XFormsUtils.decodeXML(propertyContext, encodedStaticState);
 
         // Initialize
-        initialize(propertyContext, staticStateDocument, null, null, encodedStaticState);
+        initialize(propertyContext, staticStateDocument, staticStateDigest, null, null, encodedStaticState);
+
+        assert (staticStateDigest != null) && isServerStateHandling() || (staticStateDigest == null) && isClientStateHandling();
     }
 
     public Configuration getXPathConfiguration() {
@@ -183,15 +177,6 @@ public class XFormsStaticState {
     }
 
     /**
-     * Return path matchers for versioned resources mode.
-     *
-     * @return  List of PathMatcher
-     */
-    public List<URLRewriterUtils.PathMatcher> getVersionedPathMatchers() {
-        return versionedPathMatchers;
-    }
-
-    /**
      * Initialize. Either there is:
      *
      * o staticStateDocument, topLevelStaticIds, namespaceMap, and optional xhtmlDocument
@@ -199,34 +184,33 @@ public class XFormsStaticState {
      *
      * @param propertyContext       current context
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
+     * @param digest                digest of the static state document
      * @param metadata              metadata or null if not available
      * @param xhtmlDocument         SAXStore containing the XHTML for noscript mode, null if not available
      * @param encodedStaticState    existing serialization of static state, null if not available
      */
-    private void initialize(PropertyContext propertyContext, Document staticStateDocument,
-                            Metadata metadata,
-                            SAXStore xhtmlDocument, String encodedStaticState) {
+    private void initialize(PropertyContext propertyContext, Document staticStateDocument, String digest,
+                            Metadata metadata, SAXStore xhtmlDocument, String encodedStaticState) {
 
-        indentedLogger.startHandleOperation("", "initializing static state");
+        // Remember digest
+        this.digest = digest;
+
+        // Extract static state
+        extract(propertyContext, staticStateDocument, metadata, xhtmlDocument, encodedStaticState);
+
+        // Analyze
+        analyze(propertyContext);
+    }
+
+    private void extract(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, SAXStore xhtmlDocument, String encodedStaticState) {
+
+        indentedLogger.startHandleOperation("", "extracting static state");
 
         final Element staticStateElement = staticStateDocument.getRootElement();
-
-        // Remember UUID
-        this.uuid = UUIDUtils.createPseudoUUID();
 
         // TODO: if staticStateDocument contains XHTML document, get controls and models from there
 
         // Extract top-level information
-
-        final String deploymentAttribute = staticStateElement.attributeValue("deployment");
-        deploymentType = (deploymentAttribute != null) ? XFormsConstants.DeploymentType.valueOf(deploymentAttribute) : XFormsConstants.DeploymentType.plain;
-        requestContextPath = staticStateElement.attributeValue("context-path");
-        baseURI = staticStateElement.attributeValue(XMLConstants.XML_BASE_QNAME);
-        containerType = staticStateElement.attributeValue("container-type");
-        containerNamespace = staticStateElement.attributeValue("container-namespace");
-        if (containerNamespace == null)
-            containerNamespace = "";
-
         {
             final String systemId = staticStateElement.attributeValue("system-id");
             if (systemId != null) {
@@ -306,32 +290,65 @@ public class XFormsStaticState {
             }
         }
 
-        // Extract versioned paths matchers if present
-        {
-            final Element matchersElement = staticStateElement.element("matchers");
-            if (matchersElement != null) {
-                final List<Element> matchersElements = Dom4jUtils.elements(matchersElement, "matcher");
-                this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
-                for (Element currentMatcherElement: matchersElements) {
-                    versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
-                }
-            } else {
-                // Otherwise use matchers from the pipeline context
-                this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
-            }
-        }
-
         if (encodedStaticState != null) {
             // Static state is fully initialized
             this.encodedStaticState = encodedStaticState;
-            initialized = true;
+            encodedStaticStateAvailable = true;
         } else {
             // Remember this temporarily only if the encoded state is not yet known
             this.staticStateDocument = staticStateDocument;
-            initialized = false;
+            encodedStaticStateAvailable = false;
         }
 
         indentedLogger.endHandleOperation();
+    }
+
+    /**
+     * Perform static analysis.
+     *
+     * @param propertyContext   current context
+     * @return                  true iif analysis was just performed in this call
+     */
+    private void analyze(final PropertyContext propertyContext) {
+
+        indentedLogger.startHandleOperation("", "performing static analysis");
+
+        controlTypes = new HashMap<String, Map<String, ControlAnalysis>>();
+        eventNames = new HashSet<String>();
+        eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
+        eventHandlerAncestorsMap = new HashMap<String, String>();
+        keyHandlers = new ArrayList<XFormsEventHandler>();
+        controlAnalysisMap = new LinkedHashMap<String, ControlAnalysis>();
+        repeatChildrenMap = new HashMap<String, List<String>>();
+
+        // Iterate over main static controls tree
+        final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
+        final XBLBindings.Scope rootScope = xblBindings.getResolutionScopeById("");
+        final ContainerAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this, rootScope);
+
+        analyzeComponentTree(propertyContext, xpathConfiguration, rootScope,
+                controlsDocument.getRootElement(), rootControlAnalysis, repeatHierarchyStringBuffer);
+
+        if (xxformsScripts != null && xxformsScripts.size() > 0)
+            indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
+
+        // Finalize repeat hierarchy
+        repeatHierarchyString = repeatHierarchyStringBuffer.toString();
+
+        // Iterate over models to extract event handlers and scripts
+        for (final Map.Entry<String, Model> currentEntry: modelsByPrefixedId.entrySet()) {
+            final String modelPrefixedId = currentEntry.getKey();
+            final Document modelDocument = currentEntry.getValue().document;
+            final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
+            // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
+            extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
+            extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
+        }
+
+        // Once analysis is done, some state can be freed
+        xblBindings.freeTransientState();
+
+        indentedLogger.endHandleOperation("controls", Integer.toString(controlAnalysisMap.size()));
     }
 
     private void extractProperties(Element staticStateElement, List<Element> topLevelModelsElements) {
@@ -451,7 +468,7 @@ public class XFormsStaticState {
             for (final Element modelElement: topLevelModelsElements) {
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-                addModelDocument(pipelineContext, xblBindings.getTopLevelScope(), modelDocument);
+                addModelDocument(xblBindings.getTopLevelScope(), modelDocument);
                 modelsCount++;
             }
 
@@ -492,7 +509,7 @@ public class XFormsStaticState {
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
             indentedLogger.logDebug("", "created nested model documents", "count", Integer.toString(extractedModels.size()));
             for (final Document currentModelDocument: extractedModels) {
-                addModelDocument(pipelineContext, xblBindings.getTopLevelScope(), currentModelDocument);
+                addModelDocument(xblBindings.getTopLevelScope(), currentModelDocument);
             }
         }
     }
@@ -500,17 +517,16 @@ public class XFormsStaticState {
     /**
      * Register a model document. Used by this and XBLBindings.
      *
-     * @param propertyContext   current context
      * @param scope             XBL scope
      * @param modelDocument     model document
      */
-    public void addModelDocument(PropertyContext propertyContext, XBLBindings.Scope scope, Document modelDocument) {
+    public void addModelDocument(XBLBindings.Scope scope, Document modelDocument) {
         List<Model> models = modelsByScope.get(scope);
         if (models == null) {
             models = new ArrayList<Model>();
             modelsByScope.put(scope, models);
         }
-        final Model newModel = new Model(propertyContext, this, scope, modelDocument);
+        final Model newModel = new Model(this, scope, modelDocument);
         models.add(newModel);
         modelsByPrefixedId.put(newModel.prefixedId, newModel);
     }
@@ -543,8 +559,8 @@ public class XFormsStaticState {
         }
     }
 
-    public String getUUID() {
-        return uuid;
+    public String getDigest() {
+        return digest;
     }
 
     /**
@@ -556,7 +572,7 @@ public class XFormsStaticState {
      */
     public String getEncodedStaticState(PropertyContext propertyContext) {
 
-        if (!initialized) {
+        if (!encodedStaticStateAvailable) {
 
             final Element rootElement = staticStateDocument.getRootElement();
 
@@ -572,19 +588,11 @@ public class XFormsStaticState {
                 staticStateDocument.getRootElement().add(document.getRootElement().detach());
             }
 
-            // Remember versioned paths
-            if (versionedPathMatchers != null && versionedPathMatchers.size() > 0) {
-                final Element matchersElement = rootElement.addElement("matchers");
-                for (final URLRewriterUtils.PathMatcher pathMatcher: versionedPathMatchers) {
-                    matchersElement.add(pathMatcher.serialize());
-                }
-            }
-
             // Remember encoded state and discard Document
             encodedStaticState = XFormsUtils.encodeXML(propertyContext, staticStateDocument, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
 
             staticStateDocument = null;
-            initialized = true;
+            encodedStaticStateAvailable = true;
         }
 
         return encodedStaticState;
@@ -698,24 +706,8 @@ public class XFormsStaticState {
         return xxformsScripts;
     }
 
-    public XFormsConstants.DeploymentType getDeploymentType() {
-        return deploymentType;
-    }
-
-    public String getRequestContextPath() {
-        return requestContextPath;
-    }
-
     public Set<String> getAllowedExternalEvents() {
         return allowedExternalEvents;
-    }
-
-    public String getContainerType() {
-        return containerType;
-    }
-
-    public String getContainerNamespace() {
-        return containerNamespace;
     }
 
     public LocationData getLocationData() {
@@ -797,7 +789,7 @@ public class XFormsStaticState {
 
     public boolean hasNodeBinding(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis == null) ? false : controlAnalysis.hasNodeBinding;
+        return (controlAnalysis != null) && controlAnalysis.hasNodeBinding;
     }
 
     public ControlAnalysis.LHHAAnalysis getLabel(String prefixedId) {
@@ -896,66 +888,6 @@ public class XFormsStaticState {
      */
     public XBLBindings getXBLBindings() {
         return xblBindings;
-    }
-
-    /**
-     * Perform static analysis on this document if not already done.
-     *
-     * @param propertyContext   current pipeline context
-     * @return                  true iif analysis was just performed in this call
-     */
-    public synchronized boolean analyzeIfNecessary(final PropertyContext propertyContext) {
-        if (!isAnalyzed) {
-            final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-
-            controlTypes = new HashMap<String, Map<String, ControlAnalysis>>();
-            eventNames = new HashSet<String>();
-            eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
-            eventHandlerAncestorsMap = new HashMap<String, String>();
-            keyHandlers = new ArrayList<XFormsEventHandler>();
-            controlAnalysisMap = new LinkedHashMap<String, ControlAnalysis>();
-            repeatChildrenMap = new HashMap<String, List<String>>();
-
-            // Iterate over main static controls tree
-            final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
-            final XBLBindings.Scope rootScope = xblBindings.getResolutionScopeById("");
-            final ContainerAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this, rootScope);
-
-            analyzeComponentTree(propertyContext, xpathConfiguration, rootScope,
-                    controlsDocument.getRootElement(), rootControlAnalysis, repeatHierarchyStringBuffer);
-
-            if (xxformsScripts != null && xxformsScripts.size() > 0)
-                indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
-
-            // Finalize repeat hierarchy
-            repeatHierarchyString = repeatHierarchyStringBuffer.toString();
-
-            // Iterate over models to extract event handlers and scripts
-            for (final Map.Entry<String, Model> currentEntry: modelsByPrefixedId.entrySet()) {
-                final String modelPrefixedId = currentEntry.getKey();
-                final Document modelDocument = currentEntry.getValue().document;
-                final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
-                // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
-                extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
-                extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
-            }
-
-            if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.logDebug("", "performed static analysis",
-                            "time", Long.toString(System.currentTimeMillis() - startTime),
-                            "controls", Integer.toString(controlAnalysisMap.size()));
-
-            }
-
-            // Once analysis is done, some state can be freed
-            xblBindings.freeTransientState();
-
-            isAnalyzed = true;
-            return true;
-        } else {
-            indentedLogger.logDebug("", "static analysis already available");
-            return false;
-        }
     }
 
     private void extractEventHandlers(PropertyContext propertyContext, Configuration xpathConfiguration, DocumentInfo documentInfo, String prefix, boolean isControls) {

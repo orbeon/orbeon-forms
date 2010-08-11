@@ -15,56 +15,37 @@ package org.orbeon.oxf.xforms;
 
 import com.sun.msv.datatype.xsd.DatatypeFactory;
 import com.sun.msv.datatype.xsd.XSDatatype;
-import com.sun.msv.grammar.Expression;
-import com.sun.msv.grammar.Grammar;
-import com.sun.msv.grammar.IDContextProvider2;
+import com.sun.msv.grammar.*;
 import com.sun.msv.grammar.xmlschema.*;
 import com.sun.msv.reader.GrammarReaderController;
 import com.sun.msv.reader.util.GrammarLoader;
 import com.sun.msv.reader.xmlschema.XMLSchemaReader;
-import com.sun.msv.util.DatatypeRef;
-import com.sun.msv.util.StartTagInfo;
-import com.sun.msv.util.StringRef;
+import com.sun.msv.util.*;
 import com.sun.msv.verifier.Acceptor;
-import com.sun.msv.verifier.regexp.ExpressionAcceptor;
-import com.sun.msv.verifier.regexp.REDocumentDeclaration;
-import com.sun.msv.verifier.regexp.SimpleAcceptor;
-import com.sun.msv.verifier.regexp.StringToken;
+import com.sun.msv.verifier.regexp.*;
 import com.sun.msv.verifier.regexp.xmlschema.XSAcceptor;
 import com.sun.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.CacheKey;
-import org.orbeon.oxf.cache.ObjectCache;
+import org.dom4j.*;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.relaxng.datatype.Datatype;
 import org.relaxng.datatype.DatatypeException;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides XML Schema validation services for the XForms model.
@@ -648,15 +629,16 @@ public class XFormsModelSchemaValidator {
     /**
      * Load XForms model schemas.
      *
-     * @param propertyContext   current context
+     * @param propertyContext       current context
+     * @param containingDocument    current document
      */
-    public void loadSchemas(final PropertyContext propertyContext) {
+    public void loadSchemas(final PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
 
         // Check for external schema
         if (schemaURIs != null && schemaURIs.length > 0) {
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-            final String resolvedURLString = XFormsUtils.resolveServiceURL(propertyContext, modelElement, schemaURIs[0],
+            final String resolvedURLString = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, modelElement, schemaURIs[0],
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
             // Load associated grammar

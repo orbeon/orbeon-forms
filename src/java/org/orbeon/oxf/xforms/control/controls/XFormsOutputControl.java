@@ -149,7 +149,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:anyURI type
                 if (!urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                    final String resolvedURI = XFormsUtils.resolveResourceURL(propertyContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    final String resolvedURI = XFormsUtils.resolveResourceURL(propertyContext, containingDocument, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
                     updatedValue = NetUtils.proxyURI(propertyContext, resolvedURI, fileInfo.getFileName(propertyContext), mediatype, lastModified);
                 } else {
@@ -182,7 +182,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // External value is not blank, rewrite as absolute path. Two cases:
                 // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
                 // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
-                return XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+                return XFormsUtils.resolveResourceURL(pipelineContext, containingDocument, getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
             } else {
                 // Empty value, return as is
                 return externalValue;
@@ -200,7 +200,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(propertyContext, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue(propertyContext);

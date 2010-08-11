@@ -27,22 +27,14 @@ import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
-import org.orbeon.oxf.xforms.submission.BaseSubmission;
-import org.orbeon.oxf.xforms.submission.OptimizedSubmission;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.submission.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.saxon.om.*;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 
 /**
@@ -371,7 +363,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (schemaValidator == null) {
             final Element modelElement = staticModel.document.getRootElement();
             schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
-            schemaValidator.loadSchemas(propertyContext);
+            schemaValidator.loadSchemas(propertyContext, containingDocument);
 
             mustSchemaValidate = schemaValidator.hasSchema();
         }
@@ -726,11 +718,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // TODO: This doesn't handle optimized submissions.
 
+                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element, instance.instanceSource,
+                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+
                 // NOTE: No XInclude supported to read instances with @src for now
                 final XFormsInstance sharedXFormsInstance
                         = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, indentedLogger,
                             instance.staticId, effectiveId,
-                            instance.instanceSource, null, instance.isReadonlyHint, false, XFormsProperties.isExposeXPathTypes(containingDocument),
+                            resolvedInstanceURL, null, instance.isReadonlyHint, false, XFormsProperties.isExposeXPathTypes(containingDocument),
                             instance.xxformsTimeToLive, instance.xxformsValidation, INSTANCE_LOADER);
 
                 setInstance(sharedXFormsInstance, false);
@@ -749,13 +744,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 if (optimizeLocal) {
                     // Use URL resolved against current context
-                    final URI resolvedURI = XFormsUtils.resolveXMLBase(instance.element, instanceResource);
+                    final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, instance.element, instanceResource);
                     loadInstanceOptimized(propertyContext, externalContext, instance.element, instance.staticId, resolvedURI.toString(), instance.isReadonlyHint, instance.xxformsValidation);
                 } else {
                     // Use full resolved resource URL
                     // o absolute URL, e.g. http://example.org/instance.xml
                     // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
-                    loadInstance(externalContext, instance);
+                    loadInstance(propertyContext, externalContext, instance);
                 }
             }
         } catch (Exception e) {
@@ -811,9 +806,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /*
      * Load an external instance using an absolute URL.
      */
-    private void loadInstance(ExternalContext externalContext, Instance instance) {
+    private void loadInstance(PropertyContext propertyContext, ExternalContext externalContext, Instance instance) {
 
-        final String absoluteURLString = instance.instanceSource;
+        final String absoluteURLString = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element, instance.instanceSource,
+                ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
         assert NetUtils.urlHasProtocol(absoluteURLString);
 

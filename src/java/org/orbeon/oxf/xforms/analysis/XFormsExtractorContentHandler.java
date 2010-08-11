@@ -15,9 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
@@ -32,6 +30,9 @@ import java.util.*;
 
 /**
  * This ContentHandler extracts XForms information from an XHTML document and creates a static state document.
+ *
+ * NOTE: This must be independent from the actual request (including request path, etc.) so the state can be reused
+ * between different requests. Request information, if needed, must go into the dynamic state.
  *
  * The static state document contains only models and controls, without interleaved XHTML elements in order to save
  * memory and to facilitate visiting controls. The exceptions are:
@@ -49,7 +50,7 @@ import java.util.*;
  *
  * Structure:
  *
- * <static-state xmlns:xxforms="..." xml:base="..." deployment="integrated" context-path="/orbeon" container-type="servlet" container-namespace="">
+ * <static-state xmlns:xxforms="..." system-id="..." ...>
  *   <!-- E.g. AVT on xhtml:html -->
  *   <xxforms:attribute .../>
  *   <!-- E.g. xforms:output within xhtml:title -->
@@ -86,7 +87,6 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private boolean mustOutputFirstElement = true;
 
     private final boolean isTopLevel;
-    private final ExternalContext externalContext;
     private final XFormsStaticState.Metadata metadata;
     private final boolean ignoreRootElement;
 
@@ -103,8 +103,6 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     }
 
     private Stack<XMLBaseLang> xmlBaseLangStack = new Stack<XMLBaseLang>();
-    private XFormsConstants.DeploymentType deploymentType;
-    private String requestContextPath;
 
     private boolean inXFormsOrExtension;       // whether we are in a model
     private int xformsLevel;
@@ -115,42 +113,19 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     /**
      * Constructor for top-level document.
      *
-     * @param externalContext   external context to obtain request path, properties, etc.
      * @param xmlReceiver       resulting static state document
      * @param metadata          metadata
      */
-    public XFormsExtractorContentHandler(ExternalContext externalContext, XMLReceiver xmlReceiver,
-                                         XFormsStaticState.Metadata metadata) {
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, XFormsStaticState.Metadata metadata) {
         super(xmlReceiver);
 
         this.isTopLevel = true;
-        this.externalContext = externalContext;
         this.metadata = metadata;
         this.ignoreRootElement = false;
 
-        final ExternalContext.Request request = externalContext.getRequest();
-
-        // Remember if filter provided separate deployment information
-        final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
-        deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
-                    : "integrated".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.integrated
-                    : XFormsConstants.DeploymentType.plain;
-
-        // Try to get request context path
-        requestContextPath = request.getClientContextPath("/");
-
         // Create xml:base stack
         try {
-            final String rootXMLBase;
-            {
-                // It is possible to override the base URI by setting a request attribute. This is used by OrbeonXFormsFilter.
-                final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
-                if (rendererBaseURI != null)
-                    rootXMLBase = rendererBaseURI;
-                else
-                    rootXMLBase = request.getRequestPath();
-            }
-            xmlBaseLangStack.push(new XMLBaseLang(null, new URI(null, null, rootXMLBase, null), null));
+            xmlBaseLangStack.push(new XMLBaseLang(null, new URI(null, null, ".", null), null));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }
@@ -169,7 +144,6 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         super(xmlReceiver);
 
         this.isTopLevel = false;
-        this.externalContext = null;
         this.metadata = metadata;
         this.ignoreRootElement = ignoreRootElement;
 
@@ -188,19 +162,6 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private void outputFirstElementIfNeeded() throws SAXException {
         if (mustOutputFirstElement) {
             final AttributesImpl attributesImpl = new AttributesImpl();
-
-            if (externalContext != null) {// null in case of nested document (XBL templates)
-                // Add xml:base attribute
-                attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL((xmlBaseLangStack.get(0)).toString()));
-                // Add deployment attribute
-                attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, deploymentType.name());
-                // Add context path attribute
-                attributesImpl.addAttribute(XMLConstants.XML_URI, "context-path", "context-path", ContentHandlerHelper.CDATA, requestContextPath);
-                // Add container-type attribute
-                attributesImpl.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
-                // Add container-namespace attribute
-                attributesImpl.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
-            }
 
             // Add location information
             if (locationData != null) {

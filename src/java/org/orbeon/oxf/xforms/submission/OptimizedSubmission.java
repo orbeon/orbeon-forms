@@ -17,16 +17,11 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xml.XMLUtils;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -157,7 +152,7 @@ public class OptimizedSubmission extends BaseSubmission {
         // o Portlets cannot access resources outside the portlet except by using absolute URLs (unless f:url-type="resource")
 
         // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(submission.getSubmissionElement(), p2.actionOrResource);
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
 
         // NOTE: We don't want any changes to happen to the document upon xxforms-submit when producing
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
@@ -256,13 +251,13 @@ public class OptimizedSubmission extends BaseSubmission {
         final String effectiveAction;
         if (!isNorewrite) {
             // Must rewrite
-            if (containingDocument.getStaticState().getDeploymentType() != XFormsConstants.DeploymentType.separate) {
+            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.separate) {
                 // We are not in separate deployment, so keep path relative to the current servlet context
                 isContextRelative = true;
                 effectiveAction = resource;
             } else {
                 // We are in separate deployment, so prepend request context path and mark path as not relative to the current context`
-                final String contextPath = containingDocument.getStaticState().getRequestContextPath();
+                final String contextPath = containingDocument.getRequestContextPath();
                 isContextRelative = false;
                 effectiveAction = contextPath + resource;
             }

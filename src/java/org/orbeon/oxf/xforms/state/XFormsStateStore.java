@@ -20,15 +20,10 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Base class for XForms state stores. This store deals with storing items in memory.
@@ -72,6 +67,8 @@ public abstract class XFormsStateStore {
     public synchronized void storeDocumentState(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
                                                 String sessionId, boolean isInitialState) {
 
+        assert containingDocument.getStaticState().isServerStateHandling();
+
         assert sessionId != null;
 
         if (isDebugEnabled()) {
@@ -80,7 +77,7 @@ public abstract class XFormsStateStore {
         }
 
         final String documentUUID = containingDocument.getUUID();
-        final String staticStateUUID = containingDocument.getStaticState().getUUID();
+        final String staticStateUUID = containingDocument.getStaticState().getDigest();
         final String dynamicStateKey = getDynamicStateKey(documentUUID, isInitialState);
 
         // Mapping (UUID -> static state key : dynamic state key)
@@ -119,7 +116,7 @@ public abstract class XFormsStateStore {
                 return null;
 
             final int colonIndex = keys.indexOf(':');
-            assert colonIndex == UUIDUtils.UUID_LENGTH;
+            assert colonIndex == XFormsStaticState.DIGEST_LENGTH;   // static state key is an hex MD5
             staticStateKey = keys.substring(0, colonIndex);
             // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
             dynamicStateKey = isInitialState ? getDynamicStateKey(documentUUID, true) : keys.substring(colonIndex + 1);
@@ -133,7 +130,7 @@ public abstract class XFormsStateStore {
         if (dynamicState == null)
             return null;
 
-        return new XFormsState(staticState, dynamicState);
+        return new XFormsState(staticStateKey, staticState, dynamicState);
     }
 
     private synchronized void addOrReplaceOne(String key, String value, String sessionId) {
@@ -422,7 +419,7 @@ public abstract class XFormsStateStore {
         if (dynamicState == null)
             return null;
 
-        return new XFormsState(staticState, dynamicState);
+        return new XFormsState(staticStateUUID, staticState, dynamicState);
     }
 
     protected static class StoreEntry {

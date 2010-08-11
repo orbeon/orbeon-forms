@@ -18,9 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ResponseAdapter;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
@@ -28,29 +26,19 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventFactory;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TeeXMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -208,12 +196,12 @@ public class XFormsServer extends ProcessorImpl {
                 final boolean isNoscript = containingDocument.getStaticState().isNoscript();
 
                 // Set URL rewriter resource path information based on information in static state
-                pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
+                pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, containingDocument.getVersionedPathMatchers());
                 // Set XPath configuration
                 pipelineContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, containingDocument.getStaticState().getXPathConfiguration());
 
                 // Set deployment mode into request (useful for epilogue)
-                externalContext.getRequest().getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getStaticState().getDeploymentType().name());
+                externalContext.getRequest().getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getDeploymentType().name());
 
                 final boolean hasEvents = eventElements.size() > 0;
                 // Whether there are uploaded files to handle

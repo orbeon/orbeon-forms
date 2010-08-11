@@ -840,14 +840,15 @@ public class XFormsUtils {
     /**
      * Resolve a render URL including xml:base resolution.
      *
-     * @param isPortletLoad         whether this is called within a portlet
      * @param propertyContext       current context
+     * @param containingDocument    current document
+     * @param isPortletLoad         whether this is called within a portlet
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
      * @return                      resolved URL
      */
-    public static String resolveRenderURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url) {
-        final URI resolvedURI = resolveXMLBase(currentElement, url);
+    public static String resolveRenderURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean isPortletLoad, Element currentElement, String url) {
+        final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
 
         final String externalURL;
@@ -878,14 +879,15 @@ public class XFormsUtils {
      * Resolve a resource URL including xml:base resolution.
      *
      * @param propertyContext       current context
+     * @param containingDocument    current document
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
      * @param rewriteMode           rewrite mode (see ExternalContext.Response)
      * @return                      resolved URL
      */
-    public static String resolveResourceURL(PropertyContext propertyContext, Element element, String url, int rewriteMode) {
+    public static String resolveResourceURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element element, String url, int rewriteMode) {
 
-        final URI resolvedURI = resolveXMLBase(element, url);
+        final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
         return XFormsUtils.getExternalContext(propertyContext).getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
     }
@@ -894,14 +896,15 @@ public class XFormsUtils {
      * Resolve a resource URL including xml:base resolution.
      *
      * @param propertyContext       current PropertyContext
+     * @param containingDocument    current document
      * @param element               element used to start resolution (if null, no resolution takes place)
      * @param url                   URL to resolve
      * @param rewriteMode           rewrite mode (see ExternalContext.Response)
      * @return                      resolved URL
      */
-    public static String resolveServiceURL(PropertyContext propertyContext, Element element, String url, int rewriteMode) {
+    public static String resolveServiceURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element element, String url, int rewriteMode) {
 
-        final URI resolvedURI = resolveXMLBase(element, url);
+        final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
         return XFormsUtils.getExternalContext(propertyContext).rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
     }
@@ -919,13 +922,13 @@ public class XFormsUtils {
     public static String getEscapedURLAttributeIfNeeded(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, Element element, String attributeName, String attributeValue) {
         final String rewrittenValue;
         if ("src".equals(attributeName)) {
-            rewrittenValue = resolveResourceURL(pipelineContext, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            rewrittenValue = resolveResourceURL(pipelineContext, containingDocument, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         } else if ("href".equals(attributeName)) {
 
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
 
             final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-            rewrittenValue = resolveRenderURL(isPortletLoad, pipelineContext, element, attributeValue);
+            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, isPortletLoad, element, attributeValue);
         } else {
             rewrittenValue = attributeValue;
         }
@@ -980,36 +983,54 @@ public class XFormsUtils {
 
     /**
      * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
-     * the resolution.
+     * the resolution, and using the document's request URL as a base.
      *
+     * @param containingDocument    current document
      * @param element   element used to start resolution (if null, no resolution takes place)
      * @param uri       URI to resolve
      * @return          resolved URI
      */
-    public static URI resolveXMLBase(Element element, String uri) {
+    public static URI resolveXMLBase(XFormsContainingDocument containingDocument, Element element, String uri) {
+        return resolveXMLBase(element, containingDocument.getRequestPath(), uri);
+    }
+
+    /**
+     * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
+     * the resolution.
+     *
+     * @param element   element used to start resolution (if null, no resolution takes place)
+     * @param baseURI   optional base URI
+     * @param uri       URI to resolve
+     * @return          resolved URI
+     */
+    public static URI resolveXMLBase(Element element, String baseURI, String uri) {
         try {
             // Allow for null Element
             if (element == null)
                 return new URI(uri);
 
-            final List<String> xmlBaseElements = new ArrayList<String>();
+            final List<String> xmlBaseValues = new ArrayList<String>();
 
             // Collect xml:base values
             Element currentElement = element;
             do {
                 final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_BASE_QNAME);
                 if (xmlBaseAttribute != null)
-                    xmlBaseElements.add(xmlBaseAttribute);
+                    xmlBaseValues.add(xmlBaseAttribute);
                 currentElement = currentElement.getParent();
             } while(currentElement != null);
 
+            // Append base if needed
+            if (baseURI != null)
+                xmlBaseValues.add(baseURI);
+
             // Go from root to leaf
-            Collections.reverse(xmlBaseElements);
-            xmlBaseElements.add(uri);
+            Collections.reverse(xmlBaseValues);
+            xmlBaseValues.add(uri);
 
             // Resolve paths from root to leaf
             URI result = null;
-            for (final String currentXMLBase: xmlBaseElements) {
+            for (final String currentXMLBase: xmlBaseValues) {
                 final URI currentXMLBaseURI = new URI(currentXMLBase);
                 result = (result == null) ? currentXMLBaseURI : result.resolve(currentXMLBaseURI);
             }

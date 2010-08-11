@@ -245,7 +245,7 @@
         </xforms:group>
     </xsl:template>
 
-        <xsl:template match="fr:form-builder-doc">
+    <xsl:template match="fr:form-builder-doc">
         <xsl:if test="$is-form-builder">
             <xhtml:div class="fr-doc-links">
                 <xhtml:a href="http://wiki.orbeon.com/forms/doc/user-guide/form-builder-user-guide" target="_blank">Form Builder User Guide</xhtml:a>

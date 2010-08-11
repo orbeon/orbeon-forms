@@ -19,20 +19,29 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import java.util.List;
+
 public class TeeXMLReceiver implements XMLReceiver {
 
     // NOTE: Use an array, as List and Iterator are less efficient (profiling)
     private XMLReceiver[] xmlReceivers;
 
-    public TeeXMLReceiver(final java.util.List<XMLReceiver> hndlrs) {
-        xmlReceivers = new XMLReceiver[hndlrs.size()];
-        hndlrs.toArray(xmlReceivers);
+    public TeeXMLReceiver(final List<XMLReceiver> receivers) {
+        xmlReceivers = new XMLReceiver[receivers.size()];
+        receivers.toArray(xmlReceivers);
     }
 
     public TeeXMLReceiver(XMLReceiver xmlReceiver1, XMLReceiver xmlReceiver2) {
         xmlReceivers = new XMLReceiver[2];
         xmlReceivers[0] = xmlReceiver1;
         xmlReceivers[1] = xmlReceiver2;
+    }
+
+    public TeeXMLReceiver(XMLReceiver xmlReceiver1, XMLReceiver xmlReceiver2, XMLReceiver xmlReceiver3) {
+        xmlReceivers = new XMLReceiver[3];
+        xmlReceivers[0] = xmlReceiver1;
+        xmlReceivers[1] = xmlReceiver2;
+        xmlReceivers[2] = xmlReceiver3;
     }
 
     public void setDocumentLocator(Locator locator) {

@@ -13,14 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.model;
 
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.dom4j.*;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -53,7 +47,7 @@ public class Model {
     public final Set<String> computedBindExpressionsInstances;
     public final Set<String> validationBindInstances;
 
-    public Model(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope, Document document) {
+    public Model(XFormsStaticState staticState, XBLBindings.Scope scope, Document document) {
 
         assert scope != null;
         assert document != null;
@@ -66,7 +60,7 @@ public class Model {
         instances = new LinkedHashMap<String, Instance>(instanceElements.size());
 
         for (final Element instanceElement: instanceElements) {
-            final Instance newInstance = new Instance(propertyContext, instanceElement);
+            final Instance newInstance = new Instance(instanceElement);
             instances.put(newInstance.staticId, newInstance);
         }
 

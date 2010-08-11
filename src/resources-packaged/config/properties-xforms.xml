@@ -71,6 +71,7 @@
     <property as="xs:string"  name="oxf.xforms.store.application.collection"            value="/db/orbeon/xforms/cache/"/>
     <property as="xs:boolean" name="oxf.xforms.cache.document"                          value="true"/>
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
+    <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
 
     <!-- Other XForms options -->

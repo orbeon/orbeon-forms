@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.InternalCacheKey;
-import org.orbeon.oxf.cache.ObjectCache;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -26,9 +24,9 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 public class XFormsDocumentCache {
 
     private static final String XFORMS_DOCUMENT_CACHE_NAME = "xforms.cache.documents";
-    private static final int XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE = 10;
+    private static final int XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE = 50;
 
-    private static final Long CONSTANT_VALIDITY = (long) 0;
+    private static final Long CONSTANT_VALIDITY = 0L;
     private static final String CONTAINING_DOCUMENT_KEY_TYPE = XFORMS_DOCUMENT_CACHE_NAME;
 
     private static XFormsDocumentCache instance = new XFormsDocumentCache();

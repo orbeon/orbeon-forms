@@ -21,13 +21,8 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 
 import java.util.Map;
 
@@ -72,7 +67,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         {
             final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
             requestPath = request.getRequestPath();
-            if (staticState.getDeploymentType() != XFormsConstants.DeploymentType.plain) {
+            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.plain) {
                 // Integrated or separate deployment mode
                 xformsSubmissionPath =  "/xforms-server-submit";// TODO: read property?
             } else {

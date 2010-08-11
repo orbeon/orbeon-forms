@@ -15,18 +15,14 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 public abstract class BaseSubmission implements Submission {
@@ -49,12 +45,12 @@ public abstract class BaseSubmission implements Submission {
             // NOTE: Before 2009-10-08, there was some code performing custom rewriting in portlet mode. That code was
             // very unclear and was removed as it seemed like resolveResourceURL() should handle all cases.
 
-            return XFormsUtils.resolveResourceURL(propertyContext, submission.getSubmissionElement(),
+            return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         } else {
             // Regular case of service URL
-            return XFormsUtils.resolveServiceURL(propertyContext, submission.getSubmissionElement(),
+            return XFormsUtils.resolveServiceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         }

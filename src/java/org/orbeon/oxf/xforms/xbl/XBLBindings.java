@@ -692,33 +692,37 @@ public class XBLBindings {
 
             // Index prefixed id => scope
             final String staticId = attributes.getValue("id");
-            assert staticId != null;
-            final String prefixedId = prefix + staticId;
-            final Scope scope;
-            {
-                if (prefixedIdToXBLScopeMap.containsKey(prefix)) // enforce constraint that mapping must be unique
-                    throw new OXFException("Duplicate id found for effective id: " + prefixedId);
+            // NOTE: We can be called on HTML elements within LHHA, which may or may not have an id (they must have one if they have AVTs)
+            if (staticId != null) {
+                final String prefixedId = prefix + staticId;
+                if (metadata.getNamespaceMapping(prefixedId) != null) {
+                    final Scope scope;
+                    {
+                        if (prefixedIdToXBLScopeMap.containsKey(prefix)) // enforce constraint that mapping must be unique
+                            throw new OXFException("Duplicate id found for effective id: " + prefixedId);
 
-                if (currentScope == XFormsConstants.XXBLScope.inner) {
-                    scope = innerScope;
-                } else {
-                    scope = outerScope;
+                        if (currentScope == XFormsConstants.XXBLScope.inner) {
+                            scope = innerScope;
+                        } else {
+                            scope = outerScope;
+                        }
+                        prefixedIdToXBLScopeMap.put(prefixedId, scope);
+                    }
+
+                    // Index static id => prefixed id by scope
+                    {
+                        Map<String, String> staticIdToPrefixedIdMap = scopeToIdMap.get(scope);
+                        if (staticIdToPrefixedIdMap == null) {
+                            staticIdToPrefixedIdMap = new HashMap<String, String>();
+                            scopeToIdMap.put(scope, staticIdToPrefixedIdMap);
+                        }
+
+                        if (staticIdToPrefixedIdMap.containsKey(staticId)) // enforce constraint that mapping must be unique
+                            throw new OXFException("Duplicate id found for static id: " + staticId);
+
+                        staticIdToPrefixedIdMap.put(staticId, prefixedId);
+                    }
                 }
-                prefixedIdToXBLScopeMap.put(prefixedId, scope);
-            }
-
-            // Index static id => prefixed id by scope
-            {
-                Map<String, String> staticIdToPrefixedIdMap = scopeToIdMap.get(scope);
-                if (staticIdToPrefixedIdMap == null) {
-                    staticIdToPrefixedIdMap = new HashMap<String, String>();
-                    scopeToIdMap.put(scope, staticIdToPrefixedIdMap);
-                }
-
-                if (staticIdToPrefixedIdMap.containsKey(staticId)) // enforce constraint that mapping must be unique
-                    throw new OXFException("Duplicate id found for static id: " + staticId);
-
-                staticIdToPrefixedIdMap.put(staticId, prefixedId);
             }
         }
         @Override

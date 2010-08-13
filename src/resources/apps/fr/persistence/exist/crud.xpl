@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:sql="http://orbeon.org/oxf/xml/sql"
         xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
@@ -94,7 +94,7 @@
                                     resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
-                                    <xforms:delete while="/*/*" nodeset="/*/*"/>
+                                    <xforms:delete nodeset="/*/*"/>
                                     <xforms:setvalue ref="/*" value="event('response-body')"/>
                                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                                 </xforms:action>
@@ -114,7 +114,7 @@
                                     resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
-                                    <xforms:delete while="/*/*" nodeset="/*/*"/>
+                                    <xforms:delete nodeset="/*/*"/>
                                     <xforms:setvalue ref="/*" value="event('response-body')"/>
                                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                                 </xforms:action>
@@ -134,7 +134,7 @@
                                     resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
-                                    <xforms:delete while="/*/*" nodeset="/*/*"/>
+                                    <xforms:delete nodeset="/*/*"/>
                                     <xforms:setvalue ref="/*" value="event('response-body')"/>
                                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
                                 </xforms:action>

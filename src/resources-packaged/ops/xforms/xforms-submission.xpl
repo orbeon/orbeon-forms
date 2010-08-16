@@ -50,63 +50,88 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:output name="xml-output" method="xml" version="1.0" encoding="UTF-8" indent="no" omit-xml-declaration="no"/>
+
                 <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
+                <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application' or @xxforms:cache = 'true'])" as="xs:boolean"/>
+                
+                <xsl:variable name="static-state" as="document-node()">
+                    <xsl:document>
+                        <static-state>
+                            <xforms:trigger id="fr-trigger">
+                                <xforms:send id="fr-send" submission="fr-default-submission" ev:event="DOMActivate"/>
+                            </xforms:trigger>
+                            <xforms:model id="fr-model">
+                                <xforms:instance id="fr-instance">
+                                    <dummy/>
+                                </xforms:instance>
+                                <xsl:if test="$is-shared-result">
+                                    <xforms:instance id="fr-result-instance">
+                                        <dummy/>
+                                    </xforms:instance>
+                                </xsl:if>
+                                <xforms:submission id="fr-default-submission" replace="instance">
+                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id']"/>
+                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
+                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
+                                    <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
+                                    <xsl:if test="$is-shared-result">
+                                        <xforms:insert ev:event="xforms-submit-done" origin="instance('fr-instance')" nodeset="instance('fr-result-instance')"/>
+                                    </xsl:if>
+                                </xforms:submission>
+                            </xforms:model>
+                            <properties xxforms:state-handling="client" xxforms:noscript="false" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
+                            <last-id id="1000"/>
+                        </static-state>
+                    </xsl:document>
+                </xsl:variable>
+                
+                <xsl:variable name="dynamic-state" as="document-node()">
+                    <xsl:document>
+                        <dynamic-state uuid="{$uuid}" sequence="0">
+                            <instances>
+                                <instance id="fr-instance" model-id="fr-model">
+                                    <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>
+                                </instance>
+                                <xsl:if test="$is-shared-result">
+                                    <instance id="fr-result-instance" model-id="fr-model">&lt;dummy/></instance>
+                                </xsl:if>
+                            </instances>
+                        </dynamic-state>
+                    </xsl:document>
+                </xsl:variable>
+
+                <xsl:template match="/*/xforms:model/xforms:submission//*[not(exists(@id))]" mode="update-ids">
+                    <xsl:copy>
+                        <xsl:attribute name="id" select="concat('xf-', count(preceding::*) + 1)"/>
+                        <xsl:apply-templates select="@*|node()" mode="#current"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template match="@*|node()" mode="update-ids">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*|node()" mode="#current"/>
+                    </xsl:copy>
+                </xsl:template>
+                
                 <xsl:template match="/">
-                    <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application' or @xxforms:cache = 'true'])" as="xs:boolean"/>
-                    <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+
+                    <!-- Add ids as oxf:xforms-server expects ids on all XForms elements and caller might not have put ids everywhere -->
+                    <xsl:variable name="annotated-static-state" as="document-node()">
+                        <xsl:document>
+                            <xsl:apply-templates select="$static-state" mode="update-ids"/>
+                        </xsl:document>
+                    </xsl:variable>
+
+                    <xxforms:event-request>
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:static-state>
-                            <xsl:variable name="static-state" as="document-node()">
-                                <xsl:document>
-                                    <static-state last-id="10000">
-                                        <xforms:trigger id="trigger">
-                                            <xforms:send id="send" submission="default-submission" ev:event="DOMActivate"/>
-                                        </xforms:trigger>
-                                        <xforms:model id="default-model">
-                                            <xforms:instance id="default-instance">
-                                                <xsl:copy-of select="doc('input:request')"/>
-                                            </xforms:instance>
-                                            <xsl:if test="$is-shared-result">
-                                                <xforms:instance id="result-instance">
-                                                    <dummy/>
-                                                </xforms:instance>
-                                            </xsl:if>
-                                            <xforms:submission id="default-submission" replace="instance">
-                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id']"/>
-                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
-                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
-                                                <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
-                                                <xsl:if test="$is-shared-result">
-                                                    <xforms:insert id="insert-done" ev:event="xforms-submit-done" origin="instance('default-instance')" nodeset="instance('result-instance')"/>
-                                                </xsl:if>
-                                            </xforms:submission>
-                                        </xforms:model>
-                                        <properties xxforms:state-handling="client" xxforms:noscript="false" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
-                                        <last-id id="1000"/>
-                                    </static-state>
-                                </xsl:document>
-                            </xsl:variable>
-                            <xsl:value-of select="context:encodeXML($static-state)"/>
+                            <xsl:value-of select="context:encodeXML($annotated-static-state)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
-                            <xsl:variable name="dynamic-state" as="document-node()">
-                                <xsl:document>
-                                    <dynamic-state uuid="{$uuid}" sequence="0">
-                                        <instances>
-                                            <instance id="default-instance" model-id="default-model">
-                                                <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>
-                                            </instance>
-                                            <xsl:if test="$is-shared-result">
-                                                <instance id="result-instance" model-id="default-model">&lt;dummy/></instance>
-                                            </xsl:if>
-                                        </instances>
-                                    </dynamic-state>
-                                </xsl:document>
-                            </xsl:variable>
-                            <xsl:value-of select="context:encodeXML($dynamic-state)"/>
+                            <xsl:value-of select="context:encodeXML($dynamic-state)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
                         </xxforms:dynamic-state>
                         <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="trigger"/>
+                            <xxforms:event name="DOMActivate" source-control-id="fr-trigger"/>
                         </xxforms:action>
                     </xxforms:event-request>
                 </xsl:template>

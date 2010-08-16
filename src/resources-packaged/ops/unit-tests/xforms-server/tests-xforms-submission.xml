@@ -1048,7 +1048,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="Instance replacement: replace text" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1604,5 +1604,50 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="oxf:xforms-submission with actions upon successful result" name="oxf:xforms-submission">
+        <input name="submission">
+            <xforms:submission ref="/*" method="get" replace="instance"
+                    resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml">
+                <!-- Try some actions -->
+                <xforms:action ev:event="xforms-submit-done">
+                    <xforms:insert nodeset="/*" origin="xxforms:element('envelope', /*)"/>
+                </xforms:action>
+            </xforms:submission>
+        </input>
+        <input name="request">
+            <dummy/>
+        </input>
+        <output name="response">
+            <envelope>
+                <book>
+                    <title lang="en">Pale Blue Dot</title>
+                    <author>Carl Sagan</author>
+                </book>
+            </envelope>
+        </output>
+    </test>
+
+    <test description="oxf:xforms-submission with actions upon error result" name="oxf:xforms-submission">
+        <input name="submission">
+            <xforms:submission ref="/*" method="get" replace="instance"
+                    resource="oxf:/ops/unit-tests/xforms-server/i-don't-exist.xml">
+                <!-- Try some actions -->
+                <xforms:action ev:event="xforms-submit-done">
+                    <xforms:insert nodeset="/*" origin="xxforms:element('success')"/>
+                </xforms:action>
+                <xforms:action ev:event="xforms-submit-error">
+                    <xforms:insert nodeset="/*" origin="xxforms:element('failure')"/>
+                </xforms:action>
+            </xforms:submission>
+        </input>
+        <input name="request">
+            <dummy/>
+        </input>
+        <output name="response">
+            <failure/>
+        </output>
+    </test>
+
 
 </group>

@@ -13,94 +13,6 @@
  */
 
 /**
- * Parameters
- */
-
-/**
- * === How state handling works
- *
- * Places where state are stored:
- *
- * - The current dynamic state is stored in:
- *      ORBEON.xforms.Globals.formDynamicState[formID].value
- * - The initial dynamic state is stored in the client state:
- *      xformsGetFromClientState(formID, "initial-dynamic-state")
- * - The static state is stored in
- *      ORBEON.xforms.Globals.formStaticState[formID].value
- *
- * Modifications to the state information:
- *
- * - When the page is loaded if the client state is empty, the dynamic state is stored in the client state.
- * - When a response to an Ajax response is received the new dynamic state is stored right away.
- * - When an Ajax response also contains an updated static state, that state is stored as well.
- *
- */
-
-// Parameter names
-// NOTE: Names below MUST match the ones in XFormsProperties
-var SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
-var SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
-var FCK_EDITOR_BASE_PATH_PROPERTY = "fck-editor-base-path";
-var DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
-var DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
-var DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
-var DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY = "delay-before-close-minimal-dialog";
-var DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
-var INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
-var DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
-var REQUEST_RETRIES_PROPERTY = "request-retries";
-var DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
-var DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
-var LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
-var REVISIT_HANDLING_PROPERTY = "revisit-handling";
-var HELP_HANDLER_PROPERTY = "help-handler";
-var HELP_TOOLTIP_PROPERTY = "help-tooltip";
-var OFFLINE_SUPPORT_PROPERTY = "offline";
-var FORMAT_INPUT_TIME_PROPERTY = "format.input.time";
-var FORMAT_INPUT_DATE_PROPERTY = "format.input.date";
-var DATE_PICKER_PROPERTY = "datepicker";
-var DATE_PICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
-var DATE_PICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
-var HTML_EDITOR_PROPERTY = "htmleditor";
-var SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
-var CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
-var CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
-var RESOURCES_VERSIONED = "oxf.resources.versioned";
-var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
-var NEW_XHTML_LAYOUT_PROPERTY = "new-xhtml-layout";
-var XHTML_LAYOUT_PROPERTY = "xhtml-layout";
-
-// Parameter defaults
-// NOTE: Default values below MUST match the ones in XFormsProperties
-var XFORMS_SESSION_HEARTBEAT = true;
-var XFORMS_SESSION_HEARTBEAT_DELAY = 12 * 60 * 60 * 800; // 80 % of 12 hours in ms
-var FCK_EDITOR_BASE_PATH = "/ops/fckeditor/";
-var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
-var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
-var XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS = 5000;
-var XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS = 5000;
-var XFORMS_DELAY_BEFORE_AJAX_TIMEOUT_IN_MS = -1;
-var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 100;
-var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
-var XFORMS_REQUEST_RETRIES = 1;
-var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
-var XFORMS_DEBUG_WINDOW_WIDTH = 300;
-var XFORMS_LOADING_MIN_TOP_PADDING = 10;
-var XFORMS_REVISIT_HANDLING = "restore";
-var XFORMS_HELP_HANDLER = false;
-var XFORMS_HELP_TOOLTIP = false;
-var XFORMS_OFFLINE_SUPPORT = false;
-var XFORMS_FORMAT_INPUT_TIME = "[h]:[m]:[s] [P]";
-var XFORMS_FORMAT_INPUT_DATE = "[M]/[D]/[Y]";
-var XFORMS_DATEPICKER = "yui";
-var XFORMS_DATEPICKER_NAVIGATOR = true;
-var XFORMS_DATEPICKER_TWO_MONTHS = false;
-var XFORMS_HTMLEDITOR = "yui";
-var XFORMS_CLIENT_EVENTS_MODE = "default";
-var XFORMS_CLIENT_EVENTS_FILTER = "";
-var XHTML_LAYOUT_NOSPAN = "nospan";
-
-/**
  * Constants
  */
 var XFORMS_SEPARATOR_1 = "\xB7";
@@ -551,7 +463,7 @@ ORBEON.util.Dom = {
                     var table = tables[tableIndex];
                     table.className = table.className;
                 }
-            }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+            }, ORBEON.util.Properties.internalShortDelay.get());
         }
     },
 
@@ -692,7 +604,7 @@ ORBEON.util.DateTime = {
     },
 
     jsDateToformatDisplayTime: function(jsDate) {
-        if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_TIME_PROPERTY) == "[H]:[m]:[s]") {
+        if (ORBEON.util.Properties.formatInputTime.get() == "[H]:[m]:[s]") {
             // EU time
             return jsDate.getHours() + ":"
                     + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
@@ -708,7 +620,7 @@ ORBEON.util.DateTime = {
     },
 
     jsDateToformatDisplayDate: function(jsDate) {
-        var inputDateFormat = ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY); // e.g. "[D01].[M01].[Y]"
+        var inputDateFormat = ORBEON.util.Properties.formatInputDate.get(); // e.g. "[D01].[M01].[Y]"
         var inputDateFormatParts = inputDateFormat.split(new RegExp("[\\[\\]]")); // e.g. ["", "D01", ".", "M01", ".", "Y", ""]
         var result = [];
         for (var inputDateFormatPartIndex = 0; inputDateFormatPartIndex < inputDateFormatParts.length; inputDateFormatPartIndex++) {
@@ -915,7 +827,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2}).(\d{1,2}).(\d{2,4})$/,
             handler: function(bits) {
                 var d;
-                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY).indexOf("[D") == 0) {
+                if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
                     // Day first
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 } else {
@@ -929,7 +841,7 @@ ORBEON.util.DateTime = {
         {   re: /^(\d{1,2}).(\d{1,2})$/,
             handler: function(bits) {
                 var d;
-                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY).indexOf("[D") == 0) {
+                if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 } else {
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
@@ -1016,6 +928,51 @@ ORBEON.util.DateTime = {
     }
 };
 
+
+ORBEON.util.Property = function(name, defaultValue) {
+    this.name = name;
+    this.defaultValue = defaultValue;
+};
+
+ORBEON.util.Property.prototype.get = function() {
+    return YAHOO.lang.isUndefined(opsXFormsProperties) || YAHOO.lang.isUndefined(opsXFormsProperties[this.name])
+        ? this.defaultValue : opsXFormsProperties[this.name];
+};
+
+ORBEON.util.Properties = {
+    sessionHeartbeat: new ORBEON.util.Property("session-heartbeat", true),
+    sessionHeartbeatDelay: new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800), // 80 % of 12 hours in ms
+    revisitHandling: new ORBEON.util.Property("revisit-handling", "restore"),
+    fckEditorBasePath: new ORBEON.util.Property("fck-editor-base-path", "/ops/fckeditor/"),
+    delayBeforeIncrementalRequest: new ORBEON.util.Property("delay-before-incremental-request", 500),
+    delayBeforeForceIncrementalRequest: new ORBEON.util.Property("delay-before-force-incremental-request", 2000),
+    delayBeforeGeckoCommunicationError: new ORBEON.util.Property("delay-before-gecko-communication-error", 5000),
+    delayBeforeCloseMinimalDialog: new ORBEON.util.Property("delay-before-close-minimal-dialog", 5000),
+    delayBeforeAjaxTimeout: new ORBEON.util.Property("delay-before-ajax-timeout", 30000),
+    internalShortDelay: new ORBEON.util.Property("internal-short-delay", 100),
+    delayBeforeDisplayLoading: new ORBEON.util.Property("delay-before-display-loading", 500),
+    debugWindowHeight: new ORBEON.util.Property("debug-window-height", 600),
+    debugWindowWidth: new ORBEON.util.Property("debug-window-width", 300),
+    loadingMinTopPadding: new ORBEON.util.Property("loading-min-top-padding", 10),
+    helpHandler: new ORBEON.util.Property("help-handler", false),
+    helpTooltip: new ORBEON.util.Property("help-tooltip", false),
+    offlineSupport: new ORBEON.util.Property("offline", false),
+    formatInputTime: new ORBEON.util.Property("format.input.time", "[h]:[m]:[s] [P]"),
+    formatInputDate: new ORBEON.util.Property("format.input.date", "[M]/[D]/[Y]"),
+    datePicker: new ORBEON.util.Property("datepicker", "yui"),
+    datePickerNavigator: new ORBEON.util.Property("datepicker.navigator", true),
+    datePickerTwoMonths: new ORBEON.util.Property("datepicker.two-months", false),
+    htmlEditor: new ORBEON.util.Property("htmleditor", "yui"),
+    showErrorDialog: new ORBEON.util.Property("show-error-dialog", true),
+    clientEventMode: new ORBEON.util.Property("client.events.mode", "default"),
+    clientEventsFilter: new ORBEON.util.Property("client.events.filter", ""),
+    resourcesVersioned: new ORBEON.util.Property("oxf.resources.versioned", false),
+    newXHTMLLayout: new ORBEON.util.Property("new-xhtml-layout", false),
+    xhtmlLayout: new ORBEON.util.Property("xhtml-layout", "nospan"),
+    retryDelayIncrement: new ORBEON.util.Property("retry.delay-increment", 5000),
+    retryMaxDelay: new ORBEON.util.Property("retry.max-delay", 30000)
+};
+
 /**
  * Utility methods that don't in any other category
  */
@@ -1026,56 +983,9 @@ ORBEON.util.Utils = {
         }
     },
 
-    /**
-     * A convenience method for getting values of property supplied as inline script.
-     * If the property value is not supplied, then the default value will be returned.
-     */
-
-    getProperty: function(propertyName) {
-        // Check if the value for the property was supplied in inline script
-        if (typeof opsXFormsProperties != "undefined" && typeof opsXFormsProperties[propertyName] != "undefined")
-            return opsXFormsProperties[propertyName];
-
-        // Return default value for the property
-        switch (propertyName) {
-            case SESSION_HEARTBEAT_PROPERTY: { return XFORMS_SESSION_HEARTBEAT; }
-            case SESSION_HEARTBEAT_DELAY_PROPERTY: { return XFORMS_SESSION_HEARTBEAT_DELAY;  }
-            case REVISIT_HANDLING_PROPERTY: { return XFORMS_REVISIT_HANDLING; }
-            case FCK_EDITOR_BASE_PATH_PROPERTY: { return FCK_EDITOR_BASE_PATH; }
-            case DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY: { return XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS; }
-            case DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY: { return XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS; }
-            case DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY: { return XFORMS_DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_IN_MS; }
-            case DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY: { return XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS; }
-            case DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY: { return XFORMS_DELAY_BEFORE_AJAX_TIMEOUT_IN_MS; }
-            case INTERNAL_SHORT_DELAY_PROPERTY: { return XFORMS_INTERNAL_SHORT_DELAY_IN_MS; }
-            case DELAY_BEFORE_DISPLAY_LOADING_PROPERTY: { return XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS; }
-            case REQUEST_RETRIES_PROPERTY: { return XFORMS_REQUEST_RETRIES; }
-            case DEBUG_WINDOW_HEIGHT_PROPERTY: { return XFORMS_DEBUG_WINDOW_HEIGHT; }
-            case DEBUG_WINDOW_WIDTH_PROPERTY: { return XFORMS_DEBUG_WINDOW_WIDTH; }
-            case LOADING_MIN_TOP_PADDING_PROPERTY: { return XFORMS_LOADING_MIN_TOP_PADDING; }
-            case HELP_HANDLER_PROPERTY: { return XFORMS_HELP_HANDLER; }
-            case HELP_TOOLTIP_PROPERTY: { return XFORMS_HELP_TOOLTIP; }
-            case OFFLINE_SUPPORT_PROPERTY: { return XFORMS_OFFLINE_SUPPORT; }
-            case FORMAT_INPUT_TIME_PROPERTY: { return XFORMS_FORMAT_INPUT_TIME; }
-            case FORMAT_INPUT_DATE_PROPERTY: { return XFORMS_FORMAT_INPUT_DATE; }
-            case DATE_PICKER_PROPERTY: { return XFORMS_DATEPICKER; }
-            case DATE_PICKER_NAVIGATOR_PROPERTY: { return XFORMS_DATEPICKER_NAVIGATOR; }
-            case DATE_PICKER_TWO_MONTHS_PROPERTY: { return XFORMS_DATEPICKER_TWO_MONTHS; }
-            case HTML_EDITOR_PROPERTY: { return XFORMS_HTMLEDITOR; }
-            case SHOW_ERROR_DIALOG_PROPERTY: { return "true"; }
-            case CLIENT_EVENTS_MODE_PROPERTY: { return XFORMS_CLIENT_EVENTS_MODE; }
-            case CLIENT_EVENTS_FILTER_PROPERTY: { return XFORMS_CLIENT_EVENTS_FILTER; }
-            case RESOURCES_VERSIONED: { return "false"; }
-            case NEW_XHTML_LAYOUT_PROPERTY: { return false; }
-            case XHTML_LAYOUT_PROPERTY: { return XHTML_LAYOUT_NOSPAN; }
-        }
-    	// Neither the property's value was supplied, nor a default value exists for the property
-        return null;
-    },
-
     isNewXHTMLLayout: function() {
-        return ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
-            || ORBEON.util.Utils.getProperty(XHTML_LAYOUT_PROPERTY) != XHTML_LAYOUT_NOSPAN;
+        return ORBEON.util.Properties.newXHTMLLayout.get()
+            || ORBEON.util.Properties.xhtmlLayout.get() != "nospan";
     },
 
     hideModalProgressPanel: function() {
@@ -1625,6 +1535,41 @@ ORBEON.xforms.Document = {
             }
             offlineIframe.contentWindow.ORBEON.xforms.Offline.takeOnline(beforeOnlineListener);
         });
+    },
+
+    /**
+     * Gets a value stored in the hidden client-state input field.
+     */
+    getFromClientState: function(formID, key) {
+        var clientState = ORBEON.xforms.Globals.formClientState[formID];
+        var keyValues = clientState.value.split("&");
+        for (var i = 0; i < keyValues.length; i = i + 2)
+            if (keyValues[i] == key)
+                return unescape(keyValues[i + 1]);
+        return null;
+    },
+
+    /**
+     * Returns a value stored in the hidden client-state input field.
+     */
+    storeInClientState: function(formID, key, value) {
+        var clientState = ORBEON.xforms.Globals.formClientState[formID];
+        var keyValues = clientState.value == "" ? new Array() : clientState.value.split("&");
+        var found = false;
+        // If we found the key, replace the value
+        for (var i = 0; i < keyValues.length; i = i + 2) {
+            if (keyValues[i] == key) {
+                keyValues[i + 1] = escape(value);
+                found = true;
+                break;
+            }
+        }
+        // If key is there already, replace it
+        if (!found) {
+            keyValues.push(key);
+            keyValues.push(escape(value));
+        }
+        clientState.value = keyValues.join("&");
     }
 };
 
@@ -1739,7 +1684,7 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML text area
-            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
                 return ORBEON.widgets.RTE.getValue(control);
             } else {
                 var editorInstance = FCKeditorAPI.GetInstance(control.name);
@@ -1970,7 +1915,7 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
-            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
                 // YUI RTE
                 ORBEON.widgets.RTE.setValue(control, newControlValue);
             } else {
@@ -2430,7 +2375,7 @@ ORBEON.xforms.Controls = {
             ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea") && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
-            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
                 ORBEON.widgets.RTE.setReadonly(control, isReadonly);
             } else {
                 var htmlEditor = FCKeditorAPI.GetInstance(control.name);
@@ -2554,7 +2499,7 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // Special case for RTE
-            if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
                 ORBEON.widgets.RTE.setFocus(control);
             } else {
                 // Not sure anything meaningful can be done for FCK
@@ -2685,9 +2630,9 @@ ORBEON.xforms.Controls = {
             // Distance between top of viewport and top of the page. Initially 0 when we are at the top of the page.
             var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
             var initialTop = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][1];
-            y = scrollY + ORBEON.util.Utils.getProperty(LOADING_MIN_TOP_PADDING_PROPERTY) > initialTop
+            y = scrollY + ORBEON.util.Properties.loadingMinTopPadding.get() > initialTop
                 // Place indicator at a few pixels from the top of the viewport
-                    ? scrollY + ORBEON.util.Utils.getProperty(LOADING_MIN_TOP_PADDING_PROPERTY)
+                    ? scrollY + ORBEON.util.Properties.loadingMinTopPadding.get()
                 // Loading is visible left at its initial position, so leave it there
                     : initialTop;
         }
@@ -2911,7 +2856,7 @@ ORBEON.xforms.Events = {
                         && ORBEON.util.String.endsWith(element.id, "_container")
                         && ORBEON.util.Dom.hasClass(element, "xforms-textarea")
                         && ORBEON.util.Dom.hasClass(element, "xforms-mediatype-text-html")
-                        && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+                        && ORBEON.util.Properties.htmlEditor.get() == "yui") {
                     // We may get a focus event on the container created by YUI. Instead, find the
                     // original nested textarea element.
 
@@ -2989,7 +2934,7 @@ ORBEON.xforms.Events = {
                 if (currentFocusControlElement != null) { // Can be null on first focus
                     if (ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
                             && ORBEON.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")
-                            && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "fck") {
+                            && ORBEON.util.Properties.htmlEditor.get() == "fck") {
                         // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't duplicate the code here
                         var editorInstance = FCKeditorAPI.GetInstance(currentFocusControlElement.name);
                         currentFocusControlElement.value = editorInstance.GetXHTML();
@@ -3277,7 +3222,7 @@ ORBEON.xforms.Events = {
             }
 
             // Help tooltip
-            if (ORBEON.util.Utils.getProperty(HELP_TOOLTIP_PROPERTY)
+            if (ORBEON.util.Properties.helpTooltip.get()
                     && ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
                 // Get help element which is right after the image; there might be a text node between the two elements
 
@@ -3384,7 +3329,7 @@ ORBEON.xforms.Events = {
 
         } else if (target != null && ORBEON.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
             // Click on calendar inside input field
-            if (ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar") {
+            if (ORBEON.util.Properties.datePicker.get() == "jscalendar") {
                 ORBEON.widgets.JSCalendar.click(event, target);
             } else {
                 ORBEON.widgets.YUICalendar.click(event, target);
@@ -3438,7 +3383,7 @@ ORBEON.xforms.Events = {
 
             // Get control for this help image
             var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help-image");
-            if (ORBEON.util.Utils.getProperty(HELP_HANDLER_PROPERTY)) {
+            if (ORBEON.util.Properties.helpHandler.get()) {
                 // We are sending the xforms-help event to the server and the server will tell us what do to
                 var event = new ORBEON.xforms.Server.Event(null, control.id, null, null, "xforms-help");
                 ORBEON.xforms.Server.fireEvents([event], false);
@@ -3751,7 +3696,7 @@ ORBEON.xforms.Events = {
         var current = new Date().getTime();
         if (yuiDialog.element.style.display == "block"
                 && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
-                && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= ORBEON.util.Utils.getProperty(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY)) {
+                && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= ORBEON.util.Properties.delayBeforeCloseMinimalDialog.get()) {
             var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
             ORBEON.xforms.Server.fireEvents([event], false);
         }
@@ -3941,7 +3886,7 @@ ORBEON.widgets.JSCalendar = function() {
 
         appliesToControl: function(control) {
             return (ORBEON.util.Dom.hasClass(control, "xforms-type-date") || ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime"))
-                    && ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "jscalendar";
+                    && ORBEON.util.Properties.datePicker.get() == "jscalendar";
         },
 
         click: function(event, target) {
@@ -4120,7 +4065,7 @@ ORBEON.widgets.YUICalendar = function() {
 
         appliesToControl: function(control) {
             return (ORBEON.util.Dom.hasClass(control, "xforms-type-date") || ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime"))
-                    && ORBEON.util.Utils.getProperty(DATE_PICKER_PROPERTY) == "yui";
+                    && ORBEON.util.Properties.datePicker.get() == "yui";
         },
 
         click: function(event, target) {
@@ -4147,7 +4092,7 @@ ORBEON.widgets.YUICalendar = function() {
 
             if (yuiCalendar == null) {
                 // Create YUI calendar
-                var hasTwoMonths = ORBEON.util.Utils.getProperty(DATE_PICKER_TWO_MONTHS_PROPERTY);
+                var hasTwoMonths = ORBEON.util.Properties.datePickerTwoMonths.get();
                 var overlayBodyId = YAHOO.util.Dom.generateId(YAHOO.util.Dom.getElementsByClassName("bd", null, calendarDiv)[0]);
                 yuiCalendar = hasTwoMonths
                     ? new YAHOO.widget.CalendarGroup(overlayBodyId)
@@ -4206,7 +4151,7 @@ ORBEON.widgets.YUICalendar = function() {
             var resources = RESOURCES[lang];
             for (var key in resources.properties)
                 yuiCalendar.cfg.setProperty(key, resources.properties[key]);
-            var hasNavigator = ORBEON.util.Utils.getProperty(DATE_PICKER_NAVIGATOR_PROPERTY);
+            var hasNavigator = ORBEON.util.Properties.datePickerNavigator.get();
             if (hasNavigator) {
                 yuiCalendar.cfg.setProperty("navigator", {
                     strings : resources.navigator,
@@ -4636,7 +4581,7 @@ ORBEON.xforms.Init = {
             requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
             requestInProgress: false,            // Indicates whether an Ajax request is currently in process
             requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
-            requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
+            requestTryCount: 0,                  // How many attempts to run the current Ajax request we have done so far
             executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
             maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
             maskDialogCloseEvents: false,        // Avoid catching a dialog close event received from the server, so we don't sent it back to the server
@@ -4706,15 +4651,15 @@ ORBEON.xforms.Init = {
         ORBEON.util.Dom.addClass(document.body, "yui-skin-sam");
 
         // Notify the offline module that the page was loaded
-        if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
+        if (ORBEON.util.Properties.offlineSupport.get())
             ORBEON.xforms.Offline.pageLoad();
 
         // Initialize XForms server URL
-        ORBEON.xforms.Init._setBasePaths(document.getElementsByTagName("script"), ORBEON.util.Utils.getProperty(RESOURCES_VERSIONED) == "true");
+        ORBEON.xforms.Init._setBasePaths(document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get() == "true");
 
         // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
-        if (ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_PROPERTY)) {
-            var heartBeatDelay = ORBEON.util.Utils.getProperty(SESSION_HEARTBEAT_DELAY_PROPERTY);
+        if (ORBEON.util.Properties.sessionHeartbeat.get()) {
+            var heartBeatDelay = ORBEON.util.Properties.sessionHeartbeatDelay.get();
             if (heartBeatDelay > 0) {
                 window.setInterval(function() {
                     ORBEON.xforms.Events.sendHeartBeatIfNeeded(heartBeatDelay);
@@ -4828,7 +4773,7 @@ ORBEON.xforms.Init = {
                             // Store the initial dynamic state in client state. We do this only if formClientState is empty.
                             // If it is not empty, this means that we already have an initial state stored there, and that this
                             // function runs because the user reloaded or navigated back to this page.
-                            xformsStoreInClientState(formID, "initial-dynamic-state",
+                            ORBEON.xforms.Document.storeInClientState(formID, "initial-dynamic-state",
                                     ORBEON.xforms.Globals.formDynamicState[formID].value);
                         }
                     } else if (element.name.indexOf("$repeat-tree") != -1) {
@@ -4872,10 +4817,11 @@ ORBEON.xforms.Init = {
                 }
 
                 // Ask server to resend events if this is not the first time load is called
-                if (xformsGetFromClientState(formID, "load-did-run") == null) {
-                    xformsStoreInClientState(formID, "load-did-run", "true");
+                if (ORBEON.xforms.Document.getFromClientState(formID, "load-did-run") == null) {
+                    ORBEON.xforms.Document.storeInClientState(formID, "load-did-run", "true");
+                    ORBEON.xforms.Document.storeInClientState(formID, "request-sequence-number", "1");
                 } else {
-                    if (ORBEON.util.Utils.getProperty(REVISIT_HANDLING_PROPERTY) == "reload") {
+                    if (ORBEON.util.Properties.revisitHandling.get() == "reload") {
                         ORBEON.xforms.Globals.isReloading = true;
                         window.location.reload(true);
                         //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
@@ -4937,7 +4883,7 @@ ORBEON.xforms.Init = {
                                     if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
                                     if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
                                     if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
-                                };
+                                }
                             }
                             // Handle text string by building array of key codes
                             keyData["keys"] = [];
@@ -5037,7 +4983,7 @@ ORBEON.xforms.Init = {
         // YUI event.js's call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
             ORBEON.xforms.Events.orbeonLoadedEvent.fire();
-        }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+        }, ORBEON.util.Properties.internalShortDelay.get());
     },
 
     profileDocument: function() {
@@ -5366,7 +5312,7 @@ ORBEON.xforms.Init = {
      * Initialize HTML areas.
      */
     _htmlArea: function (htmlArea) {
-        if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
+        if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
             ORBEON.widgets.RTE.init(htmlArea);
         } else {
 
@@ -5376,7 +5322,7 @@ ORBEON.xforms.Init = {
             if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
                 ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
 
-            fckEditor.BasePath = ORBEON.xforms.Globals.resourcesBaseURL + ORBEON.util.Utils.getProperty(FCK_EDITOR_BASE_PATH_PROPERTY);
+            fckEditor.BasePath = ORBEON.xforms.Globals.resourcesBaseURL + ORBEON.util.Properties.fckEditorBasePath.get();
             fckEditor.ToolbarSet = "OPS";
 
             // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
@@ -5518,7 +5464,7 @@ ORBEON.xforms.Server = {
      */
     showError: function(title, details, formID) {
         ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
-        if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Utils.getProperty(SHOW_ERROR_DIALOG_PROPERTY) == "true") {
+        if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get() == "true") {
             var formErrorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
             if (formErrorPanel) {
                 // Render the dialog if needed
@@ -5555,7 +5501,7 @@ ORBEON.xforms.Server = {
                         if (ORBEON.xforms.Globals.executeEventFunctionQueued == 0)
                             ORBEON.xforms.Offline.evaluateMIPs();
                     },
-                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
+                    ORBEON.util.Properties.internalShortDelay.get()
                 );
             }
         } else {
@@ -5579,13 +5525,13 @@ ORBEON.xforms.Server = {
             // Fire them with a delay to give us a change to aggregate events together
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
             if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                                 ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
+                                 ORBEON.util.Properties.delayBeforeForceIncrementalRequest.get())) {
                 // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
                 // if there are no other executeNextRequest() that have been added to the queue after this
                 // request.
                 window.setTimeout(
                     function() { ORBEON.xforms.Server.executeNextRequest(false); },
-                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY)
+                    ORBEON.util.Properties.delayBeforeForceIncrementalRequest.get()
                 );
             } else {
                 // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
@@ -5594,7 +5540,7 @@ ORBEON.xforms.Server = {
                 // browser gives us a sequence of events (e.g. focus out, change, focus in).
                 window.setTimeout(
                     function() { ORBEON.xforms.Server.executeNextRequest(true); },
-                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
+                    ORBEON.util.Properties.internalShortDelay.get()
                 );
             }
             ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
@@ -5639,13 +5585,13 @@ ORBEON.xforms.Server = {
             // TODO: could compute this once and for all
             var eventsToFilter = {};
             {
-                var eventsToFilterProperty = ORBEON.util.Utils.getProperty(CLIENT_EVENTS_FILTER_PROPERTY).split(" ");
+                var eventsToFilterProperty = ORBEON.util.Properties.clientEventsFilter.get().split(" ");
                 for (var eventIndex = 0; eventIndex < eventsToFilterProperty.length; eventIndex++)
                     eventsToFilter[eventsToFilterProperty[eventIndex]] = true;
             }
 
             var foundActivatingEvent = false;
-            if (ORBEON.util.Utils.getProperty(CLIENT_EVENTS_MODE_PROPERTY) == "deferred") {
+            if (ORBEON.util.Properties.clientEventMode.get() == "deferred") {
 
                 // Element with class xxforms-events-mode-default which is the parent of a target
                 var parentWithDefaultClass = null;
@@ -5834,7 +5780,7 @@ ORBEON.xforms.Server = {
 
                     // Show loading indicator, unless all the events asked us not to display it
                     if (showProgress) {
-                        var delayBeforeDisplayLoading = ORBEON.util.Utils.getProperty(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY);
+                        var delayBeforeDisplayLoading = ORBEON.util.Properties.delayBeforeDisplayLoading.get();
                         if (delayBeforeDisplayLoading == 0) xformsDisplayLoading(progressMessage);
                         else window.setTimeout(function() { xformsDisplayLoading(progressMessage); }, delayBeforeDisplayLoading);
                     }
@@ -5843,7 +5789,8 @@ ORBEON.xforms.Server = {
                     var requestDocumentString = [];
 
                     // Add entity declaration for nbsp. We are adding this as this entity is generated by the FCK editor.
-                    requestDocumentString.push('<!DOCTYPE xxforms:event-request [<!ENTITY nbsp "&#160;">]>\n');
+                    // The "unnecessary" concatenation is done to prevent IntelliJ from wrongly interpreting this
+                    requestDocumentString.push('<!' + 'DOCTYPE xxforms:event-request [<!ENTITY nbsp "&#160;">]>\n');
 
                     var indent = "    ";
                     {
@@ -5855,6 +5802,14 @@ ORBEON.xforms.Server = {
                         requestDocumentString.push('<xxforms:uuid>');
                         requestDocumentString.push(ORBEON.xforms.Globals.formUUID[formID].value);
                         requestDocumentString.push('</xxforms:uuid>\n');
+
+                        // Add request sequence number
+                        var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "request-sequence-number");
+                        ORBEON.xforms.Document.storeInClientState(formID, "request-sequence-number", parseInt(currentSequenceNumber) + 1);
+                        requestDocumentString.push(indent);
+                        requestDocumentString.push('<xxforms:request-sequence-number>');
+                        requestDocumentString.push(currentSequenceNumber);
+                        requestDocumentString.push('</xxforms:request-sequence-number>\n');
 
                         // Add static state
                         var staticState = ORBEON.xforms.Globals.formStaticState[formID].value;
@@ -5878,7 +5833,7 @@ ORBEON.xforms.Server = {
                         if (sendInitialDynamicState) {
                             requestDocumentString.push(indent);
                             requestDocumentString.push('<xxforms:initial-dynamic-state>');
-                            requestDocumentString.push(xformsGetFromClientState(formID, "initial-dynamic-state"));
+                            requestDocumentString.push(ORBEON.xforms.Document.getFromClientState(formID, "initial-dynamic-state"));
                             requestDocumentString.push('</xxforms:initial-dynamic-state>\n');
                         }
 
@@ -5954,7 +5909,7 @@ ORBEON.xforms.Server = {
 
                     // Send request
                     executedRequest = true;
-                    ORBEON.xforms.Globals.requestRetries = ORBEON.util.Utils.getProperty(REQUEST_RETRIES_PROPERTY);
+                    ORBEON.xforms.Globals.requestTryCount = 0;
                     ORBEON.xforms.Globals.requestDocument = requestDocumentString.join("");
                     ORBEON.xforms.Server.asyncRequest();
                 }
@@ -5971,14 +5926,14 @@ ORBEON.xforms.Server = {
 
     asyncRequest: function() {
         try {
-            ORBEON.xforms.Globals.requestRetries--;
+            ORBEON.xforms.Globals.requestTryCount++;
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
             var callback = {
                 success: ORBEON.xforms.Server.handleResponseAjax,
                 failure: ORBEON.xforms.Server.handleFailure
             };
-            var ajaxTimeout = ORBEON.util.Utils.getProperty(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY);
+            var ajaxTimeout = ORBEON.util.Properties.delayBeforeAjaxTimeout.get();
             if (ajaxTimeout != -1)
                 callback.timeout = ajaxTimeout;
             YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback, ORBEON.xforms.Globals.requestDocument);
@@ -5988,43 +5943,46 @@ ORBEON.xforms.Server = {
         }
     },
 
+    /**
+     * Unless we get a clear indication from the server that an error occurred, we retry to send the request to
+     * the server.
+     *
+     * Browsers behaviors:
+     *
+     *      On Safari, when o.status == 0, it might not be an error. Instead, it can be happen when users click on a
+     *      link to download a file, and Safari stops the current Ajax request before it knows that new page is loaded
+     *      (vs. a file being downloaded). With the current core, we assimilate this to a communication error, and
+     *      we'll retry to send the Ajax request to the server.
+     *
+     *      On Firefox, when users navigate to another page while an Ajax request is in progress,
+     *      we receive an error here, which we don't want to display. We don't have a good way of knowing if we get
+     *      this error because there was really a communication failure or if this is because the user is
+     *      going to another page. We handle this as a communication failure, and resend the request to the server,
+     *      This  doesn't hurt as the server knows that it must not execute the request more than once.
+     *
+     */
     handleFailure: function(o) {
-        // Here when o.status == 0, it might not be an error if the UE is Safari. This might be caused by users clicking
-        // on a link to download a file, and Safari stopping the current Ajax request before it knows that new page is
-        // loaded (vs. a file being downloaded). At this point, we are not handling this situation.
 
-        if (ORBEON.xforms.Globals.requestRetries > 0) {
-            // If the request fails, we try again
-            ORBEON.xforms.Server.asyncRequest();
-        } else {
-            // We have tried this 3 times, give up.
+        if (o.responseXML && o.responseXML.documentElement && o.responseXML.documentElement.tagName.indexOf("error") != -1) {
+            // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
+            // we show an error to users.
+            //      <error>
+            //          <title>...</title>
+            //          <body>...</body>
+            //      </error>
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
             var formID = ORBEON.xforms.Globals.requestForm.id;
-
-            if (o.responseXML && o.responseXML.documentElement
-                && o.responseXML.documentElement.tagName.indexOf("error") != -1) {
-                // Extract and display error message
-                var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
-                var detailsFromBody = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]);
-                ORBEON.xforms.Server.showError(title, detailsFromBody, formID);
-            } else {
-                var detailsGeneric = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : o.statusText);
-                if (ORBEON.xforms.Globals.isRenderingEngineGecko && o.statusText == "communication failure") {
-                    // On Firefox, when the user navigates to another page while an Ajax request is in progress,
-                    // we receive an error here, which we don't want to display. We don't have a good way of knowing if we get
-                    // this error because there was really a communication failure or if this is because the user is
-                    // going to another page. So we wait some time before showing the error, hoping that if another page is
-                    // loading, that other page will be loaded by the time our timeout expires.
-                    window.setTimeout(function() {
-                        ORBEON.xforms.Server.showError("Error while processing response", detailsGeneric, formID);
-                    },
-                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY));
-                } else {
-                    // Display alert right away
-                    ORBEON.xforms.Server.showError("Error while processing response", detailsGeneric, formID);
-                }
-            }
+            var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
+            var detailsFromBody = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]);
+            ORBEON.xforms.Server.showError(title, detailsFromBody, formID);
+        } else {
+            // Retry after a certain delay which increases with the number of consecutive failed request, but which
+            // never exceeds a maximum delay.
+            var delay = Math.min(ORBEON.util.Properties.retryDelayIncrement.get() * (ORBEON.xforms.Globals.requestTryCount - 1),
+                    ORBEON.util.Properties.retryMaxDelay.get());
+            if (delay == 0) ORBEON.xforms.Server.asyncRequest();
+            else window.setTimeout(ORBEON.xforms.Server.asyncRequest, delay);
         }
     },
 
@@ -6985,7 +6943,7 @@ ORBEON.xforms.Server = {
                                     // After we update classes on textarea, copy those classes on the FCKeditor iframe
                                     if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
                                             && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")
-                                            && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "fck") {
+                                            && ORBEON.util.Properties.htmlEditor.get() == "fck") {
                                         ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
                                     }
                                 }
@@ -8255,7 +8213,7 @@ ORBEON.xforms.Offline = {
             f();
             // Hide loading indicator
             xformsDisplayIndicator("none");
-        }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+        }, ORBEON.util.Properties.internalShortDelay.get());
     }
 };
 
@@ -8308,10 +8266,10 @@ function xformsLog(object) {
         debugDiv = document.createElement("div");
         debugDiv.className = "xforms-debug";
         debugDiv.id = "xforms-debug";
-        debugDiv.style.width = ORBEON.util.Utils.getProperty(DEBUG_WINDOW_WIDTH_PROPERTY) + "px";
-        debugDiv.style.left = visibleWidth - (ORBEON.util.Utils.getProperty(DEBUG_WINDOW_WIDTH_PROPERTY) + 50) + "px";
-        debugDiv.style.height = ORBEON.util.Utils.getProperty(DEBUG_WINDOW_HEIGHT_PROPERTY) + "px";
-        debugDiv.style.top = visibleHeight - (ORBEON.util.Utils.getProperty(DEBUG_WINDOW_HEIGHT_PROPERTY) + 20) + "px";
+        debugDiv.style.width = ORBEON.util.Properties.debugWindowWidth.get() + "px";
+        debugDiv.style.left = visibleWidth - (ORBEON.util.Properties.debugWindowWidth.get() + 50) + "px";
+        debugDiv.style.height = ORBEON.util.Properties.debugWindowHeight.get() + "px";
+        debugDiv.style.top = visibleHeight - (ORBEON.util.Properties.debugWindowHeight.get() + 20) + "px";
 
         // Add "clear" button
         var clear = document.createElement("BUTTON");
@@ -8404,37 +8362,6 @@ function xformsDisplayIndicator(state, progressMessage) {
                 break;
         }
     }
-}
-
-// Gets a value stored in the hidden client-state input field
-function xformsGetFromClientState(formID, key) {
-    var clientState = ORBEON.xforms.Globals.formClientState[formID];
-    var keyValues = clientState.value.split("&");
-    for (var i = 0; i < keyValues.length; i = i + 2)
-        if (keyValues[i] == key)
-            return unescape(keyValues[i + 1]);
-    return null;
-}
-
-// Returns a value stored in the hidden client-state input field
-function xformsStoreInClientState(formID, key, value) {
-    var clientState = ORBEON.xforms.Globals.formClientState[formID];
-    var keyValues = clientState.value == "" ? new Array() : clientState.value.split("&");
-    var found = false;
-    // If we found the key, replace the value
-    for (var i = 0; i < keyValues.length; i = i + 2) {
-        if (keyValues[i] == key) {
-            keyValues[i + 1] = escape(value);
-            found = true;
-            break;
-        }
-    }
-    // If key is there already, replace it
-    if (!found) {
-        keyValues.push(key);
-        keyValues.push(escape(value));
-    }
-    clientState.value = keyValues.join("&");
 }
 
 /**

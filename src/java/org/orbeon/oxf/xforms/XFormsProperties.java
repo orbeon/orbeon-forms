@@ -96,7 +96,6 @@ public class XFormsProperties {
     private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
     private static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
     private static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
-    private static final String REQUEST_RETRIES_PROPERTY = "request-retries";
     private static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
     private static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
     private static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
@@ -116,6 +115,8 @@ public class XFormsProperties {
 
     public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
     public static final String XHTML_LAYOUT = "xhtml-layout";
+    public static final String RETRY_DELAY_INCREMENT = "retry.delay-increment";
+    public static final String RETRY_MAX_DELAY = "retry.max-delay";
 
     public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
 
@@ -217,6 +218,8 @@ public class XFormsProperties {
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
             new PropertyDefinition(XHTML_LAYOUT, XHTMLLayout.NOSPAN.toString().toLowerCase(), true),
+            new PropertyDefinition(RETRY_DELAY_INCREMENT, 5000, true),
+            new PropertyDefinition(RETRY_MAX_DELAY, 30000, true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),// dynamic
@@ -224,10 +227,9 @@ public class XFormsProperties {
             new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
             new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),
             new PropertyDefinition(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY, 5000, true),
-            new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, -1, true),
+            new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, 30000, true),
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY, 10, true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY, 500, true),
-            new PropertyDefinition(REQUEST_RETRIES_PROPERTY, 1, true),
             new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
             new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),
@@ -310,7 +312,7 @@ public class XFormsProperties {
 
     public  static Object parseProperty(String propertyName, String propertyValue) {
         assert propertyName != null && propertyValue != null;
-        
+
         final PropertyDefinition propertyDefinition = getPropertyDefinition(propertyName);
         return (propertyDefinition == null) ? null : propertyDefinition.parseProperty(propertyValue);
     }

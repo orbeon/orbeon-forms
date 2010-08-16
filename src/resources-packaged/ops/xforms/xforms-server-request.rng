@@ -24,6 +24,9 @@
             <element name="xxforms:uuid">
                 <data type="string"/>
             </element>
+            <element name="xxforms:request-sequence-number">
+                <data type="integer"/>
+            </element>
             <optional>
                 <element name="xxforms:static-state">
                     <data type="string"/>

@@ -69,7 +69,6 @@ public class XFormsStaticState {
     private DocumentWrapper documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument(), null, xpathConfiguration);
 
     private Document controlsDocument;                                      // controls document
-    private SAXStore xhtmlDocument;                                         // entire XHTML document (for noscript mode and full updates only)
 
     // Static representation of models and instances
     private LinkedHashMap<XBLBindings.Scope, List<Model>> modelsByScope = new LinkedHashMap<XBLBindings.Scope, List<Model>>();
@@ -134,12 +133,11 @@ public class XFormsStaticState {
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
      * @param digest                digest of the static state document
      * @param metadata              metadata or null if not available
-     * @param annotatedDocument     SAXStore containing the XHTML for noscript mode, null if not available
      */
-    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata, SAXStore annotatedDocument) {
+    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata) {
         // Set XPath configuration
         propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
-        initialize(propertyContext, staticStateDocument, digest, metadata, annotatedDocument, null);
+        initialize(propertyContext, staticStateDocument, digest, metadata, null);
     }
 
     /**
@@ -159,7 +157,7 @@ public class XFormsStaticState {
         final Document staticStateDocument = XFormsUtils.decodeXML(propertyContext, encodedStaticState);
 
         // Initialize
-        initialize(propertyContext, staticStateDocument, staticStateDigest, null, null, encodedStaticState);
+        initialize(propertyContext, staticStateDocument, staticStateDigest, null, encodedStaticState);
 
         assert (staticStateDigest != null) && isServerStateHandling() || (staticStateDigest == null) && isClientStateHandling();
     }
@@ -186,23 +184,21 @@ public class XFormsStaticState {
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
      * @param digest                digest of the static state document
      * @param metadata              metadata or null if not available
-     * @param xhtmlDocument         SAXStore containing the XHTML for noscript mode, null if not available
      * @param encodedStaticState    existing serialization of static state, null if not available
      */
-    private void initialize(PropertyContext propertyContext, Document staticStateDocument, String digest,
-                            Metadata metadata, SAXStore xhtmlDocument, String encodedStaticState) {
+    private void initialize(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata, String encodedStaticState) {
 
         // Remember digest
         this.digest = digest;
 
         // Extract static state
-        extract(propertyContext, staticStateDocument, metadata, xhtmlDocument, encodedStaticState);
+        extract(propertyContext, staticStateDocument, metadata, encodedStaticState);
 
         // Analyze
         analyze(propertyContext);
     }
 
-    private void extract(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, SAXStore xhtmlDocument, String encodedStaticState) {
+    private void extract(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, String encodedStaticState) {
 
         indentedLogger.startHandleOperation("", "extracting static state");
 
@@ -219,7 +215,6 @@ public class XFormsStaticState {
         }
 
         // Recompute namespace mappings if needed
-        final Element htmlElement = staticStateElement.element(XMLConstants.XHTML_HTML_QNAME);
         if (metadata == null) {
             final IdGenerator idGenerator;
             {
@@ -232,24 +227,9 @@ public class XFormsStaticState {
             }
             this.metadata = new Metadata(idGenerator);
             try {
-//                if (xhtmlDocument == null) {
                 // Recompute from staticStateDocument
                 // TODO: Can there be in this case a nested xhtml:html element, thereby causing duplicate id exceptions?
-
-                // Detach xhtml element as models and controls are enough to produce namespaces map
-                if (htmlElement != null)
-                    htmlElement.detach();
-                // Compute namespaces map
                 TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument), new XFormsAnnotatorContentHandler(this.metadata));
-                // Re-attach xhtml element
-                if (htmlElement != null)
-                    staticStateElement.add(htmlElement);
-//                } else {
-//                    // Recompute from xhtmlDocument
-//                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//                    identity.setResult(new SAXResult(new XFormsAnnotatorContentHandler(namespacesMap)));
-//                    xhtmlDocument.replay(identity);
-//                }
             } catch (Exception e) {
                 throw new OXFException(e);
             }
@@ -266,29 +246,6 @@ public class XFormsStaticState {
 
         // Extract controls, models and components documents
         extractControlsModelsComponents(propertyContext, staticStateElement, topLevelModelsElements);
-
-        // Extract XHTML if present and requested
-        {
-            if (xhtmlDocument == null && htmlElement != null) {
-                // Get from static state document if available there
-                final Document htmlDocument = Dom4jUtils.createDocument();
-                htmlDocument.setRootElement((Element) htmlElement.detach());
-                this.xhtmlDocument = TransformerUtils.dom4jToSAXStore(htmlDocument);
-            } else if (isNoscript()) {
-                // Use provided SAXStore ONLY if noscript mode is requested
-                this.xhtmlDocument = xhtmlDocument;
-            } else if (this.metadata.hasTopLevelMarks()) {
-                // Keep XHTML if we have top-level marks
-                this.xhtmlDocument = xhtmlDocument;
-            } else {
-                // Otherwise there is no need to keep XHTML
-                this.xhtmlDocument = null;
-            }
-
-            if (this.xhtmlDocument != null && indentedLogger.isDebugEnabled()) {
-                indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.xhtmlDocument.getApproximateSize()));
-            }
-        }
 
         if (encodedStaticState != null) {
             // Static state is fully initialized
@@ -573,21 +530,6 @@ public class XFormsStaticState {
     public String getEncodedStaticState(PropertyContext propertyContext) {
 
         if (!encodedStaticStateAvailable) {
-
-            final Element rootElement = staticStateDocument.getRootElement();
-
-            if (rootElement.element("instances") != null)
-                throw new IllegalStateException("Element instances already present in static state.");
-
-            // TODO: if staticStateDocument will contains XHTML document, don't store controls and models in there
-
-            // Handle XHTML document if needed (for noscript mode)
-            if (xhtmlDocument != null && rootElement.element(XMLConstants.XHTML_HTML_QNAME) == null) {
-                // Add document
-                final Document document = TransformerUtils.saxStoreToDom4jDocument(xhtmlDocument);
-                staticStateDocument.getRootElement().add(document.getRootElement().detach());
-            }
-
             // Remember encoded state and discard Document
             encodedStaticState = XFormsUtils.encodeXML(propertyContext, staticStateDocument, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
 
@@ -641,15 +583,6 @@ public class XFormsStaticState {
 
             propertiesRead = true;
         }
-    }
-
-    /**
-     * Return the complete XHTML document if available. Only for noscript mode.
-     *
-     * @return  SAXStore containing XHTML document
-     */
-    public SAXStore getXHTMLDocument() {
-        return xhtmlDocument;
     }
 
     public Document getControlsDocument() {

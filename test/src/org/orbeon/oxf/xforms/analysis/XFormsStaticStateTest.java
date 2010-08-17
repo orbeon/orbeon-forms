@@ -366,15 +366,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
         final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
-        final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata));
+        final SAXStore annotatedTemplate = new SAXStore();
 
         // Read the input through the annotator and gather namespace mappings
-        XMLUtils.urlToSAX(documentURL, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata), false, false, false);
+        XMLUtils.urlToSAX(documentURL, new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata),
+                    externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata),
+                        false, false, false);
 
         final String digest = NumberUtils.toHexString(digestContentHandler.getResult());
 
         // Get static state document and create static state object
         final Document staticStateDocument = documentResult.getDocument();
-        return new XFormsStaticState(pipelineContext, staticStateDocument, digest, metadata, annotatedSAXStore);
+        return new XFormsStaticState(pipelineContext, staticStateDocument, digest, metadata);
     }
 }

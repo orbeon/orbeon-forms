@@ -37,7 +37,7 @@ import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.Item;
@@ -135,6 +135,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private String helpEffectiveControlId;
     private List<DelayedEvent> delayedEvents;
 
+    // Annotated page template for noscript and full updates mode
+    // NOTE: We used to keep this in the static state, but the static state must now not depend on external HTML anymore
+    private SAXStore annotatedTemplate;
+
 //    private boolean goingOffline;
 
     private final XPathDependencies xpathDependencies;
@@ -155,7 +159,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, XFormsURIResolver uriResolver) {
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, SAXStore annotatedTemplate, XFormsURIResolver uriResolver) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
         // Remember location data
@@ -174,6 +178,24 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         {
             // Remember static state
             this.xformsStaticState = xformsStaticState;
+
+            // Remember annotated page template if needed based on static state information
+            {
+                if (xformsStaticState.isNoscript()) {
+                    // Use provided template SAXStore if noscript mode is requested
+                    this.annotatedTemplate = annotatedTemplate;
+                } else if (xformsStaticState.getMetadata().hasTopLevelMarks()) {
+                    // Use provided template SAXStore if we have top-level marks
+                    this.annotatedTemplate = annotatedTemplate;
+                } else {
+                    // Otherwise there is no need to keep the template
+                    this.annotatedTemplate = null;
+                }
+
+                if (this.annotatedTemplate != null && indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.annotatedTemplate.getApproximateSize()));
+                }
+            }
 
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
@@ -367,6 +389,15 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public final XPathDependencies getXPathDependencies() {
         return xpathDependencies;
+    }
+
+    /**
+     * Return the annotated page template if available. Only for noscript mode and full updates.
+     *
+     * @return  SAXStore containing annotated page template or null
+     */
+    public SAXStore getAnnotatedTemplate() {
+        return annotatedTemplate;
     }
 
     /**
@@ -1311,11 +1342,18 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             // Serialize controls
             xformsControls.serializeControls(dynamicStateElement);
+
+            // Serialize annotated page template if present
+            if (annotatedTemplate != null) {
+                final Element templateElement = dynamicStateElement.addElement("template");
+                final Document document = TransformerUtils.saxStoreToDom4jDocument(annotatedTemplate);
+                templateElement.add(document.getRootElement().detach());
+            }
         }
         indentedLogger.endHandleOperation();
 
-        // XXX DEBUG
-//        System.out.println("SERIALIZE: " + Dom4jUtils.domToPrettyString(dynamicStateDocument));
+        // DEBUG
+//        System.out.println("XXX SERIALIZE: " + Dom4jUtils.domToPrettyString(dynamicStateDocument));
 
         return dynamicStateDocument;
     }
@@ -1332,8 +1370,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Get dynamic state document
         final Element dynamicStateElement = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState).getRootElement();
 
-        // XXX DEBUG
-//        System.out.println("RESTORE: " + Dom4jUtils.domToPrettyString(dynamicStateDocument));
+        // DEBUG
+//        System.out.println("XXX RESTORE: " + Dom4jUtils.domToPrettyString(dynamicStateElement.getDocument()));
 
         // Restore UUIDs
 
@@ -1364,8 +1402,18 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 final List<Element> matchersElements = Dom4jUtils.elements(matchersElement, "matcher");
                 this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
                 for (final Element currentMatcherElement: matchersElements) {
-                    versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
+                    this.versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
                 }
+            }
+        }
+
+        // Restore annotated page template if present
+        {
+            final Element templateElement = dynamicStateElement.element("template");
+            if (templateElement != null) {
+                final Document templateDocument = Dom4jUtils.createDocument();
+                templateDocument.setRootElement((Element) ((Element) templateElement.elements().get(0)).detach());
+                this.annotatedTemplate = TransformerUtils.dom4jToSAXStore(templateDocument);
             }
         }
 

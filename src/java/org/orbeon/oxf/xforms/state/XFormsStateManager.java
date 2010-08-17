@@ -167,7 +167,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     }
 
     private void cacheOrStore(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean isInitialState) {
-        if (containingDocument.getStaticState().isCacheDocument()) {
+        if (XFormsDocumentCache.instance().isEnabled(containingDocument.getStaticState())) {
             // Cache the document
             indentedLogger.logDebug(LOG_TYPE, "Document cache enabled. Storing document in cache.");
             XFormsDocumentCache.instance().storeDocument(propertyContext, containingDocument);
@@ -425,7 +425,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param containingDocument    containing document
      */
     public void onUpdateError(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
-        if (containingDocument.getStaticState().isCacheDocument()) {
+        if (XFormsDocumentCache.instance().isEnabled(containingDocument.getStaticState())) {
             // Remove document from the cache
             indentedLogger.logDebug(LOG_TYPE, "Document cache enabled. Removing document from cache following error.");
             XFormsDocumentCache.instance().removeDocument(propertyContext, containingDocument);

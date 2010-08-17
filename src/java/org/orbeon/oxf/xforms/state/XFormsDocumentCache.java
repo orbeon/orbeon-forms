@@ -17,6 +17,7 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsStaticState;
 
 /**
  * This cache stores mappings XFormsState -> XFormsContainingDocument into a global cache.
@@ -38,6 +39,16 @@ public class XFormsDocumentCache {
     private final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
 
     private XFormsDocumentCache() {}
+
+    /**
+     * Whether the cache is enabled for this static state.
+     *
+     * @param staticState   static state to check
+     * @return              true if cache enabled
+     */
+    public boolean isEnabled(XFormsStaticState staticState) {
+        return staticState.isCacheDocument() && cache.getMaxSize() > 0;
+    }
 
     /**
      * Add a document to the cache using the document's UUID as cache key.

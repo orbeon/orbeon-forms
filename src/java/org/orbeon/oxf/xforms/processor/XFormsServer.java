@@ -668,7 +668,7 @@ public class XFormsServer extends ProcessorImpl {
             XMLUtils.streamNullDocument(xmlReceiver);
         } else {
             // Response will be Ajax response or XHTML document
-            final SAXStore xhtmlDocument = containingDocument.getStaticState().getXHTMLDocument();
+            final SAXStore xhtmlDocument = containingDocument.getAnnotatedTemplate();
             if (xhtmlDocument == null)
                 throw new OXFException("Missing XHTML document in static state for noscript mode.");// shouldn't happen!
 

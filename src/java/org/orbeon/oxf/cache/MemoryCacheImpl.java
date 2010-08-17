@@ -187,6 +187,10 @@ public class MemoryCacheImpl implements Cache {
         return keyToEntryMap.get(key);
     }
 
+    public int getMaxSize() {
+        return maxSize;
+    }
+
     public synchronized void setMaxSize(PropertyContext propertyContext, int maxSize) {
         if (maxSize != this.maxSize) {
             // Decrease size if necessary

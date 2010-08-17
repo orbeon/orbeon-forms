@@ -155,7 +155,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput,
                                 pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
-                        containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState[0], uriResolver);
+                        containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver);
 
                         // Gather set caching dependencies
                         gatherInputDependencies(pipelineContext, containingDocument[0], indentedLogger, stage1CacheableState);
@@ -192,7 +192,9 @@ public class XFormsToXHTML extends ProcessorImpl {
                     } else {
                         // Not found static state in cache, create static state from input
                         indentedLogger.logDebug("", "did not find static state by digest in cache");
-                        staticState = readStaticState(pipelineContext, externalContext, indentedLogger, stage2CacheableState.getStaticStateDigest());
+
+                        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, externalContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
+                        staticState = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
 
                         // Store in cache
                         XFormsStaticStateCache.instance().storeDocument(pipelineContext, staticState);
@@ -200,7 +202,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
 
                 final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
-                containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState, uriResolver);
+                containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver);
             } else {
                 assert !cachedStatus[0];
                 indentedLogger.logDebug("", "annotated document and static state digest not obtained from cache.");
@@ -209,7 +211,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Output resulting document
             if (outputName.equals("document")) {
                 // Normal case where we output XHTML
-                outputResponseDocument(pipelineContext, externalContext, indentedLogger, stage2CacheableState.getAnnotatedSAXStore(),
+                outputResponseDocument(pipelineContext, externalContext, indentedLogger, stage2CacheableState.getAnnotatedTemplate(),
                         containingDocument[0], xmlReceiver);
             } else {
                 // Output in test mode
@@ -238,8 +240,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             } else {
                 // Not found in cache, create and initialize static state object
                 indentedLogger.logDebug("", "did not find static state by digest in cache");
-                staticState[0] = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, staticStateBits.staticStateDigest,
-                        staticStateBits.metadata, staticStateBits.annotatedSAXStore);
+                staticState[0] = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
 
                 // Store in cache
                 XFormsStaticStateCache.instance().storeDocument(pipelineContext, staticState[0]);
@@ -247,20 +248,16 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
 
         // Update input dependencies object
-        return new Stage2CacheableState(staticStateBits.annotatedSAXStore, staticStateBits.staticStateDigest);
-    }
-
-    private XFormsStaticState readStaticState(PipelineContext pipelineContext, ExternalContext externalContext, IndentedLogger indentedLogger, String staticStateDigest) {
-        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, externalContext, indentedLogger,  staticStateDigest);
-        return new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, staticStateDigest, staticStateBits.metadata, staticStateBits.annotatedSAXStore);
+        return new Stage2CacheableState(staticStateBits.annotatedTemplate, staticStateBits.staticStateDigest);
     }
 
     private class StaticStateBits {
 
         private static final boolean DEBUG = false;
 
-        public final XFormsStaticState.Metadata metadata;
-        public final SAXStore annotatedSAXStore;
+        public final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
+        public final SAXStore annotatedTemplate = new SAXStore();
+
         public final Document staticStateDocument;
         public final String staticStateDigest;
 
@@ -274,22 +271,33 @@ public class XFormsToXHTML extends ProcessorImpl {
             final LocationDocumentResult documentResult = new LocationDocumentResult();
             documentReceiver.setResult(documentResult);
 
-            this.metadata = new XFormsStaticState.Metadata();
-
-            final XMLUtils.DigestContentHandler digestContentHandler = computeDigest ? new XMLUtils.DigestContentHandler("MD5") : null;
-            final XMLReceiver outputReceiver;
+            final XMLUtils.DigestContentHandler digestReceiver = computeDigest ? new XMLUtils.DigestContentHandler("MD5") : null;
+            final XMLReceiver extractorOutput;
             if (DEBUG) {
-                outputReceiver = computeDigest ? new TeeXMLReceiver(documentReceiver, digestContentHandler, getDebugReceiver()) : new TeeXMLReceiver(documentReceiver, getDebugReceiver());
+                extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver, getDebugReceiver()) : new TeeXMLReceiver(documentReceiver, getDebugReceiver());
             } else {
-                outputReceiver = computeDigest ? new TeeXMLReceiver(documentReceiver, digestContentHandler) : documentReceiver;
+                extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver) : documentReceiver;
             }
-            this.annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(outputReceiver, metadata));
 
             // Read the input through the annotator and gather namespace mappings
-            readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata));
+            //
+            // Output of annotator is:
+            //
+            // o annotated page template (TODO: this should not include model elements)
+            // o extractor
+            //
+            // Output of extractor is:
+            //
+            // o static state document
+            // o optionally: digest
+            // o optionally: debug output
+            //
+            readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,
+                    new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(extractorOutput, metadata),
+                            externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata));
 
             this.staticStateDocument = documentResult.getDocument();
-            this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestContentHandler.getResult()) : null;
+            this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestReceiver.getResult()) : null;
 
             assert !DEBUG || existingStaticStateDigest == null || this.staticStateDigest.equals(existingStaticStateDigest);
 
@@ -309,16 +317,16 @@ public class XFormsToXHTML extends ProcessorImpl {
     // What can be cached by the second stage: SAXStore and static state
     private static class Stage2CacheableState extends URIProcessorOutputImpl.URIReferences {
 
-        private final SAXStore annotatedSAXStore;
+        private final SAXStore annotatedTemplate;
         private final String staticStateDigest;
 
-        public Stage2CacheableState(SAXStore annotatedSAXStore, String staticStateDigest) {
-            this.annotatedSAXStore = annotatedSAXStore;
+        public Stage2CacheableState(SAXStore annotatedTemplate, String staticStateDigest) {
+            this.annotatedTemplate = annotatedTemplate;
             this.staticStateDigest = staticStateDigest;
         }
 
-        public SAXStore getAnnotatedSAXStore() {
-            return annotatedSAXStore;
+        public SAXStore getAnnotatedTemplate() {
+            return annotatedTemplate;
         }
 
         public String getStaticStateDigest() {

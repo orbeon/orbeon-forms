@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -19,10 +19,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an item (xforms:item, xforms:choice, or item in itemset).
@@ -40,6 +37,14 @@ public class Item implements ItemContainer {
     private List<Item> children;
 
     public Item(boolean isMultiple, boolean isEncryptValue, Map<String, String> attributes, String label, String value) {
+
+        // NOTE: As of 2010-08-18, label can be null in these cases:
+        //
+        // o xforms:choice with (see XFormsUtils.getElementValue())
+        //   o single-node binding that doesn't point to an acceptable item
+        //   o value attribute but the evaluation context is empty
+        //   o exception when dereferencing an @src attribute
+        // o xforms|input:xxforms-type(xs:boolean)
 
         // Value is encrypted if requested, except with single selection if the value
         this.isEncryptValue = isEncryptValue && (isMultiple || StringUtils.isNotEmpty(value));

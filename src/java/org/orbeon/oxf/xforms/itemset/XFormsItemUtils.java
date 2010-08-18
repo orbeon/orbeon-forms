@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.itemset;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
@@ -132,7 +133,7 @@ public class XFormsItemUtils {
                     final String value = getValueValue(element.element(XFormsConstants.VALUE_QNAME));
 
                     final Map<String, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
@@ -207,7 +208,7 @@ public class XFormsItemUtils {
                                             // a leaf item, so we prune such non-relevant items later.
 
                                             final Map<String, String> attributes = getAttributes(element);
-                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value));
+                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), value));
                                         } else {
                                             // TODO: handle xforms:copy
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -229,7 +230,9 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
+                        final String label = getLabelValue(labelElement);
+
+                        // NOTE: returned label can be null in some cases
 
                         final Map<String, String> attributes = getAttributes(element);
                         final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
@@ -395,7 +398,7 @@ public class XFormsItemUtils {
                     final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
 
                     final Map<String, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
@@ -407,7 +410,9 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.LABEL_QNAME), false, null);
+                        final String label = XFormsUtils.getStaticChildElementValue(labelElement, false, null);
+
+                        assert label != null;
 
                         final Map<String, String> attributes = getAttributes(element);
                         final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);

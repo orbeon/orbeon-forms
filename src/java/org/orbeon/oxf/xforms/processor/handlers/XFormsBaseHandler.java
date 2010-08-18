@@ -538,10 +538,10 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
-                                         String forEffectiveId, LHHAC lhha, String elementName, String value,
+                                         String forEffectiveId, LHHAC lhha, String elementName, String labelValue,
                                          boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
         outputLabelForStart(handlerContext, attributes, controlEffectiveId, forEffectiveId, lhha, elementName, addIds);
-        outputLabelForEnd(handlerContext, elementName, value, mustOutputHTMLFragment);
+        outputLabelForEnd(handlerContext, elementName, labelValue, mustOutputHTMLFragment);
     }
 
     protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
@@ -568,18 +568,18 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttribute);
     }
 
-    protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName, String value, boolean mustOutputHTMLFragment) throws SAXException {
+    protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName, String labelValue, boolean mustOutputHTMLFragment) throws SAXException {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         // Only output content when there value is non-empty
-        if (value != null && !value.equals("")) {
+        if (labelValue != null && !labelValue.equals("")) {
             if (mustOutputHTMLFragment) {
-                XFormsUtils.streamHTMLFragment(xmlReceiver, value, null, xhtmlPrefix);
+                XFormsUtils.streamHTMLFragment(xmlReceiver, labelValue, null, xhtmlPrefix);
             } else {
-                xmlReceiver.characters(value.toCharArray(), 0, value.length());
+                xmlReceiver.characters(labelValue.toCharArray(), 0, labelValue.length());
             }
         }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);

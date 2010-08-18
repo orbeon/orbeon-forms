@@ -428,7 +428,7 @@ public class XFormsUtils {
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
-     * @return                      string containing the result of the evaluation, null if evaluation failed
+     * @return                      string containing the result of the evaluation, null if evaluation failed (see comments)
      */
     public static String getElementValue(final PropertyContext propertyContext, final XBLContainer container,
                                          final XFormsContextStack contextStack, final String sourceEffectiveId,
@@ -450,8 +450,10 @@ public class XFormsUtils {
                 final String tempResult = XFormsUtils.getBoundItemValue(boundItem);
                 if (tempResult != null) {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
-                } else
+                } else {
+                    // There is a single-node binding but it doesn't point to an acceptable item
                     return null;
+                }
             }
         }
 
@@ -474,6 +476,7 @@ public class XFormsUtils {
 
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
+                    // There is a value attribute but the evaluation context is empty
                     return null;
                 }
             }
@@ -496,6 +499,7 @@ public class XFormsUtils {
                     final XFormsModel currentModel = currentBindingContext.model;
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
                     currentModel.getXBLContainer(null).dispatchEvent(propertyContext, new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
+                    // Exception when dereferencing the linking attribute
                     return null;
                 }
             }

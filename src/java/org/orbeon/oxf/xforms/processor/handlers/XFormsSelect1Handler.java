@@ -17,23 +17,14 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
-import org.orbeon.oxf.xforms.itemset.Item;
-import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.itemset.ItemsetListener;
-import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xforms.itemset.*;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Iterator;
@@ -520,10 +511,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         addItemAttributes(item, spanAttributes);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
-        final boolean testSpanAroundInput = true;
-
         {
-            if (testSpanAroundInput) {
+            final String itemLabel = item.getLabel();
+            if (itemLabel != null) { // null only for xforms|input:xxforms-type(xs:boolean)
                 reusableAttributes.clear();
                 outputLabelForStart(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", false);
             }
@@ -559,16 +549,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }
 
-            if (testSpanAroundInput) {
-                final String label = item.getLabel();
-                outputLabelForEnd(handlerContext, "label", label, false);// TODO: may be HTML for full appearance
-            } else {
-                // We don't output the label within <input></input>, because XHTML won't display it.
-                final String label = item.getLabel();
-                if (label != null) { // allow null label to tell not to output the <label> element at all
-                    reusableAttributes.clear();
-                    outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", label, false, false);// TODO: may be HTML for full appearance
-                }
+            if (itemLabel != null) { // null only for xforms|input:xxforms-type(xs:boolean)
+                outputLabelForEnd(handlerContext, "label", itemLabel, false);// TODO: may be HTML for full appearance
             }
         }
 

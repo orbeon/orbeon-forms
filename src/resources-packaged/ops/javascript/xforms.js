@@ -6726,12 +6726,17 @@ ORBEON.xforms.Server = {
                                             return newInputElement;
                                         }
 
+                                        var inputLabelElement = ORBEON.xforms.Controls._getControlLHHA(documentElement, "label");
                                         if (isStringType) {
-                                            insertIntoDocument([createInput("xforms-type-string", 1)]);
+                                            var newStringInput = createInput("xforms-type-string", 1);
+                                            insertIntoDocument([newStringInput]);
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
+                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
                                         } else if (isDateType && !isMinimal) {
-                                            insertIntoDocument([createInput("xforms-type-date", 1)]);
+                                            var newDateInput = createInput("xforms-type-date", 1);
+                                            insertIntoDocument([newDateInput]);
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newDateInput.id;
                                         } else if (isDateType && isMinimal) {
                                             // Create image element
                                             var image = document.createElement("img");
@@ -6739,12 +6744,17 @@ ORBEON.xforms.Server = {
                                             image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
                                             insertIntoDocument([image]);
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                            if (inputLabelElement != null) inputLabelElement.htmlFor = documentElement.id;
                                         } else if (isTimeType) {
-                                            insertIntoDocument([createInput("xforms-type-time", 1)]);
+                                            var newTimeInput = createInput("xforms-type-time", 1);
+                                            insertIntoDocument([newTimeInput]);
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
+                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newTimeInput.id;
                                         } else if (isDateTimeType) {
-                                            insertIntoDocument([createInput("xforms-type-date", 1), createInput("xforms-type-time", 2)]);
+                                            var newDateTimeInput = createInput("xforms-type-date", 1);
+                                            insertIntoDocument([newDateTimeInput, createInput("xforms-type-time", 2)]);
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
+                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newDateTimeInput.id;
                                         } else if (isBooleanType) {
 
                                             // Make copy of the template
@@ -6753,9 +6763,11 @@ ORBEON.xforms.Server = {
                                             var booleanTemplateClone = booleanTemplate.cloneNode(true);
 
                                             // Remove the label we have in the template for each individual checkbox/radio button
-                                            // Do this because the checkbox label is actually not used
+                                            // Do this because the checkbox label is actually not used, instead the control label is used
                                             var templateLabelElement = booleanTemplateClone.getElementsByTagName("label")[0];
-                                            ORBEON.util.Utils.stringReplace(templateLabelElement, "$xforms-template-label$", "");
+                                            var templateInputElement = booleanTemplateClone.getElementsByTagName("input")[0];
+                                            // Move <input> at level of <label> and get rid of label
+                                            templateLabelElement.parentNode.replaceChild(templateInputElement, templateLabelElement);
 
                                             // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
                                             var booleanInput = ORBEON.util.Dom.getElementByTagName(booleanTemplateClone, "input");
@@ -6772,6 +6784,8 @@ ORBEON.xforms.Server = {
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
+
+                                            if (inputLabelElement != null) inputLabelElement.htmlFor = booleanEffectiveId;
                                         }
                                     } else if (type != null) {
                                         // Type has changed for any control but xforms:input

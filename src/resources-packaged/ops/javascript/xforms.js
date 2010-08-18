@@ -4390,8 +4390,8 @@ ORBEON.widgets.RTE = function() {
             // Create RTE object
             var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("textarea")[0] : control;
-            // Make sure that textarea is not disabled, otherwise RTE renders it in read-only mode
-            textarea.disabled = false;
+            // Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
+            textarea.disabled = ORBEON.util.Dom.hasClass(control, "xforms-readonly");
             var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
 
             // Register event listener for user interacting with the control

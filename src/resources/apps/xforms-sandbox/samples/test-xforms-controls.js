@@ -330,8 +330,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                     monthYear = YAHOO.util.Dom.getElementsByClassName("calnav", null, "orbeon-calendar-div")[0];
                     YAHOO.util.Assert.areEqual("October 2029", monthYear.innerHTML);
                     YAHOO.util.UserAction.click(document.body);
-                }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
-            }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+                }, ORBEON.util.Properties.internalShortDelay.get());
+            }, ORBEON.util.Properties.internalShortDelay.get());
         });
 
     }

@@ -53,7 +53,7 @@
                                 top.YAHOO.log("Setting confirm value after short delay", "info", "TestCase");
                                 ORBEON.xforms.Events.focus({ target: confirmInput });
                                 confirmInput.value = "b";
-                            }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
+                            }, ORBEON.util.Properties.internalShortDelay.get());
                         }, function() {
                             top.YAHOO.log("Checking result on Ajax response", "info", "TestCase");
                             YAHOO.util.Assert.areEqual("b", ORBEON.xforms.Document.getValue("confirm"));

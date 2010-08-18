@@ -16,7 +16,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                     });
                 });
             });
-        }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
+        }, ORBEON.util.Properties.internalShortDelay.get());
         testCase.wait();
     },
 

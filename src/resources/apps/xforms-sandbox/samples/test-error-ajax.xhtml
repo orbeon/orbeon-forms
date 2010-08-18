@@ -39,7 +39,7 @@
                     name: "AJAX error",
 					listenerInvoked: null,
 					testType: null,
-					initialShowDialogValue: opsXFormsProperties[SHOW_ERROR_DIALOG_PROPERTY],
+					initialShowDialogValue: ORBEON.util.Properties.showErrorDialog.get(),
 
 					myErrorListener: function(eventName, eventData) {
 						// Handler here.
@@ -47,7 +47,7 @@
 						listenerInvoked = "set";
 					},
 					setProperties: function() {
-						opsXFormsProperties[SHOW_ERROR_DIALOG_PROPERTY] = (((this.testType % 2) == 0) ? "true" : "false");
+						ORBEON.util.Properties.showErrorDialog.get() = (((this.testType % 2) == 0) ? "true" : "false");
 						if ((this.testType % 4) < 2) {
 							ORBEON.xforms.Events.errorEvent.subscribe(this.myErrorListener);
 						}

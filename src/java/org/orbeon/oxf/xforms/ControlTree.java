@@ -20,9 +20,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.*;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
+import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -122,14 +120,19 @@ public class ControlTree implements ExternalCopyable {
         }
 
         // Evaluate all controls
-        ControlIndex.evaluateAll(indentedLogger, propertyContext, controlIndex.getEffectiveIdsToControls().values());
-
+        final Collection<XFormsControl> allControls = controlIndex.getEffectiveIdsToControls().values();
+        ControlIndex.evaluateAll(indentedLogger, propertyContext, allControls);
 
         // Dispatch initialization events for all controls created in index
         if (!containingDocument.isRestoringDynamicState(propertyContext)) {
             // Copy list because it can be modified concurrently as events are being dispatched and handled
             final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
             dispatchRefreshEvents(propertyContext, controlsEffectiveIds);
+        } else {
+            // Make sure all controls state such as relevance, value changed, etc. does not mark a difference
+            for (final XFormsControl control: allControls) {
+                control.commitCurrentUIState();
+            }
         }
 
         indentedLogger.endHandleOperation(
@@ -176,16 +179,8 @@ public class ControlTree implements ExternalCopyable {
                 final XBLContainer container = control.getXBLContainer();
                 final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
-                // Commit current control properties
-                control.wasRelevant();
-                control.getPreviousEffectiveId();
-                if (control instanceof XFormsSingleNodeControl) {
-                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    singleNodeControl.isValueChanged();
-                    singleNodeControl.wasRequired();
-                    singleNodeControl.wasReadonly();
-                    singleNodeControl.wasValid();
-                }
+                // Commit current control state
+                control.commitCurrentUIState();
 
                 // Dispatch xforms-enabled if needed
                 if (isAllowSendingRelevantEvents) {

@@ -121,6 +121,16 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         this.customMIPsAsString = null;
     }
 
+    @Override
+    public void commitCurrentUIState() {
+        super.commitCurrentUIState();
+
+        isValueChanged();
+        wasRequired();
+        wasReadonly();
+        wasValid();
+    }
+
     /**
      * Return the item (usually a node) to which the control is bound, if any. If the control is not bound to any item,
      * return null.

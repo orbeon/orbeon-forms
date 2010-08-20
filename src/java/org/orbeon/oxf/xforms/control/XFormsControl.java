@@ -230,6 +230,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return result;
     }
 
+    public void commitCurrentUIState() {
+        wasRelevant();
+        getPreviousEffectiveId();
+    }
+
     public boolean supportsRefreshEvents() {
         // TODO: should probably return true because most controls could then dispatch relevance events
         return false;

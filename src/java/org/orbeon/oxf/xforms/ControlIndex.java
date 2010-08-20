@@ -16,15 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.controls.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ControlIndex {
 
@@ -113,13 +107,13 @@ public class ControlIndex {
      *
      * @param indentedLogger            logger
      * @param propertyContext           current context
-     * @param effectiveIdsToControls    controls to evaluate
+     * @param controls                  controls to evaluate
      */
-    public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> effectiveIdsToControls) {
+    public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> controls) {
         indentedLogger.startHandleOperation("controls", "evaluating");
         // Evaluate all controls
-        for (final XFormsControl currentControl: effectiveIdsToControls) {
-            currentControl.evaluate(propertyContext);
+        for (final XFormsControl control: controls) {
+            control.evaluate(propertyContext);
         }
         indentedLogger.endHandleOperation();
     }

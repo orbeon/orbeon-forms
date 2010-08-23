@@ -66,7 +66,7 @@ public class XXFormsInstance extends XFormsFunction {
 
     @Override
     public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
-        // TODO: if argument[0] is true, must search globally
+        // TODO: if argument[1] is true, must search globally
         argument[0].addToPathMap(pathMap, pathMapNodeSet);
         return new PathMap.PathMapNodeSet(pathMap.makeNewRoot(this));
     }

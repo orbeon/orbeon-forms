@@ -613,7 +613,7 @@ public class XFormsModelBinds {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
             final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-            XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
+            XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
         }
     }
 
@@ -623,7 +623,7 @@ public class XFormsModelBinds {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
             final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-            XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
+            XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
         }
     }
 

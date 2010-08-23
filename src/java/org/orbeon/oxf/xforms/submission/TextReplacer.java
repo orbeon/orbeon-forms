@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
@@ -95,7 +93,7 @@ public class TextReplacer extends BaseReplacer {
 
         // Set value into the instance
         // NOTE: Here we decided to use the actions logger, by compatibility with xforms:setvalue. Anything we would like to log in "submission" mode?
-        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY), submission, destinationNodeInfo, responseBody, null, false);
+        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY), submission, destinationNodeInfo, responseBody, null, "submission", false);
 
         // Dispatch xforms-submit-done
         return dispatchSubmitDone(propertyContext, connectionResult);

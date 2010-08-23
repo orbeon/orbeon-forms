@@ -16,14 +16,10 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -76,7 +72,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             // have either a single non-empty text node child, or no children string was empty.
 
             // Node exists, we can try to set the value
-            doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, false);
+            doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, "setvalue", false);
         } else {
             // Node doesn't exist, don't do anything
             // NOP
@@ -91,14 +87,14 @@ public class XFormsSetvalueAction extends XFormsAction {
 
     public static boolean doSetValue(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
                                      IndentedLogger indentedLogger, XFormsEventTarget eventTarget, NodeInfo currentNode,
-                                     String valueToSet, String type, boolean isCalculate) {
+                                     String valueToSet, String type, String source, boolean isCalculate) {
 
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         final boolean changed = !currentValue.equals(valueToSet);
 
         if (indentedLogger.isDebugEnabled()) {
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-            indentedLogger.logDebug("xforms:setvalue", "setting instance value", "value", valueToSet,
+            indentedLogger.logDebug("xforms:setvalue", "setting instance value", "source", source, "value", valueToSet,
                     "changed", Boolean.toString(changed),
                     "instance", (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : "N/A");
         }

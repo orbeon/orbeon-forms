@@ -19,18 +19,11 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.ExternalCopyable;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -502,7 +495,7 @@ class FileInfo implements ExternalCopyable {
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
             XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
-                    control, (NodeInfo) currentSingleItem, value, null, false);
+                    control, (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
             contextStack.popBinding();
         }
     }

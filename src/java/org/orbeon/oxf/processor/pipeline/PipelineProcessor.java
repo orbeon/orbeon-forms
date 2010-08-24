@@ -17,15 +17,12 @@ import org.dom4j.*;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.debugger.api.Breakpoint;
-import org.orbeon.oxf.debugger.api.BreakpointKey;
-import org.orbeon.oxf.debugger.api.Debuggable;
+import org.orbeon.oxf.debugger.api.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.choose.AbstractChooseProcessor;
 import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
@@ -34,9 +31,7 @@ import org.orbeon.oxf.processor.pipeline.foreach.ConcreteForEachProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -560,7 +555,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     /**
      * "Artificial" output sitting at the "top" of the pipeline to which the "top processors" are connected.
      */
-    public static class InternalTopOutput extends ProcessorOutputImpl {
+    public static class InternalTopOutput extends org.orbeon.oxf.processor.impl.ProcessorOutputImpl {
 
         private LocationData locationData;
 

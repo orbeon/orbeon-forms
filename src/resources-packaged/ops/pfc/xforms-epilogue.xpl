@@ -114,23 +114,11 @@
                 </p:otherwise>
             </p:choose>
 
-            <!-- Get current namespace to enable caching per portlet -->
-            <p:processor name="oxf:request">
-                <p:input name="config">
-                    <config>
-                        <include>/request/container-namespace</include>
-                    </config>
-                </p:input>
-                <p:output name="data" id="namespace"/>
-            </p:processor>
-
             <!-- Native XForms Initialization -->
             <p:processor name="oxf:xforms-to-xhtml">
                 <p:input name="annotated-document" href="#widgeted-view"/>
                 <!--<p:input name="annotated-document" href="#widgeted-view" schema-href="oxf:/ops/xforms/schema/orbeon.rng"/>-->
                 <p:input name="data" href="#model-data"/>
-                <!-- This input adds a dependency on the container namespace. Keep it for portlets. -->
-                <p:input name="namespace" href="#namespace"/>
                 <p:input name="instance" href="#instance"/>
                 <p:output name="document" id="xhtml-data"/>
             </p:processor>

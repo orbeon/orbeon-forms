@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!--
     The epilogue is run after all page views. This is the part of the epilogue called to handle Orbeon Forms
     applications running in a portlet container. It is typically used to perform tasks that need to be done for all
@@ -22,7 +22,8 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- The document produced by the page view XForms processing performed -->
     <p:param type="input" name="xformed-data"/>
@@ -52,92 +53,105 @@
                 <p:input name="data" href="#xformed-data"/>
                 <p:output name="data" id="xformed-data-2"/>
             </p:processor>
-        </p:when>
-        <!-- No particular document format detected. Create an XHTML document which formats the XML content. -->
-        <p:otherwise>
+
+            <!-- Extract a fragment and apply theme -->
+            <p:processor name="oxf:url-generator">
+                <p:input name="config"
+                         href="aggregate('config', #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
+                                    for $app-style in concat('oxf:/apps/', $app, '/theme-embeddable.xsl') return
+                                    if (doc-available($app-style))
+                                        then $app-style
+                                        else p:property('oxf.epilogue.theme.embeddable')))"/>
+                <p:output name="data" id="theme"/>
+            </p:processor>
             <p:processor name="oxf:unsafe-xslt">
-                <p:input name="data" href="#xformed-data"/>
+                <p:input name="data" href="#xformed-data-2"/>
                 <p:input name="request" href="#request"/>
+                <p:input name="config" href="#theme"/>
+                <p:output name="data" id="themed-data"/>
+            </p:processor>
+            <!-- Rewrite all URLs in XHTML documents -->
+            <p:processor name="oxf:xhtml-rewrite" >
+                <p:input name="rewrite-in" href="#themed-data"/>
+                <p:output name="rewrite-out" id="rewritten-data"/>
+            </p:processor>
+            <!-- Move from XHTML namespace to no namespace -->
+            <p:processor name="oxf:qname-converter">
                 <p:input name="config">
-                    <xsl:stylesheet version="2.0"
-                            xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                        <xsl:template match="/">
-                            <xhtml:html>
-                                <xhtml:head><xhtml:title>XML Document</xhtml:title></xhtml:head>
-                                <xhtml:body>
-                                    <f:xml-source>
-                                        <xsl:copy-of select="/*"/>
-                                    </f:xml-source>
-                                </xhtml:body>
-                            </xhtml:html>
-                        </xsl:template>
-                    </xsl:stylesheet>
+                    <config>
+                        <match>
+                            <uri>http://www.w3.org/1999/xhtml</uri>
+                        </match>
+                        <replace>
+                            <uri/>
+                            <prefix/>
+                        </replace>
+                    </config>
                 </p:input>
-                <p:output name="data" id="xformed-data-2"/>
+                <p:input name="data" href="#rewritten-data"/>
+                <p:output name="data" id="html-data"/>
+            </p:processor>
+            <!-- Convert and serialize to HTML -->
+            <p:processor name="oxf:html-converter">
+                <p:input name="config">
+                    <config>
+                        <!-- Indent to level 0 -->
+                        <indent>true</indent>
+                        <indent-amount>0</indent-amount>
+                        <!-- Do not output any doctype, this is a fragment -->
+                    </config>
+                </p:input>
+                <p:input name="data" href="#html-data"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <!-- Disable caching, so that the title is always generated -->
+                        <cache-control>
+                            <use-local-cache>false</use-local-cache>
+                        </cache-control>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#converted"/>
+            </p:processor>
+
+        </p:when>
+        <!-- Non XML documents -->
+        <p:when test="/document[@xsi:type]">
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <!-- NOTE: use content-type specified on root element -->
+                    </config>
+                </p:input>
+                <p:input name="data" href="#xformed-data"/>
+            </p:processor>
+        </p:when>
+        <!-- No particular document format detected. Output plain XML. -->
+        <p:otherwise>
+            <!-- Convert and serialize to XML -->
+            <p:processor name="oxf:xml-converter">
+                <p:input name="config">
+                    <config>
+                        <encoding>utf-8</encoding>
+                        <indent>false</indent>
+                        <indent-amount>0</indent-amount>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#xformed-data"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <!-- NOTE: XML converter specifies application/xml content-type -->
+                    </config>
+                </p:input>
+                <p:input name="data" href="#converted"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
 
-    <!-- Extract a fragment and apply theme -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config"
-                 href="aggregate('config', #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
-                            for $app-style in concat('oxf:/apps/', $app, '/theme-embeddable.xsl') return
-                            if (doc-available($app-style))
-                                then $app-style
-                                else p:property('oxf.epilogue.theme.embeddable')))"/>
-        <p:output name="data" id="theme"/>
-    </p:processor>
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#xformed-data-2"/>
-        <p:input name="request" href="#request"/>
-        <p:input name="config" href="#theme"/>
-        <p:output name="data" id="themed-data"/>
-    </p:processor>
-    <!-- Rewrite all URLs in XHTML documents -->
-    <p:processor name="oxf:xhtml-rewrite" >
-        <p:input name="rewrite-in" href="#themed-data"/>
-        <p:output name="rewrite-out" id="rewritten-data"/>
-    </p:processor>
-    <!-- Move from XHTML namespace to no namespace -->
-    <p:processor name="oxf:qname-converter">
-        <p:input name="config">
-            <config>
-                <match>
-                    <uri>http://www.w3.org/1999/xhtml</uri>
-                </match>
-                <replace>
-                    <uri/>
-                    <prefix/>
-                </replace>
-            </config>
-        </p:input>
-        <p:input name="data" href="#rewritten-data"/>
-        <p:output name="data" id="html-data"/>
-    </p:processor>
-    <!-- Convert and serialize to HTML -->
-    <p:processor name="oxf:html-converter">
-        <p:input name="config">
-            <config>
-                <!-- Indent to level 0 -->
-                <indent>true</indent>
-                <indent-amount>0</indent-amount>
-                <!-- Do not output any doctype, this is a fragment -->
-            </config>
-        </p:input>
-        <p:input name="data" href="#html-data"/>
-        <p:output name="data" id="converted"/>
-    </p:processor>
-    <p:processor name="oxf:http-serializer">
-        <p:input name="config">
-            <config>
-                <!-- Disable caching, so that the title is always generated -->
-                <cache-control>
-                    <use-local-cache>false</use-local-cache>
-                </cache-control>
-            </config>
-        </p:input>
-        <p:input name="data" href="#converted"/>
-    </p:processor>
 
 </p:config>

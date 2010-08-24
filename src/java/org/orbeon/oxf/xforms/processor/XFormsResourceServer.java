@@ -65,7 +65,8 @@ public class XFormsResourceServer extends ProcessorImpl {
             if (session != null) {
                 // Store mapping into session
                 final String lookupKey = NetUtils.DYNAMIC_RESOURCES_SESSION_KEY + filename;
-                NetUtils.DynamicResource resource = (NetUtils.DynamicResource) session.getAttributesMap().get(lookupKey);
+                // Use same session scope as proxyURI()
+                NetUtils.DynamicResource resource = (NetUtils.DynamicResource) session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).get(lookupKey);
 
                 if (resource != null && resource.getURI() != null) {
                     // Found URI, stream it out

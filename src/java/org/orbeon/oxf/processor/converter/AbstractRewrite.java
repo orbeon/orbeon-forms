@@ -13,21 +13,16 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.portlet.PortletExternalContext;
+import org.orbeon.oxf.portlet.Portlet2ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.saxrewrite.DocumentRootState;
-import org.orbeon.oxf.xml.saxrewrite.FragmentRootState;
-import org.orbeon.oxf.xml.saxrewrite.State;
-import org.orbeon.oxf.xml.saxrewrite.StatefulHandler;
+import org.orbeon.oxf.xml.saxrewrite.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -865,7 +860,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
     public XMLReceiver getRewriteXMLReceiver(final ExternalContext externalContext, final XMLReceiver xmlReceiver, final boolean fragment) {
 
-        final boolean isPortlet = externalContext instanceof PortletExternalContext;
+        final boolean isPortlet = externalContext instanceof Portlet2ExternalContext;
 
         // Do the conversion
         final State rootState;

@@ -476,8 +476,27 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             sb.append(XFormsUtils.getFormId(containingDocument));
             sb.append("\"] = {");
 
+            // Output path information
+            final boolean hasPaths = handlerContext.getExternalContext().getRequest().getContainerType().equals("portlet");
+
+            if (hasPaths) {
+                sb.append("\"paths\":{");
+
+                sb.append("\"xforms-server\": \"");
+                sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/xforms-server", false));
+                
+                sb.append("\",\"resources-base\": \"");
+                sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/", false));
+                sb.append('"');
+
+                sb.append('}');
+            }
+
             // Output controls initialization
             if (hasInitControls) {
+                if (hasPaths)
+                    sb.append(',');
+
                 sb.append("\"controls\":{");
 
                 for (Iterator<Map.Entry<String,Map<String,List<String>>>> i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
@@ -521,7 +540,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
             // Output key listener information
             if (hasKeyListeners) {
-                if (hasInitControls)
+                if (hasPaths || hasInitControls)
                     sb.append(',');
 
                 sb.append("\"keylisteners\":[");

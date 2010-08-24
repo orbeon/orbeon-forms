@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.externalcontext.RequestAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.submission.OptimizedSubmission;
+import org.orbeon.oxf.xforms.submission.RequestDispatcherSubmission;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,7 +65,7 @@ public class SubmissionTest extends TestCase {
 
         final ForwardExternalContextRequestWrapper request
                 = new ForwardExternalContextRequestWrapper(incomingRequest, "/orbeon", "/foo/bar",
-                "GET", OptimizedSubmission.STANDARD_HEADERS_TO_FORWARD, customHeaderValuesMap);
+                "GET", RequestDispatcherSubmission.STANDARD_HEADERS_TO_FORWARD, customHeaderValuesMap);
 
         // Test standard headers received
         final Map<String, String> headerMap = request.getHeaderMap();

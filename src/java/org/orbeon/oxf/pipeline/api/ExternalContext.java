@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,9 +15,7 @@ package org.orbeon.oxf.pipeline.api;
 
 import java.io.*;
 import java.security.Principal;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
@@ -28,86 +26,86 @@ import java.util.Map;
  */
 public interface ExternalContext extends WebAppExternalContext {
 
-    public static final int SC_OK = 200;
-    public static final int SC_NOT_FOUND = 404;
-    public static final int SC_NOT_MODIFIED = 304;
-    public static final int SC_INTERNAL_SERVER_ERROR = 500;
+    static final int SC_OK = 200;
+    static final int SC_NOT_FOUND = 404;
+    static final int SC_NOT_MODIFIED = 304;
+    static final int SC_INTERNAL_SERVER_ERROR = 500;
 
     public interface Request {
-        public String getContainerType();
-        public String getContainerNamespace();
+        String getContainerType();
+        String getContainerNamespace();
 
-        public String getPathInfo();
-        public String getRequestPath();
-        public String getContextPath();
-        public String getServletPath();
-        public String getClientContextPath(String urlString);
+        String getPathInfo();
+        String getRequestPath();
+        String getContextPath();
+        String getServletPath();
+        String getClientContextPath(String urlString);
 
-        public Map<String, Object> getAttributesMap();
-        public Map<String, String> getHeaderMap();
-        public Map<String, String[]> getHeaderValuesMap();
-        public Map<String, Object[]> getParameterMap();
+        Map<String, Object> getAttributesMap();
+        Map<String, String> getHeaderMap();
+        Map<String, String[]> getHeaderValuesMap();
+        Map<String, Object[]> getParameterMap();
 
-        public String getCharacterEncoding();
-        public int getContentLength();
-        public String getContentType();
-        public InputStream getInputStream() throws IOException;
-        public Reader getReader() throws IOException;
+        String getCharacterEncoding();
+        int getContentLength();
+        String getContentType();
+        InputStream getInputStream() throws IOException;
+        Reader getReader() throws IOException;
 
-        public String getProtocol();
-        public String getRemoteHost();
-        public String getRemoteAddr();
-        public String getScheme();
-        public String getMethod();
-        public String getServerName();
-        public int getServerPort();
+        String getProtocol();
+        String getRemoteHost();
+        String getRemoteAddr();
+        String getScheme();
+        String getMethod();
+        String getServerName();
+        int getServerPort();
 
-        public void sessionInvalidate();
-        public boolean isRequestedSessionIdValid();
-        public String getRequestedSessionId();
+        void sessionInvalidate();
+        boolean isRequestedSessionIdValid();
+        String getRequestedSessionId();
 
-        public String getAuthType();
-        public boolean isSecure();
-        public String getRemoteUser();
-        public boolean isUserInRole(String role);
-        public Principal getUserPrincipal();
+        String getAuthType();
+        boolean isSecure();
+        String getRemoteUser();
+        boolean isUserInRole(String role);
+        Principal getUserPrincipal();
 
-        public Locale getLocale();
-        public Enumeration getLocales();
+        Locale getLocale();
+        Enumeration getLocales();
 
-        public String getPathTranslated();
-        public String getQueryString();
-        public String getRequestURI();
-        public String getRequestURL();
+        String getPathTranslated();
+        String getQueryString();
+        String getRequestURI();
+        String getRequestURL();
 
-        public String getPortletMode();
-        public String getWindowState();
+        String getPortletMode();
+        String getWindowState();
 
-        public Object getNativeRequest();
+        Object getNativeRequest();
     }
 
     public interface Response {
 
-        public static final int REWRITE_MODE_ABSOLUTE = 1;
-        public static final int REWRITE_MODE_ABSOLUTE_PATH = 2;
-        public static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 3;
-        public static final int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
+        static final int REWRITE_MODE_ABSOLUTE = 1;
+        static final int REWRITE_MODE_ABSOLUTE_PATH = 2;
+        static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 3;
+        static final int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
 
-        public PrintWriter getWriter() throws IOException;
-        public OutputStream getOutputStream() throws IOException;
-        public boolean isCommitted();
-        public void reset();
-        public void setContentType(String contentType);
-        public void setStatus(int status);
-        public void setContentLength(int len);
-        public void setHeader(String name, String value);
-        public void addHeader(String name, String value);
-        public void sendError(int len) throws IOException;
-        public String getCharacterEncoding();
+        PrintWriter getWriter() throws IOException;
+        OutputStream getOutputStream() throws IOException;
+        boolean isCommitted();
+        void reset();
+        void setContentType(String contentType);
+        void setStatus(int status);
+        void setContentLength(int len);
+        void setHeader(String name, String value);
+        void addHeader(String name, String value);
+        void sendError(int len) throws IOException;
+        String getCharacterEncoding();
 
-        public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException;
+        void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException;
 
-        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
+        void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
 
         /**
          * Set expiration headers for resources.
@@ -120,58 +118,58 @@ public interface ExternalContext extends WebAppExternalContext {
          * @param lastModified  last modification date of resource, or <= 0 if unknown
          * @param expires       requested expiration, or <=0 if unknown or to trigger default policy
          */
-        public void setResourceCaching(long lastModified, long expires);
+        void setResourceCaching(long lastModified, long expires);
 
-        public boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
+        boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
 
-        public String rewriteActionURL(String urlString);
-        public String rewriteRenderURL(String urlString);
-        public String rewriteActionURL(String urlString, String portletMode, String windowState);
-        public String rewriteRenderURL(String urlString, String portletMode, String windowState);
-        public String rewriteResourceURL(String urlString, boolean absolute);
-        public String rewriteResourceURL(String urlString, int rewriteMode);
-        public String getNamespacePrefix();
-        public void setTitle(String title);
+        String rewriteActionURL(String urlString);
+        String rewriteRenderURL(String urlString);
+        String rewriteActionURL(String urlString, String portletMode, String windowState);
+        String rewriteRenderURL(String urlString, String portletMode, String windowState);
+        String rewriteResourceURL(String urlString, boolean absolute);
+        String rewriteResourceURL(String urlString, int rewriteMode);
+        String getNamespacePrefix();
+        void setTitle(String title);
 
-        public Object getNativeResponse();
+        Object getNativeResponse();
     }
 
     public interface Session {
-        public static final int APPLICATION_SCOPE = 1;
-        public static final int PORTLET_SCOPE = 2;
+        static final int APPLICATION_SCOPE = 1;
+        static final int PORTLET_SCOPE = 2;
 
-        public long getCreationTime();
-        public String getId();
-        public long getLastAccessedTime();
-        public int getMaxInactiveInterval();
-        public void invalidate();
-        public boolean isNew();
-        public void setMaxInactiveInterval(int interval);
+        long getCreationTime();
+        String getId();
+        long getLastAccessedTime();
+        int getMaxInactiveInterval();
+        void invalidate();
+        boolean isNew();
+        void setMaxInactiveInterval(int interval);
 
-        public Map<String, Object> getAttributesMap();
-        public Map<String, Object> getAttributesMap(int scope);
+        Map<String, Object> getAttributesMap();
+        Map<String, Object> getAttributesMap(int scope);
 
-        public void addListener(SessionListener sessionListener);
-        public void removeListener(SessionListener sessionListener);
+        void addListener(SessionListener sessionListener);
+        void removeListener(SessionListener sessionListener);
 
-        public interface SessionListener {
-            public void sessionDestroyed();
+        interface SessionListener {
+            void sessionDestroyed();
         }
     }
 
     public interface Application {
-        public void addListener(ApplicationListener applicationListener);
-        public void removeListener(ApplicationListener applicationListener);
+        void addListener(ApplicationListener applicationListener);
+        void removeListener(ApplicationListener applicationListener);
 
-        public interface ApplicationListener {
-            public void servletDestroyed();
+        interface ApplicationListener {
+            void servletDestroyed();
         }
     }
 
     public interface RequestDispatcher {
-        public abstract void forward(Request request, Response response) throws IOException;
-        public void include(Request request, Response response) throws IOException;
-        public boolean isDefaultContext();
+        abstract void forward(Request request, Response response) throws IOException;
+        void include(Request request, Response response) throws IOException;
+        boolean isDefaultContext();
     }
 
     /**
@@ -184,13 +182,13 @@ public interface ExternalContext extends WebAppExternalContext {
      * @param isContextRelative     if true, path is relative to the current context root, otherwise to the document root
      * @return                      RequestDispatcher or null if cannot be found
      */
-    public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative);
-    public RequestDispatcher getNamedDispatcher(String name);
+    RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative);
+    RequestDispatcher getNamedDispatcher(String name);
 
-    public Request getRequest();
-    public Response getResponse();
-    public Session getSession(boolean create);
-    public Application getApplication();
+    Request getRequest();
+    Response getResponse();
+    Session getSession(boolean create);
+    Application getApplication();
 
     /**
      * Rewrite a service URL. The URL is rewritten against a base URL which is:
@@ -202,12 +200,12 @@ public interface ExternalContext extends WebAppExternalContext {
      * @param forceAbsolute force absolute URL
      * @return              rewritten URL
      */
-    public String rewriteServiceURL(String urlString, boolean forceAbsolute);
+    String rewriteServiceURL(String urlString, boolean forceAbsolute);
 
-    public String getStartLoggerString();
-    public String getEndLoggerString();
+    String getStartLoggerString();
+    String getEndLoggerString();
 
-    public Object getNativeRequest();
-    public Object getNativeResponse();
-    public Object getNativeSession(boolean flag);
+    Object getNativeRequest();
+    Object getNativeResponse();
+    Object getNativeSession(boolean flag);
 }

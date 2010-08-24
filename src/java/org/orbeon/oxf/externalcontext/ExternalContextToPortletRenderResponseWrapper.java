@@ -29,6 +29,8 @@ import java.util.Locale;
  * Methods with counterparts in ExternalContext.Response use the wrapped
  * ExternalContext.Response object and can be overridden using ResponseWrapper. Other methods
  * directly forward to the native response.
+ *
+ * TODO: Review this.
  */
 public class ExternalContextToPortletRenderResponseWrapper implements RenderResponse {
 
@@ -39,6 +41,9 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
         this.response = response;
         if (response.getNativeResponse() instanceof RenderResponse)
             this.nativeResponse = (RenderResponse) response.getNativeResponse();
+
+        // TODO: Throw this until we implement this properly
+        throw new UnsupportedOperationException();
     }
 
     public PortletURL createActionURL() {

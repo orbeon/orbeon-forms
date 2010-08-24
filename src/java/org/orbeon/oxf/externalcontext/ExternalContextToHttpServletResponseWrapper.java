@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,12 +17,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import javax.servlet.http.*;
+import java.io.*;
 import java.util.Locale;
 import java.util.Map;
 
@@ -30,7 +26,7 @@ import java.util.Map;
  * Wrap an ExternalContext.Response into an HttpServletResponse.
  *
  * Methods with counterparts in ExternalContext.Response use the wrapped
- * ExternalContext.Response object and can be overrided using ResponseWrapper. Other methods
+ * ExternalContext.Response object and can be overridden using ResponseWrapper. Other methods
  * directly forward to the native response.
  */
 public class ExternalContextToHttpServletResponseWrapper extends HttpServletResponseWrapper {

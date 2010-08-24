@@ -67,8 +67,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         {
             final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
             requestPath = request.getRequestPath();
-            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.plain) {
-                // Integrated or separate deployment mode
+            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.plain || request.getContainerType().equals("portlet")) {
+                // Integrated or separate deployment mode or portlet
                 xformsSubmissionPath =  "/xforms-server-submit";// TODO: read property?
             } else {
                 // Plain deployment mode: submission posts to URL of the current page and xforms-xml-submission.xpl intercepts that

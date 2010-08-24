@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -88,9 +88,6 @@ public class Portlet2URLRewriter implements URLRewriter {
     }
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {
-        // JSR-168
-        //return URLRewriter.rewriteURL(getRequest(), urlString, rewriteMode);
-
         // JSR-268 supports portlet resources
         return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_RESOURCE, null, null);
     }

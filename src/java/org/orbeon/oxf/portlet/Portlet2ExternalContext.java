@@ -76,7 +76,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public String getPathInfo() {
-            String result = portletRequest.getParameter(PATH_PARAMETER_NAME);
+            // Use the resource id if we are a ResourceRequest
+            String result = (portletRequest instanceof ResourceRequest) ? ((ResourceRequest) portletRequest).getResourceID() : portletRequest.getParameter(PATH_PARAMETER_NAME);
             if (result == null) result = "";
             return (result.startsWith("/")) ? result : "/" + result;
         }

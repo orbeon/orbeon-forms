@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,7 +13,7 @@
   -->
 <config xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page path-info="/home/" view="view.xhtml"/>
+    <page path-info="*" view="view.xhtml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

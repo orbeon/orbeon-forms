@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,10 +38,14 @@
 
     <p:choose href="#request-info">
         <!-- Check for noscript mode form post OR script form post for replace="all" -->
-        <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
-        <p:when test="(lower-case(/*/method) = ('post') or /*/container-type = 'portlet')
-                        and (/*/content-type = 'application/x-www-form-urlencoded' or starts-with(/*/content-type, 'multipart/form-data'))
-                        and (/*/parameters/parameter[name = '$noscript']/value = 'true' or /*/parameters/parameter[name = '$server-events'])">
+        <!-- NOTE: In portlet mode, the method and content-type are not available (not sure why), so just assume checking for the content type is enough -->
+        <p:when test="(
+                        (
+                          lower-case(/*/method) = 'post' and (/*/content-type = 'application/x-www-form-urlencoded' or starts-with(/*/content-type, 'multipart/form-data'))
+                        ) or /*/container-type = 'portlet'
+                      ) and (
+                        /*/parameters/parameter[name = '$noscript']/value = 'true' or /*/parameters/parameter[name = '$server-events']
+                      )">
             <!-- Process submission -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="/ops/xforms/xforms-server-submit.xpl"/>

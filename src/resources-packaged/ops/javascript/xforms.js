@@ -997,7 +997,7 @@ ORBEON.util.Utils = {
         }
     },
 
-    displayModalProgressPanel: function() {
+    displayModalProgressPanel: function(formID) {
         if (!ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel =
             new YAHOO.widget.Panel("wait", {
@@ -1010,7 +1010,7 @@ ORBEON.util.Utils = {
                 visible: true
             });
             ORBEON.xforms.Globals.modalProgressPanel.setBody('<img alt="Processing, please wait" src="'
-                    + ORBEON.xforms.Globals.resourcesBaseURL + '/ops/images/xforms/processing.gif"/>');
+                    + ORBEON.xforms.Globals.resourcesBaseURL[formID] + '/ops/images/xforms/processing.gif"/>');
             ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
         }
         ORBEON.xforms.Globals.modalProgressPanel.show();
@@ -1696,7 +1696,7 @@ ORBEON.xforms.Controls = {
                 var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 return image.src;
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
-                // Download link don't really have a value
+                // Download link doesn't really have a value
                 return null;
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 return control.innerHTML;
@@ -3313,7 +3313,7 @@ ORBEON.xforms.Events = {
                     // the progress panel is displayed.
                     target.blur();
                     // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
-                    ORBEON.util.Utils.displayModalProgressPanel();
+                    ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(target).id);
                 }
             }
         } else if (target != null &&
@@ -3341,7 +3341,7 @@ ORBEON.xforms.Events = {
         } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
             // Click on menu item
 
-            // Find what is the position in the hiearchy of the item
+            // Find what is the position in the hierarchy of the item
             var positions = [];
             var currentParent = originalTarget;
             while (true) {
@@ -4572,10 +4572,9 @@ ORBEON.xforms.Init = {
              * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
              * just registering the event handler on the window object.
              */
-            //XXX
-            ns : {},                                                    // Namespace of ids (for portlets)
-            resourcesBaseURL: ORBEON.xforms.Globals.resourcesBaseURL,   // Base URL for resources e.g. /context[/version]
-            xformsServerURL: ORBEON.xforms.Globals.xformsServerURL,     // XForms Server URL
+            ns: {},                                                    // Namespace of ids (for portlets)
+            resourcesBaseURL: {},                // Base URL for resources e.g. /context[/version]
+            xformsServerURL: {},                 // XForms Server URL
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
             discardableTimerIds: {},             // Maps form id to array of discardable events (which are used by the server as a form of polling)
@@ -4656,27 +4655,17 @@ ORBEON.xforms.Init = {
         if (ORBEON.util.Properties.offlineSupport.get())
             ORBEON.xforms.Offline.pageLoad();
 
-        // Initialize XForms server URL
-        ORBEON.xforms.Init._setBasePaths(document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get() == "true");
-
-        // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
-        if (ORBEON.util.Properties.sessionHeartbeat.get()) {
-            var heartBeatDelay = ORBEON.util.Properties.sessionHeartbeatDelay.get();
-            if (heartBeatDelay > 0) {
-                window.setInterval(function() {
-                    ORBEON.xforms.Events.sendHeartBeatIfNeeded(heartBeatDelay);
-                }, heartBeatDelay / 10); // say session is 30 mn, heartbeat must come after 24 mn, we check every 2.4 mn so we should
-            }
-        }
-
         // Initialize attributes on form
         for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
             var form = document.forms[formIndex];
             // If this is an XForms form, proceed with initialization
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
                 var formID = document.forms[formIndex].id;
-                //XXX
+
                 ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
+
+                // Initialize XForms server URL
+                ORBEON.xforms.Init._setBasePaths(formID, document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get() == "true");
 
                 // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
                 // interaction with the form before it is initialized
@@ -4983,6 +4972,16 @@ ORBEON.xforms.Init = {
 
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
 
+        // A heartbeat event - An AJAX request for letting server know that "I'm still alive"
+        if (ORBEON.util.Properties.sessionHeartbeat.get()) {
+            var heartBeatDelay = ORBEON.util.Properties.sessionHeartbeatDelay.get();
+            if (heartBeatDelay > 0) {
+                window.setInterval(function() {
+                    ORBEON.xforms.Events.sendHeartBeatIfNeeded(heartBeatDelay);
+                }, heartBeatDelay / 10); // say session is 30 mn, heartbeat must come after 24 mn, we check every 2.4 mn so we should
+            }
+        }
+
         // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
         // YUI event.js's call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
@@ -5027,60 +5026,77 @@ ORBEON.xforms.Init = {
         }
     },
 
-    _setBasePaths: function(scripts, versioned) {
+    _setBasePaths: function(formID, scripts, versioned) {
         // NOTE: The server provides us with a base URL, but we must use a client-side value to support proxying
-        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-            var script = scripts[scriptIndex];
-            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
-            if (scriptSrc != null) {
-                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
-                if (startPathToJavaScript != -1) {
-                    // Found path to non-xforms-server resource
-                    // scriptSrc: (/context)(/version)/ops/javascript/xforms-min.js
 
-                    // Take the part of the path before the JS path
-                    // prefix: (/context)(/version)
-                    // NOTE: may be "" if no context is present
-                    var prefix = scriptSrc.substr(0, startPathToJavaScript);
-                    ORBEON.xforms.Globals.resourcesBaseURL = prefix;
-                    if (versioned) {
-                        // Remove version
-                        ORBEON.xforms.Globals.xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
-                    } else {
-                        ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
-                    }
+        var resourcesBaseURL = null;
+        var xformsServerURL = null;
 
-                    break;
-                } else {
-                    startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
+        if (!(window.orbeonInitData === undefined)) {
+            // Try values passed by server (in portlet mode)
+            var formInitData = window.orbeonInitData[formID];
+            if (formInitData && formInitData["paths"]) {
+                resourcesBaseURL = formInitData["paths"]["resources-base"];
+                xformsServerURL = formInitData["paths"]["xforms-server"];
+            }
+        }
+
+        if (resourcesBaseURL == null) {
+            // Try scripts
+            for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+                var script = scripts[scriptIndex];
+                var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
+                if (scriptSrc != null) {
+                    var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
                     if (startPathToJavaScript != -1) {
-                        // Found path to xforms-server resource
-                        // scriptSrc: (/context)/xforms-server(/version)/xforms-...-min.js
+                        // Found path to non-xforms-server resource
+                        // scriptSrc: (/context)(/version)/ops/javascript/xforms-min.js
 
                         // Take the part of the path before the JS path
-                        // prefix: (/context)
+                        // prefix: (/context)(/version)
                         // NOTE: may be "" if no context is present
                         var prefix = scriptSrc.substr(0, startPathToJavaScript);
-                        var jsPath = scriptSrc.substr(startPathToJavaScript);
+                        resourcesBaseURL = prefix;
                         if (versioned) {
-
-                            var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
-                            var version = bits[2];
-
-                            ORBEON.xforms.Globals.resourcesBaseURL = prefix + version;
-                            ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                            // Remove version
+                            xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
                         } else {
-                            ORBEON.xforms.Globals.resourcesBaseURL = prefix;
-                            ORBEON.xforms.Globals.xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                            xformsServerURL = prefix + XFORMS_SERVER_PATH;
                         }
 
                         break;
+                    } else {
+                        startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
+                        if (startPathToJavaScript != -1) {
+                            // Found path to xforms-server resource
+                            // scriptSrc: (/context)/xforms-server(/version)/xforms-...-min.js
+
+                            // Take the part of the path before the JS path
+                            // prefix: (/context)
+                            // NOTE: may be "" if no context is present
+                            var prefix = scriptSrc.substr(0, startPathToJavaScript);
+                            var jsPath = scriptSrc.substr(startPathToJavaScript);
+                            if (versioned) {
+
+                                var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
+                                var version = bits[2];
+
+                                resourcesBaseURL = prefix + version;
+                                xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                            } else {
+                                resourcesBaseURL = prefix;
+                                xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
         }
-        //XXX
-//        ORBEON.xforms.Globals.xformsServerURL = "http://localhost:8080/mywebapp/web/guest/testorbeon?p_p_id=OrbeonFormsPortlet_WAR_orbeon_INSTANCE_v6BJ&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_count=1&_OrbeonFormsPortlet_WAR_orbeon_INSTANCE_v6BJ_orbeon.path=%2Fxforms-server%2F&_OrbeonFormsPortlet_WAR_orbeon_INSTANCE_v6BJ_orbeon.path=%2Fxforms-calculator%2F";
+
+        ORBEON.xforms.Globals.resourcesBaseURL[formID] = resourcesBaseURL;
+        ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
     },
 
     _autoComplete: function(autoComplete) {
@@ -5328,7 +5344,8 @@ ORBEON.xforms.Init = {
             if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
                 ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
 
-            fckEditor.BasePath = ORBEON.xforms.Globals.resourcesBaseURL + ORBEON.util.Properties.fckEditorBasePath.get();
+            var formID = ORBEON.xforms.Globals.requestForm.id;
+            fckEditor.BasePath = ORBEON.xforms.Globals.resourcesBaseURL[formID] + ORBEON.util.Properties.fckEditorBasePath.get();
             fckEditor.ToolbarSet = "OPS";
 
             // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
@@ -5535,6 +5552,8 @@ ORBEON.xforms.Server = {
                 // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
                 // if there are no other executeNextRequest() that have been added to the queue after this
                 // request.
+                // XXX TODO: used to be: ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY), NOT:
+                //                       ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY)
                 window.setTimeout(
                     function() { ORBEON.xforms.Server.executeNextRequest(false); },
                     ORBEON.util.Properties.delayBeforeForceIncrementalRequest.get()
@@ -5941,10 +5960,10 @@ ORBEON.xforms.Server = {
             var ajaxTimeout = ORBEON.util.Properties.delayBeforeAjaxTimeout.get();
             if (ajaxTimeout != -1)
                 callback.timeout = ajaxTimeout;
-            YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback, ORBEON.xforms.Globals.requestDocument);
+            var formID = ORBEON.xforms.Globals.requestForm.id;
+            YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
-            //XXX
             var formID = ORBEON.xforms.Globals.requestForm.id;
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
         }
@@ -6747,7 +6766,7 @@ ORBEON.xforms.Server = {
                                         } else if (isDateType && isMinimal) {
                                             // Create image element
                                             var image = document.createElement("img");
-                                            image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL + "/ops/images/xforms/calendar.png");
+                                            image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL[formID] + "/ops/images/xforms/calendar.png");
                                             image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
                                             insertIntoDocument([image]);
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
@@ -7290,7 +7309,7 @@ ORBEON.xforms.Server = {
                                         upload: ORBEON.xforms.Server.handleUploadResponse,
                                         failure: ORBEON.xforms.Server.handleFailure
                                     };
-                                    YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL, callback);
+                                    YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback);
                                 }
                                 ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                 break;

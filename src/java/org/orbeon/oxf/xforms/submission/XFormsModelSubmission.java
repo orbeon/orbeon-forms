@@ -117,7 +117,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         this.submissions = new Submission[] {
             new EchoSubmission(this),
             new ClientGetAllSubmission(this),
-            new OptimizedSubmission(this),
+            new LocalPortletSubmission(this),
+            new RequestDispatcherSubmission(this),
             new CacheableSubmission(this),
             new RegularSubmission(this)
         };
@@ -455,7 +456,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             } catch (Throwable throwable) {
                 /* ***** Handle errors ********************************************************************************** */
-                if (p != null && p.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
+                if (p != null && p.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
                     // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
                     throw new XFormsSubmissionException(this, throwable, "Error while processing xforms:submission", "processing submission");
                 } else {

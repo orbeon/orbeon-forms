@@ -50,9 +50,9 @@ public class XFormsProperties {
 
     private static final String OPTIMIZE_GET_ALL_PROPERTY = "optimize-get-all";
     private static final String OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY = "optimize-local-submission";
-    private static final String OPTIMIZE_LOCAL_SUBMISSION_FORWARD_PROPERTY = "local-submission-forward";
-    private static final String OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
-    private static final String OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
+    private static final String LOCAL_SUBMISSION_FORWARD_PROPERTY = "local-submission-forward";
+    private static final String LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
+    private static final String LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
@@ -190,9 +190,9 @@ public class XFormsProperties {
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY, "", false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY, true, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY, true, false),
-            new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_FORWARD_PROPERTY, true, false),
-            new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY, false, false),
-            new PropertyDefinition(OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
+            new PropertyDefinition(LOCAL_SUBMISSION_FORWARD_PROPERTY, true, false),
+            new PropertyDefinition(LOCAL_SUBMISSION_INCLUDE_PROPERTY, false, false),
+            new PropertyDefinition(LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
@@ -399,9 +399,9 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, OPTIMIZE_GET_ALL_PROPERTY);
     }
 
-    public static boolean isOptimizeLocalSubmissionForward(XFormsContainingDocument containingDocument) {
+    public static boolean isLocalSubmissionForward(XFormsContainingDocument containingDocument) {
         // Try new property first
-        final boolean newPropertyValue = getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_SUBMISSION_FORWARD_PROPERTY);
+        final boolean newPropertyValue = getBooleanProperty(containingDocument, LOCAL_SUBMISSION_FORWARD_PROPERTY);
         if (!newPropertyValue)
             return newPropertyValue;
 
@@ -409,12 +409,12 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY);
     }
 
-    public static boolean isOptimizeLocalSubmissionInclude(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_SUBMISSION_INCLUDE_PROPERTY);
+    public static boolean isLocalSubmissionInclude(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, LOCAL_SUBMISSION_INCLUDE_PROPERTY);
     }
 
-    public static boolean isOptimizeLocalInstanceInclude(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY);
+    public static boolean isLocalInstanceInclude(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, LOCAL_INSTANCE_INCLUDE_PROPERTY);
     }
 
     public static boolean isAjaxShowLoadingIcon(XFormsContainingDocument containingDocument) {

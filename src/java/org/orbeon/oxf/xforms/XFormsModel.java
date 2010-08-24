@@ -27,14 +27,16 @@ import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
-import org.orbeon.oxf.xforms.submission.*;
+import org.orbeon.oxf.xforms.submission.BaseSubmission;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.om.*;
 
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -736,22 +738,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // the proper split between servlet path and path info is not done.
                 final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
                 final ExternalContext.Request request = externalContext.getRequest();
-                final boolean optimizeLocal =
-                        !NetUtils.urlHasProtocol(instanceResource)
-                                && (request.getContainerType().equals("portlet")
-                                    || request.getContainerType().equals("servlet")
-                                       && XFormsProperties.isOptimizeLocalInstanceInclude(containingDocument));
 
-                if (optimizeLocal) {
-                    // Use URL resolved against current context
-                    final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, instance.element, instanceResource);
-                    loadInstanceOptimized(propertyContext, externalContext, instance.element, instance.staticId, resolvedURI.toString(), instance.isReadonlyHint, instance.xxformsValidation);
-                } else {
-                    // Use full resolved resource URL
-                    // o absolute URL, e.g. http://example.org/instance.xml
-                    // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
-                    loadInstance(propertyContext, externalContext, instance);
-                }
+                // TODO: Temporary. Use XFormsModelSubmission to load instances instead
+                if (!NetUtils.urlHasProtocol(instanceResource) && request.getContainerType().equals("portlet"))
+                    throw new UnsupportedOperationException("<xforms:instance src=\"\"> with relative path within a portlet");
+
+                // Use full resolved resource URL
+                // o absolute URL, e.g. http://example.org/instance.xml
+                // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
+                loadInstance(propertyContext, externalContext, instance);
             }
         } catch (Exception e) {
             final ValidationException validationException
@@ -879,48 +874,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
         setInstanceDocument(instanceDocument, effectiveId, instance.staticId, absoluteURLString, instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain, false, -1, instance.xxformsValidation, false);
-    }
-
-    private void loadInstanceOptimized(PropertyContext propertyContext, ExternalContext externalContext, Element instanceContainer,
-                                       String instanceId, String resourceAbsolutePathOrAbsoluteURL, boolean isReadonlyHint, String xxformsValidation) {
-
-        // Whether or not to rewrite URLs
-        final boolean isNoRewrite = XFormsUtils.resolveUrlNorewrite(instanceContainer);
-
-        if (indentedLogger.isDebugEnabled())
-            indentedLogger.logDebug("load", "getting document from optimized URI",
-                        "URI", resourceAbsolutePathOrAbsoluteURL, "norewrite", Boolean.toString(isNoRewrite));
-
-        // Run submission
-        final ConnectionResult connectionResult = OptimizedSubmission.openOptimizedConnection(propertyContext, externalContext, containingDocument,
-                indentedLogger, null, "get", resourceAbsolutePathOrAbsoluteURL, isNoRewrite, null, null, null, false,
-                OptimizedSubmission.MINIMAL_HEADERS_TO_FORWARD, null);
-
-        final Object instanceDocument;// Document or DocumentInfo
-        try {
-            // Handle connection errors
-            if (connectionResult.statusCode != 200) {
-                throw new OXFException("Got invalid return code while loading instance: " + resourceAbsolutePathOrAbsoluteURL + ", " + connectionResult.statusCode);
-            }
-
-            // TODO: Handle validating and handleXInclude!
-
-            // Read result as XML
-            // TODO: use submission code
-            if (!isReadonlyHint) {
-                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
-            } else {
-                instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
-                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
-            }
-        } finally {
-            // Clean-up
-            connectionResult.close();
-        }
-
-        // Set instance and associated information if everything went well
-        // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, effectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, null, false, -1, xxformsValidation, false);
     }
 
     public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {

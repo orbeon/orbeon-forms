@@ -18,14 +18,14 @@ import org.dom4j.QName;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.impl.*;
+import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.processor.impl.DelegatingProcessorInput;
+import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -773,5 +773,16 @@ public abstract class ProcessorImpl implements Processor {
         }
         public CacheKey key;
         public Object validity;
+    }
+
+    // For backward compatibility
+    protected abstract class ProcessorOutputImpl extends org.orbeon.oxf.processor.impl.ProcessorOutputImpl {
+        public ProcessorOutputImpl(Class processorClass, String name) {
+            super(processorClass, name);
+        }
+
+        public ProcessorOutputImpl(Processor processor, String name) {
+            super(processor, name);
+        }
     }
 }

@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
@@ -44,11 +45,138 @@ public class ControlAnalysis extends SimpleAnalysis {
 
     private String classes;
 
-    public class LHHAAnalysis extends SimpleAnalysis {
+    public ControlAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
+                           XBLBindings.Scope scope, Element element, int index, boolean isValueControl,
+                           ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+
+        super(staticState, scope, element, parentControlAnalysis, inScopeVariables, isValueControl);
+
+        this.index = index;
+
+        this.nestedLabel = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.LABEL_QNAME);
+        this.nestedHelp = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.HELP_QNAME);
+        this.nestedHint = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.HINT_QNAME);
+        this.nestedAlert = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.ALERT_QNAME);
+    }
+
+    private LHHAAnalysis findNestedLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
+        final Element e = findNestedLHHAElement(propertyContext, controlsDocumentInfo, qName);
+        return (e != null) ? new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, e, true) : null;
+    }
+
+    protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
+        return element.element(qName);
+    }
+
+    public void setExternalLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement) {
+        assert lhhaElement != null;
+        final String name = lhhaElement.getName();
+        if (XFormsConstants.LABEL_QNAME.getName().equals(name)) {
+            externalLabel = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+        } else if (XFormsConstants.HELP_QNAME.getName().equals(name)) {
+            externalHelp = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+        } else if (XFormsConstants.HINT_QNAME.getName().equals(name)) {
+            externalHint = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+        } else if (XFormsConstants.ALERT_QNAME.getName().equals(name)) {
+            externalAlert = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+        }
+    }
+
+    public LHHAAnalysis getLabel() {
+        return (nestedLabel != null) ? nestedLabel : externalLabel;
+    }
+
+    public LHHAAnalysis getHelp() {
+        return (nestedHelp != null) ? nestedHelp : externalHelp;
+    }
+
+    public LHHAAnalysis getHint() {
+        return (nestedHint != null) ? nestedHint : externalHint;
+    }
+
+    public LHHAAnalysis getAlert() {
+        return (nestedAlert != null) ? nestedAlert : externalAlert;
+    }
+
+    @Override
+    protected XPathAnalysis computeValueAnalysis() {
+        if (element != null && canHoldValue && !element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME)) {
+            return super.computeValueAnalysis();
+        } else {
+            return null;
+        }
+    }
+
+    public void addClasses(String classes) {
+        if (this.classes == null) {
+            // Set
+            this.classes = classes;
+        } else {
+            // Append
+            this.classes = this.classes + ' ' + classes;
+        }
+    }
+
+    public String getClasses() {
+        return classes;
+    }
+
+    public RepeatAnalysis getAncestorRepeat() {
+        SimpleAnalysis currentParent = parentControlAnalysis;
+        while (currentParent != null) {
+            if (currentParent instanceof RepeatAnalysis)
+                return (RepeatAnalysis) currentParent;
+            currentParent = currentParent.parentControlAnalysis;
+        }
+        return null;
+    }
+
+    public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+        helper.startElement("control", new String[] {
+                "scope", scope.scopeId,
+                "prefixed-id", prefixedId,
+                "model-prefixed-id", modelPrefixedId,
+                "binding", Boolean.toString(hasNodeBinding),
+                "value", Boolean.toString(canHoldValue)
+        });
+
+        // Control binding and value analysis
+        if (bindingAnalysis != null) {
+            helper.startElement("binding");
+            bindingAnalysis.toXML(propertyContext, helper);
+            helper.endElement();
+        }
+        if (valueAnalysis != null) {
+            helper.startElement("value");
+            valueAnalysis.toXML(propertyContext, helper);
+            helper.endElement();
+        }
+
+        // LHHA analysis
+        final Collection<LHHAAnalysis> lhhaAnalysises = new ArrayList<LHHAAnalysis>();
+        if (getLabel() != null) lhhaAnalysises.add(getLabel());
+        if (getHelp() != null) lhhaAnalysises.add(getHelp());
+        if (getHint() != null) lhhaAnalysises.add(getHint());
+        if (getAlert() != null) lhhaAnalysises.add(getAlert());
+
+        for (final LHHAAnalysis analysis : lhhaAnalysises) {
+            helper.startElement(analysis.element.getName());
+            if (analysis.bindingAnalysis != null)
+                analysis.bindingAnalysis.toXML(propertyContext, helper);
+            if (analysis.valueAnalysis != null)
+                analysis.valueAnalysis.toXML(propertyContext, helper);
+            helper.endElement();
+        }
+
+        helper.endElement();
+    }
+
+    public class LHHAAnalysis extends SimpleAnalysis {// TODO: maybe move this to outer level?
         public final Element element;
         public final boolean isLocal;
         public final boolean hasStaticValue;
 
+        // TODO: use valueAnalysis
         public final XPathAnalysis valueAnalysis;
 
         public LHHAAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope,
@@ -156,91 +284,5 @@ public class ControlAnalysis extends SimpleAnalysis {
         public LocationData getLocationData() {
             return new ExtendedLocationData((LocationData) element.getData(), "gathering static control information", element);
         }
-    }
-
-    public ControlAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
-                           XBLBindings.Scope scope, Element element, int index, boolean isValueControl,
-                           ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
-
-        super(staticState, scope, element, parentControlAnalysis, inScopeVariables, isValueControl);
-
-        this.index = index;
-
-        this.nestedLabel = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.LABEL_QNAME);
-        this.nestedHelp = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.HELP_QNAME);
-        this.nestedHint = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.HINT_QNAME);
-        this.nestedAlert = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.ALERT_QNAME);
-    }
-
-    private LHHAAnalysis findNestedLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
-        final Element e = findNestedLHHAElement(propertyContext, controlsDocumentInfo, qName);
-        return (e != null) ? new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, e, true) : null;
-    }
-
-    protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
-        return element.element(qName);
-    }
-
-    public void setExternalLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement) {
-        assert lhhaElement != null;
-        final String name = lhhaElement.getName();
-        if (XFormsConstants.LABEL_QNAME.getName().equals(name)) {
-            externalLabel = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
-        } else if (XFormsConstants.HELP_QNAME.getName().equals(name)) {
-            externalHelp = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
-        } else if (XFormsConstants.HINT_QNAME.getName().equals(name)) {
-            externalHint = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
-        } else if (XFormsConstants.ALERT_QNAME.getName().equals(name)) {
-            externalAlert = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
-        }
-    }
-
-    public LHHAAnalysis getLabel() {
-        return (nestedLabel != null) ? nestedLabel : externalLabel;
-    }
-
-    public LHHAAnalysis getHelp() {
-        return (nestedHelp != null) ? nestedHelp : externalHelp;
-    }
-
-    public LHHAAnalysis getHint() {
-        return (nestedHint != null) ? nestedHint : externalHint;
-    }
-
-    public LHHAAnalysis getAlert() {
-        return (nestedAlert != null) ? nestedAlert : externalAlert;
-    }
-
-    @Override
-    protected XPathAnalysis computeValueAnalysis() {
-        if (element != null && hasValue && !element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME)) {
-            return super.computeValueAnalysis();
-        } else {
-            return null;
-        }
-    }
-
-    public void addClasses(String classes) {
-        if (this.classes == null) {
-            // Set
-            this.classes = classes;
-        } else {
-            // Append
-            this.classes = this.classes + ' ' + classes;
-        }
-    }
-
-    public String getClasses() {
-        return classes;
-    }
-
-    public RepeatAnalysis getAncestorRepeat() {
-        SimpleAnalysis currentParent = parentControlAnalysis;
-        while (currentParent != null) {
-            if (currentParent instanceof RepeatAnalysis)
-                return (RepeatAnalysis) currentParent;
-            currentParent = currentParent.parentControlAnalysis;
-        }
-        return null;
     }
 }

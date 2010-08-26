@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
@@ -21,12 +22,12 @@ import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Axis;
 import org.orbeon.saxon.om.NamePool;
 
-import java.io.PrintStream;
 import java.util.*;
 
 public class XPathAnalysis {
@@ -35,6 +36,8 @@ public class XPathAnalysis {
     public final String xpathString;
     public final PathMap pathmap;
 
+    public final boolean figuredOutDependencies;
+
     public final Set<String> dependentPaths = new HashSet<String>();
     public final Set<String> returnablePaths = new HashSet<String>();
 
@@ -42,15 +45,14 @@ public class XPathAnalysis {
     public final Set<String> dependentInstances = new HashSet<String>();
     public final Set<String> returnableInstances = new HashSet<String>();
 
-    public final boolean figuredOutDependencies;
+    public static XPathAnalysis CONSTANT_ANALYSIS = new XPathAnalysis(true);
+    public static XPathAnalysis CONSTANT_NEGATIVE_ANALYSIS = new XPathAnalysis(false);
 
-    public static XPathAnalysis CONSTANT_ANALYSIS = new XPathAnalysis();
-
-    private XPathAnalysis() {
-        staticState = null;
-        xpathString = null;
-        pathmap = null;
-        figuredOutDependencies = true;
+    private XPathAnalysis(boolean figuredOutDependencies) {
+        this.staticState = null;
+        this.xpathString = null;
+        this.pathmap = null;
+        this.figuredOutDependencies = figuredOutDependencies;
     }
 
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
@@ -75,10 +77,19 @@ public class XPathAnalysis {
             } else {
                 if ((expression.getDependencies() & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
                     // Expression depends on the context item
-                    // We clone and add to an existing PathMap
-                    pathmap = baseAnalysis.pathmap.clone();
-                    pathmap.setInScopeVariables(variables);
-                    pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
+
+                    if (baseAnalysis.figuredOutDependencies) {
+                        // We clone the base analysis and add to an existing PathMap
+                        pathmap = baseAnalysis.pathmap.clone();
+                        pathmap.setInScopeVariables(variables);
+                        pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
+                    } else {
+                        // Base analysis failed, we fail analysis too
+                        this.pathmap = null;
+                        this.figuredOutDependencies = false;
+
+                        return;
+                    }
                 } else {
                     // Expression does not depend on the context item
                     pathmap = new PathMap(expression, variables);
@@ -91,7 +102,7 @@ public class XPathAnalysis {
             this.pathmap = pathmap;
 
             // Produce resulting paths
-            figuredOutDependencies = processPaths(scope, modelPrefixedId, defaultInstancePrefixedId);
+            this.figuredOutDependencies = processPaths(scope, modelPrefixedId, defaultInstancePrefixedId);
 
         } catch (Exception e) {
             throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
@@ -292,21 +303,27 @@ public class XPathAnalysis {
         return success;
     }
 
-    public void dump(PrintStream out, int indent) {
+    public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
 
-        final String pad = "                                           ".substring(0, indent);
+        helper.startElement("analysis", new String[] { "expression", xpathString, "analyzed", Boolean.toString(figuredOutDependencies) } );
 
-        out.println(pad + "PATHMAP - expression: " + xpathString);
-        out.println(pad + "ok: " + figuredOutDependencies);
-        out.println(pad + "dependent:");
-        for (final String path: dependentPaths) {
-            out.println(pad + "  path: " + getDisplayPath(path));
+        if (dependentPaths.size() > 0) {
+            helper.startElement("dependent");
+            for (final String path: dependentPaths) {
+                helper.element("path", getDisplayPath(path));
+            }
+            helper.endElement();
         }
 
-        out.println(pad + "returnable:");
-        for (final String path: returnablePaths) {
-            out.println(pad + "  path: " + getDisplayPath(path));
+        if (returnablePaths.size() > 0) {
+            helper.startElement("returnable");
+            for (final String path: returnablePaths) {
+                helper.element("path", getDisplayPath(path));
+            }
+            helper.endElement();
         }
+
+        helper.endElement();
     }
 
     // For debugging/logging

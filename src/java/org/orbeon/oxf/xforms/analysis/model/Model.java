@@ -14,10 +14,12 @@
 package org.orbeon.oxf.xforms.analysis.model;
 
 import org.dom4j.*;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.*;
@@ -235,5 +237,31 @@ public class Model {
 
     public static String buildCustomMIPName(String qualifiedName) {
         return qualifiedName.replace(':', '-');
+    }
+
+    public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+        helper.startElement("model", new String[] {
+                "scope", scope.scopeId,
+                "prefixed-id", prefixedId,
+                "default-instance-prefixed-id", defaultInstancePrefixedId,
+                "analyzed-binds", Boolean.toString(figuredBindAnalysis),
+
+        });
+
+        outputInstanceList(helper, "bind-instances", bindInstances);
+        outputInstanceList(helper, "computed-binds-instances", computedBindExpressionsInstances);
+        outputInstanceList(helper, "validation-binds-instances", validationBindInstances);
+
+        helper.endElement();
+    }
+
+    private static void outputInstanceList(ContentHandlerHelper helper, String name, Set<String> values) {
+        if (values.size() > 0) {
+            helper.startElement(name);
+            for (final String value : values) {
+                helper.element("instance", value);
+            }
+            helper.endElement();
+        }
     }
 }

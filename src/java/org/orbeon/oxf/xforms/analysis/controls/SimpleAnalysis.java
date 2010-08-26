@@ -37,8 +37,9 @@ public class SimpleAnalysis {
     public final String prefixedId;
     public final Element element;
     public final LocationData locationData;
+    
     public final boolean hasNodeBinding;
-    public final boolean hasValue;
+    public final boolean canHoldValue;
 
     public final SimpleAnalysis parentControlAnalysis;
     public final Map<String, ControlAnalysis> inScopeVariables; // variable name -> ControlAnalysis
@@ -49,7 +50,7 @@ public class SimpleAnalysis {
     public final XPathAnalysis valueAnalysis;
 
     public SimpleAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope, Element element, SimpleAnalysis parentControlAnalysis,
-                          Map<String, ControlAnalysis> inScopeVariables, boolean hasValue) {
+                          Map<String, ControlAnalysis> inScopeVariables, boolean canHoldValue) {
 
         this.staticState = staticState;
         this.scope = scope;
@@ -58,7 +59,7 @@ public class SimpleAnalysis {
         this.locationData = (element != null) ? new ExtendedLocationData((LocationData) element.getData(), "gathering static control information", element) : null;
         this.parentControlAnalysis = parentControlAnalysis;
         this.inScopeVariables = inScopeVariables;
-        this.hasValue = hasValue;
+        this.canHoldValue = canHoldValue;
 
         if (element != null) {
             final boolean hasBind = element.attribute("bind") != null;
@@ -131,12 +132,16 @@ public class SimpleAnalysis {
     protected XPathAnalysis computeBindingAnalysis(Element element) {
         if (element != null) {
             // TODO: handle @context
-            final String bindingExpression;
-            if (element.attributeValue("context") == null) {
-                bindingExpression = getBindingExpression(element);
-            } else {
-                bindingExpression = null;
+            if (element.attributeValue("context") != null) {
+                return XPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS;
             }
+
+            // TODO: handle @bind
+            if (element.attributeValue("bind") != null) {
+                return XPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS;
+            }
+
+            final String bindingExpression = getBindingExpression(element);
 
             final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
             if ((bindingExpression != null)) {
@@ -164,7 +169,7 @@ public class SimpleAnalysis {
 
     protected XPathAnalysis computeValueAnalysis() {
         if (element != null) {
-            if (hasValue) {
+            if (canHoldValue) {
                 // Regular value control
                 final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
                 return analyzeValueXPath(baseAnalysis, element, prefixedId);
@@ -178,10 +183,10 @@ public class SimpleAnalysis {
 
     protected XPathAnalysis findOrCreateBaseAnalysis() {
         final XPathAnalysis baseAnalysis;
-        final XPathAnalysis ancestor = getAncestorOrSelfBindingAnalysis();
-        if (ancestor != null) {
+        final XPathAnalysis ancestorOrSelf = getAncestorOrSelfBindingAnalysis();
+        if (ancestorOrSelf != null) {
             // There is an ancestor control in the same scope with same model, use its analysis as base
-            baseAnalysis = ancestor;
+            baseAnalysis = ancestorOrSelf;
         } else {
             // We are a top-level control in a scope/model combination, create analysis
             if (modelPrefixedId != null) {

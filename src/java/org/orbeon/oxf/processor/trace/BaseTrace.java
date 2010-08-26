@@ -13,13 +13,11 @@
  */
 package org.orbeon.oxf.processor.trace;
 
-import org.dom4j.Document;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
+import org.orbeon.oxf.pipeline.api.TraceEntry;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
 import java.util.*;
 
@@ -86,10 +84,9 @@ public abstract class BaseTrace implements Trace {
         }
     }
 
-    private PipelineContext pipelineContext;
+    protected PipelineContext pipelineContext;
 
     protected final HashMap<ProcessorOutputImpl, TraceEntry> traceEntries = new LinkedHashMap<ProcessorOutputImpl, TraceEntry>();
-
 
     public void setPipelineContext(PipelineContext pipelineContext) {
         this.pipelineContext = pipelineContext;
@@ -106,30 +103,6 @@ public abstract class BaseTrace implements Trace {
             traceEntries.put(processorOutputImpl, traceEntry);
         }
         return traceEntry;
-    }
-
-    protected Document toXMLDocument(final TraceNode traceNode) {
-        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-        final LocationDocumentResult result = new LocationDocumentResult();
-        identity.setResult(result);
-
-        final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
-        helper.startDocument();
-
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final ExternalContext.Request request = externalContext.getRequest();
-        helper.startElement("request", new String[] { "request-uri", (request != null) ? request.getRequestURI() : null,
-                "query-string", (request != null) ? request.getQueryString() : null,
-                "method", (request != null) ? request.getMethod() : null
-        });
-
-        traceNode.toXML(pipelineContext, helper);
-
-        helper.endElement();
-
-        helper.endDocument();
-
-        return result.getDocument();
     }
 
     public static TraceNode buildTraceNodes(Collection<TraceEntry> traceEntries) {

@@ -60,7 +60,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         if (Version.isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xml");
 
-            staticState.dumpAnalysis();
+//            final PipelineContext pipelineContext = new PipelineContext();
+//            staticState.dumpAnalysis(pipelineContext);
 
             // TODO: test computedBindExpressionsInstances and validationBindInstances
             {
@@ -121,7 +122,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
                 }
             };
 
-            staticState.dumpAnalysis();
+//            final PipelineContext pipelineContext = new PipelineContext();
+//            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
             currentChanges.clear();
@@ -328,7 +330,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
                 }
             };
 
-            staticState.dumpAnalysis();
+//            final PipelineContext pipelineContext = new PipelineContext();
+//            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
             currentChanges.clear();

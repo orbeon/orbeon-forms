@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -196,6 +197,9 @@ public class XFormsStaticState {
 
         // Analyze
         analyze(propertyContext);
+
+        // XXX DEBUG
+//        dumpAnalysis(propertyContext);
     }
 
     private void extract(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, String encodedStaticState) {
@@ -753,7 +757,7 @@ public class XFormsStaticState {
      */
     public boolean isValueControl(String controlEffectiveId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(XFormsUtils.getPrefixedId(controlEffectiveId));
-        return (controlAnalysis != null) && controlAnalysis.hasValue;
+        return (controlAnalysis != null) && controlAnalysis.canHoldValue;
     }
 
     /**
@@ -1486,38 +1490,21 @@ public class XFormsStaticState {
     }
 
     // This for debug only
-    public void dumpAnalysis() {
+    public void dumpAnalysis(PropertyContext propertyContext) {
         if (isXPathAnalysis()) {
-            for (final ControlAnalysis info: controlAnalysisMap.values()) {
-                final String pad = "                                           ".substring(0, info.getLevel());
 
-                System.out.println(pad + "- Control ----------------------------------------------------------------------");
-                System.out.println(pad + info.prefixedId);
-                if (info.bindingAnalysis != null) {
-                    System.out.println(pad + "- Binding ----------------------------------------------------------------------");
-                    info.bindingAnalysis.dump(System.out, info.getLevel());
-                }
-                if (info.valueAnalysis != null) {
-                    System.out.println(pad + "- Value ------------------------------------------------------------------------");
-                    info.valueAnalysis.dump(System.out, info.getLevel());
-                }
-            }
+            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDebugRequestDocument(propertyContext, new XMLUtils.DebugXML() {
+                public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
 
-            for (final Model model: modelsByPrefixedId.values()) {
-                if (model.figuredBindAnalysis) {
-                    final String pad = "";
-                    System.out.println(pad + "- Model ----------------------------------------------------------------------");
-                    System.out.println(pad + model.prefixedId);
-                    if (model.computedBindExpressionsInstances!= null) {
-                        System.out.println(pad + "- Computed binds instances ----------------------------------------------------------------------");
-                        System.out.println(model.computedBindExpressionsInstances.toString());
+                    for (final ControlAnalysis controlAnalysis: controlAnalysisMap.values()) {
+                        controlAnalysis.toXML(propertyContext, helper);
                     }
-                    if (model.validationBindInstances != null) {
-                        System.out.println(pad + "- Validation binds instances ------------------------------------------------------------------------");
-                        System.out.println(model.validationBindInstances.toString());
+
+                    for (final Model model: modelsByPrefixedId.values()) {
+                        model.toXML(propertyContext, helper);
                     }
                 }
-            }
+            })));
         }
     }
 

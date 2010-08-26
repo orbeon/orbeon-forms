@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xml;
 
-import orbeon.apache.xerces.impl.Constants;
-import orbeon.apache.xerces.impl.XMLEntityManager;
-import orbeon.apache.xerces.impl.XMLErrorReporter;
+import orbeon.apache.xerces.impl.*;
 import orbeon.apache.xerces.xni.parser.XMLInputSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -23,18 +21,13 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -42,17 +35,12 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.*;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
+import java.nio.charset.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -1278,5 +1266,33 @@ public class XMLUtils {
 
             declaredPrefixes.add(prefix);
         }
+    }
+
+    public interface DebugXML {
+        void toXML(PropertyContext propertyContext, ContentHandlerHelper helper);
+    }
+
+    public static org.dom4j.Document createDebugRequestDocument(PropertyContext propertyContext, DebugXML debugXML) {
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
+        final LocationDocumentResult result = new LocationDocumentResult();
+        identity.setResult(result);
+
+        final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
+        helper.startDocument();
+
+        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Request request = externalContext.getRequest();
+        helper.startElement("request", new String[] { "request-uri", (request != null) ? request.getRequestURI() : null,
+                "query-string", (request != null) ? request.getQueryString() : null,
+                "method", (request != null) ? request.getMethod() : null
+        });
+
+        debugXML.toXML(propertyContext, helper);
+
+        helper.endElement();
+
+        helper.endDocument();
+
+        return result.getDocument();
     }
 }

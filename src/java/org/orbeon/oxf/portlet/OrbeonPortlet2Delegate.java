@@ -27,17 +27,16 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * OPSPortlet and OPSPortletDelegate are the Portlet (JSR-168) entry point of OPS. OPSPortlet simply delegates to
- * OPSPortletDelegate and provides an option of using the OPS Class Loader.
+ * OrbeonPortlet2 and OrbeonPortlet2Delegate are the Portlet (JSR-268) entry point of Orbeon. OrbeonPortlet2 simply
+ * delegates to OrbeonPortlet2Delegate and provides an option of using the Orbeon Class Loader.
  *
- * Several OPSServlet and OPSPortlet instances can be used in the same Web or Portlet application.
+ * Several OrbeonServlet and OrbeonPortlet2 instances can be used in the same Web or Portlet application.
  * They all share the same Servlet context initialization parameters, but each Portlet can be
  * configured with its own main processor and inputs.
  *
- * All OPSServlet and OPSPortlet instances in a given Web application share the same resource
- * manager.
+ * All OrbeonServlet and OrbeonPortlet2 instances in a given Web application share the same resource manager.
  *
- * WARNING: OPSPortlet must only depend on the Servlet API and the OPS Class Loader.
+ * WARNING: OrbeonPortlet2 must only depend on the Servlet API and the Orbeon Class Loader.
  */
 public class OrbeonPortlet2Delegate extends GenericPortlet {
 
@@ -182,7 +181,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
                     Map redirectParameters = bufferedResponse.getRedirectParameters();
                     if (redirectParameters == null)
                         redirectParameters = new HashMap();
-                    redirectParameters.put(Portlet2ExternalContext.PATH_PARAMETER_NAME, new String[]{bufferedResponse.getRedirectPathInfo()});
+                    redirectParameters.put(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME, new String[]{bufferedResponse.getRedirectPathInfo()});
 
                     // Set the new parameters for the subsequent render requests
                     response.setRenderParameters(redirectParameters);

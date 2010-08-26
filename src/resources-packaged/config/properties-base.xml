@@ -28,6 +28,7 @@
     <!--<property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms)/.*$"/>-->
     <!--<property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>-->
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
+    <!-- Support "servlet" or "wsrp" (or "portlet2" for backward compatibility") -->
     <property as="xs:string"  name="oxf.url-rewriting.strategy.servlet"              value="servlet"/>
     <!-- TODO: support for base context for servlet rewriting strategy -->
     <!--<property as="xs:string"  name="oxf.url-rewriting.portlet.context"               value=""/>-->

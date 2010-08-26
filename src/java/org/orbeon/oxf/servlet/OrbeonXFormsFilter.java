@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -34,7 +34,8 @@ public class OrbeonXFormsFilter implements Filter {
 
     public static final String RENDERER_PATH = "/xforms-renderer";
 
-    private static final String RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
+    public static final String RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
+    public static final String RESOURCE_PATHS_PARAMETER_NAME = "oxf.xforms.renderer.resources";
     private static final String DEFAULT_ENCODING = "ISO-8859-1"; // must be this per Servlet spec
 
     private ServletContext servletContext;
@@ -93,7 +94,7 @@ public class OrbeonXFormsFilter implements Filter {
             // Set base URI
             httpRequest.setAttribute(RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
 
-            // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
+            // Forward to Orbeon Forms for rendering only if there is content to be rendered, otherwise just return and
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
             if (!isEmptyContent) {
@@ -129,7 +130,8 @@ public class OrbeonXFormsFilter implements Filter {
     private ServletContext getOrbeonContext() throws ServletException {
         final ServletContext orbeonContext = (orbeonContextPath != null) ? servletContext.getContext(orbeonContextPath) : servletContext;
         if (orbeonContext  == null)
-            throw new ServletException("Can't find Orbeon Forms context called '" + orbeonContextPath + "'. Check the '" + RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
+            throw new ServletException("Can't find Orbeon Forms context called '" + orbeonContextPath + "'. Check the '"
+                    + RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
 
         return orbeonContext ;
     }

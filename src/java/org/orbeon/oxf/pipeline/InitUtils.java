@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,17 +14,11 @@
 package org.orbeon.oxf.pipeline;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.CacheStatistics;
-import org.orbeon.oxf.cache.ObjectCache;
+import org.dom4j.*;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.properties.Properties;
@@ -34,7 +28,6 @@ import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 
 import javax.servlet.ServletContext;
@@ -112,7 +105,7 @@ public class InitUtils {
             if (logger.isInfoEnabled()) {
                 // Add timing
                 final long timing = System.currentTimeMillis() - tsBegin;
-                final FastStringBuffer sb = new FastStringBuffer(requestPath != null ? requestPath : "Done running processor");
+                final StringBuilder sb = new StringBuilder(requestPath != null ? requestPath : "Done running processor");
                 sb.append(" - Timing: ");
                 sb.append(Long.toString(timing));
 
@@ -136,7 +129,7 @@ public class InitUtils {
         }
     }
 
-    private static void appendCacheStatistics(PipelineContext pipelineContext, Cache cache, FastStringBuffer sb) {
+    private static void appendCacheStatistics(PipelineContext pipelineContext, Cache cache, StringBuilder sb) {
         if (cache != null) {
             final CacheStatistics statistics = cache.getStatistics(pipelineContext);
             final int hitCount = statistics.getHitCount();

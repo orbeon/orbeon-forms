@@ -15,8 +15,7 @@ package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.portlet.Portlet2ExternalContext;
-import org.orbeon.oxf.portlet.WSRP2Utils;
+import org.orbeon.oxf.portlet.*;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
@@ -24,28 +23,28 @@ import java.net.URL;
 import java.util.Map;
 
 
-public class Portlet2URLRewriter implements URLRewriter {
+public class WSRPURLRewriter implements URLRewriter {
 
     private final ExternalContext.Request request;
 
-    public Portlet2URLRewriter(ExternalContext.Request request) {
+    public WSRPURLRewriter(ExternalContext.Request request) {
         this.request = request;
-    }
-
-    public String rewriteActionURL(String urlString) {
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_BLOCKING_ACTION, null, null);
     }
 
     public String rewriteRenderURL(String urlString) {
         return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_RENDER, null, null);
     }
 
-    public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_BLOCKING_ACTION, portletMode, windowState);
-    }
-
     public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
         return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_RENDER, portletMode, windowState);
+    }
+
+    public String rewriteActionURL(String urlString) {
+        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_BLOCKING_ACTION, null, null);
+    }
+
+    public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_BLOCKING_ACTION, portletMode, windowState);
     }
 
     private String rewritePortletURL(String urlString, int urlType, String portletMode, String windowState) {
@@ -67,11 +66,11 @@ public class Portlet2URLRewriter implements URLRewriter {
             if (urlString.startsWith("?")) {
                 // This is a special case that appears to be implemented
                 // in Web browsers as a convenience. Users may use it.
-                parameters.put(Portlet2ExternalContext.PATH_PARAMETER_NAME, new String[]{request.getRequestPath()});
+                parameters.put(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME, new String[]{request.getRequestPath()});
             } else {
                 // Regular case, use parsed path
-                final String path = URLRewriterUtils.getRewritingContext("portlet2", "") + u.getPath();
-                parameters.put(Portlet2ExternalContext.PATH_PARAMETER_NAME, new String[]{ path });
+                final String path = URLRewriterUtils.getRewritingContext("wsrp", "") + u.getPath();
+                parameters.put(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME, new String[]{ path });
             }
             // Encode as "navigational state"
             final String navigationalState = NetUtils.encodeQueryString(parameters);
@@ -81,10 +80,6 @@ public class Portlet2URLRewriter implements URLRewriter {
         } catch (Exception e) {
             throw new OXFException(e);
         }
-    }
-
-    public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
-        return rewriteResourceURL(urlString, generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
     }
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {

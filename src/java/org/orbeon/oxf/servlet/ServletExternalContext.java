@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -62,6 +63,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     private class Request implements ExternalContext.Request {
 
+        private String namespace = null;
+
         private String contextPath;
 
         private Map<String, Object> attributesMap;
@@ -82,7 +85,18 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getContainerNamespace() {
-            return "";
+            if (namespace == null) {
+                final String namespaceAttribute = (String) nativeRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_NAMESPACE_TEMPLATE_ATTRIBUTE);
+                if (namespaceAttribute != null) {
+                    // Namespace is provided with request so we use that
+                    // This is useful e.g. when a portlet delegates rendering to a servlet
+                    namespace = namespaceAttribute;
+                } else {
+                    namespace = "";
+                }
+            }
+
+            return namespace;
         }
 
         public String getContextPath() {
@@ -757,8 +771,18 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public ExternalContext.Response getResponse() {
         if (response == null) {
             response = new Response();
-            final boolean isPortlet2 = "portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT));
-            response.setURLRewriter(isPortlet2 ? new Portlet2URLRewriter(getRequest()) : new ServletURLRewriter(pipelineContext, getRequest()));
+
+            if (nativeRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE) != null) {
+                // If we are passed template URLs, then we use the template URL rewriter automatically
+                response.setURLRewriter(new TemplateURLRewriter(request));
+            } else if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
+                        "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
+                // Configuration asks to use portlet2
+                response.setURLRewriter(new WSRPURLRewriter(getRequest()));
+            } else {
+                // Default
+                response.setURLRewriter(new ServletURLRewriter(pipelineContext, getRequest()));
+            }
         }
         return response;
     }

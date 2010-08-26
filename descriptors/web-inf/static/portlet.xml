@@ -1,7 +1,9 @@
 <?xml version="1.0" ?>
 <portlet-app>
+
+    <!-- Orbeon Forms portlet (for Orbeon Forms running directly within a portlet) -->
     <portlet>
-        <portlet-name>OrbeonFormsPortlet</portlet-name>
+        <portlet-name>orbeon-forms-portlet</portlet-name>
         <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet2Delegate</portlet-class>
         <supports>
             <mime-type>text/html</mime-type>
@@ -23,10 +25,6 @@
             <name>oxf.error-processor.input.config</name>
             <value>oxf:/config/error.xpl</value>
         </init-param>
-        <supports>
-            <mime-type>text/html</mime-type>
-            <mime-type>application/xml</mime-type>
-        </supports>
         <portlet-info>
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
@@ -41,4 +39,25 @@
             </preference>
         </portlet-preferences>
     </portlet>
+
+    <!-- Define the Orbeon portlet XForms filter (for handling XForms within your own portlets) -->
+    <filter>
+        <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
+        <filter-class>org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter</filter-class>
+        <lifecycle>RENDER_PHASE</lifecycle>
+        <lifecycle>RESOURCE_PHASE</lifecycle>
+        <init-param>
+            <name>oxf.xforms.renderer.context</name>
+            <value>/orbeon</value>
+        </init-param>
+    </filter>
+
+    <!-- Uncomment and configure this to map the Orbeon portlet XForms filter -->
+    <!--
+    <filter-mapping>
+        <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
+        <portlet-name>my-portlet</portlet-name>
+    </filter-mapping>
+    -->
+    
 </portlet-app>

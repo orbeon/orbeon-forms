@@ -14,8 +14,7 @@
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.Portlet2URLRewriter;
-import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
@@ -34,10 +33,12 @@ import java.util.*;
  */
 public class Portlet2ExternalContext extends PortletWebAppExternalContext implements ExternalContext {
 
-    public static final String PATH_PARAMETER_NAME = "orbeon.path";
     private static final String OPS_CONTEXT_NAMESPACE_KEY = "org.orbeon.ops.portlet.namespace";
 
     private class Request implements ExternalContext.Request {
+
+        private String namespace = null;
+
         private Map<String, Object> attributesMap;
         private Map<String, String> headerMap;
         private Map<String, String[]> headerValuesMap;
@@ -52,22 +53,20 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public String getContainerNamespace() {
-            final String namespace;
-            if (getNativeResponse() instanceof MimeResponse) {
-//                System.out.println("getContainerNamespace() 1: ");
-                // We have a render response, so we can get the namespace directly and remember it
-                namespace = ((MimeResponse) getNativeResponse()).getNamespace().replace(' ', '_');
-                Portlet2ExternalContext.this.getAttributesMap().put(OPS_CONTEXT_NAMESPACE_KEY, namespace);
-            } else {
-//                System.out.println("getContainerNamespace() 2: ");
-                // We don't have a render response, and we hope for two things:
-                // 1. For a given portlet, the namespace tends to remain constant for the lifetime of the portlet
-                // 2. Even if it is not constant, we hope that it tends to be between a render and action requests
-                namespace = (String) Portlet2ExternalContext.this.getAttributesMap().get(OPS_CONTEXT_NAMESPACE_KEY);
-                if (namespace == null)
-                    throw new OXFException("Unable to find portlet namespace in portlet context.");
+            if (namespace == null) {
+                if (getNativeResponse() instanceof MimeResponse) {
+                    // We have a render response, so we can get the namespace directly and remember it
+                    namespace = ((MimeResponse) getNativeResponse()).getNamespace().replace(' ', '_');// replacement probably because at some point Liferay was allowing spaces in namespace
+                    Portlet2ExternalContext.this.getAttributesMap().put(OPS_CONTEXT_NAMESPACE_KEY, namespace);
+                } else {
+                    // We don't have a render response, and we hope for two things:
+                    // 1. For a given portlet, the namespace tends to remain constant for the lifetime of the portlet
+                    // 2. Even if it is not constant, we hope that it tends to be between a render and action requests
+                    namespace = (String) Portlet2ExternalContext.this.getAttributesMap().get(OPS_CONTEXT_NAMESPACE_KEY);
+                    if (namespace == null)
+                        throw new OXFException("Unable to find portlet namespace in portlet context.");
+                }
             }
-//            System.out.println("  namespace: " + namespace);
             return namespace;
         }
 
@@ -77,7 +76,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
         public String getPathInfo() {
             // Use the resource id if we are a ResourceRequest
-            String result = (portletRequest instanceof ResourceRequest) ? ((ResourceRequest) portletRequest).getResourceID() : portletRequest.getParameter(PATH_PARAMETER_NAME);
+            String result = (portletRequest instanceof ResourceRequest) ? ((ResourceRequest) portletRequest).getResourceID() : portletRequest.getParameter(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
             if (result == null) result = "";
             return (result.startsWith("/")) ? result : "/" + result;
         }
@@ -163,7 +162,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 } else {
                     // Just use native request parameters
                     parameterMap = new HashMap<String, Object[]>(portletRequest.getParameterMap());
-                    parameterMap.remove(PATH_PARAMETER_NAME);
+                    parameterMap.remove(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
                     parameterMap = Collections.unmodifiableMap(parameterMap);
                 }
             }
@@ -390,7 +389,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
     public abstract class BaseResponse implements Response {
 
-        private org.orbeon.oxf.externalcontext.URLRewriter urlRewriter = new Portlet2URLRewriter(request);
+        private URLRewriter urlRewriter = new WSRPURLRewriter(request);
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // NIY / FIXME
@@ -429,7 +428,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             } else if (status >= 400) {
                 // Ignore
             }
-                //throw new OXFException("Error while processing request. HTTP status: " + status);
             // FIXME: How to handle NOT_MODIFIED?
         }
 

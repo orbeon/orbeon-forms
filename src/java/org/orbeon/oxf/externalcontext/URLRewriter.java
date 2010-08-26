@@ -14,9 +14,9 @@
 package org.orbeon.oxf.externalcontext;
 
 public interface URLRewriter {
-    String rewriteActionURL(String urlString);
     String rewriteRenderURL(String urlString);
-    String rewriteActionURL(String urlString, String portletMode, String windowState);
     String rewriteRenderURL(String urlString, String portletMode, String windowState);
+    String rewriteActionURL(String urlString);
+    String rewriteActionURL(String urlString, String portletMode, String windowState);
     String rewriteResourceURL(String urlString, int rewriteMode);
 }

@@ -5032,65 +5032,66 @@ ORBEON.xforms.Init = {
         var resourcesBaseURL = null;
         var xformsServerURL = null;
 
-        if (!(window.orbeonInitData === undefined)) {
-            // Try values passed by server (in portlet mode)
-            var formInitData = window.orbeonInitData[formID];
-            if (formInitData && formInitData["paths"]) {
-                resourcesBaseURL = formInitData["paths"]["resources-base"];
-                xformsServerURL = formInitData["paths"]["xforms-server"];
-            }
-        }
+        // Try scripts
+        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+            var script = scripts[scriptIndex];
+            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
+            if (scriptSrc != null) {
+                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
+                if (startPathToJavaScript != -1) {
+                    // Found path to non-xforms-server resource
+                    // scriptSrc: (/context)(/version)/ops/javascript/xforms-min.js
 
-        if (resourcesBaseURL == null) {
-            // Try scripts
-            for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-                var script = scripts[scriptIndex];
-                var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
-                if (scriptSrc != null) {
-                    var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
+                    // Take the part of the path before the JS path
+                    // prefix: (/context)(/version)
+                    // NOTE: may be "" if no context is present
+                    var prefix = scriptSrc.substr(0, startPathToJavaScript);
+                    resourcesBaseURL = prefix;
+                    if (versioned) {
+                        // Remove version
+                        xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
+                    } else {
+                        xformsServerURL = prefix + XFORMS_SERVER_PATH;
+                    }
+
+                    break;
+                } else {
+                    startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
                     if (startPathToJavaScript != -1) {
-                        // Found path to non-xforms-server resource
-                        // scriptSrc: (/context)(/version)/ops/javascript/xforms-min.js
+                        // Found path to xforms-server resource
+                        // scriptSrc: (/context)/xforms-server(/version)/xforms-...-min.js
 
                         // Take the part of the path before the JS path
-                        // prefix: (/context)(/version)
+                        // prefix: (/context)
                         // NOTE: may be "" if no context is present
                         var prefix = scriptSrc.substr(0, startPathToJavaScript);
-                        resourcesBaseURL = prefix;
+                        var jsPath = scriptSrc.substr(startPathToJavaScript);
                         if (versioned) {
-                            // Remove version
-                            xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
+
+                            var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
+                            var version = bits[2];
+
+                            resourcesBaseURL = prefix + version;
+                            xformsServerURL = prefix + XFORMS_SERVER_PATH;
                         } else {
+                            resourcesBaseURL = prefix;
                             xformsServerURL = prefix + XFORMS_SERVER_PATH;
                         }
 
                         break;
-                    } else {
-                        startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
-                        if (startPathToJavaScript != -1) {
-                            // Found path to xforms-server resource
-                            // scriptSrc: (/context)/xforms-server(/version)/xforms-...-min.js
-
-                            // Take the part of the path before the JS path
-                            // prefix: (/context)
-                            // NOTE: may be "" if no context is present
-                            var prefix = scriptSrc.substr(0, startPathToJavaScript);
-                            var jsPath = scriptSrc.substr(startPathToJavaScript);
-                            if (versioned) {
-
-                                var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
-                                var version = bits[2];
-
-                                resourcesBaseURL = prefix + version;
-                                xformsServerURL = prefix + XFORMS_SERVER_PATH;
-                            } else {
-                                resourcesBaseURL = prefix;
-                                xformsServerURL = prefix + XFORMS_SERVER_PATH;
-                            }
-
-                            break;
-                        }
                     }
+                }
+            }
+        }
+
+        if (resourcesBaseURL == null) {
+            if (!(window.orbeonInitData === undefined)) {
+                // Try values passed by server (in portlet mode)
+                // NOTE: We try this second as of 2010-08-27 server always puts these in 
+                var formInitData = window.orbeonInitData[formID];
+                if (formInitData && formInitData["paths"]) {
+                    resourcesBaseURL = formInitData["paths"]["resources-base"];
+                    xformsServerURL = formInitData["paths"]["xforms-server"];
                 }
             }
         }

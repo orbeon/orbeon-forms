@@ -64,7 +64,7 @@ final public class ResourceManagerWrapper {
     }
 
     /**
-     * Sets a new factory. Nulls the current instance so a new one willbe created
+     * Sets a new factory. Nulls the current instance so a new one will be created
      */
     synchronized public static void setFactory(ResourceManagerFactoryFunctor factory) {
         ResourceManagerWrapper.factory = factory;

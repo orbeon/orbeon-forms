@@ -146,7 +146,7 @@ public class NetUtils {
             if (servletPath == null)
                 servletPath = "";
         }
-        
+
         // Get path info
         String pathInfo = (String) request.getAttribute("javax.servlet.include.path_info");
         if (pathInfo == null) {

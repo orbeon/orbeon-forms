@@ -3,6 +3,7 @@
 
 <display>
     <category name="Orbeon Forms">
-        <portlet id="OrbeonFormsPortlet"/>
+        <portlet id="orbeon-forms-portlet"/>
+        <portlet id="orbeon-forms-jsp-portlet"/>
     </category>
 </display>

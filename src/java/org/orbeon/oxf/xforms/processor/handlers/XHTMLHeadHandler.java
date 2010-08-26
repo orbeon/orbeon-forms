@@ -464,21 +464,20 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 "type", "text/javascript"});
 
         // Produce JSON output
+        final boolean hasPaths = true;
         final boolean hasInitControls = javaScriptControlsAppearancesMap.size() > 0;
         final boolean hasKeyListeners = containingDocument.getStaticState().getKeyHandlers().size() > 0;
         final boolean hasServerEvents; {
             final List<XFormsContainingDocument.DelayedEvent> delayedEvents = containingDocument.getDelayedEvents();
             hasServerEvents = delayedEvents != null && delayedEvents.size() > 0;
         }
-        final boolean outputInitData = hasInitControls || hasKeyListeners || hasServerEvents;
+        final boolean outputInitData = hasPaths || hasInitControls || hasKeyListeners || hasServerEvents;
         if (outputInitData) {
             final StringBuilder sb = new StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"");
             sb.append(XFormsUtils.getFormId(containingDocument));
             sb.append("\"] = {");
 
             // Output path information
-            final boolean hasPaths = handlerContext.getExternalContext().getRequest().getContainerType().equals("portlet");
-
             if (hasPaths) {
                 sb.append("\"paths\":{");
 

@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <liferay-portlet-app>
 	<portlet>
-		<portlet-name>OrbeonFormsPortlet</portlet-name>
+		<portlet-name>orbeon-forms-portlet</portlet-name>
+		<instanceable>true</instanceable>
+	</portlet>
+    <portlet>
+		<portlet-name>orbeon-forms-jsp-portlet</portlet-name>
 		<instanceable>true</instanceable>
 	</portlet>
 </liferay-portlet-app>

@@ -48,6 +48,7 @@ public class OrbeonServletDelegate extends HttpServlet {
     // Accepted methods for this servlet
     private Map acceptedMethods = new HashMap();
 
+    @Override
     public void init() throws ServletException {
         try {
             // Make sure the Web app context is initialized
@@ -117,6 +118,7 @@ public class OrbeonServletDelegate extends HttpServlet {
         }
     }
 
+    @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             // Filter on supported methods
@@ -134,6 +136,7 @@ public class OrbeonServletDelegate extends HttpServlet {
         }
     }
 
+    @Override
     public void destroy() {
 
         // Run listeners
@@ -174,39 +177,4 @@ public class OrbeonServletDelegate extends HttpServlet {
             });
         }
     }
-
-/*
-    {
-        if (config.waitPageProcessorDefinition != null) {
-                // Create and schedule the task
-                Task task = new Task() {
-                    public String getStatus() {
-                        return null;
-                    }
-
-                    public void run() {
-                        // Scenarios:
-                        // 1. GET -> redirect
-                        // 2. GET -> content (*)
-                        // 3. POST -> redirect (*)
-                        // 4. POST -> content
-
-                        // Check (synchronized on output) whether the response was committed
-
-                        // If it was, return immediately, there is nothing we can do
-
-                        // If it was not, bufferize regular output and run pipeline
-
-                        // When processing instruction is found,
-                    }
-                };
-                task.setSchedule(System.currentTimeMillis() + config.waitPageDelay, 0);
-            }
-    }
-
-    {
-        InitUtils.ProcessorDefinition waitPageProcessorDefinition;
-        long waitPageDelay;
-    }
-*/
 }

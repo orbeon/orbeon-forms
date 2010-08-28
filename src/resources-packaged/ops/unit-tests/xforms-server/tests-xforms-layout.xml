@@ -539,7 +539,7 @@
                     <xhtml:span id="my-new-output-2$$c·1" class="xforms-output-output">Hello!</xhtml:span>
                 </xhtml:span>
                 <xhtml:fieldset id="my-new-fieldset-group·1" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required xforms-repeat-selected-item-1">
-                    <xhtml:legend class="xforms-label">My label</xhtml:legend>
+                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group$$l·1">My label</xhtml:legend>
                     <xhtml:span id="my-new-output-3·1" class="xforms-control xforms-output">
                         <xhtml:span id="my-new-output-3$$c·1" class="xforms-output-output">Hello!</xhtml:span>
                     </xhtml:span>
@@ -571,7 +571,7 @@
                     <xhtml:span id="my-new-output-2$$c" class="xforms-output-output"/>
                 </xhtml:span>
                 <xhtml:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-repeat-template">
-                    <xhtml:legend class="xforms-label"/>
+                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group$$l"/>
                     <xhtml:span id="my-new-output-3" class="xforms-control xforms-output">
                         <xhtml:span id="my-new-output-3$$c" class="xforms-output-output"/>
                     </xhtml:span>
@@ -657,7 +657,7 @@
                 <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-group$$t·1">My hint</xhtml:span>
                 <xhtml:span id="my-new-output-2·1" class="xforms-control xforms-output xforms-repeat-selected-item-1">Hello!</xhtml:span>
                 <xhtml:fieldset id="my-new-fieldset-group·1" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required xforms-repeat-selected-item-1">
-                    <xhtml:legend class="xforms-label">My label</xhtml:legend>
+                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group$$l·1">My label</xhtml:legend>
                     <xhtml:span id="my-new-output-3·1" class="xforms-control xforms-output">Hello!</xhtml:span>
                 </xhtml:fieldset>
                 <xhtml:img id="my-new-fieldset-group$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
@@ -681,7 +681,7 @@
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-group$$t"/>
                 <xhtml:span id="my-new-output-2" class="xforms-control xforms-output xforms-repeat-template"/>
                 <xhtml:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-repeat-template">
-                    <xhtml:legend class="xforms-label"/>
+                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group$$l"/>
                     <xhtml:span id="my-new-output-3" class="xforms-control xforms-output"/>
                 </xhtml:fieldset>
                 <xhtml:img id="my-new-fieldset-group$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>

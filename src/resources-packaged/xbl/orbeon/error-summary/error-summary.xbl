@@ -473,7 +473,7 @@ Inserting error information into error list:
                             <xbl:content includes="fr|error-summary > fr|header > *"/>
 
                             <!-- Body of the error summary -->
-                            <xforms:group class="fr-error-summary-body" id="body">
+                            <xforms:group class="fr-error-summary-body" id="body" appearance="xxforms:fieldset">
                                 <!-- Include optional fr:label into xforms:label -->
                                 <xsl:for-each select="/*/fr:label[1]">
                                     <xforms:label xxbl:scope="outer" class="fr-error-title">

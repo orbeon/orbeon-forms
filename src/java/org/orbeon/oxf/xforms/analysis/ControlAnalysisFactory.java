@@ -28,7 +28,7 @@ public class ControlAnalysisFactory {
 
     public static ControlAnalysis create(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
                                            XBLBindings.Scope controlScope, Element controlElement, int index, boolean isContainer,
-                                           ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+                                           ContainerAnalysis parentControlAnalysis, Map<String, SimpleAnalysis> inScopeVariables) {
 
         final String controlName = controlElement.getName();
         final String controlURI = controlElement.getNamespaceURI();
@@ -66,6 +66,11 @@ public class ControlAnalysisFactory {
             controlAnalysis = new ControlAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
                     controlElement, index, XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         }
+
+        // Evaluate aggressively
+        controlAnalysis.getBindingAnalysis();
+        controlAnalysis.getValueAnalysis();
+
         return controlAnalysis;
     }
 }

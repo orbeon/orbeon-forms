@@ -1048,7 +1048,7 @@ public class XFormsStaticState {
                 final ControlAnalysis controlAnalysis; {
                     final XBLBindings.Scope controlScope = xblBindings.getResolutionScopeByPrefixedId(controlPrefixedId);
                     final int controlIndex = controlAnalysisMap.size() + 1;
-                    final Map<String, ControlAnalysis> inScopeVariables = parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap);
+                    final Map<String, SimpleAnalysis> inScopeVariables = parentControlAnalysis.getInScopeViewVariablesForContained();
 
                     controlAnalysis = ControlAnalysisFactory.create(propertyContext, XFormsStaticState.this, controlsDocumentInfo,
                             controlScope, controlElement, controlIndex, isContainer, parentControlAnalysis, inScopeVariables);

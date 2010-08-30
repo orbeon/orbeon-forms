@@ -16,13 +16,12 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Axis;
@@ -55,8 +54,22 @@ public class XPathAnalysis {
         this.figuredOutDependencies = figuredOutDependencies;
     }
 
+    public XPathAnalysis(XFormsStaticState staticState, String xpathString, NamespaceMapping namespaceMapping,
+                         XPathAnalysis baseAnalysis, Map<String, SimpleAnalysis> inScopeVariables,
+                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
+
+        // Create new expression
+        // TODO: get expression from pool and pass in-scope variables (probably more efficient)
+        // TODO: if we use the cache, be careful as expressions can be rewritten in XPathAnalysis()
+
+        this(staticState,
+                XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString, namespaceMapping,
+                        XFormsContainingDocument.getFunctionLibrary()),
+                xpathString, baseAnalysis, inScopeVariables, scope, modelPrefixedId, defaultInstancePrefixedId);
+    }
+
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
-                         XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables,
+                         XPathAnalysis baseAnalysis, Map<String, SimpleAnalysis> inScopeVariables,
                          XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
         
         this.staticState = staticState;
@@ -65,15 +78,18 @@ public class XPathAnalysis {
         try {
             final Map<String, PathMap> variables = new HashMap<String, PathMap>();
             if (inScopeVariables != null) {
-                for (final Map.Entry<String, ControlAnalysis> entry: inScopeVariables.entrySet()) {
-                    variables.put(entry.getKey(), entry.getValue().valueAnalysis.pathmap);
+                for (final Map.Entry<String, SimpleAnalysis> entry: inScopeVariables.entrySet()) {
+                    variables.put(entry.getKey(), entry.getValue().getValueAnalysis().pathmap);
                 }
             }
+
+            // Properties useful for PathMap analysis
+            final Map<String, String> properties = Collections.emptyMap();
 
             final PathMap pathmap;
             if (baseAnalysis == null) {
                 // We are at the top, start with a new PathMap
-                pathmap = new PathMap(expression, variables);
+                pathmap = new PathMap(expression, variables, properties);
             } else {
                 if ((expression.getDependencies() & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
                     // Expression depends on the context item
@@ -81,7 +97,7 @@ public class XPathAnalysis {
                     if (baseAnalysis.figuredOutDependencies) {
                         // We clone the base analysis and add to an existing PathMap
                         pathmap = baseAnalysis.pathmap.clone();
-                        pathmap.setInScopeVariables(variables);
+                        pathmap.setProperties(variables, properties);
                         pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
                     } else {
                         // Base analysis failed, we fail analysis too
@@ -92,7 +108,7 @@ public class XPathAnalysis {
                     }
                 } else {
                     // Expression does not depend on the context item
-                    pathmap = new PathMap(expression, variables);
+                    pathmap = new PathMap(expression, variables, properties);
                 }
             }
 
@@ -225,6 +241,9 @@ public class XPathAnalysis {
                         dependentInstances.add(defaultInstancePrefixedId);
                         if (isReturnable)
                             returnableInstances.add(defaultInstancePrefixedId);
+
+                        // Rewrite expression to add/replace its argument with a prefixed instance id
+                        ((FunctionCall) expression).setArguments(new Expression[] { new StringLiteral(defaultInstancePrefixedId) });
                     } else {
                         // Model does not have a default instance
                         // This is successful, but the path must not be added
@@ -257,6 +276,8 @@ public class XPathAnalysis {
                             dependentInstances.add(prefixedInstanceId);
                             if (isReturnable)
                                 returnableInstances.add(prefixedInstanceId);
+                            // Rewrite expression to replace its argument with a prefixed instance id
+                            ((FunctionCall) expression).setArguments(new Expression[] { new StringLiteral(prefixedInstanceId) });
                         } else {
                             // Instance not found (could be reference to unknown instance e.g. author typo!)
                             // TODO: must also catch case where id is found but does not correspond to instance

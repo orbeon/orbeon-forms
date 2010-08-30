@@ -41,6 +41,8 @@ public class Model {
     public final String defaultInstanceStaticId;
     public final String defaultInstancePrefixedId;
 
+    public final Map<String, SimpleAnalysis> variables;
+
     public final List<Element> bindElements;
     public final Set<String> bindIds;
     public final Map<String, Map<String, String>> customMIPs;
@@ -48,6 +50,7 @@ public class Model {
     public final Set<String> bindInstances;
     public final Set<String> computedBindExpressionsInstances;
     public final Set<String> validationBindInstances;
+
 
     public Model(XFormsStaticState staticState, XBLBindings.Scope scope, Document document) {
 
@@ -72,49 +75,83 @@ public class Model {
         defaultInstanceStaticId = hasInstances  ? instances.keySet().iterator().next() : null;
         defaultInstancePrefixedId = hasInstances ? scope.getFullPrefix() + defaultInstanceStaticId : null;
 
-        bindElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_BIND_QNAME);
-        if (hasBinds()) {
-            // Analyse binds
-            bindIds = new HashSet<String>();
-            customMIPs = new HashMap<String, Map<String, String>>();
-            bindInstances = new HashSet<String>();
-            computedBindExpressionsInstances = new HashSet<String>();
-            validationBindInstances = new HashSet<String>();
-            figuredBindAnalysis = analyzeBinds(bindElements) && staticState.isXPathAnalysis();
-            if (!figuredBindAnalysis) {
-                bindInstances.clear();
-                computedBindExpressionsInstances.clear();
-                validationBindInstances.clear();
+        // Handle variables
+
+        {
+            final List<Element> variableElements = new ArrayList<Element>(); {
+                for (final Element element : Dom4jUtils.elements(document.getRootElement())) {
+                    if (element.getName().equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
+                        // Add xxforms:variable and exforms:variable (in fact *:variable)
+                        variableElements.add(element);
+                    }
+                }
             }
-        } else {
-            // Easy case to figure out
-            bindIds = Collections.emptySet();
-            customMIPs = Collections.emptyMap();
-            figuredBindAnalysis = true;
-            bindInstances = Collections.emptySet();
-            computedBindExpressionsInstances = Collections.emptySet();
-            validationBindInstances = Collections.emptySet();
+
+            if (variableElements.size() > 0) {
+                // Root analysis for model
+                final SimpleAnalysis modelRootAnalysis = new ModelAnalysis(staticState, scope, null, null, Collections.<String, SimpleAnalysis>emptyMap(), false, prefixedId, defaultInstancePrefixedId) {
+
+                    @Override
+                    protected XPathAnalysis computeBindingAnalysis(Element element) {
+                        if (defaultInstancePrefixedId != null) {
+                            // Start with instance('defaultInstanceId')
+                            return analyzeXPath(staticState, null, getModelPrefixedId(), XPathAnalysis.buildInstanceString(defaultInstancePrefixedId));
+                        } else {
+                            return null;
+                        }
+                    }
+                };
+
+                // Iterate and resolve all variables in order
+                variables = new LinkedHashMap<String, SimpleAnalysis>();
+                for (final Element element : variableElements) {
+                    final ModelVariableAnalysis currentVariableAnalysis = new ModelVariableAnalysis(staticState, scope, element, modelRootAnalysis, variables, prefixedId, defaultInstanceStaticId);
+                    variables.put(currentVariableAnalysis.name, currentVariableAnalysis);
+                }
+            } else {
+                variables = Collections.emptyMap();
+            }
         }
+
+        // Handle binds
+        {
+            // TODO: use and produce variables introduced with xf:bind/@name
+
+            bindElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_BIND_QNAME);
+            if (hasBinds()) {
+                // Analyse binds
+                bindIds = new HashSet<String>();
+                customMIPs = new HashMap<String, Map<String, String>>();
+                bindInstances = new HashSet<String>();
+                computedBindExpressionsInstances = new HashSet<String>();
+                validationBindInstances = new HashSet<String>();
+                figuredBindAnalysis = analyzeBinds(bindElements) && staticState.isXPathAnalysis();
+                if (!figuredBindAnalysis) {
+                    bindInstances.clear();
+                    computedBindExpressionsInstances.clear();
+                    validationBindInstances.clear();
+                }
+            } else {
+                // Easy case to figure out
+                bindIds = Collections.emptySet();
+                customMIPs = Collections.emptyMap();
+                figuredBindAnalysis = true;
+                bindInstances = Collections.emptySet();
+                computedBindExpressionsInstances = Collections.emptySet();
+                validationBindInstances = Collections.emptySet();
+            }
+    }
     }
 
     private boolean analyzeBinds(List<Element> bindElements) {
         final List<SimpleAnalysis> stack = new ArrayList<SimpleAnalysis>();
-        stack.add(new SimpleAnalysis(staticState, scope, null, null, null, false) {
-            @Override
-            protected String computeModelPrefixedId() {
-                return Model.this.prefixedId;
-            }
-
-            @Override
-            protected String getDefaultInstancePrefixedId() {
-                return Model.this.defaultInstancePrefixedId;
-            }
+        stack.add(new ModelAnalysis(staticState, scope, null, null, variables, false, prefixedId, defaultInstancePrefixedId) {
 
             @Override
             protected XPathAnalysis computeBindingAnalysis(Element element) {
                 if (defaultInstancePrefixedId != null) {
                     // Start with instance('defaultInstanceId')
-                    return analyzeXPath(staticState, null, modelPrefixedId, XPathAnalysis.buildInstanceString(defaultInstancePrefixedId));
+                    return analyzeXPath(staticState, null, getModelPrefixedId(), XPathAnalysis.buildInstanceString(defaultInstancePrefixedId));
                 } else {
                     return null;
                 }
@@ -146,17 +183,12 @@ public class Model {
 
                 if (bindingExpression != null) {
                     // Analyze binding
-                    final SimpleAnalysis analysis = new SimpleAnalysis(staticState, scope, element, stack.get(stack.size() - 1), null, false) {
-                        @Override
-                        protected String getDefaultInstancePrefixedId() {
-                            return Model.this.defaultInstancePrefixedId;
-                        }
-                    };
-                    if (analysis.bindingAnalysis != null && analysis.bindingAnalysis.figuredOutDependencies) {
+                    final SimpleAnalysis analysis = new ModelAnalysis(staticState, scope, element, stack.get(stack.size() - 1), null, false, Model.this.prefixedId, Model.this.defaultInstancePrefixedId);
+                    if (analysis.getBindingAnalysis() != null && analysis.getBindingAnalysis().figuredOutDependencies) {
                         // Analysis succeeded
 
                         // Add instances
-                        final Set<String> returnableInstances = analysis.bindingAnalysis.returnableInstances;
+                        final Set<String> returnableInstances = analysis.getBindingAnalysis().returnableInstances;
                         bindInstances.addAll(returnableInstances);
                         if (hasCustomMIP || hasCalculateComputedBind(element))
                             computedBindExpressionsInstances.addAll(returnableInstances);
@@ -247,6 +279,12 @@ public class Model {
                 "analyzed-binds", Boolean.toString(figuredBindAnalysis),
 
         });
+
+        if (variables.size() > 0) {
+            for (final Map.Entry<String, SimpleAnalysis> entry: variables.entrySet()) {
+                ((ModelVariableAnalysis) entry.getValue()).toXML(propertyContext, helper);
+            }
+        }
 
         outputInstanceList(helper, "bind-instances", bindInstances);
         outputInstanceList(helper, "computed-binds-instances", computedBindExpressionsInstances);

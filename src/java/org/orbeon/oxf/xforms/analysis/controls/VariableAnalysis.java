@@ -23,12 +23,17 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import java.util.Map;
 
 public class VariableAnalysis extends ControlAnalysis {
-    
-    public VariableAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+
+    public final String name;
+
+    public VariableAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
+                            XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis,
+                            Map<String, SimpleAnalysis> inScopeVariables) {
         super(propertyContext, staticState, controlsDocumentInfo, scope, element, index, isValueControl, parentControlAnalysis, inScopeVariables);
 
         // Gather variable information
-        parentControlAnalysis.addContainedVariable(element.attributeValue("name"), prefixedId);
+        this.name = element.attributeValue("name");
+        parentControlAnalysis.addContainedVariable(this.name, this);
     }
 
     @Override
@@ -36,7 +41,7 @@ public class VariableAnalysis extends ControlAnalysis {
         // TODO: handle xxf:sequence
         final String selectAttribute = element.attributeValue("select");
         if (selectAttribute != null) {
-            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
+            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(true);
             return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute);
         } else {
             // Value is constant

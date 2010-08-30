@@ -171,26 +171,26 @@ public class PathMapXPathDependencies implements XPathDependencies {
             result = cached;
         } else {
             final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
-            if (controlAnalysis.bindingAnalysis == null) {
+            if (controlAnalysis.getBindingAnalysis() == null) {
                 // Control does not have an XPath binding
                 result = false;
-            } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
+            } else if (!controlAnalysis.getBindingAnalysis().figuredOutDependencies) {
                 // Binding dependencies are unknown
                 result = true;
             } else {
                 // Binding dependencies are known
                 if (structuralChanges.isEmpty()) {
                     // No structural change, just test for paths
-                    result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
+                    result = controlAnalysis.getBindingAnalysis().intersectsBinding(getModifiedPaths());
                 } else {
                     // Structural change, also test for models
-                    result = controlAnalysis.bindingAnalysis.intersectsModels(structuralChanges)
-                            || controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
+                    result = controlAnalysis.getBindingAnalysis().intersectsModels(structuralChanges)
+                            || controlAnalysis.getBindingAnalysis().intersectsBinding(getModifiedPaths());
                 }
             }
             if (result) {
                 getLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
-                        "XPath", controlAnalysis.bindingAnalysis.xpathString);
+                        "XPath", controlAnalysis.getBindingAnalysis().xpathString);
             }
 
             modifiedBindingCache.put(controlPrefixedId, result);
@@ -209,10 +209,10 @@ public class PathMapXPathDependencies implements XPathDependencies {
         final XPathAnalysis valueAnalysis;
         if (cached != null) {
             result =  cached;
-            valueAnalysis = result ? staticState.getControlAnalysis(controlPrefixedId).valueAnalysis : null;
+            valueAnalysis = result ? staticState.getControlAnalysis(controlPrefixedId).getValueAnalysis() : null;
         } else {
             final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
-            valueAnalysis = controlAnalysis.valueAnalysis;
+            valueAnalysis = controlAnalysis.getValueAnalysis();
             if (valueAnalysis == null) {
                 // Control does not have a value
                 result = true;//TODO: should be able to return false here; change once markDirty is handled better

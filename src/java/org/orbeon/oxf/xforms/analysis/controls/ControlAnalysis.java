@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * Hold the static analysis for an XForms control.
  */
-public class ControlAnalysis extends SimpleAnalysis {
+public class ControlAnalysis extends ViewAnalysis {
 
     public final int index;
     
@@ -47,7 +47,7 @@ public class ControlAnalysis extends SimpleAnalysis {
 
     public ControlAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
                            XBLBindings.Scope scope, Element element, int index, boolean isValueControl,
-                           ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+                           ContainerAnalysis parentControlAnalysis, Map<String, SimpleAnalysis> inScopeVariables) {
 
         super(staticState, scope, element, parentControlAnalysis, inScopeVariables, isValueControl);
 
@@ -61,7 +61,7 @@ public class ControlAnalysis extends SimpleAnalysis {
 
     private LHHAAnalysis findNestedLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         final Element e = findNestedLHHAElement(propertyContext, controlsDocumentInfo, qName);
-        return (e != null) ? new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, e, true) : null;
+        return (e != null) ? new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, e, true) : null;
     }
 
     protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
@@ -71,14 +71,15 @@ public class ControlAnalysis extends SimpleAnalysis {
     public void setExternalLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement) {
         assert lhhaElement != null;
         final String name = lhhaElement.getName();
+        // TODO: check: getViewVariables() might not be right
         if (XFormsConstants.LABEL_QNAME.getName().equals(name)) {
-            externalLabel = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+            externalLabel = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.HELP_QNAME.getName().equals(name)) {
-            externalHelp = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+            externalHelp = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.HINT_QNAME.getName().equals(name)) {
-            externalHint = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+            externalHint = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.ALERT_QNAME.getName().equals(name)) {
-            externalAlert = new LHHAAnalysis(propertyContext, staticState, scope, inScopeVariables, controlsDocumentInfo, lhhaElement, false);
+            externalAlert = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         }
     }
 
@@ -122,11 +123,11 @@ public class ControlAnalysis extends SimpleAnalysis {
     }
 
     public RepeatAnalysis getAncestorRepeat() {
-        SimpleAnalysis currentParent = parentControlAnalysis;
+        SimpleAnalysis currentParent = parentAnalysis;
         while (currentParent != null) {
             if (currentParent instanceof RepeatAnalysis)
                 return (RepeatAnalysis) currentParent;
-            currentParent = currentParent.parentControlAnalysis;
+            currentParent = currentParent.parentAnalysis;
         }
         return null;
     }
@@ -135,20 +136,20 @@ public class ControlAnalysis extends SimpleAnalysis {
         helper.startElement("control", new String[] {
                 "scope", scope.scopeId,
                 "prefixed-id", prefixedId,
-                "model-prefixed-id", modelPrefixedId,
+                "model-prefixed-id", getModelPrefixedId(),
                 "binding", Boolean.toString(hasNodeBinding),
                 "value", Boolean.toString(canHoldValue)
         });
 
         // Control binding and value analysis
-        if (bindingAnalysis != null) {
+        if (getBindingAnalysis() != null) {
             helper.startElement("binding");
-            bindingAnalysis.toXML(propertyContext, helper);
+            getBindingAnalysis().toXML(propertyContext, helper);
             helper.endElement();
         }
-        if (valueAnalysis != null) {
+        if (getValueAnalysis() != null) {
             helper.startElement("value");
-            valueAnalysis.toXML(propertyContext, helper);
+            getValueAnalysis().toXML(propertyContext, helper);
             helper.endElement();
         }
 
@@ -161,8 +162,8 @@ public class ControlAnalysis extends SimpleAnalysis {
 
         for (final LHHAAnalysis analysis : lhhaAnalysises) {
             helper.startElement(analysis.element.getName());
-            if (analysis.bindingAnalysis != null)
-                analysis.bindingAnalysis.toXML(propertyContext, helper);
+            if (analysis.getBindingAnalysis() != null)
+                analysis.getBindingAnalysis().toXML(propertyContext, helper);
             if (analysis.valueAnalysis != null)
                 analysis.valueAnalysis.toXML(propertyContext, helper);
             helper.endElement();
@@ -171,7 +172,7 @@ public class ControlAnalysis extends SimpleAnalysis {
         helper.endElement();
     }
 
-    public class LHHAAnalysis extends SimpleAnalysis {// TODO: maybe move this to outer level?
+    public class LHHAAnalysis extends ViewAnalysis {// TODO: maybe move this to outer level?
         public final Element element;
         public final boolean isLocal;
         public final boolean hasStaticValue;
@@ -180,7 +181,7 @@ public class ControlAnalysis extends SimpleAnalysis {
         public final XPathAnalysis valueAnalysis;
 
         public LHHAAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope,
-                            Map<String, ControlAnalysis> inScopeVariables,
+                            Map<String, SimpleAnalysis> inScopeVariables,
                             DocumentWrapper controlsDocumentInfo, Element element, boolean isLocal) {
             super(staticState, scope, element, ControlAnalysis.this, inScopeVariables, true);
             this.element = element;

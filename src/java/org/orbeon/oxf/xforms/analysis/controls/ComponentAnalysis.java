@@ -23,7 +23,9 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import java.util.Map;
 
 public class ComponentAnalysis extends ContainerAnalysis {
-    public ComponentAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+    public ComponentAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
+                             XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis,
+                             Map<String, SimpleAnalysis> inScopeVariables) {
         super(propertyContext, staticState, controlsDocumentInfo, scope, element, index, isValueControl, parentControlAnalysis, inScopeVariables);
     }
 

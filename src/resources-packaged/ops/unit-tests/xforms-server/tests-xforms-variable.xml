@@ -594,4 +594,42 @@
         </output>
     </test>
 
+    <test description="Model switching and model variables" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <!-- Reuse document used by other tests -->
+        <input name="document" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xml"/>
+        <!-- FIXME: output2b should be 42. See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315410&group_id=168&atid=350207 -->
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <instance>42</instance>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <instance>43</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">42</xxf:control>
+                        <xxf:control id="output2a">43</xxf:control>
+                        <xxf:control id="output2b">43</xxf:control>
+                        <xxf:control id="output3a">42</xxf:control>
+                        <xxf:control id="output3b">42</xxf:control>
+                        <xxf:control id="output3c">43</xxf:control>
+                        <xxf:control id="output4a">42</xxf:control>
+                        <xxf:control id="output4b">42</xxf:control>
+                        <xxf:control id="output4c">43</xxf:control>
+                        <xxf:control id="output5a">42</xxf:control>
+                        <xxf:control id="output5b">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

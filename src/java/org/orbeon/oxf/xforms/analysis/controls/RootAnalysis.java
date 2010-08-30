@@ -21,9 +21,12 @@ import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
+import java.util.Collections;
+
 public class RootAnalysis extends ContainerAnalysis {
+
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
-        super(propertyContext, staticState, null, scope, null, 1, false, null, null);
+        super(propertyContext, staticState, null, scope, null, 1, false, null, Collections.<String, SimpleAnalysis>emptyMap());
     }
 
     @Override
@@ -32,7 +35,7 @@ public class RootAnalysis extends ContainerAnalysis {
     }
 
     @Override
-    protected String computeModelPrefixedId() {
+    public String getModelPrefixedId() {
         return staticState.getDefaultModelId();
     }
 

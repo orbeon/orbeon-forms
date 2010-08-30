@@ -1281,7 +1281,7 @@ public class XMLUtils {
         helper.startDocument();
 
         final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final ExternalContext.Request request = externalContext.getRequest();
+        final ExternalContext.Request request = (externalContext != null) ? externalContext.getRequest() : null;
         helper.startElement("request", new String[] { "request-uri", (request != null) ? request.getRequestURI() : null,
                 "query-string", (request != null) ? request.getQueryString() : null,
                 "method", (request != null) ? request.getMethod() : null

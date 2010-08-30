@@ -122,8 +122,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
                 }
             };
 
-//            final PipelineContext pipelineContext = new PipelineContext();
-//            staticState.dumpAnalysis(pipelineContext);
+            final PipelineContext pipelineContext = new PipelineContext();
+            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
             currentChanges.clear();
@@ -347,6 +347,94 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
             assertFalse(dependencies.requireBindingUpdate("input"));
             assertTrue(dependencies.requireValueUpdate("input"));
+        }
+    }
+    
+    @Test
+    public void testModelVariables() {
+        if (Version.isPE()) { // only test this feature if we are the PE version
+            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xml");
+            final Map<String, String> namespaces = new HashMap<String, String>();
+            namespaces.put("", "");
+
+            // Hold the current list of changes
+            final Set<String> currentChanges = new HashSet<String>();
+
+            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState) {
+                @Override
+                protected Set<String> getModifiedPaths() {
+                    return currentChanges;
+                }
+            };
+
+//            final PipelineContext pipelineContext = new PipelineContext();
+//            staticState.dumpAnalysis(pipelineContext);
+
+            // == Value change to instance1 ============================================================================
+            currentChanges.clear();
+            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance1')"));
+
+            // No binding update
+            assertFalse(dependencies.requireBindingUpdate("output1"));
+            assertFalse(dependencies.requireBindingUpdate("group2"));
+            assertFalse(dependencies.requireBindingUpdate("output2a"));
+            assertFalse(dependencies.requireBindingUpdate("output2b"));
+            assertFalse(dependencies.requireBindingUpdate("group3"));
+            assertFalse(dependencies.requireBindingUpdate("output3a"));
+            assertFalse(dependencies.requireBindingUpdate("output3b"));
+            // TODO: group4 has @context attribute so not analyzed
+//            assertFalse(dependencies.requireBindingUpdate("group4"));
+//            assertFalse(dependencies.requireBindingUpdate("output4a"));
+//            assertFalse(dependencies.requireBindingUpdate("output4b"));
+
+            // $mv pointing to model1 must update their value
+            assertTrue(dependencies.requireValueUpdate("output1"));
+            assertTrue(dependencies.requireValueUpdate("output2b"));
+            assertTrue(dependencies.requireValueUpdate("output3a"));
+            assertTrue(dependencies.requireValueUpdate("output3b"));
+            assertTrue(dependencies.requireValueUpdate("output4a"));
+            assertTrue(dependencies.requireValueUpdate("output4b"));
+            assertTrue(dependencies.requireValueUpdate("output5a"));
+
+            // $mv pointing to model2 must not update
+            assertFalse(dependencies.requireValueUpdate("output2a"));
+            assertFalse(dependencies.requireValueUpdate("output3c"));
+            assertFalse(dependencies.requireValueUpdate("output4c"));
+            assertFalse(dependencies.requireValueUpdate("output5b"));
+
+            dependencies.refreshDone();
+            
+            // == Value change to instance2 ============================================================================
+            currentChanges.clear();
+            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance2')"));
+
+            // No binding update
+            assertFalse(dependencies.requireBindingUpdate("output1"));
+            assertFalse(dependencies.requireBindingUpdate("group2"));
+            assertFalse(dependencies.requireBindingUpdate("output2a"));
+            assertFalse(dependencies.requireBindingUpdate("output2b"));
+            assertFalse(dependencies.requireBindingUpdate("group3"));
+            assertFalse(dependencies.requireBindingUpdate("output3a"));
+            assertFalse(dependencies.requireBindingUpdate("output3b"));
+            // TODO: group4 has @context attribute so not analyzed
+//            assertFalse(dependencies.requireBindingUpdate("group4"));
+//            assertFalse(dependencies.requireBindingUpdate("output4a"));
+//            assertFalse(dependencies.requireBindingUpdate("output4b"));
+
+            // $mv pointing to model1 must not update their value
+            assertFalse(dependencies.requireValueUpdate("output1"));
+            assertFalse(dependencies.requireValueUpdate("output2b"));
+            assertFalse(dependencies.requireValueUpdate("output3a"));
+            assertFalse(dependencies.requireValueUpdate("output3b"));
+            assertFalse(dependencies.requireValueUpdate("output4a"));
+            assertFalse(dependencies.requireValueUpdate("output4b"));
+            assertFalse(dependencies.requireValueUpdate("output5a"));
+
+            // $mv pointing to model2 must update
+            assertTrue(dependencies.requireValueUpdate("output2a"));
+            assertTrue(dependencies.requireValueUpdate("output3c"));
+            assertTrue(dependencies.requireValueUpdate("output4c"));
+            assertTrue(dependencies.requireValueUpdate("output5b"));
         }
     }
 

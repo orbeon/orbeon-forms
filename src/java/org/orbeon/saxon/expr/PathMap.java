@@ -14,9 +14,7 @@
 package org.orbeon.saxon.expr;
 
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.functions.Doc;
-import org.orbeon.saxon.functions.Document;
-import org.orbeon.saxon.functions.SystemFunction;
+import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.Axis;
 import org.orbeon.saxon.pattern.AnyNodeTest;
 import org.orbeon.saxon.pattern.NodeKindTest;
@@ -26,9 +24,7 @@ import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.XPathException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -59,6 +55,7 @@ public class PathMap implements Cloneable {
     private HashMap<Binding, PathMapNodeSet> pathsForVariables = new HashMap<Binding, PathMapNodeSet>();  // a map from a variable Binding to a PathMapNodeSet
 
     private Map<String, PathMap> inScopeVariables;
+    private Map<String, String> properties;
 
     /**
      * A node in the path map. A node holds a set of arcs, each representing a link to another
@@ -149,9 +146,12 @@ public class PathMap implements Cloneable {
             this.arcs.addAll(arcs);
         }
 
+        // ORBEON
         public void addArcs(PathMapArc[] arcs) {
             this.arcs.addAll(Arrays.asList(arcs));
         }
+
+        // ORBEON
         public void removeArc(PathMapArc arc) {
             this.arcs.remove(arc);
         }
@@ -396,15 +396,23 @@ public class PathMap implements Cloneable {
     }
 
     // ORBEON
-    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables) {
-        this.inScopeVariables = inScopeVariables;
+    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables, Map<String, String> properties) {
+
+        setProperties(inScopeVariables, properties);
+
         final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
         updateFinalNodes(finalNodes);
     }
 
     // ORBEON
-    public void setInScopeVariables(Map<String, PathMap> inScopeVariables) {
+    public void setProperties(Map<String, PathMap> inScopeVariables, Map<String, String> properties) {
         this.inScopeVariables = inScopeVariables;
+        this.properties = properties;
+    }
+
+    // ORBEON
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     /**
@@ -456,6 +464,8 @@ public class PathMap implements Cloneable {
         final PathMapNodeSet localResult = (PathMapNodeSet)pathsForVariables.get(binding);
         if (localResult != null)
             return localResult;
+
+        // ORBEON
 
         // Check external variables
         // Clone the PathMap first because the nodes returned must belong to this PathMap

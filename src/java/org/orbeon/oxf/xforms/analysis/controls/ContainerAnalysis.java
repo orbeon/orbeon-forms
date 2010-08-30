@@ -25,11 +25,11 @@ import java.util.Map;
 
 public class ContainerAnalysis extends ControlAnalysis {
 
-    private Map<String, String> containedVariables; // variable name -> prefixed id
+    private Map<String, VariableAnalysis> containedVariables;
 
     public ContainerAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
                              XBLBindings.Scope scope, Element element, int index, boolean isValueControl,
-                             ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+                             ContainerAnalysis parentControlAnalysis, Map<String, SimpleAnalysis> inScopeVariables) {
         super(propertyContext, staticState, controlsDocumentInfo, scope, element, index, isValueControl, parentControlAnalysis, inScopeVariables);
     }
 
@@ -47,9 +47,9 @@ public class ContainerAnalysis extends ControlAnalysis {
         }
     }
 
-    public void addContainedVariable(String variableName, String variablePrefixedId) {
+    public void addContainedVariable(String variableName, VariableAnalysis variablePrefixedId) {
         if (containedVariables == null)
-            containedVariables = new HashMap<String, String>();
+            containedVariables = new HashMap<String, VariableAnalysis>();
         containedVariables.put(variableName, variablePrefixedId);
     }
 
@@ -58,25 +58,19 @@ public class ContainerAnalysis extends ControlAnalysis {
         containedVariables = null;
     }
 
-    public Map<String, ControlAnalysis> getInScopeVariablesForContained(Map<String, ControlAnalysis> controlAnalysisMap) {
-        if (inScopeVariables == null && containedVariables == null) {
-            // No variables at all
-            return null;
-        } else if (containedVariables == null) {
-            // No contained variables
-            return inScopeVariables;
-        } else {
-            // Contained variables
-            final Map<String, ControlAnalysis> result = new HashMap<String, ControlAnalysis>();
-            // Add all of parent's in-scope variables
-            if (inScopeVariables != null)
-                result.putAll(inScopeVariables);
-            // Add all new variables so far
-            for (final Map.Entry<String, String> entry: containedVariables.entrySet()) {
-                result.put(entry.getKey(), controlAnalysisMap.get(entry.getValue()));
-            }
+    public Map<String, SimpleAnalysis> getInScopeViewVariablesForContained() {
 
-            return result;
+        // NOTE: We don't scope model variables as this method must only return view variables
+
+        // Add all of parent's in-scope view variables
+        final Map<String, SimpleAnalysis> result = new HashMap<String, SimpleAnalysis>();
+        result.putAll(getViewVariables());
+
+        // Add all new view variables in the container so far
+        if (containedVariables != null) {
+            result.putAll(containedVariables);
         }
+
+        return result;
     }
 }

@@ -27,7 +27,9 @@ public class Select1Analysis extends ControlAnalysis {
     public final boolean isMultiple;
     public final boolean hasNonStaticItem;
 
-    public Select1Analysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+    public Select1Analysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
+                           XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis,
+                           Map<String, SimpleAnalysis> inScopeVariables) {
         super(propertyContext, staticState, controlsDocumentInfo, scope, element, index, isValueControl, parentControlAnalysis, inScopeVariables);
 
         // Gather itemset information

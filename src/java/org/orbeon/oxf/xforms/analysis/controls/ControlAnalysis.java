@@ -190,7 +190,8 @@ public class ControlAnalysis extends ViewAnalysis {
             this.hasStaticValue = hasStaticValue(propertyContext, controlsDocumentInfo);
             // TODO: model change
 
-            if (!this.hasStaticValue && staticState.isXPathAnalysis()) {
+            // TODO: this is disabled until implementation is complete
+            if (false && !this.hasStaticValue && staticState.isXPathAnalysis()) {
                 final String lhhaPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(element));
                 if (element.attribute("value") != null || element.attribute("ref") != null) {
                     // 1. E.g. <xforms:label model="..." context="..." value|ref="..."/>

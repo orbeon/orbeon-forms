@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xh:head>
+        <xf:model id="model1" xxf:xpath-analysis="true">
+            <xf:instance id="instance1">
+                <instance>42</instance>
+            </xf:instance>
+            <xxf:variable name="mv" select="instance()"/>
+        </xf:model>
+        <xf:model id="model2">
+            <xf:instance id="instance2">
+                <instance>43</instance>
+            </xf:instance>
+            <xxf:variable name="mv" select="instance()"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:output id="output1" value="$mv"/>
+        <xf:group id="group2" model="model2">
+            <!-- Change model with @model attribute -->
+            <xf:output id="output2a" value="$mv"/>
+            <xf:output id="output2b" model="model1" value="$mv"/>
+        </xf:group>
+        <xf:group id="group3" ref="xxf:instance('instance2')">
+            <!-- Change model with @ref attribute -->
+            <!-- Currently: doesn't change which model variables are in scope! -->
+            <xf:output id="output3a" value="$mv"/>
+            <xf:output id="output3b" model="model1" value="$mv"/>
+            <xf:output id="output3c" model="model2" value="$mv"/>
+        </xf:group>
+        <xf:group id="group4" context="xxf:instance('instance2')">
+            <!-- Change model with @context attribute -->
+            <!-- Currently: doesn't change which model variables are in scope! -->
+            <xf:output id="output4a" value="$mv"/>
+            <xf:output id="output4b" model="model1" value="$mv"/>
+            <xf:output id="output4c" model="model2" value="$mv"/>
+        </xf:group>
+
+        <xxf:variable name="mv1" select="$mv"/>
+        <xxf:variable name="mv2" model="model2" select="$mv"/>
+
+        <xf:output id="output5a" value="$mv1"/>
+        <xf:output id="output5b" value="$mv2"/>
+
+    </xh:body>
+</xh:html>

@@ -195,7 +195,7 @@ public abstract class SimpleAnalysis {
         while (currentAnalysis != null) {
 
             if (currentAnalysis.getBindingAnalysis() != null
-                    && currentAnalysis.getModelPrefixedId().equals(getModelPrefixedId())
+                    && XFormsUtils.compareStrings(currentAnalysis.getModelPrefixedId(), getModelPrefixedId()) // support null model
                     && currentAnalysis.scope.equals(scope)) {
                 return currentAnalysis.getBindingAnalysis();
             }

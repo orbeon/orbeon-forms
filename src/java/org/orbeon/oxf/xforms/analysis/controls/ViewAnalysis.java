@@ -75,7 +75,8 @@ public class ViewAnalysis extends SimpleAnalysis {
     }
 
     public String getDefaultInstancePrefixedId() {
-        return staticState.getModel(getModelPrefixedId()).defaultInstancePrefixedId;
+        final Model model = staticState.getModel(getModelPrefixedId());
+        return (model != null) ? model.defaultInstancePrefixedId : null;
     }
 
     @Override
@@ -83,7 +84,8 @@ public class ViewAnalysis extends SimpleAnalysis {
         if (inScopeVariables == null) {
             final Model model = staticState.getModel(getModelPrefixedId());
             inScopeVariables = new HashMap<String, SimpleAnalysis>();
-            inScopeVariables.putAll(model.variables);
+            if (model != null)
+                inScopeVariables.putAll(model.variables);
             inScopeVariables.putAll(viewVariables);
         }
         return inScopeVariables;

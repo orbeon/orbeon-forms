@@ -51,7 +51,7 @@ import java.util.*;
  *
  * NOTE: This code will have to change a bit if we move towards TinyTree to store the static state.
  */
-public class XFormsStaticState {
+public class XFormsStaticState implements XMLUtils.DebugXML {
 
     public static final String LOGGING_CATEGORY = "analysis";
     private static final Logger logger = LoggerFactory.createLogger(XFormsStaticState.class);
@@ -1492,20 +1492,23 @@ public class XFormsStaticState {
     // This for debug only
     public void dumpAnalysis(PropertyContext propertyContext) {
         if (isXPathAnalysis()) {
-
-            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDebugRequestDocument(propertyContext, new XMLUtils.DebugXML() {
-                public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
-
-                    for (final ControlAnalysis controlAnalysis: controlAnalysisMap.values()) {
-                        controlAnalysis.toXML(propertyContext, helper);
-                    }
-
-                    for (final Model model: modelsByPrefixedId.values()) {
-                        model.toXML(propertyContext, helper);
-                    }
-                }
-            })));
+            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(propertyContext, this)));
         }
+    }
+
+    public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+        XMLUtils.wrapWithRequestElement(propertyContext, helper, new XMLUtils.DebugXML() {
+            public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+
+                for (final ControlAnalysis controlAnalysis: controlAnalysisMap.values()) {
+                    controlAnalysis.toXML(propertyContext, helper);
+                }
+
+                for (final Model model: modelsByPrefixedId.values()) {
+                    model.toXML(propertyContext, helper);
+                }
+            }
+        });
     }
 
     public DocumentWrapper getDefaultDocumentWrapper() {

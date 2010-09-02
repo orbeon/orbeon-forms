@@ -142,7 +142,7 @@ public class ControlAnalysis extends ViewAnalysis {
         });
 
         // Control binding and value analysis
-        if (getBindingAnalysis() != null) {
+        if (getBindingAnalysis() != null && hasNodeBinding) {// NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
             helper.startElement("binding");
             getBindingAnalysis().toXML(propertyContext, helper);
             helper.endElement();

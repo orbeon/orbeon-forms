@@ -19,9 +19,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -186,7 +184,16 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     public String getRealPath(final String key) {
         return (String) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return resourceManager.getRealPath(key);
+                final String realPath = resourceManager.getRealPath(key);
+                // Here consider null as not found
+                // The semantic is a bit different from the underlying managers, which have:
+                //
+                // o null: unsupported
+                // o ResourceNotFoundException: supported by not found
+                if (realPath == null)
+                   throw new ResourceNotFoundException("Cannot read from file " + key);
+                else
+                    return realPath;
             }
         });
     }

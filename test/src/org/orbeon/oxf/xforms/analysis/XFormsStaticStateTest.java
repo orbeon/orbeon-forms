@@ -445,6 +445,16 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
      * @return              static state
      */
     public static XFormsStaticState getStaticState(String documentURL) {
+        return getStaticState(ProcessorUtils.createDocumentFromURL(documentURL, null));
+    }
+
+    /**
+     * Return an analyzed static state for the given XForms document.
+     *
+     * @param formDocument  document to analyze
+     * @return              static state
+     */
+    public static XFormsStaticState getStaticState(Document formDocument) {
         final PipelineContext pipelineContext = new PipelineContext();
         final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/xforms/analysis/request.xml", null);
         final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
@@ -460,9 +470,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         final SAXStore annotatedTemplate = new SAXStore();
 
         // Read the input through the annotator and gather namespace mappings
-        XMLUtils.urlToSAX(documentURL, new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata),
-                    externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata),
-                        false, false, false);
+        TransformerUtils.writeDom4j(formDocument, new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata),
+                    externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata));
 
         final String digest = NumberUtils.toHexString(digestContentHandler.getResult());
 

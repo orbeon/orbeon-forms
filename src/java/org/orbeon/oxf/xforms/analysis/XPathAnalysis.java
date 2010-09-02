@@ -29,7 +29,7 @@ import org.orbeon.saxon.om.NamePool;
 
 import java.util.*;
 
-public class XPathAnalysis {
+public class XPathAnalysis implements XMLUtils.DebugXML {
 
     public final XFormsStaticState staticState;
     public final String xpathString;
@@ -404,8 +404,8 @@ public class XPathAnalysis {
     }
 
     private static class NodeArc {
-        public final PathMap.PathMapNode node;
-        public final PathMap.PathMapArc arc;
+        public final PathMap.PathMapNode node;  // node, as we otherwise can't go back to the node from an arc
+        public final PathMap.PathMapArc arc;    // one of the arcs of the node
 
         private NodeArc(PathMap.PathMapNode node, PathMap.PathMapArc arc) {
             this.node = node;
@@ -427,47 +427,56 @@ public class XPathAnalysis {
 
     private boolean reduceAncestorAxis(List<NodeArc> stack, PathMap.PathMapNode node) {
         // Process children nodes
-        if (node.getArcs().length > 0) {
-            for (final PathMap.PathMapArc arc: node.getArcs()) {
+        for (final PathMap.PathMapArc arc: node.getArcs()) {
 
-                final AxisExpression e = arc.getStep();
-                // TODO: handle ANCESTOR_OR_SELF axis
-                if (e.getAxis() == Axis.ANCESTOR && e.getNodeTest().getFingerprint() != -1) {
-                    // Found ancestor::foobar
-                    final int nodeName = e.getNodeTest().getFingerprint();
-                    final PathMap.PathMapArc ancestorArc = ancestorWithFingerprint(stack, nodeName);
-                    if (moveArc(stack, node, arc, ancestorArc))
+            final NodeArc newNodeArc = new NodeArc(node, arc);
+
+            final AxisExpression e = arc.getStep();
+            // TODO: handle ANCESTOR_OR_SELF axis
+            if (e.getAxis() == Axis.ANCESTOR && e.getNodeTest().getFingerprint() != -1) {
+                // Found ancestor::foobar
+                final int nodeName = e.getNodeTest().getFingerprint();
+                final PathMap.PathMapArc ancestorArc = ancestorWithFingerprint(stack, nodeName);
+                if (ancestorArc != null) {
+                    if (moveArc(stack, newNodeArc, ancestorArc.getTarget()))
                         return true;
-                } else if (e.getAxis() == Axis.PARENT) {
-                    // Parent axis
-                    final NodeArc grandparentNodeArc = stack.get(stack.size() - 2);
-                    if (moveArc(stack, node, arc, grandparentNodeArc.arc))
-                        return true;
-                } else if (e.getAxis() == Axis.FOLLOWING_SIBLING || e.getAxis() == Axis.PRECEDING_SIBLING) {
-                    // Simplify preceding-sibling::foobar / following-sibling::foobar
+                } else {
+                    // E.g.: /a/b/ancestor::c
+                    // TODO
+                }
+            } else if (e.getAxis() == Axis.PARENT) { // don't test fingerprint as we could handle /a/*/..
+                // Parent axis
+                if (stack.size() >= 1) {
                     final NodeArc parentNodeArc = stack.get(stack.size() - 1);
-                    if (stack.size() > 2) {
-                        final NodeArc grandparentNodeArc = stack.get(stack.size() - 2);
-
-                        final AxisExpression newStep = new AxisExpression(parentNodeArc.arc.getStep().getAxis(), e.getNodeTest());
-                        newStep.setContainer(e.getContainer());
-                        grandparentNodeArc.node.createArc(newStep, arc.getTarget());
-                        node.removeArc(arc);
-                    } else {
-                        final AxisExpression newStep = new AxisExpression(Axis.CHILD, e.getNodeTest());
-                        newStep.setContainer(e.getContainer());
-                        parentNodeArc.node.createArc(newStep, arc.getTarget());
-                        node.removeArc(arc);
-                    }
-                }
-
-                {
-                    stack.add(new NodeArc(node, arc));
-                    if (reduceAncestorAxis(stack, arc.getTarget())) {
+                    if (moveArc(stack, newNodeArc, parentNodeArc.node))
                         return true;
-                    }
-                    stack.remove(stack.size() - 1);
+                } else {
+                    // TODO: is this possible?
                 }
+            } else if (e.getAxis() == Axis.FOLLOWING_SIBLING || e.getAxis() == Axis.PRECEDING_SIBLING) {
+                // Simplify preceding-sibling::foobar / following-sibling::foobar
+                final NodeArc parentNodeArc = stack.get(stack.size() - 1);
+                if (stack.size() > 2) {
+                    final NodeArc grandparentNodeArc = stack.get(stack.size() - 2);
+
+                    final AxisExpression newStep = new AxisExpression(parentNodeArc.arc.getStep().getAxis(), e.getNodeTest());
+                    newStep.setContainer(e.getContainer());
+                    grandparentNodeArc.node.createArc(newStep, arc.getTarget());
+                    node.removeArc(arc);
+                } else {
+                    final AxisExpression newStep = new AxisExpression(Axis.CHILD, e.getNodeTest());
+                    newStep.setContainer(e.getContainer());
+                    parentNodeArc.node.createArc(newStep, arc.getTarget());
+                    node.removeArc(arc);
+                }
+            }
+
+            {
+                stack.add(newNodeArc);
+                if (reduceAncestorAxis(stack, arc.getTarget())) {
+                    return true;
+                }
+                stack.remove(stack.size() - 1);
             }
         }
 
@@ -475,17 +484,20 @@ public class XPathAnalysis {
         return false;
     }
 
-    private boolean moveArc(List<NodeArc> stack, PathMap.PathMapNode node, PathMap.PathMapArc arc, PathMap.PathMapArc ancestorArc) {
-        if (ancestorArc != null) {
+    private boolean moveArc(List<NodeArc> stack, NodeArc nodeArc, PathMap.PathMapNode ancestorNode) {
+        if (ancestorNode != null) {
 
             // Move arcs
-            ancestorArc.getTarget().addArcs(arc.getTarget().getArcs());
+            ancestorNode.addArcs(nodeArc.arc.getTarget().getArcs());
 
             // Remove current arc from its node as it's been moved
-            node.removeArc(arc);
+            nodeArc.node.removeArc(nodeArc.arc);
+
+            if (nodeArc.arc.getTarget().isReturnable())
+                ancestorNode.setReturnable(true);
 
             // Remove orphan nodes
-            removeOrphanNodes(stack);
+//            removeOrphanNodes(stack);
 
             return true;
         } else {
@@ -509,10 +521,12 @@ public class XPathAnalysis {
         return null;
     }
 
+    // TODO: Fix this function to properly remove orphan nodes without removing actual dependencies
     private void removeOrphanNodes(List<NodeArc> stack) {
         Collections.reverse(stack);
         for (final NodeArc nodeArc: stack) {
-            if (nodeArc.arc.getTarget().getArcs().length == 0) {
+            // If the node is not returnable and doesn't have children arcs, prune it
+            if (!nodeArc.node.isReturnable() && nodeArc.arc.getTarget().getArcs().length == 0) {
                 nodeArc.node.removeArc(nodeArc.arc);
             }
         }

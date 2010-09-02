@@ -1272,12 +1272,26 @@ public class XMLUtils {
         void toXML(PropertyContext propertyContext, ContentHandlerHelper helper);
     }
 
-    public static org.dom4j.Document createDebugRequestDocument(PropertyContext propertyContext, DebugXML debugXML) {
+    public static org.dom4j.Document createDebugRequestDocument(final PropertyContext propertyContext, final DebugXML debugXML) {
+        return createDocument(propertyContext, new DebugXML() {
+            public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+                wrapWithRequestElement(propertyContext, helper, debugXML);
+            }
+        });
+    }
+
+    public static org.dom4j.Document createDocument(PropertyContext propertyContext, DebugXML debugXML) {
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
         final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
+        debugXML.toXML(propertyContext, helper);
+
+        return result.getDocument();
+    }
+
+    public static void wrapWithRequestElement(PropertyContext propertyContext, ContentHandlerHelper helper, DebugXML debugXML) {
         helper.startDocument();
 
         final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -1292,7 +1306,5 @@ public class XMLUtils {
         helper.endElement();
 
         helper.endDocument();
-
-        return result.getDocument();
     }
 }

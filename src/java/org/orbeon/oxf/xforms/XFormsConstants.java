@@ -72,6 +72,14 @@ public class XFormsConstants {
     public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
     public static final Namespace XXFORMS_NAMESPACE = new Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
 
+    // Common attributes
+    public static final QName REF_QNAME = new QName("ref");
+    public static final QName NODESET_QNAME = new QName("nodeset");
+    public static final QName CONTEXT_QNAME = new QName("context");
+    public static final QName BIND_QNAME = new QName("bind");
+    public static final QName VALUE_QNAME = new QName("value");
+    public static final QName MODEL_QNAME = new QName("model");
+
     // XForms controls
     public static final QName GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
     public static final QName REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
@@ -215,7 +223,7 @@ public class XFormsConstants {
     public static final QName HELP_QNAME = new QName("help", XFORMS_NAMESPACE);
     public static final QName HINT_QNAME = new QName("hint", XFORMS_NAMESPACE);
     public static final QName ALERT_QNAME = new QName("alert", XFORMS_NAMESPACE);
-    public static final QName VALUE_QNAME = new QName("value", XFORMS_NAMESPACE);
+    public static final QName XFORMS_VALUE_QNAME = new QName("value", XFORMS_NAMESPACE);
     public static final QName COPY_QNAME = new QName("copy", XFORMS_NAMESPACE);
     public static final QName ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);
     public static final QName ITEM_QNAME = new QName("item", XFORMS_NAMESPACE);

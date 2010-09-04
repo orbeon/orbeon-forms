@@ -126,7 +126,7 @@ public class XFormsContextStack {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
         // All variables in the model are in scope for the nested binds and actions.
-        final List<Element> elements = Dom4jUtils.elements(xformsModel.getStaticModel().document.getRootElement(), XFormsConstants.XXFORMS_VARIABLE_NAME);
+        final List<Element> elements = Dom4jUtils.elements(xformsModel.getStaticModel().document().getRootElement(), XFormsConstants.XXFORMS_VARIABLE_NAME);
         final List<BindingContext.VariableInfo> variableInfos
                 = addAndScopeVariables(propertyContext, xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
 

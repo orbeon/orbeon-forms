@@ -91,7 +91,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Basic check trying to make sure this is an XForms model
         // TODO: should rather use schema here or when obtaining document passed to this constructor
-        final Element modelElement = staticModel.document.getRootElement();
+        final Element modelElement = staticModel.document().getRootElement();
         final String rootNamespaceURI = modelElement.getNamespaceURI();
         if (!rootNamespaceURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI))
             throw new ValidationException("Root element of XForms model must be in namespace '"
@@ -187,6 +187,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public Model getStaticModel() {
         return staticModel;
+    }
+
+    public boolean isMustSchemaValidate() {
+        return mustSchemaValidate;
     }
 
     /**
@@ -350,7 +354,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public LocationData getLocationData() {
-        return (LocationData) staticModel.document.getRootElement().getData();
+        return (LocationData) staticModel.document().getRootElement().getData();
     }
 
     public XFormsModelBinds getBinds() {
@@ -363,7 +367,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadSchemasIfNeeded(PropertyContext propertyContext) {
         if (schemaValidator == null) {
-            final Element modelElement = staticModel.document.getRootElement();
+            final Element modelElement = staticModel.document().getRootElement();
             schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
             schemaValidator.loadSchemas(propertyContext, containingDocument);
 
@@ -457,8 +461,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Then get instances from static state if necessary
         // This can happen if the instance is inline, readonly, and not replaced
         for (final Instance instance: containingDocument.getStaticState().getInstances(getPrefixedId())) {
-            final Element containerElement = instance.element;
-            final String instanceStaticId = instance.staticId;
+            final Element containerElement = instance.element();
+            final String instanceStaticId = instance.staticId();
 
             if (instancesMap.get(instanceStaticId) == null) {
                 // Must create instance
@@ -548,7 +552,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doModelConstruct(PropertyContext propertyContext) {
-        final Element modelElement = staticModel.document.getRootElement();
+        final Element modelElement = staticModel.document().getRootElement();
 
         // 1. All XML Schema loaded (throws xforms-link-exception)
 
@@ -640,8 +644,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadInstance(PropertyContext propertyContext, String instanceStaticId) {
 
-        final Instance instance = staticModel.instances.get(instanceStaticId);
-        final Element instanceContainer = instance.element;
+        final Instance instance = staticModel.instancesMap().get(instanceStaticId);
+        final Element instanceContainer = instance.element();
 
         indentedLogger.startHandleOperation("load", "loading instance",
                 "instance id", XFormsUtils.getElementStaticId(instanceContainer));
@@ -649,19 +653,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // Get instance resource URI, can be from @src or @resource
 
             final List<Element> children = Dom4jUtils.elements(instanceContainer);
-            if (instance.src != null) {
+            if (instance.src() != null) {
                 // "If the src attribute is given, then it takes precedence over inline content and the resource
                 // attribute, and the XML data for the instance is obtained from the link."
 
-                if (instance.src.equals("")) {
+                if (instance.src().equals("")) {
                     // Got a blank src attribute, just dispatch xforms-link-exception
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData, "processing XForms instance", instanceContainer);
+                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Invalid blank URL specified for instance/@src: " + instanceStaticId, extendedLocationData);
-                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.src, instanceContainer, throwable));
+                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.src(), instanceContainer, throwable));
                 }
 
                 // Load instance
-                loadExternalInstance(propertyContext, instance, instance.src);
+                loadExternalInstance(propertyContext, instance, instance.src());
             } else if (children != null && children.size() >= 1) {
                 // "If the src attribute is omitted, then the data for the instance is obtained from inline content if
                 // it is given or the resource attribute otherwise. If both the resource attribute and inline content
@@ -670,7 +674,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final String xxformsExcludeResultPrefixes = instanceContainer.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
 
                 if (children.size() > 1) {
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData, "processing XForms instance", instanceContainer);
+                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", extendedLocationData);
                     container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
                 }
@@ -679,32 +683,32 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     // Extract document
                     final Object instanceDocument
                             = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().getXPathConfiguration(),
-                            (Element) children.get(0), xxformsExcludeResultPrefixes, instance.isReadonlyHint);
+                            (Element) children.get(0), xxformsExcludeResultPrefixes, instance.isReadonlyHint());
 
                     // Set instance and associated information if everything went well
                     // NOTE: No XInclude supported to read instances with @src for now
-                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, null, false, -1, instance.xxformsValidation, false);
+                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, null, false, -1, instance.xxformsValidation(), false);
                 } catch (Exception e) {
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData, "processing XForms instance", instanceContainer);
+                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
                     container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
                 }
-            } else if (instance.resource != null) {
+            } else if (instance.resource() != null) {
                 // "the data for the instance is obtained from inline content if it is given or the
                 // resource attribute otherwise"
 
-                if (instance.resource.equals("")) {
+                if (instance.resource().equals("")) {
                     // Got a blank src attribute, just dispatch xforms-link-exception
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData, "processing XForms instance", instanceContainer);
+                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Invalid blank URL specified for instance/@resource: " + instanceStaticId, extendedLocationData);
-                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.resource, instanceContainer, throwable));
+                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.resource(), instanceContainer, throwable));
                 }
 
                 // Load instance
-                loadExternalInstance(propertyContext, instance, instance.resource);
+                loadExternalInstance(propertyContext, instance, instance.resource());
             } else {
                 // Everything missing
-                final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData, "processing XForms instance", instanceContainer);
+                final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                 final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceStaticId, extendedLocationData);
                 container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, "", instanceContainer, throwable));
             }
@@ -714,21 +718,21 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadExternalInstance(final PropertyContext propertyContext, Instance instance, String instanceResource) {
         try {
-            if (instance.isCacheHint && ProcessorImpl.getProcessorInputSchemeInputName(instanceResource) == null) {
+            if (instance.isCacheHint() && ProcessorImpl.getProcessorInputSchemeInputName(instanceResource) == null) {
                 // Instance 1) has cache hint and 2) is not input:*, so it can be cached
                 // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
 
                 // TODO: This doesn't handle optimized submissions.
 
-                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element, instance.instanceSource,
+                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element(), instance.instanceSource(),
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                 // NOTE: No XInclude supported to read instances with @src for now
                 final XFormsInstance sharedXFormsInstance
                         = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, indentedLogger,
-                            instance.staticId, effectiveId,
-                            resolvedInstanceURL, null, instance.isReadonlyHint, false, XFormsProperties.isExposeXPathTypes(containingDocument),
-                            instance.xxformsTimeToLive, instance.xxformsValidation, INSTANCE_LOADER);
+                            instance.staticId(), effectiveId,
+                            resolvedInstanceURL, null, instance.isReadonlyHint(), false, XFormsProperties.isExposeXPathTypes(containingDocument),
+                            instance.xxformsTimeToLive(), instance.xxformsValidation(), INSTANCE_LOADER);
 
                 setInstance(sharedXFormsInstance, false);
             } else {
@@ -750,8 +754,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
         } catch (Exception e) {
             final ValidationException validationException
-                = ValidationException.wrapException(e, new ExtendedLocationData(instance.locationData, "reading external instance", instance.element));
-            container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instanceResource, instance.element, validationException));
+                = ValidationException.wrapException(e, new ExtendedLocationData(instance.locationData(), "reading external instance", instance.element()));
+            container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instanceResource, instance.element(), validationException));
         }
     }
 
@@ -803,7 +807,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      */
     private void loadInstance(PropertyContext propertyContext, ExternalContext externalContext, Instance instance) {
 
-        final String absoluteURLString = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element, instance.instanceSource,
+        final String absoluteURLString = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element(), instance.instanceSource(),
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
         assert NetUtils.urlHasProtocol(absoluteURLString);
@@ -828,8 +832,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
 
             final ConnectionResult connectionResult = new Connection().open(externalContext, indentedLogger, BaseSubmission.isLogBody(),
-                    Connection.Method.GET.name(), absoluteResolvedURL, instance.xxformsUsername, instance.xxformsPassword,
-                    instance.xxformsDomain, null, null, null,
+                    Connection.Method.GET.name(), absoluteResolvedURL, instance.xxformsUsername(), instance.xxformsPassword(),
+                    instance.xxformsDomain(), null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             try {
@@ -842,7 +846,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // Read result as XML
                 // TODO: use submission code
-                if (!instance.isReadonlyHint) {
+                if (!instance.isReadonlyHint()) {
                     instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 } else {
                     instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
@@ -860,20 +864,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             // TODO: Handle validating and handleXInclude!
 
-            if (!instance.isReadonlyHint) {
+            if (!instance.isReadonlyHint()) {
                 instanceDocument = containingDocument.getURIResolver().readAsDom4j(
-                        absoluteURLString, instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain,
+                        absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
                 instanceDocument = containingDocument.getURIResolver().readAsTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
-                        absoluteURLString, instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain,
+                        absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
         }
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, effectiveId, instance.staticId, absoluteURLString, instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain, false, -1, instance.xxformsValidation, false);
+        setInstanceDocument(instanceDocument, effectiveId, instance.staticId(), absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(), false, -1, instance.xxformsValidation(), false);
     }
 
     public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
@@ -894,6 +898,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
         deferredActionContext.rebuild = false;
+
+        // Notify dependencies
+        containingDocument.getXPathDependencies().rebuildDone(staticModel);
     }
 
     public void doRecalculate(PropertyContext propertyContext, boolean applyInitialValues) {
@@ -907,6 +914,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
         deferredActionContext.recalculate = false;
+
+        // Notify dependencies
+        containingDocument.getXPathDependencies().recalculateDone(staticModel);
     }
 
 
@@ -919,11 +929,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
 
             // Clear validation state
+            // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
             for (final XFormsInstance instance: instances) {
                 // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
                 // The reason is that clearing this state can take quite some time
                 final boolean mustSchemaValidateInstance = mustSchemaValidate && instance.isSchemaValidation();
-                if (mustSchemaValidateInstance || containingDocument.getXPathDependencies().requireBindValidation(staticModel, instance.getPrefixedId())) {
+                if (mustSchemaValidateInstance || containingDocument.getXPathDependencies().hasAnyValidationBind(staticModel, instance.getPrefixedId())) {
                     XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
                         public void walk(NodeInfo nodeInfo) {
                             InstanceData.clearValidationState(nodeInfo);
@@ -956,6 +967,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
             // algorithm below.
+            // TODO: Must dispatch validity changes, not validity status
+            // TODO: Mus dispatch after marking revalidate = false, right?
             for (final XFormsInstance instance: instances) {
                 if (invalidInstances.contains(instance.getEffectiveId())) {
                     container.dispatchEvent(propertyContext, new XXFormsInvalidEvent(containingDocument, instance));
@@ -971,6 +984,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
         // have an immediate effect, and clear the corresponding flag."
         deferredActionContext.revalidate = false;
+
+        // Notify dependencies
+        containingDocument.getXPathDependencies().revalidateDone(staticModel);
     }
 
     private void doRefresh(PropertyContext propertyContext) {

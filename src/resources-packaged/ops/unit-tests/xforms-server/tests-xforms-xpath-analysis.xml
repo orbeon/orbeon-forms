@@ -17,17 +17,15 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="xforms:bind dependencies" name="oxf:java">
+    <test description="Simple xforms:bind dependencies" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -71,6 +69,138 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true">
+                    <binds>
+                        <bind id="bv1" ref="instance('i1')">
+                            <analysis expression="instance('i1')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i1')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i1</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i1</instance>
+                                </returnable-instances>
+                            </analysis>
+                        </bind>
+                        <bind id="bv2" ref="instance('i2')">
+                            <analysis expression="instance('i2')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i2')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i2</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i2</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <mip name="constraint" expression="true()">
+                                <analysis expression="xs:boolean((true())[1])" analyzed="true"/>
+                            </mip>
+                        </bind>
+                        <bind id="bv3" ref="instance('i3')">
+                            <analysis expression="instance('i3')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i3')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i3</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i3</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <mip name="required" expression="true()">
+                                <analysis expression="xs:boolean((true())[1])" analyzed="true"/>
+                            </mip>
+                        </bind>
+                        <bind id="bc1" ref="instance('i4')">
+                            <analysis expression="instance('i4')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i4')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i4</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i4</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <mip name="relevant" expression="false()">
+                                <analysis expression="xs:boolean((false())[1])" analyzed="true"/>
+                            </mip>
+                        </bind>
+                        <bind id="bc2" ref="instance('i5')">
+                            <analysis expression="instance('i5')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i5')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i5</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i5</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <mip name="calculate" expression="42">
+                                <analysis expression="xs:string((42)[1])" analyzed="true"/>
+                            </mip>
+                        </bind>
+                        <bind id="bc3" ref="instance('i6')">
+                            <analysis expression="instance('i6')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i6')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i6</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i6</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <mip name="readonly" expression="true()">
+                                <analysis expression="xs:boolean((true())[1])" analyzed="true"/>
+                            </mip>
+                        </bind>
+                        <bind id="bc4" ref="instance('i7')">
+                            <analysis expression="instance('i7')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i7')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i7</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i7</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <mip name="initial-value" expression="42">
+                                <analysis expression="xs:string((42)[1])" analyzed="true"/>
+                            </mip>
+                        </bind>
+                    </binds>
                     <bind-instances>
                         <instance>i1</instance>
                         <instance>i2</instance>
@@ -96,6 +226,238 @@
         </output>
     </test>
 
+    <test description="MIP xforms:bind dependencies" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model" xxf:xpath-analysis="true">
+                        <xf:instance id="i1">
+                            <instance>
+                                <a/>
+                                <b/>
+                                <c/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:instance id="i2">
+                            <instance>
+                                <a/>
+                                <b/>
+                                <c/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:bind id="b1" ref="instance('i1')">
+                            <xf:bind id="b11" ref="a" constraint="../b = 'x'"/>
+                            <xf:bind id="b12" ref="b" readonly="instance('i2')/a"/>
+                            <xf:bind id="b13" ref="instance()/c" required=". = 'y'"/>
+                            <xf:bind id="b14" context="a"/>
+                        </xf:bind>
+                        <xf:bind id="b2" ref="instance('i2')">
+                            <xf:bind id="b21" ref="a" calculate="concat(../b, ../c)"/>
+                            <xf:bind id="b22" ref="b" xxf:default="concat(../a, ../c)"/>
+                        </xf:bind>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="false">
+                    <binds>
+                        <bind id="b1" ref="instance('i1')">
+                            <analysis expression="instance('i1')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i1')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i1</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i1</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <bind id="b11" ref="a">
+                                <analysis expression="a" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i1')/a</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i1</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i1</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="constraint" expression="../b = 'x'">
+                                    <analysis expression="xs:boolean((../b = 'x')[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i1')/b</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i1</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="b12" ref="b">
+                                <analysis expression="b" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i1')/b</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i1</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i1</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="readonly" expression="instance('i2')/a">
+                                    <analysis expression="xs:boolean((instance('i2')/a)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i2')/a</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i2</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="b13" ref="instance()/c">
+                                <analysis expression="instance()/c" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i1')/c</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i1</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i1</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="required" expression=". = 'y'">
+                                    <analysis expression="xs:boolean((. = 'y')[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i1')/c</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i1</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="b14" context="a">
+                                <analysis analyzed="false"/>
+                            </bind>
+                        </bind>
+                        <bind id="b2" ref="instance('i2')">
+                            <analysis expression="instance('i2')" analyzed="true">
+                                <returnable>
+                                    <path>instance('i2')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i2</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i2</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <bind id="b21" ref="a">
+                                <analysis expression="a" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i2')/a</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i2</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i2</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="calculate" expression="concat(../b, ../c)">
+                                    <analysis expression="xs:string((concat(../b, ../c))[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i2')/b</path>
+                                            <path>instance('i2')/c</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i2</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="b22" ref="b">
+                                <analysis expression="b" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i2')/b</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i2</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i2</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="initial-value" expression="concat(../a, ../c)">
+                                    <analysis expression="xs:string((concat(../a, ../c))[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('i2')/a</path>
+                                            <path>instance('i2')/c</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i2</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                        </bind>
+                    </binds>
+                </model>
+            </request>
+        </output>
+    </test>
+
     <test description="Rejection of unsupported attributes" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -111,6 +473,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
+                    <!-- NOTE: @bind now supported -->
                     <xf:input id="u1" bind="my-bind"/>
                     <xf:input id="u2" context="." ref="b"/>
                 </xh:body>
@@ -120,10 +483,33 @@
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <control name="input" scope="" prefixed-id="u1" model-prefixed-id="model" binding="true" value="true">
                     <binding>
-                        <analysis analyzed="false"/>
+                        <analysis expression="." analyzed="true">
+                            <returnable>
+                                <path>instance('instance')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
                     </binding>
                     <value>
-                        <analysis expression="xs:string(.[1])" analyzed="false"/>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
                     </value>
                 </control>
                 <control name="input" scope="" prefixed-id="u2" model-prefixed-id="model" binding="true" value="true">
@@ -135,11 +521,29 @@
                     </value>
                 </control>
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
+                    <binds>
+                        <bind id="my-bind" ref=".">
+                            <analysis expression="." analyzed="true">
+                                <returnable>
+                                    <path>instance('instance')</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>instance</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>instance</instance>
+                                </returnable-instances>
+                            </analysis>
+                        </bind>
+                    </binds>
                     <bind-instances>
                         <instance>instance</instance>
                     </bind-instances>
                 </model>
-            </request>
+            </request>            
         </output>
     </test>
 
@@ -266,7 +670,6 @@
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>
-
                     </xf:model>
                 </xh:head>
                 <xh:body>
@@ -280,7 +683,6 @@
                     <xf:input id="a2" ref="instance('instance')/a/b/ancestor::a/c"/>
                     <xf:input id="a3" ref="instance('instance')/a/b/a/c/ancestor::a"/>
                     <xf:input id="a4" ref="instance('instance')/a/b/a/(c/ancestor::a | d)"/>
-
                 </xh:body>
             </xh:html>
         </input>
@@ -296,10 +698,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -312,7 +714,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -327,10 +729,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -343,7 +745,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -358,10 +760,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -374,7 +776,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -389,10 +791,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -405,7 +807,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -420,10 +822,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -436,7 +838,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -452,10 +854,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -469,7 +871,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -486,10 +888,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -504,7 +906,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -546,10 +948,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -562,7 +964,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -580,10 +982,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -597,7 +999,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -615,10 +1017,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -632,7 +1034,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -659,7 +1061,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -675,7 +1077,7 @@
                                 <model>model2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -690,7 +1092,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -705,10 +1107,10 @@
                                 <model>model2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -723,7 +1125,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -738,7 +1140,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -753,7 +1155,7 @@
                                 <model>model2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -769,7 +1171,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -784,7 +1186,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -799,7 +1201,7 @@
                                 <model>model2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -814,10 +1216,10 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </returnable-instances>
                         </analysis>
                     </value>
@@ -832,10 +1234,10 @@
                                 <model>model2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </returnable-instances>
                         </analysis>
                     </value>
@@ -850,7 +1252,7 @@
                                 <model>model1</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance1</instances>
+                                <instance>instance1</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -865,7 +1267,7 @@
                                 <model>model2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance2</instances>
+                                <instance>instance2</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -881,10 +1283,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance1</instances>
+                                    <instance>instance1</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance1</instances>
+                                    <instance>instance1</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -901,10 +1303,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance2</instances>
+                                    <instance>instance2</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance2</instances>
+                                    <instance>instance2</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -950,10 +1352,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance2</instances>
+                                    <instance>instance2</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance2</instances>
+                                    <instance>instance2</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -970,10 +1372,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance1</instances>
+                                    <instance>instance1</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance1</instances>
+                                    <instance>instance1</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1046,10 +1448,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1064,10 +1466,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1082,10 +1484,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance12</instances>
+                                    <instance>instance12</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance12</instances>
+                                    <instance>instance12</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1100,10 +1502,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1118,10 +1520,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance22</instances>
+                                    <instance>instance22</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance22</instances>
+                                    <instance>instance22</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1136,10 +1538,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1154,10 +1556,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1172,10 +1574,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance22</instances>
+                                    <instance>instance22</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance22</instances>
+                                    <instance>instance22</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1192,10 +1594,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1210,10 +1612,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance22</instances>
+                                    <instance>instance22</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance22</instances>
+                                    <instance>instance22</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1228,10 +1630,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1246,10 +1648,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance12</instances>
+                                    <instance>instance12</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance12</instances>
+                                    <instance>instance12</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1264,10 +1666,10 @@
                                     <model>model2</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance21</instances>
+                                    <instance>instance21</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1282,10 +1684,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance11</instances>
+                                    <instance>instance11</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1300,10 +1702,10 @@
                                     <model>model1</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance12</instances>
+                                    <instance>instance12</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance12</instances>
+                                    <instance>instance12</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1365,7 +1767,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1381,7 +1783,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1396,10 +1798,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -1413,7 +1815,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1429,7 +1831,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1445,7 +1847,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1461,7 +1863,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1477,10 +1879,10 @@
                                     <model>model</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1495,10 +1897,10 @@
                                     <model>model</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1575,10 +1977,10 @@
                                 <model>my-foo$model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>my-foo$instance</instances>
+                                <instance>my-foo$instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>my-foo$instance</instances>
+                                <instance>my-foo$instance</instance>
                             </returnable-instances>
                         </analysis>
                     </value>
@@ -1593,10 +1995,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </value>
@@ -1616,10 +2018,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -1634,7 +2036,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1654,10 +2056,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -1673,10 +2075,10 @@
                                     <model>model</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1691,10 +2093,10 @@
                                     <model>model</model>
                                 </dependent-models>
                                 <dependent-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </dependent-instances>
                                 <returnable-instances>
-                                    <instances>instance</instances>
+                                    <instance>instance</instance>
                                 </returnable-instances>
                             </analysis>
                         </value>
@@ -1719,7 +2121,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xforms:input id="input" ref="name[. = 42]"/>
+                    <xf:input id="input" ref="name[. = 42]"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -1738,10 +2140,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -1754,7 +2156,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1798,7 +2200,7 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                         </analysis>
                     </value>
@@ -1817,10 +2219,10 @@
                                 <model>model</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </dependent-instances>
                             <returnable-instances>
-                                <instances>instance</instances>
+                                <instance>instance</instance>
                             </returnable-instances>
                         </analysis>
                     </binding>
@@ -1889,6 +2291,848 @@
                 <control name="foo" scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
                 <model scope="" prefixed-id="model" analyzed-binds="true"/>
             </request>
+        </output>
+    </test>
+    
+    <test description="Simple use of xxf:context() function" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:exf="http://www.exforms.org/exf/1-0"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="i1">
+                            <instance>
+                                <foo/>
+                                <bar/>
+                            </instance>
+                        </xf:instance>
+                        <xf:instance id="i2">
+                            <instance>
+                                <foo/>
+                                <bar/>
+                            </instance>
+                        </xf:instance>
+                        <xf:instance id="i3">
+                            <instance>
+                                <foo/>
+                                <bar/>
+                            </instance>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="g1" ref="instance()/foo">
+                        <xf:group id="g2" ref="instance('i2')/foo">
+                            <xf:group id="g3" ref="instance('i3')/foo">
+                                <xf:output id="o1" value="xxf:context('g1')/../bar"/>
+                                <xf:output id="o2" value="xxf:context('g2')/../bar"/>
+                                <xf:output id="o3" value="xxf:context('g3')/../bar"/>
+                                
+                                <xf:output id="o4" value="xxf:context('o4')/../bar"/>
+                            </xf:group>
+                        </xf:group>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <control name="group" scope="" prefixed-id="g1" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="instance()/foo" analyzed="true">
+                            <returnable>
+                                <path>instance('i1')/foo</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i1</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </control>
+                <control name="group" scope="" prefixed-id="g2" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="instance('i2')/foo" analyzed="true">
+                            <returnable>
+                                <path>instance('i2')/foo</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i2</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </control>
+                <control name="group" scope="" prefixed-id="g3" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="instance('i3')/foo" analyzed="true">
+                            <returnable>
+                                <path>instance('i3')/foo</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i3</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i3</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </control>
+                <control name="output" scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:context('g1')/../bar)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i1')/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:context('g2')/../bar)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i2')/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:context('g3')/../bar)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i3')/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o4" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:context('o4')/../bar)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i3')/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="Simple change of control validity based on MIP" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model" xxf:xpath-analysis="true">
+                        <xf:instance id="i1">
+                            <instance>
+                                <a/>
+                                <b/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:bind id="b1" ref="instance()/a" constraint="../b = 'x'"/>
+
+                        <xf:action ev:event="xforms-ready">
+                            <xf:refresh/>
+                            <xf:delete model="events-model" nodeset="*"/>
+
+                            <!-- Cause a to become valid -->
+                            <xf:setvalue ref="b">x</xf:setvalue>
+                            <xf:refresh/>
+
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:insert ev:event="#all"
+                                   model="events-model" context="." nodeset="*"
+                                   origin="xxf:element('event',
+                                            (xxf:attribute('type', xxf:event('xxf:type')),
+                                             xxf:attribute('target', xxf:event('xxf:targetid'))))"/>
+
+                    
+                    <xf:output id="g11" ref="a"/>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="i1" model-id="model">
+                                <instance>
+                                    <a/>
+                                    <b>x</b>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="xforms-valid" target="g11"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="PO example: analysis" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form" href="oxf:/ops/unit-tests/xforms-server/po.xhtml"/>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <control name="repeat" scope="" prefixed-id="item-repeat" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="items/item" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/items/item</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </control>
+                <control name="input" scope="" prefixed-id="name" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="name" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/items/item/name</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/items/item/name</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="input" scope="" prefixed-id="units" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="units" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/items/item/units</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/items/item/units</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="input" scope="" prefixed-id="price" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="price" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/items/item/price</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/items/item/price</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="line-total" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="total" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/items/item/total</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/items/item/total</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="subtotal" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="totals/subtotal" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/totals/subtotal</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/totals/subtotal</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="tax" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="totals/tax" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/totals/tax</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/totals/tax</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="total" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="totals/total" analyzed="true">
+                            <returnable>
+                                <path>instance('po')/totals/total</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>po</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('po')/totals/total</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>po</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="po" analyzed-binds="true">
+                    <binds>
+                        <bind id="item-bind" ref="items/item">
+                            <analysis expression="items/item" analyzed="true">
+                                <returnable>
+                                    <path>instance('po')/items/item</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>po</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>po</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <bind id="name-bind" ref="name">
+                                <analysis expression="name" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/items/item/name</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="required" expression="true()">
+                                    <analysis expression="xs:boolean((true())[1])" analyzed="true"/>
+                                </mip>
+                            </bind>
+                            <bind id="units-bind" ref="units">
+                                <analysis expression="units" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/items/item/units</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="constraint" expression=". &gt; 0">
+                                    <analysis expression="xs:boolean((. &gt; 0)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/items/item/units</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="price-bind" ref="price">
+                                <analysis expression="price" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/items/item/price</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="constraint" expression=". &gt; 0">
+                                    <analysis expression="xs:boolean((. &gt; 0)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/items/item/price</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="line-total-bind" ref="total">
+                                <analysis expression="total" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/items/item/total</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="relevant" expression="for $u in ../units return $u castable as xs:decimal and $u &gt; 0">
+                                    <analysis expression="xs:boolean((for $u in ../units return $u castable as xs:decimal and $u &gt; 0)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/items/item/units</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                                <mip name="calculate" expression="if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-'">
+                                    <analysis expression="xs:string((if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/items/item/units</path>
+                                            <path>instance('po')/items/item/price</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                        </bind>
+                        <bind id="totals-bind" ref="totals">
+                            <analysis expression="totals" analyzed="true">
+                                <returnable>
+                                    <path>instance('po')/totals</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>po</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>po</instance>
+                                </returnable-instances>
+                            </analysis>
+                            <bind id="subtotal-bind" ref="subtotal">
+                                <analysis expression="subtotal" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/totals/subtotal</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="calculate" expression="sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t)">
+                                    <analysis expression="xs:string((sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t))[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/items/item/total</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="tax-bind" ref="tax">
+                                <analysis expression="tax" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/totals/tax</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="calculate" expression="../subtotal * ../../info/tax">
+                                    <analysis expression="xs:string((../subtotal * ../../info/tax)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/totals/subtotal</path>
+                                            <path>instance('po')/info/tax</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="total-bind" ref="total">
+                                <analysis expression="total" analyzed="true">
+                                    <returnable>
+                                        <path>instance('po')/totals/total</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>po</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>po</instance>
+                                    </returnable-instances>
+                                </analysis>
+                                <mip name="calculate" expression="for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9">
+                                    <analysis expression="xs:string((for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/totals/subtotal</path>
+                                            <path>instance('po')/totals/tax</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                        </bind>
+                        <bind id="info-tax-bind" ref="info/tax">
+                            <analysis expression="info/tax" analyzed="true">
+                                <returnable>
+                                    <path>instance('po')/info/tax</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>po</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>po</instance>
+                                </returnable-instances>
+                            </analysis>
+                        </bind>
+                    </binds>
+                    <bind-instances>
+                        <instance>po</instance>
+                    </bind-instances>
+                    <computed-binds-instances>
+                        <instance>po</instance>
+                    </computed-binds-instances>
+                    <validation-binds-instances>
+                        <instance>po</instance>
+                    </validation-binds-instances>
+                </model>
+                <model scope="" prefixed-id="events-model" default-instance-prefixed-id="events-instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="PO example: change to values causing change to MIPs" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document" href="oxf:/ops/unit-tests/xforms-server/po.xhtml"/>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="po" model-id="model" types="true">
+                                <purchaseOrder>
+                                    <items>
+                                        <item>
+                                            <name>Item 1</name>
+                                            <units>3</units>
+                                            <price>60</price>
+                                            <total>180</total>
+                                        </item>
+                                        <item>
+                                            <name>Item 2</name>
+                                            <units>1</units>
+                                            <price>500</price>
+                                            <total>500</total>
+                                        </item>
+                                        <item>
+                                            <name>Item 3</name>
+                                            <units>1</units>
+                                            <price>1500</price>
+                                            <total>1500</total>
+                                        </item>
+                                    </items>
+                                    <totals>
+                                        <subtotal>2180</subtotal>
+                                        <tax>479.6</tax>
+                                        <total>2393.64</total>
+                                    </totals>
+                                    <info>
+                                        <tax>0.22</tax>
+                                    </info>
+                                </purchaseOrder>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model" types="true">
+                                <events>
+                                    <event type="xforms-value-changed" target="price" indexes="1"/>
+                                    <event type="xforms-invalid" target="price" indexes="1"/>
+                                    <event type="xforms-value-changed" target="line-total" indexes="1"/>
+                                    <event type="xforms-invalid" target="line-total" indexes="1"/>
+                                    <event type="xforms-value-changed" target="subtotal" indexes=""/>
+                                    <event type="xforms-value-changed" target="tax" indexes=""/>
+                                    <event type="xforms-value-changed" target="total" indexes=""/>
+                                    <event type="xforms-value-changed" target="price" indexes="1"/>
+                                    <event type="xforms-valid" target="price" indexes="1"/>
+                                    <event type="xforms-value-changed" target="line-total" indexes="1"/>
+                                    <event type="xforms-valid" target="line-total" indexes="1"/>
+                                    <event type="xforms-value-changed" target="subtotal" indexes=""/>
+                                    <event type="xforms-value-changed" target="tax" indexes=""/>
+                                    <event type="xforms-value-changed" target="total" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="item-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="name·1" required="true">Item 1</xxf:control>
+                        <xxf:control id="units·1" type="{http://www.w3.org/2001/XMLSchema}integer">3</xxf:control>
+                        <xxf:control id="price·1" type="{http://www.w3.org/2001/XMLSchema}decimal">60</xxf:control>
+                        <xxf:control id="line-total·1" type="{http://www.w3.org/2001/XMLSchema}decimal">180.00</xxf:control>
+                        <xxf:control id="name·2" required="true">Item 2</xxf:control>
+                        <xxf:control id="units·2" type="{http://www.w3.org/2001/XMLSchema}integer">1</xxf:control>
+                        <xxf:control id="price·2" type="{http://www.w3.org/2001/XMLSchema}decimal">500</xxf:control>
+                        <xxf:control id="line-total·2" type="{http://www.w3.org/2001/XMLSchema}decimal">500.00</xxf:control>
+                        <xxf:control id="name·3" required="true">Item 3</xxf:control>
+                        <xxf:control id="units·3" type="{http://www.w3.org/2001/XMLSchema}integer">1</xxf:control>
+                        <xxf:control id="price·3" type="{http://www.w3.org/2001/XMLSchema}decimal">1500</xxf:control>
+                        <xxf:control id="line-total·3" type="{http://www.w3.org/2001/XMLSchema}decimal">1,500.00</xxf:control>
+                        <xxf:control id="subtotal" type="{http://www.w3.org/2001/XMLSchema}decimal">2,180.00</xxf:control>
+                        <xxf:control id="tax" type="{http://www.w3.org/2001/XMLSchema}decimal">479.60</xxf:control>
+                        <xxf:control id="total" type="{http://www.w3.org/2001/XMLSchema}decimal">2,393.64</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
         </output>
     </test>
     

@@ -300,7 +300,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         // Iterate over models to extract event handlers and scripts
         for (final Map.Entry<String, Model> currentEntry: modelsByPrefixedId.entrySet()) {
             final String modelPrefixedId = currentEntry.getKey();
-            final Document modelDocument = currentEntry.getValue().document;
+            final Document modelDocument = currentEntry.getValue().document();
             final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
             // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
             extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
@@ -508,9 +508,9 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         }
         final Model newModel = new Model(this, scope, modelDocument);
         models.add(newModel);
-        modelsByPrefixedId.put(newModel.prefixedId, newModel);
-        for (final Instance instance : newModel.instances.values())
-            modelByInstancePrefixedId.put(instance.prefixedId, newModel);
+        modelsByPrefixedId.put(newModel.prefixedId(), newModel);
+        for (final Instance instance : newModel.instancesMap().values())
+            modelByInstancePrefixedId.put(instance.prefixedId(), newModel);
     }
 
     public Model getModel(String prefixedId) {
@@ -576,7 +576,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      * @return                      instances
      */
     public Collection<Instance> getInstances(String modelPrefixedId) {
-        return modelsByPrefixedId.get(modelPrefixedId).instances.values();
+        return modelsByPrefixedId.get(modelPrefixedId).instancesMap().values();
     }
 
     /**
@@ -628,6 +628,18 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         }
     }
 
+    public Model getModelByScopeAndBind(XBLBindings.Scope scope, String bindStaticId) {
+        final List<Model> models = modelsByScope.get(scope);
+        if (models != null && models.size() > 0) {
+//            final String bindPrefixedId = scope.getPrefixedIdForStaticId(bindStaticId);
+            for (final Model model: models) {
+                if (model.bindsById().get(bindStaticId) != null)
+                    return model;
+            }
+        }
+        return null;
+    }
+
     public final List<Model> getModelsForScope(XBLBindings.Scope scope) {
         final List<Model> models = modelsByScope.get(scope);
         return (models != null) ? models : Collections.<Model>emptyList();
@@ -637,7 +649,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         XBLBindings.Scope currentScope = startScope;
         while (currentScope != null) {
             for (final Model model: getModelsForScope(currentScope)) {
-                if (model.instances.containsKey(instanceStaticId)) {
+                if (model.instancesMap().containsKey(instanceStaticId)) {
                     return currentScope.getPrefixedIdForStaticId(instanceStaticId);
                 }
             }
@@ -723,7 +735,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
     public Element getControlElement(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis == null) ? null : controlAnalysis.element;
+        return (controlAnalysis == null) ? null : controlAnalysis.element();
     }
 
     public int getControlPosition(String prefixedId) {
@@ -733,7 +745,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
     public boolean hasNodeBinding(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis != null) && controlAnalysis.hasNodeBinding;
+        return (controlAnalysis != null) && controlAnalysis.hasNodeBinding();
     }
 
     public ControlAnalysis.LHHAAnalysis getLabel(String prefixedId) {
@@ -764,7 +776,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      */
     public boolean isValueControl(String controlEffectiveId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(XFormsUtils.getPrefixedId(controlEffectiveId));
-        return (controlAnalysis != null) && controlAnalysis.canHoldValue;
+        return (controlAnalysis != null) && controlAnalysis.canHoldValue();
     }
 
     /**
@@ -1073,7 +1085,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                             controlScope, controlElement, controlIndex, isContainer, parentControlAnalysis, inScopeVariables);
                 }
 
-                controlAnalysisMap.put(controlAnalysis.prefixedId, controlAnalysis);
+                controlAnalysisMap.put(controlAnalysis.prefixedId(), controlAnalysis);
                 {
                     Map<String, ControlAnalysis> controlsMap = controlTypes.get(controlName);
                     if (controlsMap == null) {
@@ -1081,7 +1093,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                         controlTypes.put(controlName, controlsMap);
                     }
 
-                    controlsMap.put(controlAnalysis.prefixedId, controlAnalysis);
+                    controlsMap.put(controlAnalysis.prefixedId(), controlAnalysis);
                 }
 
                 // TODO: move repeat and attribute cases below to RepeatAnalysis and AttributeAnalysis
@@ -1096,25 +1108,25 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                         if (repeatHierarchyStringBuffer.length() > 0)
                             repeatHierarchyStringBuffer.append(',');
 
-                        repeatHierarchyStringBuffer.append(controlAnalysis.prefixedId);
+                        repeatHierarchyStringBuffer.append(controlAnalysis.prefixedId());
 
                         if (ancestorRepeatAnalysis != null) {
                             // If we have a parent, append it
                             repeatHierarchyStringBuffer.append(' ');
-                            repeatHierarchyStringBuffer.append(ancestorRepeatAnalysis.prefixedId);
+                            repeatHierarchyStringBuffer.append(ancestorRepeatAnalysis.prefixedId());
                         }
                     }
                     // Find repeat children
                     {
                         if (ancestorRepeatAnalysis != null) {
                             // If we have a parent, tell the parent that it has a child
-                            final String parentRepeatId = ancestorRepeatAnalysis.prefixedId;
+                            final String parentRepeatId = ancestorRepeatAnalysis.prefixedId();
                             List<String> parentRepeatList = repeatChildrenMap.get(parentRepeatId);
                             if (parentRepeatList == null) {
                                 parentRepeatList = new ArrayList<String>();
                                 repeatChildrenMap.put(parentRepeatId, parentRepeatList);
                             }
-                            parentRepeatList.add(controlAnalysis.prefixedId);
+                            parentRepeatList.add(controlAnalysis.prefixedId());
                         }
 
                     }
@@ -1411,8 +1423,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         // At least one ancestor repeat
         final List<String> result = new ArrayList<String>();
         // Go until there are no more ancestors OR we find the boundary repeat
-        while (repeatControlAnalysis != null && (endPrefixedId == null || !endPrefixedId.equals(repeatControlAnalysis.prefixedId)) ) {
-            result.add(repeatControlAnalysis.prefixedId);
+        while (repeatControlAnalysis != null && (endPrefixedId == null || !endPrefixedId.equals(repeatControlAnalysis.prefixedId())) ) {
+            result.add(repeatControlAnalysis.prefixedId());
             repeatControlAnalysis = repeatControlAnalysis.getAncestorRepeat();
         }
         return result;

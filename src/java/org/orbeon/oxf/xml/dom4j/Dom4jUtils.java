@@ -61,6 +61,7 @@ public class Dom4jUtils {
     private static SAXReader createSAXReader() throws SAXException {
         return createSAXReader(XMLUtils.DEFAULT_VALIDATING, XMLUtils.DEFAULT_HANDLE_XINCLUDE);
     }
+
     /**
      * Typed version of the dom4j API.
      */
@@ -91,6 +92,14 @@ public class Dom4jUtils {
     @SuppressWarnings("unchecked")
     public static List<Node> content(Element container) {
         return (List<Node>) container.content();
+    }
+
+    /**
+     * Typed version of the dom4j API.
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Attribute> attributes(Element element) {
+        return (List<Attribute>) element.attributes();
     }
 
     /**

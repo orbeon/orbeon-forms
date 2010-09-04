@@ -68,11 +68,11 @@ public class ControlAnalysis extends ViewAnalysis {
 
     private LHHAAnalysis findNestedLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         final Element e = findNestedLHHAElement(propertyContext, controlsDocumentInfo, qName);
-        return (e != null) ? new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, e, true) : null;
+        return (e != null) ? new LHHAAnalysis(propertyContext, staticState(), scope(), getViewVariables(), controlsDocumentInfo, e, true) : null;
     }
 
     protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
-        return element.element(qName);
+        return element().element(qName);
     }
 
     public void setExternalLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement) {
@@ -80,13 +80,13 @@ public class ControlAnalysis extends ViewAnalysis {
         final String name = lhhaElement.getName();
         // TODO: check: getViewVariables() might not be right
         if (XFormsConstants.LABEL_QNAME.getName().equals(name)) {
-            externalLabel = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
+            externalLabel = new LHHAAnalysis(propertyContext, staticState(), scope(), getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.HELP_QNAME.getName().equals(name)) {
-            externalHelp = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
+            externalHelp = new LHHAAnalysis(propertyContext, staticState(), scope(), getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.HINT_QNAME.getName().equals(name)) {
-            externalHint = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
+            externalHint = new LHHAAnalysis(propertyContext, staticState(), scope(), getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.ALERT_QNAME.getName().equals(name)) {
-            externalAlert = new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, lhhaElement, false);
+            externalAlert = new LHHAAnalysis(propertyContext, staticState(), scope(), getViewVariables(), controlsDocumentInfo, lhhaElement, false);
         }
     }
 
@@ -107,8 +107,8 @@ public class ControlAnalysis extends ViewAnalysis {
     }
 
     @Override
-    protected XPathAnalysis computeValueAnalysis() {
-        if (element != null && canHoldValue && !element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME)) {
+    public XPathAnalysis computeValueAnalysis() {
+        if (element() != null && canHoldValue() && !element().getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME)) {
             return super.computeValueAnalysis();
         } else {
             return null;
@@ -130,27 +130,27 @@ public class ControlAnalysis extends ViewAnalysis {
     }
 
     public RepeatAnalysis getAncestorRepeat() {
-        SimpleAnalysis currentParent = parentAnalysis;
+        SimpleAnalysis currentParent = parentAnalysis();
         while (currentParent != null) {
             if (currentParent instanceof RepeatAnalysis)
                 return (RepeatAnalysis) currentParent;
-            currentParent = currentParent.parentAnalysis;
+            currentParent = currentParent.parentAnalysis();
         }
         return null;
     }
 
     public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
         helper.startElement("control", new String[] {
-                "name", element.getName(),
-                "scope", scope.scopeId,
-                "prefixed-id", prefixedId,
+                "name", element().getName(),
+                "scope", scope().scopeId,
+                "prefixed-id", prefixedId(),
                 "model-prefixed-id", getModelPrefixedId(),
-                "binding", Boolean.toString(hasNodeBinding),
-                "value", Boolean.toString(canHoldValue)
+                "binding", Boolean.toString(hasNodeBinding()),
+                "value", Boolean.toString(canHoldValue())
         });
 
         // Control binding and value analysis
-        if (getBindingAnalysis() != null && hasNodeBinding) {// NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
+        if (getBindingAnalysis() != null && hasNodeBinding()) {// NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
             helper.startElement("binding");
             getBindingAnalysis().toXML(propertyContext, helper);
             helper.endElement();
@@ -200,8 +200,8 @@ public class ControlAnalysis extends ViewAnalysis {
 
             // TODO: this is disabled until implementation is complete
             if (false && !this.hasStaticValue && staticState.isXPathAnalysis()) {
-                final String lhhaPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(element));
-                if (element.attribute("value") != null || element.attribute("ref") != null) {
+                final String lhhaPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId(), XFormsUtils.getElementStaticId(element));
+                if (element.attribute(XFormsConstants.VALUE_QNAME) != null || element.attribute(XFormsConstants.REF_QNAME) != null) {
                     // 1. E.g. <xforms:label model="..." context="..." value|ref="..."/>
                     final XPathAnalysis bindingAnalysis = computeBindingAnalysis(element);
                     this.valueAnalysis = analyzeValueXPath(bindingAnalysis, element, lhhaPrefixedId);
@@ -241,10 +241,10 @@ public class ControlAnalysis extends ViewAnalysis {
                     if (analyses.size() > 0) {
                         final Iterator<XPathAnalysis> i = analyses.iterator();
                         XPathAnalysis combinedAnalysis = i.next();
-                        if (combinedAnalysis != null && combinedAnalysis.figuredOutDependencies) {
+                        if (combinedAnalysis != null && combinedAnalysis.figuredOutDependencies()) {
                             while (i.hasNext()) {
                                 final XPathAnalysis nextAnalysis = i.next();
-                                if (nextAnalysis != null && nextAnalysis.figuredOutDependencies) {
+                                if (nextAnalysis != null && nextAnalysis.figuredOutDependencies()) {
                                     combinedAnalysis.combine(nextAnalysis);
                                 } else {
                                     combinedAnalysis = null;
@@ -270,12 +270,12 @@ public class ControlAnalysis extends ViewAnalysis {
         }
 
         @Override
-        protected XPathAnalysis computeValueAnalysis() {
+        public XPathAnalysis computeValueAnalysis() {
             return super.computeValueAnalysis();
         }
 
         @Override
-        protected XPathAnalysis computeBindingAnalysis(Element element) {
+        public XPathAnalysis computeBindingAnalysis(Element element) {
             return super.computeBindingAnalysis(element);
         }
 

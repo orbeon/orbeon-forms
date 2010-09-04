@@ -55,7 +55,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                         // Get static id of attribute control associated with this particular attribute
                         final String attributeControlStaticId; {
                             final ControlAnalysis controlAnalysis = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
-                            attributeControlStaticId = controlAnalysis.element.attributeValue("id");
+                            attributeControlStaticId = controlAnalysis.element().attributeValue("id");
                         }
 
                         // Find concrete control if possible

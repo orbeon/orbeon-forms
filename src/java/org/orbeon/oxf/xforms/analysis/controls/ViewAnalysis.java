@@ -27,7 +27,7 @@ public class ViewAnalysis extends SimpleAnalysis {
     private Map<String, SimpleAnalysis> inScopeVariables;
 
     public ViewAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope, Element element, SimpleAnalysis parentAnalysis, Map<String, SimpleAnalysis> inScopeVariables, boolean canHoldValue) {
-        super(staticState, scope, element, parentAnalysis, canHoldValue, findContainingModel(staticState, element, parentAnalysis, scope));
+        super(staticState, scope, element, parentAnalysis, canHoldValue, SimpleAnalysis.findContainingModel(staticState, element, parentAnalysis, scope));
         this.viewVariables = inScopeVariables;
     }
 
@@ -40,10 +40,10 @@ public class ViewAnalysis extends SimpleAnalysis {
     @Override
     public Map<String, SimpleAnalysis> getInScopeVariables() {
         if (inScopeVariables == null) {
-            final Model model = staticState.getModel(getModelPrefixedId());
+            final Model model = staticState().getModel(getModelPrefixedId());
             inScopeVariables = new HashMap<String, SimpleAnalysis>();
             if (model != null)
-                inScopeVariables.putAll(model.variables);
+                inScopeVariables.putAll(model.variables());
             inScopeVariables.putAll(viewVariables);
         }
         return inScopeVariables;

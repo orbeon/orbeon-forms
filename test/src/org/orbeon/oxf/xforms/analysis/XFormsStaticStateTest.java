@@ -24,10 +24,10 @@ import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -46,7 +46,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //
 //            final PathMapUIDependencies dependencies = new PathMapUIDependencies(staticState.getIndentedLogger(), staticState) {
 //                @Override
-//                protected Set<String> getModifiedPaths() {
+//                protected Set<String> getModifiedPathsTest() {
 //                    return currentChanges;
 //                }
 //            };
@@ -66,41 +66,41 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             // TODO: test computedBindExpressionsInstances and validationBindInstances
             {
                 final Model model1 = staticState.getModel("model1");
-                assertTrue(model1.figuredBindAnalysis);
+                assertTrue(model1.figuredAllBindRefAnalysis());
 
-                assertTrue(model1.bindInstances.contains("instance11"));
-                assertTrue(model1.bindInstances.contains("instance12"));
-                assertTrue(model1.bindInstances.contains("instance13"));
+                assertTrue(model1.bindInstances().contains("instance11"));
+                assertTrue(model1.bindInstances().contains("instance12"));
+                assertTrue(model1.bindInstances().contains("instance13"));
             }
             {
                 final Model model2 = staticState.getModel("model2");
-                assertTrue(model2.figuredBindAnalysis);
+                assertTrue(model2.figuredAllBindRefAnalysis());
 
-                assertFalse(model2.bindInstances.contains("instance21"));
+                assertFalse(model2.bindInstances().contains("instance21"));
             }
             {
                 final Model model3 = staticState.getModel("model3");
-                assertTrue(model3.figuredBindAnalysis);
+                assertTrue(model3.figuredAllBindRefAnalysis());
 
-                assertFalse(model3.bindInstances.contains("instance31"));
-                assertTrue(model3.bindInstances.contains("instance32"));
+                assertFalse(model3.bindInstances().contains("instance31"));
+                assertTrue(model3.bindInstances().contains("instance32"));
             }
             {
                 final Model model4 = staticState.getModel("model4");
-                assertTrue(model4.figuredBindAnalysis);
+                assertTrue(model4.figuredAllBindRefAnalysis());
 
-                assertTrue(model4.bindInstances.contains("instance41"));
-                assertFalse(model4.bindInstances.contains("instance42"));
+                assertTrue(model4.bindInstances().contains("instance41"));
+                assertFalse(model4.bindInstances().contains("instance42"));
             }
             {
                 final Model model5 = staticState.getModel("model5");
-                assertTrue(model5.figuredBindAnalysis);
+                assertTrue(model5.figuredAllBindRefAnalysis());
 
-                assertTrue(model5.validationBindInstances.contains("instance51"));
-                assertFalse(model5.computedBindExpressionsInstances.contains("instance51"));
+                assertTrue(model5.validationBindInstances().contains("instance51"));
+                assertFalse(model5.computedBindExpressionsInstances().contains("instance51"));
 
-                assertFalse(model5.validationBindInstances.contains("instance52"));
-                assertTrue(model5.computedBindExpressionsInstances.contains("instance52"));
+                assertFalse(model5.validationBindInstances().contains("instance52"));
+                assertTrue(model5.computedBindExpressionsInstances().contains("instance52"));
             }
         }
     }
@@ -112,22 +112,13 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             final Map<String, String> namespaces = new HashMap<String, String>();
             namespaces.put("", "");
 
-            // Hold the current list of changes
-            final Set<String> currentChanges = new HashSet<String>();
-
-            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState) {
-                @Override
-                protected Set<String> getModifiedPaths() {
-                    return currentChanges;
-                }
-            };
+            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
             final PipelineContext pipelineContext = new PipelineContext();
             staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('default')/a"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('default')/a"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -157,8 +148,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to default ==================================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('default')/b"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('default')/b"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -188,8 +178,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to instance2 ================================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance2')/a"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance2')/a"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -219,8 +208,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to instance2 ================================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance2')/b"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance2')/b"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -250,8 +238,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Structural change to model1 ==============================================================================
-            currentChanges.clear();
-            dependencies.markStructuralChange("model1");
+            dependencies.markStructuralChangeTest("model1");
 
             assertTrue(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -281,8 +268,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Structural change to model2 ==============================================================================
-            currentChanges.clear();
-            dependencies.markStructuralChange("model2");
+            dependencies.markStructuralChangeTest("model2");
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertTrue(dependencies.requireBindingUpdate("trigger2"));
@@ -320,22 +306,13 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             final Map<String, String> namespaces = new HashMap<String, String>();
             namespaces.put("", "");
 
-            // Hold the current list of changes
-            final Set<String> currentChanges = new HashSet<String>();
-
-            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState) {
-                @Override
-                protected Set<String> getModifiedPaths() {
-                    return currentChanges;
-                }
-            };
+            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
 //            final PipelineContext pipelineContext = new PipelineContext();
 //            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('default')/value"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('default')/value"));
 
             assertFalse(dependencies.requireBindingUpdate("values"));
             assertTrue(dependencies.requireValueUpdate("values"));
@@ -356,23 +333,14 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xml");
             final Map<String, String> namespaces = new HashMap<String, String>();
             namespaces.put("", "");
-
-            // Hold the current list of changes
-            final Set<String> currentChanges = new HashSet<String>();
-
-            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState) {
-                @Override
-                protected Set<String> getModifiedPaths() {
-                    return currentChanges;
-                }
-            };
+            
+            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
 //            final PipelineContext pipelineContext = new PipelineContext();
 //            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to instance1 ============================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance1')"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance1')"));
 
             // No binding update
             assertFalse(dependencies.requireBindingUpdate("output1"));
@@ -405,8 +373,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
             
             // == Value change to instance2 ============================================================================
-            currentChanges.clear();
-            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance2')"));
+            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance2')"));
 
             // No binding update
             assertFalse(dependencies.requireBindingUpdate("output1"));

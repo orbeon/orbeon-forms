@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -51,6 +52,7 @@ public class XFormsModelBinds {
     private final IndentedLogger indentedLogger;
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;  // current containing document
+    private final XPathDependencies dependencies;
 
     private final List<Element> bindElements;
     private List<Bind> topLevelBinds = new ArrayList<Bind>();
@@ -88,9 +90,10 @@ public class XFormsModelBinds {
         this.indentedLogger = model.getIndentedLogger();
         this.container = model.getXBLContainer();
         this.containingDocument = model.getContainingDocument();
+        this.dependencies = this.containingDocument.getXPathDependencies();
 
         this.staticModel = model.getStaticModel();
-        this.bindElements = staticModel.bindElements;
+        this.bindElements = staticModel.bindElements();
 
         // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
         // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
@@ -123,6 +126,35 @@ public class XFormsModelBinds {
             topLevelBinds.add(currentBind);
         }
 
+        // Clear state
+        final List<XFormsInstance> instances = model.getInstances();
+        if (instances != null) {
+            for (final XFormsInstance instance: instances) {
+                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                // The reason is that clearing this state can take quite some time
+                if (dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId())) {
+                    XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
+                        public void walk(NodeInfo nodeInfo) {
+                            InstanceData.clearOtherState(nodeInfo);
+                        }
+                    }, true);
+                }
+
+                // If a schema is in use, we don't know at this point if it will touch a particular instance unless the
+                // instance excludes validation, either because it is readonly or because it is marked as "skip".
+                // If there is no schema, then we clear the instance only if some binds are known to touch this instance
+                // or we couldn't figure out dependencies.
+//                final boolean mustSchemaValidateInstance = model.isMustSchemaValidate() && instance.isSchemaValidation();
+//                if (mustSchemaValidateInstance || dependencies.requireBindValidation(staticModel, instance.getPrefixedId())) {
+//                    XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
+//                        public void walk(NodeInfo nodeInfo) {
+//                            InstanceData.clearValidationState(nodeInfo);
+//                        }
+//                    }, true);
+//                }
+            }
+        }
+
         if (indentedLogger.isDebugEnabled())
             indentedLogger.endHandleOperation();
     }
@@ -135,43 +167,53 @@ public class XFormsModelBinds {
      */
     public void applyCalculateBinds(final PropertyContext propertyContext, boolean applyInitialValues) {
 
-        if (indentedLogger.isDebugEnabled())
-            indentedLogger.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
+        if (!dependencies.hasAnyCalculationBind(staticModel)) {
+            // Dependencies say we can skip this
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("model", "skipping recalculate", "model id", model.getEffectiveId(), "reason", "no recalculation binds");
+        } else {
+            // This model may have calculation binds
 
-//        PROFILING
-//        final int iterations = Properties.instance().getPropertySet().getInteger("oxf.xforms.profiling.iterations", 1);
-//        for (int i = 0; i < iterations; i++)
-        {
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
 
-            // Reset context stack just to re-evaluate the variables
-            model.getContextStack().resetBindingContext(propertyContext, model);
+    //        PROFILING
+    //        final int iterations = Properties.instance().getPropertySet().getInteger("oxf.xforms.profiling.iterations", 1);
+    //        for (int i = 0; i < iterations; i++)
+            {
 
-            if (isFirstCalculate || applyInitialValues) {
-                // Handle default values
+                // Reset context stack just to re-evaluate the variables
+                model.getContextStack().resetBindingContext(propertyContext, model);
+
+                if (isFirstCalculate || applyInitialValues) {
+                    // Handle default values first
+                    iterateBinds(propertyContext, new BindRunner() {
+                        public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                            if (dependencies.requireModelMIPUpdate(staticModel, bind.getId(), Model.INITIAL_VALUE()))
+                                handleInitialValueDefaultBind(propertyContext, bind, nodeset, position);
+                        }
+                    });
+                    // This will be false from now on as we have done our first handling of calculate binds
+                    isFirstCalculate = false;
+                }
+
+                // Handle calculations
+                // NOTE: we do not correctly handle computational dependencies, but it helps to evaluate "calculate"
+                // binds before the rest.
                 iterateBinds(propertyContext, new BindRunner() {
                     public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-                        handleXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+                        if (dependencies.requireModelMIPUpdate(staticModel, bind.getId(), Model.CALCULATE()))
+                            handleCalculateBind(propertyContext, bind, nodeset, position);
                     }
                 });
-                // This will be false from now on as we have done our first handling of calculate binds
-                isFirstCalculate = false;
+
+                // Update computed expression binds if requested (done here according to XForms 1.1)
+                applyComputedExpressionBinds(propertyContext);
             }
 
-            // Handle calculations
-            // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
-            // to evaluate "calculate" binds before the other binds.
-            iterateBinds(propertyContext, new BindRunner() {
-                public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-                    handleCalculateBind(propertyContext, bind, nodeset, position);
-                }
-            });
-
-            // Update computed expression binds if requested (done here according to XForms 1.1)
-            applyComputedExpressionBinds(propertyContext);
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.endHandleOperation();
         }
-
-        if (indentedLogger.isDebugEnabled())
-            indentedLogger.endHandleOperation();
     }
 
     /**
@@ -181,24 +223,12 @@ public class XFormsModelBinds {
      */
     public void applyComputedExpressionBinds(final PropertyContext propertyContext) {
 
-        // Reset context stack just to re-evaluate the variables
+        // Reset context stack just to re-evaluate the variables as instance values may have changed with @calculate
         model.getContextStack().resetBindingContext(propertyContext, model);
 
         // Apply
         final List<XFormsInstance> instances = model.getInstances();
         if (instances != null) {
-            for (final XFormsInstance instance: instances) {
-                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
-                // The reason is that clearing this state can take quite some time
-                if (containingDocument.getXPathDependencies().requireBindCalculation(staticModel, instance.getPrefixedId())) {
-                    XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
-                        public void walk(NodeInfo nodeInfo) {
-                            InstanceData.clearOtherState(nodeInfo);
-                        }
-                    }, true);
-                }
-            }
-
             iterateBinds(propertyContext, new BindRunner() {
                 public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
                     handleComputedExpressionBind(propertyContext, bind, nodeset, position);
@@ -215,15 +245,23 @@ public class XFormsModelBinds {
      */
     public void applyValidationBinds(final PropertyContext propertyContext, final Set<String> invalidInstances) {
 
-        // Reset context stack just to re-evaluate the variables
-        model.getContextStack().resetBindingContext(propertyContext, model);
+        if (!dependencies.hasAnyValidationBind(staticModel)) {
+            // Dependencies say we can skip this
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("model", "skipping bind revalidate", "model id", model.getEffectiveId(), "reason", "no validation binds");
+        } else {
+            // This model may have validation binds
 
-        // Apply
-        iterateBinds(propertyContext, new BindRunner() {
-            public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-                handleValidationBind(propertyContext, bind, nodeset, position, invalidInstances);
-            }
-        });
+            // Reset context stack just to re-evaluate the variables
+            model.getContextStack().resetBindingContext(propertyContext, model);
+
+            // Apply
+            iterateBinds(propertyContext, new BindRunner() {
+                public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                    handleValidationBind(propertyContext, bind, nodeset, position, invalidInstances);
+                }
+            });
+        }
     }
 
     /**
@@ -578,7 +616,7 @@ public class XFormsModelBinds {
      */
     private void iterateBinds(PropertyContext propertyContext, BindRunner bindRunner) {
         // Iterate over top-level binds
-        for (Bind currentBind: topLevelBinds) {
+        for (final Bind currentBind: topLevelBinds) {
             try {
                 currentBind.applyBinds(propertyContext, bindRunner);
             } catch (Exception e) {
@@ -606,7 +644,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleXXFormsDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+    private void handleInitialValueDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
 
         final String stringResult = evaluateXXFormsDefaultBind(propertyContext, bind, nodeset, position);
         if (stringResult != null) {
@@ -674,16 +712,21 @@ public class XFormsModelBinds {
         final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
 
         // Handle required, relevant, readonly, and custom MIPs
-        handleRequiredMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
-        handleRelevantMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
-        handleReadonlyMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        if (dependencies.requireModelMIPUpdate(staticModel, bind.getId(), Model.REQUIRED()))
+            handleRequiredMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        if (dependencies.requireModelMIPUpdate(staticModel, bind.getId(), Model.RELEVANT()))
+            handleRelevantMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        if (dependencies.requireModelMIPUpdate(staticModel, bind.getId(), Model.READONLY()))
+            handleReadonlyMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+
+        // TODO: optimize those as well
         handleCustomMIPs(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
     }
 
     private void handleCustomMIPs(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo, Map<String, ValueRepresentation> currentVariables) {
-        final Map<String, String> customMips = bind.getCustomMips();
+        final Map<String, Model.Bind.MIP> customMips = bind.getCustomMips();// NOTE: IntelliJ marks Model.Bind as an error, but it compiles fine
         if (customMips != null && customMips.size() > 0) {
-            for (String propertyName: customMips.keySet()) {
+            for (final String propertyName: customMips.keySet()) {
                 final String stringResult = evaluateCustomMIP(propertyContext, bind, propertyName, nodeset, position, currentVariables);
                 InstanceData.setCustom(currentNodeInfo, propertyName, stringResult);
             }
@@ -691,9 +734,9 @@ public class XFormsModelBinds {
     }
 
     private String evaluateCustomMIP(PropertyContext propertyContext, Bind bind, String propertyName, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
-        final Map<String, String> customMips = bind.getCustomMips();
+        final Map<String, Model.Bind.MIP> customMips = bind.getCustomMips();// NOTE: IntelliJ marks Model.Bind as an error, but it compiles fine
         if (customMips != null && customMips.size() > 0) {
-            final String expression = customMips.get(propertyName);
+            final String expression = customMips.get(propertyName).expression();
             if (expression != null) {
                 try {
                     return evaluateStringExpression(propertyContext, nodeset, position, bind, expression, currentVariables);
@@ -1038,7 +1081,8 @@ public class XFormsModelBinds {
 
         // NOTE: We evaluate the constraint here, so that if the type is not respected the constraint is not evaluated.
         // This can also prevent XPath errors, e.g.: <xforms:bind nodeset="foobar" type="xs:integer" constraint=". > 10"/>
-        isValid &= handleConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
+        if (dependencies.requireModelMIPUpdate(staticModel, bind.getId(), Model.CONSTRAINT()))
+            isValid &= handleConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
 
         // Remember invalid instances
         if (!isValid) {
@@ -1124,7 +1168,6 @@ public class XFormsModelBinds {
         private List<Item> nodeset;       // actual nodeset for this bind
 
         private List<BindIteration> childrenIterations; // List<BindIteration>
-        private Map<String, String> customMips;         // Map<String name, String expression> where: foo:bar="true()" => "foo-bar" -> "true()"
 
         public Bind(PropertyContext propertyContext, Element bindElement, boolean isSingleNodeContext) {
             this.bindElement = bindElement;
@@ -1138,9 +1181,6 @@ public class XFormsModelBinds {
             // If this bind is marked for offline handling, remember it
             if ("true".equals(bindElement.attributeValue(XFormsConstants.XXFORMS_OFFLINE_QNAME)))
                 offlineBinds.add(this);
-
-            // Remember custom MIPs
-            customMips = staticModel.customMIPs.get(this.id);
 
             // Compute nodeset for this bind
             model.getContextStack().pushBinding(propertyContext, bindElement, model.getEffectiveId(), model.getResolutionScope());
@@ -1265,8 +1305,8 @@ public class XFormsModelBinds {
             return bindElement.attributeValue(XFormsConstants.XXFORMS_DEFAULT_QNAME);
         }
 
-        public Map<String, String> getCustomMips() {
-            return customMips;
+        public Map<String, Model.Bind.MIP> getCustomMips() {// NOTE: IntelliJ marks Model.Bind as an error, but it compiles fine
+            return staticModel.customMIPs().get(this.id);
         }
     }
 

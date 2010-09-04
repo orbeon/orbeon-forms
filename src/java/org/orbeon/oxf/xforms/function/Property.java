@@ -14,21 +14,15 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.expr.ExpressionVisitor;
-import org.orbeon.saxon.expr.StaticContext;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NamespaceResolver;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * XForms property() function.
@@ -99,5 +93,12 @@ public class Property extends XFormsFunction {
                 }
             }
         }
+    }
+
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // Default behavior: depend on arguments
+        // We don't consider that a change to the properties should cause a reevaluation
+        return saxonAddToPathMap(pathMap, pathMapNodeSet);
     }
 }

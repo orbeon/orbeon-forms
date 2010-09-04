@@ -55,7 +55,7 @@ public class PathMap implements Cloneable {
     private HashMap<Binding, PathMapNodeSet> pathsForVariables = new HashMap<Binding, PathMapNodeSet>();  // a map from a variable Binding to a PathMapNodeSet
 
     private Map<String, PathMap> inScopeVariables;
-    private Map<String, String> properties;
+    private Map<String, PathMap> inScopeAncestorContexts;
 
     private boolean invalidated;    // whether during PathMap construction it is found that we cannot produce a meaningful result
 
@@ -398,23 +398,18 @@ public class PathMap implements Cloneable {
     }
 
     // ORBEON
-    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables, Map<String, String> properties) {
+    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables, Map<String, PathMap> inScopeAncestorContexts) {
 
-        setProperties(inScopeVariables, properties);
+        setProperties(inScopeVariables, inScopeAncestorContexts);
 
         final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
         updateFinalNodes(finalNodes);
     }
 
     // ORBEON
-    public void setProperties(Map<String, PathMap> inScopeVariables, Map<String, String> properties) {
+    public void setProperties(Map<String, PathMap> inScopeVariables, Map<String, PathMap> inScopeAncestorContexts) {
         this.inScopeVariables = inScopeVariables;
-        this.properties = properties;
-    }
-
-    // ORBEON
-    public Map<String, String> getProperties() {
-        return properties;
+        this.inScopeAncestorContexts = inScopeAncestorContexts;
     }
 
     /**
@@ -463,7 +458,7 @@ public class PathMap implements Cloneable {
 
     public PathMapNodeSet getPathForVariable(Binding binding) {
         // Check local variables
-        final PathMapNodeSet localResult = (PathMapNodeSet)pathsForVariables.get(binding);
+        final PathMapNodeSet localResult = pathsForVariables.get(binding);
         if (localResult != null)
             return localResult;
 
@@ -484,6 +479,21 @@ public class PathMap implements Cloneable {
             if (binding.getLocalSlotNumber() == -1)
                 invalidated = true;
 
+            return null;
+        }
+    }
+
+    // ORBEON: this for xxf:context() and similar
+    public PathMapNodeSet getPathForContext(String contextStaticId) {
+        // Clone the PathMap first because the nodes returned must belong to this PathMap
+        final PathMap contextPathMap = inScopeAncestorContexts.get(contextStaticId);
+        if (contextPathMap != null) {
+            final PathMap clonedContextPathMap = contextPathMap.clone();
+            addRoots(clonedContextPathMap.getPathMapRoots());
+            return clonedContextPathMap.findFinalNodes();
+        } else {
+            // Probably the id passed is invalid
+            invalidated = true;
             return null;
         }
     }
@@ -543,6 +553,10 @@ public class PathMap implements Cloneable {
             } else if (exp instanceof Document) {
                 baseUri = ((Document)exp).getStaticBaseURI();
             }
+            // Latest Saxon 9.2 has this
+//            } else {
+//                continue;
+//            }
             Expression arg = ((SystemFunction)exp).getArguments()[0];
             String suppliedUri = null;
             if (arg instanceof Literal) {

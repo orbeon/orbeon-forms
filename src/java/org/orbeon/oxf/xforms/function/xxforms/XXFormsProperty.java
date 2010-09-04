@@ -16,8 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
@@ -48,5 +47,12 @@ public class XXFormsProperty extends XFormsFunction {
         // Get property value
         final Object propertyValue = Properties.instance().getPropertySet().getObject(propertyName);
         return (propertyValue == null) ? null : (AtomicValue) XFormsUtils.convertJavaObjectToSaxonObject(propertyValue);
+    }
+
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // Default behavior: depend on arguments
+        // We don't consider that a change to the properties should cause a reevaluation
+        return saxonAddToPathMap(pathMap, pathMapNodeSet);
     }
 }

@@ -43,7 +43,7 @@ public class ContainerAnalysis extends ControlAnalysis {
         // For e.g. <xforms:group>, consider only nested element without @for attribute
         // NOTE: Should probably be child::xforms:label[not(exists(@for))] to get first such element, but e.g. group
         // label if any should probably be first anyway.
-        final Element e = element.element(qName);
+        final Element e = element().element(qName);
         if (e != null) {
             final String forAttribute = e.attributeValue("for");
             return (forAttribute == null) ? e : null;

@@ -350,15 +350,15 @@ public class XFormsToXHTML extends ProcessorImpl {
         // TODO: check all models/instances
         final XFormsStaticState staticState = containingDocument.getStaticState();
         for (final Model model: staticState.getModelsForScope(staticState.getXBLBindings().getTopLevelScope())) {
-            for (final Instance instance: model.instances.values()) {
-                if (instance.dependencyURL != null) {
+            for (final Instance instance: model.instancesMap().values()) {
+                if (instance.dependencyURL() != null) {
 
-                    final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(pipelineContext, containingDocument, instance.element, instance.dependencyURL,
+                    final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(pipelineContext, containingDocument, instance.element(), instance.dependencyURL(),
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
-                    if (!instance.isCacheHint) {
-                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.xxformsUsername,
-                                instance.xxformsPassword, instance.xxformsPassword, forwardSubmissionHeaders);
+                    if (!instance.isCacheHint()) {
+                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.xxformsUsername(),
+                                instance.xxformsPassword(), instance.xxformsPassword(), forwardSubmissionHeaders);
 
                         if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL);

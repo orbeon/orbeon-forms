@@ -108,7 +108,7 @@ public class XXFormsLang extends XFormsFunction {
 
             final String attributeControlStaticId; {
                 final ControlAnalysis controlAnalysis = containingDocument.getStaticState().getAttributeControl(xmlLang.substring(1), "xml:lang");
-                attributeControlStaticId = controlAnalysis.element.attributeValue("id");
+                attributeControlStaticId = controlAnalysis.element().attributeValue("id");
             }
 
             final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlStaticId);

@@ -130,7 +130,7 @@ public class XFormsItemUtils {
 
 //                    mayReuse[0] = false;
                     final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
-                    final String value = getValueValue(element.element(XFormsConstants.VALUE_QNAME));
+                    final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     final Map<String, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)));
@@ -169,7 +169,7 @@ public class XFormsItemUtils {
                                         final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                                         final Element valueCopyElement;
                                         {
-                                            final Element valueElement = element.element(XFormsConstants.VALUE_QNAME);
+                                            final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
                                             valueCopyElement = (valueElement != null)
                                                     ? valueElement : element.element(XFormsConstants.COPY_QNAME);
                                         }
@@ -198,7 +198,7 @@ public class XFormsItemUtils {
                                         }
 
                                         // Handle new item
-                                        if (valueCopyElement.getName().equals(XFormsConstants.VALUE_QNAME.getName())) {
+                                        if (valueCopyElement.getName().equals(XFormsConstants.XFORMS_VALUE_QNAME.getName())) {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
                                             final String value = getValueValue(valueCopyElement);
@@ -392,7 +392,7 @@ public class XFormsItemUtils {
                         throw new ValidationException("xforms:item must contain an xforms:label element.", (LocationData) controlElement.getData());
                     final String label = XFormsUtils.getStaticChildElementValue(labelElement, false, null);
 
-                    final Element valueElement = element.element(XFormsConstants.VALUE_QNAME);
+                    final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
                     if (valueElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:value element.", (LocationData) controlElement.getData());
                     final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);

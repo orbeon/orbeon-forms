@@ -37,13 +37,13 @@ public class ComponentAnalysis extends ContainerAnalysis {
     }
 
     @Override
-    protected XPathAnalysis computeBindingAnalysis(Element element) {
+    public XPathAnalysis computeBindingAnalysis(Element element) {
         // TODO: TEMP: Control does not have a binding. But return one anyway so that controls w/o their own binding also get updated.
-        return findOrCreateBaseAnalysis(parentAnalysis);
+        return findOrCreateBaseAnalysis(parentAnalysis());
     }
 
     @Override
-    protected XPathAnalysis computeValueAnalysis() {
+    public XPathAnalysis computeValueAnalysis() {
         return null;
     }
 }

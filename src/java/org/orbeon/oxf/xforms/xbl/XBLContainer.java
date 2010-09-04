@@ -305,7 +305,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         for (final Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
             // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
             // my-model => foo$bar$my-model.1-2
-            final String modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
+            final String modelEffectiveId = model.prefixedId() + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
 
             // Create and add model
             addModel(new XFormsModel(this, modelEffectiveId, model));

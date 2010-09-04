@@ -29,9 +29,17 @@ public class DumbXPathDependencies implements XPathDependencies {
         // NOP
     }
 
-//    public void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo) {
-//        // NOP
-//    }
+    public void rebuildDone(Model model) {
+        // NOP
+    }
+
+    public void recalculateDone(Model model) {
+        // NOP
+    }
+
+    public void revalidateDone(Model model) {
+        // NOP
+    }
 
     public void refreshStart() {
         // NOP
@@ -46,11 +54,6 @@ public class DumbXPathDependencies implements XPathDependencies {
         return true;
     }
 
-//    public boolean requireMIPUpdate(String controlPrefixedId) {
-//        // Always update
-//        return true;
-//    }
-
     public boolean requireValueUpdate(String controlPrefixedId) {
         // Always update
         return true;
@@ -61,12 +64,27 @@ public class DumbXPathDependencies implements XPathDependencies {
         return true;
     }
 
-    public boolean requireBindCalculation(Model model, String instancePrefixedId) {
+    public boolean hasAnyCalculationBind(Model model, String instancePrefixedId) {
         // Always update
         return true;
     }
 
-    public boolean requireBindValidation(Model model, String instancePrefixedId) {
+    public boolean hasAnyValidationBind(Model model, String instancePrefixedId) {
+        // Always update
+        return true;
+    }
+
+    public boolean hasAnyCalculationBind(Model model) {
+        // Always update
+        return true;
+    }
+
+    public boolean hasAnyValidationBind(Model model) {
+        // Always update
+        return true;
+    }
+
+    public boolean requireModelMIPUpdate(Model model, String bindId, String mipName) {
         // Always update
         return true;
     }

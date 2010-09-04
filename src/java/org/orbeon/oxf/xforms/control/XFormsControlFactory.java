@@ -90,7 +90,7 @@ public class XFormsControlFactory {
         // TODO: some of those are not controls at all, must review this
         OPTIONAL_SINGLE_NODE_CONTROLS.addAll(coreNoValueControls);
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.UPLOAD_QNAME);  // can have @value attribute
-        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.VALUE_QNAME);   // can have inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_VALUE_QNAME);   // can have inline text
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.LABEL_QNAME);   // can have linking or inline text
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.HELP_QNAME);    // can have linking or inline text
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.HINT_QNAME);    // can have linking or inline text

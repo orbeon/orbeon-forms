@@ -24,15 +24,22 @@ public interface XPathDependencies {
     void markValueChanged(XFormsModel model, NodeInfo nodeInfo);
     void markStructuralChange(XFormsModel model, XFormsInstance instance);
 
-//    void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo);
+    void rebuildDone(Model model);
+    void recalculateDone(Model model);
+    void revalidateDone(Model model);
 
     void refreshStart();
     void refreshDone();
 
     boolean requireBindingUpdate(String controlPrefixedId);
-//    boolean requireMIPUpdate(String controlPrefixedId);
     boolean requireValueUpdate(String controlPrefixedId);
     boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId);
-    boolean requireBindCalculation(Model model, String instancePrefixedId);
-    boolean requireBindValidation(Model model, String instancePrefixedId);
+
+    boolean hasAnyCalculationBind(Model model);
+    boolean hasAnyValidationBind(Model model);
+
+    boolean hasAnyCalculationBind(Model model, String instancePrefixedId);
+    boolean hasAnyValidationBind(Model model, String instancePrefixedId);
+
+    boolean requireModelMIPUpdate(Model model, String bindId, String mipName);
 }

@@ -45,8 +45,15 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
     @Override
     public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
-        // TODO: Handle this function
-        pathMap.setInvalidated(true);
-        return null;
+        // NOTE: This does the same as xxf:context()
+        final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        if (contextIdExpression instanceof StringLiteral) {
+            // Ask PathMap for the result
+            return pathMap.getPathForContext(((StringLiteral) contextIdExpression).getStringValue());
+        } else {
+            // Argument is not static so we can't figure it out
+            pathMap.setInvalidated(true);
+            return null;
+        }
     }
 }

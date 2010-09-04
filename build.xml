@@ -103,6 +103,8 @@
         <include name="exist-xmlrpc-common-3_1_1.jar"/>
         <include name="exist-xmlrpc-server-3_1_1.jar"/>
 
+        <include name="scala-library.jar"/>
+
         <include name="flyingsaucer-core-renderer_orbeon_20100512.jar"/>
         <include name="flyingsaucer-20100212-itext-2_1_7.jar"/>
         <include name="itext-bcmail-jdk14-138.jar"/>
@@ -181,6 +183,7 @@
         <echo message="##teamcity[buildNumber '${orbeon-version}']"/>
 
         <property name="java-src.dir" value="${src.dir}/java"/>
+        <property name="scala-src.dir" value="${src.dir}/scala"/>
         <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>
@@ -226,18 +229,32 @@
     <!-- Set classpath to compile and run the application -->
     <target name="classpath" depends="prepare">
         <path id="class.path">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+    </target>
+
+    <target name="test-classpath" depends="classpath">
+        <path id="test.class.path">
             <pathelement location="${jar.file}"/>
             <pathelement location="${xforms-filter.jar.file}"/>
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
             </fileset>
-            <!--            <pathelement location="${build.classes.dir}"/>-->
-            <pathelement location="${java.home}/../lib/tools.jar"/>
         </path>
     </target>
 
     <!-- Compile source -->
     <target name="classes" depends="classpath" unless="skip.compilation">
+
+        <taskdef resource="scala/tools/ant/antlib.xml">
+            <classpath>
+                <pathelement location="${lib.dir}/scala-compiler.jar"/>
+                <pathelement location="${lib.dir}/scala-library.jar"/>
+            </classpath>
+        </taskdef>
+
         <mkdir dir="${build.dir}/src"/>
         <copy todir="${build.dir}/src" file="${java-src.dir}/org/orbeon/oxf/common/Version.java" overwrite="true">
             <filterset>
@@ -245,10 +262,20 @@
                 <filter token="EDITION" value="${edition}"/>
             </filterset>
         </copy>
+
+        <scalac destdir="${build.classes.dir}"
+            classpathref="class.path"
+            fork="false" encoding="utf-8">
+            <src path="${build.dir}/src"/>
+            <src path="${java-src.dir}"/>
+            <src path="${scala-src.dir}"/>
+            <exclude name="org/orbeon/oxf/common/Version.java"/>
+        </scalac>
+
         <javac destdir="${build.classes.dir}"
             classpathref="class.path"
             debug="${build.debug}" optimize="off" target="1.5" source="1.5"
-            fork="false" memoryInitialSize="128m" memoryMaximumSize="256m" encoding="utf-8">
+            fork="false" memoryInitialSize="128m" memoryMaximumSize="300m" encoding="utf-8">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
@@ -257,10 +284,10 @@
     </target>
 
     <!-- Compile test source -->
-    <target name="test-classes" depends="classes">
+    <target name="test-classes" depends="classes, test-classpath">
         <mkdir dir="${build.test-classes.dir}"/>
         <javac srcdir="${test-src.dir}" destdir="${build.test-classes.dir}"
-            classpathref="class.path" debug="on" optimize="off" target="1.5" source="1.5"
+            classpathref="test.class.path" debug="on" optimize="off" target="1.5" source="1.5"
             includes="**/*.java" encoding="utf-8">
         </javac>
     </target>
@@ -650,7 +677,7 @@
         <property name="debug.arg4" value=""/>
     </target>
 
-    <target name="test" depends="jars, test-classes, debug-enabled, debug-disabled">
+    <target name="test" depends="jars, test-classes, debug-enabled, debug-disabled, test-classpath">
     	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successfully
     	     				it would leave behind .class files in java.io.tmpdir.  This
     	     				meant that on subsequent runs of the test it wouldn't try to
@@ -705,7 +732,7 @@
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}"/>
 
             <classpath>
-                <path refid="class.path"/>
+                <path refid="test.class.path"/>
                 <pathelement location="${build.test-classes.dir}"/>
                 <pathelement location="${resources-private.jar.file}"/>
                 <!-- SHOULD ADD THIS WHEN skip.compilation:  <pathelement location="${war.classes}"/>-->

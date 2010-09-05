@@ -14,9 +14,7 @@
 package org.orbeon.oxf.processor.sql;
 
 import org.dom4j.Node;
-import org.jaxen.Function;
-import org.jaxen.FunctionContext;
-import org.jaxen.UnresolvableException;
+import org.jaxen.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -30,10 +28,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -150,6 +145,17 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                     } catch (Throwable t) {
                         // Ignore
                     }
+                    // Try JBoss delegate
+                    if (clazz == null) {
+                        try {
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJBossDelegate");
+                            SQLProcessor.logger.info("Using Oracle JBoss delegate.");
+                        } catch (Throwable t) {
+                            // Ignore
+                        	t.printStackTrace();
+                        }
+                    }
+
                     // First try Tomcat 4
                     if (clazz == null) {
                         try {

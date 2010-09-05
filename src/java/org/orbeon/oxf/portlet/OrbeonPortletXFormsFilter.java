@@ -38,10 +38,10 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
     public static final String TRAMPOLINE_PATH = "/xforms-trampoline";
 
 //    public static final String RENDERER_CONTAINER_ATTRIBUTE_NAME = "oxf.xforms.renderer.container";
-    private static final String DEFAULT_ENCODING = "UTF-8"; // must be this per Portlet spec
+    protected static final String DEFAULT_ENCODING = "UTF-8"; // must be this per Portlet spec
 
-    private PortletContext portletContext;
-    private String applicationPathRegexp = "^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$";
+    protected PortletContext portletContext;
+    protected String applicationPathRegexp = "^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$";
 
     public OrbeonPortletXFormsFilter() {}
 
@@ -108,7 +108,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
         }
     }
 
-    private void setRequestRequestAttributes(PortletRequest request, MimeResponse response, String method, String path) {
+    protected void setRequestRequestAttributes(PortletRequest request, MimeResponse response, String method, String path) {
 
         // Notify that we are in separate deployment
         request.setAttribute(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, "separate");
@@ -139,7 +139,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
         request.setAttribute(PORTLET_PATH_QUERY_ATTRIBUTE, path);
     }
 
-    private PortletRequestDispatcher getTrampolineDispatcher(String path) throws PortletException {
+    protected PortletRequestDispatcher getTrampolineDispatcher(String path) throws PortletException {
         final PortletRequestDispatcher dispatcher = portletContext.getRequestDispatcher(path);
         if (dispatcher == null)
             throw new PortletException("Can't find Orbeon Forms trampoline request dispatcher.");
@@ -176,17 +176,16 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
         return contentType.substring(0, semicolonIndex).trim();
     }
 
-    private static class FilterResponseWrapper extends RenderResponseWrapper {
+    protected static class FilterResponseWrapper extends RenderResponseWrapper {
 
-        private ByteArrayOutputStream byteArrayOutputStream;
-        private OutputStream outputStream;
+        protected ByteArrayOutputStream byteArrayOutputStream;
+        protected OutputStream outputStream;
 
-        private StringWriter stringWriter;
-        private PrintWriter printWriter;
+        protected StringWriter stringWriter;
+        protected PrintWriter printWriter;
 
-
-        private String encoding;
-        private String mediatype;
+        protected String encoding;
+        protected String mediatype;
 
         public FilterResponseWrapper(RenderResponse response) {
             super(response);

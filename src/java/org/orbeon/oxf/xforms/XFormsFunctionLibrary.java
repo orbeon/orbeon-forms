@@ -171,6 +171,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}case", XXFormsCase.class, 0, 1, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
+        // xxforms:get-request-path()
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-path", XXFormsGetRequestPath.class, 0, 0, 0, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ONE);
+
         // xxforms:get-request-header()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-header", XXFormsGetRequestHeader.class, 0, 1, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);

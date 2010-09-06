@@ -170,14 +170,15 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     }
 
     public String getRealPath(String key) {
-
-        final String realPath = servletContext.getRealPath(rootDirectory + key);
-        if (realPath == null)
-            return null;
-
-        if (!new File(realPath).canRead())
-            throw new ResourceNotFoundException("Cannot read from file " + key);
-        else
-            return realPath;
+        return servletContext.getRealPath(rootDirectory + key);
+        // Need an option for this as some callers call this for non-existing files
+//        final String realPath = servletContext.getRealPath(rootDirectory + key);
+//        if (realPath == null)
+//            return null;
+//
+//        if (!new File(realPath).canRead())
+//            throw new ResourceNotFoundException("Cannot read from file " + key);
+//        else
+//            return realPath;
     }
 }

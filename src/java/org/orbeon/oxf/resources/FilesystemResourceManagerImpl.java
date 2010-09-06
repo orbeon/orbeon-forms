@@ -180,10 +180,12 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
     }
 
     public String getRealPath(String key) {
-        final File file = getFile(key);
-        if (!file.canRead())
-            throw new ResourceNotFoundException("Cannot read from file " + key);
-        else
-            return file.getAbsolutePath();
+        return getFile(key).getAbsolutePath();
+        // Need an option for this as some callers call this for non-existing files
+//        final File file = getFile(key);
+//        if (!file.canRead())
+//            throw new ResourceNotFoundException("Cannot read from file " + key);
+//        else
+//            return file.getAbsolutePath();
     }
 }

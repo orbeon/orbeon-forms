@@ -253,7 +253,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private class StaticStateBits {
 
-        private static final boolean DEBUG = false;
+        private final boolean isLogStaticStateInput = XFormsProperties.getDebugLogging().contains("html-static-state");
 
         public final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
         public final SAXStore annotatedTemplate = new SAXStore();
@@ -263,7 +263,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         public StaticStateBits(PipelineContext pipelineContext, ExternalContext externalContext, IndentedLogger indentedLogger, String existingStaticStateDigest) {
 
-            final boolean computeDigest = DEBUG || existingStaticStateDigest == null;
+            final boolean computeDigest = isLogStaticStateInput || existingStaticStateDigest == null;
 
             indentedLogger.startHandleOperation("", "reading input", "existing digest", existingStaticStateDigest);
 
@@ -273,8 +273,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             final XMLUtils.DigestContentHandler digestReceiver = computeDigest ? new XMLUtils.DigestContentHandler("MD5") : null;
             final XMLReceiver extractorOutput;
-            if (DEBUG) {
-                extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver, getDebugReceiver()) : new TeeXMLReceiver(documentReceiver, getDebugReceiver());
+            if (isLogStaticStateInput) {
+                extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver, getDebugReceiver(indentedLogger)) : new TeeXMLReceiver(documentReceiver, getDebugReceiver(indentedLogger));
             } else {
                 extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver) : documentReceiver;
             }
@@ -299,15 +299,24 @@ public class XFormsToXHTML extends ProcessorImpl {
             this.staticStateDocument = documentResult.getDocument();
             this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestReceiver.getResult()) : null;
 
-            assert !DEBUG || existingStaticStateDigest == null || this.staticStateDigest.equals(existingStaticStateDigest);
+            assert !isLogStaticStateInput || existingStaticStateDigest == null || this.staticStateDigest.equals(existingStaticStateDigest);
 
             indentedLogger.endHandleOperation("computed digest", this.staticStateDigest);
         }
 
-        private TransformerXMLReceiver getDebugReceiver() {
+        private XMLReceiver getDebugReceiver(final IndentedLogger indentedLogger) {
             final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(new StreamResult(System.out));
-            return identity;
+            final StringBuilderWriter writer = new StringBuilderWriter();
+            identity.setResult(new StreamResult(writer));
+
+            return new ForwardingXMLReceiver(identity) {
+                @Override
+                public void endDocument() throws SAXException {
+                    super.endDocument();
+                    // Log out at end of document
+                    indentedLogger.logDebug("", "static state input", "input", writer.toString());
+                }
+            };
         }
     }
 

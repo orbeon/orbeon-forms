@@ -35,9 +35,10 @@ import java.util.*;
 
 public class XPathAnalysis implements XMLUtils.DebugXML {
 
+    public PathMap pathmap; // this is used during analysis and can be freed afterwards
+
     public final XFormsStaticState staticState;
     public final String xpathString;
-    public final PathMap pathmap;
 
     public final boolean figuredOutDependencies;
 
@@ -582,5 +583,9 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         // Not found
         Collections.reverse(stack);
         return result;
+    }
+
+    public void freeTransientState() {
+        this.pathmap = null;
     }
 }

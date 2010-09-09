@@ -312,9 +312,22 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         }
 
         // Once analysis is done, some state can be freed
-        xblBindings.freeTransientState();
+        freeTransientState();
 
         indentedLogger.endHandleOperation("controls", Integer.toString(controlAnalysisMap.size()));
+    }
+
+    private void freeTransientState() {
+
+        xblBindings.freeTransientState();
+
+        for (final ControlAnalysis controlAnalysis: controlAnalysisMap.values()) {
+            controlAnalysis.freeTransientState();
+        }
+
+        for (final Model model: modelsByPrefixedId.values()) {
+            model.freeTransientState();
+        }
     }
 
     private void extractProperties(Element staticStateElement, List<Element> topLevelModelsElements) {

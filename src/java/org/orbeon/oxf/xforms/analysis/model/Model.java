@@ -311,4 +311,10 @@ public class Model {
             helper.endElement();
         }
     }
+
+    public void freeTransientState() {
+        for (final SimpleAnalysis analysis : variables.values()) {
+            analysis.freeTransientState();
+        }
+    }
 }

@@ -229,4 +229,11 @@ public abstract class SimpleAnalysis {
         else
             return parentAnalysis.getLevel() + 1;
     }
+
+    public void freeTransientState() {
+        if (getBindingAnalysis() != null)
+            getBindingAnalysis().freeTransientState();
+        if (getValueAnalysis() != null)
+            getValueAnalysis().freeTransientState();
+    }
 }

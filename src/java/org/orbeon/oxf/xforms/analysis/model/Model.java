@@ -154,7 +154,7 @@ public class Model {
 
     private boolean analyzeBinds(List<Element> bindElements) {
         final List<SimpleAnalysis> stack = new ArrayList<SimpleAnalysis>();
-        stack.add(new ModelAnalysis(staticState, scope, null, null, variables, false, prefixedId, defaultInstancePrefixedId) {
+        stack.add(new ModelAnalysis(staticState, scope, document.getRootElement(), null, variables, false, prefixedId, defaultInstancePrefixedId) {
 
             @Override
             protected XPathAnalysis computeBindingAnalysis(Element element) {

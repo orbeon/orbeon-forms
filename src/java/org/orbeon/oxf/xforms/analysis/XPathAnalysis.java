@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.common.OXFException;
+import org.dom4j.Element;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
@@ -24,6 +25,8 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Axis;
 import org.orbeon.saxon.om.NamePool;
@@ -57,7 +60,8 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
 
     public XPathAnalysis(XFormsStaticState staticState, String xpathString, NamespaceMapping namespaceMapping,
                          XPathAnalysis baseAnalysis, Map<String, SimpleAnalysis> inScopeVariables,
-                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
+                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId,
+                         LocationData locationData, Element element) {
 
         // Create new expression
         // TODO: get expression from pool and pass in-scope variables (probably more efficient)
@@ -66,12 +70,12 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         this(staticState,
                 XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString, namespaceMapping,
                         XFormsContainingDocument.getFunctionLibrary()),
-                xpathString, baseAnalysis, inScopeVariables, scope, modelPrefixedId, defaultInstancePrefixedId);
+                xpathString, baseAnalysis, inScopeVariables, scope, modelPrefixedId, defaultInstancePrefixedId, locationData, element);
     }
 
-    public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
+    private XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
                          XPathAnalysis baseAnalysis, Map<String, SimpleAnalysis> inScopeVariables,
-                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
+                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId, LocationData locationData, Element element) {
         
         this.staticState = staticState;
         this.xpathString = xpathString;
@@ -138,7 +142,8 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             }
 
         } catch (Exception e) {
-            throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
+            throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "analysing XPath expression",
+                    element, "expression", xpathString));
         }
     }
 

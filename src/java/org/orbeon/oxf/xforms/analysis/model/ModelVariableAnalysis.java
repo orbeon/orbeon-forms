@@ -41,7 +41,7 @@ public class ModelVariableAnalysis extends ModelAnalysis {
         if (selectAttribute != null) {
             final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(true);
             return new XPathAnalysis(staticState, selectAttribute, staticState.getMetadata().getNamespaceMapping(prefixedId),
-                    baseAnalysis, parentAnalysis.getInScopeVariables(), scope, getModelPrefixedId(), getDefaultInstancePrefixedId());
+                    baseAnalysis, parentAnalysis.getInScopeVariables(), scope, getModelPrefixedId(), getDefaultInstancePrefixedId(), locationData, element);
         } else {
             // Value is constant
             return XPathAnalysis.CONSTANT_ANALYSIS;

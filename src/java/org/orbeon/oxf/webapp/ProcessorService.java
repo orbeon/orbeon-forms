@@ -17,9 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl;
 import org.orbeon.oxf.resources.ResourceManager;
@@ -31,10 +29,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
+import java.io.*;
 import java.util.HashMap;
 
 public class ProcessorService {
@@ -123,8 +118,8 @@ public class ProcessorService {
         if (errorProcessor != null) {
             // Create pipeline context
             final PipelineContext pipelineContext = new PipelineContext();
-            final Throwable rootThrowable = OXFException.getRootThrowable(throwable);
-            pipelineContext.setAttribute(THROWABLE, rootThrowable);
+            // Put top-level throwable so that the exception page can show the Orbeon Forms call stack if available
+            pipelineContext.setAttribute(THROWABLE, throwable);
             // NOTE: Should this just be available from the ExternalContext?
             pipelineContext.setAttribute(JNDI_CONTEXT, jndiContext);
             try {

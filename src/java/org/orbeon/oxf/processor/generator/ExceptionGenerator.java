@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -62,16 +61,6 @@ public class ExceptionGenerator extends ProcessorImpl {
                         addThrowable(helper, throwable);
                         throwable = OXFException.getNestedException(throwable);
                     }
-
-                    // The code below outputs the first exception only, but not all the OPS stack trace info
-//                    while (true) {
-//                        final Throwable nestedThrowable = OXFException.getNestedException(throwable);
-//                        if (nestedThrowable == null) {
-//                            addThrowable(helper, throwable);
-//                            break;
-//                        }
-//                        throwable = nestedThrowable;
-//                    }
 
                     helper.endElement();
                     helper.endDocument();

@@ -177,7 +177,8 @@ public abstract class SimpleAnalysis {
                 final Model model = staticState.getModel(getModelPrefixedId());
                 if (model.defaultInstancePrefixedId != null) {
                     // Start with instance('defaultInstanceId')
-                    baseAnalysis = new XPathAnalysis(staticState, XPathAnalysis.buildInstanceString(model.defaultInstancePrefixedId), null, null, null, scope, model.prefixedId, model.defaultInstancePrefixedId);
+                    baseAnalysis = new XPathAnalysis(staticState, XPathAnalysis.buildInstanceString(model.defaultInstancePrefixedId),
+                            null, null, null, scope, model.prefixedId, model.defaultInstancePrefixedId, locationData, element);
                 } else {
                     // No instance
                     baseAnalysis = null;
@@ -219,7 +220,7 @@ public abstract class SimpleAnalysis {
 
     protected XPathAnalysis analyzeXPath(XFormsStaticState staticState, XPathAnalysis baseAnalysis, String prefixedId, String xpathString) {
         return new XPathAnalysis(staticState, xpathString, staticState.getMetadata().getNamespaceMapping(prefixedId),
-                baseAnalysis, getInScopeVariables(), scope, getModelPrefixedId(), getDefaultInstancePrefixedId());
+                baseAnalysis, getInScopeVariables(), scope, getModelPrefixedId(), getDefaultInstancePrefixedId(), locationData, element);
     }
 
     public int getLevel() {

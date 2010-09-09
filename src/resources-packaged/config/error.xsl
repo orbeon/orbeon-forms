@@ -153,21 +153,21 @@
                         </p>
                         <div class="orbeon-error-panel-details">
                             <!-- Call stack -->
-                            <h2>Call Stack</h2>
+                            <h2>Orbeon Forms call stack</h2>
                             <div class="orbeon-error-panel-call-stack">
                                 <xsl:call-template name="format-orbeon-call-stack">
                                     <xsl:with-param name="exceptions" select="/exceptions/exception"/>
                                 </xsl:call-template>
                             </div>
-                            <!-- Java exceptions -->
-                            <h2>Java Exceptions (<xsl:value-of select="count(/exceptions/exception)"/> total)</h2>
+                            <!-- Java exception -->
+                            <h2>Java exception</h2>
                             <p>
-                                Java Exceptions are the native mechanism by which Orbeon Forms reports errors. More
+                                Java exceptions are the native mechanism by which Orbeon Forms reports errors. More
                                 than one exception may be provided below but usually the first exception along with the
                                 Orbeon Forms Stack Trace above provide enough information to track down an issue.
                             </p>
                             <table class="orbeon-error-table orbeon-error-java-table">
-                                <xsl:for-each select="/exceptions/exception">
+                                <xsl:for-each select="/exceptions/exception[last()]">
                                     <xsl:sort select="position()" order="descending"/>
                                     <xsl:variable name="exception-position" select="position()"/>
                                     <tr>

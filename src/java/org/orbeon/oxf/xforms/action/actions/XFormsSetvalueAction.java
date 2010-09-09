@@ -65,20 +65,19 @@ public class XFormsSetvalueAction extends XFormsAction {
 
         // Set value on current node
         final Item currentItem = contextStack.getCurrentSingleItem();
-        if (currentItem instanceof NodeInfo) {
+        if ((currentItem instanceof NodeInfo) && valueToSet != null) {
             // TODO: XForms 1.1: "Element nodes: If element child nodes are present, then an xforms-binding-exception
             // occurs. Otherwise, regardless of how many child nodes the element has, the result is that the string
             // becomes the new content of the element. In accord with the data model of [XPath 1.0], the element will
             // have either a single non-empty text node child, or no children string was empty.
 
-            // Node exists, we can try to set the value
+            // Node exists and value is not null, we can try to set the value
             doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, "setvalue", false);
         } else {
-            // Node doesn't exist, don't do anything
-            // NOP
+            // Node doesn't exist or value is null: NOP
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("xforms:setvalue", "not setting instance value",
-                        "reason", "destination node not found",
+                        "reason", (valueToSet != null) ? "destination node not found" : "value to set is ()",
                         "value", valueToSet
                 );
             }
@@ -88,6 +87,8 @@ public class XFormsSetvalueAction extends XFormsAction {
     public static boolean doSetValue(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
                                      IndentedLogger indentedLogger, XFormsEventTarget eventTarget, NodeInfo currentNode,
                                      String valueToSet, String type, String source, boolean isCalculate) {
+
+        assert valueToSet != null;
 
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         final boolean changed = !currentValue.equals(valueToSet);

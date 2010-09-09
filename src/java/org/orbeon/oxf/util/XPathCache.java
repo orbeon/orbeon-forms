@@ -267,7 +267,7 @@ public class XPathCache {
                                           FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition, "string(subsequence(" + xpathString + ", 1, 1))",
+                getConfiguration(propertyContext), contextItems, contextPosition, "xs:string((" + xpathString + ")[1])",
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
         try {
             final Object result = xpathExpression.evaluateSingleKeepNodeInfo(functionContext);

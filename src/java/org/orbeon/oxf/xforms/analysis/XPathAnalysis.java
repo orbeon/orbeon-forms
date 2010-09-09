@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -37,7 +38,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
 
     public final boolean figuredOutDependencies;
 
-    public final Set<String> dependentPaths = new HashSet<String>();
+    public final Set<String> valueDependentPaths = new HashSet<String>();
     public final Set<String> returnablePaths = new HashSet<String>();
 
     public final Set<String> dependentModels = new HashSet<String>();
@@ -113,12 +114,28 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             }
 
             // Try to reduce ancestor axis
+//            System.out.println("xxx before");
+//            System.out.println(expression.toString());
+//            pathmap.diagnosticDump(System.out);// xxx
+
             reduceAncestorAxis(pathmap);
+
+//            System.out.println("xxx after");
+//            pathmap.diagnosticDump(System.out);// xxx
 
             this.pathmap = pathmap;
 
             // Produce resulting paths
             this.figuredOutDependencies = processPaths(scope, modelPrefixedId, defaultInstancePrefixedId);
+
+            if (!this.figuredOutDependencies) {
+                // This really shouldn't be touched if we can't figure out dependencies, but they are so clear them here
+                valueDependentPaths.clear();
+                returnablePaths.clear();
+                dependentModels.clear();
+                dependentInstances.clear();
+                returnableInstances.clear();
+            }
 
         } catch (Exception e) {
             throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
@@ -130,7 +147,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         assert figuredOutDependencies && other.figuredOutDependencies;
 
         pathmap.addRoots(other.pathmap.getPathMapRoots());
-        dependentPaths.addAll(other.dependentPaths);
+        valueDependentPaths.addAll(other.valueDependentPaths);
         returnablePaths.addAll(other.returnablePaths);
         dependentModels.addAll(other.dependentModels);
         dependentInstances.addAll(other.dependentInstances);
@@ -140,7 +157,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
     public boolean intersectsBinding(Set<String> touchedPaths) {
         // Return true if any path matches
         // TODO: for now naively just check exact paths
-        for (final String path: dependentPaths) {
+        for (final String path: valueDependentPaths) {
             if (touchedPaths.contains(path))
                 return true;
         }
@@ -154,7 +171,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             if (touchedPaths.contains(path))
                 return true;
         }
-        for (final String path: dependentPaths) {
+        for (final String path: valueDependentPaths) {
             if (touchedPaths.contains(path))
                 return true;
         }
@@ -169,11 +186,14 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         return false;
     }
 
+    /**
+     * Process the pathmap to extract paths and other information useful for handling dependencies.
+     */
     private boolean processPaths(XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
-            final boolean success = processNode(stack, root, scope, modelPrefixedId, defaultInstancePrefixedId);
+            final boolean success = processNode(stack, root, scope, modelPrefixedId, defaultInstancePrefixedId, false);
             if (!success)
                 return false;
             stack.remove(stack.size() - 1);
@@ -185,20 +205,20 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         return "instance('" + instanceId.replaceAll("'", "''") + "')";
     }
 
-    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
+    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId, boolean ancestorAtomized) {
         boolean success = true;
-        if (node.getArcs().length == 0 || node.isReturnable()) {
+        if (node.getArcs().length == 0 || node.isReturnable() || node.isAtomized() || ancestorAtomized) {
 
             final StringBuilder sb = new StringBuilder();
-            success &= createPath(sb, stack, scope, modelPrefixedId, defaultInstancePrefixedId, node.isReturnable());
+            success &= createPath(sb, stack, scope, modelPrefixedId, defaultInstancePrefixedId, node);
             if (success) {
                 if (sb.length() > 0) {
                     // A path was created
                     final String s = sb.toString();
                     if (node.isReturnable()) {
                         returnablePaths.add(s);
-                    } else {
-                        dependentPaths.add(s);
+                    } else if (node.isAtomized()) {
+                        valueDependentPaths.add(s);
                     }
                 } else {
                     // NOP: don't add the path as this is not considered a dependency
@@ -213,7 +233,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         if (node.getArcs().length > 0) {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());
-                success &= processNode(stack, arc.getTarget(), scope, modelPrefixedId, defaultInstancePrefixedId);
+                success &= processNode(stack, arc.getTarget(), scope, modelPrefixedId, defaultInstancePrefixedId, node.isAtomized());
                 if (!success) {
                     return false;
                 }
@@ -225,7 +245,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         return true;
     }
 
-    private boolean createPath(StringBuilder sb, List<Expression> stack, XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId, boolean isReturnable) {
+    private boolean createPath(StringBuilder sb, List<Expression> stack, XBLBindings.Scope scope, String containingModelPrefixedId, String defaultInstancePrefixedId, PathMap.PathMapNode node) {
         boolean success = true;
         for (final Expression expression: stack) {
             if (expression instanceof Instance || expression instanceof XXFormsInstance) {
@@ -237,9 +257,15 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                     // instance() resolves to default instance for scope
                     if (defaultInstancePrefixedId != null) {
                         sb.append(buildInstanceString(defaultInstancePrefixedId));
-                        dependentModels.add(modelPrefixedId);
+                        {
+                            // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
+                            final Model defaultModelForInstance = staticState.getModelByInstancePrefixedId(defaultInstancePrefixedId);
+                            final String dependentModelPrefixedId = (defaultModelForInstance != null) ? defaultModelForInstance.prefixedId : containingModelPrefixedId;
+                            dependentModels.add(dependentModelPrefixedId);
+                        }
+
                         dependentInstances.add(defaultInstancePrefixedId);
-                        if (isReturnable)
+                        if (node.isReturnable())
                             returnableInstances.add(defaultInstancePrefixedId);
 
                         // Rewrite expression to add/replace its argument with a prefixed instance id
@@ -272,9 +298,15 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                         if (prefixedInstanceId != null) {
                             // Instance found
                             sb.append(buildInstanceString(prefixedInstanceId));
-                            dependentModels.add(modelPrefixedId);
+                            {
+                                // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
+                                // TODO: What if xxf:instance() refers to subsequent model? Must change processing model a bit: first extract model/instances info, then analyze.
+                                final Model modelForInstance = staticState.getModelByInstancePrefixedId(prefixedInstanceId);
+                                final String dependentModelPrefixedId = (modelForInstance != null) ? modelForInstance.prefixedId : containingModelPrefixedId;
+                                dependentModels.add(dependentModelPrefixedId);
+                            }
                             dependentInstances.add(prefixedInstanceId);
-                            if (isReturnable)
+                            if (node.isReturnable())
                                 returnableInstances.add(prefixedInstanceId);
                             // Rewrite expression to replace its argument with a prefixed instance id
                             ((FunctionCall) expression).setArguments(new Expression[] { new StringLiteral(prefixedInstanceId) });
@@ -328,9 +360,9 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
 
         helper.startElement("analysis", new String[] { "expression", xpathString, "analyzed", Boolean.toString(figuredOutDependencies) } );
 
-        if (dependentPaths.size() > 0) {
-            helper.startElement("dependent");
-            for (final String path: dependentPaths) {
+        if (valueDependentPaths.size() > 0) {
+            helper.startElement("value-dependent");
+            for (final String path: valueDependentPaths) {
                 helper.element("path", getDisplayPath(path));
             }
             helper.endElement();
@@ -340,6 +372,30 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             helper.startElement("returnable");
             for (final String path: returnablePaths) {
                 helper.element("path", getDisplayPath(path));
+            }
+            helper.endElement();
+        }
+
+        if (dependentModels.size() > 0) {
+            helper.startElement("dependent-models");
+            for (final String path: dependentModels) {
+                helper.element("model", getDisplayPath(path));
+            }
+            helper.endElement();
+        }
+
+        if (dependentInstances.size() > 0) {
+            helper.startElement("dependent-instances");
+            for (final String path: dependentInstances) {
+                helper.element("instances", getDisplayPath(path));
+            }
+            helper.endElement();
+        }
+
+        if (returnableInstances.size() > 0) {
+            helper.startElement("returnable-instances");
+            for (final String path: returnableInstances) {
+                helper.element("instances", getDisplayPath(path));
             }
             helper.endElement();
         }
@@ -436,10 +492,12 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             if (e.getAxis() == Axis.ANCESTOR && e.getNodeTest().getFingerprint() != -1) {
                 // Found ancestor::foobar
                 final int nodeName = e.getNodeTest().getFingerprint();
-                final PathMap.PathMapArc ancestorArc = ancestorWithFingerprint(stack, nodeName);
-                if (ancestorArc != null) {
-                    if (moveArc(stack, newNodeArc, ancestorArc.getTarget()))
-                        return true;
+                final List<PathMap.PathMapArc> ancestorArcs = ancestorsWithFingerprint(stack, nodeName);
+                if (ancestorArcs.size() > 0) {
+                    // There can be more than one ancestor with that fingerprint
+                    for (final PathMap.PathMapArc ancestorArc : ancestorArcs)
+                        moveArc(newNodeArc, ancestorArc.getTarget());
+                    return true;
                 } else {
                     // E.g.: /a/b/ancestor::c
                     // TODO
@@ -448,8 +506,8 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                 // Parent axis
                 if (stack.size() >= 1) {
                     final NodeArc parentNodeArc = stack.get(stack.size() - 1);
-                    if (moveArc(stack, newNodeArc, parentNodeArc.node))
-                        return true;
+                    moveArc(newNodeArc, parentNodeArc.node);
+                    return true;
                 } else {
                     // TODO: is this possible?
                 }
@@ -484,7 +542,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         return false;
     }
 
-    private boolean moveArc(List<NodeArc> stack, NodeArc nodeArc, PathMap.PathMapNode ancestorNode) {
+    private boolean moveArc(NodeArc nodeArc, PathMap.PathMapNode ancestorNode) {
         if (ancestorNode != null) {
 
             // Move arcs
@@ -496,8 +554,8 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             if (nodeArc.arc.getTarget().isReturnable())
                 ancestorNode.setReturnable(true);
 
-            // Remove orphan nodes
-//            removeOrphanNodes(stack);
+            if (nodeArc.arc.getTarget().isAtomized())
+                ancestorNode.setAtomized();
 
             return true;
         } else {
@@ -506,31 +564,18 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         return false;
     }
 
-    private PathMap.PathMapArc ancestorWithFingerprint(List<NodeArc> stack, int nodeName) {
+    private List<PathMap.PathMapArc> ancestorsWithFingerprint(List<NodeArc> stack, int nodeName) {
+        final List<PathMap.PathMapArc> result = new ArrayList<PathMap.PathMapArc>();
         Collections.reverse(stack);
         for (final NodeArc nodeArc: stack.subList(1, stack.size())) {
             final AxisExpression e = nodeArc.arc.getStep();
 
             if (e.getAxis() == Axis.CHILD && e.getNodeTest().getFingerprint() == nodeName) {
-                Collections.reverse(stack);
-                return nodeArc.arc;
+                result.add(nodeArc.arc);
             }
         }
         // Not found
         Collections.reverse(stack);
-        return null;
-    }
-
-    // TODO: Fix this function to properly remove orphan nodes without removing actual dependencies
-    private void removeOrphanNodes(List<NodeArc> stack) {
-        Collections.reverse(stack);
-        for (final NodeArc nodeArc: stack) {
-            // If the node is not returnable and doesn't have children arcs, prune it
-            if (!nodeArc.node.isReturnable() && nodeArc.arc.getTarget().getArcs().length == 0) {
-                nodeArc.node.removeArc(nodeArc.arc);
-            }
-        }
-
-        Collections.reverse(stack);
+        return result;
     }
 }

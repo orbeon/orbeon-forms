@@ -68,6 +68,7 @@ public class ControlAnalysisFactory {
         }
 
         // Evaluate aggressively
+        // TODO: controlAnalysis.analyze();
         controlAnalysis.getBindingAnalysis();
         controlAnalysis.getValueAnalysis();
 

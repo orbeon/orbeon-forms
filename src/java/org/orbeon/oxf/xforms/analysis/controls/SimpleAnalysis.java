@@ -210,10 +210,10 @@ public abstract class SimpleAnalysis {
             final String valueAttribute = element.attributeValue("value");
             if (valueAttribute != null) {
                 // E.g. xforms:output/@value
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, valueAttribute);
+                return analyzeXPath(staticState, baseAnalysis, prefixedId, "xs:string((" + valueAttribute + ")[1])");
             } else {
                 // Value is considered the string value
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, "string()");
+                return analyzeXPath(staticState, baseAnalysis, prefixedId, "xs:string(.[1])");
             }
         }
 

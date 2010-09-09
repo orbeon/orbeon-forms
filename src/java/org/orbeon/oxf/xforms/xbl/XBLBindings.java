@@ -418,6 +418,9 @@ public class XBLBindings {
                         }
                     }
 
+                    // Analyze the models first
+                    staticState.analyzeModelsForScope(newInnerScope);
+
                     // Remember full and compact shadow trees for this prefixed id
                     xblFullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
                     xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
@@ -460,6 +463,7 @@ public class XBLBindings {
                         }
                     }
 
+                    // Analyze the component tree
                     staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newInnerScope, compactShadowTreeDocument.getRootElement(),
                             parentControlAnalysis, repeatHierarchyStringBuffer);
                 }

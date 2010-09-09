@@ -74,6 +74,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     // Static representation of models and instances
     private LinkedHashMap<XBLBindings.Scope, List<Model>> modelsByScope = new LinkedHashMap<XBLBindings.Scope, List<Model>>();
     private Map<String, Model> modelsByPrefixedId = new LinkedHashMap<String, Model>();
+    private Map<String, Model> modelByInstancePrefixedId = new LinkedHashMap<String, Model>();
 
     private Map<String, String> xxformsScripts;                             // Map of id to script content
 
@@ -287,6 +288,10 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         final XBLBindings.Scope rootScope = xblBindings.getResolutionScopeById("");
         final ContainerAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this, rootScope);
 
+        // Analyze models first
+        analyzeModelsForScope(xblBindings.getTopLevelScope());
+
+        // Then analyze controls
         analyzeComponentTree(propertyContext, xpathConfiguration, rootScope,
                 controlsDocument.getRootElement(), rootControlAnalysis, repeatHierarchyStringBuffer);
 
@@ -445,8 +450,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
             // Find all top-level controls
             int topLevelControlsCount = 0;
-            for (Object o: staticStateElement.elements()) {
-                final Element currentElement = (Element) o;
+            for (final Element currentElement : Dom4jUtils.elements(staticStateElement)) {
                 final QName currentElementQName = currentElement.getQName();
 
                 if (!currentElementQName.equals(XFormsConstants.XFORMS_MODEL_QNAME)
@@ -469,9 +473,12 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
             indentedLogger.logDebug("", "created nested model documents", "count", Integer.toString(extractedModels.size()));
+            int modelsCount = 0;
             for (final Document currentModelDocument: extractedModels) {
                 addModelDocument(xblBindings.getTopLevelScope(), currentModelDocument);
+                modelsCount++;
             }
+            indentedLogger.logDebug("", "created nested top-level model documents", "count", Integer.toString(modelsCount));
         }
     }
 
@@ -490,10 +497,16 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         final Model newModel = new Model(this, scope, modelDocument);
         models.add(newModel);
         modelsByPrefixedId.put(newModel.prefixedId, newModel);
+        for (final Instance instance : newModel.instances.values())
+            modelByInstancePrefixedId.put(instance.prefixedId, newModel);
     }
 
     public Model getModel(String prefixedId) {
         return modelsByPrefixedId.get(prefixedId);
+    }
+
+    public Model getModelByInstancePrefixedId(String prefixedId) {
+        return modelByInstancePrefixedId.get(prefixedId);
     }
 
     public void extractXFormsScripts(PropertyContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
@@ -998,6 +1011,12 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         }
 
         return false;
+    }
+
+    public void analyzeModelsForScope(XBLBindings.Scope scope) {
+        if (modelsByScope.get(scope) != null)
+            for (final Model model : modelsByScope.get(scope))
+                model.analyze();
     }
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,

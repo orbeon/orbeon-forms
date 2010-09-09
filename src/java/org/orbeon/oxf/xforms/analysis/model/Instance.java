@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -30,6 +31,7 @@ public class Instance {
     public final LocationData locationData;
 
     public final String staticId;
+    public final String prefixedId;
     public final boolean isReadonlyHint;
     public final boolean isCacheHint;
     public final long xxformsTimeToLive;
@@ -48,10 +50,11 @@ public class Instance {
     public final String dependencyURL;
 
 
-    public Instance(Element element) {
+    public Instance(Element element, XBLBindings.Scope scope) {
 
         this.element = element;
         this.staticId = XFormsUtils.getElementStaticId(element);
+        this.prefixedId = scope.getFullPrefix() + staticId;
 
         locationData = (LocationData) element.getData();
         isReadonlyHint = XFormsInstance.isReadonlyHint(element);

@@ -31,26 +31,30 @@ public class Model {
 
     private final XFormsStaticState staticState;
 
-    public final XBLBindings.Scope scope;
+    // TODO: ideally this should not be kept as a model variable: attributes should be extracted and copied etc.
     public final Document document;
 
-    public final Map<String, Instance> instances;
-
+    // Scope and ids
+    public final XBLBindings.Scope scope;
     public final String staticId;
     public final String prefixedId;
+
+    // Instances
+    public final Map<String, Instance> instances;
     public final String defaultInstanceStaticId;
     public final String defaultInstancePrefixedId;
 
-    public final Map<String, SimpleAnalysis> variables;
+    // Variables
+    public Map<String, SimpleAnalysis> variables;
 
-    public final List<Element> bindElements;
-    public final Set<String> bindIds;
-    public final Map<String, Map<String, String>> customMIPs;
-    public final boolean figuredBindAnalysis;
-    public final Set<String> bindInstances;
-    public final Set<String> computedBindExpressionsInstances;
-    public final Set<String> validationBindInstances;
-
+    // Binds
+    public List<Element> bindElements;
+    public Set<String> bindIds;
+    public Map<String, Map<String, String>> customMIPs;
+    public boolean figuredBindAnalysis;
+    public Set<String> bindInstances;
+    public Set<String> computedBindExpressionsInstances;
+    public Set<String> validationBindInstances;
 
     public Model(XFormsStaticState staticState, XBLBindings.Scope scope, Document document) {
 
@@ -58,25 +62,26 @@ public class Model {
         assert document != null;
 
         this.staticState = staticState;
-        this.scope = scope;
         this.document = document;
+
+        this.scope = scope;
+        staticId = XFormsUtils.getElementStaticId(document.getRootElement());
+        prefixedId = scope.getFullPrefix() + staticId;
 
         final List<Element> instanceElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
         instances = new LinkedHashMap<String, Instance>(instanceElements.size());
-
         for (final Element instanceElement: instanceElements) {
-            final Instance newInstance = new Instance(instanceElement);
+            final Instance newInstance = new Instance(instanceElement, scope);
             instances.put(newInstance.staticId, newInstance);
         }
 
-        staticId = XFormsUtils.getElementStaticId(document.getRootElement());
-        prefixedId = scope.getFullPrefix() + staticId;
         final boolean hasInstances = instances.size() > 0;
         defaultInstanceStaticId = hasInstances  ? instances.keySet().iterator().next() : null;
         defaultInstancePrefixedId = hasInstances ? scope.getFullPrefix() + defaultInstanceStaticId : null;
+    }
 
+    public  void analyze() {
         // Handle variables
-
         {
             final List<Element> variableElements = new ArrayList<Element>(); {
                 for (final Element element : Dom4jUtils.elements(document.getRootElement())) {
@@ -107,6 +112,10 @@ public class Model {
                 for (final Element element : variableElements) {
                     final ModelVariableAnalysis currentVariableAnalysis = new ModelVariableAnalysis(staticState, scope, element, modelRootAnalysis, variables, prefixedId, defaultInstanceStaticId);
                     variables.put(currentVariableAnalysis.name, currentVariableAnalysis);
+
+                    // Evaluate aggressively
+                    currentVariableAnalysis.getBindingAnalysis();
+                    currentVariableAnalysis.getValueAnalysis();
                 }
             } else {
                 variables = Collections.emptyMap();
@@ -140,7 +149,7 @@ public class Model {
                 computedBindExpressionsInstances = Collections.emptySet();
                 validationBindInstances = Collections.emptySet();
             }
-    }
+        }
     }
 
     private boolean analyzeBinds(List<Element> bindElements) {

@@ -225,6 +225,7 @@
     <target name="classpath" depends="prepare">
         <path id="class.path">
             <pathelement location="${jar.file}"/>
+            <pathelement location="${xforms-filter.jar.file}"/>
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
             </fileset>

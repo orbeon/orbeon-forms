@@ -20,6 +20,8 @@
         <selected>Selected</selected>
         <confirm>Confirm</confirm>
         <cancel>Cancel</cancel>
+        <add>Add</add>
+        <remove>Remove</remove>
     </resource>
     <resource xml:lang="fr">
         <select>...</select>
@@ -28,5 +30,7 @@
         <selected>Sélectionné</selected>
         <confirm>Confirmer</confirm>
         <cancel>Annuler</cancel>
+        <add>Ajouter</add>
+        <remove>Supprimer</remove>
     </resource>
 </resources>

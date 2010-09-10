@@ -52,21 +52,7 @@
         </metadata>
 
         <xbl:resources>
-            <xbl:style>
-                .xbl-fr-dialog-select ul .xforms-repeat-selected-item-1 { background-color: transparent}
-                .xbl-fr-dialog-select .fr-component-group { display: inline-block; display: -moz-inline-block }
-
-                #doc .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label,
-                        #doc4 .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label {
-                    width: auto;
-                }
-
-                .fr-dialog-select-dialog td { vertical-align: top; padding: .5em }
-                .fr-dialog-select-dialog select { height: 10em; width: 15em }
-                .fr-dialog-select-dialog table .xbl-fr-button { display: block; margin: .5em }
-                .fr-dialog-select-dialog .xforms-label { display: block; font-weight: bold }
-                .fr-dialog-select-dialog .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
-            </xbl:style>
+            <xbl:style src="/xbl/orbeon/dialog-select/dialog-select.css"/>
         </xbl:resources>
 
         <xbl:implementation>
@@ -175,9 +161,9 @@
                                         </xforms:select>
                                     </xhtml:td>
                                     <xhtml:td>
-                                        <fr:button ref="add-trigger">
+                                        <fr:button ref="add-trigger" class="fr-add-button">
                                             <xforms:label>
-                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
+                                                <xforms:output value="$resources/add"/>
                                             </xforms:label>
                                             <xforms:action ev:event="DOMActivate" >
                                                 <xxforms:variable name="selection" select="tokenize(available, '\s+')" as="xs:string*"/>
@@ -190,9 +176,9 @@
                                             </xforms:action>
                                         </fr:button>
 
-                                        <fr:button ref="remove-trigger">
+                                        <fr:button ref="remove-trigger" class="fr-remove-button">
                                             <xforms:label>
-                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
+                                                <xforms:output value="$resources/remove"/>
                                             </xforms:label>
                                             <xforms:action ev:event="DOMActivate" >
                                                 <xxforms:variable name="selection" select="tokenize(selected, '\s+')" as="xs:string*"/>

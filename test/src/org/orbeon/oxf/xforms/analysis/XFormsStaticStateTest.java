@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.analysis;
 import org.dom4j.Document;
 import org.junit.Test;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
@@ -455,10 +455,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
      * @return              static state
      */
     public static XFormsStaticState getStaticState(Document formDocument) {
-        final PipelineContext pipelineContext = new PipelineContext();
-        final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/xforms/analysis/request.xml", null);
-        final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
 
+        final PipelineContext pipelineContext = new PipelineContext();
 
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
 
@@ -470,8 +468,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         final SAXStore annotatedTemplate = new SAXStore();
 
         // Read the input through the annotator and gather namespace mappings
-        TransformerUtils.writeDom4j(formDocument, new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata),
-                    externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata));
+        TransformerUtils.writeDom4j(formDocument, new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata), metadata));
 
         final String digest = NumberUtils.toHexString(digestContentHandler.getResult());
 

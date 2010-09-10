@@ -19,8 +19,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -60,9 +59,6 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     private Locator documentLocator;
 
-    private final String containerNamespace;
-    private final boolean portlet;
-
 
     private final XFormsStaticState.Metadata metadata;
     private final boolean isGenerateIds;
@@ -90,16 +86,11 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
      *
      * @param templateReceiver      template output (special treatment for marks if this is a SAXStore)
      * @param extractorReceiver     extractor output (can be null for XBL for now)
-     * @param containerNamespace    container namespace for portlets
-     * @param portlet               whether we are in portlet mode
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, String containerNamespace, boolean portlet, XFormsStaticState.Metadata metadata) {
+    public XFormsAnnotatorContentHandler(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, XFormsStaticState.Metadata metadata) {
         this.templateReceiver = templateReceiver;
         this.extractorReceiver = extractorReceiver;
-
-        this.containerNamespace = containerNamespace;
-        this.portlet = portlet;
 
         this.metadata = metadata;
         this.isGenerateIds = true;
@@ -116,9 +107,6 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     public XFormsAnnotatorContentHandler(XFormsStaticState.Metadata metadata) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
-        this.containerNamespace = "";
-        this.portlet = false;
-
         this.metadata = metadata;
         this.isGenerateIds = false;
     }
@@ -155,10 +143,10 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // Gather id and namespace information about content of LHHA
                 if (isXForms) {
                     // Must be xforms:output
-                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                    attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
                 } else if (hostLanguageAVTs && hasAVT(attributes)) {
                     // Must be an AVT on an host language element
-                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                    attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
                 }
             } else if (inXBL && level - 1 == preserveLevel && isXBL && "binding".equals(localname)) {
                 // Gather binding information in xbl:xbl/xbl:binding
@@ -167,7 +155,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                     storeXBLBinding(elementAttribute);
                 }
                 // Gather id and namespace information
-                attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
             }
             // Output element
             startElement(true, uri, localname, qName, attributes);
@@ -177,7 +165,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
 
             // Create a new id and update the attributes if needed
-            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+            attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
 
             if (templateSAXStore != null && Version.isPE()) {
                 // Remember mark if xxforms:update="full"
@@ -204,7 +192,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             // Element with a binding
 
             // Create a new id and update the attributes if needed
-            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+            attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
 
             // Leave element untouched (except for the id attribute)
             startElement(true, uri, localname, qName, attributes);
@@ -216,7 +204,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         } else if (isXBL) {
             // This must be xbl:xbl (otherwise we will have isPreserve == true)
             // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
-            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+            attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
             startElement(true, uri, localname, qName, attributes);
         } else {
             // Non-XForms element without an XBL binding
@@ -233,7 +221,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                     // Entering title
                     inTitle = true;
                     // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xforms:output)
-                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                    attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
                     htmlElementId = reusableStringArray[0];
                     htmlTitleElementId = htmlElementId;
                 }
@@ -259,7 +247,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
                                 // Create a new id and update the attributes if needed
                                 if (htmlElementId == null) {
-                                    attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+                                    attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
                                     htmlElementId = reusableStringArray[0];
 
                                     // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
@@ -274,7 +262,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                                 // Create a new xxforms:attribute control
                                 reusableAttributes.clear();
 
-                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(reusableAttributes, reusableStringArray, -1);
+                                final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, -1);
 
                                 newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
                                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
@@ -448,44 +436,30 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         return documentLocator;
     }
 
-    private Attributes getAttributesGatherNamespaces(Attributes attributes, String[] newIdAttribute, final int idIndex) {
+    private Attributes getAttributesGatherNamespaces(String qName, Attributes attributes, String[] newIdAttribute, final int idIndex) {
         if (isGenerateIds) {
             // Process ids
-            final String newIdAttributeUnprefixed;
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttributeUnprefixed = metadata.idGenerator.getNextId();
-                newIdAttribute[0] = newIdAttributeUnprefixed;
+                newIdAttribute[0] = metadata.idGenerator.getNextId();
                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
-                attributes = newAttributes;
-            } else if (portlet) {
-                // Then we must prefix the existing id
-                final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
-                newIdAttribute[0] = newIdAttributeUnprefixed;
-                newAttributes.setValue(idIndex, newIdAttribute[0]);
                 attributes = newAttributes;
             } else {
                 // Keep existing id
-                newIdAttributeUnprefixed = newIdAttribute[0] = attributes.getValue(idIndex);
+                newIdAttribute[0] = attributes.getValue(idIndex);
             }
 
             // Check for duplicate ids
-            if (metadata.idGenerator.isDuplicate(newIdAttribute[0])) // TODO: create Element to provide more location info?
-                throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
-                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
+            // TODO: create Element to provide more location info?
+            if (metadata.idGenerator.isDuplicate(newIdAttribute[0]))
+                throw new ValidationException("Duplicate id for XForms element: " + newIdAttribute[0],
+                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));
 
-            // Prefix observer id
-            if (portlet) {
-                final int observerIndex = attributes.getIndex(XFormsConstants.XML_EVENTS_NAMESPACE_URI, "observer");
-                if (observerIndex != -1) {
-                    final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                    String newObserverAttributeUnprefixed = newAttributes.getValue(observerIndex);
-                    newAttributes.setValue(observerIndex, newObserverAttributeUnprefixed);
-                    attributes = newAttributes;
-                }
-            }
+            // TODO: Make sure we can test on the presense of "$" without breaking ids produced by XBLBindings
+//            else if (newIdAttribute[0].contains("$"))
+//                throw new ValidationException("Id for XForms element cannot contain the \"$\" character: " + newIdAttribute[0],
+//                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));
 
         } else {
             // Don't create a new id but remember the existing one

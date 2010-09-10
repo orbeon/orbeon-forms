@@ -14,24 +14,16 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.*;
-import org.dom4j.io.DocumentSource;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
+import org.dom4j.io.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.xml.NamespaceCleanupXMLReceiver;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -266,11 +258,6 @@ public class Dom4jUtils {
                 j.remove();
             }
         }
-    }
-
-    public static String makeSystemId(final Document d) {
-        final Element e = d.getRootElement();
-        return makeSystemId(e);
     }
 
     public static String makeSystemId(final Element e) {
@@ -709,6 +696,16 @@ public class Dom4jUtils {
         final Element newElement = sourceElement.createCopy();
         copyMissingNamespaces(sourceElement.getParent(), newElement);
         return newElement;
+    }
+
+    public static Element saxToDebugElement(String qName, Attributes attributes) {
+        final Element element = createElement(qName);
+
+        for (int i = 0; i < attributes.getLength(); i++) {
+            element.addAttribute(attributes.getQName(i), attributes.getValue(i));
+        }
+
+        return element;
     }
 
     /**

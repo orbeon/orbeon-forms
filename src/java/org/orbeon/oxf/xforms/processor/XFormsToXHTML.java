@@ -293,8 +293,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // o optionally: debug output
             //
             readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,
-                    new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(extractorOutput, metadata),
-                            externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata));
+                    new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(extractorOutput, metadata), metadata));
 
             this.staticStateDocument = documentResult.getDocument();
             this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestReceiver.getResult()) : null;

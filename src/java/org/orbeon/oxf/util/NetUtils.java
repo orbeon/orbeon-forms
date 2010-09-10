@@ -632,7 +632,8 @@ public class NetUtils {
 
         // Return a file URL
         final File storeLocation = ((DiskFileItem) fileItem).getStoreLocation();
-        return storeLocation.toURI().toString();
+        // Escape "+" because at least in one environment (JBoss 5.1.0 GA on OS X) not escaping the "+" in a file URL causes later incorrect conversion to space
+        return storeLocation.toURI().toString().replace("+", "%2B");
     }
 
     private static FileItem prepareFileItemFromInputStream(PipelineContext pipelineContext, InputStream inputStream, int scope) {

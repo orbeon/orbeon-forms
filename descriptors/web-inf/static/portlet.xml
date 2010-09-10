@@ -45,6 +45,7 @@
         <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
         <filter-class>org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter</filter-class>
         <lifecycle>RENDER_PHASE</lifecycle>
+        <lifecycle>ACTION_PHASE</lifecycle>
         <lifecycle>RESOURCE_PHASE</lifecycle>
         <init-param>
             <name>oxf.xforms.renderer.context</name>

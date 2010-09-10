@@ -27,6 +27,7 @@ import java.util.*;
 public class OrbeonXFormsFilter implements Filter {
 
     public static final String RENDERER_DEPLOYMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.deployment";
+    public static final String RENDERER_DEPLOYMENT_SOURCE_ATTRIBUTE_NAME = "oxf.xforms.renderer.source";
     public static final String RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
     public static final String RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
     public static final String RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
@@ -58,6 +59,7 @@ public class OrbeonXFormsFilter implements Filter {
         // Set whether deployment is integrated or separate
         // NOTE: DO this also for resources, so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly
         httpRequest.setAttribute(RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, (getOrbeonContext() == servletContext) ? "integrated" : "separate");
+        httpRequest.setAttribute(RENDERER_DEPLOYMENT_SOURCE_ATTRIBUTE_NAME, "servlet");
 
         if (isOrbeonResourceRequest(requestPath)) {
             // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)

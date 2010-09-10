@@ -118,6 +118,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             new EchoSubmission(this),
             new ClientGetAllSubmission(this),
             new LocalPortletSubmission(this),
+            new FilterPortletSubmission(this),
             new RequestDispatcherSubmission(this),
             new CacheableSubmission(this),
             new RegularSubmission(this)
@@ -833,6 +834,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             "resolving resource URI");
                 }
                 actionOrResource = NetUtils.encodeHRRI(temp, true);
+                // TODO: see if we can resolve xml:base early to detect absolute URLs early as well
+//                actionOrResource = XFormsUtils.resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString();
             }
 
             serialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);

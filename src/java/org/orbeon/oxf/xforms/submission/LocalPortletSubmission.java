@@ -23,6 +23,9 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+/**
+ * This submission directly uses the Orbeon portlet to run a request/response as a response to a submission.
+ */
 public class LocalPortletSubmission extends BaseSubmission {
 
     private static final String SKIPPING_SUBMISSION_DEBUG_MESSAGE = "skipping local portlet submission";

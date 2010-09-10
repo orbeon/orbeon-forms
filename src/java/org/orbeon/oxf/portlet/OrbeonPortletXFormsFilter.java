@@ -18,12 +18,13 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import javax.portlet.*;
 import javax.portlet.filter.*;
 import java.io.*;
+import java.util.StringTokenizer;
 
 /**
  * The Orbeon portlet filter intercepts the output of a portlet, sets up information in the request and forwards the
  * request to the trampoline servlet for XForms rendering. 
  */
-public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
+public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, ResourceFilter {
 
     public static final String PATH_PARAMETER_NAME = "orbeon.path";
 
@@ -34,6 +35,12 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
     public static final String PORTLET_RESOURCE_URL_TEMPLATE_ATTRIBUTE = "oxf.xforms.renderer.portlet.resource-url";
     public static final String PORTLET_METHOD_ATTRIBUTE = "oxf.xforms.renderer.portlet.method";
     public static final String PORTLET_PATH_QUERY_ATTRIBUTE = "oxf.xforms.renderer.portlet.path";
+
+    public static final String PORTLET_SUBMISSION_METHOD_ATTRIBUTE = "oxf.xforms.renderer.portlet.submission-method";
+    public static final String PORTLET_SUBMISSION_PATH_ATTRIBUTE = "oxf.xforms.renderer.portlet.submission-path";
+    public static final String PORTLET_SUBMISSION_MEDIATYPE_ATTRIBUTE = "oxf.xforms.renderer.portlet.submission-mediatype";
+    public static final String PORTLET_SUBMISSION_BODY_ATTRIBUTE = "oxf.xforms.renderer.portlet.submission-body";
+
 
     public static final String TRAMPOLINE_PATH = "/xforms-trampoline";
 
@@ -53,7 +60,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
         if (applicationPathRegexp != null)
             this.applicationPathRegexp = applicationPathRegexp;
     }
-
+    
     /**
      * Filter render requests.
      */
@@ -93,6 +100,44 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
     }
 
     /**
+     * Filter action requests.
+     */
+    public void doFilter(ActionRequest actionRequest, ActionResponse actionResponse, FilterChain filterChain) throws IOException, PortletException {
+        final String orbeonPath = actionRequest.getParameter(PATH_PARAMETER_NAME);
+        if (orbeonPath != null) {
+            // This is an Orbeon action: let Orbeon handle it
+            setRequestRequestAttributes(actionRequest, actionResponse, actionRequest.getMethod(), orbeonPath);
+            getTrampolineDispatcher(TRAMPOLINE_PATH).forward(actionRequest, actionResponse);
+
+            // If Orbeon does a local XForms submission with replace="all", it places some parameters in the request
+            final byte[] requestBody = (byte[]) actionRequest.getAttribute(PORTLET_SUBMISSION_BODY_ATTRIBUTE);
+            final String requestPath = (String) actionRequest.getAttribute(PORTLET_SUBMISSION_PATH_ATTRIBUTE);
+            if (requestBody != null || requestPath != null) {
+                // Submission occurred
+
+                // Set new render parameters if needed
+                if (requestPath != null && requestPath.contains("?")) {
+                    final String queryString = requestPath.substring(requestPath.indexOf('?') + 1);
+                    final StringTokenizer st = new StringTokenizer(queryString, "&");
+                    while (st.hasMoreTokens()) {
+                        final String nameValue = st.nextToken();
+                        if (nameValue.contains("=")) {
+                            final int equalIndex = nameValue.indexOf('=');
+                            actionResponse.setRenderParameter(nameValue.substring(0, equalIndex), nameValue.substring(equalIndex + 1));
+                        }
+                    }
+                }
+
+                // Run the chain with a new body (which might be empty)
+                filterChain.doFilter(new BodyRequestWrapper(actionRequest, requestBody, (String) actionRequest.getAttribute(PORTLET_SUBMISSION_MEDIATYPE_ATTRIBUTE)), actionResponse);
+            }
+        } else {
+            // Not an Orbeon action: just apply the filter
+            filterChain.doFilter(actionRequest, actionResponse);
+        }
+    }
+
+    /**
      * Filter resource requests.
      */
     public void doFilter(ResourceRequest resourceRequest, ResourceResponse resourceResponse, FilterChain filterChain) throws IOException, PortletException {
@@ -108,30 +153,34 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
         }
     }
 
-    protected void setRequestRequestAttributes(PortletRequest request, MimeResponse response, String method, String path) {
+    protected void setRequestRequestAttributes(PortletRequest request, PortletResponse response, String method, String path) {
 
         // Notify that we are in separate deployment
         request.setAttribute(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, "separate");
+        request.setAttribute(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_SOURCE_ATTRIBUTE_NAME, "portlet");
 
         // Set rewriting information
         request.setAttribute(PORTLET_NAMESPACE_TEMPLATE_ATTRIBUTE, response.getNamespace());
 
-        {
-            final PortletURL renderURL = response.createRenderURL();
-            renderURL.setParameter(PATH_PARAMETER_NAME, PATH_TEMPLATE);
+        if (response instanceof MimeResponse) {
+            final MimeResponse mimeResponse = (MimeResponse) response;
+            {
+                final PortletURL renderURL = mimeResponse.createRenderURL();
+                renderURL.setParameter(PATH_PARAMETER_NAME, PATH_TEMPLATE);
 
-            request.setAttribute(PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE, renderURL.toString());
-        }
-        {
-            final PortletURL actionURL = response.createActionURL();
-            actionURL.setParameter(PATH_PARAMETER_NAME, PATH_TEMPLATE);
+                request.setAttribute(PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE, renderURL.toString());
+            }
+            {
+                final PortletURL actionURL = mimeResponse.createActionURL();
+                actionURL.setParameter(PATH_PARAMETER_NAME, PATH_TEMPLATE);
 
-            request.setAttribute(PORTLET_ACTION_URL_TEMPLATE_ATTRIBUTE, actionURL.toString());
-        }
-        {
-            final ResourceURL resourceURL = response.createResourceURL();
-            resourceURL.setResourceID(PATH_TEMPLATE);
-            request.setAttribute(PORTLET_RESOURCE_URL_TEMPLATE_ATTRIBUTE, resourceURL.toString());
+                request.setAttribute(PORTLET_ACTION_URL_TEMPLATE_ATTRIBUTE, actionURL.toString());
+            }
+            {
+                final ResourceURL resourceURL = mimeResponse.createResourceURL();
+                resourceURL.setResourceID(PATH_TEMPLATE);
+                request.setAttribute(PORTLET_RESOURCE_URL_TEMPLATE_ATTRIBUTE, resourceURL.toString());
+            }
         }
 
         // Set request information
@@ -240,6 +289,48 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ResourceFilter {
         public void setContentType(String contentType) {
             this.encoding = getContentTypeCharset(contentType);
             this.mediatype = getContentTypeMediaType(contentType);
+        }
+    }
+
+    protected static class BodyRequestWrapper extends ActionRequestWrapper {
+
+        protected byte[] requestBody;
+        protected String mediatype;
+
+        private ByteArrayInputStream is;
+        private BufferedReader reader;
+
+        public BodyRequestWrapper(ActionRequest request, byte[] requestBody, final String mediatype) {
+            super(request);
+            this.requestBody = requestBody;
+            this.mediatype = mediatype;
+        }
+
+        @Override
+        public InputStream getPortletInputStream() throws IOException {
+            if (is == null) {
+                is = new ByteArrayInputStream(requestBody != null ? requestBody : new byte[0]);
+            }
+            return is;
+        }
+
+        @Override
+        public BufferedReader getReader() throws IOException {
+            if (reader == null) {
+                // TODO: encoding might not always be utf-8, right?
+                reader = new BufferedReader(new InputStreamReader(getPortletInputStream(), "utf-8"));
+            }
+            return reader;
+        }
+
+        @Override
+        public String getContentType() {
+            return mediatype;
+        }
+
+        @Override
+        public int getContentLength() {
+            return requestBody != null ? requestBody.length : 0;
         }
     }
 }

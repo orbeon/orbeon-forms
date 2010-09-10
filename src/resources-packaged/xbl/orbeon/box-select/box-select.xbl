@@ -86,7 +86,11 @@
                     <!-- Variable pointing to external single-node binding -->
                     <xxforms:variable name="result" select="." as="node()?"/>
 
-                    <xhtml:ul>
+                    <!-- The tabindex prevents the ul from being able to get the focus on Firefox. Because of the 
+                         overflow-y: scroll, it seems that this element can be tabbed to on Firefox, which is also
+                         a problem when using screen readers (JAWS), as the screen readers don't know how to read
+                         that element. -->
+                    <xhtml:ul tabindex="-1">
                         <xforms:repeat nodeset="{/*/xforms:itemset/@nodeset}">
                             <xxforms:variable name="position" select="position()" as="xs:integer"/>
                             <xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/(@ref | @value)}" as="xs:string"/>

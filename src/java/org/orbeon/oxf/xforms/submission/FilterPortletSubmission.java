@@ -49,6 +49,7 @@ public class FilterPortletSubmission extends BaseSubmission {
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
                 "resource", p2.actionOrResource,
+                "replace", submission.getReplace(),
                 "container type", request.getContainerType(),
                 "deployment type", containingDocument.getDeploymentType().name(),
                 "deployment source", (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_SOURCE_ATTRIBUTE_NAME)
@@ -60,6 +61,14 @@ public class FilterPortletSubmission extends BaseSubmission {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "resource URL has protocol", "resource", p2.actionOrResource);
+            return false;
+        }
+
+        // Only enable this for replace="all"
+        if (!p.isReplaceAll) {
+            if (isDebugEnabled)
+                indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
+                        "reason", "only replace=\"all\" is supported");
             return false;
         }
 

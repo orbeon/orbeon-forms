@@ -111,7 +111,9 @@
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
                         <xxforms:variable name="separator" xbl:attr="xbl:text=separator" as="xs:string">ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8</xxforms:variable>
                         <xforms:group ref=".[$separator != 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']">
-                            <xforms:output value="string-join($items[value = $selected]/label, $separator)"/>
+                            <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
+                                 This isn't done by default, but can be done by the application, as is the case in the test-dialog-select.xthml -->
+                            <xforms:output value="string-join($items[value = $selected]/label, $separator)" tabindex="-1"/>
                         </xforms:group>
                         <xforms:group ref=".[$separator = 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']">
                             <xhtml:ul>

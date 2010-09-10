@@ -1,0 +1,29 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+
+.xbl-fr-dialog-select ul .xforms-repeat-selected-item-1 { background-color: transparent}
+.xbl-fr-dialog-select .fr-component-group { display: inline-block; display: -moz-inline-block }
+
+#doc .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label,
+        #doc4 .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label {
+    width: auto;
+}
+
+.fr-dialog-select-dialog td { vertical-align: top; padding: .5em }
+.fr-dialog-select-dialog select { height: 10em; width: 15em }
+.fr-dialog-select-dialog table .xbl-fr-button { display: block; margin: .5em }
+.fr-dialog-select-dialog .xforms-label { display: block; font-weight: bold }
+.fr-dialog-select-dialog .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
+.fr-dialog-select-dialog .xbl-fr-button .fr-add-button button { background: url(../../../apps/fr/style/images/pixelmixer/right_16.png) no-repeat 5px 3px; width: 25px; text-indent: -9999px; *text-indent: 0; *padding-left: 100px; *overflow: hidden }
+.fr-dialog-select-dialog .xbl-fr-button .fr-remove-button button { background: url(../../../apps/fr/style/images/pixelmixer/left_16.png) no-repeat 5px 3px; width: 25px; text-indent: -9999px; *text-indent: 0; *padding-left: 100px; *overflow: hidden }

@@ -26,9 +26,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -305,13 +303,12 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // Set new binding context on the repeat control
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
             final XFormsContextStack contextStack = getXBLContainer().getContextStack();
-            final XFormsControl parentControl = getParent();
-            if (parentControl == null) {
-                // TODO: does this prevent preceding top-level variables from working?
+            if (getBindingContext().parent == null) {
+                // This might happen at the top-level if there is no model and no variables in scope?
                 contextStack.resetBindingContext(propertyContext);
             } else {
-                // NOTE: Don't do setBinding(parent) as that would not keep the variables in scope
                 contextStack.setBinding(this);
+                // If there are some preceding variables in scope, the top of the stack is now the last scoped variable
                 contextStack.popBinding();
             }
             contextStack.pushBinding(propertyContext, getControlElement(), getEffectiveId(), getResolutionScope());

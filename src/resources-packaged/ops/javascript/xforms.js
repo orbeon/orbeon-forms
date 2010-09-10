@@ -967,6 +967,7 @@ ORBEON.util.Properties = {
     clientEventMode: new ORBEON.util.Property("client.events.mode", "default"),
     clientEventsFilter: new ORBEON.util.Property("client.events.filter", ""),
     resourcesVersioned: new ORBEON.util.Property("oxf.resources.versioned", false),
+    resourcesVersionNumber: new ORBEON.util.Property("oxf.resources.version-number", ""),
     newXHTMLLayout: new ORBEON.util.Property("new-xhtml-layout", false),
     xhtmlLayout: new ORBEON.util.Property("xhtml-layout", "nospan"),
     retryDelayIncrement: new ORBEON.util.Property("retry.delay-increment", 5000),

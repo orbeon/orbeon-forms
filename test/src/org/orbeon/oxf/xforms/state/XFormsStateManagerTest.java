@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
 import org.junit.Test;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -22,9 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -34,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.*;
-import static junit.framework.Assert.assertNotNull;
 
 public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
@@ -152,8 +150,10 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             stateManager.afterInitialResponse(pipelineContext, state1.document);
         }
 
+        assertEquals(1, getSequenceNumber(state1.dynamicStateString));
+
         // Run update
-        final State state2 = doUpdate(isCache, state1, false, null, new EventCallback() {
+        final State state2 = doUpdate(isCache, state1, null, new EventCallback() {
             public List<XFormsEvent> createEvents(XFormsContainingDocument document) {
                 final XFormsEventTarget input = (XFormsEventTarget) document.getObjectByEffectiveId("my-input");
                 return Collections.<XFormsEvent>singletonList(new XXFormsValueChangeWithFocusChangeEvent(document, input, null, "gaga"));
@@ -163,26 +163,32 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // UUID and static state can't change
         assertEquals(state1.uuid, state2.uuid);
         assertEquals(state1.staticStateString, state2.staticStateString);
+        // Sequence must be updated
+        assertEquals(2, getSequenceNumber(state2.dynamicStateString));
         // Dynamic state must have changed
-        assertFalse(state1.dynamicStateString.equals(state2.dynamicStateString));
+        assertFalse(stripSequenceNumber(state1.dynamicStateString).equals(stripSequenceNumber(state2.dynamicStateString)));
 
         // Run update
-        final State state3 = doUpdate(isCache, state2, false, null, null);
+        final State state3 = doUpdate(isCache, state2, null, null);
 
         // UUID and static state can't change
         assertEquals(state1.uuid, state3.uuid);
         assertEquals(state1.staticStateString, state3.staticStateString);
+        // Sequence must be updated
+        assertEquals(3, getSequenceNumber(state3.dynamicStateString));
         // Dynamic state must NOT have changed because no event was dispatched
-        assertTrue(state2.dynamicStateString.equals(state3.dynamicStateString));
+        assertEquals(stripSequenceNumber(state2.dynamicStateString), stripSequenceNumber(state3.dynamicStateString));
 
-        // Run update back to initial state
-        final State state4 = doUpdate(isCache, state1, true, null, null);
+        // Get back to initial state
+        final State state4 = getInitialState(state1);
 
         // UUID and static state can't change
         assertEquals(state1.uuid, state4.uuid);
         assertEquals(state1.staticStateString, state4.staticStateString);
+        // Sequence must be updated
+        assertEquals(1, getSequenceNumber(state4.dynamicStateString));
         // Make sure we found the initial dynamic state
-        assertEquals(state1.dynamicStateString, state4.dynamicStateString);
+        assertEquals(stripSequenceNumber(state1.dynamicStateString), stripSequenceNumber(state4.dynamicStateString));
     }
 
     private void testServer(boolean isCache, String formFile) {
@@ -212,8 +218,10 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             initialDynamicStateString = state1.document.createEncodedDynamicState(pipelineContext, false);
         }
 
+        assertEquals(1, state1.document.getSequence());
+
         // Run update
-        final State state2 = doUpdate(isCache, state1, false, session, new EventCallback() {
+        final State state2 = doUpdate(isCache, state1, session, new EventCallback() {
             public List<XFormsEvent> createEvents(XFormsContainingDocument document) {
                 final XFormsEventTarget input = (XFormsEventTarget) document.getObjectByEffectiveId("my-input");
                 return Collections.<XFormsEvent>singletonList(new XXFormsValueChangeWithFocusChangeEvent(document, input, null, "gaga"));
@@ -222,35 +230,41 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
         // UUID can't change
         assertEquals(state1.uuid, state2.uuid);
+        // Sequence must be updated
+        assertEquals(2, state2.document.getSequence());
         // State strings must be null
         assertNull(StringUtils.trimToNull(state2.staticStateString));
         assertNull(StringUtils.trimToNull(state2.dynamicStateString));
 
         // Run update
-        final State state3 = doUpdate(isCache, state2, false, session, null);
+        final State state3 = doUpdate(isCache, state2, session, null);
 
         // UUID can't change
         assertEquals(state1.uuid, state3.uuid);
+        // Sequence must be updated
+        assertEquals(3, state3.document.getSequence());
         // State strings must be null
         assertNull(StringUtils.trimToNull(state3.staticStateString));
         assertNull(StringUtils.trimToNull(state3.dynamicStateString));
 
-        // Run update back to initial state
-        final State state4 = doUpdate(isCache, state1, true, session, null);
+        // Get back to initial state
+        final State state4 = getInitialState(state1);
 
         // UUID can't change
         assertEquals(state1.uuid, state4.uuid);
+        // Sequence must be updated
+        assertEquals(1, state4.document.getSequence());
         // State strings must be null
         assertNull(StringUtils.trimToNull(state4.staticStateString));
         assertNull(StringUtils.trimToNull(state4.dynamicStateString));
         // Make sure we found the initial dynamic state
         {
             final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-            assertEquals(initialDynamicStateString, state4.document.createEncodedDynamicState(pipelineContext, false));
+            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(state4.document.createEncodedDynamicState(pipelineContext, false)));
         }
     }
 
-    private State doUpdate(boolean isCache, State state1, boolean isInitialState, ExternalContext.Session session, EventCallback callback) {
+    private State doUpdate(boolean isCache, State state1, ExternalContext.Session session, EventCallback callback) {
         // New state
         final State state2 = new State();
 
@@ -259,9 +273,9 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         ((TestExternalContext) XFormsUtils.getExternalContext(pipelineContext)).setSession(session);
 
         state2.document = XFormsStateManager.instance()
-                .findOrRestoreDocument(pipelineContext, state1.uuid, state1.staticStateString, state1.dynamicStateString, isInitialState);
+                .findOrRestoreDocument(pipelineContext, state1.uuid, state1.staticStateString, state1.dynamicStateString, false);
 
-        if (isCache && !isInitialState)
+        if (isCache)
             assertSame(state1.document, state2.document);// must be the same because cache is enabled and cache has room
         else
             assertNotSame(state1.document, state2.document);// can't be the same because cache is disabled
@@ -275,7 +289,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         }
         state2.document.afterExternalEvents(pipelineContext, false);
 
-        stateManager.beforeUpdateResponse(pipelineContext, state2.document);
+        stateManager.beforeUpdateResponse(pipelineContext, state2.document, false);
 
         // New state
         state2.uuid = state2.document.getUUID();
@@ -285,5 +299,42 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         stateManager.afterUpdateResponse(pipelineContext, state2.document);
 
         return state2;
+    }
+
+    private State getInitialState(State state1) {
+        // New state
+        final State state2 = new State();
+
+        // Find document
+        final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
+
+        state2.document = XFormsStateManager.instance()
+                .findOrRestoreDocument(pipelineContext, state1.uuid, state1.staticStateString, state1.dynamicStateString, true);
+
+        assertNotSame(state1.document, state2.document);// can't be the same because either cache is disabled OR we create a duplicate document (could be same if state1 is initial state)
+
+        // New state
+        state2.uuid = state2.document.getUUID();
+        state2.staticStateString = stateManager.getClientEncodedStaticState(pipelineContext, state2.document);
+        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(pipelineContext, state2.document);
+
+        return state2;
+    }
+
+    private String stripSequenceNumber(String serializedState) {
+        final PipelineContext pipelineContext = new PipelineContext();
+        final Document state = XFormsUtils.decodeXML(pipelineContext, serializedState);
+        final Attribute sequenceNumber = state.getRootElement().attribute("sequence");
+        if (sequenceNumber != null)
+            state.getRootElement().remove(sequenceNumber);
+        return XFormsUtils.encodeXML(pipelineContext, state, false);
+    }
+
+    private long getSequenceNumber(String serializedState) {
+        final PipelineContext pipelineContext = new PipelineContext();
+        final Document state = XFormsUtils.decodeXML(pipelineContext, serializedState);
+        final Attribute sequenceNumber = state.getRootElement().attribute("sequence");
+
+        return Long.parseLong(sequenceNumber.getStringValue());
     }
 }

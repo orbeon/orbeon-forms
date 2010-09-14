@@ -42,11 +42,25 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         private String selectedCaseControlId;
     }
 
-    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
-        super(container, parent, element, name, id);
+    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+        super(container, parent, element, name, effectiveId);
 
         // Initial local state
         setLocal(new XFormsSwitchControlLocal());
+
+        // Restore state if needed
+        if (state != null) {
+            final Element stateElement = state. get(effectiveId);
+            // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
+            final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
+            if (stateElement != null)
+                local.selectedCaseControlId = element.attributeValue("case-id");
+            else
+                local.selectedCaseControlId = findDefaultSelectedCaseId();// special case of unit tests which don't actually include a value
+
+            // Indicate that deserialized state must be used
+            restoredState = true;
+        }
     }
 
     @Override
@@ -194,18 +208,6 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     public Map<String, String> serializeLocal() {
         // Serialize case id
         return Collections.singletonMap("case-id", XFormsUtils.getStaticIdFromId(getSelectedCaseEffectiveId()));
-    }
-
-    @Override
-    public void deserializeLocal(Element element) {
-        // Deserialize case id
-        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-
-        // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-        local.selectedCaseControlId = element.attributeValue("case-id");
-
-        // Indicate that deserialized state must be used
-        restoredState = true;
     }
 
     @Override

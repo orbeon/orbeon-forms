@@ -94,8 +94,20 @@ public class XFormsServer extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+        final ExternalContext.Request request = externalContext.getRequest();
+
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+
+        // Request retry details
+        final boolean isRetries = true;// TODO: property?
+        final long requestSequenceNumber = !isRetries ? 0 : XFormsStateManager.getRequestSequence(requestDocument);
+
+        final boolean isAjaxRequest = request.getMethod().equalsIgnoreCase("post") && XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(request.getContentType()));
+        final boolean isPseudoAjaxRequest = request.getMethod().equalsIgnoreCase("post") && request.getContentType().startsWith("multipart/form-data");
+
+        final boolean isIgnoreSequenceNumber = !isRetries || !isAjaxRequest;
 
         // Logger used for heartbeat and request/response
         final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
@@ -129,12 +141,11 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Gather client events if any
-        if (actionElement != null) {
+        if (actionElement != null && !isPseudoAjaxRequest) {// ignore client events in pseudo-Ajax: only files and server events are considered
             eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
         // Hit session if it exists (it's probably not even necessary to do so)
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
         final ExternalContext.Session session = externalContext.getSession(false);
 
         // Check for message where there is only the heartbeat event
@@ -190,116 +201,184 @@ public class XFormsServer extends ProcessorImpl {
         Callable<SubmissionResult> replaceAllCallable = null;
         synchronized (containingDocument) {
             final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
-            try {
-                // Run events if any
-                final boolean isNoscript = containingDocument.getStaticState().isNoscript();
 
-                // Set URL rewriter resource path information based on information in static state
-                if (containingDocument.getVersionedPathMatchers() != null) {
-                    // Don't override existing matchers if any (e.g. case of oxf:xforms-to-xhtml and oxf:xforms-submission processor running in same pipeline)
-                    pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, containingDocument.getVersionedPathMatchers());
-                }
-                // Set XPath configuration
-                pipelineContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, containingDocument.getStaticState().getXPathConfiguration());
+            final long expectedSequenceNumber = !isRetries ? 0 : containingDocument.getSequence();
 
-                // Set deployment mode into request (useful for epilogue)
-                externalContext.getRequest().getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getDeploymentType().name());
+            if (isIgnoreSequenceNumber || requestSequenceNumber == expectedSequenceNumber) {
+                // We are good: process request and produce new sequence number
 
-                final boolean hasEvents = eventElements.size() > 0;
-                // Whether there are uploaded files to handle
-                // NOTE: In script mode, if we do get files, the only events we can get are server events. In noscript mode, we
-                // can get files and other events. See xforms-server-submit.xpl. But in noscript mode, we are never doing two-
-                // pass submissions.
-                final boolean hasFiles = XFormsUploadControl.hasUploadedFiles(filesElement);
+                try {
+                    // Run events if any
+                    final boolean isNoscript = containingDocument.getStaticState().isNoscript();
 
-                final boolean allEvents;
-                final Set<String> valueChangeControlIds = new HashSet<String>();
-                if (hasEvents || hasFiles) {
-
-                    // Iterate through events to:
-                    // 1. Reorder events if needed for noscript mode
-                    // 2. Detect whether we got xxforms-online
-                    boolean handleGoingOnline = hasEvents && processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
-
-                    eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
-                    {
-                        // Start external events
-                        containingDocument.beforeExternalEvents(pipelineContext, response, handleGoingOnline);
-
-                        // Handle uploaded files if any
-                        if (hasFiles) {
-                            eventsIndentedLogger.logDebug("", "handling uploaded files");
-                            XFormsUploadControl.handleUploadedFiles(pipelineContext, containingDocument, filesElement, true);
-                        }
-
-                        // Dispatch everything
-                        allEvents = hasEvents && createAndDispatchEvents(pipelineContext, containingDocument, eventElements,
-                                serverEventsCount, valueChangeControlIds, handleGoingOnline);
-
-                        // End external events
-                        containingDocument.afterExternalEvents(pipelineContext, handleGoingOnline);
+                    // Set URL rewriter resource path information based on information in static state
+                    if (containingDocument.getVersionedPathMatchers() != null) {
+                        // Don't override existing matchers if any (e.g. case of oxf:xforms-to-xhtml and oxf:xforms-submission processor running in same pipeline)
+                        pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, containingDocument.getVersionedPathMatchers());
                     }
-                    eventsIndentedLogger.endHandleOperation();
-                } else {
-                    allEvents = false;
-                }
+                    // Set XPath configuration
+                    pipelineContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, containingDocument.getStaticState().getXPathConfiguration());
 
-                // Check if there is a submission with replace="all" that needs processing
-                replaceAllCallable = containingDocument.getReplaceAllCallable();
+                    // Set deployment mode into request (useful for epilogue)
+                    request.getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getDeploymentType().name());
 
-                // TODO: UI-DEPENDENCIES TEMP
-//                containingDocument.getStaticState().dumpAnalysis();
+                    final boolean hasEvents = eventElements.size() > 0;
+                    // Whether there are uploaded files to handle
+                    // NOTE: In script mode, if we do get files, the only events we can get are server events. In noscript mode, we
+                    // can get files and other events. See xforms-server-submit.xpl. But in noscript mode, we are never doing two-
+                    // pass submissions.
+                    final boolean hasFiles = XFormsUploadControl.hasUploadedFiles(filesElement);
 
-                // Notify the state manager that we will send the response
-                XFormsStateManager.instance().beforeUpdateResponse(pipelineContext, containingDocument);
+                    final boolean allEvents;
+                    final Set<String> valueChangeControlIds = new HashSet<String>();
+                    if (hasEvents || hasFiles) {
 
-                if (replaceAllCallable == null) {
-                    // Handle response here (if not null, is handled after synchronized block)
-                    if (xmlReceiver != null) {
-                        // Create resulting document if there is a ContentHandler
-                        if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
-                            // NOP: Response already sent out by a submission
-                            indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
-                        } else if (!isNoscript) {
-                            // This is an Ajax response
-                            indentedLogger.startHandleOperation("response", "handling regular Ajax response");
+                        // Iterate through events to:
+                        // 1. Reorder events if needed for noscript mode
+                        // 2. Detect whether we got xxforms-online
+                        boolean handleGoingOnline = hasEvents && processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
 
-                            // Hook-up debug content handler if we must log the response document
-                            final XMLReceiver responseContentHandler;
-                            final LocationSAXContentHandler debugContentHandler;
-                            if (logRequestResponse) {
-                                debugContentHandler = new LocationSAXContentHandler();
-                                responseContentHandler = new TeeXMLReceiver(xmlReceiver, debugContentHandler);
-                            } else {
-                                debugContentHandler = null;
-                                responseContentHandler = xmlReceiver;
+                        eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
+                        {
+                            // Start external events
+                            containingDocument.beforeExternalEvents(pipelineContext, response, handleGoingOnline);
+
+                            // Handle uploaded files if any
+                            if (hasFiles) {
+                                eventsIndentedLogger.logDebug("", "handling uploaded files");
+                                XFormsUploadControl.handleUploadedFiles(pipelineContext, containingDocument, filesElement, true);
                             }
 
-                            outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext,
-                                    requestDocument, responseContentHandler, allEvents, false);
+                            // Dispatch everything
+                            allEvents = hasEvents && createAndDispatchEvents(pipelineContext, containingDocument, eventElements,
+                                    serverEventsCount, valueChangeControlIds, handleGoingOnline);
 
-                            indentedLogger.endHandleOperation("ajax response", (debugContentHandler != null) ? Dom4jUtils.domToPrettyString(debugContentHandler.getDocument()) : null);
-                        } else {
-                            // Noscript mode
-                            indentedLogger.startHandleOperation("response", "handling noscript response");
-                            outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, xmlReceiver, externalContext);
-                            indentedLogger.endHandleOperation();
+                            // End external events
+                            containingDocument.afterExternalEvents(pipelineContext, handleGoingOnline);
                         }
+                        eventsIndentedLogger.endHandleOperation();
                     } else {
-                        // This is the second pass of a submission with replace="all". We make it so that the document is
-                        // not modified. However, we must then return it to its pool.
-
-                        indentedLogger.logDebug("response", "handling NOP response for submission with replace=\"all\"");
+                        allEvents = false;
                     }
+
+                    // Check if there is a submission with replace="all" that needs processing
+                    replaceAllCallable = containingDocument.getReplaceAllCallable();
+
+                    // TODO: UI-DEPENDENCIES TEMP
+    //                containingDocument.getStaticState().dumpAnalysis();
+
+                    // Notify the state manager that we will send the response
+                    XFormsStateManager.instance().beforeUpdateResponse(pipelineContext, containingDocument, isIgnoreSequenceNumber);
+
+                    if (replaceAllCallable == null) {
+                        // Handle response here (if not null, is handled after synchronized block)
+                        if (xmlReceiver != null) {
+                            // Create resulting document if there is a receiver
+                            if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
+                                // NOP: Response already sent out by a submission
+                                indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
+                            } else if (!isNoscript) {
+                                // This is an Ajax response
+                                indentedLogger.startHandleOperation("response", "handling regular Ajax response");
+
+                                // Hook-up debug content handler if we must log the response document
+                                final XMLReceiver responseReceiver;
+                                final LocationSAXContentHandler debugContentHandler;
+                                final SAXStore responseStore;
+                                if (logRequestResponse || isRetries) {
+                                    // Two receivers
+
+                                    debugContentHandler = new LocationSAXContentHandler();
+
+                                    final List<XMLReceiver> receivers = new ArrayList<XMLReceiver>();
+
+                                    // Buffer for retries
+                                    if (isRetries) {
+                                        responseStore = new SAXStore();
+                                        receivers.add(responseStore);
+                                    } else {
+                                        responseStore = null;
+                                        receivers.add(xmlReceiver);
+                                    }
+
+                                    // Debug output
+                                    if (logRequestResponse)
+                                        receivers.add(debugContentHandler);
+
+                                    responseReceiver = new TeeXMLReceiver(receivers);
+
+                                } else {
+                                    // Just one receiver
+                                    debugContentHandler = null;
+                                    responseStore = null;
+                                    responseReceiver = xmlReceiver;
+                                }
+
+                                // Prepare and/or output response
+                                outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext,
+                                        requestDocument, responseReceiver, allEvents, false);
+
+                                if (isRetries) {
+                                    // Store response in to document
+                                    containingDocument.rememberLastAjaxResponse(responseStore);
+
+                                    // Actually output response
+                                    // If there is an error, we do not 
+                                    try {
+                                        responseStore.replay(xmlReceiver);
+                                    } catch (Throwable t) {
+                                        indentedLogger.logDebug("retry", "got exception while sending response; ignoring and expecting client to retry", t);
+                                    }
+                                }
+
+                                indentedLogger.endHandleOperation("ajax response", (debugContentHandler != null) ? Dom4jUtils.domToPrettyString(debugContentHandler.getDocument()) : null);
+                            } else {
+                                // Noscript mode
+                                indentedLogger.startHandleOperation("response", "handling noscript response");
+                                outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, xmlReceiver, externalContext);
+                                indentedLogger.endHandleOperation();
+                            }
+                        } else {
+                            // This is the second pass of a submission with replace="all". We ensure that the document is
+                            // not modified.
+
+                            indentedLogger.logDebug("response", "handling NOP response for submission with replace=\"all\"");
+                        }
+                    }
+
+                    // Notify state manager that we are done sending the response
+                    XFormsStateManager.instance().afterUpdateResponse(pipelineContext, containingDocument);
+
+                } catch (Throwable e) {
+                    // Notify state manager that an error occurred
+                    XFormsStateManager.instance().onUpdateError(pipelineContext, containingDocument);
+                    throw new OXFException(e);
                 }
 
-                // Notify state manager that we are done sending the response
-                XFormsStateManager.instance().afterUpdateResponse(pipelineContext, containingDocument);
+            } else if (requestSequenceNumber == expectedSequenceNumber - 1) {
+                // This is a request for the previous response
 
-            } catch (Throwable e) {
-                // Notify state manager that an error occurred
-                XFormsStateManager.instance().onUpdateError(pipelineContext, containingDocument);
-                throw new OXFException(e);
+                assert containingDocument.getLastAjaxResponse() != null;
+
+                indentedLogger.startHandleOperation("retry", "replaying previous Ajax response");
+                boolean success = false;
+                try {
+                    // Write last response
+                    containingDocument.getLastAjaxResponse().replay(xmlReceiver);
+                    success = true;
+                } catch (Exception e) {
+                    throw new OXFException(e);
+                } finally {
+                    indentedLogger.endHandleOperation("success", Boolean.toString(success));
+                }
+
+
+                // We are done here
+                return;
+
+            } else {
+                // This should not happen
+                throw new OXFException("Got unexpected request sequence number");
             }
         }
 

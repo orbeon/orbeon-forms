@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.test;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,10 +39,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.fail;
 
@@ -149,8 +147,8 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 i = XPathUtils.selectIterator(tests, "/tests/group/test[not(@exclude = 'true')] | /tests/test[not(@exclude = 'true')]");
 
             for (; i.hasNext();) {
-                Element testNode = (Element) i.next();
-                Element groupNode = testNode.getParent();
+                final Element testNode = (Element) i.next();
+                final Element groupNode = testNode.getParent();
                 if (testNode.attributeValue("ignore") != null)
                     continue;
                 String description = testNode.attributeValue("description", "");
@@ -162,12 +160,12 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 currentTestError = "Error when executing test with description: '" + description + "'";
 
                 // Create processor and connect its inputs
-                Processor processor = ProcessorUtils.createProcessorWithInputs(testNode);
+                final Processor processor = ProcessorUtils.createProcessorWithInputs(testNode);
                 processor.setId("Main Test Processor");
 
                 // Connect outputs
-                List domSerializers = new ArrayList();
-                List expectedDocuments = new ArrayList();
+                final List<DOMSerializer> domSerializers = new ArrayList<DOMSerializer>();
+                final List<Document> expectedDocuments = new ArrayList<Document>();
                 for (Iterator j = XPathUtils.selectIterator(testNode, "output"); j.hasNext();) {
                     final Element outputElement = (Element) j.next();
                     final String name = XPathUtils.selectStringValue(outputElement, "@name");
@@ -182,7 +180,9 @@ public class ProcessorTest extends ResourceManagerTestBase {
                     domSerializers.add(domSerializer);
                 }
 
-                parameters.add(new Object[] { description, processor, domSerializers, expectedDocuments });
+                final String requestURL = testNode.attributeValue("request", "");
+
+                parameters.add(new Object[] { description, processor, requestURL, domSerializers, expectedDocuments });
             }
             return parameters;
         } catch (Exception e) {
@@ -198,11 +198,13 @@ public class ProcessorTest extends ResourceManagerTestBase {
 
     private String description;
     private Processor processor;
-    private List domSerializers;
-    private List expectedDocuments;
+    private String requestURL;
+    private List<DOMSerializer> domSerializers;
+    private List<Document> expectedDocuments;
 
-    public ProcessorTest(String description, Processor processor, List domSerializers, List expectedDocuments) {
+    public ProcessorTest(String description, Processor processor, String requestURL, List<DOMSerializer> domSerializers, List<Document> expectedDocuments) {
         this.description = description;
+        this.requestURL = requestURL;
         this.processor = processor;
         this.domSerializers = domSerializers;
         this.expectedDocuments = expectedDocuments;
@@ -257,7 +259,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
      * in this element or child elements.
      */
     private synchronized void removeUnusedNamespaceDeclarations(Element element) {
-        List usedNamespaces = new ArrayList();
+        List<String> usedNamespaces = new ArrayList<String>();
         getUsedNamespaces(usedNamespaces, element);
         List declaredNamespaces = element.declaredNamespaces();
         for (Iterator i = declaredNamespaces.iterator(); i.hasNext();) {
@@ -278,7 +280,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
      *
      * @param result List of String (URI)
      */
-    private synchronized void getUsedNamespaces(List result, Element element) {
+    private synchronized void getUsedNamespaces(List<String> result, Element element) {
         if (element != null) {
             if (!"".equals(element.getNamespaceURI()))
                 result.add(element.getNamespaceURI());
@@ -314,7 +316,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
             try {
                 for (; executionCount < REPEAT_COUNT; executionCount++) {
                     // Create pipeline context
-                    final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
+                    final PipelineContext pipelineContext = StringUtils.isNotEmpty(requestURL) ? createPipelineContextWithExternalContext(requestURL) : createPipelineContextWithExternalContext();
                     pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
                     // Get ExternalContext
@@ -330,13 +332,13 @@ public class ProcessorTest extends ResourceManagerTestBase {
                             processor.start(pipelineContext);
                         } else {
                             // Get output and compare to expected result
-                            final Iterator domSerializersIterator = domSerializers.iterator();
-                            final Iterator expectedNodesIterator = expectedDocuments.iterator();
+                            final Iterator<DOMSerializer> domSerializersIterator = domSerializers.iterator();
+                            final Iterator<Document> expectedNodesIterator = expectedDocuments.iterator();
                             while (domSerializersIterator.hasNext()) {
 
                                 // Get expected
-                                final DOMSerializer domSerializer = (DOMSerializer) domSerializersIterator.next();
-                                final Document expectedData = (Document) expectedNodesIterator.next();
+                                final DOMSerializer domSerializer = domSerializersIterator.next();
+                                final Document expectedData = expectedNodesIterator.next();
                                 // TODO: we want to remove that (avernet 2004-12-14)
                                 removeUnusedNamespaceDeclarations(expectedData.getRootElement());
 

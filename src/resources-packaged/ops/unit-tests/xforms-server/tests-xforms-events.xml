@@ -1086,6 +1086,9 @@
                         <xxf:control id="plate·3">3TRE787</xxf:control>
                         <xxf:control id="leased·3"/>
                     </xxf:control-values>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="repeat" old-index="0" new-index="1"/>
+                    </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
         </output>

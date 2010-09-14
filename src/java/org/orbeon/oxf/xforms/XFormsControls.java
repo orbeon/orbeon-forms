@@ -42,6 +42,9 @@ public class XFormsControls implements XFormsObjectResolver {
     private ControlTree initialControlTree;
     private ControlTree currentControlTree;
 
+    // Crude flag to indicate that something might have changed since the last request. This caches simples cases where
+    // an incoming change on the document does not cause any change to the data or controls. In that case, the control
+    // trees need not be compared
     private boolean dirtySinceLastRequest;
 
     // Whether we currently require a UI refresh
@@ -86,6 +89,11 @@ public class XFormsControls implements XFormsObjectResolver {
             currentControlTree.markBindingsDirty();
     }
 
+    private void markCleanSinceLastRequest() {
+        dirtySinceLastRequest = false;
+        currentControlTree.markBindingsClean();
+    }
+
     public void requireRefresh() {
         this.requireRefresh = true;
         markDirtySinceLastRequest(true);
@@ -109,61 +117,70 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     /**
-     * Initialize the controls if needed. This is called upon initial creation of the engine OR when new external events
-     * arrive.
-     *
-     * TODO: this is called in XFormsContainingDocument.prepareForExternalEventsSequence() but it is not really an
-     * initialization in that case.
+     * Initialize the controls. This is called upon initial creation of the engine.
      *
      * @param propertyContext   current context
      */
     public void initialize(PropertyContext propertyContext) {
-        initializeState(propertyContext);
-    }
 
+        assert !initialized;
+
+        createControlTree(propertyContext);
+    }
     /**
-     * Initialize the controls if needed, passing initial state information. This is called if the state of the engine
-     * needs to be built or rebuilt.
+     * Restore the controls. This is called when the document is restored.
      *
      * @param propertyContext   current context
      */
-    public void initializeState(PropertyContext propertyContext) {
+    public void restoreControls(PropertyContext propertyContext) {
 
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        if (staticState.getControlsDocument() != null) {
+        assert !initialized;
 
-            // We are now clean
-            // NOTE: Do this here, because ControlTree.initialize() can dispatch events and make the tree dirty
-            dirtySinceLastRequest = false;
-            initialControlTree.markBindingsClean();
+        createControlTree(propertyContext);
+    }
 
-            if (initialized) {
-                // Use existing controls tree
+    private void createControlTree(PropertyContext propertyContext) {
+        if (containingDocument.getStaticState().getControlsDocument() != null) {
 
-                initialControlTree = currentControlTree;
+            // Create new controls tree
+            // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case()
+            currentControlTree = initialControlTree = new ControlTree(containingDocument, indentedLogger);
 
-                // Need to make sure that current == initial within controls
-                visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-                    public boolean startVisitControl(XFormsControl control) {
-                        control.resetLocal();
-                        return true;
-                    }
-                });
+            // Set this here so that while initialize() runs below, refresh events will find the flag set
+            initialized = true;
 
-            } else {
-                // Create new controls tree
-                // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case() 
-                currentControlTree = initialControlTree = new ControlTree(containingDocument, indentedLogger);
-
-                // Set this here so that while initialize() runs below, refresh events will find the flag set
-                initialized = true;
-
-                // Initialize new control tree
-                currentControlTree.initialize(propertyContext, containingDocument, rootContainer);
-            }
+            // Initialize new control tree
+            currentControlTree.initialize(propertyContext, containingDocument, rootContainer);
         } else {
             // Consider initialized
             initialized = true;
+        }
+    }
+
+    /**
+     * Adjust the controls after sending a response.
+     *
+     * This makes sure that we don't keep duplicate control trees.
+     */
+    public void afterUpdateResponse() {
+
+        assert initialized;
+
+        if (containingDocument.getStaticState().getControlsDocument() != null) {
+
+            // Keep only one control tree
+            initialControlTree = currentControlTree;
+
+            // We are now clean
+            markCleanSinceLastRequest();
+
+            // Need to make sure that current == initial within controls
+            visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+                public boolean startVisitControl(XFormsControl control) {
+                    control.resetLocal();
+                    return true;
+                }
+            });
         }
     }
 

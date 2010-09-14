@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -131,7 +131,7 @@
             <p:processor name="oxf:xforms-resource-server"/>
         </p:when>
         <p:otherwise>
-            <!-- This is (probably) a form submission that requires a pseudo-AJAX response -->
+            <!-- This is a background file upload -->
 
             <!-- Extract parameters -->
             <p:processor name="oxf:request">
@@ -142,7 +142,7 @@
                 </p:input>
                 <!--<p:output name="data" id="request-params" debug="xxxrequest-params"/>-->
                 <p:output name="data" id="request-params"/>
-            </p:processor>
+            </p:processor>  
 
             <!-- Create XForms Server request -->
             <p:processor name="oxf:xslt">
@@ -152,12 +152,15 @@
                         <xxforms:uuid>
                             <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
                         </xxforms:uuid>
+                        <!-- Omit sequence number -->
+                        <xxforms:sequence/>
                         <xxforms:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
                         </xxforms:dynamic-state>
+                        <!-- Only include files and omit all other parameters -->
                         <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
                         <xsl:if test="$files">
                             <xxforms:files>
@@ -165,6 +168,7 @@
                             </xxforms:files>
                         </xsl:if>
                         <xxforms:action/>
+                        <!-- Server events -->
                         <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
                         <xsl:if test="not($server-events = '')">
                             <xxforms:server-events>
@@ -184,7 +188,7 @@
                 <!--<p:output name="response" id="xforms-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>-->
             </p:processor>
 
-            <!-- Create XForms Server response -->
+            <!-- Create XForms Server response: XML is embedded within an HTML envelope -->
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#xforms-response"/>
                 <p:input name="config">

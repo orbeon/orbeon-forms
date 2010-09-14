@@ -276,7 +276,7 @@ public class XBLBindings {
                 // Create and remember factory for this QName
                 xblComponentsFactories.put(currentQNameMatch,
                     new XFormsControlFactory.Factory() {
-                        public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+                        public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                             return new XFormsComponentControl(container, parent, element, name, effectiveId);
                         }
                     });

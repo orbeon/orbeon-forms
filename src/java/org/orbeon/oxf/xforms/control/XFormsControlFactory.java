@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.XFormsActions;
@@ -23,10 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Factory for all existing XForms controls.
@@ -123,98 +118,98 @@ public class XFormsControlFactory {
     static {
         // Built-in standard controls
         nameToClassMap.put(XFormsConstants.CASE_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsCaseControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.GROUP_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsGroupControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.INPUT_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsInputControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.OUTPUT_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsOutputControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.RANGE_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsRangeControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.REPEAT_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-                return new XFormsRepeatControl(container, parent, element, name, effectiveId);
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+                return new XFormsRepeatControl(container, parent, element, name, effectiveId, state);
             }
         });
         nameToClassMap.put(XFormsConstants.SECRET_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSecretControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.SELECT1_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSelect1Control(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.SELECT_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSelectControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.SUBMIT_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSubmitControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.SWITCH_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-                return new XFormsSwitchControl(container, parent, element, name, effectiveId);
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+                return new XFormsSwitchControl(container, parent, element, name, effectiveId, state);
             }
         });
         nameToClassMap.put(XFormsConstants.TEXTAREA_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsTextareaControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.TRIGGER_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsTriggerControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.UPLOAD_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsUploadControl(container, parent, element, name, effectiveId);
             }
         });
         // Built-in extension controls
         nameToClassMap.put(XFormsConstants.XXFORMS_DIALOG_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-                return new XXFormsDialogControl(container, parent, element, name, effectiveId);
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+                return new XXFormsDialogControl(container, parent, element, name, effectiveId, state);
             }
         });
         nameToClassMap.put(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XXFormsAttributeControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.XXFORMS_TEXT_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XXFormsTextControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.XXFORMS_VARIABLE_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XXFormsVariableControl(container, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put(XFormsConstants.EXFORMS_VARIABLE_QNAME, new Factory() {
-            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XXFormsVariableControl(container, parent, element, name, effectiveId);
             }
         });
@@ -228,9 +223,10 @@ public class XFormsControlFactory {
      * @param parent                parent control, null if none
      * @param element               element associated with the control
      * @param effectiveId           effective id of the control
+     * @param state                 initial state if needed, or null
      * @return                      control
      */
-    public static XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
+    public static XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, Element> state) {
 
         final String controlName = element.getName();
 
@@ -245,7 +241,7 @@ public class XFormsControlFactory {
             throw new OXFException("Invalid control name: " + Dom4jUtils.qNameToExplodedQName(element.getQName()));
 
         // Create and return the control
-        return factory.createXFormsControl(container, parent, element, controlName, effectiveId);
+        return factory.createXFormsControl(container, parent, element, controlName, effectiveId, state);
     }
 
     public static boolean isValueControl(String controlURI, String controlName) {
@@ -273,7 +269,7 @@ public class XFormsControlFactory {
     }
 
     public static abstract class Factory {
-        public abstract XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId);
+        public abstract XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state);
     }
 
     private XFormsControlFactory() {}

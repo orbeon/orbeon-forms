@@ -907,15 +907,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Deserialize this control's information which cannot be reconstructed from instances.
-     *
-     * @param element containing attributes which can be used by the control
-     */
-    public void deserializeLocal(Element element) {
-        // NOP
-    }
-
-    /**
      * Clone a control. It is important to understand why this is implemented: to create a copy of a tree of controls
      * before updates that may change control bindings. Also, it is important to understand that we clone "back", that
      * is the new clone will be used as the reference copy for the difference engine.

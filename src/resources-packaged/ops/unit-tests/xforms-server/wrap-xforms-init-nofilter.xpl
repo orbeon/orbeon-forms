@@ -25,34 +25,37 @@
     <p:param name="document" type="input"/>
     <p:param name="response" type="output"/>
 
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
-        <p:input name="document" href="#document"/>
-        <p:output name="response" id="xincluded"/>
-    </p:processor>
-
-    <!-- Filter stuff to make tests reproducible -->
+    <!-- Update input document -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xincluded"/>
+        <p:input name="data" href="#document"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <!-- Remove xml:base -->
-                <xsl:template match="@xml:base"/>
-                <xsl:template match="xhtml:input[@name = '$uuid']">
+                <xsl:template match="xforms:model[1]">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>
-                        <xsl:attribute name="value">4A00AF98-7464-2F85-9AF6-291447DCC6F8</xsl:attribute>
-                    </xsl:copy>
-                </xsl:template>
-                <xsl:template match="xhtml:input[@name = ('$static-state', '$dynamic-state')]">
-                    <xsl:copy>
-                        <xsl:copy-of select="@*"/>
-                        <xsl:attribute name="value">X29xIUN8Mudjr...</xsl:attribute>
+                        <!-- Force client state mode -->
+                        <xsl:attribute name="xxforms:state-handling">client</xsl:attribute>
+                        <xsl:apply-templates/>
                     </xsl:copy>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
+        <p:output name="data" id="updated-document"/>
+    </p:processor>
+
+    <!-- Native XForms Initialization -->
+    <p:processor name="oxf:xforms-to-xhtml">
+        <p:input name="annotated-document" href="#updated-document"/>
+        <p:input name="namespace"><request><container-namespace/></request></p:input>
+        <p:input name="data"><null xsi:nil="true"/></p:input>
+        <p:input name="instance"><null xsi:nil="true"/></p:input>
+        <p:output name="document" id="xhtml"/>
+    </p:processor>
+
+    <!-- Process XInclude if any -->
+    <p:processor name="oxf:xinclude">
+        <p:input name="config" href="#xhtml"/>
         <p:output name="data" ref="response"/>
     </p:processor>
 

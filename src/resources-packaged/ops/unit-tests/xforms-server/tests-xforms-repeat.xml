@@ -586,8 +586,8 @@
                 <xxf:action>
                     <xxf:control-values/>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
-                        <xxf:repeat-index id="id124" old-index="1" new-index="2"/>
+                        <xxf:repeat-index id="id123" old-index="0" new-index="3"/>
+                        <xxf:repeat-index id="id124" old-index="0" new-index="2"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
@@ -1158,7 +1158,8 @@
                         <xxf:control id="description-textarea·2-2" label="Condition:" relevant="true"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>
+                        <xxf:repeat-index id="authorization-repeat" old-index="0" new-index="2"/>
+                        <xxf:repeat-index id="condition-repeat" old-index="0" new-index="1"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>

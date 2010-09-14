@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group description="XForms Ajax Protocol" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <test description="Basic retry sequence number handling: 1) resend the previous Ajax response 2) throw an exception for out of sequence number." name="oxf:pipeline"
+          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>initial</instance>
+                                    </xforms:instance>
+                                    <xforms:setvalue ev:event="xforms-ready" ref=".">new</xforms:setvalue>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:input id="input" ref="."/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" id="xhtml" debug="xxx"/>
+                </p:processor>
+
+                <!-- Request 1: sequence == 1 -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>1</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action/>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response1" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Request 2: sequence == 2 -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>2</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action/>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response2" schema-href="/ops/xforms/xforms-server-response.rng" debug="yyy"/>
+                </p:processor>
+
+                <!-- Request 3: sequence == 2 again -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>2</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action/>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response3" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Request 3: sequence == 1 again => must produce an exception -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>1</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action/>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response4" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <p:processor name="oxf:exception-catcher">
+                    <p:input name="data" href="#response4"/>
+                    <p:output name="data" id="exception4"/>
+                </p:processor>
+
+                <!-- Aggregate and filter responses -->
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('responses', #response1, #response2, #response3, #exception4)" transform="oxf:unsafe-xslt">
+                        <xsl:transform version="2.0">
+                            <xsl:import href="xforms-server/wrap-server-decode-nofilter.xsl"/>
+                            <xsl:template match="stack-trace-elements"/>
+                            <xsl:template match="dynamic-state[@uuid]">
+                                <xsl:copy>
+                                    <xsl:copy-of select="@* except @uuid"/>
+                                    <xsl:attribute name="uuid">4A00AF98-7464-2F85-9AF6-291447DCC6F8</xsl:attribute>
+                                    <xsl:apply-templates/>
+                                </xsl:copy>
+                            </xsl:template>
+                        </xsl:transform>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <responses>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:dynamic-state>
+                        <dynamic-state sequence="2" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                            <instances>
+                                <instance id="instance" model-id="model">
+                                    <instance>new</instance>
+                                </instance>
+                            </instances>
+                        </dynamic-state>
+                    </xxf:dynamic-state>
+                    <xxf:action>
+                        <xxf:control-values/>
+                    </xxf:action>
+                </xxf:event-response>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:dynamic-state>
+                        <dynamic-state sequence="3" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                            <instances>
+                                <instance id="instance" model-id="model">
+                                    <instance>new</instance>
+                                </instance>
+                            </instances>
+                            <response>
+                                <xxf:event-response>
+                                    <xxf:dynamic-state>
+                                        <dynamic-state sequence="2" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                                            <instances>
+                                                <instance id="instance" model-id="model">
+                                                    <instance>new</instance>
+                                                </instance>
+                                            </instances>
+                                        </dynamic-state>
+                                    </xxf:dynamic-state>
+                                    <xxf:action>
+                                        <xxf:control-values/>
+                                    </xxf:action>
+                                </xxf:event-response>
+                            </response>
+                        </dynamic-state>
+                    </xxf:dynamic-state>
+                    <xxf:action>
+                        <xxf:control-values/>
+                    </xxf:action>
+                </xxf:event-response>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:dynamic-state>
+                        <dynamic-state sequence="3" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                            <instances>
+                                <instance id="instance" model-id="model">
+                                    <instance>new</instance>
+                                </instance>
+                            </instances>
+                            <response>
+                                <xxf:event-response>
+                                    <xxf:dynamic-state>
+                                        <dynamic-state sequence="2" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                                            <instances>
+                                                <instance id="instance" model-id="model">
+                                                    <instance>new</instance>
+                                                </instance>
+                                            </instances>
+                                        </dynamic-state>
+                                    </xxf:dynamic-state>
+                                    <xxf:action>
+                                        <xxf:control-values/>
+                                    </xxf:action>
+                                </xxf:event-response>
+                            </response>
+                        </dynamic-state>
+                    </xxf:dynamic-state>
+                    <xxf:action>
+                        <xxf:control-values/>
+                    </xxf:action>
+                </xxf:event-response>
+                <exceptions>
+                    <exception>
+                        <type>org.orbeon.oxf.common.OXFException</type>
+                        <message>Got unexpected request sequence number</message>
+                    </exception>
+                </exceptions>
+            </responses>
+        </output>
+    </test>
+
+</group>

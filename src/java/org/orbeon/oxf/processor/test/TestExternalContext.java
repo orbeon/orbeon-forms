@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -124,61 +124,68 @@ public class TestExternalContext implements ExternalContext  {
 
         private void setupBody() {
             try {
-                Element bodyNode = (Element) XPathUtils.selectSingleNode(requestDocument, "/*/body");
+                final Element bodyNode = (Element) XPathUtils.selectSingleNode(requestDocument, "/*/body");
                 if (bodyNode != null) {
-                    String contentTypeAttribute = bodyNode.attributeValue("content-type");
+                    final String contentTypeAttribute = bodyNode.attributeValue("content-type");
                     final String contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
                     final String charset = NetUtils.getContentTypeCharset(contentTypeAttribute);
 
-                    String hrefAttribute = bodyNode.attributeValue("href");
+                    final String hrefAttribute = bodyNode.attributeValue("href");
                     // TODO: Support same scenarios as Email processor
-                    if (hrefAttribute == null)
-                        throw new OXFException("Inline content not implemented yet.");
+                    if (hrefAttribute != null) {
+                        final LocationData locationData = (LocationData) bodyNode.getData();
+                        final String systemId = locationData == null ? null : locationData.getSystemID();
 
-                    LocationData locationData = (LocationData) bodyNode.getData();
-                    String systemId = locationData == null ? null : locationData.getSystemID();
+                        final SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
+                        final FileItem fileItem = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource);
 
-                    SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
-                    final FileItem fileItem = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource);
+                        if (!(XMLUtils.isTextOrJSONContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
+                            // This is binary content
+                            if (fileItem != null) {
 
-                    if (!(XMLUtils.isTextOrJSONContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
-                        // This is binary content
-                        if (fileItem != null) {
-
-                            bodyInputStream = fileItem.getInputStream();
-                            bodyContentType = contentType;
-                            bodyContentLength = fileItem.getSize();
+                                bodyInputStream = fileItem.getInputStream();
+                                bodyContentType = contentType;
+                                bodyContentLength = fileItem.getSize();
+                            } else {
+                                // TODO
+                                throw new OXFException("Not implemented yet.");
+    //                            byte[] data = XMLUtils.base64StringToByteArray((String) content);
+    //
+    //                            bodyInputStream = new ByteArrayInputStream(data);
+    //                            bodyContentType = contentType;
+    //                            bodyContentLength = data.length;
+                            }
                         } else {
-                            // TODO
-                            throw new OXFException("Not implemented yet.");
-//                            byte[] data = XMLUtils.base64StringToByteArray((String) content);
-//
-//                            bodyInputStream = new ByteArrayInputStream(data);
-//                            bodyContentType = contentType;
-//                            bodyContentLength = data.length;
+                            // This is text content
+                            if (fileItem != null) {
+                                // The text content was encoded when written to the FileItem
+
+                                bodyInputStream = fileItem.getInputStream();
+                                bodyContentType = contentType;
+                                bodyEncoding = charset;
+                                bodyContentLength = fileItem.getSize();
+
+                            } else {
+                                // TODO
+                                throw new OXFException("Not implemented yet.");
+
+    //                            final String s = (String) content
+    //                            byte[] bytes = s.getBytes(charset);
+    //
+    //                            bodyInputStream = new ByteArrayInputStream(bytes);
+    //                            bodyContentType = contentType;
+    //                            bodyEncoding = charset;
+    //                            bodyContentLength = bytes.length;
+                            }
                         }
                     } else {
-                        // This is text content
-                        if (fileItem != null) {
-                            // The text content was encoded when written to the FileItem
-
-                            bodyInputStream = fileItem.getInputStream();
-                            bodyContentType = contentType;
-                            bodyEncoding = charset;
-                            bodyContentLength = fileItem.getSize();
-
-                        } else {
-                            // TODO
-                            throw new OXFException("Not implemented yet.");
-
-//                            final String s = (String) content
-//                            byte[] bytes = s.getBytes(charset);
-//
-//                            bodyInputStream = new ByteArrayInputStream(bytes);
-//                            bodyContentType = contentType;
-//                            bodyEncoding = charset;
-//                            bodyContentLength = bytes.length;
-                        }
+                        // Just treat the content as UTF-8 text
+                        // Should handle other scenarios better - this is just to support basic use cases
+                        final byte[] textContentAsBytes = bodyNode.getText().getBytes("utf-8");
+                        bodyInputStream = new ByteArrayInputStream(textContentAsBytes);
+                        bodyContentType = contentType;
+                        bodyEncoding = charset;
+                        bodyContentLength = textContentAsBytes.length;
                     }
                 }
             } catch (Exception e) {

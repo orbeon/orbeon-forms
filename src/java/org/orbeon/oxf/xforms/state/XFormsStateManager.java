@@ -15,19 +15,12 @@ package org.orbeon.oxf.xforms.state;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.util.Map;
@@ -213,7 +206,21 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      */
     public static String getRequestUUID(Document request) {
         final Element uuidElement = request.getRootElement().element(XFormsConstants.XXFORMS_UUID_QNAME);
+        assert uuidElement != null;
         return StringUtils.trimToNull(uuidElement.getTextTrim());
+    }
+
+    /**
+     * Get the request sequence number from an incoming request.
+     *
+     * @param request   incoming
+     * @return          request sequence number, or -1 if missing
+     */
+    public static long getRequestSequence(Document request) {
+        final Element sequenceElement = request.getRootElement().element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
+        assert sequenceElement != null;
+        final String text = StringUtils.trimToNull(sequenceElement.getTextTrim());
+        return (text != null) ? Long.parseLong(text) : -1; // allow for empty value for non-Ajax cases
     }
 
     /**
@@ -390,18 +397,20 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * @param propertyContext       current context
      * @param containingDocument    containing document
+     * @param ignoreSequence        whether to ignore the sequence number
      */
-    public void beforeUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void beforeUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean ignoreSequence) {
         if (containingDocument.isDirtySinceLastRequest()) {
             // The document is dirty
             indentedLogger.logDebug(LOG_TYPE, "Document is dirty. Generating new dynamic state.");
-
-            // Tell the document to update its state
-            containingDocument.updateChangeSequence();
         } else {
             // The document is not dirty: no real encoding takes place here
             indentedLogger.logDebug(LOG_TYPE, "Document is not dirty. Keep existing dynamic state.");
         }
+
+        // Tell the document to update its state
+        if (!ignoreSequence)
+            containingDocument.updateChangeSequence();
     }
 
     /**
@@ -413,6 +422,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param containingDocument    containing document
      */
     public void afterUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+
+        // Notify document that we are done sending the response
+        containingDocument.afterUpdateResponse();
+
         cacheOrStore(propertyContext, containingDocument, false);
     }
 

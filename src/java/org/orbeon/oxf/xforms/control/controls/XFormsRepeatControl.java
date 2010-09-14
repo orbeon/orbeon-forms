@@ -55,11 +55,25 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XFormsRepeatControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsRepeatControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
         super(container, parent, element, name, effectiveId);
 
         // Initial local state
         setLocal(new XFormsRepeatControlLocal());
+
+        // Restore state if needed
+        if (state != null) {
+            final Element stateElement = state. get(effectiveId);
+            // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
+            final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
+            if (stateElement != null)
+                local.index = Integer.parseInt(element.attributeValue("index"));
+            else
+                local.index = 0;// special case of unit tests which don't actually include a value
+
+            // Indicate that deserialized state must be used
+            restoredState = true;
+        }
 
         // Store initial repeat index information
         final String startIndexString = element.attributeValue("startindex");
@@ -685,18 +699,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     public Map<String, String> serializeLocal() {
         // Serialize index
         return Collections.singletonMap("index", Integer.toString(getIndex()));
-    }
-
-    @Override
-    public void deserializeLocal(Element element) {
-        // Deserialize index
-
-        // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
-        final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
-        local.index = Integer.parseInt(element.attributeValue("index"));
-
-        // Indicate that deserialized state must be used
-        restoredState = true;
     }
 
     @Override

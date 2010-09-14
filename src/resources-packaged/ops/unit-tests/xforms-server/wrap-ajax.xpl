@@ -20,11 +20,7 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:saxon="http://saxon.sf.net/">
 
-    <p:param name="action" type="input"/>
-    <p:param name="controls" type="input"/>
-    <p:param name="models" type="input"/>
-    <p:param name="instances" type="input"/>
-
+    <p:param name="request" type="input"/>
     <p:param name="response" type="output"/>
 
     <!-- Encode -->

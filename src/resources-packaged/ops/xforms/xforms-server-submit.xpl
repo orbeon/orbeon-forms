@@ -39,12 +39,15 @@
                         <xxforms:uuid>
                             <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
                         </xxforms:uuid>
+                        <!-- Omit sequence number -->
+                        <xxforms:sequence/>
                         <xxforms:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
                         </xxforms:dynamic-state>
+                        <!-- Only include files and omit all other parameters -->
                         <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
                         <xsl:if test="$files">
                             <xxforms:files>
@@ -79,6 +82,8 @@
                         <xxforms:uuid>
                             <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
                         </xxforms:uuid>
+                        <!-- Omit sequence number -->
+                        <xxforms:sequence/>
                         <xxforms:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
                         </xxforms:static-state>

@@ -27,7 +27,7 @@ public interface XFormsStateLifecycle {
 
     XFormsContainingDocument findOrRestoreDocument(PipelineContext pipelineContext, String uuid, String encodedClientStaticState,
                                                    String encodedClientDynamicState, boolean isInitialState);
-    void beforeUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
+    void beforeUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean ignoreSequence);
     void afterUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
     void onUpdateError(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
 

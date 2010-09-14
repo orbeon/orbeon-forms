@@ -11,26 +11,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xsl:stylesheet version="2.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                xmlns:saxon="http://saxon.sf.net/"
-                xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-    <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
-        <xsl:copy>
-            <xsl:apply-templates select="context:decodeXML(normalize-space(.))"/>
-        </xsl:copy>
-    </xsl:template>
+    <xsl:import href="wrap-server-decode-nofilter.xsl"/>
+
     <!-- Filter out attributes on dynamic-state element so that unit tests are reproducible -->
     <xsl:template match="/dynamic-state/@*"/>
-    <xsl:template match="instances/instance">
-        <xsl:copy>
-            <xsl:copy-of select="@*"/>
-            <xsl:if test="normalize-space(.) != ''">
-                <xsl:copy-of select="saxon:parse(string(.))"/>
-            </xsl:if>
-        </xsl:copy>
-    </xsl:template>
+
 </xsl:stylesheet>

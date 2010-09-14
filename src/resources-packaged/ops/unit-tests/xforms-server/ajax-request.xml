@@ -1,0 +1,33 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<request>
+    <container-type>servlet</container-type>
+    <content-length>0</content-length>
+    <body content-type="application/xml"/>
+    <protocol>HTTP/1.1</protocol>
+    <remote-addr>127.0.0.1</remote-addr>
+    <remote-host>localhost</remote-host>
+    <scheme>http</scheme>
+    <server-name>localhost</server-name>
+    <server-port>8080</server-port>
+    <is-secure>false</is-secure>
+    <context-path>/orbeon</context-path>
+    <method>POST</method>
+    <path-info>/xforms-server</path-info>
+    <request-path>/xforms-server</request-path>
+    <path-translated>/Users/ebruchez/Orbeon/build/orbeon-war/WEB-INF/resources/xforms-server</path-translated>
+    <requested-session-id>DA6E64FC1E6DFF0499B5D6F46A32186A</requested-session-id>
+    <request-uri>/xforms-server</request-uri>
+    <servlet-path/>
+</request>

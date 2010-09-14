@@ -24,4 +24,5 @@ public interface XFormsDocumentLifecycle {
     void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response, boolean handleGoingOnline);
     void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event, boolean handleGoingOnline);
     void afterExternalEvents(PipelineContext pipelineContext, boolean handleGoingOnline);
+    void afterUpdateResponse();
 }

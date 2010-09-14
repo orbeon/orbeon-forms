@@ -24,11 +24,13 @@
             <element name="xxforms:uuid">
                 <data type="string"/>
             </element>
-            <optional>
-                <element name="xxforms:request-sequence-number">
+            <!-- Can be empty in case of non-Ajax request -->
+            <element name="xxforms:sequence">
+                <choice>
                     <data type="integer"/>
-                </element>
-            </optional>
+                    <empty/>
+                </choice>
+            </element>
             <optional>
                 <element name="xxforms:static-state">
                     <data type="string"/>

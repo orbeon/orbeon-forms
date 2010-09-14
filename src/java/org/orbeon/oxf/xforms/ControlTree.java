@@ -740,19 +740,18 @@ public class ControlTree implements ExternalCopyable {
 
         private XFormsControl currentControlsContainer;
 
-        private final Map serializedControls;
+        private final Map<String, Element> serializedControls;
         private final PropertyContext propertyContext;
         private final ControlIndex controlIndex;
 
         private transient int updateCount;
         private transient int iterationCount;
 
-        public CreateControlsListener(PropertyContext propertyContext, ControlIndex controlIndex, XFormsControl rootControl,
-                                      Map serializedControlStateMap) {
+        public CreateControlsListener(PropertyContext propertyContext, ControlIndex controlIndex, XFormsControl rootControl, Map<String, Element> serializedControls) {
 
             this.currentControlsContainer = rootControl;
 
-            this.serializedControls = serializedControlStateMap;
+            this.serializedControls = serializedControls;
             this.propertyContext = propertyContext;
             this.controlIndex = controlIndex;
         }
@@ -762,14 +761,7 @@ public class ControlTree implements ExternalCopyable {
             updateCount++;
 
             // Create XFormsControl with basic information
-            final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId);
-
-            // If needed, deserialize control state
-            if (serializedControls != null) {
-                final Element element = (Element) serializedControls.get(effectiveControlId);
-                if (element != null)
-                    control.deserializeLocal(element);
-            }
+            final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId, serializedControls);
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
@@ -787,16 +779,6 @@ public class ControlTree implements ExternalCopyable {
             if (control instanceof XFormsContainerControl) {
                 currentControlsContainer = control;
             }
-
-//            if (control instanceof XFormsComponentControl) {
-//                // Compute new id prefix for nested component
-//                final String newIdPrefix = idPrefix + staticControlId + XFormsConstants.COMPONENT_SEPARATOR;
-//
-//                // Recurse into component tree
-//                final Element shadowTreeDocumentElement = staticState.getCompactShadowTree(idPrefix + staticControlId);
-//                XFormsControls.visitControlElementsHandleRepeat(pipelineContext, this, isOptimizeRelevance,
-//                        staticState, newContainer, shadowTreeDocumentElement, newIdPrefix, idPostfix);
-//            }
 
             return control;
         }

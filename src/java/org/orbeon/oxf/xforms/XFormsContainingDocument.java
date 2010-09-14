@@ -88,8 +88,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
 
+
     private String uuid;        // UUID of this document
-    private int changeSequence; // number of state changes that have touched this document
+    private long sequence = 1;  // sequence number of changes to this document
+
+    private SAXStore lastAjaxResponse; // last Ajax response for retry feature
 
     private final IndentedLogger indentedLogger = getIndentedLogger(LOGGING_CATEGORY);
 
@@ -314,7 +317,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public void updateChangeSequence() {
-        changeSequence++;
+        sequence++;
+    }
+
+    public SAXStore getLastAjaxResponse() {
+        return lastAjaxResponse;
     }
 
     public boolean isInitializing() {
@@ -1161,13 +1168,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response, boolean handleGoingOnline) {
         // Clear containing document state
+        // NOTE: This should no longer be needed here as it's done on afterSendingResponse()
         clearClientState();
 
         // Remember OutputStream
         this.response = response;
-
-        // Initialize controls
-        xformsControls.initialize(pipelineContext);
 
         // Start outermost action handler here if going online
         if (handleGoingOnline)
@@ -1193,6 +1198,22 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             endOutermostActionHandler(pipelineContext);
 
         this.response = null;
+    }
+
+    /**
+     * Called after sending a successful update response.
+     */
+    public void afterUpdateResponse() {
+        clearClientState();
+        xformsControls.afterUpdateResponse();
+    }
+
+    public void rememberLastAjaxResponse(SAXStore response) {
+        lastAjaxResponse = response;
+    }
+
+    public long getSequence() {
+        return sequence;
     }
 
     /**
@@ -1272,7 +1293,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
             // Add UUIDs
             dynamicStateElement.addAttribute("uuid", uuid);
-            dynamicStateElement.addAttribute("sequence", Integer.toString(changeSequence));
+            dynamicStateElement.addAttribute("sequence", Long.toString(sequence));
 
             // Add request information
             dynamicStateElement.addAttribute("deployment-type", deploymentType.name());
@@ -1304,6 +1325,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 final Document document = TransformerUtils.saxStoreToDom4jDocument(annotatedTemplate);
                 templateElement.add(document.getRootElement().detach());
             }
+
+            // Serialize last Ajax response if present
+            if (lastAjaxResponse != null) {
+                final Element responseElement = dynamicStateElement.addElement("response");
+                final Document document = TransformerUtils.saxStoreToDom4jDocument(lastAjaxResponse);
+                responseElement.add(document.getRootElement().detach());
+            }
         }
         indentedLogger.endHandleOperation();
 
@@ -1331,10 +1359,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Restore UUIDs
 
         this.uuid = dynamicStateElement.attributeValue("uuid");
-        this.changeSequence = Integer.parseInt(dynamicStateElement.attributeValue("sequence"));
+        this.sequence = Long.parseLong(dynamicStateElement.attributeValue("sequence"));
 
         indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid,
-                "change sequence", Integer.toString(this.changeSequence));
+                "sequence", Long.toString(this.sequence));
 
         // Restore request information
         if (dynamicStateElement.attribute("deployment-type") != null) {
@@ -1388,12 +1416,22 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Restore controls state
         {
             // Store serialized control state for retrieval later
-            final Map serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateElement);
+            final Map<String, Element> serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateElement);
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
 
-            xformsControls.initializeState(pipelineContext);
+            xformsControls.restoreControls(pipelineContext);
 
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
+        }
+
+        // Restore last Ajax response if present
+        {
+            final Element responseElement = dynamicStateElement.element("response");
+            if (responseElement != null) {
+                final Document responseDocument = Dom4jUtils.createDocument();
+                responseDocument.setRootElement((Element) ((Element) responseElement.elements().get(0)).detach());
+                this.lastAjaxResponse = TransformerUtils.dom4jToSAXStore(responseDocument);
+            }
         }
 
         // Indicate that instance restoration process is over
@@ -1410,7 +1448,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
     }
 
-    public Map getSerializedControlStatesMap(PropertyContext propertyContext) {
+    public Map<String, Element> getSerializedControlStatesMap(PropertyContext propertyContext) {
         return (Map) propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 

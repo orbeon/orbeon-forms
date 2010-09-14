@@ -59,7 +59,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
         super(container, parent, element, name, effectiveId);
 
         // NOTE: attributes logic duplicated in XXFormsDialogHandler
@@ -75,6 +75,20 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
         // Initial local state
         setLocal(new XXFormsDialogControlLocal(initiallyVisible));
+
+        // Restore state if needed
+        if (state != null) {
+            final Element stateElement = state. get(effectiveId);
+            // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
+            if (stateElement != null) {
+                final String visibleString = element.attributeValue("visible");
+                setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
+                        "true".equals(element.attributeValue("constrain")),
+                        element.attributeValue("neighbor")));
+            } else {
+                // special case of unit tests which don't actually include a value
+            }
+        }
     }
 
     @Override
@@ -176,17 +190,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         }
 
         return result;
-    }
-
-    @Override
-    public void deserializeLocal(Element element) {
-        // Deserialize
-
-        // NOTE: Don't use setSelectedCase() as we don't want to cause initialLocal != currentLocal
-        final String visibleString = element.attributeValue("visible");
-        setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
-                "true".equals(element.attributeValue("constrain")),
-                element.attributeValue("neighbor")));
     }
 
 //    public void updateContent(PropertyContext propertyContext, boolean isVisible) {

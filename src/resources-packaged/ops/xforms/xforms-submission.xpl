@@ -87,7 +87,7 @@
                 
                 <xsl:variable name="dynamic-state" as="document-node()">
                     <xsl:document>
-                        <dynamic-state uuid="{$uuid}" sequence="0">
+                        <dynamic-state uuid="{$uuid}" sequence="1">
                             <instances>
                                 <instance id="fr-instance" model-id="fr-model">
                                     <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>
@@ -124,6 +124,7 @@
 
                     <xxforms:event-request>
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
+                        <xxforms:sequence>1</xxforms:sequence>
                         <xxforms:static-state>
                             <xsl:value-of select="context:encodeXML($annotated-static-state)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
                         </xxforms:static-state>

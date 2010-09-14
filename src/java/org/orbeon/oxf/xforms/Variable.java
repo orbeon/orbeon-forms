@@ -25,12 +25,9 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.LastPositionFinder;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.EmptySequence;
-import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.List;

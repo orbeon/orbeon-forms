@@ -18,15 +18,14 @@ import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
+import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
-import java.util.Collections;
-
 public class RootAnalysis extends ContainerAnalysis {
 
-    public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
-        super(propertyContext, staticState, null, scope, null, 1, false, null, Collections.<String, SimpleAnalysis>emptyMap());
+    public RootAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope) {
+        super(staticState, 1, scope);
     }
 
     @Override
@@ -35,17 +34,12 @@ public class RootAnalysis extends ContainerAnalysis {
     }
 
     @Override
-    public String getModelPrefixedId() {
-        return staticState.getDefaultModelId();
-    }
-
-    @Override
     protected XPathAnalysis computeBindingAnalysis(Element element) {
-        if (staticState.getDefaultModelId() != null) {
-            final String defaultInstanceId = staticState.getDefaultInstanceId();
-            if (defaultInstanceId != null) {
+        if (containingModel != null) {
+            final Instance defaultInstance = containingModel.getDefaultInstance();
+            if (defaultInstance != null) {
                 // Start with instance('defaultInstanceId')
-                return analyzeXPath(staticState, null, prefixedId, XPathAnalysis.buildInstanceString(defaultInstanceId));
+                return analyzeXPath(staticState, null, prefixedId, XPathAnalysis.buildInstanceString(defaultInstance.prefixedId));
             } else {
                 return null;
             }

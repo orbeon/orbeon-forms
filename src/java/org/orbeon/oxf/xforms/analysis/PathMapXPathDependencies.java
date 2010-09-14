@@ -43,6 +43,9 @@ public class PathMapXPathDependencies implements XPathDependencies {
     private Map<String, Boolean> modifiedBindingCache = new HashMap<String, Boolean>();
     private Map<String, Boolean> modifiedValueCache = new HashMap<String, Boolean>();
 
+//    // Set of MIP nodes to check in the end
+//    private Set<NodeInfo> touchedMIPNodes = new HashSet<NodeInfo>();
+
     private int bindingUpdateCount;
     private int valueUpdateCount;
 
@@ -107,6 +110,8 @@ public class PathMapXPathDependencies implements XPathDependencies {
         modifiedPaths.clear();
         modifiedBindingCache.clear();
         modifiedValueCache.clear();
+
+//        touchedMIPNodes.clear();
 
         bindingUpdateCount = 0;
         valueUpdateCount = 0;
@@ -256,5 +261,27 @@ public class PathMapXPathDependencies implements XPathDependencies {
 
     public boolean requireBindValidation(Model model, String instancePrefixedId) {
         return !model.figuredBindAnalysis || model.validationBindInstances.contains(instancePrefixedId);
+    }
+
+//    public void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo) {
+//        if (!touchedMIPNodes.contains(nodeInfo)) {
+//            // First time this is called for a NodeInfo: keep old MIP values and remember NodeInfo
+//            InstanceData.saveMIPs(nodeInfo);
+//            touchedMIPNodes.add(nodeInfo);
+//        }
+//    }
+
+    public void refreshStart() {
+//        if (touchedMIPNodes.size() > 0) {
+//            // All revalidations and recalculations are done, process information about nodes touched
+//            for (final NodeInfo nodeInfo : touchedMIPNodes) {
+//                if (InstanceData.getPreviousInheritedRelevant(nodeInfo) != InstanceData.getInheritedRelevant(nodeInfo)
+//                        || InstanceData.getPreviousInheritedReadonly(nodeInfo) != InstanceData.getInheritedReadonly(nodeInfo)
+//                        || InstanceData.getPreviousRequired(nodeInfo) != InstanceData.getRequired(nodeInfo)
+//                        || InstanceData.getPreviousValid(nodeInfo) != InstanceData.getValid(nodeInfo)) {
+//                    markMIPChanged(model, nodeInfo);
+//                }
+//            }
+//        }
     }
 }

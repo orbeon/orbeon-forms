@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.apache.axis.utils.StringUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticProperty;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
@@ -29,7 +27,7 @@ import java.util.List;
 /**
  * xxforms:invalid-binds()
  */
-public class XXFormsInvalidBinds extends XFormsFunction {
+public class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunction as addToPathMap returns something different
 
     @Override
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
@@ -59,7 +57,8 @@ public class XXFormsInvalidBinds extends XFormsFunction {
     }
 
     @Override
-    public int getIntrinsicDependencies() {
-	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // TODO: something smart
+        return super.addToPathMap(pathMap, pathMapNodeSet);
     }
 }

@@ -29,7 +29,6 @@ import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -41,8 +40,6 @@ import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.value.BooleanValue;
-import org.orbeon.saxon.value.SequenceExtent;
 
 import java.io.IOException;
 import java.util.*;
@@ -138,8 +135,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     // Annotated page template for noscript and full updates mode
     // NOTE: We used to keep this in the static state, but the static state must now not depend on external HTML anymore
     private SAXStore annotatedTemplate;
-
-//    private boolean goingOffline;
 
     private final XPathDependencies xpathDependencies;
 
@@ -497,8 +492,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.focusEffectiveControlId = null;
         this.helpEffectiveControlId = null;
         this.delayedEvents = null;
-
-//        this.goingOffline = false;
     }
 
     /**
@@ -1251,50 +1244,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public void goOnline(PropertyContext propertyContext) {
-        // Dispatch to all models
-        for (XFormsModel currentModel: getModels()) {
-            // TODO: Dispatch to children containers?
-            dispatchEvent(propertyContext, new XXFormsOnlineEvent(this, currentModel));
-        }
-//        this.goingOffline = false;
+        // NOP
     }
 
     public void goOffline(PropertyContext propertyContext) {
-
-        // Handle inserts of controls marked as "offline insert triggers"
-        final List<String> offlineInsertTriggerPrefixedIds = getStaticState().getOfflineInsertTriggerIds();
-        if (offlineInsertTriggerPrefixedIds != null) {
-
-            for (String currentPrefixedId: offlineInsertTriggerPrefixedIds) {
-                final Object o = getObjectByEffectiveId(currentPrefixedId);// NOTE: won't work for triggers within repeats
-                if (o instanceof XFormsTriggerControl) {
-                    final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
-                    final XFormsEvent event = new DOMActivateEvent(this, trigger);
-                    // This attribute is a temporary HACK, used to improve performance when going offline. It causes
-                    // the insert action to not rebuild controls to adjust indexes after insertion, as well as always
-                    // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
-                    // insert performance was good from the get go.
-                    // TODO: check above now that repeat/insert/delete has been improved
-                    event.setAttribute(XFormsConstants.NO_INDEX_ADJUSTMENT, new SequenceExtent(new Item[] { BooleanValue.TRUE }));
-                    // Dispatch event n times
-                    final int repeatCount = XFormsProperties.getOfflineRepeatCount(this);
-                    for (int j = 0; j < repeatCount; j++)
-                        dispatchEvent(propertyContext, event);
-                }
-            }
-        }
-
-        // Dispatch xxforms-offline to all models
-        for (XFormsModel currentModel: getModels()) {
-            // TODO: Dispatch to children containers
-            dispatchEvent(propertyContext, new XXFormsOfflineEvent(this, currentModel));
-        }
-//        this.goingOffline = true;
+        // NOP
     }
-
-//    public boolean goingOffline() {
-//        return goingOffline;
-//    }
 
     /**
      * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.

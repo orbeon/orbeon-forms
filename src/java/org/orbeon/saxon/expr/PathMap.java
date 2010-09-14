@@ -57,6 +57,8 @@ public class PathMap implements Cloneable {
     private Map<String, PathMap> inScopeVariables;
     private Map<String, String> properties;
 
+    private boolean invalidated;    // whether during PathMap contruction it is found that we cannot produce a meaningful result
+
     /**
      * A node in the path map. A node holds a set of arcs, each representing a link to another
      * node in the path map.
@@ -476,8 +478,22 @@ public class PathMap implements Cloneable {
             return clonedVariablePathMap.findFinalNodes();
         } else {
             // TODO: when can this happen? it does seem to happen, e.g. w/ names like zz:zz1303689357 for internal LetExpression
+
+            // Only invalidate if this is not a local variable, i.e. if this is a reference to an external variable. In
+            // this case, there is no local slot number.
+            if (binding.getLocalSlotNumber() == -1)
+                invalidated = true;
+
             return null;
         }
+    }
+
+    public boolean isInvalidated() {
+        return invalidated;
+    }
+
+    public void setInvalidated(boolean invalidated) {
+        this.invalidated = invalidated;
     }
 
     /**
@@ -834,14 +850,16 @@ public class PathMap implements Cloneable {
     public void diagnosticDump(PrintStream out) {
         for (int i=0; i<pathMapRoots.size(); i++) {
             out.println("\nROOT EXPRESSION " + i);
-            PathMapRoot mapRoot = (PathMapRoot)pathMapRoots.get(i);
-            if (mapRoot.hasUnknownDependencies()) {
+            PathMapRoot rootNode = (PathMapRoot)pathMapRoots.get(i);
+            if (rootNode.hasUnknownDependencies()) {
                 out.println("  -- has unknown dependencies --");
             }
-            Expression exp = mapRoot.rootExpression;
-            exp.explain(out);
+            final Expression rootExpression = rootNode.rootExpression;
+            out.println();
+            rootExpression.explain(out);
+            showStep(out, "", rootExpression, rootNode);
             out.println("\nTREE FOR EXPRESSION " + i);
-            showArcs(out, mapRoot, 2);
+            showArcs(out, rootNode, 2);
         }
     }
 
@@ -860,12 +878,16 @@ public class PathMap implements Cloneable {
         List arcs = node.arcs;
         for (int i=0; i<arcs.size(); i++) {
             PathMapArc arc = ((PathMapArc)arcs.get(i));
-            out.println(pad + arc.step +
-                    (arc.target.isAtomized() ? " @" : "") +
-                    (arc.target.isReturnable() ? " #" : "") +
-                    (arc.target.hasUnknownDependencies() ? " ...??" : ""));
+            showStep(out, pad, arc.step, arc.target);
             showArcs(out, arc.target, indent+2);
         }
+    }
+
+    private void showStep(PrintStream out, String pad, Expression step, PathMapNode targetNode) {
+        out.println(pad + step +
+                (targetNode.isAtomized() ? " @" : "") +
+                (targetNode.isReturnable() ? " #" : "") +
+                (targetNode.hasUnknownDependencies() ? " ...??" : ""));
     }
 
     /**

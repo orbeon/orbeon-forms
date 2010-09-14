@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
-import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -26,7 +25,7 @@ import org.orbeon.saxon.value.BooleanValue;
 /**
  * Base class for eXForms MIP functions.
  */
-public abstract class EXFormsMIP extends XFormsFunction {
+public abstract class EXFormsMIP extends XXFormsMIPFunction {
 
     @Override
     public Item evaluateItem(XPathContext c) throws XPathException {
@@ -48,9 +47,4 @@ public abstract class EXFormsMIP extends XFormsFunction {
     }
 
     protected abstract boolean getResult(NodeInfo nodeInfo);
-
-    @Override
-    public int getIntrinsicDependencies() {
-	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
-    }
 }

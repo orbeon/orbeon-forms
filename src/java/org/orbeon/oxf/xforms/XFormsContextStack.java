@@ -951,6 +951,11 @@ public class XFormsContextStack {
         }
 
         public Map<String, ValueRepresentation> getInScopeVariables(boolean useCache) {
+
+            // TODO: Remove useCache completely or implement better cache!
+            // Force use cache to false, because when not all bindings are updated, variables can get out of date
+            useCache = false;
+
             // TODO: Variables in scope in the view must not include the variables defined in another model, but must include all view variables.
             if (inScopeVariablesMap == null || !useCache) {
                 final Map<String, ValueRepresentation> tempVariablesMap = new HashMap<String, ValueRepresentation>();

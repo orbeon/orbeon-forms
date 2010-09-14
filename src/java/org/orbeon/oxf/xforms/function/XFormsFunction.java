@@ -290,4 +290,17 @@ abstract public class XFormsFunction extends SystemFunction {
             }
         }
     }
+
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // By default, all XForms function invalidate the map. Subclasses can override this behavior. This ensures that
+        // we do not, by default, produce invalid maps.
+        pathMap.setInvalidated(true);
+        return null;
+    }
+
+    // Access to Saxon's default implementation
+    protected PathMap.PathMapNodeSet saxonAddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        return super.addToPathMap(pathMap, pathMapNodeSet);
+    }
 }

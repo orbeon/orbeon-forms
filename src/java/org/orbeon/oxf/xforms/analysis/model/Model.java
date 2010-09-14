@@ -50,7 +50,7 @@ public class Model {
     // Binds
     public List<Element> bindElements;
     public Set<String> bindIds;
-    public Map<String, Map<String, String>> customMIPs;
+    public Map<String, Map<String, String>> customMIPs; // staticId -> MIP mapping
     public boolean figuredBindAnalysis;
     public Set<String> bindInstances;
     public Set<String> computedBindExpressionsInstances;
@@ -78,9 +78,7 @@ public class Model {
         final boolean hasInstances = instances.size() > 0;
         defaultInstanceStaticId = hasInstances  ? instances.keySet().iterator().next() : null;
         defaultInstancePrefixedId = hasInstances ? scope.getFullPrefix() + defaultInstanceStaticId : null;
-    }
 
-    public  void analyze() {
         // Handle variables
         {
             final List<Element> variableElements = new ArrayList<Element>(); {
@@ -94,7 +92,7 @@ public class Model {
 
             if (variableElements.size() > 0) {
                 // Root analysis for model
-                final SimpleAnalysis modelRootAnalysis = new ModelAnalysis(staticState, scope, null, null, Collections.<String, SimpleAnalysis>emptyMap(), false, prefixedId, defaultInstancePrefixedId) {
+                final SimpleAnalysis modelRootAnalysis = new ModelAnalysis(staticState, scope, null, null, Collections.<String, SimpleAnalysis>emptyMap(), false, this) {
 
                     @Override
                     protected XPathAnalysis computeBindingAnalysis(Element element) {
@@ -110,12 +108,9 @@ public class Model {
                 // Iterate and resolve all variables in order
                 variables = new LinkedHashMap<String, SimpleAnalysis>();
                 for (final Element element : variableElements) {
-                    final ModelVariableAnalysis currentVariableAnalysis = new ModelVariableAnalysis(staticState, scope, element, modelRootAnalysis, variables, prefixedId, defaultInstanceStaticId);
+                    // TODO: Here all variables are passed with the same Map of in-scope variables. In the end, all variables see all other variables, which is not correct.
+                    final ModelVariableAnalysis currentVariableAnalysis = new ModelVariableAnalysis(staticState, scope, element, modelRootAnalysis, variables, this);
                     variables.put(currentVariableAnalysis.name, currentVariableAnalysis);
-
-                    // Evaluate aggressively
-                    currentVariableAnalysis.getBindingAnalysis();
-                    currentVariableAnalysis.getValueAnalysis();
                 }
             } else {
                 variables = Collections.emptyMap();
@@ -129,17 +124,15 @@ public class Model {
             bindElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_BIND_QNAME);
             if (hasBinds()) {
                 // Analyse binds
-                bindIds = new HashSet<String>();
-                customMIPs = new HashMap<String, Map<String, String>>();
-                bindInstances = new HashSet<String>();
-                computedBindExpressionsInstances = new HashSet<String>();
-                validationBindInstances = new HashSet<String>();
-                figuredBindAnalysis = analyzeBinds(bindElements) && staticState.isXPathAnalysis();
-                if (!figuredBindAnalysis) {
-                    bindInstances.clear();
-                    computedBindExpressionsInstances.clear();
-                    validationBindInstances.clear();
-                }
+                bindIds = new LinkedHashSet<String>();
+                customMIPs = new LinkedHashMap<String, Map<String, String>>();
+
+                analyzeBinds(bindElements);
+
+                bindInstances = new LinkedHashSet<String>();
+                computedBindExpressionsInstances = new LinkedHashSet<String>();
+                validationBindInstances = new LinkedHashSet<String>();
+
             } else {
                 // Easy case to figure out
                 bindIds = Collections.emptySet();
@@ -152,9 +145,38 @@ public class Model {
         }
     }
 
-    private boolean analyzeBinds(List<Element> bindElements) {
+    private void analyzeBinds(List<Element> bindElements) {
+        for (final Element element : bindElements) {
+
+            // Add id of this element
+            final String bindStaticId = XFormsUtils.getElementStaticId(element);
+            bindIds.add(bindStaticId);
+
+            // See if there are custom MIPs
+            processCustomMIPs(bindStaticId, element);
+
+            // Recurse to find nested bind elements
+            analyzeBinds(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME));
+        }
+    }
+
+    public  void analyzeXPath() {
+        // Variables
+        for (final SimpleAnalysis variableAnalysis : variables.values()) {
+            variableAnalysis.analyzeXPath();
+        }
+        // Binds
+        figuredBindAnalysis = analyzeBindsXPath(bindElements);
+        if (!figuredBindAnalysis) {
+            bindInstances.clear();
+            computedBindExpressionsInstances.clear();
+            validationBindInstances.clear();
+        }
+    }
+
+    private boolean analyzeBindsXPath(List<Element> bindElements) {
         final List<SimpleAnalysis> stack = new ArrayList<SimpleAnalysis>();
-        stack.add(new ModelAnalysis(staticState, scope, document.getRootElement(), null, variables, false, prefixedId, defaultInstancePrefixedId) {
+        stack.add(new ModelAnalysis(staticState, scope, document.getRootElement(), null, variables, false, this) {
 
             @Override
             protected XPathAnalysis computeBindingAnalysis(Element element) {
@@ -166,18 +188,12 @@ public class Model {
                 }
             }
         });
-        return analyzeBinds(bindElements, stack);
+        return analyzeBindsXPath(bindElements, stack);
     }
 
-    private boolean analyzeBinds(List<Element> bindElements, List<SimpleAnalysis> stack) {
+    private boolean analyzeBindsXPath(List<Element> bindElements, List<SimpleAnalysis> stack) {
         boolean result = true;
         for (final Element element: bindElements) {
-            // Add id of this element
-            final String staticId = XFormsUtils.getElementStaticId(element);
-            bindIds.add(staticId);
-
-            // See if there are custom MIPs
-            final boolean hasCustomMIP = processCustomMIPs(staticId, element);
 
             if (staticState.isXPathAnalysis()) {
                 // Figure out instance dependencies if possible
@@ -192,14 +208,16 @@ public class Model {
 
                 if (bindingExpression != null) {
                     // Analyze binding
-                    final SimpleAnalysis analysis = new ModelAnalysis(staticState, scope, element, stack.get(stack.size() - 1), null, false, Model.this.prefixedId, Model.this.defaultInstancePrefixedId);
+                    final SimpleAnalysis analysis = new ModelAnalysis(staticState, scope, element, stack.get(stack.size() - 1), null, false, Model.this);
+                    analysis.analyzeXPath();// evaluate aggressively
+
                     if (analysis.getBindingAnalysis() != null && analysis.getBindingAnalysis().figuredOutDependencies) {
                         // Analysis succeeded
 
                         // Add instances
                         final Set<String> returnableInstances = analysis.getBindingAnalysis().returnableInstances;
                         bindInstances.addAll(returnableInstances);
-                        if (hasCustomMIP || hasCalculateComputedBind(element))
+                        if (customMIPs.containsKey(XFormsUtils.getElementStaticId(element)) || hasCalculateComputedBind(element))
                             computedBindExpressionsInstances.addAll(returnableInstances);
 
                         if (hasValidateBind(element))
@@ -207,7 +225,7 @@ public class Model {
 
                         // Recurse to find nested bind elements
                         stack.add(analysis);
-                        result &= analyzeBinds(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME), stack);
+                        result &= analyzeBindsXPath(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME), stack);
                         stack.remove(stack.size() - 1);
                     } else {
                         // Analysis failed
@@ -216,11 +234,11 @@ public class Model {
                 } else {
                     // Just ignore this xforms:bind
                     // Recurse to find nested bind elements
-                    result &= analyzeBinds(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME), stack);
+                    result &= analyzeBindsXPath(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME), stack);
                 }
             } else {
                 // Recurse to find nested bind elements
-                analyzeBinds(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME), stack);
+                analyzeBindsXPath(Dom4jUtils.elements(element, XFormsConstants.XFORMS_BIND_QNAME), stack);
             }
         }
         return result;
@@ -278,6 +296,10 @@ public class Model {
 
     public static String buildCustomMIPName(String qualifiedName) {
         return qualifiedName.replace(':', '-');
+    }
+
+    public Instance getDefaultInstance() {
+        return (instances.size() > 0) ? instances.values().iterator().next() : null;
     }
 
     public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {

@@ -52,7 +52,6 @@ public class InstanceData {
 
     private String type;
     private boolean valueValid = DEFAULT_VALID;
-    private boolean constraint = DEFAULT_VALID;// TODO: we don't really need separate constraint information: valueValid is enough!
 
     private String invalidBindIds;
     private List<String> schemaErrors;
@@ -60,12 +59,29 @@ public class InstanceData {
     // Custom MIPs
     private Map<String, String> customMips = null;
 
-    private static InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
+    private static final InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
         {
             // Default for non-mutable nodes is to be read-only
             this.readonly = true;
         }
     };
+
+//    // Previous values for dependencies
+//    private boolean previousRelevant = DEFAULT_RELEVANT;
+//    private boolean previousReadonly = DEFAULT_READONLY;
+//    private boolean previousRequired = DEFAULT_REQUIRED;
+//    private boolean previousValueValid = DEFAULT_VALID;
+//
+//    public static void saveMIPs(NodeInfo nodeInfo) {
+//        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+//        if (existingInstanceData != null) {
+//            existingInstanceData.previousRelevant = existingInstanceData.relevant;
+//            existingInstanceData.previousReadonly = existingInstanceData.readonly;
+//            existingInstanceData.previousRequired = existingInstanceData.required;
+//            existingInstanceData.previousValueValid = existingInstanceData.valueValid;
+//            // TODO: custom MIPs
+//        }
+//    }
 
     private InstanceData() {
     }
@@ -154,6 +170,27 @@ public class InstanceData {
         return true;
     }
 
+//    public static boolean getPreviousInheritedRelevant(NodeInfo nodeInfo) {
+//        if (nodeInfo instanceof NodeWrapper) {
+//            return getPreviousInheritedRelevant(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
+//        } else if (nodeInfo != null) {
+//            return DEFAULT_RELEVANT;
+//        } else {
+//            throw new OXFException("Cannot get relevant Model Item Property on null object.");
+//        }
+//    }
+//
+//    public static boolean getPreviousInheritedRelevant(Node node) {
+//        // Iterate this node and its parents. The node is non-relevant if it or any ancestor is non-relevant.
+//        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
+//            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
+//            final boolean currentRelevant = (currentInstanceData == null) ? DEFAULT_RELEVANT : currentInstanceData.previousRelevant;
+//            if (!currentRelevant)
+//                return false;
+//        }
+//        return true;
+//    }
+
     public static void setRequired(NodeInfo nodeInfo, boolean required) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
         if (existingInstanceData == null) {
@@ -169,6 +206,11 @@ public class InstanceData {
             existingInstanceData.required = required;
         }
     }
+
+//    public static boolean getPreviousRequired(NodeInfo nodeInfo) {
+//        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+//        return (existingInstanceData == null) ? DEFAULT_REQUIRED : existingInstanceData.previousRequired;
+//    }
 
     public static boolean getRequired(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
@@ -196,6 +238,27 @@ public class InstanceData {
         }
     }
 
+//    public static boolean getPreviousInheritedReadonly(NodeInfo nodeInfo) {
+//        if (nodeInfo instanceof NodeWrapper) {
+//            return getPreviousInheritedReadonly(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
+//        } else if (nodeInfo != null) {
+//            return true;// Default for non-mutable nodes is to be read-only
+//        } else {
+//            throw new OXFException("Cannot get readonly Model Item Property on null object.");
+//        }
+//    }
+//
+//    public static boolean getPreviousInheritedReadonly(Node node) {
+//        // Iterate this node and its parents. The node is readonly if it or any ancestor is readonly.
+//        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
+//            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
+//            final boolean currentReadonly = (currentInstanceData == null) ? DEFAULT_READONLY : currentInstanceData.previousReadonly;
+//            if (currentReadonly)
+//                return true;
+//        }
+//        return false;
+//    }
+
     public static boolean getInheritedReadonly(NodeInfo nodeInfo) {
         if (nodeInfo instanceof NodeWrapper) {
             return getInheritedReadonly(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
@@ -217,14 +280,24 @@ public class InstanceData {
         return false;
     }
 
+    public static boolean getLocalReadonly(NodeInfo nodeInfo) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        return (existingInstanceData == null) ? DEFAULT_READONLY : existingInstanceData.readonly;
+    }
+
+//    public static boolean getPreviousValid(NodeInfo nodeInfo) {
+//        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+//        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.previousValueValid;
+//    }
+
     public static boolean getValid(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.constraint && existingInstanceData.valueValid;
+        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.valueValid;
     }
 
     public static boolean getValid(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
-        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.constraint && existingInstanceData.valueValid;
+        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.valueValid;
     }
 
     public static void setType(NodeInfo nodeInfo, String type) {
@@ -375,7 +448,6 @@ public class InstanceData {
         if (existingInstanceData != null) {
             // Clear everything related to validity (except required)
             existingInstanceData.valueValid = DEFAULT_VALID;
-            existingInstanceData.constraint = DEFAULT_VALID;
             existingInstanceData.type = null;
             existingInstanceData.invalidBindIds = null;
             if (existingInstanceData.schemaErrors != null)

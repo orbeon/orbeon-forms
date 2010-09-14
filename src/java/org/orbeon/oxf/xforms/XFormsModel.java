@@ -1010,7 +1010,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
 
             if (!isCalculate) {
-                // Only set recalculate when we are not currently performing a recalculate (vaoid infinite loop)
+                // Only set recalculate when we are not currently performing a recalculate (avoid infinite loop)
                 recalculate = true;
             }
 
@@ -1032,6 +1032,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (nodeInfo != null)
             containingDocument.getXPathDependencies().markValueChanged(this, nodeInfo);
     }
+
+//    public void markMipChange(NodeInfo nodeInfo) {
+//        // Notify dependencies of the change
+//        if (nodeInfo != null)
+//            containingDocument.getXPathDependencies().markMipChanged(this, nodeInfo);
+//    }
 
     public void markStructuralChange() {
         // Set the flags

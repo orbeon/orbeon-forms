@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
@@ -32,6 +33,17 @@ public class ComponentAnalysis extends ContainerAnalysis {
     @Override
     protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         // Nested LHHA elements are handled by XBL template
+        return null;
+    }
+
+    @Override
+    protected XPathAnalysis computeBindingAnalysis(Element element) {
+        // TODO: TEMP: Control does not have a binding. But return one anyway so that controls w/o their own binding also get updated.
+        return findOrCreateBaseAnalysis(parentAnalysis);
+    }
+
+    @Override
+    protected XPathAnalysis computeValueAnalysis() {
         return null;
     }
 }

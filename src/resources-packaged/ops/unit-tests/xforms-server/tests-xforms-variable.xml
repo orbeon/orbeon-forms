@@ -466,7 +466,7 @@
                         <xxforms:variable name="sum">
                             <xxforms:sequence select="$foo + $bar"/>
                         </xxforms:variable>
-                        <xxforms:variable name="product" select="$foo * $bar">
+                        <xxforms:variable name="product">
                             <xxforms:sequence ref="foo" select=". * $bar"/>
                         </xxforms:variable>
                         <xforms:group id="group2">

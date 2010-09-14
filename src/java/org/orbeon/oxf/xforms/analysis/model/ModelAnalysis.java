@@ -22,26 +22,12 @@ import java.util.Map;
 
 public class ModelAnalysis extends SimpleAnalysis {
 
-    private final String modelPrefixedId;
-    private final String defaultInstancePrefixedId;
     private final Map<String, SimpleAnalysis> inScopeVariables;
 
     public ModelAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope, Element element, SimpleAnalysis parentControlAnalysis,
-                         Map<String, SimpleAnalysis> inScopeVariables, boolean canHoldValue, String modelPrefixedId, String defaultInstancePrefixedId) {
-        super(staticState, scope, element, parentControlAnalysis, canHoldValue);
-        this.modelPrefixedId = modelPrefixedId;
-        this.defaultInstancePrefixedId = defaultInstancePrefixedId;
+                         Map<String, SimpleAnalysis> inScopeVariables, boolean canHoldValue, Model containingModel) {
+        super(staticState, scope, element, parentControlAnalysis, canHoldValue, containingModel);
         this.inScopeVariables = inScopeVariables;
-    }
-
-    @Override
-    public String getModelPrefixedId() {
-        return modelPrefixedId;
-    }
-
-    @Override
-    public String getDefaultInstancePrefixedId() {
-        return defaultInstancePrefixedId;
     }
 
     @Override

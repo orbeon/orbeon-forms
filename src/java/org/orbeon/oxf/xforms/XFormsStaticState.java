@@ -103,10 +103,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     // XXFormsAttributeControl
     private Map<String, Map<String, ControlAnalysis>> attributeControls;        // Map<String forPrefixedId, Map<String name, ControlAnalysis info>>
 
-    // Offline support
-    private boolean hasOfflineSupport;                                      // whether the document requires offline support
-    private List<String> offlineInsertTriggerIds;                           // List<String triggerPrefixedId> of triggers can do inserts
-
     // Commonly used properties (use getter to access them)
     private boolean propertiesRead;
     private boolean isNoscript;
@@ -285,11 +281,11 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         // Iterate over main static controls tree
         final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
-        final XBLBindings.Scope rootScope = xblBindings.getResolutionScopeById("");
-        final ContainerAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this, rootScope);
+        final XBLBindings.Scope rootScope = xblBindings.getTopLevelScope();
+        final ContainerAnalysis rootControlAnalysis = new RootAnalysis(this, rootScope);
 
         // Analyze models first
-        analyzeModelsForScope(xblBindings.getTopLevelScope());
+        analyzeModelsXPathForScope(xblBindings.getTopLevelScope());
 
         // Then analyze controls
         analyzeComponentTree(propertyContext, xpathConfiguration, rootScope,
@@ -310,6 +306,9 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
             extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
         }
+
+        // Analyze controls XPath
+        analyzeControlsXPath();
 
         // Once analysis is done, some state can be freed
         freeTransientState();
@@ -632,24 +631,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     public final List<Model> getModelsForScope(XBLBindings.Scope scope) {
         final List<Model> models = modelsByScope.get(scope);
         return (models != null) ? models : Collections.<Model>emptyList();
-    }
-
-    public String getDefaultModelPrefixedIdForScope(XBLBindings.Scope scope) {
-        final Model model = getDefaultModelForScope(scope);
-        return (model != null) ? model.prefixedId : null;
-    }
-
-    public String getDefaultInstancePrefixedIdForScope(XBLBindings.Scope scope) {
-        final Model model = getDefaultModelForScope(scope);
-        return (model != null) ? model.defaultInstancePrefixedId: null;
-    }
-
-    public String getDefaultModelId() {
-        return getDefaultModelForScope(xblBindings.getTopLevelScope()).prefixedId;
-    }
-
-    public String getDefaultInstanceId() {
-        return getDefaultInstancePrefixedIdForScope(xblBindings.getTopLevelScope());
     }
 
     public String findInstancePrefixedId(XBLBindings.Scope startScope, String instanceStaticId) {
@@ -1026,10 +1007,16 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         return false;
     }
 
-    public void analyzeModelsForScope(XBLBindings.Scope scope) {
-        if (modelsByScope.get(scope) != null)
+    public void analyzeModelsXPathForScope(XBLBindings.Scope scope) {
+        if (isXPathAnalysis() && modelsByScope.get(scope) != null)
             for (final Model model : modelsByScope.get(scope))
-                model.analyze();
+                model.analyzeXPath();
+    }
+
+    public void analyzeControlsXPath() {
+        if (isXPathAnalysis())
+            for (final ControlAnalysis control : controlAnalysisMap.values())
+                control.analyzeXPath();
     }
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
@@ -1154,9 +1141,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             }
 
             public void endVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, ControlAnalysis newControl, boolean isContainer) {
-                if (isContainer) {
-                    ((ContainerAnalysis) newControl).clearContainedVariables();
-                }
             }
         });
 
@@ -1173,81 +1157,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         // Extract event handlers for this tree of controls
         // NOTE: Do this after analysing controls above so that XBL bindings are available for detection of nested event handlers.
         extractEventHandlers(propertyContext, xpathConfiguration, controlsDocumentInfo, prefix, true);
-
-        // Gather online/offline information
-        {
-            {
-                // Create list of all the documents to search
-                final List<DocumentWrapper> documentInfos = new ArrayList<DocumentWrapper>(modelsByPrefixedId.size() + 1);
-                for (final Model model: modelsByPrefixedId.values()) {
-                    documentInfos.add(new DocumentWrapper(model.document, null, xpathConfiguration));
-                }
-                documentInfos.add(controlsDocumentInfo);
-
-                // Search for xxforms:offline which are not within instances
-                for (final DocumentWrapper currentDocumentInfo: documentInfos) {
-                    hasOfflineSupport |= (Boolean) XPathCache.evaluateSingle(propertyContext, currentDocumentInfo,
-                            "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPING,
-                            null, null, null, null, locationData);
-
-                    if (hasOfflineSupport) {
-                        break;
-                    }
-                }
-            }
-
-            if (hasOfflineSupport) {
-                // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online, xxforms:offline and xxforms:offline-save actions
-                final List onlineTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
-                    "distinct-values(for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
-                    null, null, null, null, locationData);
-
-                final List offlineTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
-                    "distinct-values(for $handler in for $action in //xxforms:offline return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
-                    null, null, null, null, locationData);
-
-                final List offlineSaveTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
-                    "distinct-values(for $handler in for $action in //xxforms:offline-save return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
-                    null, null, null, null, locationData);
-
-                offlineInsertTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
-                    "distinct-values(for $handler in for $action in //xforms:insert return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
-                    null, null, null, null, locationData);
-
-                final List offlineDeleteTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
-                    "distinct-values(for $handler in for $action in //xforms:delete return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
-                    "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPING,
-                    null, null, null, null, locationData);
-
-                for (Object onlineTriggerId: onlineTriggerIds) {
-                    final String currentId = (String) onlineTriggerId;
-                    controlAnalysisMap.get(prefix + currentId).addClasses("xxforms-online");
-                }
-
-                for (Object offlineTriggerId: offlineTriggerIds) {
-                    final String currentId = (String) offlineTriggerId;
-                    controlAnalysisMap.get(prefix + currentId).addClasses("xxforms-offline");
-                }
-
-                for (Object offlineSaveTriggerId: offlineSaveTriggerIds) {
-                    final String currentId = (String) offlineSaveTriggerId;
-                    controlAnalysisMap.get(prefix + currentId).addClasses("xxforms-offline-save");
-                }
-
-                for (final String currentId: offlineInsertTriggerIds) {
-                    controlAnalysisMap.get(prefix + currentId).addClasses("xxforms-offline-insert");
-                }
-
-                for (Object offlineDeleteTriggerId: offlineDeleteTriggerIds) {
-                    final String currentId = (String) offlineDeleteTriggerId;
-                    controlAnalysisMap.get(prefix + currentId).addClasses("xxforms-offline-delete");
-                }
-            }
-        }
     }
 
     private boolean processLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement, String controlStaticId, String prefix) {
@@ -1302,10 +1211,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             sb.append(' ');
 
         sb.append(controlClasses);
-    }
-
-    public List<String> getOfflineInsertTriggerIds() {
-        return offlineInsertTriggerIds;
     }
 
     /**

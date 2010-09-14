@@ -30,6 +30,14 @@ public class DumbXPathDependencies implements XPathDependencies {
         // NOP
     }
 
+//    public void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo) {
+//        // NOP
+//    }
+
+    public void refreshStart() {
+        // NOP
+    }
+
     public void refreshDone() {
         // NOP
     }
@@ -38,6 +46,11 @@ public class DumbXPathDependencies implements XPathDependencies {
         // Always update
         return true;
     }
+
+//    public boolean requireMIPUpdate(String controlPrefixedId) {
+//        // Always update
+//        return true;
+//    }
 
     public boolean requireValueUpdate(String controlPrefixedId) {
         // Always update

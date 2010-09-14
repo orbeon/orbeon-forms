@@ -419,7 +419,7 @@ public class XBLBindings {
                     }
 
                     // Analyze the models first
-                    staticState.analyzeModelsForScope(newInnerScope);
+                    staticState.analyzeModelsXPathForScope(newInnerScope);
 
                     // Remember full and compact shadow trees for this prefixed id
                     xblFullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);

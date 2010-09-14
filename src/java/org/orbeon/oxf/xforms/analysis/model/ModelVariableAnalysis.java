@@ -28,8 +28,8 @@ public class ModelVariableAnalysis extends ModelAnalysis {
     public final String name;
 
     public ModelVariableAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope, Element element, SimpleAnalysis parentAnalysis,
-                                 Map<String, SimpleAnalysis> inScopeVariables, String modelPrefixedId, String defaultInstancePrefixedId) {
-        super(staticState, scope, element, parentAnalysis, inScopeVariables, true, modelPrefixedId, defaultInstancePrefixedId);
+                                 Map<String, SimpleAnalysis> inScopeVariables, Model containingModel) {
+        super(staticState, scope, element, parentAnalysis, inScopeVariables, true, containingModel);
 
         this.name = element.attributeValue("name");
     }
@@ -39,7 +39,7 @@ public class ModelVariableAnalysis extends ModelAnalysis {
         // TODO: handle xxf:sequence
         final String selectAttribute = element.attributeValue("select");
         if (selectAttribute != null) {
-            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(true);
+            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(this);
             return new XPathAnalysis(staticState, selectAttribute, staticState.getMetadata().getNamespaceMapping(prefixedId),
                     baseAnalysis, parentAnalysis.getInScopeVariables(), scope, getModelPrefixedId(), getDefaultInstancePrefixedId(), locationData, element);
         } else {

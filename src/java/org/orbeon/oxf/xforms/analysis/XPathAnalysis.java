@@ -76,7 +76,8 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
 
     private XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
                          XPathAnalysis baseAnalysis, Map<String, SimpleAnalysis> inScopeVariables,
-                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId, LocationData locationData, Element element) {
+                         XBLBindings.Scope scope, String containingModelPrefixedId, String defaultInstancePrefixedId,
+                         LocationData locationData, Element element) {
         
         this.staticState = staticState;
         this.xpathString = xpathString;
@@ -85,7 +86,8 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             final Map<String, PathMap> variables = new HashMap<String, PathMap>();
             if (inScopeVariables != null) {
                 for (final Map.Entry<String, SimpleAnalysis> entry: inScopeVariables.entrySet()) {
-                    variables.put(entry.getKey(), entry.getValue().getValueAnalysis().pathmap);
+                    final XPathAnalysis valueAnalysis = entry.getValue().getValueAnalysis();
+                    variables.put(entry.getKey(), (valueAnalysis != null) ? valueAnalysis.pathmap : null);
                 }
             }
 
@@ -104,7 +106,11 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                         // We clone the base analysis and add to an existing PathMap
                         pathmap = baseAnalysis.pathmap.clone();
                         pathmap.setProperties(variables, properties);
-                        pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
+
+                        final PathMap.PathMapNodeSet newNodeset = expression.addToPathMap(pathmap, pathmap.findFinalNodes());
+
+                        if (!pathmap.isInvalidated())
+                            pathmap.updateFinalNodes(newNodeset);
                     } else {
                         // Base analysis failed, we fail analysis too
                         this.pathmap = null;
@@ -118,28 +124,35 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                 }
             }
 
-            // Try to reduce ancestor axis
-//            System.out.println("xxx before");
-//            System.out.println(expression.toString());
-//            pathmap.diagnosticDump(System.out);// xxx
+            if (pathmap.isInvalidated()) {
+                this.pathmap = null;
+                this.figuredOutDependencies = false;
+            } else {
 
-            reduceAncestorAxis(pathmap);
 
-//            System.out.println("xxx after");
-//            pathmap.diagnosticDump(System.out);// xxx
+//                System.out.println("xxx expressions");
+//                System.out.println(expression.toString());
+//                pathmap.diagnosticDump(System.out);
 
-            this.pathmap = pathmap;
+                // Try to reduce ancestor axis
+                reduceAncestorAxis(pathmap);
 
-            // Produce resulting paths
-            this.figuredOutDependencies = processPaths(scope, modelPrefixedId, defaultInstancePrefixedId);
+    //            System.out.println("xxx after");
+    //            pathmap.diagnosticDump(System.out);// xxx
 
-            if (!this.figuredOutDependencies) {
-                // This really shouldn't be touched if we can't figure out dependencies, but they are so clear them here
-                valueDependentPaths.clear();
-                returnablePaths.clear();
-                dependentModels.clear();
-                dependentInstances.clear();
-                returnableInstances.clear();
+                this.pathmap = pathmap;
+
+                // Produce resulting paths
+                this.figuredOutDependencies = processPaths(scope, containingModelPrefixedId, defaultInstancePrefixedId);
+
+                if (!this.figuredOutDependencies) {
+                    // This really shouldn't be touched if we can't figure out dependencies, but they are so clear them here
+                    valueDependentPaths.clear();
+                    returnablePaths.clear();
+                    dependentModels.clear();
+                    dependentInstances.clear();
+                    returnableInstances.clear();
+                }
             }
 
         } catch (Exception e) {
@@ -195,11 +208,11 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
     /**
      * Process the pathmap to extract paths and other information useful for handling dependencies.
      */
-    private boolean processPaths(XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
+    private boolean processPaths(XBLBindings.Scope scope, String containingModelPrefixedId, String defaultInstancePrefixedId) {
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
-            final boolean success = processNode(stack, root, scope, modelPrefixedId, defaultInstancePrefixedId, false);
+            final boolean success = processNode(stack, root, scope, containingModelPrefixedId, defaultInstancePrefixedId, false);
             if (!success)
                 return false;
             stack.remove(stack.size() - 1);
@@ -211,21 +224,22 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         return "instance('" + instanceId.replaceAll("'", "''") + "')";
     }
 
-    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId, boolean ancestorAtomized) {
+    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String containingModelPrefixedId, String defaultInstancePrefixedId, boolean ancestorAtomized) {
         boolean success = true;
         if (node.getArcs().length == 0 || node.isReturnable() || node.isAtomized() || ancestorAtomized) {
 
             final StringBuilder sb = new StringBuilder();
-            success &= createPath(sb, stack, scope, modelPrefixedId, defaultInstancePrefixedId, node);
+            success &= createPath(sb, stack, scope, containingModelPrefixedId, defaultInstancePrefixedId, node);
             if (success) {
                 if (sb.length() > 0) {
                     // A path was created
+
+                    // NOTE: A same node can be both returnable AND atomized in a given expression
                     final String s = sb.toString();
-                    if (node.isReturnable()) {
+                    if (node.isReturnable())
                         returnablePaths.add(s);
-                    } else if (node.isAtomized()) {
+                    if (node.isAtomized())
                         valueDependentPaths.add(s);
-                    }
                 } else {
                     // NOP: don't add the path as this is not considered a dependency
                 }
@@ -239,7 +253,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
         if (node.getArcs().length > 0) {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());
-                success &= processNode(stack, arc.getTarget(), scope, modelPrefixedId, defaultInstancePrefixedId, node.isAtomized());
+                success &= processNode(stack, arc.getTarget(), scope, containingModelPrefixedId, defaultInstancePrefixedId, node.isAtomized());
                 if (!success) {
                     return false;
                 }
@@ -265,6 +279,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                         sb.append(buildInstanceString(defaultInstancePrefixedId));
                         {
                             // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
+                            // TODO: not needed anymore because model now set before it is analyzed
                             final Model defaultModelForInstance = staticState.getModelByInstancePrefixedId(defaultInstancePrefixedId);
                             final String dependentModelPrefixedId = (defaultModelForInstance != null) ? defaultModelForInstance.prefixedId : containingModelPrefixedId;
                             dependentModels.add(dependentModelPrefixedId);
@@ -289,8 +304,14 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                         final String originalInstanceId = ((StringLiteral) instanceNameExpression).getStringValue();
                         final boolean searchAncestors = expression instanceof XXFormsInstance;
 
+                        // This is hacky: we use RewrittenStringLiteral as a marker so we don't rewrite an instance() StringLiteral parameter twice
+                        final boolean alreadyRewritten = instanceNameExpression instanceof PrefixedIdStringLiteral;
+
                         final String prefixedInstanceId;
-                        if (searchAncestors) {
+                        if (alreadyRewritten) {
+                            // Parameter is already a prefixed id
+                            prefixedInstanceId = originalInstanceId;
+                        } else if (searchAncestors) {
                             // xxforms:instance()
                             prefixedInstanceId = staticState.findInstancePrefixedId(scope, originalInstanceId);
                         } else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1) {
@@ -306,7 +327,7 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                             sb.append(buildInstanceString(prefixedInstanceId));
                             {
                                 // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
-                                // TODO: What if xxf:instance() refers to subsequent model? Must change processing model a bit: first extract model/instances info, then analyze.
+                                // TODO: not needed anymore because model now set before it is analyzed
                                 final Model modelForInstance = staticState.getModelByInstancePrefixedId(prefixedInstanceId);
                                 final String dependentModelPrefixedId = (modelForInstance != null) ? modelForInstance.prefixedId : containingModelPrefixedId;
                                 dependentModels.add(dependentModelPrefixedId);
@@ -314,8 +335,9 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
                             dependentInstances.add(prefixedInstanceId);
                             if (node.isReturnable())
                                 returnableInstances.add(prefixedInstanceId);
-                            // Rewrite expression to replace its argument with a prefixed instance id
-                            ((FunctionCall) expression).setArguments(new Expression[] { new StringLiteral(prefixedInstanceId) });
+                            // If needed, rewrite expression to replace its argument with a prefixed instance id
+                            if (!alreadyRewritten)
+                                ((FunctionCall) expression).setArguments(new Expression[] { new PrefixedIdStringLiteral(prefixedInstanceId) });
                         } else {
                             // Instance not found (could be reference to unknown instance e.g. author typo!)
                             // TODO: must also catch case where id is found but does not correspond to instance
@@ -360,6 +382,12 @@ public class XPathAnalysis implements XMLUtils.DebugXML {
             }
         }
         return success;
+    }
+
+    private static class PrefixedIdStringLiteral extends StringLiteral {
+        public PrefixedIdStringLiteral(CharSequence value) {
+            super(value);
+        }
     }
 
     public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {

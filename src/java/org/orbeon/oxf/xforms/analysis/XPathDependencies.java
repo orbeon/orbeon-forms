@@ -24,8 +24,14 @@ import org.orbeon.saxon.om.NodeInfo;
 public interface XPathDependencies {
     void markValueChanged(XFormsModel model, NodeInfo nodeInfo);
     void markStructuralChange(XFormsModel model);
+
+//    void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo);
+
+    void refreshStart();
     void refreshDone();
+
     boolean requireBindingUpdate(String controlPrefixedId);
+//    boolean requireMIPUpdate(String controlPrefixedId);
     boolean requireValueUpdate(String controlPrefixedId);
     boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId);
     boolean requireBindCalculation(Model model, String instancePrefixedId);

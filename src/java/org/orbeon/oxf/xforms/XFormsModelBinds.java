@@ -184,7 +184,7 @@ public class XFormsModelBinds {
         // Reset context stack just to re-evaluate the variables
         model.getContextStack().resetBindingContext(propertyContext, model);
 
-        // Clear state
+        // Apply
         final List<XFormsInstance> instances = model.getInstances();
         if (instances != null) {
             for (final XFormsInstance instance: instances) {
@@ -218,7 +218,7 @@ public class XFormsModelBinds {
         // Reset context stack just to re-evaluate the variables
         model.getContextStack().resetBindingContext(propertyContext, model);
 
-        // Handle validation
+        // Apply
         iterateBinds(propertyContext, new BindRunner() {
             public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
                 handleValidationBind(propertyContext, bind, nodeset, position, invalidInstances);
@@ -747,6 +747,26 @@ public class XFormsModelBinds {
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
             InstanceData.setReadonly(currentNodeInfo, true);
         }
+//
+//        final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, nodeset, position, currentVariables);
+//        final boolean oldValue = InstanceData.getLocalReadonly(currentNodeInfo);
+//        final boolean newValue;
+//        if (readonly != null) {
+//            // Set new value
+//            newValue = readonly;
+//        } else if (bind.getCalculate() != null) {
+//            // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
+//            newValue = true;
+//        } else {
+//            // No change
+//            newValue = oldValue;
+//        }
+//
+//        if (oldValue != newValue) {
+//            // Mark node
+//            InstanceData.setReadonly(currentNodeInfo, newValue);
+//            model.markMipChange(currentNodeInfo);
+//        }
     }
 
     private Boolean evaluateReadonlyMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {

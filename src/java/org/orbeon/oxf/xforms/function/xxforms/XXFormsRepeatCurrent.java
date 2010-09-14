@@ -16,8 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 
@@ -42,5 +41,12 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
         // Get current single node
         return getContextStack(xpathContext).getRepeatCurrentSingleNode(repeatId);
+    }
+
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // TODO: Handle this function
+        pathMap.setInvalidated(true);
+        return null;
     }
 }

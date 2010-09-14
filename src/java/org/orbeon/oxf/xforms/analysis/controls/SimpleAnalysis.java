@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
@@ -25,36 +26,42 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import java.util.Map;
 
 /**
- * Hold the static analysis for an XForms control.
+ * Hold the static analysis for an XForms object.
  */
 public abstract class SimpleAnalysis {
 
     public final XFormsStaticState staticState;
 
-    public final XBLBindings.Scope scope;
-    public final String prefixedId;
     public final Element element;
     public final LocationData locationData;
-    
-    public final boolean hasNodeBinding;
+
+    public final XBLBindings.Scope scope;
+    public final String prefixedId;
+
     public final boolean canHoldValue;
+    public final Model containingModel;
+
+    public final boolean hasNodeBinding;
 
     public final SimpleAnalysis parentAnalysis;
 
-    private boolean bindingAnalyzed = false;
-    private boolean valueAnalyzed = false;
     private XPathAnalysis bindingAnalysis;
     private XPathAnalysis valueAnalysis;
 
-    public SimpleAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope, Element element, SimpleAnalysis parentAnalysis, boolean canHoldValue) {
+    public SimpleAnalysis(XFormsStaticState staticState, XBLBindings.Scope scope, Element element, SimpleAnalysis parentAnalysis, boolean canHoldValue, Model containingModel) {
 
         this.staticState = staticState;
+
+        this.parentAnalysis = parentAnalysis;
+
+        this.element = element;
+        this.locationData = createLocationData(element);
+
         this.scope = scope;
         this.prefixedId = (element != null) ? scope.getPrefixedIdForStaticId(XFormsUtils.getElementStaticId(element)) : "#controls";
-        this.element = element;
-        this.locationData = (element != null) ? new ExtendedLocationData((LocationData) element.getData(), "gathering static XPath information", element) : null;
-        this.parentAnalysis = parentAnalysis;
+
         this.canHoldValue = canHoldValue;
+        this.containingModel = containingModel;
 
         if (element != null) {
             final boolean hasBind = element.attribute("bind") != null;
@@ -84,33 +91,29 @@ public abstract class SimpleAnalysis {
         } else {
             this.hasNodeBinding = false;
         }
-
-        if (!staticState.isXPathAnalysis()) {
-            // Don't perform analysis because it's not enabled
-            this.bindingAnalyzed = this.valueAnalyzed = true;
-            this.bindingAnalysis = null;
-            this.valueAnalysis = null;
-        }
     }
 
-    public XPathAnalysis getBindingAnalysis() {
-        if (!bindingAnalyzed) {
-            bindingAnalysis = computeBindingAnalysis(element);
-            bindingAnalyzed = true;
-        }
+    public final void analyzeXPath() {
+        bindingAnalysis = computeBindingAnalysis(element);
+        valueAnalysis = computeValueAnalysis();
+    }
+
+    public final XPathAnalysis getBindingAnalysis() {
         return bindingAnalysis;
     }
 
-    public XPathAnalysis getValueAnalysis() {
-        if (!valueAnalyzed) {
-            valueAnalysis = computeValueAnalysis();
-            valueAnalyzed = true;
-        }
+    public final XPathAnalysis getValueAnalysis() {
         return valueAnalysis;
     }
 
-    public abstract String getModelPrefixedId();
-    public abstract String getDefaultInstancePrefixedId();
+    public final String getModelPrefixedId() {
+        return (containingModel != null) ? containingModel.prefixedId : null;
+    }
+    public final String getDefaultInstancePrefixedId() {
+        return (containingModel != null) ? containingModel.defaultInstancePrefixedId : null;
+    }
+
+    // TODO: can we just pass this at construction?
     public abstract Map<String, SimpleAnalysis> getInScopeVariables();
 
     protected XPathAnalysis computeBindingAnalysis(Element element) {
@@ -127,12 +130,12 @@ public abstract class SimpleAnalysis {
 
             final String bindingExpression = getBindingExpression(element);
 
-            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(false);
+            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(parentAnalysis);
             if ((bindingExpression != null)) {
                 // New binding expression
                 return analyzeXPath(staticState, baseAnalysis, prefixedId, bindingExpression);
             } else {
-                // TODO: TEMP: just do this for now so that controls w/o their own binding also get binding updated
+                // TODO: TEMP: Control does not have a binding. But return one anyway so that controls w/o their own binding also get updated.
                 return baseAnalysis;
             }
         } else {
@@ -140,22 +143,12 @@ public abstract class SimpleAnalysis {
         }
     }
 
-    public static String getBindingExpression(Element element) {
-        final String bindingExpression;
-        final String ref = element.attributeValue("ref");
-        if (ref != null) {
-            bindingExpression = ref;
-        } else {
-            bindingExpression = element.attributeValue("nodeset");
-        }
-        return bindingExpression;
-    }
 
     protected XPathAnalysis computeValueAnalysis() {
         if (element != null) {
             if (canHoldValue) {
                 // Regular value analysis
-                final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(true);
+                final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(this);
                 return analyzeValueXPath(baseAnalysis, element, prefixedId);
             } else {
                 return null;
@@ -165,20 +158,23 @@ public abstract class SimpleAnalysis {
         }
     }
 
-    protected XPathAnalysis findOrCreateBaseAnalysis(boolean useSelf) {
+    protected XPathAnalysis findOrCreateBaseAnalysis(SimpleAnalysis startAnalysis) {
+        return findOrCreateBaseAnalysis(startAnalysis, scope, containingModel);
+    }
+
+    protected XPathAnalysis findOrCreateBaseAnalysis(SimpleAnalysis startAnalysis, XBLBindings.Scope scope, Model containingModel) {
         final XPathAnalysis baseAnalysis;
-        final XPathAnalysis ancestorOrSelf = getAncestorOrSelfBindingAnalysis(useSelf);
+        final XPathAnalysis ancestorOrSelf = getAncestorOrSelfBindingAnalysis(startAnalysis, scope, containingModel);
         if (ancestorOrSelf != null) {
             // There is an ancestor in the same scope with same model, use its analysis as base
             baseAnalysis = ancestorOrSelf;
         } else {
             // We are top-level in a scope/model combination, create analysis
-            if (getModelPrefixedId() != null) {
-                final Model model = staticState.getModel(getModelPrefixedId());
-                if (model.defaultInstancePrefixedId != null) {
+            if (containingModel != null) {
+                if (containingModel.defaultInstancePrefixedId != null) {
                     // Start with instance('defaultInstanceId')
-                    baseAnalysis = new XPathAnalysis(staticState, XPathAnalysis.buildInstanceString(model.defaultInstancePrefixedId),
-                            null, null, null, scope, model.prefixedId, model.defaultInstancePrefixedId, locationData, element);
+                    baseAnalysis = new XPathAnalysis(staticState, XPathAnalysis.buildInstanceString(containingModel.defaultInstancePrefixedId),
+                            null, null, null, scope, containingModel.prefixedId, containingModel.defaultInstancePrefixedId, locationData, element);
                 } else {
                     // No instance
                     baseAnalysis = null;
@@ -191,12 +187,12 @@ public abstract class SimpleAnalysis {
         return baseAnalysis;
     }
 
-    private XPathAnalysis getAncestorOrSelfBindingAnalysis(boolean useSelf) {
-        SimpleAnalysis currentAnalysis = useSelf ? this : parentAnalysis;
+    private XPathAnalysis getAncestorOrSelfBindingAnalysis(SimpleAnalysis startAnalysis, XBLBindings.Scope scope, Model containingModel) {
+        SimpleAnalysis currentAnalysis = startAnalysis;
         while (currentAnalysis != null) {
 
             if (currentAnalysis.getBindingAnalysis() != null
-                    && XFormsUtils.compareStrings(currentAnalysis.getModelPrefixedId(), getModelPrefixedId()) // support null model
+                    && XFormsUtils.compareStrings(currentAnalysis.getModelPrefixedId(), containingModel.prefixedId) // support null model
                     && currentAnalysis.scope.equals(scope)) {
                 return currentAnalysis.getBindingAnalysis();
             }
@@ -208,15 +204,11 @@ public abstract class SimpleAnalysis {
     }
 
     protected XPathAnalysis analyzeValueXPath(XPathAnalysis baseAnalysis, Element element, String prefixedId) {
-            final String valueAttribute = element.attributeValue("value");
-            if (valueAttribute != null) {
-                // E.g. xforms:output/@value
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, "xs:string((" + valueAttribute + ")[1])");
-            } else {
-                // Value is considered the string value
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, "xs:string(.[1])");
-            }
-        }
+        // Two cases: e.g. xforms:output/@value, or the current item
+        final String valueAttribute = element.attributeValue("value");
+        final String subExpression = (valueAttribute != null) ? ("(" + valueAttribute + ")") : ".";
+        return analyzeXPath(staticState, baseAnalysis, prefixedId, "xs:string(" + subExpression + "[1])");
+    }
 
     protected XPathAnalysis analyzeXPath(XFormsStaticState staticState, XPathAnalysis baseAnalysis, String prefixedId, String xpathString) {
         return new XPathAnalysis(staticState, xpathString, staticState.getMetadata().getNamespaceMapping(prefixedId),
@@ -235,5 +227,71 @@ public abstract class SimpleAnalysis {
             getBindingAnalysis().freeTransientState();
         if (getValueAnalysis() != null)
             getValueAnalysis().freeTransientState();
+    }
+
+    /* Companion object methods */
+
+    protected static ExtendedLocationData createLocationData(Element element) {
+        return (element != null) ? new ExtendedLocationData((LocationData) element.getData(), "gathering static XPath information", element) : null;
+    }
+
+    public static String getBindingExpression(Element element) {
+        final String bindingExpression;
+        final String ref = element.attributeValue("ref");
+        if (ref != null) {
+            bindingExpression = ref;
+        } else {
+            bindingExpression = element.attributeValue("nodeset");
+        }
+        return bindingExpression;
+    }
+
+    protected static SimpleAnalysis getAncestorAnalysisInScope(SimpleAnalysis parentAnalysis, XBLBindings.Scope scope) {
+        SimpleAnalysis currentControlAnalysis = parentAnalysis;
+        while (currentControlAnalysis != null) {
+
+            if (currentControlAnalysis.scope.equals(scope)) {
+                return currentControlAnalysis;
+            }
+
+            currentControlAnalysis = currentControlAnalysis.parentAnalysis;
+        }
+
+        return null;
+    }
+
+    protected static Model findContainingModel(XFormsStaticState staticState, Element element, SimpleAnalysis parentAnalysis, XBLBindings.Scope scope) {
+        if (element != null) {
+
+            final Model newContainingModel;
+
+            // Find inherited model
+            final Model inheritedContainingModel; {
+                final SimpleAnalysis ancestor = getAncestorAnalysisInScope(parentAnalysis, scope);
+                if (ancestor != null) {
+                    // There is an ancestor control in the same scope, use its model id
+                    inheritedContainingModel = ancestor.containingModel;
+                } else {
+                    // Top-level control in a new scope, use default model id for scope
+                    inheritedContainingModel = staticState.getDefaultModelForScope(scope);
+                }
+            }
+
+            // Check for @model attribute
+            final String localModelId = element.attributeValue("model");
+            if (localModelId != null) {
+                // Get model prefixed id and verify it belongs to this scope
+                final String localModelPrefixedId = scope.getPrefixedIdForStaticId(localModelId);
+                if (staticState.getModel(localModelPrefixedId) == null)
+                    throw new ValidationException("Reference to non-existing model id: " + localModelId, createLocationData(element));
+                newContainingModel = staticState.getModel(localModelPrefixedId);
+            } else {
+                // Just use inherited model
+                newContainingModel = inheritedContainingModel;
+            }
+            return newContainingModel;
+        } else {
+            return null;
+        }
     }
 }

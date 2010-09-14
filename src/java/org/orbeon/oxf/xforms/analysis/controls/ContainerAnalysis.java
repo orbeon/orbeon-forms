@@ -33,6 +33,11 @@ public class ContainerAnalysis extends ControlAnalysis {
         super(propertyContext, staticState, controlsDocumentInfo, scope, element, index, isValueControl, parentControlAnalysis, inScopeVariables);
     }
 
+    // Constructor for root
+    public ContainerAnalysis(XFormsStaticState staticState, int index, XBLBindings.Scope scope) {
+        super(staticState, index, scope);
+    }
+
     @Override
     protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         // For e.g. <xforms:group>, consider only nested element without @for attribute
@@ -53,11 +58,6 @@ public class ContainerAnalysis extends ControlAnalysis {
         containedVariables.put(variableName, variablePrefixedId);
     }
 
-    public void clearContainedVariables() {
-        // Free this since this information is only useful while building sub-controls
-        containedVariables = null;
-    }
-
     public Map<String, SimpleAnalysis> getInScopeViewVariablesForContained() {
 
         // NOTE: We don't scope model variables as this method must only return view variables
@@ -72,5 +72,11 @@ public class ContainerAnalysis extends ControlAnalysis {
         }
 
         return result;
+    }
+
+    @Override
+    public void freeTransientState() {
+        // Free this since this information is only useful while building sub-controls
+        containedVariables = null;
     }
 }

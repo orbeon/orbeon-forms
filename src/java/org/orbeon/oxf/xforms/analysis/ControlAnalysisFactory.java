@@ -67,11 +67,6 @@ public class ControlAnalysisFactory {
                     controlElement, index, XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         }
 
-        // Evaluate aggressively
-        // TODO: controlAnalysis.analyze();
-        controlAnalysis.getBindingAnalysis();
-        controlAnalysis.getValueAnalysis();
-
         return controlAnalysis;
     }
 }

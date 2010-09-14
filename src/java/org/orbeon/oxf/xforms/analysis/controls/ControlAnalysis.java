@@ -59,6 +59,13 @@ public class ControlAnalysis extends ViewAnalysis {
         this.nestedAlert = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.ALERT_QNAME);
     }
 
+    // Constructor for root
+    protected ControlAnalysis(XFormsStaticState staticState, int index, XBLBindings.Scope scope) {
+        super(staticState, scope);
+        this.index = index;
+        this.nestedLabel = this.nestedHelp = this.nestedHint = this.nestedAlert = null;
+    }
+
     private LHHAAnalysis findNestedLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         final Element e = findNestedLHHAElement(propertyContext, controlsDocumentInfo, qName);
         return (e != null) ? new LHHAAnalysis(propertyContext, staticState, scope, getViewVariables(), controlsDocumentInfo, e, true) : null;

@@ -14,21 +14,15 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.StandardNames;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.saxon.value.QNameValue;
-import org.orbeon.saxon.value.Value;
+import org.orbeon.saxon.value.*;
 
-public class XXFormsType extends XFormsFunction {
+public class XXFormsType extends XXFormsMIPFunction {
 
     @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
@@ -79,10 +73,5 @@ public class XXFormsType extends XFormsFunction {
             // Return () if we can't access the node or if it is not an atomic value or a node
             return null;
         }
-    }
-
-    @Override
-    public int getIntrinsicDependencies() {
-	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
     }
 }

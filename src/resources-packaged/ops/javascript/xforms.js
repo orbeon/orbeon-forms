@@ -3738,7 +3738,7 @@ ORBEON.xforms.action = {
         _messageQueue: [],
         _messageDialog: null,
 
-        init: function() {
+        clinit: function() {
             YAHOO.util.Event.onDOMReady(function() {
                 // Prevent SimpleDialog from registering itself on the form
                 YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
@@ -3790,7 +3790,7 @@ ORBEON.xforms.action = {
 };
 
 // TODO: Should have generic code to call init() on all static classes, if we determine this is a good practice
-ORBEON.xforms.action.Message.init();
+ORBEON.xforms.action.Message.clinit();
 
 ORBEON.xforms.XBL = {
 

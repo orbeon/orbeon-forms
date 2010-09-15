@@ -68,7 +68,12 @@
         </xxforms:dialog>
         <xhtml:div>
             <xxforms:dialog id="default-dialog">
+                <xforms:setfocus control="first-name" ev:event="xxforms-dialog-open"/>
+                <xforms:label>Dialog title</xforms:label>
                 Body of the dialog.
+                <xforms:input ref="." id="first-name">
+                    <xforms:label>First name</xforms:label>
+                </xforms:input>
             </xxforms:dialog>
             <xforms:trigger appearance="minimal" id="show-default-dialog">
                 <xforms:label>Show default dialog</xforms:label>

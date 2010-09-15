@@ -4,13 +4,8 @@
       <root url="file://$PROJECT_DIR$/lib" />
       <root url="file://$PROJECT_DIR$/lib/oracle" />
     </CLASSES>
-    <JAVADOC>
-      <root url="http://www.jfree.org/jfreechart/api/javadoc" />
-    </JAVADOC>
-    <SOURCES>
-      <root url="file://$USER_HOME$/Orbeon/Saxon" />
-      <root url="file://$USER_HOME$/Orbeon/Xerces/src" />
-    </SOURCES>
+    <JAVADOC />
+    <SOURCES />
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/oracle" recursive="false" />
   </library>

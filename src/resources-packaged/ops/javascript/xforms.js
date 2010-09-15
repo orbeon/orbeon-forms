@@ -6062,7 +6062,7 @@ ORBEON.xforms.Server = {
         var uploadElements = YAHOO.util.Dom.getElementsByClassName("xforms-upload", "span");
         for (var uploadIndex = 0; uploadIndex < uploadElements.length; uploadIndex++) {
             var uploadElement = uploadElements[uploadIndex];
-            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty"))// this also excludes templates
+            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty")) // This also excludes templates
                 ORBEON.util.Dom.clearUploadControl(uploadElement);
         }
         ORBEON.xforms.Server.handleResponseAjax(o);
@@ -7298,7 +7298,7 @@ ORBEON.xforms.Server = {
                                 var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
                                 var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
                                 showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
-                                var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable")
+                                var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable");
                                 discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
                                 var progressMessage = ORBEON.util.Dom.getAttribute(serverEventsElement, "progress-message");
                                 if (delay == null) {

@@ -3152,8 +3152,7 @@ ORBEON.xforms.Events = {
      *      control with a new value coming from the server.
      */
     _isChangingKey: function(control, keyCode) {
-        return
-            ! YAHOO.lang.isUndefined(keyCode) &&
+        return ! YAHOO.lang.isUndefined(keyCode) &&
             keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
             (ORBEON.util.Dom.hasClass(control, "xforms-input") || ORBEON.util.Dom.hasClass(control, "xforms-secret")
                     || ORBEON.util.Dom.hasClass(control, "xforms-textarea"));
@@ -4954,7 +4953,7 @@ ORBEON.xforms.Init = {
                 // Ask server to resend events if this is not the first time load is called
                 if (ORBEON.xforms.Document.getFromClientState(formID, "load-did-run") == null) {
                     ORBEON.xforms.Document.storeInClientState(formID, "load-did-run", "true");
-                    ORBEON.xforms.Document.storeInClientState(formID, "request-sequence-number", "1");
+                    ORBEON.xforms.Document.storeInClientState(formID, "sequence", "1");
                 } else {
                     if (ORBEON.util.Properties.revisitHandling.get() == "reload") {
                         ORBEON.xforms.Globals.isReloading = true;
@@ -5695,7 +5694,7 @@ ORBEON.xforms.Server = {
             // Fire them with a delay to give us a change to aggregate events together
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
             if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                                 ORBEON.util.Properties.delayBeforeForceIncrementalRequest.get())) {
+                                 ORBEON.util.Properties.delayBeforeIncrementalRequest.get())) {
                 // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
                 // if there are no other executeNextRequest() that have been added to the queue after this
                 // request.
@@ -5775,7 +5774,7 @@ ORBEON.xforms.Server = {
                     // DOMActivate is considered to be an "activating" event
                     if (event.eventName == "DOMActivate") {
                         foundActivatingEvent = true;
-                        break eventLoop;
+                        break;
                     }
 
                     // Check if we find a class on the target that tells us this is an activating event
@@ -5785,12 +5784,12 @@ ORBEON.xforms.Server = {
                         if (target == null) {
                             // Target is not on the client. For most use cases, assume event should be dispatched right away.
                             foundActivatingEvent = true;
-                            break eventLoop;
+                            break;
                         } else {
                             // Target is on the client
                             if (ORBEON.util.Dom.hasClass(target, "xxforms-events-mode-default")) {
                                 foundActivatingEvent = true;
-                                break eventLoop;
+                                break;
                             }
 
                             // Look for parent with the default class
@@ -5821,7 +5820,7 @@ ORBEON.xforms.Server = {
                                 foundTargetWithNoParentWithDefaultClass = true;
                                 if (parentWithDefaultClass != null) {
                                     foundActivatingEvent = true;
-                                    break eventLoop;
+                                    break;
                                 }
                             }
                         }
@@ -5829,7 +5828,7 @@ ORBEON.xforms.Server = {
                 }
             } else {
                 // Every event is an activating event
-                var foundActivatingEvent = true;
+                foundActivatingEvent = true;
             }
 
             if (foundActivatingEvent) {
@@ -5937,7 +5936,7 @@ ORBEON.xforms.Server = {
                     // Since we are sending a request, throw out all the discardable timers.
                     // But only do this if we are not just sending a heartbeat event, which is handled in a more efficient
                     // way by the server, skipping the "normal" processing which includes checking if there are
-                    // any discarable events waiting to be executed.
+                    // any discardable events waiting to be executed.
                     if (foundEventOtherThanHeartBeat) {
                         var discardableTimerIds = ORBEON.xforms.Globals.discardableTimerIds[formID] || [];
                         for (var discardableTimerIdIndex = 0; discardableTimerIdIndex < discardableTimerIds.length; discardableTimerIdIndex++) {
@@ -5973,12 +5972,12 @@ ORBEON.xforms.Server = {
                         requestDocumentString.push('</xxforms:uuid>\n');
 
                         // Add request sequence number
-                        var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "request-sequence-number");
-                        ORBEON.xforms.Document.storeInClientState(formID, "request-sequence-number", parseInt(currentSequenceNumber) + 1);
+                        var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
+                        ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
                         requestDocumentString.push(indent);
-                        requestDocumentString.push('<xxforms:request-sequence-number>');
+                        requestDocumentString.push('<xxforms:sequence>');
                         requestDocumentString.push(currentSequenceNumber);
-                        requestDocumentString.push('</xxforms:request-sequence-number>\n');
+                        requestDocumentString.push('</xxforms:sequence>\n');
 
                         // Add static state
                         var staticState = ORBEON.xforms.Globals.formStaticState[formID].value;
@@ -6078,7 +6077,7 @@ ORBEON.xforms.Server = {
                     // Send request
                     ORBEON.xforms.Globals.requestTryCount = 0;
                     ORBEON.xforms.Globals.requestDocument = requestDocumentString.join("");
-                    ORBEON.xforms.Server.asyncRequest();
+                    ORBEON.xforms.Server.asyncAjaxRequest();
                 }
             }
         }
@@ -6091,25 +6090,52 @@ ORBEON.xforms.Server = {
         }
     },
 
-    asyncRequest: function() {
+    setTimeoutOnCallback: function(callback) {
+        var ajaxTimeout = ORBEON.util.Properties.delayBeforeAjaxTimeout.get();
+        if (ajaxTimeout != -1)
+            callback.timeout = ajaxTimeout;
+    },
+
+    asyncAjaxRequest: function() {
+        var formID = ORBEON.xforms.Globals.requestForm.id;
         try {
             ORBEON.xforms.Globals.requestTryCount++;
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
             var callback = {
                 success: ORBEON.xforms.Server.handleResponseAjax,
-                failure: ORBEON.xforms.Server.handleFailure
+                failure: ORBEON.xforms.Server.handleFailureAjax
             };
-            var ajaxTimeout = ORBEON.util.Properties.delayBeforeAjaxTimeout.get();
-            if (ajaxTimeout != -1)
-                callback.timeout = ajaxTimeout;
-            var formID = ORBEON.xforms.Globals.requestForm.id;
+            ORBEON.xforms.Server.setTimeoutOnCallback(callback);
             YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
-            var formID = ORBEON.xforms.Globals.requestForm.id;
             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
         }
+    },
+
+    /**
+     * Run background form post (upload)
+     */
+    asyncUploadRequest: function() {
+        var formID = ORBEON.xforms.Globals.requestForm.id;
+        var callback = {
+            upload: ORBEON.xforms.Server.handleResponseUpload,
+            failure: ORBEON.xforms.Server.handleFailureUpload
+        };
+        ORBEON.xforms.Server.setTimeoutOnCallback(callback);
+        YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback);
+    },
+
+    /**
+     * Retry after a certain delay which increases with the number of consecutive failed request, but which
+     * never exceeds a maximum delay.
+     */
+    retryRequestAfterDelay: function(requestFunction) {
+        var delay = Math.min(ORBEON.util.Properties.retryDelayIncrement.get() * (ORBEON.xforms.Globals.requestTryCount - 1),
+                ORBEON.util.Properties.retryMaxDelay.get());
+        if (delay == 0) requestFunction();
+        else window.setTimeout(requestFunction, delay);
     },
 
     /**
@@ -6130,7 +6156,7 @@ ORBEON.xforms.Server = {
      *      This  doesn't hurt as the server knows that it must not execute the request more than once.
      *
      */
-    handleFailure: function(o) {
+    handleFailureAjax: function(o) {
 
         if (o.responseXML && o.responseXML.documentElement && o.responseXML.documentElement.tagName.indexOf("error") != -1) {
             // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
@@ -6146,24 +6172,12 @@ ORBEON.xforms.Server = {
             var detailsFromBody = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]);
             ORBEON.xforms.Server.showError(title, detailsFromBody, formID);
         } else {
-            // Retry after a certain delay which increases with the number of consecutive failed request, but which
-            // never exceeds a maximum delay.
-            var delay = Math.min(ORBEON.util.Properties.retryDelayIncrement.get() * (ORBEON.xforms.Globals.requestTryCount - 1),
-                    ORBEON.util.Properties.retryMaxDelay.get());
-            if (delay == 0) ORBEON.xforms.Server.asyncRequest();
-            else window.setTimeout(ORBEON.xforms.Server.asyncRequest, delay);
+            ORBEON.xforms.Server.retryRequestAfterDelay(ORBEON.xforms.Server.asyncAjaxRequest);
         }
     },
 
-    handleUploadResponse: function(o) {
-        // Clear all the upload fields (currently we submit all of them, but in the future, should clear only the ones that have been submitted)
-        var uploadElements = YAHOO.util.Dom.getElementsByClassName("xforms-upload", "span");
-        for (var uploadIndex = 0; uploadIndex < uploadElements.length; uploadIndex++) {
-            var uploadElement = uploadElements[uploadIndex];
-            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty")) // This also excludes templates
-                ORBEON.util.Dom.clearUploadControl(uploadElement);
-        }
-        ORBEON.xforms.Server.handleResponseAjax(o);
+    handleFailureUpload: function(o) {
+        ORBEON.xforms.Server.retryRequestAfterDelay(ORBEON.xforms.Server.asyncUploadRequest);
     },
 
     handleResponseAjax: function(o) {
@@ -6253,16 +6267,29 @@ ORBEON.xforms.Server = {
                 // Notify listeners that we are done processing this request
                 ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
                 // Go ahead with next request, if any
-                ORBEON.xforms.Globals.requestInProgress = false;
                 ORBEON.xforms.Globals.requestDocument = "";
                 ORBEON.xforms.Globals.executeEventFunctionQueued++;
                 ORBEON.xforms.Server.executeNextRequest(false);
 
             } else {
                 // Consider this a failure
-                ORBEON.xforms.Server.handleFailure(o);
+                ORBEON.xforms.Server.handleFailureAjax(o);
             }
         }
+    },
+
+    handleResponseUpload: function(o) {
+        // Clear server events that were sent to the server
+        var formID = ORBEON.xforms.Globals.requestForm.id;
+        ORBEON.xforms.Globals.formServerEvents[formID].value = "";
+        // Clear all the upload fields (currently we submit all of them, but in the future, should clear only the ones that have been submitted)
+        var uploadElements = YAHOO.util.Dom.getElementsByClassName("xforms-upload", "span");
+        for (var uploadIndex = 0; uploadIndex < uploadElements.length; uploadIndex++) {
+            var uploadElement = uploadElements[uploadIndex];
+            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty")) // This also excludes templates
+                ORBEON.util.Dom.clearUploadControl(uploadElement);
+        }
+        ORBEON.xforms.Server.handleResponseAjax(o);
     },
 
     /**
@@ -6301,6 +6328,8 @@ ORBEON.xforms.Server = {
 
             // Whether this response has triggered a load which will replace the current page.
             var newDynamicStateTriggersReplace = false;
+            // Whether we should run a background form submission once we are done with all the Ajax events
+            var doBackgroundFormSubmission = false;
 
             var xmlNamespace = null; // xforms namespace
             // Getting xforms namespace
@@ -7424,11 +7453,9 @@ ORBEON.xforms.Server = {
                                 var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                 var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                 if (replace == null) replace = "all";
-                                if (serverEventsIndex != -1) {
-                                    ORBEON.xforms.Globals.formServerEvents[formID].value = ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]);
-                                } else {
-                                    ORBEON.xforms.Globals.formServerEvents[formID].value = "";
-                                }
+                                ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsIndex != -1
+                                    ? ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]) : "";
+                                // Increment and send sequence number
                                 var requestForm = ORBEON.util.Dom.getElementById(formID);
                                 if (replace == "all") {
                                     // Go to another page
@@ -7441,7 +7468,7 @@ ORBEON.xforms.Server = {
                                     if (requestForm.action.indexOf("xforms-server-submit") == -1)
                                         requestForm.action = window.location.href;
                                     if (target == null) {
-                                        // Reset as this may have been changed before by asyncRequest
+                                        // Reset as this may have been changed before by asyncAjaxRequest
                                         requestForm.removeAttribute("target");
                                     } else {
                                         // Set the requested target
@@ -7451,13 +7478,8 @@ ORBEON.xforms.Server = {
                                 } else {
                                     // Submit form in the background (pseudo-Ajax request)
                                     YAHOO.util.Connect.setForm(requestForm, true, true);
-                                    var callback = {
-                                        upload: ORBEON.xforms.Server.handleUploadResponse,
-                                        failure: ORBEON.xforms.Server.handleFailure
-                                    };
-                                    YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback);
+                                    doBackgroundFormSubmission = true;
                                 }
-                                ORBEON.xforms.Globals.formServerEvents[formID].value = "";
                                 break;
                             }
 
@@ -7537,27 +7559,6 @@ ORBEON.xforms.Server = {
                             }
                         }
                     }
-
-                    // Call custom itemset listener if any (temporary until we have a good API for custom components)
-                    // NOTE: We call this here so that xxforms:script has an opportunity to run first
-//                        if (typeof xformsItemsetUpdatedListener != "undefined") {
-//                            for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
-//                                // Change values in an itemset
-//                                if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
-//                                    var itemsetsElement = actionElement.childNodes[actionIndex];
-//                                    for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
-//                                        if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
-//                                            var itemsetElement = itemsetsElement.childNodes[j];
-//                                            var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
-//                                            var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
-//
-//                                            // Call custom listener
-//                                            xformsItemsetUpdatedListener(controlId, itemsetTree);
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
                 }
             }
 
@@ -7566,6 +7567,14 @@ ORBEON.xforms.Server = {
                 // Display it even if it was not displayed before as loading the page could take time.
                 xformsDisplayIndicator("loading");
                 ORBEON.xforms.Globals.loadingOtherPage = true;
+            }
+
+            if (doBackgroundFormSubmission) {
+                ORBEON.xforms.Server.asyncUploadRequest();
+            } else {
+                // Only say we have no request in process if are not right away running an form POST.
+                // If there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
+                ORBEON.xforms.Globals.requestInProgress = false;
             }
         } catch (e) {
             // Show dialog with error to the user, as they won't be able to continue using the UI anyway

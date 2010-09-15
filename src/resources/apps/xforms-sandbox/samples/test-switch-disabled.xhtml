@@ -1,0 +1,59 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XForms switch and disabled controls</xhtml:title>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xforms:model>
+            <xforms:instance id="ui">
+                <ui>
+                    <show-one>true</show-one>
+                    <show-two>true</show-two>
+                    <case-value>1</case-value>
+                    <first-input>First</first-input>
+                    <second-input>Second</second-input>
+                    <focus-value>1</focus-value>
+                </ui>
+            </xforms:instance>
+            <xforms:instance id="numbers">
+                <numbers>
+                    <number value="1">One</number>
+                    <number value="2">Two</number>
+                    <number value="3">Three</number>
+                </numbers>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:switch>
+            <xforms:case/>
+            <xforms:case>
+                <xforms:input ref="." id="my-input"/>
+            </xforms:case>
+        </xforms:switch>
+
+    </xhtml:body>
+</xhtml:html>

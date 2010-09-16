@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.analysis.model;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.ViewAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 
@@ -34,20 +35,48 @@ public class ModelVariableAnalysis extends ModelAnalysis {
         this.name = element.attributeValue("name");
     }
 
+    // NEED A TRAIT FOR THIS: duplicated in VariableAnalysis
     @Override
     protected XPathAnalysis computeValueAnalysis() {
-        // TODO: handle xxf:sequence
-        final String selectAttribute = element.attributeValue("select");
-        if (selectAttribute != null) {
-            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(this);
-            return new XPathAnalysis(staticState, selectAttribute, staticState.getMetadata().getNamespaceMapping(prefixedId),
-                    baseAnalysis, parentAnalysis.getInScopeVariables(), scope, getModelPrefixedId(), getDefaultInstancePrefixedId(), locationData, element);
+
+        final Element sequenceElement = element.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
+        if (sequenceElement != null) {
+            // Value is provided by nested xxf:sequence/@select
+
+            // First figure out the scope for xxf:sequence
+            final String sequencePrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(sequenceElement));
+            final XBLBindings.Scope sequenceScope = staticState.getXBLBindings().getResolutionScopeByPrefixedId(sequencePrefixedId);
+
+            final ViewAnalysis sequenceAnalysis = new ViewAnalysis(staticState, sequenceScope, sequenceElement, this, getInScopeVariables(), false) {
+                @Override
+                protected XPathAnalysis computeValueAnalysis() {
+                    final String selectAttribute = element.attributeValue("select");
+                    if (selectAttribute != null) {
+                        // Value is provided by @select
+                        final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(this);
+                        return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute);
+                    } else {
+                        // Value is constant
+                        return XPathAnalysis.CONSTANT_ANALYSIS;
+                    }
+                }
+            };
+            sequenceAnalysis.analyzeXPath();
+            return sequenceAnalysis.getValueAnalysis();
         } else {
-            // Value is constant
-            return XPathAnalysis.CONSTANT_ANALYSIS;
+            final String selectAttribute = element.attributeValue("select");
+            if (selectAttribute != null) {
+                // Value is provided by @select
+                final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis(this);
+                return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute);
+            } else {
+                // Value is constant
+                return XPathAnalysis.CONSTANT_ANALYSIS;
+            }
         }
     }
 
+    // NEED A TRAIT FOR THIS: duplicated in VariableAnalysis
     public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
         helper.startElement("variable", new String[] {
                 "scope", scope.scopeId,
@@ -59,7 +88,7 @@ public class ModelVariableAnalysis extends ModelAnalysis {
         });
 
         // Control binding and value analysis
-        if (getBindingAnalysis() != null) {
+        if (getBindingAnalysis() != null && hasNodeBinding) {// NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
             helper.startElement("binding");
             getBindingAnalysis().toXML(propertyContext, helper);
             helper.endElement();

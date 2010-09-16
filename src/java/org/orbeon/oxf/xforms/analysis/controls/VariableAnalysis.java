@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 import java.util.Map;
@@ -36,6 +37,7 @@ public class VariableAnalysis extends ControlAnalysis {
         parentControlAnalysis.addContainedVariable(this.name, this);
     }
 
+    // NEED A TRAIT FOR THIS: duplicated in ModelVariableAnalysis
     @Override
     protected XPathAnalysis computeValueAnalysis() {
 
@@ -74,5 +76,32 @@ public class VariableAnalysis extends ControlAnalysis {
                 return XPathAnalysis.CONSTANT_ANALYSIS;
             }
         }
+    }
+
+    // NEED A TRAIT FOR THIS: duplicated in ModelVariableAnalysis
+    @Override
+    public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+        helper.startElement("variable", new String[] {
+                "scope", scope.scopeId,
+                "prefixed-id", prefixedId,
+                "model-prefixed-id", getModelPrefixedId(),
+                "binding", Boolean.toString(hasNodeBinding),
+                "value", Boolean.toString(canHoldValue),
+                "name", name
+        });
+
+        // Control binding and value analysis
+        if (getBindingAnalysis() != null && hasNodeBinding) {// NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
+            helper.startElement("binding");
+            getBindingAnalysis().toXML(propertyContext, helper);
+            helper.endElement();
+        }
+        if (getValueAnalysis() != null) {
+            helper.startElement("value");
+            getValueAnalysis().toXML(propertyContext, helper);
+            helper.endElement();
+        }
+
+        helper.endElement();
     }
 }

@@ -286,10 +286,7 @@ public class XFormsServer extends ProcessorImpl {
                                 final LocationSAXContentHandler debugContentHandler;
                                 final SAXStore responseStore;
                                 if (logRequestResponse || isRetries) {
-                                    // Two receivers
-
-                                    debugContentHandler = new LocationSAXContentHandler();
-
+                                    // Two receivers possible
                                     final List<XMLReceiver> receivers = new ArrayList<XMLReceiver>();
 
                                     // Buffer for retries
@@ -302,8 +299,12 @@ public class XFormsServer extends ProcessorImpl {
                                     }
 
                                     // Debug output
-                                    if (logRequestResponse)
+                                    if (logRequestResponse) {
+                                        debugContentHandler = new LocationSAXContentHandler();
                                         receivers.add(debugContentHandler);
+                                    } else {
+                                        debugContentHandler = null;
+                                    }
 
                                     responseReceiver = new TeeXMLReceiver(receivers);
 
@@ -323,7 +324,7 @@ public class XFormsServer extends ProcessorImpl {
                                     containingDocument.rememberLastAjaxResponse(responseStore);
 
                                     // Actually output response
-                                    // If there is an error, we do not 
+                                    // If there is an error, we do not
                                     try {
                                         responseStore.replay(xmlReceiver);
                                     } catch (Throwable t) {
@@ -621,7 +622,7 @@ public class XFormsServer extends ProcessorImpl {
             // Event is not trusted and is not allowed
             return;
         }
-        
+
         // Get other event target
         final XFormsEventTarget otherEventTarget;
         {
@@ -871,7 +872,7 @@ public class XFormsServer extends ProcessorImpl {
 
             // Output action
             {
-                // Create a containing document in the initial state 
+                // Create a containing document in the initial state
                 final XFormsContainingDocument initialContainingDocument;
                 if (!allEvents) {
                     initialContainingDocument = null;

@@ -575,7 +575,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             
             // Output server events
             if (hasServerEvents) {
-                if (hasInitControls || hasKeyListeners)
+                if (hasPaths || hasInitControls || hasKeyListeners)
                     sb.append(',');
 
                 sb.append("\"server-events\":[");

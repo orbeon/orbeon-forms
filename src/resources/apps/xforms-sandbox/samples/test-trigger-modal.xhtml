@@ -39,30 +39,36 @@
 
                     name: "Modal trigger",
 
-                    clickWorker: function(control, start) {
+                    /**
+                     * Simulates a double-click and checks that the action is performed twice on the server.
+                     * If the trigger on which the action is performed doesn't become disable because of the first
+                     * click, then the action should run twice, and in this case the counter incremented twice.
+                     */
+                    clickWorker: function(control) {
                         var countControl = document.getElementById("click-count");
+                        var start = parseInt(ORBEON.xforms.Controls.getCurrentValue(countControl));
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            // Simulate double click
                             YAHOO.util.UserAction.click(control);
                             YAHOO.util.UserAction.click(control);
                         }, function() {
                             var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
-                            YAHOO.util.Assert.areEqual(start + 1, count);
-                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                                YAHOO.util.UserAction.click(control);
-                                YAHOO.util.UserAction.click(control);
-                            }, function() {
-                                var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
-                                YAHOO.util.Assert.areEqual(start + 2, count);
-                            });
+                            YAHOO.util.Assert.areEqual(start + 2, count);
                         });
                     },
 
+                    /**
+                     * Perform test implemented by clickWorker() on a regular button.
+                     */
                     testDoubleClickOnButton: function() {
-                        this.clickWorker(document.getElementById("modal-trigger-button"), 0);
+                        this.clickWorker(document.getElementById("modal-trigger-button"));
                     },
 
+                    /**
+                     * Perform test implemented by clickWorker() on a link (minimal trigger).
+                     */
                     testDoubleClickOnLink: function() {
-                        this.clickWorker(document.getElementById("modal-trigger-link"), 2);
+                        this.clickWorker(document.getElementById("modal-trigger-link"));
                     }
                 }));
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {

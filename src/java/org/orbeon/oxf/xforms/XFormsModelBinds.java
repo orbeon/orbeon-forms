@@ -1014,7 +1014,7 @@ public class XFormsModelBinds {
         }
 
         // Handle required MIP
-        if (isRequired) {// this assumes that the required MIP has been already computed (during recalculate)
+        if (isRequired && bind.getRequired() != null) {// this assumes that the required MIP has been already computed (during recalculate)
             // Current node is required...
             if (nodeValue == null)
                 nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);

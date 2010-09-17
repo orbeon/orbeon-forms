@@ -1427,4 +1427,54 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="xxf:invalid-binds() returns correct bind id with required-but-empty and constraint" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315460&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value1/>
+                                <value2/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="constraint-bind1" ref="value1" constraint="true()"/>
+                        <xforms:bind id="required-bind1" ref="value1" required="true()"/>
+
+                        <xforms:bind id="required-bind2" ref="value2" required="true()"/>
+                        <xforms:bind id="constraint-bind2" ref="value2" constraint="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="string-join(xxforms:invalid-binds(value1), ', ')"/>
+                    <xforms:output id="output2" value="string-join(xxforms:invalid-binds(value2), ', ')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value1/>
+                                    <value2/>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">required-bind1</xxf:control>
+                        <xxf:control id="output2">required-bind2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

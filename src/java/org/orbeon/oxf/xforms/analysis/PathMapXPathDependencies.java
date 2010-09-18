@@ -88,7 +88,7 @@ public class PathMapXPathDependencies implements XPathDependencies {
         }
     }
 
-    public void markStructuralChange(XFormsModel model) {
+    public void markStructuralChange(XFormsModel model, XFormsInstance instance) {
         structuralChanges.add(model.getPrefixedId());
     }
 

@@ -14,20 +14,14 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Document;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -189,7 +183,7 @@ public class InstanceReplacer extends BaseReplacer {
                 replaceModel.setInstance(newInstance, true);
 
                 // Call this directly, since we are not using insert/delete here
-                replaceModel.markStructuralChange();
+                replaceModel.markStructuralChange(newInstance);
 
                 // Dispatch xforms-delete event
                 // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement

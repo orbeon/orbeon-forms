@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action.actions;
 
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
@@ -29,9 +26,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 9.3.6 The delete Element
@@ -158,7 +153,7 @@ public class XFormsDeleteAction extends XFormsAction {
                 // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
                 
                 // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-                modifiedInstance.getModel(containingDocument).markStructuralChange();
+                modifiedInstance.getModel(containingDocument).markStructuralChange(modifiedInstance);
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)

@@ -410,9 +410,9 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-        if (didInsertNodes && modifiedInstance  != null) {
+        if (didInsertNodes && modifiedInstance != null) {
             // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
-            modifiedInstance.getModel(containingDocument).markStructuralChange();
+            modifiedInstance.getModel(containingDocument).markStructuralChange(modifiedInstance);
         }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."

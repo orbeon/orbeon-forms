@@ -1039,12 +1039,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 //            containingDocument.getXPathDependencies().markMipChanged(this, nodeInfo);
 //    }
 
-    public void markStructuralChange() {
+    public void markStructuralChange(XFormsInstance instance) {
         // Set the flags
         deferredActionContext.markStructuralChange();
 
         // Notify dependencies of the change
-        containingDocument.getXPathDependencies().markStructuralChange(this);
+        containingDocument.getXPathDependencies().markStructuralChange(this, instance);
     }
 
     public void startOutermostActionHandler() {

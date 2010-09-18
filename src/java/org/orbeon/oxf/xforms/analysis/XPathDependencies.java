@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -23,7 +22,7 @@ import org.orbeon.saxon.om.NodeInfo;
  */
 public interface XPathDependencies {
     void markValueChanged(XFormsModel model, NodeInfo nodeInfo);
-    void markStructuralChange(XFormsModel model);
+    void markStructuralChange(XFormsModel model, XFormsInstance instance);
 
 //    void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo);
 

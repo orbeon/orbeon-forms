@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -26,7 +25,7 @@ public class DumbXPathDependencies implements XPathDependencies {
         // NOP
     }
 
-    public void markStructuralChange(XFormsModel model) {
+    public void markStructuralChange(XFormsModel model, XFormsInstance instance) {
         // NOP
     }
 

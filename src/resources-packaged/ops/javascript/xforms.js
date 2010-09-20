@@ -2184,13 +2184,9 @@ ORBEON.xforms.Controls = {
 
         // If the control is now valid and there is an alert tooltip for this control, destroy it
         var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
-        if (newValid && alertTooltip != null) {
-            if (alertTooltip != true) {
-                // Hum, the tooltip can be null, true, or an actual tooltip object!
-                alertTooltip.destroy();
-            }
-            ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
-        }
+        if (newValid && alertTooltip != null && alertTooltip != true)
+            alertTooltip.destroy();
+        ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
     },
 
     setDisabledOnFormElement: function(element, disabled) {

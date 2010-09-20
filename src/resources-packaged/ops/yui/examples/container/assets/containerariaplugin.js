@@ -6,11 +6,11 @@
 		UA = YAHOO.env.ua,
 		Panel = YAHOO.widget.Panel,
 		Tooltip = YAHOO.widget.Tooltip,
-		
+
 		ModulePrototype = YAHOO.widget.Module.prototype,
 		fnModuleInitDefaultConfig = ModulePrototype.initDefaultConfig,
 		fnModuleInitResizeMonitor = ModulePrototype._initResizeMonitor,
-		
+
 		OverlayPrototype = YAHOO.widget.Overlay.prototype,
 		fnOverlayShowIframe = OverlayPrototype.showIframe,
 
@@ -52,20 +52,20 @@
 		_XY = "xy",
 		_TOOLTIP = "tooltip",
 		_DESTROY = "destroy";
-		
-		
+
+
 	var setARIARole = function (element, role) {
-	
+
 		element.setAttribute(_ROLE, role);
-	
+
 	};
 
 
 	var setARIAProperty = function (element, property, value) {
 
 		element.setAttribute((_ARIA_PREFIX + property), value);
-	
-	};		
+
+	};
 
 
 	// Module ARIA plugin - augments YAHOO.widget.Module
@@ -73,7 +73,7 @@
 	Lang.augmentObject(ModulePrototype, {
 
 		_initResizeMonitor: function () {
-		
+
 			fnModuleInitResizeMonitor.call(this);
 
 			var oIFrame = this.resizeMonitor;
@@ -81,49 +81,49 @@
 			if (oIFrame) {
 				setARIARole(oIFrame, _PRESENTATION);
 				oIFrame.tabIndex = -1;
-			}		
-		
+			}
+
 		},
-		
+
 
 		configUseARIA: function (type, args) {
 			// Stub for subclasses
 		},
 
 		configDescribedBy: function (type, args) {
-		
+
 			var sID = args[0];
-		
+
 			if (this.cfg.getProperty(_USE_ARIA) && sID) {
 				setARIAProperty(this.element, _DESCRIBED_BY, sID);
 			}
-		
+
 		},
-		
+
 		configLabelledBy: function (type, args) {
 
 			var sID = args[0];
-		
+
 			if (this.cfg.getProperty(_USE_ARIA) && sID) {
-				setARIAProperty(this.element, _LABELLED_BY, sID);			
+				setARIAProperty(this.element, _LABELLED_BY, sID);
 			}
-		
+
 		},
 
 		initDefaultConfig: function () {
 
             /**
             * @config usearia
-            * @description Boolean indicating if use of the WAI-ARIA Roles and States should 
+            * @description Boolean indicating if use of the WAI-ARIA Roles and States should
             * be enabled.
             * @type Boolean
             * @default true for Firefox 3 and IE 8, false for all other browsers.
             */
 			this.cfg.addProperty(
-				_USE_ARIA, 
+				_USE_ARIA,
 				{
-					handler: this.configUseARIA, 
-					value: (UA.gecko && UA.gecko >= 1.9) || (UA.ie && UA.ie >= 8), 
+					handler: this.configUseARIA,
+					value: (UA.gecko && UA.gecko >= 1.9) || (UA.ie && UA.ie >= 8),
 					validator: Lang.isBoolean
 				}
 			 );
@@ -138,9 +138,9 @@
             * @default null
             */
 			this.cfg.addProperty(
-				_LABELLED_BY, 
+				_LABELLED_BY,
 				{
-					handler: this.configLabelledBy, 
+					handler: this.configLabelledBy,
 					validator: Lang.isString
 				}
 			 );
@@ -155,18 +155,18 @@
             * @default null
             */
 			this.cfg.addProperty(
-				_DESCRIBED_BY, 
+				_DESCRIBED_BY,
 				{
-					handler: this.configDescribedBy, 
+					handler: this.configDescribedBy,
 					validator: Lang.isString
 				}
 			 );
-			 
-			fnModuleInitDefaultConfig.call(this);			 
-	
+
+			fnModuleInitDefaultConfig.call(this);
+
 		}
-	
-	}, "initDefaultConfig", "configUseARIA", "configLabelledBy", 
+
+	}, "initDefaultConfig", "configUseARIA", "configLabelledBy",
 		"configDescribedBy", "_initResizeMonitor");
 
 
@@ -176,12 +176,12 @@
 	OverlayPrototype.showIframe = function () {
 
 		fnOverlayShowIframe.call(this);
-		
+
 		var oIFrame = this.iframe;
 
 		if (this.cfg.getProperty(_USE_ARIA) && oIFrame && !oIFrame.getAttribute(_ROLE)) {
 			setARIARole(oIFrame, _PRESENTATION);
-			oIFrame.tabIndex = -1;			
+			oIFrame.tabIndex = -1;
 		}
 
 	};
@@ -194,32 +194,32 @@
 	var onPanelKeyDown = function (event) {
 
 		var nCharCode = Event.getCharCode(event);
-		
+
 		if (nCharCode === 27) {
 
 			if (this.cancel) {	// Dialog
 				this.cancel();
 			}
 			else {	// Panel
-				this.hide();			
+				this.hide();
 			}
 
 		}
-		
+
 	};
 
 
 	var onPanelDOMFocus = function (event) {
 
 		this.fireEvent(_FOCUS, event);
-	
+
 	};
 
 
 	var onPanelDOMBlur = function (event) {
-	
+
 		this.fireEvent(_BLUR, event);
-	
+
 	};
 
 
@@ -232,7 +232,7 @@
 			if (this.cfg.getProperty(_VISIBLE) && this.focusFirst) {
 
 				// If the event was not sourced from the UI, focus the first element in the Panel
-		
+
 				if (!oEvent) {
 					this.focusFirst();
 				}
@@ -253,69 +253,69 @@
 		if (m_oOverlayManager._manageBlur(this) && !oEvent) {
 			this.fireEvent(_BLUR);
 		}
-	
+
 	};
 
 
 	var onPanelBeforeHide = function (type, args, element) {
-	
+
 		this.blur();
 
 		if (element && element.focus) {
 
 			try {
-				element.focus();				
+				element.focus();
 			}
 			catch(e) {
-			
+
 			}
-			
+
 		}
 
 		this.unsubscribe(_BEFORE_HIDE, onPanelBeforeHide, element);
-	
+
 	};
 
 
 	var onPanelBeforeShow = function () {
-	
+
 		this.subscribe(_BEFORE_HIDE, onPanelBeforeHide, m_oFocusedElement);
-	
+
 	};
 
 
 	var setPanelHiddenRole = function () {
-	
+
 		var oElement = this.cfg.getProperty(_ROLE) === _DIALOG ? this.innerElement : this.body;
-	
+
 		setARIAProperty(oElement, _HIDDEN, !this.cfg.getProperty(_VISIBLE));
-	
+
 	};
 
 
 	var setRoleForCloseButton = function () {
 
 		Dom.getElementsByClassName(_CONTAINER_CLOSE, _A, this.element, function (element) {
-		
+
 			element.removeAttribute(_HREF);
 			setARIARole(element, _BUTTON);
 			element.tabIndex = 0;
-		
+
 		});
-	
+
 	};
-	
+
 
 	var onPanelConfigClose = function (type, args) {
-	
+
 		var bClose = args[0];
-	
+
 		if (bClose) {
 
 			setRoleForCloseButton.call(this);
-		
+
 		}
-	
+
 	};
 
 
@@ -323,175 +323,175 @@
 
 		PanelPrototype = Panel.prototype;
 		fnPanelInitDefaultConfig = PanelPrototype.initDefaultConfig;
-	
-	
+
+
 		Lang.augmentObject(PanelPrototype, {
-			
+
 			hasFocus: function () {
-		
+
 				return (m_oOverlayManager && this === m_oOverlayManager.getActive());
-			
+
 			},
-		
-		
+
+
 			configUseARIA: function (type, args) {
-		
+
 				var bUseARIA = args[0];
-				
+
 				if (bUseARIA) {
-		
+
 					if (!m_oOverlayManager) {
 						m_oOverlayManager = new YAHOO.widget.OverlayManager();
 					}
-					
+
 					m_oOverlayManager.register(this);
-					
-		
+
+
 					this.focus = function () {
-					
+
 						if (!this.hasFocus()) {
-							this.fireEvent(_FOCUS);			
+							this.fireEvent(_FOCUS);
 						}
-					
+
 					};
-					
-				
+
+
 					this.blur = function () {
-				
+
 						if (this.hasFocus()) {
 							this.fireEvent(_BLUR);
 						}
-					
-					};			
-			
-		
+
+					};
+
+
 					Event.onFocus(this.element, onPanelDOMFocus, null, this);
 					Event.onBlur(this.element, onPanelDOMBlur, null, this);
-		
+
 					this.subscribe(_FOCUS, onPanelFocus);
 					this.subscribe(_BLUR, onPanelBlur);
-					
+
 					Event.on(this.element, _KEY_DOWN, onPanelKeyDown, null, this);
-				
+
 					this.subscribe(_BEFORE_SHOW, onPanelBeforeShow);
-	
+
 					setPanelHiddenRole.call(this);
-	
+
 					this.cfg.subscribeToConfigEvent(_VISIBLE, setPanelHiddenRole);
 					this.cfg.subscribeToConfigEvent(_CLOSE, onPanelConfigClose);
-		
+
 					if (!m_bPanelDocumentListenersAdded) {
-					
+
 						Event.onFocus(document, function (event) {
-						
+
 							m_oFocusedElement = Event.getTarget(event);
-						
+
 						});
-						
-		
+
+
 						m_bPanelDocumentListenersAdded = true;
-		
+
 					}
-		
+
 				}
-			
+
 			},
 
 			configDescribedBy: function (type, args) {
-			
+
 				var sID = args[0],
 					oElement;
-			
+
 				if (this.cfg.getProperty(_USE_ARIA) && sID) {
 
-					oElement = this.cfg.getProperty(_ROLE) === _DIALOG ? 
+					oElement = this.cfg.getProperty(_ROLE) === _DIALOG ?
 						this.innerElement : this.body;
 
 					setARIAProperty(oElement, _DESCRIBED_BY, sID);
 
 				}
-			
+
 			},
-			
+
 			configLabelledBy: function (type, args) {
-	
+
 				var sID = args[0],
 					oElement;
-			
+
 				if (this.cfg.getProperty(_USE_ARIA) && sID) {
 
-					oElement = this.cfg.getProperty(_ROLE) === _DIALOG ? 
+					oElement = this.cfg.getProperty(_ROLE) === _DIALOG ?
 						this.innerElement : this.body;
 
-					setARIAProperty(oElement, _LABELLED_BY, sID);			
+					setARIAProperty(oElement, _LABELLED_BY, sID);
 
 				}
-			
-			},			
-			
+
+			},
+
 			configRole: function (type, args) {
-			
+
 				var sRole = args[0],
 					oElement,
 					oHeader,
 					sHeaderId;
-		
-	
+
+
 				if (sRole) {
-		
-	
+
+
 					switch (sRole) {
-		
+
 						case _DIALOG:
-		
-							oElement = this.innerElement;						
-								
+
+							oElement = this.innerElement;
+
 						break;
-						
+
 						case _ALERT_DIALOG:
-		
+
 							oElement = this.body;
-						
+
 						break;
-					
+
 					}
-					
-					
+
+
 					if (oElement) {
-	
+
 						setARIARole(oElement, sRole);
-						
+
 						oHeader = this.header;
-						
+
 						sHeaderId = oHeader.id || Dom.generateId(oHeader);
-						
+
 						this.cfg.setProperty(_LABELLED_BY, sHeaderId);
-						
+
 						setRoleForCloseButton.call(this);
-	
+
 					}
-		
+
 				}
-			
+
 			},
-		
-		
+
+
 			initDefaultConfig: function () {
-			
+
 				fnPanelInitDefaultConfig.call(this);
-		
+
 				this.cfg.addProperty(
-					_ROLE, 
+					_ROLE,
 					{
-						handler: this.configRole, 
-						value: _DIALOG, 
+						handler: this.configRole,
+						value: _DIALOG,
 						validator: Lang.isString
 					}
 				 );
-		
+
 			}
-		
-		}, "initDefaultConfig", "configRole", "configUseARIA", "configLabelledBy", 
+
+		}, "initDefaultConfig", "configRole", "configUseARIA", "configLabelledBy",
 			"configDescribedBy", "hasFocus");
 
 	}
@@ -500,20 +500,20 @@
 	// Tooltip ARIA plugin - augments YAHOO.widget.Tooltip
 
 	var onDocumentFocus = function (event) {
-	
+
 		var oTarget = Event.getTarget(event),
 			oTooltip = m_oTooltips[oTarget.id],
 			aXY;
-		
+
 		if (oTooltip) {
-		
+
 			aXY = Dom.getXY(oTarget);
 
 			oTooltip.cfg.setProperty(_XY, [aXY[0], (aXY[1] + oTarget.offsetHeight + 5)]);
 			oTooltip.show();
 
 		}
-	
+
 	};
 
 
@@ -521,11 +521,11 @@
 
 		var oTarget = Event.getTarget(event),
 			oTooltip = m_oTooltips[oTarget.id];
-		
+
 		if (oTooltip && oTooltip.cfg.getProperty(_VISIBLE)) {
 			oTooltip.hide();
 		}
-		
+
 	};
 
 
@@ -538,7 +538,7 @@
 			delete m_oTooltips[sContextElId];
 			element.removeAttribute(_DESCRIBED_BY);
 		}
-	
+
 	};
 
 
@@ -558,11 +558,11 @@
 	var registerContextElement = function (element) {
 
 		var sContextElId = element.id || Dom.generateId(element);
-	
+
 		m_oTooltips[sContextElId] = this;
-		
+
 		setARIAProperty(element, _DESCRIBED_BY, this.element.id);
-	
+
 	};
 
 
@@ -578,57 +578,57 @@
 
 
 	var onTooltipContextChange = function (type, args) {
-	
+
 		unregisterContextElements.call(this);
 
 		var context = args[0];
-		
+
 		if (context) {
 			registerContextElements.call(this);
 		}
-	
+
 	};
 
 
 	var setTooltipHiddenRole = function () {
-	
+
 		setARIAProperty(this.body, _HIDDEN, !this.cfg.getProperty(_VISIBLE));
-	
+
 	};
 
 
 	if (Tooltip) {
 
 		Tooltip.prototype.configUseARIA = function (type, args) {
-		
+
 			var bUseARIA = args[0];
-			
+
 			if (bUseARIA) {
-				
+
 				setARIARole(this.body, _TOOLTIP);
-	
+
 				this.cfg.subscribeToConfigEvent(_CONTEXT, onTooltipContextChange);
-				
+
 				setTooltipHiddenRole.call(this);
-				
+
 				this.cfg.subscribeToConfigEvent(_VISIBLE, setTooltipHiddenRole);
-				
+
 				this.subscribe(_DESTROY, unregisterContextElements);
-	
-	
+
+
 				if (!m_bToolTipDocumentListenersAdded) {
-				
+
 					Event.onFocus(document, onDocumentFocus);
 					Event.onBlur(document, onDocumentBlur);
-	
+
 					m_bToolTipDocumentListenersAdded = true;
-				
+
 				}
-	
+
 			}
-		
+
 		};
-	
+
 	}
-	
+
 }());

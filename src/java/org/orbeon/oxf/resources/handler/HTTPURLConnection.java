@@ -32,6 +32,7 @@ import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
 
+    public static String STALE_CHECKING_ENABLED_PROPERTY = "oxf.http.stale-checking-enabled";
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
 	public static String PROXY_USERNAME_PROPERTY = "oxf.http.proxy.username";
@@ -46,6 +47,7 @@ public class HTTPURLConnection extends URLConnection {
         final HttpConnectionManagerParams params = new HttpConnectionManagerParams();
         params.setDefaultMaxConnectionsPerHost(Integer.MAX_VALUE);
         params.setMaxTotalConnections(Integer.MAX_VALUE);
+        params.setStaleCheckingEnabled(Properties.instance().getPropertySet().getBoolean(STALE_CHECKING_ENABLED_PROPERTY));
         // The code commented below disables retries. By default HttpClient will try 3 times, and it is not clear
         // if this is a good thing or not in our case.
         //DefaultHttpMethodRetryHandler retryHandler = new DefaultHttpMethodRetryHandler(0, false);

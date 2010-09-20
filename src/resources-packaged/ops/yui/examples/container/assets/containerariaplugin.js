@@ -544,7 +544,8 @@
 
 	var unregisterContextElements = function () {
 
-		var sId = this.element.id,
+        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+		var sId = this.id,
 			aContextElements = m_oContextElements[sId];
 
 		Dom.batch(aContextElements, unregisterContextElement, this, true);

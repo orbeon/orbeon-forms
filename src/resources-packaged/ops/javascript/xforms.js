@@ -7143,19 +7143,19 @@ ORBEON.xforms.Server = {
 
                                 // "div" elements for xforms:switch and xxforms:dialog
                                 var divsElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "div", xmlNamespace);
-                                var divElementslength = divsElements.length;
-                                for (var j = 0; j < divElementslength; j++) {
+                                var divElementsLength = divsElements.length;
+                                for (var j = 0; j < divElementsLength; j++) {
                                     var divElement = divsElements[j];
 
-                                    var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
+                                    var controlVisibilityChangeId = ORBEON.util.Dom.getAttribute(divElement, "id");
                                     var visible = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
                                     var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
 
-                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
-                                    var children = new Array();// elements that are being shown
+                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[controlVisibilityChangeId];
+                                    var elementsWithVisibilityChanged = new Array();
                                     if (yuiDialog == null) {
                                         // This is a case
-                                        var caseBeginId = "xforms-case-begin-" + controlId;
+                                        var caseBeginId = "xforms-case-begin-" + controlVisibilityChangeId;
                                         var caseBegin = ORBEON.util.Dom.getElementById(caseBeginId);
                                         var caseBeginParent = caseBegin.parentNode;
                                         var foundCaseBegin = false;
@@ -7166,7 +7166,8 @@ ORBEON.xforms.Server = {
                                                 else continue;
                                             }
                                             if (cursor.nodeType == ELEMENT_TYPE) {
-                                                if (cursor.id == "xforms-case-end-" + controlId) break;
+                                                // Change visibility by switching class
+                                                if (cursor.id == "xforms-case-end-" + controlVisibilityChangeId) break;
                                                 if (visible) {
                                                     ORBEON.util.Dom.addClass(cursor, "xforms-case-selected");
                                                     ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected");
@@ -7177,14 +7178,16 @@ ORBEON.xforms.Server = {
                                                     ORBEON.util.Dom.removeClass(cursor, "xforms-case-selected");
                                                 }
 
-                                                children[children.length] = cursor;
+                                                // Keep track of changed element for FCK workaround (see below)
+                                                elementsWithVisibilityChanged[elementsWithVisibilityChanged.length] = cursor;
+
                                             }
                                         }
                                     } else {
                                         // This is a dialog
                                         if (visible) {
-                                            ORBEON.xforms.Controls.showDialog(controlId, neighbor);
-                                            children[0] = ORBEON.util.Dom.getElementById(controlId);
+                                            ORBEON.xforms.Controls.showDialog(controlVisibilityChangeId, neighbor);
+                                            elementsWithVisibilityChanged[0] = ORBEON.util.Dom.getElementById(controlVisibilityChangeId);
                                         } else {
                                             ORBEON.xforms.Globals.maskDialogCloseEvents = true;
                                             yuiDialog.hide();
@@ -7197,11 +7200,11 @@ ORBEON.xforms.Server = {
                                     // After we display divs, we must re-enable the HTML editors.
                                     // This is a workaround for a Gecko (pre-Firefox 3) bug documented at:
                                     // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                                    if (children.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3OrNewer
+                                    if (elementsWithVisibilityChanged.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3OrNewer
                                             && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
 
-                                        for (var childIndex = 0; childIndex < children.length; childIndex++) {
-                                            var child = children[childIndex];
+                                        for (var childIndex = 0; childIndex < elementsWithVisibilityChanged.length; childIndex++) {
+                                            var child = elementsWithVisibilityChanged[childIndex];
                                             var textHTMLElements = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", null, child);
 
                                             // Below we try to find elements with both xforms-mediatype-text-html and xforms-textarea

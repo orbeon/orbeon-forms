@@ -47,7 +47,7 @@ public class HTTPURLConnection extends URLConnection {
         final HttpConnectionManagerParams params = new HttpConnectionManagerParams();
         params.setDefaultMaxConnectionsPerHost(Integer.MAX_VALUE);
         params.setMaxTotalConnections(Integer.MAX_VALUE);
-        params.setStaleCheckingEnabled(Properties.instance().getPropertySet().getBoolean(STALE_CHECKING_ENABLED_PROPERTY));
+        params.setStaleCheckingEnabled(Properties.instance().getPropertySet().getBoolean(STALE_CHECKING_ENABLED_PROPERTY, true));
         // The code commented below disables retries. By default HttpClient will try 3 times, and it is not clear
         // if this is a good thing or not in our case.
         //DefaultHttpMethodRetryHandler retryHandler = new DefaultHttpMethodRetryHandler(0, false);

@@ -2182,11 +2182,20 @@ ORBEON.xforms.Controls = {
             }
         }
 
-        // If the control is now valid and there is an alert tooltip for this control, destroy it
+        // If the control is now valid and there is an alert tooltip for this control, get rid of it
         var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
-        if (newValid && alertTooltip != null && alertTooltip != true)
-            alertTooltip.destroy();
-        ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
+        if (alertTooltip != null && alertTooltip != true) {
+            if (isValid) {
+                // Prevent the tooltip from becoming visible on mouseover
+                alertTooltip.cfg.setProperty("disabled", true);
+                // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
+                alertTooltip.hide();
+            } else {
+                // When a control becomes invalid and it always has a tooltip, this means that the tooltip got disabled
+                // when the control previously became valid, so now re-enable it
+                alertTooltip.cfg.setProperty("disabled", false);
+            }
+        }
     },
 
     setDisabledOnFormElement: function(element, disabled) {

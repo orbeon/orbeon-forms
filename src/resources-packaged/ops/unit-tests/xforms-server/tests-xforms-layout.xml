@@ -1910,7 +1910,7 @@
         </output>
     </test>
     
-    <test description="New layout for xforms:select1[@appearance = 'full']" name="oxf:pipeline">
+    <test description="Old layout for xforms:select1[@appearance = 'full']" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">

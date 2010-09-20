@@ -1982,4 +1982,137 @@
         </output>
     </test>
 
+    <test description="Placement of HTML @disabled attribute with non-relevant, readonly, and case visibility" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan" xxforms:encrypt-item-values="false">
+                        <xforms:instance id="tests">
+                            <instance>
+                                <default/>
+                                <relevant/>
+                                <readonly/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind ref="relevant" relevant="false()"/>
+                        <xforms:bind ref="readonly" readonly="true()"/>
+
+                        <!-- Select all non-default cases -->
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:toggle case="s1c2"/>
+                            <xforms:toggle case="s2c2"/>
+                            <xforms:toggle case="s2c2s1c2"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Top-level switch -->
+                    <xforms:switch id="s1">
+                        <xforms:case id="s1c1">
+                            <xforms:input ref="default" id="s1c1i1"/>
+                            <xforms:input ref="relevant" id="s1c1i2"/>
+                            <xforms:input ref="readonly" id="s1c1i3"/>
+                        </xforms:case>
+                        <xforms:case id="s1c2">
+                            <xforms:input ref="default" id="s1c2i1"/>
+                            <xforms:input ref="relevant" id="s1c2i2"/>
+                            <xforms:input ref="readonly" id="s1c2i3"/>
+                        </xforms:case>
+                    </xforms:switch>
+                    <!-- Nested switches -->
+                    <xforms:switch id="s2">
+                        <xforms:case id="s2c1">
+                            <xforms:switch id="s2c1s1">
+                                <xforms:case id="s2c1s1c1">
+                                    <xforms:input ref="default" id="s2c1s1c1i1"/>
+                                    <xforms:input ref="relevant" id="s2c1s1c1i2"/>
+                                    <xforms:input ref="readonly" id="s2c1s1c1i3"/>
+                                </xforms:case>
+                                <xforms:case id="s2c1s1c2">
+                                    <xforms:input ref="default" id="s2c1s1c2i1"/>
+                                    <xforms:input ref="relevant" id="s2c1s1c2i2"/>
+                                    <xforms:input ref="readonly" id="s2c1s1c2i3"/>
+                                </xforms:case>
+                            </xforms:switch>
+                        </xforms:case>
+                        <xforms:case id="s2c2">
+                            <xforms:switch id="s2c2s1">
+                                <xforms:case id="s2c2s1c1">
+                                    <xforms:input ref="default" id="s2c2s1c1i1"/>
+                                    <xforms:input ref="relevant" id="s2c2s1c1i2"/>
+                                    <xforms:input ref="readonly" id="s2c2s1c1i3"/>
+                                </xforms:case>
+                                <xforms:case id="s2c2s1c2">
+                                    <xforms:input ref="default" id="s2c2s1c2i1"/>
+                                    <xforms:input ref="relevant" id="s2c2s1c2i2"/>
+                                    <xforms:input ref="readonly" id="s2c2s1c2i3"/>
+                                </xforms:case>
+                            </xforms:switch>
+                        </xforms:case>
+                    </xforms:switch>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="s1c1i1" class="xforms-control xforms-input xforms-case-deselected">
+                    <xhtml:input id="s1c1i1$xforms-input-1" type="text" name="s1c1i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s1c1i2" class="xforms-control xforms-input xforms-disabled xforms-case-deselected">
+                    <xhtml:input id="s1c1i2$xforms-input-1" type="text" name="s1c1i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s1c1i3" class="xforms-control xforms-input xforms-readonly xforms-case-deselected">
+                    <xhtml:input id="s1c1i3$xforms-input-1" type="text" name="s1c1i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s1c2i1" class="xforms-control xforms-input xforms-case-selected">
+                    <xhtml:input id="s1c2i1$xforms-input-1" type="text" name="s1c2i1$xforms-input-1" value="" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span id="s1c2i2" class="xforms-control xforms-input xforms-disabled xforms-case-selected">
+                    <xhtml:input id="s1c2i2$xforms-input-1" type="text" name="s1c2i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s1c2i3" class="xforms-control xforms-input xforms-readonly xforms-case-selected">
+                    <xhtml:input id="s1c2i3$xforms-input-1" type="text" name="s1c2i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c1s1c1i1" class="xforms-control xforms-input xforms-case-selected">
+                    <xhtml:input id="s2c1s1c1i1$xforms-input-1" type="text" name="s2c1s1c1i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c1s1c1i2" class="xforms-control xforms-input xforms-disabled xforms-case-selected">
+                    <xhtml:input id="s2c1s1c1i2$xforms-input-1" type="text" name="s2c1s1c1i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c1s1c1i3" class="xforms-control xforms-input xforms-readonly xforms-case-selected">
+                    <xhtml:input id="s2c1s1c1i3$xforms-input-1" type="text" name="s2c1s1c1i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c1s1c2i1" class="xforms-control xforms-input xforms-case-deselected">
+                    <xhtml:input id="s2c1s1c2i1$xforms-input-1" type="text" name="s2c1s1c2i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c1s1c2i2" class="xforms-control xforms-input xforms-disabled xforms-case-deselected">
+                    <xhtml:input id="s2c1s1c2i2$xforms-input-1" type="text" name="s2c1s1c2i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c1s1c2i3" class="xforms-control xforms-input xforms-readonly xforms-case-deselected">
+                    <xhtml:input id="s2c1s1c2i3$xforms-input-1" type="text" name="s2c1s1c2i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c2s1c1i1" class="xforms-control xforms-input xforms-case-deselected">
+                    <xhtml:input id="s2c2s1c1i1$xforms-input-1" type="text" name="s2c2s1c1i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c2s1c1i2" class="xforms-control xforms-input xforms-disabled xforms-case-deselected">
+                    <xhtml:input id="s2c2s1c1i2$xforms-input-1" type="text" name="s2c2s1c1i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c2s1c1i3" class="xforms-control xforms-input xforms-readonly xforms-case-deselected">
+                    <xhtml:input id="s2c2s1c1i3$xforms-input-1" type="text" name="s2c2s1c1i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c2s1c2i1" class="xforms-control xforms-input xforms-case-selected">
+                    <xhtml:input id="s2c2s1c2i1$xforms-input-1" type="text" name="s2c2s1c2i1$xforms-input-1" value="" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span id="s2c2s1c2i2" class="xforms-control xforms-input xforms-disabled xforms-case-selected">
+                    <xhtml:input id="s2c2s1c2i2$xforms-input-1" type="text" name="s2c2s1c2i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+                <xhtml:span id="s2c2s1c2i3" class="xforms-control xforms-input xforms-readonly xforms-case-selected">
+                    <xhtml:input id="s2c2s1c2i3$xforms-input-1" type="text" name="s2c2s1c2i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

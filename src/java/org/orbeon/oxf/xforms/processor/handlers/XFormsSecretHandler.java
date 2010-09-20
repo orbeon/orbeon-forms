@@ -16,12 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -62,7 +58,8 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                     secretControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
-                handleDisabledAttribute(reusableAttributes, containingDocument, secretControl);
+                if (isHTMLDisabled(secretControl))
+                    outputDisabledAttribute(reusableAttributes);
 
                 // Output element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);

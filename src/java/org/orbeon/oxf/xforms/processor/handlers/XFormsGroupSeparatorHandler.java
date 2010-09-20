@@ -19,6 +19,9 @@ import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+/**
+ * Group within xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr.
+ */
 public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
     private DeferredXMLReceiver currentSavedOutput;
@@ -81,7 +84,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);
-        } else if (isDisabled(control)) {
+        } else if (isHTMLDisabled(control)) {
             // In noscript, if the group not visible, set output to a black hole
             handlerContext.getController().setOutput(new DeferredXMLReceiverAdapter());
         }
@@ -106,7 +109,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end",
                         "group-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
-        } else if (isDisabled(control)) {
+        } else if (isHTMLDisabled(control)) {
             // In noscript, group was not visible, restore output
             handlerContext.getController().setOutput(currentSavedOutput);
         }

@@ -186,12 +186,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                 // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
 
                 // xforms:select[@appearance = 'full'], xforms:input[@type = 'xs:boolean']
-                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, xmlReceiver, htmlPrefix, spanQName,
+                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, this, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
                         "xforms-select-full-template", TEMPLATE_ID, true, "checkbox");
 
                 // xforms:select1[@appearance = 'full']
-                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, xmlReceiver, htmlPrefix, spanQName,
+                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, this, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
                         "xforms-select1-full-template", TEMPLATE_ID, true, "radio");
             }

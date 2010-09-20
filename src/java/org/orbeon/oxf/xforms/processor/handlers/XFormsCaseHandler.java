@@ -89,10 +89,15 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
             // Case not visible, set output to a black hole
             handlerContext.getController().setOutput(new DeferredXMLReceiverAdapter());
         }
+
+        handlerContext.pushCaseContext(isVisible);
     }
 
     @Override
     protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+
+        handlerContext.popCaseContext();
+
         if (!handlerContext.isNoScript()) {
             currentOutputInterceptor.flushCharacters(true, true);
 

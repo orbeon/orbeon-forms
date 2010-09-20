@@ -18,9 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UserAgent;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -28,14 +26,9 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Context used when converting XHTML+XForms into XHTML.
@@ -67,6 +60,7 @@ public class HandlerContext {
     // Context information
     private Stack<String> componentContextStack;
     private Stack<RepeatContext> repeatContextStack;
+    private Stack<Boolean> caseContextStack;
 
 //    private static final int INDEX_INCREMENT = 100;
 //    private int currentTabIndex = 0;
@@ -280,6 +274,24 @@ public class HandlerContext {
 
     public void popComponentContext() {
         componentContextStack.pop();
+    }
+
+    public void pushCaseContext(boolean visible) {
+        if (caseContextStack == null)
+            caseContextStack = new Stack<Boolean>();
+        final boolean currentVisible = caseContextStack.size() == 0 ? true : caseContextStack.peek();
+        caseContextStack.push(currentVisible && visible);
+    }
+
+    public void popCaseContext() {
+        caseContextStack.pop();
+    }
+
+    public boolean getCaseVisibility() {
+        if (caseContextStack == null || caseContextStack.size() == 0)
+            return true;
+        else
+            return caseContextStack.peek();
     }
 
     public String getIdPostfix() {

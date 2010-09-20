@@ -164,7 +164,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 final String value = (xformsSelect1Control == null) ? null : xformsSelect1Control.getValue(pipelineContext);
                                 // NOTE: With open selection, we send all values to the client but not encrypt them because the client matches on values
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
-                                handleDisabledAttribute(reusableAttributes, containingDocument, xformsSelect1Control);
+                                if (isHTMLDisabled(xformsSelect1Control))
+                                    outputDisabledAttribute(reusableAttributes);
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
 
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
@@ -211,7 +212,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     // Create xhtml:div with tree info
                     final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
 
-                    handleDisabledAttribute(containerAttributes, containingDocument, xformsSelect1Control);
+                    if (isHTMLDisabled(xformsSelect1Control))
+                        outputDisabledAttribute(containerAttributes);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
                     if (itemset != null) { // can be null if the control is non-relevant
                         outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
@@ -227,7 +229,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
 
-                    handleDisabledAttribute(containerAttributes, containingDocument, xformsSelect1Control);
+                    if (isHTMLDisabled(xformsSelect1Control))
+                        outputDisabledAttribute(containerAttributes);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
                     if (itemset != null) { // can be null if the control is non-relevant
                         // Create xhtml:div with initial menu entries
@@ -324,7 +327,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     // Handle accessibility attributes
                     handleAccessibilityAttributes(attributes, containerAttributes);
 
-                    handleDisabledAttribute(containerAttributes, containingDocument, xformsSelect1Control);
+                    if (isHTMLDisabled(xformsSelect1Control))
+                        outputDisabledAttribute(containerAttributes);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
                     {
                         final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
@@ -453,7 +457,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     for (Iterator<Item> i = itemset.toList().iterator(); i.hasNext(); itemIndex++) {
                         final Item item = i.next();
                         final String itemEffectiveId = getItemId(effectiveId, Integer.toString(itemIndex));
-                        handleItemFull(pipelineContext, handlerContext, xmlReceiver, reusableAttributes, attributes, xhtmlPrefix, spanQName,
+                        handleItemFull(pipelineContext, this, xmlReceiver, reusableAttributes, attributes, xhtmlPrefix, spanQName,
                                 containingDocument, xformsControl, effectiveId, itemEffectiveId, isMultiple, fullItemType, item, itemIndex == 0);
                     }
                 }
@@ -465,7 +469,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // NOTE: Templates for full items are output globally in XHTMLBodyHandler
     }
 
-    public static void outputItemFullTemplate(PipelineContext pipelineContext,HandlerContext handlerContext,
+    public static void outputItemFullTemplate(PipelineContext pipelineContext, XFormsBaseHandler baseHandler,
                                               ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
                                               XFormsContainingDocument containingDocument,
                                               AttributesImpl reusableAttributes, Attributes attributes, String templateId,
@@ -479,7 +483,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
         {
             final String itemEffectiveId = "$xforms-item-effective-id$";
-            handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes,
+            handleItemFull(pipelineContext, baseHandler, contentHandler, reusableAttributes, attributes,
                     xhtmlPrefix, spanQName, containingDocument, null, effectiveId, itemEffectiveId, isMultiple, fullItemType,
                     new Item(isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
                             "$xforms-template-label$", "$xforms-template-value$"), true);
@@ -497,11 +501,13 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    public static void handleItemFull(PipelineContext pipelineContext, HandlerContext handlerContext, ContentHandler contentHandler,
+    public static void handleItemFull(PipelineContext pipelineContext, XFormsBaseHandler baseHandler, ContentHandler contentHandler,
                                       AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl,
                                       String effectiveId, String itemEffectiveId, boolean isMultiple, String type,
                                       Item item, boolean isFirst) throws SAXException {
+
+        final HandlerContext handlerContext = baseHandler.handlerContext;
 
         // Whether this is selected
         boolean isSelected = isSelected(pipelineContext, handlerContext, xformsControl, isMultiple, item);
@@ -546,7 +552,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     }
                 }
 
-                handleDisabledAttribute(reusableAttributes, containingDocument, xformsControl);
+                if (baseHandler.isHTMLDisabled(xformsControl))
+                    outputDisabledAttribute(reusableAttributes);
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }

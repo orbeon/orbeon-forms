@@ -18,10 +18,7 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLReceiverAdapter;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -121,7 +118,8 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
         // xhtml:button or xhtml:input
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
-        handleDisabledAttribute(containerAttributes, containingDocument, triggerControl);
+        if (isHTMLDisabled(triggerControl))
+            outputDisabledAttribute(containerAttributes);
         xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName, containerAttributes);
         {
             if ("button".equals(elementName)) {

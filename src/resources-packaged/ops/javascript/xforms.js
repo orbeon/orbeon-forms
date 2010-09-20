@@ -451,7 +451,7 @@ ORBEON.util = {
         /**
          * Nudge element after a short delay for IE6/7 to force IE to "do the right thing".
          */
-        nudgeAferDelay: function(element) {
+        nudgeAfterDelay: function(element) {
             if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7) {
                 var tables = element.getElementsByTagName("table");
                 window.setTimeout(function() {
@@ -2263,7 +2263,7 @@ ORBEON.xforms.Controls = {
                         if (isRelevant && disabledChildrenDepth == 0) {
                             ORBEON.util.Dom.removeClass(current, "xforms-disabled");
                             ORBEON.util.Dom.removeClass(current, "xforms-disabled-subsequent");
-                            ORBEON.util.Dom.nudgeAferDelay(current);
+                            ORBEON.util.Dom.nudgeAfterDelay(current);
                         }
                         if (!isRelevant) {
                             ORBEON.util.Dom.addClass(current, "xforms-disabled-subsequent");
@@ -2293,7 +2293,7 @@ ORBEON.xforms.Controls = {
                     if (isRelevant) {
                         ORBEON.util.Dom.removeClass(element, "xforms-disabled");
                         ORBEON.util.Dom.removeClass(element, "xforms-disabled-subsequent");
-                        ORBEON.util.Dom.nudgeAferDelay(element);
+                        ORBEON.util.Dom.nudgeAfterDelay(element);
                     } else {
                         ORBEON.util.Dom.addClass(element, "xforms-disabled-subsequent");
                     }
@@ -7171,7 +7171,7 @@ ORBEON.xforms.Server = {
                                                     ORBEON.util.Dom.addClass(cursor, "xforms-case-selected");
                                                     ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected");
                                                     ORBEON.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
-                                                    ORBEON.util.Dom.nudgeAferDelay(cursor);
+                                                    ORBEON.util.Dom.nudgeAfterDelay(cursor);
                                                 } else {
                                                     ORBEON.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
                                                     ORBEON.util.Dom.removeClass(cursor, "xforms-case-selected");

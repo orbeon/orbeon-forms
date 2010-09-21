@@ -31,6 +31,8 @@
 
     <property name="src.dir" location="src"/>
 
+    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20100810.jar"/>
+
     <fileset id="war.libs" dir="${lib.dir}">
         <include name="dom4j-1_6_1.jar"/>
         <include name="log4j-1_2_15.jar"/>
@@ -74,7 +76,7 @@
         <include name="activation-1_0_2.jar"/>
         <include name="jtidy-8.0-20060801.131059-3.jar"/>
         <include name="tagsoup-1.2.jar"/>
-        <include name="saxon-9-1-0-8_orbeon_20100810.jar"/>
+        <include name="${saxon.jar}"/>
         <include name="batik-all-1_6.jar"/>
         <include name="avalon-framework-4_2_0.jar"/>
         <include name="fop-0_93.jar"/>
@@ -420,6 +422,10 @@
         <copy todir="${war.lib}">
           <fileset refid="war.libs"/>
         </copy>
+        <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
+        <jar destfile="${war.lib}/${saxon.jar}">
+            <zipfileset src="${lib.dir}/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
+        </jar>
 
         <copy file="${jar.file}" todir="${war.lib}"/>
         <copy file="${xforms-filter.jar.file}" todir="${war.lib}"/>

@@ -5518,7 +5518,8 @@ ORBEON.xforms.Init = {
                 fixedcenter: false,
                 constraintoviewport: true,
                 underlay: "none",
-                usearia: true
+                usearia: true,
+                role: "alertdialog"
             });
             // Close the dialog when users click on document
             YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);
@@ -5532,7 +5533,8 @@ ORBEON.xforms.Init = {
                 fixedcenter: false,
                 constraintoviewport: true,
                 underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
-                usearia: true
+                usearia: true,
+                role: "alertdialog"
             });
 			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);
             // Register listener for when the dialog is closed by a click on the "x"

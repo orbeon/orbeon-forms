@@ -6,6 +6,7 @@
 		UA = YAHOO.env.ua,
 		Panel = YAHOO.widget.Panel,
 		Tooltip = YAHOO.widget.Tooltip,
+		SimpleDialog = YAHOO.widget.SimpleDialog,
 
 		ModulePrototype = YAHOO.widget.Module.prototype,
 		fnModuleInitDefaultConfig = ModulePrototype.initDefaultConfig,
@@ -16,6 +17,9 @@
 
 		PanelPrototype,
 		fnPanelInitDefaultConfig,
+
+		SimpleDialogPrototype,
+		fnSimpleDialogConfigIcon,
 
 		m_bPanelDocumentListenersAdded = false,
 		m_oFocusedElement,	// Currently focused element in the DOM
@@ -36,6 +40,7 @@
 		_FOCUS = "focus",
 		_VISIBLE = "visible",
 		_BEFORE_HIDE = "beforeHide",
+		_ALERT_DIALOG = "alertdialog",
 		_DIALOG = "dialog",
 		_DESCRIBED_BY = "describedby",
 		_CONTEXT = "context",
@@ -47,7 +52,6 @@
 		_KEY_DOWN = "keydown",
 		_BEFORE_SHOW = "beforeShow",
 		_CLOSE = "close",
-		_ALERT_DIALOG = "alertdialog",
 		_LABELLED_BY = "labelledby",
 		_XY = "xy",
 		_TOOLTIP = "tooltip",
@@ -257,7 +261,7 @@
 	};
 
 
-	var onPanelBeforeHide = function (type, args, element) {
+	var restoreFocus = function (type, args, element) {
 
 		this.blur();
 
@@ -272,23 +276,28 @@
 
 		}
 
-		this.unsubscribe(_BEFORE_HIDE, onPanelBeforeHide, element);
+		this.unsubscribe(type, restoreFocus, element);
 
 	};
 
 
 	var onPanelBeforeShow = function () {
 
-		this.subscribe(_BEFORE_HIDE, onPanelBeforeHide, m_oFocusedElement);
+		//	If the Panel is modal it is necessary to wait until the modality
+		//	mask has been hidden before attempting to restore focus to the
+		//	element in the DOM that had focus before the Panel was made visible.
+
+		var sEvent = (this.cfg.getProperty("modal") === true) ?
+						"hideMask" : _BEFORE_HIDE;
+
+		this.subscribe(sEvent, restoreFocus, m_oFocusedElement);
 
 	};
 
 
 	var setPanelHiddenRole = function () {
 
-		var oElement = this.cfg.getProperty(_ROLE) === _DIALOG ? this.innerElement : this.body;
-
-		setARIAProperty(oElement, _HIDDEN, !this.cfg.getProperty(_VISIBLE));
+		setARIAProperty(this.innerElement, _HIDDEN, !this.cfg.getProperty(_VISIBLE));
 
 	};
 
@@ -399,32 +408,20 @@
 
 			configDescribedBy: function (type, args) {
 
-				var sID = args[0],
-					oElement;
+				var sID = args[0];
 
 				if (this.cfg.getProperty(_USE_ARIA) && sID) {
-
-					oElement = this.cfg.getProperty(_ROLE) === _DIALOG ?
-						this.innerElement : this.body;
-
-					setARIAProperty(oElement, _DESCRIBED_BY, sID);
-
+					setARIAProperty(this.innerElement, _DESCRIBED_BY, sID);
 				}
 
 			},
 
 			configLabelledBy: function (type, args) {
 
-				var sID = args[0],
-					oElement;
+				var sID = args[0];
 
 				if (this.cfg.getProperty(_USE_ARIA) && sID) {
-
-					oElement = this.cfg.getProperty(_ROLE) === _DIALOG ?
-						this.innerElement : this.body;
-
-					setARIAProperty(oElement, _LABELLED_BY, sID);
-
+					setARIAProperty(this.innerElement, _LABELLED_BY, sID);
 				}
 
 			},
@@ -432,44 +429,40 @@
 			configRole: function (type, args) {
 
 				var sRole = args[0],
-					oElement,
+					oBody,
 					oHeader,
-					sHeaderId;
+					sID;
 
 
 				if (sRole) {
 
-
 					switch (sRole) {
-
-						case _DIALOG:
-
-							oElement = this.innerElement;
-
-						break;
 
 						case _ALERT_DIALOG:
 
-							oElement = this.body;
+							oBody = this.body;
+
+							sID = oBody.id || Dom.generateId(oBody);
+
+							this.cfg.setProperty(_DESCRIBED_BY, sID);
+
+						break;
+
+						case _DIALOG:
+
+							oHeader = this.header;
+
+							sID = oHeader.id || Dom.generateId(oHeader);
+
+							this.cfg.setProperty(_LABELLED_BY, sID);
 
 						break;
 
 					}
 
+					setARIARole(this.innerElement, sRole);
 
-					if (oElement) {
-
-						setARIARole(oElement, sRole);
-
-						oHeader = this.header;
-
-						sHeaderId = oHeader.id || Dom.generateId(oHeader);
-
-						this.cfg.setProperty(_LABELLED_BY, sHeaderId);
-
-						setRoleForCloseButton.call(this);
-
-					}
+					setRoleForCloseButton.call(this);
 
 				}
 
@@ -493,6 +486,36 @@
 
 		}, "initDefaultConfig", "configRole", "configUseARIA", "configLabelledBy",
 			"configDescribedBy", "hasFocus");
+
+	}
+
+
+	// SimpleDialog ARIA plugin - augments YAHOO.widget.SimpleDialog
+
+	if (SimpleDialog) {
+
+		SimpleDialogPrototype = SimpleDialog.prototype;
+		fnSimpleDialogConfigIcon = SimpleDialogPrototype.configIcon;
+
+		SimpleDialogPrototype.configIcon = function (type, args, obj) {
+
+			fnSimpleDialogConfigIcon.apply(this, arguments);
+
+            var sIcon = args[0],
+                sCSSClass = SimpleDialog.ICON_CSS_CLASSNAME,
+                oIcon;
+
+            if (sIcon && sIcon != "none") {
+
+                oIcon = Dom.getElementsByClassName(sCSSClass, "*" , this.body);
+
+                if (oIcon) {
+					setARIARole(oIcon[0], _PRESENTATION);
+                }
+
+			}
+
+		};
 
 	}
 
@@ -544,8 +567,7 @@
 
 	var unregisterContextElements = function () {
 
-        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
-		var sId = this.id,
+		var sId = this.element.id,
 			aContextElements = m_oContextElements[sId];
 
 		Dom.batch(aContextElements, unregisterContextElement, this, true);

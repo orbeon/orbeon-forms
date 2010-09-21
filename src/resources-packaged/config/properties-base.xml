@@ -37,6 +37,7 @@
     <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <property as="xs:string"  name="oxf.http.forward-headers"                        value=""/>
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>
+    <property as="xs:integer" name="oxf.http.so-timeout"                             value="0"/>
     <!--<property as="xs:string"  name="oxf.http.proxy.host"                             value="localhost"/>-->
     <!--<property as="xs:integer" name="oxf.http.proxy.port"                             value="8090"/>-->
     <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.host"                        value=""/>-->

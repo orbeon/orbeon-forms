@@ -26,7 +26,10 @@
         <xhtml:title>XBL - Alert Dialog</xhtml:title>
         <xforms:model id="main-model">
             <xforms:instance>
-                <instance/>
+                <instance>
+                    <ok>OK</ok>
+                    <cancel>Cancel</cancel>
+                </instance>
             </xforms:instance>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -69,8 +72,8 @@
                 <fr:alert-dialog id="ok-cancel-dialog">
                     <fr:label>Copy</fr:label>
                     <fr:message>An item with the same name already exists. The file you are copying will replace it.</fr:message>
-                    <fr:negative-choice><fr:label>Cancel</fr:label></fr:negative-choice>
-                    <fr:positive-choice><fr:label>OK</fr:label></fr:positive-choice>
+                    <fr:negative-choice><fr:label ref="ok"/></fr:negative-choice>
+                    <fr:positive-choice><fr:label ref="cancel"/></fr:positive-choice>
                 </fr:alert-dialog>
             </xhtml:li>
 

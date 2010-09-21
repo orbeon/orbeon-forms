@@ -42,6 +42,22 @@
                     <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
                     <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full"
                             class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
+                        <!-- Set the focus on the first button in the dialog. This is done:
+                             a) For usability: so users can press enter to activate the button, or press tab to go to
+                                the next button.
+                             b) For accessibility, as JAWS only reads the content of the dialog if a form control
+                                inside the dialog gets the focus.
+
+                             Setting the focus could be done in XForms, but the code would be more complicated as:
+                             a) The button would need to have an id, so it needs to be in the inner scope, while the
+                                label inside the button needs to be in outer scope.
+                             b) We need code to figure out what the id of the first button is, while in JavaScript we
+                                can just refer to "the first button in the dialog".
+                        -->
+                        <xxforms:script ev:event="xxforms-dialog-open">
+                            var buttons = this.getElementsByTagName("button");
+                            if (buttons.length > 0) buttons[0].focus();
+                        </xxforms:script>
                         <xforms:label xxbl:scope="outer"><xsl:copy-of select="fr:label/(@* | node())"/></xforms:label>
                         <xforms:group appearance="xxforms:internal">
                             <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>

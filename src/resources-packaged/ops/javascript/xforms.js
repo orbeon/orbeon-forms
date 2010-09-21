@@ -498,6 +498,32 @@ ORBEON.util = {
                 if (! YAHOO.lang.isUndefined(element.style) && YAHOO.util.Dom.getStyle(element, "display") == "none") return true;
                 element = element.parentNode;
             }
+        },
+
+        /**
+         * Applies a function to all the HTML form elements under a root element, including the root if it is a
+         * form element.
+         */
+        applyOnFormElements: function(root, fn, obj, overrideContext) {
+            var FORM_TAG_NAMES = ["input", "textarea", "select", "button"];
+            ORBEON.util.Utils.apply(FORM_TAG_NAMES, function(tagName) {
+                if (root.tagName.toLowerCase() == tagName)
+                    if (overrideContext) fn.call(obj, root); else fn(root);
+                ORBEON.util.Utils.apply(root.getElementsByTagName(tagName), fn, obj, overrideContext);
+            }, null, false);
+        },
+
+        /**
+         * Test a function ancestor-or-self::* and returns true as soon as the function returns true, or false of the
+         * function always returns false.
+         */
+        existsAncestorOrSelf: function(node, fn, obj, overrideContext) {
+            while (true) {
+                if (overrideContext ? fn.call(obj, node) : fn(node)) return true;
+                node = node.parentElement;
+                if (node == null) break;
+            }
+            return false;
         }
     },
 
@@ -1254,6 +1280,16 @@ ORBEON.util.Utils = {
 
         return viewportRegion.top <= elementRegion.top && viewportRegion.left <= elementRegion.left
             && elementRegion.bottom <= viewportRegion.bottom && elementRegion.right <= viewportRegion.right;
+    },
+
+    /**
+     * Applies a function to all the elements of an array, and discards the value returned by the function, if any.
+     */
+    apply: function(array, fn, obj, overrideContext) {
+        for (var arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
+            var arrayElement = array[arrayIndex];
+            if (overrideContext) fn.call(obj, arrayElement); else fn(arrayElement);
+        }
     }
 };
 
@@ -2206,6 +2242,30 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    /**
+     * Updates the disabled attribute on all the form elements below a certain root element. This function is used when
+     * a section of the form because relevant or non-relevant, and when a case becomes selected or non-selected.
+     */
+    setDisabledOnTree: function(root, disabled) {
+        ORBEON.util.Dom.applyOnFormElements(root, function(element) {
+            if (disabled) {
+                // If the root becomes disabled, make all the form controls under that root disabled
+                ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
+            } else {
+                // If the root becomes enabled, mark the form controls under the root enabled only if they don't have a
+                // parent which is either a disabled case (xforms-case-deselected) or a non-relevant
+                // group (xforms-disabled).
+                if (! ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
+                            return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
+                                || YAHOO.util.Dom.hasClass(node, "xforms-disabled")
+                        }, null, false)) {
+                    ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
+                }
+            }
+        }, null, false);
+
+    },
+
     setRelevant: function(control, isRelevant) {
 
         // Case of group delimiters
@@ -2302,14 +2362,7 @@ ORBEON.xforms.Controls = {
 
             // Add/remove the disabled attribute on form controls
             var formFieldDisabled = ! isRelevant || ORBEON.xforms.Controls.isReadonly(control);
-            function handleFormElement(element) {
-                var tagName = element.tagName.toLowerCase();
-                if (tagName == "input" || tagName == "textarea" || tagName == "select" || tagName == "button")
-                    ORBEON.xforms.Controls.setDisabledOnFormElement(element, formFieldDisabled);
-                return false;
-            }
-            handleFormElement(control);
-            YAHOO.util.Dom.getElementsBy(handleFormElement, null, control);
+            ORBEON.xforms.Controls.setDisabledOnTree(control, formFieldDisabled);
         }
     },
 
@@ -7177,10 +7230,10 @@ ORBEON.xforms.Server = {
                                                     ORBEON.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
                                                     ORBEON.util.Dom.removeClass(cursor, "xforms-case-selected");
                                                 }
-
+                                                // Update disabled attribute on form elements
+                                                ORBEON.xforms.Controls.setDisabledOnTree(cursor, ! visible);
                                                 // Keep track of changed element for FCK workaround (see below)
                                                 elementsWithVisibilityChanged[elementsWithVisibilityChanged.length] = cursor;
-
                                             }
                                         }
                                     } else {

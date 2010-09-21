@@ -152,10 +152,7 @@
                                 <p:input name="config">
                                     <config>
                                         <method>xhtml</method>
-                                        <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>
-                                        <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>
-                                        <!--<public-doctype>-//W3C//DTD XHTML 1.0 Strict//EN</public-doctype>-->
-                                        <!--<system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</system-doctype>-->
+                                        <public-doctype>-//W3C//DTD XHTML 1.0 Strict//EN</public-doctype>
                                         <encoding>utf-8</encoding>
                                         <content-type>application/xhtml+xml</content-type>
                                         <indent>true</indent>
@@ -185,9 +182,7 @@
                             <p:processor name="oxf:html-converter">
                                 <p:input name="config">
                                     <config>
-                                        <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
-                                        <!--<public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>-->
-                                        <!--<system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>-->
+                                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
                                         <version>4.01</version>
                                         <encoding>utf-8</encoding>
                                         <indent>true</indent>
@@ -239,9 +234,7 @@
                             <p:processor name="oxf:identity">
                                 <p:input name="data">
                                     <config>
-                                        <!--<public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
                                         <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
-                                        <system-doctype>http://www.w3.org/TR/html4/strict2.dtd</system-doctype>
                                         <version>4.01</version>
                                         <encoding>utf-8</encoding>
                                         <indent>true</indent>
@@ -284,7 +277,7 @@
             <p:processor name="oxf:html-converter">
                 <p:input name="config">
                     <config>
-                        <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
                         <version>4.01</version>
                         <encoding>utf-8</encoding>
                         <indent>true</indent>

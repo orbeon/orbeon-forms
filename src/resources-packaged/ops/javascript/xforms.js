@@ -554,7 +554,7 @@ ORBEON.util = {
         },
 
         /**
-         * Escape text that apears in an HTML attribute which we use in an innerHTML.
+         * Escape text that appears in an HTML attribute which we use in an innerHTML.
          */
         escapeHTMLMinimal: function(text) {
             text = ORBEON.util.String.replace(text, '&', '&amp;');
@@ -1135,6 +1135,26 @@ ORBEON.util.Utils = {
                 // cause the name in the programming model to change in the collection of elements". This has a implication
                 // for radio buttons where using a same name for a set of radio buttons is used to group them together.
                 // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
+
+                // NOTE: Here we only fix the case of radio button groups. However, the name attribute issue is present
+                // for other controls as well. With IE versions (including IE 8 in quirks mode) that exhibit this bug,
+                // you cannot safely call document.getElementById() of a form element within a template once the template
+                // has been cloned. For example, in a template:
+                //
+                // <span id="my-input"><input id="my-input$$c" name="my-input">...
+                //
+                // getElementById("my-input") correctly returns <span id="my-input">
+                //
+                // Now clone the template. getElementById("my-input") now returns <input id="my-input$$c·1" name="my-input﻿·1">
+                //
+                // That's because IE mixes up the element id and the name, AND the name "my-input" incorrectly points to
+                // the cloned element.
+                //
+                // This seems fixed in IE 8 and up in standards mode.
+                //
+                // If we wanted to fix this, we could run the code below also for <textarea> and for all <input>, not
+                // only those with type="radio". We should also try to detect the issue so that we do not run this for IE
+                // 8 in standards mode.
                 var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
                 for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
                     var attribute = element.attributes[attributeIndex];

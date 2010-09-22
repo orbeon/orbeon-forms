@@ -1322,7 +1322,7 @@ ORBEON.util.Test = {
                 // Wait another 100 ms
                 setTimeout(checkAjaxReceived, 100);
             } else {
-                // We done with Ajax requets, continue with the test
+                // We done with Ajax requests, continue with the test
                 testCase.resume(function() {
                     afterAjaxResponseFunction.call(testCase);
                 });
@@ -1332,6 +1332,21 @@ ORBEON.util.Test = {
         causingAjaxRequestFunction.call(testCase);
         setTimeout(checkAjaxReceived, 100);
         testCase.wait(20000);
+    },
+
+    /**
+     * Similar to executeCausingAjaxRequest
+     */
+    executeSequenceCausingAjaxRequest: function(testCase, tests) {
+        if (tests.length > 0) {
+            var testTuple = tests.shift();
+            ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
+                testTuple[0].call(testCase);
+            }, function() {
+                testTuple[1].call(testCase);
+                ORBEON.util.Test.executeSequenceCausingAjaxRequest(testCase, tests);
+            });
+        }
     },
 
     /**

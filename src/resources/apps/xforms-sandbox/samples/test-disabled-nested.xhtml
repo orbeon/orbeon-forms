@@ -27,48 +27,73 @@
                     name: "XHTML Editor",
 
                     /**
-                     * Assert that inputs in the groups/cases have the disabled attribute set or not set, as specified
-                     * by the attributes.
-                     */
-                    assertInputDisabled: function(outerDisabled, innerDisabled) {
-                        function assertWorker(expected, groupOrCase, innerOrOuter, index) {
-                            var controlId = groupOrCase + "-" + innerOrOuter + "-input" + (innerOrOuter == "outer" ? "-" + index : "");
-                            var input = YAHOO.util.Dom.get(controlId).getElementsByTagName("input")[0];
-                            var message = innerOrOuter + " " + groupOrCase + " input" +  (innerOrOuter == "outer" ? " " + index : "") + " has not expected disabled state";
-                            YAHOO.util.Assert.areEqual(expected, input.disabled, message);
-
-                        }
-                        assertWorker(outerDisabled, "group", "outer", "1");
-                        assertWorker(outerDisabled, "group", "outer", "2");
-                        assertWorker(outerDisabled, "case", "outer", "1");
-                        assertWorker(outerDisabled, "case", "outer", "2");
-                        assertWorker(innerDisabled, "group", "inner", null);
-                        assertWorker(innerDisabled, "case", "inner", null);
-                    },
-
-                    /**
                      * For both groups and cases, when not shown, any form field inside the group or case should
                      * have the disabled attribute set, so it can't be reached by tabbing.
                      */
                     testDisabledOnInputs: function() {
+
+                        /**
+                         * Assert that inputs in the groups/cases have the disabled attribute set or not set, as specified
+                         * by the attributes.
+                         */
+                        function assertInputDisabled(outerDisabled, innerDisabled) {
+                            function assertWorker(expected, groupOrCase, innerOrOuter, index) {
+                                var controlId = groupOrCase + "-" + innerOrOuter + "-input" + (innerOrOuter == "outer" ? "-" + index : "");
+                                var input = YAHOO.util.Dom.get(controlId).getElementsByTagName("input")[0];
+                                var message = innerOrOuter + " " + groupOrCase + " input" +  (innerOrOuter == "outer" ? " " + index : "") + " has not expected disabled state";
+                                YAHOO.util.Assert.areEqual(expected, input.disabled, message);
+
+                            }
+                            assertWorker(outerDisabled, "group", "outer", "1");
+                            assertWorker(outerDisabled, "group", "outer", "2");
+                            assertWorker(outerDisabled, "case", "outer", "1");
+                            assertWorker(outerDisabled, "case", "outer", "2");
+                            assertWorker(innerDisabled, "group", "inner", null);
+                            assertWorker(innerDisabled, "case", "inner", null);
+                        }
+
                         // Initial state: everything is disabled
-                        this.assertInputDisabled(true, true);
+                        assertInputDisabled(true, true);
                         ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [[
                             // Enable just outer
                             function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
                             // Inputs in outer should be enabled and input in inner should still be disabled
-                            function() { this.assertInputDisabled(false, true); }
+                            function() { assertInputDisabled(false, true); }
                         ], [
                             // Enable inner
                             function() { YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]); },
                             // Now everything is enabled (that is pretty simple)
-                            function() { this.assertInputDisabled(false, false); }
+                            function() { assertInputDisabled(false, false); }
                         ], [
                             // Get back to the initial state where outer and inner are disabled
                             function() {
                                 YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]);
                                 YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]);
                             },
+                            function() {}
+                        ]]);
+                    },
+
+                    /**
+                     * When a YUI button is built from a disabled button, YUI creates a disabled button. If the button is
+                     * in a non-selected case, we need to make sure the YUI button is enabled when the case becomes
+                     * selected.
+                     */
+                    testDisabledOnYUIButton: function() {
+
+                        function assertButtonDisabled(groupOrCase) {
+                            var yuiButton = YAHOO.util.Dom.getElementsByClassName("yui-button", null, groupOrCase + "-outer-button")[0];
+                            YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(yuiButton, "yui-button-disabled"), "yui button in " + groupOrCase + " must not be disabled");
+                        }
+
+                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [[
+                            // Enable outer so button becomes visible
+                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
+                            // Buttons must not be disabled
+                            function() { assertButtonDisabled("group"); assertButtonDisabled("case"); }
+                        ], [
+                            // Get back to the initial state where outer and inner are disabled
+                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
                             function() {}
                         ]]);
                     }
@@ -110,6 +135,9 @@
                     <xforms:input ref="input" id="group-inner-input"/>
                 </xforms:group>
                 <xforms:input ref="input" id="group-outer-input-2"/>
+                <fr:button id="group-outer-button">
+                    <xforms:label>Button</xforms:label>
+                </fr:button>
             </xforms:group>
         </xhtml:fieldset>
         <xhtml:fieldset>
@@ -125,6 +153,9 @@
                         </xforms:case>
                     </xforms:switch>
                     <xforms:input ref="input" id="case-outer-input-2"/>
+                    <fr:button id="case-outer-button">
+                        <xforms:label>Button</xforms:label>
+                    </fr:button>
                 </xforms:case>
             </xforms:switch>
         </xhtml:fieldset>

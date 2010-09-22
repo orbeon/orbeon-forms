@@ -64,9 +64,20 @@
 
                         <xxforms:script ev:event="xforms-enabled">
                             if (event.target) {
-                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
+                                <!-- Node used to initialize YUI button -->
+                                var yuiButtonSpan = event.target.parentNode.parentNode;
+                                <!-- See if we already have a button initialized for this node, and proceed only if don't -->
+                                <!-- TODO: This basic test can fail on repeats, where we might not receive an xforms-enabled
+                                     on a newly added iteration. Instead, we should create an XBL class for the button. -->
+                                var button = YAHOO.widget.Button.getButton(yuiButtonSpan.id);
                                 if (button == null) {
-                                    button = new YAHOO.widget.Button(event.target.parentNode.parentNode);
+                                    <!-- If the button is disabled, enabled it while the YUI button is initialized,
+                                         otherwise the YUI button becomes disabled -->
+                                    var htmlButton = yuiButtonSpan.getElementsByTagName("button")[0];
+                                    var isDisabled = htmlButton.disabled;
+                                    if (isDisabled) ORBEON.xforms.Controls.setDisabledOnFormElement(htmlButton, false);
+                                    button = new YAHOO.widget.Button(yuiButtonSpan);
+                                    if (isDisabled) ORBEON.xforms.Controls.setDisabledOnFormElement(htmlButton, true);
                                     <!-- TODO: once we can pass values from XForms to JavaScript we'll be able to get rid of the XSLT used here -->
                                     <xsl:if test="/fr:button/@tabindex">button.set("tabindex", <xsl:value-of select="/fr:button/@tabindex"/>);</xsl:if>
                                 }
@@ -92,4 +103,3 @@
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>
-

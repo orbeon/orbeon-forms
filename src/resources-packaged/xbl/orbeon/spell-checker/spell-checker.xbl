@@ -114,15 +114,18 @@
         </xbl:resources>
         <xbl:template>
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xforms:group xxbl:scope="inner">
+                <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
 
                     <!-- Variable pointing to external single-node binding -->
                     <xxforms:variable name="binding" as="node()?">
                         <xxforms:sequence select="." xxbl:scope="outer"/>
                     </xxforms:variable>
 
+                    <!-- Shortcut to internal UI instance -->
+                    <xxforms:variable name="ui" as="element()" select="instance('ui')"/>
+
                     <!-- Trigger that starts spell checking -->
-                    <fr:button ref="." class="fr-spell-checker-start">
+                    <fr:button ref="$binding" class="fr-spell-checker-start" id="spell-check">
                         <xforms:label>Spell check</xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <xforms:setvalue ref="instance('request')/text" value="$binding"/>
@@ -144,15 +147,15 @@
 
                         <!-- On close, apply replacements and do cleanup -->
                         <xforms:action ev:event="xxforms-dialog-close">
-                            <xforms:action xxforms:iterate="instance('ui')/replacements/word">
+                            <xforms:action xxforms:iterate="$ui/replacements/word">
                                 <xxforms:variable name="replacement" select="."/>
                                 <xforms:setvalue ref="$binding" value="concat(
                                     substring(., 1, $replacement/@o),
                                     $replacement/@by,
                                     substring(., $replacement/@o + $replacement/@l + 1))"/>
                             </xforms:action>
-                            <xforms:delete nodeset="instance('ui')/(ignore-all | replacements)/word"/>
-                            <xforms:setvalue xxforms:iterate="instance('ui')/*" ref="."/>
+                            <xforms:delete nodeset="$ui/(ignore-all | replacements)/word"/>
+                            <xforms:setvalue xxforms:iterate="$ui/*" ref="."/>
                         </xforms:action>
 
                         <xforms:group ref=".[$has-corrections]" class="xbl-fr-spell-checker-correcting">
@@ -160,7 +163,7 @@
                                 <xhtml:tr>
                                     <xhtml:td class="label">Not in dictionary:</xhtml:td>
                                     <xhtml:td>
-                                        <xforms:output value="instance('ui')/context" mediatype="text/html" id="not-in-dictionary" class="not-in-dictionary"/>
+                                        <xforms:output value="$ui/context" mediatype="text/html" id="not-in-dictionary" class="not-in-dictionary"/>
                                     </xhtml:td>
                                     <xhtml:td rowspan="4">
                                         <!-- Ignore -->
@@ -181,19 +184,19 @@
                                                 Ignore All
                                             </xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="instance('ui')/ignore-all" origin="xxforms:element('word', ../unknown-word/text())"/>
+                                                <xforms:insert context="$ui/ignore-all" origin="xxforms:element('word', ../unknown-word/text())"/>
                                                 <xforms:delete nodeset="instance('result')/c[1]"/>
                                                 <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
                                             </xforms:action>
                                         </fr:button>
                                         <xforms:group appearance="xxforms:internal">
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="instance('ui')/replacements"
+                                                <xforms:insert context="$ui/replacements"
                                                     origin="xxforms:element('word', (
                                                         xxforms:attribute('by', ../correction),
                                                         xxforms:attribute('o', instance('result')/c[1]/@o),
                                                         xxforms:attribute('l', instance('result')/c[1]/@l),
-                                                        xxforms:attribute('change-all', instance('ui')/is-change-all),
+                                                        xxforms:attribute('change-all', $ui/is-change-all),
                                                         ../unknown-word/text()
                                                     ))"/>
                                                 <xforms:delete nodeset="instance('result')/c[1]"/>
@@ -205,7 +208,7 @@
                                                     <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
                                                     Change
                                                 </xforms:label>
-                                                <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/is-change-all">false</xforms:setvalue>
+                                                <xforms:setvalue ev:event="DOMActivate" ref="$ui/is-change-all">false</xforms:setvalue>
                                             </fr:button>
                                             <!-- Change all -->
                                             <fr:button id="change-all">
@@ -213,7 +216,7 @@
                                                     <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
                                                     Change All
                                                 </xforms:label>
-                                                <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/is-change-all">true</xforms:setvalue>
+                                                <xforms:setvalue ev:event="DOMActivate" ref="$ui/is-change-all">true</xforms:setvalue>
                                             </fr:button>
                                         </xforms:group>
                                         <!-- Close -->
@@ -231,7 +234,7 @@
                                         <xforms:label for="correction">Change to:</xforms:label>
                                     </xhtml:td>
                                     <xhtml:td>
-                                        <xforms:input ref="instance('ui')/correction" id="correction"/>
+                                        <xforms:input ref="$ui/correction" id="correction"/>
                                     </xhtml:td>
                                 </xhtml:tr>
                                 <xhtml:tr>
@@ -239,7 +242,7 @@
                                         <xforms:label for="suggestions">Suggestions:</xforms:label>
                                     </xhtml:td>
                                     <xhtml:td>
-                                        <xforms:select1 id="suggestions" appearance="compact" ref="instance('ui')/correction">
+                                        <xforms:select1 id="suggestions" appearance="compact" ref="$ui/correction">
                                             <xforms:itemset ref="tokenize(instance('result')/c[1], '\s')">
                                                 <xforms:label value="."/>
                                                 <xforms:value value="."/>

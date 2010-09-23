@@ -25,9 +25,9 @@
         <xforms:model>
             <xforms:instance id="instance">
                 <instance>
-                    <text>Ths is a tst.</text>
-                    <text>Ths is a tst with tst spelled incorrectly twice.</text>
-                    <text>To be or not to be– that is the question: Whether 'tis nobler in the mind to suffer The slings
+                    <text readonly="false">Ths is a tst.</text>
+                    <text readonly="false">Ths is a tst with tst spelled incorrectly twice.</text>
+                    <text readonly="false">To be or not to be– that is the question: Whether 'tis nobler in the mind to suffer The slings
                         and arrows of outrageous fortune, Or to take arms against a sea of troubles And, by opposing,
                         end them. To die, to sleep No more – and by a sleep to say we end The heartache and the thousand
                         natural shocks That flesh is heir to – ‘tis a consummation Devoutly to be wished. To die, to
@@ -44,20 +44,24 @@
                         pitch and moment With this regard their currents turn awry, And lose the name of action.—Soft
                         you now! The fair Ophelia! Nymph, in thy orisons Be all my sins remembered.
                     </text>
-                    <text>helloo helloo worlrd</text>
-                    <text>helloo helloo worlrd</text>
+                    <text readonly="true">helloo helloo worlrd</text>
+                    <text readonly="false">helloo helloo worlrd</text>
                 </instance>
             </xforms:instance>
+            <xforms:bind nodeset="text" readonly="@readonly = 'true'"/>
         </xforms:model>
-        <xhtml:link type="text/cs   s" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/spell-checker/spell-checker-unittest.js"/> -->
         <xhtml:style type="text/css">
-            <!--  -->
+            <!-- Don't highlight current repeat iteration -->
             .xforms-repeat-selected-item-1 { background-color: transparent }
+            <!-- Add spacing between iterations -->
             .block { margin-top: 1em }
+            <!-- Make textarea a bit bigger -->
             textarea { margin: 0; height: 4em; width: 15em  }
+            <!-- Align the top of the button to the top of the textarea -->
             .xbl-fr-button .yui-button { vertical-align: top }
             button { vertical-align: top }
         </xhtml:style>
@@ -69,11 +73,15 @@
         </fr:button>
         <xforms:repeat nodeset="text">
             <xhtml:div class="block">
-                <xforms:textarea ref="."/>
-                <fr:spell-checker ref="."/>
-                <fr:button>
+                <xforms:textarea ref="." id="textarea"/>
+                <fr:spell-checker ref="." id="spell-checker"/>
+                <fr:button id="remove-line">
                     <xforms:label>Remove line</xforms:label>
                     <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                </fr:button>
+                <fr:button id="toggle-readonly">
+                    <xforms:label>Toggle readonly</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="@readonly" value="if (. = 'true') then 'false' else 'true'"/>
                 </fr:button>
             </xhtml:div>
         </xforms:repeat>

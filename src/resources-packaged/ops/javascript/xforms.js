@@ -1415,7 +1415,7 @@ ORBEON.xforms.Document = {
         var control = ORBEON.util.Dom.getElementById(controlId);
         if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
 
-        if (!ORBEON.util.Dom.hasClass(control, "xforms-output") && !ORBEON.util.Dom.hasClass(control, "xforms-upload")) {// ignore event on xforms:output and xforms:upload    
+        if (!ORBEON.util.Dom.hasClass(control, "xforms-output") && !ORBEON.util.Dom.hasClass(control, "xforms-upload")) {// ignore event on xforms:output and xforms:upload
             // Directly change the value of the control in the UI without waiting for a response from the server
             ORBEON.xforms.Controls.setCurrentValue(control, stringValue);
             // And also fire server event
@@ -2455,8 +2455,8 @@ ORBEON.xforms.Controls = {
             else ORBEON.util.Dom.removeClass(control, "xforms-readonly");
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
             // Auto-complete field
-            var input = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
+            var autocompleteInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+            ORBEON.xforms.Controls.setDisabledOnFormElement(autocompleteInput, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea") && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
             if (ORBEON.util.Properties.htmlEditor.get() == "yui") {

@@ -25,9 +25,6 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="http://api.spell-checker.net/js/spell-checker_ajax.js"/>
-    <xbl:script src="/xbl/orbeon/spell-checker/spell-checker.js"/>
-
     <xbl:binding id="fr-spell-checker" element="fr|spell-checker">
         <xbl:implementation>
             <!-- Local model -->
@@ -135,6 +132,7 @@
 
                     <!-- Spell checking dialog -->
                     <xxforms:dialog id="spell-checking-dialog" class="fr-spell-checker-dialog">
+                        <xforms:setfocus ev:event="xxforms-dialog-open" control="ignore"/>
                         <xforms:label>Spelling</xforms:label>
                         <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>
 
@@ -162,11 +160,11 @@
                                 <xhtml:tr>
                                     <xhtml:td class="label">Not in dictionary:</xhtml:td>
                                     <xhtml:td>
-                                        <xforms:output value="instance('ui')/context" mediatype="text/html" class="not-in-dictionary"/>
+                                        <xforms:output value="instance('ui')/context" mediatype="text/html" id="not-in-dictionary" class="not-in-dictionary"/>
                                     </xhtml:td>
                                     <xhtml:td rowspan="4">
                                         <!-- Ignore -->
-                                        <fr:button>
+                                        <fr:button id="ignore">
                                             <xforms:label>
                                                 <xhtml:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
                                                 Ignore
@@ -229,15 +227,19 @@
                                     </xhtml:td>
                                 </xhtml:tr>
                                 <xhtml:tr>
-                                    <xhtml:td class="label">Change to:</xhtml:td>
+                                    <xhtml:td class="label">
+                                        <xforms:label for="correction">Change to:</xforms:label>
+                                    </xhtml:td>
                                     <xhtml:td>
-                                        <xforms:input ref="instance('ui')/correction"/>
+                                        <xforms:input ref="instance('ui')/correction" id="correction"/>
                                     </xhtml:td>
                                 </xhtml:tr>
                                 <xhtml:tr>
-                                    <xhtml:td class="label">Suggestions:</xhtml:td>
+                                    <xhtml:td class="label">
+                                        <xforms:label for="suggestions">Suggestions:</xforms:label>
+                                    </xhtml:td>
                                     <xhtml:td>
-                                        <xforms:select1 appearance="compact" ref="instance('ui')/correction">
+                                        <xforms:select1 id="suggestions" appearance="compact" ref="instance('ui')/correction">
                                             <xforms:itemset ref="tokenize(instance('result')/c[1], '\s')">
                                                 <xforms:label value="."/>
                                                 <xforms:value value="."/>

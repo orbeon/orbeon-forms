@@ -54,23 +54,27 @@
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/spell-checker/spell-checker-unittest.js"/> -->
         <xhtml:style type="text/css">
+            <!--  -->
             .xforms-repeat-selected-item-1 { background-color: transparent }
-            .block { margin-bottom: 1em }
+            .block { margin-top: 1em }
+            textarea { margin: 0; height: 4em; width: 15em  }
+            .xbl-fr-button .yui-button { vertical-align: top }
+            button { vertical-align: top }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Add</xforms:label>
+        <fr:button>
+            <xforms:label>Add line</xforms:label>
             <xforms:insert nodeset="text" ev:event="DOMActivate"/>
-        </xforms:trigger>
+        </fr:button>
         <xforms:repeat nodeset="text">
             <xhtml:div class="block">
                 <xforms:textarea ref="."/>
                 <fr:spell-checker ref="."/>
-                <xforms:trigger appearance="minimal">
+                <fr:button>
                     <xforms:label>Remove line</xforms:label>
                     <xforms:delete ev:event="DOMActivate" nodeset="."/>
-                </xforms:trigger>
+                </fr:button>
             </xhtml:div>
         </xforms:repeat>
     </xhtml:body>

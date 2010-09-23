@@ -423,6 +423,7 @@
           <fileset refid="war.libs"/>
         </copy>
         <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
+        <delete file="${war.lib}/${saxon.jar}"/>
         <jar destfile="${war.lib}/${saxon.jar}">
             <zipfileset src="${lib.dir}/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
         </jar>

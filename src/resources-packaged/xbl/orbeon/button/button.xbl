@@ -97,6 +97,15 @@
                                     button.set("disabled", false);
                             }
                         </xxforms:script>
+                        <xxforms:script ev:event="xxforms-iteration-moved">
+                            <!-- Update readonly when the button moves to another iteration; we'll be able to get rid
+                                 of this once we have fixed ids in iterations -->
+                            if (event.target) {
+                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
+                                if (button != null)
+                                    button.set("disabled", YAHOO.util.Dom.hasClass(event.target, "xforms-readonly"));
+                            }
+                        </xxforms:script>
                     </xforms:trigger>
                 </xhtml:span>
             </xforms:group>

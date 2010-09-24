@@ -38,10 +38,8 @@
                     setUp : function () {
                         this.resourcesBaseURL = ORBEON.xforms.Globals.resourcesBaseURL;
                         this.xformsServerURL = ORBEON.xforms.Globals.xformsServerURL;
-
                         this.dummyScript1 = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(this.dummyScript1, "src", "/orbeon/foobar");
-
                         this.dummyScript2 = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(this.dummyScript2, "src", "/other/file.js");
                     },
@@ -51,109 +49,74 @@
                         ORBEON.xforms.Globals.xformsServerURL = this.xformsServerURL;
                     },
 
+                    checkPaths: function(resourcesBaseURL, xformsServerURL) {
+                        YAHOO.util.Assert.areEqual(resourcesBaseURL, ORBEON.xforms.Globals.resourcesBaseURL["xforms-form"]);
+                        YAHOO.util.Assert.areEqual(xformsServerURL, ORBEON.xforms.Globals.xformsServerURL["xforms-form"]);
+                    },
+
                     // Tests with a non-empty context
                     testBasePath1: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/orbeon/ops/javascript/xforms-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, false);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "/orbeon");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/orbeon/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, false);
+                        this.checkPaths("/orbeon", "/orbeon/xforms-server");
                     },
 
                     testBasePath2: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/orbeon/xforms-server/xforms-foobar-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, false);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "/orbeon");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/orbeon/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, false);
+                        this.checkPaths("/orbeon", "/orbeon/xforms-server");
                     },
 
                     testBasePath3: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/orbeon/3.1415/ops/javascript/xforms-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, true);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "/orbeon/3.1415");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/orbeon/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, true);
+                        this.checkPaths("/orbeon/3.1415", "/orbeon/xforms-server");
                     },
 
                     testBasePath4: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/orbeon/xforms-server/3.1415/xforms-foobar-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, true);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "/orbeon/3.1415");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/orbeon/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, true);
+                        this.checkPaths("/orbeon/3.1415", "/orbeon/xforms-server");
                     },
                     // Tests with an empty context
                     testBasePath5: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/ops/javascript/xforms-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, false);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, false);
+                        this.checkPaths("", "/xforms-server");
                     },
 
                     testBasePath6: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/xforms-server/xforms-foobar-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, false);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, false);
+                        this.checkPaths("", "/xforms-server");
                     },
 
                     testBasePath7: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/3.1415/ops/javascript/xforms-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, true);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "/3.1415");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, true);
+                        this.checkPaths("/3.1415", "/xforms-server");
                     },
 
                     testBasePath8: function() {
-
                         var scriptToMatch = document.createElement("script");
                         ORBEON.util.Dom.setAttribute(scriptToMatch, "src", "/xforms-server/3.1415/xforms-foobar-min.js");
-
                         var scripts = [this.dummyScript1, scriptToMatch, this.dummyScript2];
-
-                        ORBEON.xforms.Init._setBasePaths(scripts, true);
-
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.resourcesBaseURL, "/3.1415");
-                        YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.xformsServerURL, "/xforms-server");
+                        ORBEON.xforms.Init._setBasePaths("xforms-form", scripts, true);
+                        this.checkPaths("/3.1415", "/xforms-server");
                     }
                 }));
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {

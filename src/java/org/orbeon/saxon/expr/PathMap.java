@@ -57,7 +57,7 @@ public class PathMap implements Cloneable {
     private Map<String, PathMap> inScopeVariables;
     private Map<String, String> properties;
 
-    private boolean invalidated;    // whether during PathMap contruction it is found that we cannot produce a meaningful result
+    private boolean invalidated;    // whether during PathMap construction it is found that we cannot produce a meaningful result
 
     /**
      * A node in the path map. A node holds a set of arcs, each representing a link to another

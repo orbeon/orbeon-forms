@@ -436,34 +436,19 @@
 
 				if (sRole) {
 
-					switch (sRole) {
+                    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+                    oBody = this.body;
+                    sID = oBody.id || Dom.generateId(oBody);
+                    this.cfg.setProperty(_DESCRIBED_BY, sID);
 
-						case _ALERT_DIALOG:
-
-							oBody = this.body;
-
-							sID = oBody.id || Dom.generateId(oBody);
-
-							this.cfg.setProperty(_DESCRIBED_BY, sID);
-
-						break;
-
-						case _DIALOG:
-
-							oHeader = this.header;
-
-							sID = oHeader.id || Dom.generateId(oHeader);
-
-							this.cfg.setProperty(_LABELLED_BY, sID);
-
-						break;
-
-					}
+                    oHeader = this.header;
+                    if (oHeader != null) {
+                        sID = oHeader.id || Dom.generateId(oHeader);
+                        this.cfg.setProperty(_LABELLED_BY, sID);
+                    }
 
 					setARIARole(this.innerElement, sRole);
-
 					setRoleForCloseButton.call(this);
-
 				}
 
 			},

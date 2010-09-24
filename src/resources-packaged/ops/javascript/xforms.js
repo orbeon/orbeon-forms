@@ -2131,24 +2131,30 @@ ORBEON.xforms.Controls = {
             : element.parentNode;
     },
 
-    _setMessage: function(control, className, message) {
-        var lhhaElement = ORBEON.xforms.Controls._getControlLHHA(control, className);
+    _setMessage: function(control, lhhaType, message) {
+        var lhhaElement = ORBEON.xforms.Controls._getControlLHHA(control, lhhaType);
         if (lhhaElement != null) {
             lhhaElement.innerHTML = message;
-            var helpImage = ORBEON.xforms.Controls._getControlLHHA(control, "help-image");
             if (message == "") {
                 // Hide LHHA with empty content
-                ORBEON.util.Dom.addClass(lhhaElement, "xforms-disabled-subsequent");
+                // NOTE: This makes sense for help, but does it make sense for alert, label, and hint?
+                if (!ORBEON.util.Dom.hasClass(lhhaElement, "xforms-disabled"))
+                    ORBEON.util.Dom.addClass(lhhaElement, "xforms-disabled-subsequent");
                 // If this is the help element, also disable help image
-                if (className == "xforms-help")
-                    ORBEON.util.Dom.addClass(helpImage, "xforms-disabled-subsequent");
+                if (lhhaType == "help") {
+                    var helpImage = ORBEON.xforms.Controls._getControlLHHA(control, "help-image");
+                    if (!ORBEON.util.Dom.hasClass(helpImage, "xforms-disabled")) {
+                        ORBEON.util.Dom.addClass(helpImage, "xforms-disabled-subsequent");
+                    }
+                }
             } else {
                 // We show LHHA with non-empty content, but ONLY if the control is relevant
                 if (ORBEON.xforms.Controls.isRelevant(control)) {
                     ORBEON.util.Dom.removeClass(lhhaElement, "xforms-disabled");
                     ORBEON.util.Dom.removeClass(lhhaElement, "xforms-disabled-subsequent");
                     // If this is the help element, also enable the help image
-                    if (className == "xforms-help") {
+                    if (lhhaType == "help") {
+                        var helpImage = ORBEON.xforms.Controls._getControlLHHA(control, "help-image");
                         ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
                         ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled-subsequent");
                     }
@@ -2222,9 +2228,6 @@ ORBEON.xforms.Controls = {
         message = ORBEON.util.String.escapeHTMLMinimal(message);
         ORBEON.xforms.Controls._setMessage(control, "help", message);
         ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
-        // Enable the help image (it might be disabled if it was just copied from a repeat template)
-        var helpImage = ORBEON.xforms.Controls._getControlLHHA(control, "help-image");
-        ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
     },
 
     setValid: function(control, newValid) {

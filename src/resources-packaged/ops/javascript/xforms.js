@@ -3651,7 +3651,8 @@ ORBEON.xforms.Events = {
      */
     treeCheckClick: function() {
         var tree = this.tree;
-        var control = ORBEON.util.Dom.getElementById(tree.id);
+        var control = tree.getEl();
+        if (! YAHOO.util.Dom.hasClass(control, "xforms-control")) control = control.parentElement;
         ORBEON.xforms.Events.treeClickFocus(control);
         control.value = "";
         for (var nodeIndex in tree._nodes) {

@@ -36,7 +36,9 @@
         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
         <xsl:variable name="readonly" as="xs:boolean" select="@readonly = 'true'"/>
         <xsl:variable name="remove-constraint" select="@remove-constraint"/>
-        <xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>
+        <!-- As of 2010-09-23 only the "table" appearance is properly working -->
+        <!--<xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>-->
+        <xsl:variable name="is-table-appearance" as="xs:boolean" select="true()"/>
 
         <xhtml:link rel="stylesheet" href="/ops/yui/datatable/assets/skins/sam/datatable.css" type="text/css" media="all"/>
 
@@ -67,7 +69,7 @@
                                                 <!--/apps/fr/style/images/silk/add.png-->
                                                 <xforms:insert ev:event="DOMActivate"
                                                                origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
-                                                               context="." nodeset="{if (@after) then @after else if (@nodeset) then @nodeset else if (@ref) then @ref else concat('xxforms:bind(''', @bind, ''')')}"
+                                                               context="." nodeset="{if (@after) then @after else if (@nodeset) then @nodeset else '$fr-repeat-sequence'}"
                                                                at="index('{$fr-repeat/@id}')"/>
                                             </xforms:trigger>
                                             <xforms:group ref=".[not($can-add)]">

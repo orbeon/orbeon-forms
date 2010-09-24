@@ -450,7 +450,7 @@ Inserting error information into error list:
                                 <xxforms:variable name="ref" as="item()?">
                                     <xxforms:sequence select="." xxbl:scope="outer"/>
                                 </xxforms:variable>
-                                <xxforms:variable name="valid" as="xs:boolean" select="xs:boolean(.)" id="xxx">
+                                <xxforms:variable name="valid" as="xs:boolean" select="xs:boolean(.)">
                                     <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="$valid"/>
                                 </xxforms:variable>
                             </xforms:group>
@@ -510,40 +510,26 @@ Inserting error information into error list:
                                     <xforms:repeat nodeset="$visible-errors" id="er">
                                         <xhtml:li>
                                             <!-- Clickable / linkable label -->
-                                            <xxforms:variable name="has-label" as="xs:boolean" xxbl:scope="outer">
-                                                <xxforms:sequence select="normalize-space(@label)" xxbl:scope="inner"/>
-                                            </xxforms:variable>
-                                            <xxforms:variable name="error" as="element(error)" xxbl:scope="outer">
-                                                <xxforms:sequence select="." xxbl:scope="inner"/>
-                                            </xxforms:variable>
-                                            <!-- NOTE: Put the entire group or trigger in outer scope, as we can't yet deal with
-                                                 different scopes for control and nested action -->
-                                            <xforms:group ref=".[$has-label and property('xxforms:noscript')]" xxbl:scope="outer">
+                                            <xxforms:variable name="error" as="element(error)" select="."/>
+                                            <xxforms:variable name="has-label" as="xs:boolean" select="normalize-space(@label)"/>
+                                            <xxforms:variable name="effective-id" as="xs:string"
+                                                    select="string-join(($error/@id, if (normalize-space($error/@indexes)) then string-join(tokenize($error/@indexes, '\s+'), '-') else ()), '·')"/>
+
+                                            <xforms:group ref=".[$has-label and property('xxforms:noscript')]">
                                                 <!-- In noscript mode, use a plain link -->
-                                                <!-- TODO: compute effective id once xforms:function is implemented -->
-                                                 <xhtml:a href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
+                                                 <xhtml:a href="#{{$effective-id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                             </xforms:group>
                                             <!-- Otherwise use trigger -->
-                                            <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" xxbl:scope="outer"
-                                                            appearance="minimal" class="fr-error-label">
+                                            <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" appearance="minimal" class="fr-error-label">
                                                 <xforms:label value="normalize-space($error/@label)"/>
-                                                <!-- Set focus to control using static id and repeat indexes -->
-                                                <xforms:action ev:event="DOMActivate">
-                                                    <!-- Set correct index hierarchy -->
-                                                    <xxforms:variable name="indexes" select="tokenize($error/@indexes, '\s+')" as="xs:integer*"/>
-                                                    <xforms:action xxforms:iterate="tokenize($error/@repeats, '\s+')">
-                                                        <xxforms:variable name="position" select="position()" as="xs:integer"/>
-                                                        <xforms:setindex repeat="{{.}}" index="$indexes[$position]"/>
-                                                    </xforms:action>
-                                                    <!-- NOTE: @id stores the prefixed id, so obtain static id -->
-                                                    <xforms:setfocus control="{{tokenize($error/@id, '\$')[last()]}}"/>
-                                                </xforms:action>
+                                                <!-- Set focus to control using effective id -->
+                                                <xforms:setfocus ev:event="DOMActivate" control="{{$effective-id}}"/>
                                             </xforms:trigger>
                                             <!-- Repeat indexes -->
                                             <xforms:output ref=".[string-length(@indexes) > 0]" class="fr-error-row"
-                                                           value="concat(' [', @indexes, ']')"  id="io"/>
+                                                           value="concat(' [', @indexes, ']')" id="io"/>
                                             <!-- Separator -->
-                                            <xforms:output ref=".[$has-label]" value="' - '" class="fr-error-dash" xxbl:scope="outer"/>
+                                            <xforms:output ref=".[$has-label]" value="' - '" class="fr-error-dash"/>
                                             <!-- Alert message -->
                                             <xforms:output ref=".[normalize-space(@alert) != '']" class="fr-error-alert"
                                                            value="@alert" id="ao"/>

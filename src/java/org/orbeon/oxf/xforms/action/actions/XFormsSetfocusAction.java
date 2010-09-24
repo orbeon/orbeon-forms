@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -41,11 +42,11 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (controlIdAttributeValue == null)
             throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
 
-        final String resolvedControlStaticId;
+        final String resolvedControlStaticOrEffectiveId;
         {
             // Resolve AVT
-            resolvedControlStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, controlIdAttributeValue);
-            if (resolvedControlStaticId == null)
+            resolvedControlStaticOrEffectiveId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, controlIdAttributeValue);
+            if (resolvedControlStaticOrEffectiveId == null)
                 return;
         }
 
@@ -53,7 +54,15 @@ public class XFormsSetfocusAction extends XFormsAction {
         containingDocument.synchronizeAndRefresh(propertyContext);
 
         // Find control
-        final Object controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, resolvedControlStaticId);
+        final Object controlObject;
+        if (resolvedControlStaticOrEffectiveId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
+                || resolvedControlStaticOrEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+            // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
+            controlObject = containingDocument.getObjectByEffectiveId(resolvedControlStaticOrEffectiveId);
+        } else {
+            // Resolve using static id
+            controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, resolvedControlStaticOrEffectiveId);
+        }
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
             containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, (XFormsEventTarget) controlObject));
@@ -63,7 +72,7 @@ public class XFormsSetfocusAction extends XFormsAction {
             final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:setfocus", "control does not refer to an existing control element, ignoring action",
-                        "control id", resolvedControlStaticId);
+                        "control id", resolvedControlStaticOrEffectiveId);
         }
     }
 }

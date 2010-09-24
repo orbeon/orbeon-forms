@@ -350,6 +350,12 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Restore defaults for controls within component */
 .fr-grid-content .xbl-component .xforms-control { display: inline; clear: none }
+html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled-subsequent { display: none }
+html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
+    top: -10000px; /* this so that no space is visible on the page */
+    left: -10000px; /* this so that no space is visible on the page */
+    position: absolute;
+}
 
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
@@ -495,7 +501,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* ***** View, PDF, email ******************************************************************************************* */
 
 /* Textarea in output mode can contain line breaks so try to keep them */
-pre.xforms-textarea { white-space: -moz-pre-wrap; white-space: pre-wrap; *white-space: normal }
+pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; white-space: pre-wrap; *white-space: normal }
 
 .fr-mode-view .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
 .fr-mode-view .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }

@@ -7478,7 +7478,13 @@ ORBEON.xforms.Server = {
                                         // Set the requested target
                                         requestForm.target = target;
                                     }
-                                    requestForm.submit();
+                                    try {
+                                        requestForm.submit();
+                                    } catch (e) {
+                                        // NOP: This is to prevent the error "Unspecified error" in IE. This can
+                                        // happen when navigating away is cancelled by the user pressing cancel
+                                        // on a dialog displayed on unload.
+                                    }
                                 } else {
                                     // Submit form in the background (pseudo-Ajax request)
                                     YAHOO.util.Connect.setForm(requestForm, true, true);
@@ -7509,10 +7515,9 @@ ORBEON.xforms.Server = {
                                         try {
                                             window.location.href = resource;
                                         } catch (e) {
-                                            // nop
-                                            //
-                                            // This is to prevent the error "Unspecified error" in IE. This can happen when navigating away
-                                            // is cancelled by the user pressing cancel on a dialog displayed on unload.
+                                            // NOP: This is to prevent the error "Unspecified error" in IE. This can
+                                            // happen when navigating away is cancelled by the user pressing cancel
+                                            // on a dialog displayed on unload.
                                         }
                                     } else {
                                         window.open(resource, target);

@@ -1,0 +1,67 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Document.setValue() in repeats</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance>
+                <family-members>
+                    <name>Homer</name>
+                    <name>Bart</name>
+                </family-members>
+            </xforms:instance>
+        </xforms:model>
+
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+                    name: "Document.setValue() in repeats",
+
+                    testSetValue: function() {
+                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [[
+                            // Add iteration
+                            function() { YAHOO.util.Dom.get("add").getElementsByTagName("button")[0].click(); },
+                            function() {
+                                // Try setting value of "name"
+                                var setValueFailed = false;
+                                try {
+                                    ORBEON.xforms.Document.setValue("name", "gaga");
+                                } catch (e) {
+                                    setValueFailed = true;
+                                }
+                                // We want the above to fail, as their no control with effective id 'name'
+                                YAHOO.util.Assert.isTrue(setValueFailed, "setting value in repeat template must fail");
+                            }
+                        ]]);
+                    }
+                }));
+
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            ]]>
+        </xhtml:script>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:button id="add">
+            <xforms:label>Add</xforms:label>
+            <xforms:insert ev:event="DOMActivate" nodeset="name"/>
+        </fr:button>
+        <xforms:repeat nodeset="name">
+            <xforms:input id="name" ref="."/>
+        </xforms:repeat>
+    </xhtml:body>
+</xhtml:html>

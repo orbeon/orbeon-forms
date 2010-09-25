@@ -1801,6 +1801,12 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    isInRepeatTemplate: function(element) {
+        return ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
+            return ORBEON.util.Dom.hasClass(node, "xforms-repeat-template")
+        }, null, false);
+    },
+
     /**
      * Updates the value of a control in the UI.
      *

@@ -773,7 +773,7 @@
                         <xhtml:span class="fr-button">
                             <!-- New button -->
                             <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
-                                <fr:button>
+                                <fr:button ref=".">
                                     <xforms:label>
                                         <!--<xhtml:img src="/apps/fr/style/add.gif" alt=""/>-->
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt=""/>
@@ -786,7 +786,7 @@
                             </xforms:group>
                             <!-- Print button -->
                             <xforms:group ref="if (. = 'print') then instance('fr-summary-triggers-instance')/view else ()">
-                                <fr:button>
+                                <fr:button ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/eye.png" alt=""/>
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/review"/></xhtml:span>
@@ -802,7 +802,7 @@
                             </xforms:group>
                             <!-- PDF button -->
                             <xforms:group ref="if (. = 'pdf') then instance('fr-summary-triggers-instance')/pdf else ()">
-                                <fr:button>
+                                <fr:button ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
@@ -816,7 +816,7 @@
                             </xforms:group>
                             <!-- Test button -->
                             <xforms:group ref="if (. = 'test') then instance('fr-summary-triggers-instance')/view else ()">
-                                <fr:button>
+                                <fr:button ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="" title="Test Form"/>
                                         <xhtml:span>Test</xhtml:span>
@@ -830,7 +830,7 @@
                             </xforms:group>
                             <!-- Delete button -->
                             <xforms:group ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
-                                <fr:button>
+                                <fr:button ref=".">
                                     <xforms:label>
                                         <!--<xhtml:img src="/apps/fr/style/delete.gif" alt=""/>-->
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt=""/>

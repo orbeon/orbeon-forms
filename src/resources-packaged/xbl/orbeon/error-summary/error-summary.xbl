@@ -523,7 +523,11 @@ Inserting error information into error list:
                                             <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" appearance="minimal" class="fr-error-label">
                                                 <xforms:label value="normalize-space($error/@label)"/>
                                                 <!-- Set focus to control using effective id -->
-                                                <xforms:setfocus ev:event="DOMActivate" control="{{$effective-id}}"/>
+                                                <!-- Make sure variable is in outer scope so that id resolution works if id is a top-level id -->
+                                                <xxforms:variable name="effective-id-outer" as="xs:string" xxbl:scope="outer">
+                                                    <xxforms:sequence select="$effective-id" xxbl:scope="inner"/>
+                                                </xxforms:variable>
+                                                <xforms:setfocus ev:event="DOMActivate" control="{{$effective-id-outer}}" xxbl:scope="outer"/>
                                             </xforms:trigger>
                                             <!-- Repeat indexes -->
                                             <xforms:output ref=".[string-length(@indexes) > 0]" class="fr-error-row"

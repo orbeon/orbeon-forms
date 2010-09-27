@@ -17,17 +17,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents xforms:repeat iteration information.
@@ -146,16 +142,16 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
         return !mustSendIterationUpdate(otherRepeatIterationControl);
     }
 
-    private boolean mustSendIterationUpdate(XFormsRepeatIterationControl otherSelect1Control) {
+    private boolean mustSendIterationUpdate(XFormsRepeatIterationControl other) {
 
         // NOTE: We only care about relevance changes. We should care about moving iterations around, but that's not
         // handled that way yet!
 
         // NOTE: We output if we are NOT relevant as the client must mark non-relevant elements. Ideally, we should not
         // have non-relevant iterations actually present on the client.
-        return (otherSelect1Control == null && !isRelevant()
+        return (other == null && !isRelevant()
                 //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
-                || otherSelect1Control != null && otherSelect1Control.isRelevant() != isRelevant());//TODO: not sure why the above alternative fails tests. Which is more correct?
+                || other != null && other.isRelevant() != isRelevant());//TODO: not sure why the above alternative fails tests. Which is more correct?
     }
 
     @Override

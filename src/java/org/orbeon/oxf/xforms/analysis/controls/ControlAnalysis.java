@@ -141,6 +141,7 @@ public class ControlAnalysis extends ViewAnalysis {
 
     public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
         helper.startElement("control", new String[] {
+                "name", element.getName(),
                 "scope", scope.scopeId,
                 "prefixed-id", prefixedId,
                 "model-prefixed-id", getModelPrefixedId(),

@@ -24,7 +24,7 @@ var PATH_TO_JAVASCRIPT_2 = XFORMS_SERVER_PATH + "/";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
-var XFORMS_REGEXP_CR = new RegExp("\\r", "g ");
+var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
 var XFORMS_REGEXP_SINGLE_QUOTE = new RegExp("'", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
@@ -507,7 +507,7 @@ ORBEON.util = {
         existsAncestorOrSelf: function(node, fn, obj, overrideContext) {
             while (true) {
                 if (overrideContext ? fn.call(obj, node) : fn(node)) return true;
-                node = node.parentElement;
+                node = node.parentNode;
                 if (node == null) break;
             }
             return false;
@@ -2291,10 +2291,11 @@ ORBEON.xforms.Controls = {
                 // If the root becomes enabled, mark the form controls under the root enabled only if they don't have a
                 // parent which is either a disabled case (xforms-case-deselected) or a non-relevant
                 // group (xforms-disabled).
-                if (! ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
-                            return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
-                                || YAHOO.util.Dom.hasClass(node, "xforms-disabled")
-                        }, null, false)) {
+                var hasParentDisabledOrNonRelevant = ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
+                        return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
+                            || YAHOO.util.Dom.hasClass(node, "xforms-disabled");
+                    }, null, false);
+                if (! hasParentDisabledOrNonRelevant) {
                     ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
                 }
             }
@@ -3645,7 +3646,7 @@ ORBEON.xforms.Events = {
     treeCheckClick: function() {
         var tree = this.tree;
         var control = tree.getEl();
-        if (! YAHOO.util.Dom.hasClass(control, "xforms-control")) control = control.parentElement;
+        if (! YAHOO.util.Dom.hasClass(control, "xforms-control")) control = control.parentNode;
         ORBEON.xforms.Events.treeClickFocus(control);
         control.value = "";
         for (var nodeIndex in tree._nodes) {

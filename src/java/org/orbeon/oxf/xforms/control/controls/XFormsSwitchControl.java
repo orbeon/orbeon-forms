@@ -50,11 +50,11 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
         // Restore state if needed
         if (state != null) {
-            final Element stateElement = state. get(effectiveId);
+            final Element stateElement = state.get(effectiveId);
             // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
             final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
             if (stateElement != null)
-                local.selectedCaseControlId = element.attributeValue("case-id");
+                local.selectedCaseControlId = stateElement.attributeValue("case-id");
             else
                 local.selectedCaseControlId = findDefaultSelectedCaseId();// special case of unit tests which don't actually include a value
 

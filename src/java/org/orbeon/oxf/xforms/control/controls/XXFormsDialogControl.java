@@ -78,13 +78,13 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
         // Restore state if needed
         if (state != null) {
-            final Element stateElement = state. get(effectiveId);
+            final Element stateElement = state.get(effectiveId);
             // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
             if (stateElement != null) {
-                final String visibleString = element.attributeValue("visible");
+                final String visibleString = stateElement.attributeValue("visible");
                 setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
-                        "true".equals(element.attributeValue("constrain")),
-                        element.attributeValue("neighbor")));
+                        "true".equals(stateElement.attributeValue("constrain")),
+                        stateElement.attributeValue("neighbor")));
             } else {
                 // special case of unit tests which don't actually include a value
             }

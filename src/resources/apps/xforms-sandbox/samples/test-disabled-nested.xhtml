@@ -24,7 +24,7 @@
             <![CDATA[
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-                    name: "XHTML Editor",
+                    name: "Nested disabled",
 
                     /**
                      * For both groups and cases, when not shown, any form field inside the group or case should
@@ -42,7 +42,6 @@
                                 var input = YAHOO.util.Dom.get(controlId).getElementsByTagName("input")[0];
                                 var message = innerOrOuter + " " + groupOrCase + " input" +  (innerOrOuter == "outer" ? " " + index : "") + " has not expected disabled state";
                                 YAHOO.util.Assert.areEqual(expected, input.disabled, message);
-
                             }
                             assertWorker(outerDisabled, "group", "outer", "1");
                             assertWorker(outerDisabled, "group", "outer", "2");

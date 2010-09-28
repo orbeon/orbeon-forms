@@ -2293,7 +2293,9 @@ ORBEON.xforms.Controls = {
                 // group (xforms-disabled).
                 var hasParentDisabledOrNonRelevant = ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
                         return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
-                            || YAHOO.util.Dom.hasClass(node, "xforms-disabled");
+                            || YAHOO.util.Dom.hasClass(node, "xforms-case-deselected-subsequent")
+                            || YAHOO.util.Dom.hasClass(node, "xforms-disabled")
+                            || YAHOO.util.Dom.hasClass(node, "xforms-disabled-subsequent");
                     }, null, false);
                 if (! hasParentDisabledOrNonRelevant) {
                     ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
@@ -2361,9 +2363,11 @@ ORBEON.xforms.Controls = {
                             ORBEON.util.Dom.removeClass(current, "xforms-disabled");
                             ORBEON.util.Dom.removeClass(current, "xforms-disabled-subsequent");
                             ORBEON.util.Dom.nudgeAfterDelay(current);
+                            ORBEON.xforms.Controls.setDisabledOnTree(current, ! isRelevant);
                         }
                         if (!isRelevant) {
                             ORBEON.util.Dom.addClass(current, "xforms-disabled-subsequent");
+                            ORBEON.xforms.Controls.setDisabledOnTree(current, ! isRelevant);
                         }
                     }
                 }

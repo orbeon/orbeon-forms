@@ -148,6 +148,10 @@
                     <!-- Actions -->
                     <!-- TODO -->
 
+                    <!-- Schema: simply copy so that the types are available locally -->
+                    <!-- NOTE: Could optimized to check if any of the types are actually used -->
+                    <xsl:copy-of select="$fr-form-model/xs:schema"/>
+
                 </xforms:model>
             </xbl:implementation>
 

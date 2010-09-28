@@ -15,6 +15,7 @@
                     <input/>
                 </instance>
             </xforms:instance>
+            <xforms:bind ref="enabled" relevant=". = 'true'"/>
         </xforms:model>
 
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -37,23 +38,38 @@
                          * by the attributes.
                          */
                         function assertInputDisabled(outerDisabled, innerDisabled) {
-                            function assertWorker(expected, groupOrCase, innerOrOuter, index) {
-                                var controlId = groupOrCase + "-" + innerOrOuter + "-input" + (innerOrOuter == "outer" ? "-" + index : "");
+                            function assertWorker(expected, groupOrCaseOrRepeat, innerOrOuter, index) {
+                                var controlId = groupOrCaseOrRepeat + "-" + innerOrOuter + "-input" + index;
+                                if (groupOrCaseOrRepeat == "repeat") controlId;
                                 var input = YAHOO.util.Dom.get(controlId).getElementsByTagName("input")[0];
-                                var message = innerOrOuter + " " + groupOrCase + " input" +  (innerOrOuter == "outer" ? " " + index : "") + " has not expected disabled state";
+                                var message = "input " + controlId  + " has not expected disabled state";
+                                if (expected != input.disabled) { console.log(input); debugger; }
                                 YAHOO.util.Assert.areEqual(expected, input.disabled, message);
                             }
-                            assertWorker(outerDisabled, "group", "outer", "1");
-                            assertWorker(outerDisabled, "group", "outer", "2");
-                            assertWorker(outerDisabled, "case", "outer", "1");
-                            assertWorker(outerDisabled, "case", "outer", "2");
-                            assertWorker(innerDisabled, "group", "inner", null);
-                            assertWorker(innerDisabled, "case", "inner", null);
+                            assertWorker(outerDisabled, "group", "outer", "-1");
+                            assertWorker(outerDisabled, "group", "outer", "-2");
+                            assertWorker(innerDisabled, "group", "inner", "");
+                            assertWorker(outerDisabled, "repeat", "outer", "-1" + XFORMS_SEPARATOR_1 + "1");
+                            assertWorker(outerDisabled, "repeat", "outer", "-2" + XFORMS_SEPARATOR_1 + "1");
+                            assertWorker(innerDisabled, "repeat", "inner", XFORMS_SEPARATOR_1 + "1-1");
+                            assertWorker(outerDisabled, "case", "outer", "-1");
+                            assertWorker(outerDisabled, "case", "outer", "-2");
+                            assertWorker(innerDisabled, "case", "inner", "");
                         }
 
                         // Initial state: everything is disabled
                         assertInputDisabled(true, true);
                         ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [[
+                            // Enable just inner
+                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]); },
+                            // Inputs in inner should still be disabled as outer is disabled
+                            function() { assertInputDisabled(true, true); }
+                        ], [
+                            // Get back to the initial state where outer and inner are disabled
+                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]); },
+                            // As at the beginning, everything should be disabled
+                            function() { assertInputDisabled(true, true); }
+                        ], [
                             // Enable just outer
                             function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
                             // Inputs in outer should be enabled and input in inner should still be disabled
@@ -70,7 +86,8 @@
                                 YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]);
                             },
                             function() {}
-                        ]]);
+                        ]
+                        ]);
                     },
 
                     /**
@@ -138,6 +155,20 @@
                     <xforms:label>Button</xforms:label>
                 </fr:button>
             </xforms:group>
+        </xhtml:fieldset>
+        <!-- TODO: we should add a test case with nested groups around tr, as the markup we generate for those is different -->
+        <xhtml:fieldset>
+            <xhtml:legend>Nested repeats</xhtml:legend>
+            <xforms:repeat nodeset="instance()/enabled[@section = 'outer']" id="outer-repeat">
+                <xforms:input ref="instance()/input" id="repeat-outer-input-1"/>
+                <xforms:repeat nodeset="instance()/enabled[@section = 'inner']" id="inner-repeat">
+                    <xforms:input ref="instance()/input" id="repeat-inner-input"/>
+                </xforms:repeat>
+                <xforms:input ref="instance()/input" id="repeat-outer-input-2"/>
+                <fr:button id="repeat-outer-button">
+                    <xforms:label>Button</xforms:label>
+                </fr:button>
+            </xforms:repeat>
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Nested cases</xhtml:legend>

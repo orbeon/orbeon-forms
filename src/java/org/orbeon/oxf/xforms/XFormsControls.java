@@ -650,7 +650,8 @@ public class XFormsControls implements XFormsObjectResolver {
             indentedLogger.endHandleOperation(
                     "controls visited", Integer.toString(listener.getVisitedCount()),
                     "repeat iterations visited", Integer.toString(listener.getIterationCount()),
-                    "bindings evaluated", Integer.toString(listener.getUpdateCount())
+                    "bindings evaluated", Integer.toString(listener.getUpdateCount()),
+                    "bindings optimized", Integer.toString(listener.getOptimizedCount())
             );
 
             // Controls are clean
@@ -748,7 +749,8 @@ public class XFormsControls implements XFormsObjectResolver {
         indentedLogger.endHandleOperation(
                 "controls visited", Integer.toString(listener.getVisitedCount()),
                 "repeat iterations visited", Integer.toString(listener.getIterationCount()),
-                "bindings evaluated", Integer.toString(listener.getUpdateCount())
+                "bindings evaluated", Integer.toString(listener.getUpdateCount()),
+                "bindings optimized", Integer.toString(listener.getOptimizedCount())
         );
     }
 

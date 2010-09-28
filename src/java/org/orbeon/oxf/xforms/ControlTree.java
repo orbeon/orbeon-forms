@@ -853,6 +853,7 @@ public class ControlTree implements ExternalCopyable {
 
         private transient int visitedCount;
         private transient int updateCount;
+        private transient int optimizedCount;
         private transient int iterationCount;
 
         public UpdateBindingsListener(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Map<String, XFormsControl> effectiveIdsToControls) {
@@ -962,6 +963,7 @@ public class ControlTree implements ExternalCopyable {
                 if (currentControl != null) {
                     // Push existing binding without re-evaluating
                     currentContextStack.pushBinding(currentControl.getBindingContext());
+                    optimizedCount++;
                 } else {
                     // Push with evaluation
                     currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
@@ -978,6 +980,10 @@ public class ControlTree implements ExternalCopyable {
 
         public int getUpdateCount() {
             return updateCount;
+        }
+
+        public int getOptimizedCount() {
+            return optimizedCount;
         }
 
         public int getIterationCount() {

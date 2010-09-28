@@ -40,14 +40,16 @@ public class PathMapXPathDependencies implements XPathDependencies {
     private Set<String> modifiedPaths = new HashSet<String>();
 
     // Cache to speedup checks on repeated items
-    private Map<String, Boolean> modifiedBindingCache = new HashMap<String, Boolean>();
-    private Map<String, Boolean> modifiedValueCache = new HashMap<String, Boolean>();
+    private Map<String, UpdateResult> modifiedBindingCache = new HashMap<String, UpdateResult>();
+    private Map<String, UpdateResult> modifiedValueCache = new HashMap<String, UpdateResult>();
 
 //    // Set of MIP nodes to check in the end
 //    private Set<NodeInfo> touchedMIPNodes = new HashSet<NodeInfo>();
 
     private int bindingUpdateCount;
     private int valueUpdateCount;
+
+    private int xpathOptimizedCount;
 
     public PathMapXPathDependencies(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
@@ -101,7 +103,8 @@ public class PathMapXPathDependencies implements XPathDependencies {
 
         getLogger().logDebug("dependencies", "refresh done",
                 "bindings updated", Integer.toString(bindingUpdateCount),
-                "values updated", Integer.toString(valueUpdateCount));
+                "values updated", Integer.toString(valueUpdateCount),
+                "XPath optimized", Integer.toString(xpathOptimizedCount));
 
         modifiedNodes.clear();
         structuralChanges.clear();
@@ -115,6 +118,7 @@ public class PathMapXPathDependencies implements XPathDependencies {
 
         bindingUpdateCount = 0;
         valueUpdateCount = 0;
+        xpathOptimizedCount = 0;
     }
 
     // Protected to help with unit tests
@@ -168,85 +172,113 @@ public class PathMapXPathDependencies implements XPathDependencies {
         return sb.toString();
     }
 
+    private static class UpdateResult {
+        public final boolean value;
+        public final int savedEvaluations;
+
+        private UpdateResult(boolean value, int savedEvaluations) {
+            this.value = value;
+            this.savedEvaluations = savedEvaluations;
+        }
+    }
+
     public boolean requireBindingUpdate(String controlPrefixedId) {
 
-        final boolean result;
-        final Boolean cached = modifiedBindingCache.get(controlPrefixedId);
+        final UpdateResult updateResult;
+        final UpdateResult cached = modifiedBindingCache.get(controlPrefixedId);
         if (cached != null) {
-            result = cached;
+            updateResult = cached;
         } else {
+            final boolean requireUpdate;
+            final int savedEvaluations;
             final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
             if (controlAnalysis.getBindingAnalysis() == null) {
                 // Control does not have an XPath binding
-                result = false;
+                requireUpdate = false;
+                savedEvaluations = 0;
             } else if (!controlAnalysis.getBindingAnalysis().figuredOutDependencies) {
                 // Binding dependencies are unknown
-                result = true;
+                requireUpdate = true;
+                savedEvaluations = 0;// N/A
             } else {
                 // Binding dependencies are known
                 if (structuralChanges.isEmpty()) {
                     // No structural change, just test for paths
-                    result = controlAnalysis.getBindingAnalysis().intersectsBinding(getModifiedPaths());
+                    requireUpdate = controlAnalysis.getBindingAnalysis().intersectsBinding(getModifiedPaths());
                 } else {
                     // Structural change, also test for models
-                    result = controlAnalysis.getBindingAnalysis().intersectsModels(structuralChanges)
+                    requireUpdate = controlAnalysis.getBindingAnalysis().intersectsModels(structuralChanges)
                             || controlAnalysis.getBindingAnalysis().intersectsBinding(getModifiedPaths());
                 }
+                savedEvaluations = controlAnalysis.bindingXPathEvaluations;
             }
-            if (result) {
-                getLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
+            if (requireUpdate) {
+                getLogger().logDebug("dependencies", "binding requires update", "prefixed id", controlPrefixedId,
                         "XPath", controlAnalysis.getBindingAnalysis().xpathString);
             }
 
-            modifiedBindingCache.put(controlPrefixedId, result);
+            updateResult = new UpdateResult(requireUpdate, savedEvaluations);
+            modifiedBindingCache.put(controlPrefixedId, updateResult);
         }
 
-        if (result) {
+        if (updateResult.value) {
             bindingUpdateCount++;
+        } else {
+            // Update not required
+            xpathOptimizedCount += updateResult.savedEvaluations;
         }
-        return result;
+        return updateResult.value;
     }
 
     public boolean requireValueUpdate(String controlPrefixedId) {
 
-        final boolean result;
-        final Boolean cached = modifiedValueCache.get(controlPrefixedId);
+        final UpdateResult updateResult;
+        final UpdateResult cached = modifiedValueCache.get(controlPrefixedId);
         final XPathAnalysis valueAnalysis;
         if (cached != null) {
-            result =  cached;
-            valueAnalysis = result ? staticState.getControlAnalysis(controlPrefixedId).getValueAnalysis() : null;
+            updateResult =  cached;
+            valueAnalysis = updateResult.value ? staticState.getControlAnalysis(controlPrefixedId).getValueAnalysis() : null;
         } else {
+            final boolean requireUpdate;
+            final int savedEvaluations;
             final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
             valueAnalysis = controlAnalysis.getValueAnalysis();
             if (valueAnalysis == null) {
                 // Control does not have a value
-                result = true;//TODO: should be able to return false here; change once markDirty is handled better
+                requireUpdate = true;//TODO: should be able to return false here; change once markDirty is handled better
+                savedEvaluations = 0;
             } else if (!valueAnalysis.figuredOutDependencies) {
                 // Value dependencies are unknown
-                result = true;
+                requireUpdate = true;
+                savedEvaluations = 0;// N/A
             } else {
                 // Value dependencies are known
                 if (structuralChanges.isEmpty()) {
                     // No structural change, just test for paths
-                    result = valueAnalysis.intersectsValue(getModifiedPaths());
+                    requireUpdate = valueAnalysis.intersectsValue(getModifiedPaths());
                 } else {
                     // Structural change, also test for models
-                    result = valueAnalysis.intersectsModels(structuralChanges)
+                    requireUpdate = valueAnalysis.intersectsModels(structuralChanges)
                             || valueAnalysis.intersectsValue(getModifiedPaths());
                 }
+                savedEvaluations = controlAnalysis.hasValueXPath ? 1 : 0;
             }
-            if (result && valueAnalysis != null) {
-                getLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
+            if (requireUpdate && valueAnalysis != null) {
+                getLogger().logDebug("dependencies", "value requires update", "prefixed id", controlPrefixedId,
                         "XPath", valueAnalysis.xpathString);
             }
 
-            modifiedValueCache.put(controlPrefixedId, result);
+            updateResult = new UpdateResult(requireUpdate, savedEvaluations);
+            modifiedValueCache.put(controlPrefixedId, updateResult);
         }
 
-        if (result && valueAnalysis != null) {// TODO: see above, check on valueAnalysis only because non-value controls still call this method
+        if (updateResult.value && valueAnalysis != null) {// TODO: see above, check on valueAnalysis only because non-value controls still call this method
             valueUpdateCount++;
+        } else {
+            // Update not required
+            xpathOptimizedCount += updateResult.savedEvaluations;
         }
-        return result;
+        return updateResult.value;
     }
 
     public boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId) {

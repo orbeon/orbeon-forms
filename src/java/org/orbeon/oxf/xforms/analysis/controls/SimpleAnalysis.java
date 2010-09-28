@@ -41,7 +41,12 @@ public abstract class SimpleAnalysis {
     public final boolean canHoldValue;
     public final Model containingModel;
 
+    public final boolean hasContextXPath;
+    public final boolean hasXPathBinding;
     public final boolean hasNodeBinding;
+    public final int bindingXPathEvaluations;   // 0, 1, or 2: number of XPath evaluations to resolve the binding
+
+    public final boolean hasValueXPath;
 
     public final SimpleAnalysis parentAnalysis;
 
@@ -64,9 +69,11 @@ public abstract class SimpleAnalysis {
         this.containingModel = containingModel;
 
         if (element != null) {
+            final boolean hasContext = element.attribute("context") != null;
             final boolean hasBind = element.attribute("bind") != null;
             final boolean hasRef = element.attribute("ref") != null;
             final boolean hasNodeset = element.attribute("nodeset") != null;
+            final boolean hasValue = element.attribute("value") != null;
 
             // TODO: check for mandatory bindings
 //            if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlURI)) {
@@ -87,9 +94,19 @@ public abstract class SimpleAnalysis {
 //                        }
 //            }
 
-            this.hasNodeBinding = hasBind || hasRef || hasNodeset;
+            this.hasContextXPath = hasContext;
+            this.hasXPathBinding = hasRef || hasNodeset;
+            this.hasNodeBinding = hasBind || hasXPathBinding;
+            this.bindingXPathEvaluations = (hasContext ? 1 : 0) + (hasXPathBinding ? 1 : 0);
+
+            this.hasValueXPath = hasValue;
         } else {
+            this.hasContextXPath = false;
+            this.hasXPathBinding = false;
             this.hasNodeBinding = false;
+            this.bindingXPathEvaluations = 0;
+
+            this.hasValueXPath = false;
         }
     }
 

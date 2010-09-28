@@ -117,6 +117,9 @@
             <!-- XBL implementation -->
             <xbl:implementation>
                 <xforms:model id="{$component-id}-model">
+                    <!-- Copy schema attribute if present -->
+                    <xsl:copy-of select="$fr-form-model/@schema"/>
+
                     <!-- Section data model -->
                     <xforms:instance id="fr-form-instance">
                         <xsl:copy-of select="$section-data"/>

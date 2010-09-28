@@ -378,7 +378,7 @@ public class XFormsServer extends ProcessorImpl {
                 return;
 
             } else {
-                // This should not happen
+                // This is not allowed to happen
                 throw new OXFException("Got unexpected request sequence number");
             }
         }

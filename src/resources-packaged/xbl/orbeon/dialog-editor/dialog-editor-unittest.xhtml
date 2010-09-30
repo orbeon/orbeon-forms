@@ -108,9 +108,11 @@
             <fr:button>
                 <xforms:label>Add</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:insert nodeset="text" origin="xxforms:element('text')"/>
-                    <xforms:insert context="text[last()]" origin="xxforms:attribute('readonly', 'false')"/>
-                    <xforms:insert context="text[last()]" origin="xxforms:attribute('relevant', 'true')"/>
+                    <xforms:insert nodeset="line" origin="xxforms:element('line',
+                        xxforms:element('text', (
+                            xxforms:attribute('readonly', 'false'),
+                            xxforms:attribute('relevant', 'true')
+                        )))"/>
                 </xforms:action>
             </fr:button>
         </xhtml:div>

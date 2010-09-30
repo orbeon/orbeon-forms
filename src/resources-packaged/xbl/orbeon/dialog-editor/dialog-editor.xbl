@@ -58,12 +58,12 @@
                             <xxforms:show dialog="dialog"/>
                             <xforms:setfocus control="textarea"/>
                         </xforms:action>
-                        <xforms:group ref=".[not($readonly)]" id="edit-button">
+                        <xforms:group ref="$internal[not($readonly)]" id="edit-button">
                             <fr:button id="open-edit" class="fr-dialog-editor-open-edit">
                                 <xforms:label>Edit</xforms:label>
                             </fr:button>
                         </xforms:group>
-                        <xforms:group ref=".[$readonly]" id="view-button">
+                        <xforms:group ref="$internal[$readonly]" id="view-button">
                             <fr:button id="open-view" class="fr-dialog-editor-open-view">
                                 <xforms:label>View</xforms:label>
                             </fr:button>

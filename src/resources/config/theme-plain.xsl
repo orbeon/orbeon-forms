@@ -13,7 +13,8 @@
   -->
 <!--
     This is a very simple theme that shows you how to create a common layout for all your pages. You can modify it at
-    will or, even better, copy it as theme-[yourapp].xsl and refer to the new name from the epilogue pipeline.
+    will or, even better, copy it as theme.xsl under your application folder where it will be picked up. For example,
+    if your app is my-app: resources/my-app/theme.xsl.
 -->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

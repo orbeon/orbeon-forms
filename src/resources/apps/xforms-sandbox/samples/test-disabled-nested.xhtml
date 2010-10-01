@@ -7,17 +7,6 @@
 
     <xhtml:head>
         <xhtml:title>Nested disabled</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance>
-                <instance>
-                    <enabled section="outer">false</enabled>
-                    <enabled section="inner">false</enabled>
-                    <input/>
-                </instance>
-            </xforms:instance>
-            <xforms:bind ref="enabled" relevant=". = 'true'"/>
-        </xforms:model>
-
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
@@ -32,29 +21,54 @@
                      * have the disabled attribute set, so it can't be reached by tabbing.
                      */
                     testDisabledOnInputs: function() {
+                        var YA = YAHOO.util.Assert;
 
                         /**
                          * Assert that inputs in the groups/cases have the disabled attribute set or not set, as specified
                          * by the attributes.
                          */
                         function assertInputDisabled(outerDisabled, innerDisabled) {
-                            function assertWorker(expected, groupOrCaseOrRepeat, innerOrOuter, index) {
-                                var controlId = groupOrCaseOrRepeat + "-" + innerOrOuter + "-input" + index;
-                                if (groupOrCaseOrRepeat == "repeat") controlId;
-                                var input = YAHOO.util.Dom.get(controlId).getElementsByTagName("input")[0];
-                                var message = "input " + controlId  + " has not expected disabled state";
-                                if (expected != input.disabled) { console.log(input); debugger; }
-                                YAHOO.util.Assert.areEqual(expected, input.disabled, message);
+
+                            function assertInputWorker(expected, groupOrCaseOrRepeat, innerOrOuter, index) {
+                                var inputControlId = groupOrCaseOrRepeat + "-" + innerOrOuter + "-input" + index;
+                                var control = YAHOO.util.Dom.get(inputControlId);
+                                if (control == null) {
+                                    YA.isTrue(expected, "can't find input id " + inputControlId + " (should be there as it is expected to be relevant)");
+                                } else {
+                                    var input = control.getElementsByTagName("input")[0];
+                                    var message = "input " + inputControlId  + " has not expected disabled state";
+                                    if (expected != input.disabled) { console.log(input); }
+                                    YA.areEqual(expected, input.disabled, message);
+                                }
                             }
-                            assertWorker(outerDisabled, "group", "outer", "-1");
-                            assertWorker(outerDisabled, "group", "outer", "-2");
-                            assertWorker(innerDisabled, "group", "inner", "");
-                            assertWorker(outerDisabled, "repeat", "outer", "-1" + XFORMS_SEPARATOR_1 + "1");
-                            assertWorker(outerDisabled, "repeat", "outer", "-2" + XFORMS_SEPARATOR_1 + "1");
-                            assertWorker(innerDisabled, "repeat", "inner", XFORMS_SEPARATOR_1 + "1-1");
-                            assertWorker(outerDisabled, "case", "outer", "-1");
-                            assertWorker(outerDisabled, "case", "outer", "-2");
-                            assertWorker(innerDisabled, "case", "inner", "");
+
+                            function assertButtonWorker(expected, id) {
+                                var buttonControl = YAHOO.util.Dom.get(id);
+                                if (buttonControl == null) {
+                                    YA.isTrue(expected, "can't find button id " + id + " (should be there as it is expected to be relevant)");
+                                } else {
+                                    var htmlButton = buttonControl.getElementsByTagName("button")[0];
+                                    YA.areEqual(expected, htmlButton.disabled, "button " + id + " has not the expected disabled state");
+                                }
+                            }
+
+                            assertInputWorker(outerDisabled, "group-nested", "outer", "-1");
+                            assertInputWorker(outerDisabled, "group-nested", "outer", "-2");
+                            assertInputWorker(innerDisabled, "group-nested", "inner", "");
+                            assertInputWorker(outerDisabled, "repeat-iteration", "outer", "-1" + XFORMS_SEPARATOR_1 + "1");
+                            assertInputWorker(outerDisabled, "repeat-iteration", "outer", "-2" + XFORMS_SEPARATOR_1 + "1");
+                            assertInputWorker(innerDisabled, "repeat-iteration", "inner", XFORMS_SEPARATOR_1 + "1-1");
+                            assertInputWorker(outerDisabled, "repeat-repeat", "outer", "-1" + XFORMS_SEPARATOR_1 + "1");
+                            assertInputWorker(outerDisabled, "repeat-repeat", "outer", "-2" + XFORMS_SEPARATOR_1 + "1");
+                            assertInputWorker(innerDisabled, "repeat-repeat", "inner", XFORMS_SEPARATOR_1 + "1-1");
+                            assertInputWorker(outerDisabled, "case", "outer", "-1");
+                            assertInputWorker(outerDisabled, "case", "outer", "-2");
+                            assertInputWorker(innerDisabled, "case", "inner", "");
+                            assertButtonWorker(outerDisabled, "group-nested-outer-button");
+                            assertButtonWorker(outerDisabled, "group-flat-outer-button");
+                            assertButtonWorker(outerDisabled, "repeat-iteration-outer-button" + XFORMS_SEPARATOR_1 + "1");
+                            assertButtonWorker(outerDisabled, "repeat-repeat-outer-button" + XFORMS_SEPARATOR_1 + "1");
+                            assertButtonWorker(outerDisabled, "case-outer-button");
                         }
 
                         // Initial state: everything is disabled
@@ -125,6 +139,16 @@
                 });
             ]]>
         </xhtml:script>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance>
+                <instance>
+                    <enabled section="outer">false</enabled>
+                    <enabled section="inner">false</enabled>
+                    <input/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind ref="enabled" relevant=". = 'true'"/>
+        </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xhtml:fieldset>
@@ -144,34 +168,71 @@
             </xforms:group>
         </xhtml:fieldset>
         <xhtml:fieldset>
-            <xhtml:legend>Nested groups</xhtml:legend>
-            <xforms:group ref=".[enabled[@section = 'outer'] = 'true']" id="outer-group">
-                <xforms:input ref="input" id="group-outer-input-1"/>
-                <xforms:group ref=".[enabled[@section = 'inner'] = 'true']" id="inner-group">
-                    <xforms:input ref="input" id="group-inner-input"/>
+            <xhtml:legend>Groups nested</xhtml:legend>
+            <xforms:group ref=".[enabled[@section = 'outer'] = 'true']" id="outer-group-nested">
+                <xforms:input ref="input" id="group-nested-outer-input-1"/>
+                <xforms:group ref=".[enabled[@section = 'inner'] = 'true']" id="inner-group-nested">
+                    <xforms:input ref="input" id="group-nested-inner-input"/>
                 </xforms:group>
-                <xforms:input ref="input" id="group-outer-input-2"/>
-                <fr:button id="group-outer-button">
+                <xforms:input ref="input" id="group-nested-outer-input-2"/>
+                <fr:button id="group-nested-outer-button">
                     <xforms:label>Button</xforms:label>
                 </fr:button>
             </xforms:group>
         </xhtml:fieldset>
-        <!-- TODO: we should add a test case with nested groups around tr, as the markup we generate for those is different -->
         <xhtml:fieldset>
-            <xhtml:legend>Nested repeats</xhtml:legend>
-            <xforms:repeat nodeset="instance()/enabled[@section = 'outer']" id="outer-repeat">
-                <xforms:input ref="instance()/input" id="repeat-outer-input-1"/>
-                <xforms:repeat nodeset="instance()/enabled[@section = 'inner']" id="inner-repeat">
-                    <xforms:input ref="instance()/input" id="repeat-inner-input"/>
+            <xhtml:legend>Groups flat</xhtml:legend>
+            <xhtml:table>
+                <xhtml:tr>
+                    <xforms:group ref=".[enabled[@section = 'outer'] = 'true']" id="outer-group-flat">
+                        <xhtml:td>
+                            <xforms:input ref="input" id="group-flat-outer-input-1"/>
+                        </xhtml:td>
+                        <xforms:group ref=".[enabled[@section = 'inner'] = 'true']" id="inner-group-flat">
+                            <xhtml:td>
+                                <xforms:input ref="input" id="group-flat-inner-input"/>
+                            </xhtml:td>
+                        </xforms:group>
+                        <xhtml:td>
+                            <xforms:input ref="input" id="group-flat-outer-input-2"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <fr:button id="group-flat-outer-button">
+                                <xforms:label>Button</xforms:label>
+                            </fr:button>
+                        </xhtml:td>
+                    </xforms:group>
+                </xhtml:tr>
+            </xhtml:table>
+        </xhtml:fieldset>
+        <xhtml:fieldset>
+            <xhtml:legend>Repeats (iteration relevance)</xhtml:legend>
+            <xforms:repeat nodeset="instance()/enabled[@section = 'outer']" id="outer-repeat-iteration">
+                <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-1"/>
+                <xforms:repeat nodeset="instance()/enabled[@section = 'inner']" id="inner-repeat-iteration">
+                    <xforms:input ref="instance()/input" id="repeat-iteration-inner-input"/>
                 </xforms:repeat>
-                <xforms:input ref="instance()/input" id="repeat-outer-input-2"/>
-                <fr:button id="repeat-outer-button">
+                <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-2"/>
+                <fr:button id="repeat-iteration-outer-button">
                     <xforms:label>Button</xforms:label>
                 </fr:button>
             </xforms:repeat>
         </xhtml:fieldset>
         <xhtml:fieldset>
-            <xhtml:legend>Nested cases</xhtml:legend>
+            <xhtml:legend>Repeats (repeat relevance)</xhtml:legend>
+            <xforms:repeat nodeset="instance()[enabled[@section = 'outer'] = 'true']" id="outer-repeat-repeat">
+                <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-1"/>
+                <xforms:repeat nodeset="instance()[enabled[@section = 'inner'] = 'true']" id="inner-repeat-repeat">
+                    <xforms:input ref="instance()/input" id="repeat-repeat-inner-input"/>
+                </xforms:repeat>
+                <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-2"/>
+                <fr:button id="repeat-repeat-outer-button">
+                    <xforms:label>Button</xforms:label>
+                </fr:button>
+            </xforms:repeat>
+        </xhtml:fieldset>
+        <xhtml:fieldset>
+            <xhtml:legend>Cases</xhtml:legend>
             <xforms:switch>
                 <xforms:case id="outer-disabled"/>
                 <xforms:case id="outer-enabled">

@@ -283,7 +283,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
         }
 
-        indentedLogger.startHandleOperation("initialization", "restoring containing document (static state object not provided).");
+        indentedLogger.startHandleOperation("initialization", "restoring containing document");
 
         {
             // Make sure there is location data

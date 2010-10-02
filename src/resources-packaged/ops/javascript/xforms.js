@@ -508,7 +508,7 @@ ORBEON.util = {
             while (true) {
                 if (overrideContext ? fn.call(obj, node) : fn(node)) return true;
                 node = node.parentNode;
-                if (node == null) break;
+                if (node == null || node == document) break;
             }
             return false;
         }
@@ -2306,73 +2306,11 @@ ORBEON.xforms.Controls = {
     },
 
     setRelevant: function(control, isRelevant) {
+        var FN = ORBEON.xforms.FlatNesting;
 
-        // Case of group delimiters
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
-
-            // Check if there is a parent group which is disabled
-            var parentDisabled = false;
-            if (isRelevant) {
-                var depth = 0;
-                var current = control;
-                while (true) {
-                    current = YAHOO.util.Dom.getPreviousSibling(current);
-                    if (current == null) break;
-                    if (YAHOO.util.Dom.hasClass(current, "xforms-group-begin-end")) {
-                        if (current.id.indexOf("group-end") == 0) depth++;
-                        if (current.id.indexOf("group-begin") == 0) {
-                            depth--;
-                            if (depth < 0 && YAHOO.util.Dom.hasClass(current, "xforms-disabled")) {
-                                parentDisabled = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Update class on begin delimiter
-            if (isRelevant) ORBEON.util.Dom.removeClass(control, "xforms-disabled");
-            else ORBEON.util.Dom.addClass(control, "xforms-disabled");
-
-            // Update classes on "children"
-            // Case where we don't do any updating of the children: becomes enabled, but we have a parent who is disabled
-            if (!(isRelevant && parentDisabled)) {
-                var depth = 1;
-                var disabledChildrenDepth = 0;
-                var current = control;
-                while (true) {
-                    current = YAHOO.util.Dom.getNextSibling(current);
-                    if (current == null) break;
-                    if (YAHOO.util.Dom.hasClass(current, "xforms-group-begin-end")) {
-                        if (current.id.indexOf("group-begin") == 0) {
-                            // Begin marker
-                            depth++;
-                            if (YAHOO.util.Dom.hasClass(current, "xforms-disabled") || disabledChildrenDepth > 0)
-                                disabledChildrenDepth++;
-                        } else if (current.id.indexOf("group-end") == 0) {
-                            // End marker
-                            depth--;
-                            if (depth == 0) break;
-                            if (disabledChildrenDepth > 0)
-                                disabledChildrenDepth--;
-                        }
-                    } else {
-                        // Other element
-                        if (isRelevant && disabledChildrenDepth == 0) {
-                            ORBEON.util.Dom.removeClass(current, "xforms-disabled");
-                            ORBEON.util.Dom.removeClass(current, "xforms-disabled-subsequent");
-                            ORBEON.util.Dom.nudgeAfterDelay(current);
-                            ORBEON.xforms.Controls.setDisabledOnTree(current, ! isRelevant);
-                        }
-                        if (!isRelevant) {
-                            ORBEON.util.Dom.addClass(current, "xforms-disabled-subsequent");
-                            ORBEON.xforms.Controls.setDisabledOnTree(current, ! isRelevant);
-                        }
-                    }
-                }
-            }
-
+            // Case of group delimiters
+            FN.setRelevant(control, isRelevant);
         } else {
             var elementsToUpdate = [ control,
                 ORBEON.xforms.Controls._getControlLHHA(control, "label"),
@@ -2408,20 +2346,11 @@ ORBEON.xforms.Controls = {
     },
 
     setRepeatIterationRelevance: function(repeatID, iteration, relevant) {
-        var cursor = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration).nextSibling;
-        while (!(cursor.nodeType == ELEMENT_TYPE &&
-                 (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                         || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
-            if (cursor.nodeType == ELEMENT_TYPE) {
-                if (relevant) {
-                    ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
-                    ORBEON.util.Dom.removeClass(cursor, "xforms-disabled-subsequent");
-                } else {
-                    ORBEON.util.Dom.addClass(cursor, "xforms-disabled-subsequent");
-                }
-            }
-            cursor = cursor.nextSibling;
-        }
+        var OU = ORBEON.util.Utils;
+        var FN = ORBEON.xforms.FlatNesting;
+
+        var delimiter = OU.findRepeatDelimiter(repeatID, iteration);
+        FN.setRelevant(delimiter, relevant);
     },
 
     setReadonly: function(control, isReadonly) {
@@ -2907,6 +2836,181 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.dialogs[control.id] = null;
         ORBEON.xforms.Globals.dialogMinimalLastMouseOut[control.id] = null;
+    }
+};
+
+ORBEON.xforms.FlatNesting = {
+
+    /**
+     * For nested groups:
+     *
+     *      <td id="group-begin-outer-group-flat" class="xforms-group-begin-end">
+     *          ...
+     *          <td id="group-begin-inner-group-flat" class="xforms-group-begin-end">
+     *              ...
+     *          <td id="group-end-inner-group-flat" class="xforms-group-begin-end">
+     *          ...
+     *      <td id="group-end-outer-group-flat" class="xforms-group-begin-end">
+     *
+     * For nested repeats (specific iteration of the outer repeat):
+     *
+     *      <span class="xforms-repeat-delimiter">
+     *          ...
+     *          <span class="xforms-repeat-begin-end" id="repeat-begin-inner-repeat·1">
+     *          <span class="xforms-repeat-delimiter">
+     *              ...
+     *          <span class="xforms-repeat-begin-end" id="repeat-end-inner-repeat·1"></span>
+     *          ...
+     *      <span class="xforms-repeat-delimiter">
+     */
+
+    isGroupBeginEnd: function(node) { return node.nodeType == ELEMENT_TYPE && YAHOO.util.Dom.hasClass(node, "xforms-group-begin-end"); },
+    isGroupBegin: function(node) { return this.isGroupBeginEnd(node) && node.id.indexOf("group-begin-") == 0; },
+    isGroupEnd: function(node) { return this.isGroupBeginEnd(node) && node.id.indexOf("group-end-") == 0; },
+    isRepeatBeginEnd: function(node) { return node.nodeType == ELEMENT_TYPE && YAHOO.util.Dom.hasClass(node, "xforms-repeat-begin-end"); },
+    isRepeatBegin: function(node) { return this.isRepeatBeginEnd(node) && node.id.indexOf("repeat-begin-") == 0; },
+    isRepeatEnd: function(node) { return this.isRepeatBeginEnd(node) && node.id.indexOf("repeat-end-") == 0; },
+    isRepeatDelimiter: function(node) { return node.nodeType == ELEMENT_TYPE && YAHOO.util.Dom.hasClass(node, "xforms-repeat-delimiter"); },
+    isBegin: function(node) { return this.isGroupBegin(node) || this.isRepeatBegin(node); },
+    isEnd: function(node) { return this.isGroupEnd(node) || this.isRepeatEnd(node); },
+
+    /**
+     * Start applying foldFunction to all the ancestors of startNode, and stops if foldFunction returns stopValue.
+     *
+     * @param startNode     Node we start with: group begin or repeat delimiter
+     * @param startValue    Start value for folding
+     * @param foldFunction  function(beginNode, value) -> value
+     * @param stopValue     Stop folding if fold function returns this value
+     */
+    foldAncestors: function(startNode, startValue, foldFunction, stopValue) {
+        var FN = ORBEON.xforms.FlatNesting;
+
+        // Determine if this a group or a repeat
+        var isGroup = FN.isGroupBegin(startNode);
+        var isRepeat = FN.isRepeatDelimiter(startNode);
+        YAHOO.util.Assert.isTrue(isGroup || isRepeat);
+
+        // Iterate over previous sibling nodes
+        var depth = 0;
+        var currentNode = startNode;
+        var currentValue = startValue;
+        while (true) {
+            currentNode = YAHOO.util.Dom.getPreviousSibling(currentNode);
+            if (currentNode == null) break;
+            if (currentNode.nodeType == ELEMENT_TYPE) {
+                if (FN.isEnd(currentNode)) depth++;
+                if (FN.isBegin(currentNode)) depth--;
+                if (depth < 0 && ((isGroup && FN.isGroupEnd(currentNode)) || (isRepeat && FN.isRepeatBegin(currentNode)))) {
+                    currentValue = foldFunction(currentNode, currentValue);
+                    if (currentValue == stopValue) return stopValue;
+                }
+            }
+        }
+        return currentValue;
+    },
+
+    /**
+     * Start applying foldFunction to descendants of startNode. When
+     *
+     * @param startNode
+     * @param startValue
+     * @param foldFunction  function(node, value) -> value
+     * @param stopValue
+     */
+    foldDescendants: function(startNode, startValue, foldFunction, stopValue) {
+        var FN = ORBEON.xforms.FlatNesting;
+
+        // Determine if this a group or a repeat
+        var isGroup = this.isGroupBegin(startNode);
+        var isRepeat = this.isRepeatDelimiter(startNode);
+        YAHOO.util.Assert.isTrue(isGroup || isRepeat);
+
+        // Iterate of following sibling nodes
+        var depth = 0;
+        var stopDepth = 0;
+        var currentNode = startNode;
+        var valueStack = [];
+        var currentValue = startValue;
+        while (true) {
+            currentNode = YAHOO.util.Dom.getNextSibling(currentNode);
+            if (currentNode == null) break;
+            if (currentNode.nodeType == ELEMENT_TYPE) {
+                if (this.isBegin(currentNode)) {
+                    // Begin marker
+                    depth++;
+                    if (stopDepth > 0) {
+                        stopDepth++;
+                    } else {
+                        valueStack.push(currentValue);
+                        currentValue = foldFunction(currentNode, currentValue);
+                        if (currentValue == stopValue) stopDepth++;
+                    }
+                } else if (this.isEnd(currentNode)) {
+                    // End marker
+                    depth--;
+                    if (depth < 0) break;
+                    if (stopDepth > 0) {
+                        stopDepth--;
+                    } else {
+                        currentValue = valueStack.pop();
+                    }
+                } else if (isRepeat && depth == 0 && this.isRepeatDelimiter(currentNode)) {
+                    // Next repeat delimiter
+                    break;
+                } else {
+                    // Other element
+                    if (stopDepth == 0) currentValue = foldFunction(currentNode, currentValue);
+                }
+            }
+        }
+        return currentValue;
+    },
+
+    /**
+     * Returns true if at least one ancestor or self matches the condition.
+     *
+     * @param startNode             Child node whose ancestors we explore
+     * @param conditionFunction     function(node) -> boolean
+     */
+    hasAncestor: function(startNode, conditionFunction) {
+        var FN = ORBEON.xforms.FlatNesting;
+
+        return FN.foldAncestors(startNode, false, function(value, node) {
+            return conditionFunction(node);
+        }, true);
+    },
+
+    setRelevant: function(node, isRelevant) {
+        var FN = ORBEON.xforms.FlatNesting;
+        var YD = YAHOO.util.Dom;
+        var OD = ORBEON.util.Dom;
+        var OC = ORBEON.xforms.Controls;
+
+        // Update class on group begin or delimiter
+        if (isRelevant) ORBEON.util.Dom.removeClass(node, "xforms-disabled");
+        else ORBEON.util.Dom.addClass(node, "xforms-disabled");
+
+        // If this group/iteration becomes relevant, but has a parent that is non-relevant, we should not
+        // remove xforms-disabled otherwise it will incorrectly show, so our job stops here
+        if (isRelevant && FN.hasAncestor(node, function(node) {
+            return YAHOO.util.Dom.hasClass(node, "xforms-disabled");
+        })) return;
+
+        FN.foldDescendants(node, null, function(node, value) {
+            // Skip sub-tree if we are enabling and this sub-tree is disabled
+            if (isRelevant && FN.isBegin(node) && YD.hasClass(node, "xforms-disabled")) return true;
+            // Update disabled class on node
+            if (isRelevant) {
+                OD.removeClass(node, "xforms-disabled");
+                OD.removeClass(node, "xforms-disabled-subsequent");
+                OD.nudgeAfterDelay(node);
+            } else {
+                OD.addClass(node, "xforms-disabled-subsequent");
+            }
+            // Update disabled attribute on form controls
+            OC.setDisabledOnTree(node, ! isRelevant);
+            return false;
+        }, true);
     }
 };
 
@@ -8226,7 +8330,7 @@ ORBEON.xforms.Offline = {
 
     evaluateMIPs: function() {
 
-        //  Applies a relevance or read-onlyness to inherited controls
+        //  Applies a relevant or readonly to inherited controls
         function applyToInherited(control, mips, getter, setter, inherited, value, isRelevance) {
             if (getter(control) != value) {
                 setter(control, value);

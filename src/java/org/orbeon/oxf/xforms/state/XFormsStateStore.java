@@ -19,7 +19,6 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -33,7 +32,7 @@ public abstract class XFormsStateStore {
     private static final String XFORMS_STATE_STORE_LISTENER_STATE_KEY = "oxf.xforms.state.store.has-session-listeners-key";
 
     // Current size of store in bytes
-    private int currentStoreBytes = 0;
+    private int currentSize = 0;
 
     // Store entries
     private Map<String, CacheLinkedList.ListEntry<StoreEntry>> keyToEntryMap = new HashMap<String, CacheLinkedList.ListEntry<StoreEntry>>();
@@ -51,7 +50,7 @@ public abstract class XFormsStateStore {
      */
     public synchronized void clear() {
         sessionToKeysMap.clear();
-        currentStoreBytes = 0;
+        currentSize = 0;
         keyToEntryMap.clear();
         linkedList.clear();
     }
@@ -72,7 +71,7 @@ public abstract class XFormsStateStore {
         assert sessionId != null;
 
         if (isDebugEnabled()) {
-            debug("store size before storing: " + currentStoreBytes + " bytes.");
+            debug("store size before storing: " + currentSize + " bytes.");
             debugDumpKeys();
         }
 
@@ -104,7 +103,7 @@ public abstract class XFormsStateStore {
     public synchronized XFormsState findState(String documentUUID, boolean isInitialState) {
 
         if (isDebugEnabled()) {
-            debug("store size before finding: " + currentStoreBytes + " bytes.");
+            debug("store size before finding: " + currentSize + " bytes.");
             debugDumpKeys();
         }
 
@@ -197,7 +196,7 @@ public abstract class XFormsStateStore {
 
         final Set<String> sessionSet = sessionToKeysMap.get(sessionId);
         if (sessionSet != null) {
-            final int storeSizeBeforeExpire = getCurrentStoreBytes();
+            final int storeSizeBeforeExpire = getCurrentSize();
             int expiredCount = 0;
             for (final String currentKey: sessionSet) {
                 final CacheLinkedList.ListEntry currentListEntry = findEntry(currentKey);
@@ -215,7 +214,7 @@ public abstract class XFormsStateStore {
             sessionToKeysMap.remove(sessionId);
 
             if (expiredCount > 0 && isDebugEnabled())
-                debug("expired " + expiredCount + " entries for session " + sessionId + " (" + (storeSizeBeforeExpire - getCurrentStoreBytes()) + " bytes).");
+                debug("expired " + expiredCount + " entries for session " + sessionId + " (" + (storeSizeBeforeExpire - getCurrentSize()) + " bytes).");
         }
     }
 
@@ -240,15 +239,15 @@ public abstract class XFormsStateStore {
 
         // Make room if needed
         {
-            final int storeSizeBeforeExpire = currentStoreBytes;
+            final int storeSizeBeforeExpire = currentSize;
             int expiredCount = 0;
-            while (currentStoreBytes != 0 && (currentStoreBytes + newValueSize) > getMaxSize()) {
+            while (currentSize != 0 && (currentSize + newValueSize) > getMaxSize()) {
                 expireOne();
                 expiredCount++;
             }
 
-            if (storeSizeBeforeExpire != currentStoreBytes && isDebugEnabled())
-               debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreBytes) + " bytes).");
+            if (storeSizeBeforeExpire != currentSize && isDebugEnabled())
+               debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentSize) + " bytes).");
         }
 
         // Add new element to store
@@ -261,7 +260,7 @@ public abstract class XFormsStateStore {
         }
 
         // Update store size
-        currentStoreBytes += newValueSize;
+        currentSize += newValueSize;
 
         if (isDebugEnabled())
             debug("added new entry of " + newValueSize + " bytes for key: " + key);
@@ -319,7 +318,7 @@ public abstract class XFormsStateStore {
         keyToEntryMap.remove(existingStoreEntry.key);
 
         // Update store size
-        currentStoreBytes -= stateSize;
+        currentSize -= stateSize;
 
         // Remove the session id -> key mappings related to this entry
         for (final String sessionId: existingStoreEntry.sessionIds) {
@@ -344,7 +343,7 @@ public abstract class XFormsStateStore {
         }
     }
 
-    private int getMaxSize() {
+    public int getMaxSize() {
         return XFormsProperties.getApplicationStateStoreSize();
     }
 
@@ -352,8 +351,8 @@ public abstract class XFormsStateStore {
         return "state store";
     }
 
-    private int getCurrentStoreBytes() {
-        return currentStoreBytes;
+    public int getCurrentSize() {
+        return currentSize;
     }
 
     /**
@@ -399,7 +398,7 @@ public abstract class XFormsStateStore {
         addOrReplaceOne(dynamicStateUUID, xformsState.getDynamicState(), sessionId);
 
         if (isDebugEnabled()) {
-            debug("store size after adding: " + currentStoreBytes + " bytes.");
+            debug("store size after adding: " + currentSize + " bytes.");
             debugDumpKeys();
         }
     }
@@ -408,7 +407,7 @@ public abstract class XFormsStateStore {
     public synchronized XFormsState findStateCombined(String staticStateUUID, String dynamicStateUUID) {
 
         if (isDebugEnabled()) {
-            debug("store size before finding: " + currentStoreBytes + " bytes.");
+            debug("store size before finding: " + currentSize + " bytes.");
             debugDumpKeys();
         }
 

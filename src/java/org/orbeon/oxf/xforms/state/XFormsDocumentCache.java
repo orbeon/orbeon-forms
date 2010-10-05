@@ -92,4 +92,12 @@ public class XFormsDocumentCache {
 
         return new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, uuid);
     }
+
+    public int getCurrentSize() {
+        return cache.getCurrentSize();
+    }
+
+    public int getMaxSize() {
+        return cache.getMaxSize();
+    }
 }

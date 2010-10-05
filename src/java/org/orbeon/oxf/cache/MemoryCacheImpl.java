@@ -187,6 +187,10 @@ public class MemoryCacheImpl implements Cache {
         return keyToEntryMap.get(key);
     }
 
+    public int getCurrentSize() {
+        return currentSize;
+    }
+
     public int getMaxSize() {
         return maxSize;
     }

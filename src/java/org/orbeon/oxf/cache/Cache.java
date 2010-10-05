@@ -26,6 +26,7 @@ public interface Cache {
     CacheEntry findAny(PropertyContext propertyContext, CacheKey key);
     Iterator iterateCacheKeys(PropertyContext propertyContext);
     Iterator iterateCacheObjects(PropertyContext propertyContext);
+    int getCurrentSize();
     int getMaxSize();
     void setMaxSize(PropertyContext propertyContext, int maxSize);
     CacheStatistics getStatistics(PropertyContext propertyContext);

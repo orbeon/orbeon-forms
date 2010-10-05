@@ -20,7 +20,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Orbeon Forms" level="project" />
     <orderEntry type="library" name="eXist" level="application" />
-    <orderEntry type="library" name="HttpClient" level="application" />
+    <orderEntry type="library" exported="" name="HttpClient" level="application" />
     <orderEntry type="library" name="Scala" level="project" />
   </component>
 </module>

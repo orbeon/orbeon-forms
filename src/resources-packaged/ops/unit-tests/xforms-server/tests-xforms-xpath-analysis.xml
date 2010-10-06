@@ -577,6 +577,9 @@
                     <!-- TODO: This should be supported -->
                     <xf:input id="u9" ref="root()/a/b"/>
 
+                    <!-- NOTE: must be supported in the future, but there is a bug in the PathMap code as of 2010-10-05 -->
+                    <xf:output id="u10" value="a/count(following-sibling::b)"/>
+
                 </xh:body>
             </xh:html>
         </input>
@@ -652,6 +655,11 @@
                     </binding>
                     <value>
                         <analysis expression="xs:string(.[1])" analyzed="false"/>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="u10" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/count(following-sibling::b))[1])" analyzed="false"/>
                     </value>
                 </control>
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>

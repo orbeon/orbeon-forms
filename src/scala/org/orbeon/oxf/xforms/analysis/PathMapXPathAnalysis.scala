@@ -396,50 +396,51 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
                 val step = arc.getStep
 
                 // TODO: handle ANCESTOR_OR_SELF axis
-                step.getAxis match {
-                    case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 => {
-                        // Found ancestor::foobar
-                        val nodeName = step.getNodeTest.getFingerprint
-                        val ancestorArcs = ancestorsWithFingerprint(nodeName)
-                        if (ancestorArcs.nonEmpty) {
-                            // There can be more than one ancestor with that fingerprint
-                            for (ancestorArc <- ancestorArcs)
-                                moveArc(newNodeArc, ancestorArc.getTarget)
-                            return true
-                        } else {
-                            // E.g.: /a/b/ancestor::c
-                            // TODO
+                if (stack.nonEmpty) // all tests below assume at least a parent
+                    step.getAxis match {
+                        case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 => {
+                            // Found ancestor::foobar
+                            val nodeName = step.getNodeTest.getFingerprint
+                            val ancestorArcs = ancestorsWithFingerprint(nodeName)
+                            if (ancestorArcs.nonEmpty) {
+                                // There can be more than one ancestor with that fingerprint
+                                for (ancestorArc <- ancestorArcs)
+                                    moveArc(newNodeArc, ancestorArc.getTarget)
+                                return true
+                            } else {
+                                // E.g.: /a/b/ancestor::c
+                                // TODO
+                            }
                         }
-                    }
-                    case Axis.PARENT => {// don't test fingerprint as we could handle /a/*/..
-                        // Parent axis
-                        if (stack.size >= 1) {
+                        case Axis.PARENT => {// don't test fingerprint as we could handle /a/*/..
+                            // Parent axis
+                            if (stack.size >= 1) {
+                                val parentNodeArc = stack.top
+                                moveArc(newNodeArc, parentNodeArc.node)
+                                return true
+                            } else {
+                                // TODO: is this possible?
+                            }
+                        }
+                        case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING => {
+                            // Simplify preceding-sibling::foobar / following-sibling::foobar
                             val parentNodeArc = stack.top
-                            moveArc(newNodeArc, parentNodeArc.node)
-                            return true
-                        } else {
-                            // TODO: is this possible?
-                        }
-                    }
-                    case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING => {
-                        // Simplify preceding-sibling::foobar / following-sibling::foobar
-                        val parentNodeArc = stack.top
-                        if (stack.size > 2) {
-                            val grandparentNodeArc = stack.tail.head
+                            if (stack.size > 2) {
+                                val grandparentNodeArc = stack.tail.head
 
-                            val newStep = new AxisExpression(parentNodeArc.arc.getStep.getAxis, step.getNodeTest)
-                            newStep.setContainer(step.getContainer)
-                            grandparentNodeArc.node.createArc(newStep, arc.getTarget)
-                            node.removeArc(arc)
-                        } else {
-                            val newStep = new AxisExpression(Axis.CHILD, step.getNodeTest)
-                            newStep.setContainer(step.getContainer)
-                            parentNodeArc.node.createArc(newStep, arc.getTarget)
-                            node.removeArc(arc)
+                                val newStep = new AxisExpression(parentNodeArc.arc.getStep.getAxis, step.getNodeTest)
+                                newStep.setContainer(step.getContainer)
+                                grandparentNodeArc.node.createArc(newStep, arc.getTarget)
+                                node.removeArc(arc)
+                            } else {
+                                val newStep = new AxisExpression(Axis.CHILD, step.getNodeTest)
+                                newStep.setContainer(step.getContainer)
+                                parentNodeArc.node.createArc(newStep, arc.getTarget)
+                                node.removeArc(arc)
+                            }
                         }
+                        case _ => // NOP
                     }
-                    case _ => // NOP
-                }
 
                 stack.push(newNodeArc)
                 if (reduceAncestorAxis(arc.getTarget)) {

@@ -62,8 +62,8 @@ public class XFormsOutputControl extends XFormsValueControl {
     public XFormsOutputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
-        this.mediatypeAttribute = element.attributeValue("mediatype");
-        this.valueAttribute = element.attributeValue("value");
+        this.mediatypeAttribute = element.attributeValue(XFormsConstants.MEDIATYPE_QNAME);
+        this.valueAttribute = element.attributeValue(XFormsConstants.VALUE_QNAME);
 
         // TODO: must be resolved statically
         this.urlNorewrite = XFormsUtils.resolveUrlNorewrite(element);

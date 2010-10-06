@@ -161,7 +161,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private void extractSubmissionElement() {
         if (!submissionElementExtracted) {
 
-            avtActionOrResource = submissionElement.attributeValue("resource");
+            avtActionOrResource = submissionElement.attributeValue(XFormsConstants.RESOURCE_QNAME);
             if (avtActionOrResource == null) // @resource has precedence over @action
                 avtActionOrResource = submissionElement.attributeValue("action");
             if (avtActionOrResource == null) {
@@ -191,7 +191,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // @targetref is the new name as of May 2009, and @target is still supported for backward compatibility
             targetref = submissionElement.attributeValue("targetref");
             if (targetref == null)
-                targetref = submissionElement.attributeValue("target");
+                targetref = submissionElement.attributeValue(XFormsConstants.TARGET_QNAME);
 
             avtMode = submissionElement.attributeValue("mode");
 

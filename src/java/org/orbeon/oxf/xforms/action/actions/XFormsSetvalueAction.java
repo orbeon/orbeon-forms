@@ -40,7 +40,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
-        final String valueExpression = actionElement.attributeValue("value");
+        final String valueExpression = actionElement.attributeValue(XFormsConstants.VALUE_QNAME);
         final String content = actionElement.getStringValue();
 
         final String valueToSet;

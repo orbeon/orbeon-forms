@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -33,7 +34,7 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
         super(container, parent, element, name, effectiveId);
 
         // Remember attributes
-        this.forAttribute = element.attributeValue("for");
+        this.forAttribute = element.attributeValue(XFormsConstants.FOR_QNAME);
     }
 
     public String getForAttribute() {

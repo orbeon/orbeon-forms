@@ -38,7 +38,7 @@ public class XFormsRecalculateAction extends XFormsAction {
         final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String modelId = actionElement.attributeValue("model");
+        final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
         final XFormsModel model = actionInterpreter.resolveModel(propertyContext, actionElement, modelId);
 
         if (model == null)

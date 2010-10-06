@@ -37,7 +37,7 @@ public class XFormsLoadAction extends XFormsAction {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String resourceAttributeValue = actionElement.attributeValue("resource");
+        final String resourceAttributeValue = actionElement.attributeValue(XFormsConstants.RESOURCE_QNAME);
 
         final String showAttribute;
         {

@@ -81,7 +81,7 @@ public abstract class BaseSubmission implements Submission {
             // Iterate over all <xforms:header> elements
             for (Element headerElement: headerElements) {
                 // Find scope of header element
-                final XBLBindings.Scope headerScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerElement.attributeValue("id"));
+                final XBLBindings.Scope headerScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerElement.attributeValue(XFormsConstants.ID_QNAME));
 
                 contextStack.pushBinding(propertyContext, headerElement, submission.getEffectiveId(), headerScope);
                 final XFormsContextStack.BindingContext currentHeaderBindingContext = contextStack.getCurrentBindingContext();
@@ -128,7 +128,7 @@ public abstract class BaseSubmission implements Submission {
             if (headerNameElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <name> child element of <header> element", "processing <header> elements");
 
-            final XBLBindings.Scope nameScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerNameElement.attributeValue("id"));
+            final XBLBindings.Scope nameScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerNameElement.attributeValue(XFormsConstants.ID_QNAME));
             contextStack.pushBinding(propertyContext, headerNameElement, submission.getEffectiveId(), nameScope);
             headerName = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, submission.getEffectiveId(), headerNameElement, false, null);
             contextStack.popBinding();
@@ -139,7 +139,7 @@ public abstract class BaseSubmission implements Submission {
             final Element headerValueElement = headerElement.element("value");
             if (headerValueElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <value> child element of <header> element", "processing <header> elements");
-            final XBLBindings.Scope valueScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerValueElement.attributeValue("id"));
+            final XBLBindings.Scope valueScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerValueElement.attributeValue(XFormsConstants.ID_QNAME));
             contextStack.pushBinding(propertyContext, headerValueElement, submission.getEffectiveId(), valueScope);
             headerValue = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, submission.getEffectiveId(), headerValueElement, false, null);
             contextStack.popBinding();

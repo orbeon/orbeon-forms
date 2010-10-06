@@ -26,9 +26,8 @@ import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 
@@ -49,7 +48,7 @@ public class XFormsInsertAction extends XFormsAction {
 
         final String atAttribute = actionElement.attributeValue("at");
         final String originAttribute = actionElement.attributeValue("origin");
-        final String contextAttribute = actionElement.attributeValue("context");
+        final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
 
         // Extension: allow position to be an AVT
         final String resolvedPositionAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "position");
@@ -267,9 +266,6 @@ public class XFormsInsertAction extends XFormsAction {
         // "7. The cloned node or nodes are inserted in the order they were cloned at their target location
         // depending on their node type."
 
-        // This attribute is a temporary HACK, used to improve performance when going offline
-        final boolean isAdjustIndexes = isAdjustIndexes(containingDocument);
-
         // Identify the instance that actually changes
         final XFormsInstance modifiedInstance;
         // Find actual insertion point and insert
@@ -301,9 +297,7 @@ public class XFormsInsertAction extends XFormsAction {
             }
         } else {
             // One or more nodes were inserted
-
-            // HACK used to improve performance when going offline: when !isAdjustIndexes, always insert at the end of the node-set
-            insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(isAdjustIndexes ? insertionIndex - 1 : collectionToBeUpdated.size() - 1);
+            insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
 
@@ -440,30 +434,12 @@ public class XFormsInsertAction extends XFormsAction {
 
             modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
                     new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
-                            positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes, isAdjustIndexes));
+                            positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes));
 
             return insertedNodeInfos;
         } else {
             return Collections.EMPTY_LIST;
         }
-    }
-
-    private static boolean isAdjustIndexes(XFormsContainingDocument containingDocument) {
-        final XFormsEvent currentEvent = containingDocument.getCurrentEvent();
-        if (currentEvent != null) {// this will be null if we happen to be in a non-top-level container; won't fix now because this is a hack anyway
-            final SequenceIterator si = currentEvent.getAttribute(XFormsConstants.NO_INDEX_ADJUSTMENT);
-            if (si != null) {
-                try {
-                    final Item item = si.next();
-                    if (item instanceof BooleanValue) {
-                        return !((BooleanValue) item).getBooleanValue();
-                    }
-                } catch (XPathException e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
-        return true;
     }
 
     private static List<Node> doInsert(Node insertionNode, List<Node> clonedNodes) {

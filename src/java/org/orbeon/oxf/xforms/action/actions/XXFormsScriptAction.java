@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -34,7 +35,7 @@ public class XXFormsScriptAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Get prefixed id of the xxforms:script element based on its location 
-        final String actionPrefixedId = actionInterpreter.getXBLContainer().getFullPrefix() + actionElement.attributeValue("id");
+        final String actionPrefixedId = actionInterpreter.getXBLContainer().getFullPrefix() + actionElement.attributeValue(XFormsConstants.ID_QNAME);
 
         containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver);
     }

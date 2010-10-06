@@ -17,23 +17,18 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.BooleanValue;
-import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -158,9 +153,6 @@ public abstract class XFormsEvent implements Cloneable {
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
             return (customAttributes.get(name)).iterate();
-        } else if (XFormsConstants.NO_INDEX_ADJUSTMENT.equals(name)) {
-            // NOP (this is related to a temporary offline performance hack)
-            return EmptyIterator.getInstance();
         } else if ("repeat-indexes".equals(name) || XXFORMS_REPEAT_INDEXES_ATTRIBUTE.equals(name)) {
 
             if ("repeat-indexes".equals(name)) {

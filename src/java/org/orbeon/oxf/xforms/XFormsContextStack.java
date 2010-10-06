@@ -157,7 +157,7 @@ public class XFormsContextStack {
                 final Variable variable = new Variable(container, this, currentElement);
 
                 // Find variable scope
-                final XBLBindings.Scope newScope = bindings.getResolutionScopeByPrefixedId(container.getFullPrefix() + currentElement.attributeValue("id"));
+                final XBLBindings.Scope newScope = bindings.getResolutionScopeByPrefixedId(container.getFullPrefix() + currentElement.attributeValue(XFormsConstants.ID_QNAME));
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the
                 // following controls and variables.
@@ -233,11 +233,12 @@ public class XFormsContextStack {
      * @param scope             XBL scope
      */
     public void pushBinding(PropertyContext propertyContext, Element bindingElement, String sourceEffectiveId, XBLBindings.Scope scope) {
-        final String ref = bindingElement.attributeValue("ref");
-        final String context = bindingElement.attributeValue("context");
-        final String nodeset = bindingElement.attributeValue("nodeset");
-        final String model = bindingElement.attributeValue("model");
-        final String bind = bindingElement.attributeValue("bind");
+        // TODO: move away from element and use static analysis information
+        final String ref = bindingElement.attributeValue(XFormsConstants.REF_QNAME);
+        final String context = bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
+        final String nodeset = bindingElement.attributeValue(XFormsConstants.NODESET_QNAME);
+        final String model = bindingElement.attributeValue(XFormsConstants.MODEL_QNAME);
+        final String bind = bindingElement.attributeValue(XFormsConstants.BIND_QNAME);
 
         final NamespaceMapping bindingElementNamespaceMapping = container.getNamespaceMappings(bindingElement);
         pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);
@@ -530,7 +531,7 @@ public class XFormsContextStack {
                 }
 
                 // Push new context
-                final String bindingElementStaticId = (bindingElement == null) ? null : bindingElement.attributeValue("id");
+                final String bindingElementStaticId = (bindingElement == null) ? null : bindingElement.attributeValue(XFormsConstants.ID_QNAME);
                 contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, bindingElementStaticId, isNewBind,
                         bindingElement, locationData, hasOverriddenContext, contextItem, newScope));
 

@@ -395,7 +395,7 @@ public class XFormsControls implements XFormsObjectResolver {
             final String currentControlURI = currentControlElement.getNamespaceURI();
             final String currentControlName = currentControlElement.getName();
 
-            final String controlStaticId = currentControlElement.attributeValue("id");
+            final String controlStaticId = currentControlElement.attributeValue(XFormsConstants.ID_QNAME);
             final String controlPrefixedId = idPrefix + controlStaticId;
             final String controlEffectiveId = controlPrefixedId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
 

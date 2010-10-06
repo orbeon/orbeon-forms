@@ -21,31 +21,19 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.dom4j.TypedDocumentWrapper;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.VirtualNode;
+import org.orbeon.saxon.dom4j.*;
+import org.orbeon.saxon.om.*;
 
 import javax.xml.transform.stream.StreamResult;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represent an XForms instance.
@@ -556,16 +544,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // Find affected repeats
             final List<Item> insertedNodeInfos = insertEvent.getInsertedNodeInfos();
 
-            final boolean didInsertNodes = insertedNodeInfos.size() != 0;
-            final boolean mustAdjustIndexes = didInsertNodes && insertEvent.isAdjustIndexes();// isAdjustIndexes() used for offline mode optimizations
+//            final boolean didInsertNodes = insertedNodeInfos.size() != 0;
 
-            if (mustAdjustIndexes) {
-                // Perform the adjustments
-
-                // Find affected repeats and update their node-sets and indexes
-                final XFormsControls controls = container.getContainingDocument().getControls();
-                updateRepeatNodesets(propertyContext, controls, insertedNodeInfos);
-            }
+            // Find affected repeats and update their node-sets and indexes
+            final XFormsControls controls = container.getContainingDocument().getControls();
+            updateRepeatNodesets(propertyContext, controls, insertedNodeInfos);
         } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
             // New nodes were just deleted
             final XFormsDeleteEvent deleteEvent = (XFormsDeleteEvent) event;

@@ -30,7 +30,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 import static junit.framework.Assert.*;
 
@@ -90,8 +91,8 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         assertNotNull(result);
         assertEquals(1, result.size());
         Element resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(resultElement.attributeValue("id").trim().length() > 0);
-        assertEquals("lang", resultElement.attributeValue("name"));
+        assertTrue(resultElement.attributeValue(XFormsConstants.ID_QNAME).trim().length() > 0);
+        assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxforms:attribute for "span" with correct name
         result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
@@ -99,7 +100,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         assertNotNull(result);
         assertEquals(1, result.size());
         resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(resultElement.attributeValue("id").trim().length() > 0);
-        assertEquals("style", resultElement.attributeValue("name"));
+        assertTrue(resultElement.attributeValue(XFormsConstants.ID_QNAME).trim().length() > 0);
+        assertEquals("style", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
     }
 }

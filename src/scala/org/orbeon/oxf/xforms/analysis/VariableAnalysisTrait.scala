@@ -22,7 +22,7 @@ trait VariableAnalysisTrait {
 
     this: SimpleAnalysis =>
 
-    val name = element.attributeValue("name")
+    val name = element.attributeValue(XFormsConstants.NAME_QNAME)
 
     def computeVariableValueAnalysis: XPathAnalysis = {
 
@@ -36,7 +36,7 @@ trait VariableAnalysisTrait {
 
             val sequenceAnalysis = new ViewAnalysis(staticState, sequenceScope, sequenceElement, this, getInScopeVariables, false) {
                 override def computeValueAnalysis(): XPathAnalysis = {
-                    val selectAttribute = element.attributeValue("select")
+                    val selectAttribute = element.attributeValue(XFormsConstants.SELECT_QNAME)
                     if (selectAttribute != null) {
                         // Value is provided by @select
                         val baseAnalysis = findOrCreateBaseAnalysis(this)
@@ -50,7 +50,7 @@ trait VariableAnalysisTrait {
             sequenceAnalysis.analyzeXPath()
             return sequenceAnalysis.getValueAnalysis
         } else {
-            val selectAttribute = element.attributeValue("select")
+            val selectAttribute = element.attributeValue(XFormsConstants.SELECT_QNAME)
             if (selectAttribute != null) {
                 // Value is provided by @select
                 val baseAnalysis = findOrCreateBaseAnalysis(this)

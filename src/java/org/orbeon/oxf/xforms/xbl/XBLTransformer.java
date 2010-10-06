@@ -47,7 +47,7 @@ public class XBLTransformer {
                 final boolean isXBLContent = element.getQName().equals(XBL_CONTENT_QNAME);
                 final List<Node> resultingNodes;
                 if (isXBLContent) {
-                    final String includesAttribute = element.attributeValue("includes");
+                    final String includesAttribute = element.attributeValue(XFormsConstants.INCLUDES_QNAME);
                     final String scopeAttribute = element.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME);
                     final List<Node> contentToInsert;
                     if (includesAttribute == null) {

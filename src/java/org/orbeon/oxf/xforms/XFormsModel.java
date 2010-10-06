@@ -559,7 +559,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         try {
             loadSchemasIfNeeded(propertyContext);
         } catch (Exception e) {
-            final String schemaAttribute = modelElement.attributeValue("schema");
+            final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
             container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this,
                     schemaAttribute, modelElement, e));
         }

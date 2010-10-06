@@ -54,7 +54,7 @@ public class Variable {
         this.contextStack = contextStack;
         this.variableElement = variableElement;
 
-        this.variableName = variableElement.attributeValue("name");
+        this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
         if (variableName == null)
             throw new ValidationException("xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
 
@@ -66,7 +66,7 @@ public class Variable {
             this.valueElement = sequenceElement;
         }
 
-        this.selectAttribute = valueElement.attributeValue("select");
+        this.selectAttribute = valueElement.attributeValue(XFormsConstants.SELECT_QNAME);
     }
 
     private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext, boolean useCache) {
@@ -79,7 +79,7 @@ public class Variable {
             final boolean pushContext = pushOuterContext || variableElement != valueElement;
             if (pushContext) {
                 // Push binding for evaluation, so that @context and @model are evaluated
-                final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue("id");
+                final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue(XFormsConstants.ID_QNAME);
                 final XBLBindings.Scope variableValueScope = container.getContainingDocument().getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(variableValuePrefixedId);
                 contextStack.pushBinding(pipelineContext, valueElement, sourceEffectiveId, variableValueScope);
             }

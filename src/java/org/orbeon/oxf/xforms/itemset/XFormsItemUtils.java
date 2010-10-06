@@ -120,7 +120,7 @@ public class XFormsItemUtils {
             private ItemContainer currentContainer = result;
 
             private String getElementEffectiveId(Element element) {
-                return XFormsUtils.getRelatedEffectiveId(select1Control.getEffectiveId(), element.attributeValue("id"));
+                return XFormsUtils.getRelatedEffectiveId(select1Control.getEffectiveId(), element.attributeValue(XFormsConstants.ID_QNAME));
             }
 
             public void startElement(Element element) {
@@ -444,7 +444,7 @@ public class XFormsItemUtils {
 
         final Map<String, String> result = new LinkedHashMap<String, String>();
         for (String attributeName: ATTRIBUTES_TO_PROPAGATE) {
-            final String attributeValue = itemChoiceItemsetElement.attributeValue("class");
+            final String attributeValue = itemChoiceItemsetElement.attributeValue(XFormsConstants.CLASS_QNAME);
             if (attributeValue != null)
                 result.put(attributeName, attributeValue);
         }

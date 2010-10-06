@@ -74,7 +74,7 @@ public class XFormsModelSchemaValidator {
         this.indentedLogger = indentedLogger;
 
         // Check for external schemas
-        final String schemaAttribute = modelElement.attributeValue("schema");
+        final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
         if (schemaAttribute != null)
             this.schemaURIs = StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
 

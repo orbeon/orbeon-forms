@@ -197,9 +197,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         if (xblStyles != null) {
             for (final Element styleElement: xblStyles) {
                 attributesImpl.clear();
-                if (styleElement.attributeValue("src") != null) {
+                if (styleElement.attributeValue(XFormsConstants.SRC_QNAME) != null) {
                     // xhtml:link
-                    final String[] attributesList = new String[]{"rel", "stylesheet", "href", styleElement.attributeValue("src"), "type", "text/css", "media", styleElement.attributeValue("media")};
+                    final String[] attributesList = new String[]{"rel", "stylesheet", "href", styleElement.attributeValue(XFormsConstants.SRC_QNAME), "type", "text/css", "media", styleElement.attributeValue("media")};
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                     helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
                 } else {
@@ -250,9 +250,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         if (xblScripts != null) {
             for (final Element scriptElement: xblScripts) {
                 attributesImpl.clear();
-                if (scriptElement.attributeValue("src") != null) {
+                if (scriptElement.attributeValue(XFormsConstants.SRC_QNAME) != null) {
                     // xhtml:script with @src
-                    final String[] attributesList = new String[]{"type", "text/javascript", "src", scriptElement.attributeValue("src")};
+                    final String[] attributesList = new String[]{"type", "text/javascript", "src", scriptElement.attributeValue(XFormsConstants.SRC_QNAME)};
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
                     helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                 } else {

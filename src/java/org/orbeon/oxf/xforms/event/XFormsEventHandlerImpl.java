@@ -16,16 +16,12 @@ package org.orbeon.oxf.xforms.event;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
@@ -255,7 +251,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public String getStaticId() {
-        return eventHandlerElement.attributeValue("id");
+        return eventHandlerElement.attributeValue(XFormsConstants.ID_QNAME);
     }
 
     public String getPrefix() {

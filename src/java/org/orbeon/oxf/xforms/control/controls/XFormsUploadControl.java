@@ -414,8 +414,8 @@ class FileInfo implements ExternalCopyable {
         this.control = control;
         this.contextStack =  contextStack;
 
-        mediatypeElement = element.element(XFormsConstants.MEDIATYPE_QNAME);
-        filenameElement = element.element(XFormsConstants.FILENAME_QNAME);
+        mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_QNAME);
+        filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_QNAME);
         sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_QNAME);
     }
 

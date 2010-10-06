@@ -17,9 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -52,11 +50,11 @@ public abstract class XFormsAction {
         for (final Element currentContextInfo: Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_CONTEXT_QNAME)) {
 
             // Get and check attributes
-            final String name = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, "name"));
+            final String name = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, XFormsConstants.NAME_QNAME));
             if (name == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
 
-            final String select = currentContextInfo.attributeValue("select");
+            final String select = currentContextInfo.attributeValue(XFormsConstants.SELECT_QNAME);
             if (select == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"select\" attribute.");
 

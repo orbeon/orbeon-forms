@@ -38,9 +38,9 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         super(container, parent, element, name, effectiveId);
 
         // Remember attributes
-        this.forAttribute = element.attributeValue("for");
-        this.nameAttribute = element.attributeValue("name");
-        this.valueAttribute = element.attributeValue("value");
+        this.forAttribute = element.attributeValue(XFormsConstants.FOR_QNAME);
+        this.nameAttribute = element.attributeValue(XFormsConstants.NAME_QNAME);
+        this.valueAttribute = element.attributeValue(XFormsConstants.VALUE_QNAME);
     }
 
     /**

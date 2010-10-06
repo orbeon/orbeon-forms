@@ -214,15 +214,15 @@ public class XFormsActionInterpreter {
                 final XFormsContextStack.BindingContext actionBindingContext = actionBlockContextStack.popBinding();
                 final NamespaceMapping namespaceMapping = container.getNamespaceMappings(actionElement);
                 {
-                    final String contextAttribute = actionElement.attributeValue("context");
-                    final String modelAttribute = actionElement.attributeValue("model");
+                    final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
+                    final String modelAttribute = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
                     // TODO: function context
                     actionBlockContextStack.pushBinding(propertyContext, null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope);
                 }
                 {
-                    final String refAttribute = actionElement.attributeValue("ref");
-                    final String nodesetAttribute = actionElement.attributeValue("nodeset");
-                    final String bindAttribute = actionElement.attributeValue("bind");
+                    final String refAttribute = actionElement.attributeValue(XFormsConstants.REF_QNAME);
+                    final String nodesetAttribute = actionElement.attributeValue(XFormsConstants.NODESET_QNAME);
+                    final String bindAttribute = actionElement.attributeValue(XFormsConstants.BIND_QNAME);
 
                     final List<Item> currentNodeset = actionBlockContextStack.getCurrentNodeset();
                     final int iterationCount = currentNodeset.size();
@@ -522,8 +522,8 @@ public class XFormsActionInterpreter {
     }
 
     public String getActionStaticId(Element actionElement) {
-        assert actionElement.attributeValue("id") != null;
-        return actionElement.attributeValue("id");
+        assert actionElement.attributeValue(XFormsConstants.ID_QNAME) != null;
+        return actionElement.attributeValue(XFormsConstants.ID_QNAME);
     }
 
     public XBLBindings.Scope getActionScope(Element actionElement) {

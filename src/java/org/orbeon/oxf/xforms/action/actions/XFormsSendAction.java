@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
@@ -37,7 +38,7 @@ public class XFormsSendAction extends XFormsAction {
         final XBLContainer container = actionInterpreter.getXBLContainer();
 
         // Find submission object
-        final String submissionId = actionElement.attributeValue("submission");
+        final String submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME);
         if (submissionId == null)
             throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
 

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -45,7 +46,7 @@ public class ContainerAnalysis extends ControlAnalysis {
         // label if any should probably be first anyway.
         final Element e = element().element(qName);
         if (e != null) {
-            final String forAttribute = e.attributeValue("for");
+            final String forAttribute = e.attributeValue(XFormsConstants.FOR_QNAME);
             return (forAttribute == null) ? e : null;
         } else {
             return null;

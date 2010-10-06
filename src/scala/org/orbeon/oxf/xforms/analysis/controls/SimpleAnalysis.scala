@@ -125,7 +125,7 @@ abstract class SimpleAnalysis(val staticState: XFormsStaticState, val scope: XBL
 
     protected def analyzeValueXPath(baseAnalysis: XPathAnalysis, element: Element, prefixedId: String): XPathAnalysis = {
         // Two cases: e.g. xforms:output/@value, or the current item
-        val valueAttribute = element.attributeValue("value")
+        val valueAttribute = element.attributeValue(XFormsConstants.VALUE_QNAME)
         val subExpression = if (valueAttribute != null) "(" + valueAttribute + ")" else "."
         return analyzeXPath(staticState, baseAnalysis, prefixedId, "xs:string(" + subExpression + "[1])")
     }

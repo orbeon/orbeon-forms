@@ -47,23 +47,23 @@ public class XFormsControlFactory {
         // TODO: standardize on QName?
 
         // Standard controls
-        CONTAINER_CONTROLS.add(XFormsConstants.GROUP_QNAME);
-        CONTAINER_CONTROLS.add(XFormsConstants.REPEAT_QNAME);
-        CONTAINER_CONTROLS.add(XFormsConstants.SWITCH_QNAME);
-        CONTAINER_CONTROLS.add(XFormsConstants.CASE_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.XFORMS_GROUP_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.XFORMS_REPEAT_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.XFORMS_SWITCH_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.XFORMS_CASE_QNAME);
 
-        CORE_VALUE_CONTROLS.add(XFormsConstants.INPUT_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.SECRET_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.TEXTAREA_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.OUTPUT_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.UPLOAD_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.RANGE_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.SELECT_QNAME);
-        CORE_VALUE_CONTROLS.add(XFormsConstants.SELECT1_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_INPUT_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_SECRET_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_TEXTAREA_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_OUTPUT_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_UPLOAD_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_RANGE_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_SELECT_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XFORMS_SELECT1_QNAME);
 
         final Set<QName> coreNoValueControls = new HashSet<QName>();
-        coreNoValueControls.add(XFormsConstants.SUBMIT_QNAME);
-        coreNoValueControls.add(XFormsConstants.TRIGGER_QNAME);
+        coreNoValueControls.add(XFormsConstants.XFORMS_SUBMIT_QNAME);
+        coreNoValueControls.add(XFormsConstants.XFORMS_TRIGGER_QNAME);
 
         // Extension controls
         CONTAINER_CONTROLS.add(XFormsConstants.XXFORMS_DIALOG_QNAME);
@@ -80,16 +80,16 @@ public class XFormsControlFactory {
         BUILTIN_CONTROLS.add(XFormsConstants.EXFORMS_VARIABLE_QNAME);
 
         MANDATORY_SINGLE_NODE_CONTROLS.addAll(CORE_VALUE_CONTROLS);
-        MANDATORY_SINGLE_NODE_CONTROLS.remove(XFormsConstants.UPLOAD_QNAME);
-        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsConstants.FILENAME_QNAME);
-        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsConstants.MEDIATYPE_QNAME);
+        MANDATORY_SINGLE_NODE_CONTROLS.remove(XFormsConstants.XFORMS_UPLOAD_QNAME);
+        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_FILENAME_QNAME);
+        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_MEDIATYPE_QNAME);
         MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsActions.XFORMS_SETVALUE_ACTION_QNAME);
 
-        SINGLE_NODE_OR_VALUE_CONTROLS.add(XFormsConstants.OUTPUT_QNAME);
+        SINGLE_NODE_OR_VALUE_CONTROLS.add(XFormsConstants.XFORMS_OUTPUT_QNAME);
 
         // TODO: some of those are not controls at all, must review this
         OPTIONAL_SINGLE_NODE_CONTROLS.addAll(coreNoValueControls);
-        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.UPLOAD_QNAME);  // can have @value attribute
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_UPLOAD_QNAME);  // can have @value attribute
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_VALUE_QNAME);   // can have inline text
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.LABEL_QNAME);   // can have linking or inline text
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.HELP_QNAME);    // can have linking or inline text
@@ -98,15 +98,15 @@ public class XFormsControlFactory {
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.COPY_QNAME);
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.LOAD_QNAME);    // can have linking
         OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsActions.XFORMS_MESSAGE_ACTION_QNAME); // can have linking or inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.GROUP_QNAME);
-        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.SWITCH_QNAME);
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_GROUP_QNAME);
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_SWITCH_QNAME);
 
         NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.CHOICES_QNAME);
         NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.ITEM_QNAME);
-        NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.CASE_QNAME);
+        NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.XFORMS_CASE_QNAME);
         NO_SINGLE_NODE_CONTROLS.add(XFormsActions.XFORMS_TOGGLE_ACTION_QNAME);
 
-        MANDATORY_NODESET_CONTROLS.add(XFormsConstants.REPEAT_QNAME);
+        MANDATORY_NODESET_CONTROLS.add(XFormsConstants.XFORMS_REPEAT_QNAME);
         MANDATORY_NODESET_CONTROLS.add(XFormsConstants.ITEMSET_QNAME);
         MANDATORY_NODESET_CONTROLS.add(XFormsActions.XFORMS_DELETE_ACTION_QNAME);
 
@@ -117,72 +117,72 @@ public class XFormsControlFactory {
 
     static {
         // Built-in standard controls
-        nameToClassMap.put(XFormsConstants.CASE_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_CASE_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsCaseControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.GROUP_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_GROUP_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsGroupControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.INPUT_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_INPUT_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsInputControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.OUTPUT_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_OUTPUT_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsOutputControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.RANGE_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_RANGE_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsRangeControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.REPEAT_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_REPEAT_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsRepeatControl(container, parent, element, name, effectiveId, state);
             }
         });
-        nameToClassMap.put(XFormsConstants.SECRET_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_SECRET_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSecretControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.SELECT1_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_SELECT1_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSelect1Control(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.SELECT_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_SELECT_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSelectControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.SUBMIT_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_SUBMIT_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSubmitControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.SWITCH_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_SWITCH_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsSwitchControl(container, parent, element, name, effectiveId, state);
             }
         });
-        nameToClassMap.put(XFormsConstants.TEXTAREA_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_TEXTAREA_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsTextareaControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.TRIGGER_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_TRIGGER_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsTriggerControl(container, parent, element, name, effectiveId);
             }
         });
-        nameToClassMap.put(XFormsConstants.UPLOAD_QNAME, new Factory() {
+        nameToClassMap.put(XFormsConstants.XFORMS_UPLOAD_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XFormsUploadControl(container, parent, element, name, effectiveId);
             }

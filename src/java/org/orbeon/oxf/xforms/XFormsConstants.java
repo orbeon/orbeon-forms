@@ -80,30 +80,48 @@ public class XFormsConstants {
     public static final QName VALUE_QNAME = new QName("value");
     public static final QName MODEL_QNAME = new QName("model");
 
+    public static final QName ID_QNAME = new QName("id");
+    public static final QName NAME_QNAME = new QName("name");
+
+    public static final QName CLASS_QNAME = new QName("class");
+    public static final QName STYLE_QNAME = new QName("style");
+
+    public static final QName APPEARANCE_QNAME = new QName("appearance");
+    public static final QName MEDIATYPE_QNAME = new QName("mediatype");
+    public static final QName SRC_QNAME = new QName("src");
+
+    public static final QName TARGET_QNAME = new QName("target");
+    public static final QName SELECT_QNAME = new QName("select");
+    public static final QName FOR_QNAME = new QName("for");
+
+    public static final QName SCHEMA_QNAME = new QName("schema");
+    public static final QName RESOURCE_QNAME = new QName("resource");
+    public static final QName SUBMISSION_QNAME = new QName("submission");
+
     // XForms controls
-    public static final QName GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
-    public static final QName REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
-    public static final String REPEAT_NAME = REPEAT_QNAME.getName();
-    public static final QName SWITCH_QNAME = new QName("switch", XFORMS_NAMESPACE);
-    public static final QName CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
+    public static final QName XFORMS_GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
+    public static final QName XFORMS_REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
+    public static final String REPEAT_NAME = XFORMS_REPEAT_QNAME.getName();
+    public static final QName XFORMS_SWITCH_QNAME = new QName("switch", XFORMS_NAMESPACE);
+    public static final QName XFORMS_CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
     public static final QName XXFORMS_DIALOG_QNAME = new QName("dialog", XXFORMS_NAMESPACE);
     public static final String XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.getName();
 
-    public static final QName INPUT_QNAME = new QName("input", XFORMS_NAMESPACE);
-    public static final QName SECRET_QNAME = new QName("secret", XFORMS_NAMESPACE);
-    public static final QName TEXTAREA_QNAME = new QName("textarea", XFORMS_NAMESPACE);
-    public static final QName OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
-    public static final QName UPLOAD_QNAME = new QName("upload", XFORMS_NAMESPACE);
-    public static final String UPLOAD_NAME = UPLOAD_QNAME.getName();
-    public static final QName RANGE_QNAME = new QName("range", XFORMS_NAMESPACE);
-    public static final QName SELECT_QNAME = new QName("select", XFORMS_NAMESPACE);
-    public static final QName SELECT1_QNAME = new QName("select1", XFORMS_NAMESPACE);
+    public static final QName XFORMS_INPUT_QNAME = new QName("input", XFORMS_NAMESPACE);
+    public static final QName XFORMS_SECRET_QNAME = new QName("secret", XFORMS_NAMESPACE);
+    public static final QName XFORMS_TEXTAREA_QNAME = new QName("textarea", XFORMS_NAMESPACE);
+    public static final QName XFORMS_OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
+    public static final QName XFORMS_UPLOAD_QNAME = new QName("upload", XFORMS_NAMESPACE);
+    public static final String UPLOAD_NAME = XFORMS_UPLOAD_QNAME.getName();
+    public static final QName XFORMS_RANGE_QNAME = new QName("range", XFORMS_NAMESPACE);
+    public static final QName XFORMS_SELECT_QNAME = new QName("select", XFORMS_NAMESPACE);
+    public static final QName XFORMS_SELECT1_QNAME = new QName("select1", XFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ATTRIBUTE_QNAME = new QName("attribute", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_TEXT_QNAME = new QName("text", XXFORMS_NAMESPACE);
 
-    public static final QName SUBMIT_QNAME = new QName("submit", XFORMS_NAMESPACE);
-    public static final QName TRIGGER_QNAME = new QName("trigger", XFORMS_NAMESPACE);
+    public static final QName XFORMS_SUBMIT_QNAME = new QName("submit", XFORMS_NAMESPACE);
+    public static final QName XFORMS_TRIGGER_QNAME = new QName("trigger", XFORMS_NAMESPACE);
 
     // XForms QNames
     public static final QName XFORMS_BIND_QNAME = new QName("bind", XFORMS_NAMESPACE);
@@ -135,6 +153,9 @@ public class XFormsConstants {
     public static final QName XBL_HANDLER_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate");
     // NOTE: XBL 2 working draft has "default-action" instead
     public static final QName XBL_HANDLER_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction");
+
+    public static final QName ELEMENT_QNAME = new QName("element");
+    public static final QName INCLUDES_QNAME = new QName("includes");
 
     // XBL extensions
     public static final String XXBL_PREFIX = "xxbl";
@@ -171,10 +192,8 @@ public class XFormsConstants {
 
     public static final String XXFORMS_ALL_EVENTS = "#all";
 
-    public static final QName APPEARANCE_QNAME = new QName("appearance");
-
-    public static final QName FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);
-    public static final QName MEDIATYPE_QNAME = new QName("mediatype", XFORMS_NAMESPACE);
+    public static final QName XFORMS_FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);
+    public static final QName XFORMS_MEDIATYPE_QNAME = new QName("mediatype", XFORMS_NAMESPACE);
     public static final QName XXFORMS_SIZE_QNAME = new QName("size", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MAXLENGTH_QNAME = new QName("maxlength", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
@@ -228,16 +247,12 @@ public class XFormsConstants {
     public static final QName ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);
     public static final QName ITEM_QNAME = new QName("item", XFORMS_NAMESPACE);
     public static final QName CHOICES_QNAME = new QName("choices", XFORMS_NAMESPACE);
-    public static final QName XFORMS_OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
     public static final QName LOAD_QNAME = new QName("load", XFORMS_NAMESPACE);
 
     public static final String XFORMS_SUBMIT_REPLACE_ALL = "all";
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
     public static final String XFORMS_SUBMIT_REPLACE_TEXT = "text";
     public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
-
-    public static final QName ID_QNAME = new QName("id");
-    public static final QName NAME_QNAME = new QName("name");
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME = "readonly-appearance";
@@ -302,9 +317,6 @@ public class XFormsConstants {
     public static final String XFORMS_INCREMENTAL_UPDATE = "incremental";
 
     public static final QName XXFORMS_XFORMS11_SWITCH_QNAME = new QName("xforms11-switch", XXFORMS_NAMESPACE);
-
-    public static final QName CLASS_QNAME = new QName("class", Namespace.NO_NAMESPACE);
-    public static final QName STYLE_QNAME = new QName("style", Namespace.NO_NAMESPACE);
 
     public static final String XFORMS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "string");
     public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");

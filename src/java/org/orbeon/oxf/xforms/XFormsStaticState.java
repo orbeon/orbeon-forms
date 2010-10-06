@@ -1132,8 +1132,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                     }
                 } else if ("attribute".equals(controlName)) {
                     // Special indexing of xxforms:attribute controls
-                    final String prefixedForAttribute = prefix + controlElement.attributeValue("for");
-                    final String nameAttribute = controlElement.attributeValue("name");
+                    final String prefixedForAttribute = prefix + controlElement.attributeValue(XFormsConstants.FOR_QNAME);
+                    final String nameAttribute = controlElement.attributeValue(XFormsConstants.NAME_QNAME);
                     Map<String, ControlAnalysis> mapForId;
                     if (attributeControls == null) {
                         attributeControls = new HashMap<String, Map<String, ControlAnalysis>>();
@@ -1172,7 +1172,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     }
 
     private boolean processLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement, String controlStaticId, String prefix) {
-        final String forAttribute = lhhaElement.attributeValue("for");
+        final String forAttribute = lhhaElement.attributeValue(XFormsConstants.FOR_QNAME);
         if (forAttribute == null) {
             // NOP: container control handles this itself
             return true;

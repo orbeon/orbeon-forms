@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 
@@ -36,7 +37,7 @@ public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             }
 
             // Copy over existing label classes if any
-            final String labelClassAttribute = containingDocument.getStaticState().getLabel(getPrefixedId()).element.attributeValue("class");
+            final String labelClassAttribute = containingDocument.getStaticState().getLabel(getPrefixedId()).element.attributeValue(XFormsConstants.CLASS_QNAME);
             if (labelClassAttribute != null) {
                 labelClasses.append(' ');
                 labelClasses.append(labelClassAttribute);

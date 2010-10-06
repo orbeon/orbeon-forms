@@ -195,7 +195,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
                 newInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
                     new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
-                            "after", null, null, true));
+                            "after", null, null));
 
             } else {
                 // Generic insertion

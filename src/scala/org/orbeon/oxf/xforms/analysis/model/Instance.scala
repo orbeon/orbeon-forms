@@ -48,7 +48,7 @@ class Instance(val element: Element, val scope: XBLBindings#Scope) {
     // Allow "", which will cause an xforms-link-exception at runtime
     // NOTE: It could make sense to throw here
     val src = {
-        val srcAttribute = element.attributeValue("src")
+        val srcAttribute = element.attributeValue(XFormsConstants.SRC_QNAME)
         if (srcAttribute == null) null else NetUtils.encodeHRRI(srcAttribute.trim, true)
     }
 

@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.StringValue;
 
@@ -39,7 +37,6 @@ public class XFormsInsertEvent extends XFormsEvent {
     // Extension attributes
     private List sourceNodes;
     private List clonedNodes;
-    private boolean isAdjustIndexes;
 
     public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
         super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
@@ -47,7 +44,7 @@ public class XFormsInsertEvent extends XFormsEvent {
 
     public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject,
                              List<Item> insertedNodes, List originItems,
-                             NodeInfo insertLocationNodeInfo, String position, List sourceNodes, List clonedNodes, boolean isAdjustIndexes) {
+                             NodeInfo insertLocationNodeInfo, String position, List sourceNodes, List clonedNodes) {
         super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
         
         this.insertedNodeInfos = insertedNodes;
@@ -57,7 +54,6 @@ public class XFormsInsertEvent extends XFormsEvent {
 
         this.sourceNodes = sourceNodes;
         this.clonedNodes = clonedNodes;
-        this.isAdjustIndexes = isAdjustIndexes;
     }
 
     public SequenceIterator getAttribute(String name) {
@@ -88,9 +84,5 @@ public class XFormsInsertEvent extends XFormsEvent {
 
     public List getClonedNodes() {
         return clonedNodes;
-    }
-
-    public boolean isAdjustIndexes() {
-        return isAdjustIndexes;
     }
 }

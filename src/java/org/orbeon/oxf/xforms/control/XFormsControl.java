@@ -105,7 +105,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         this.controlElement = element;
         this.name = name;
 
-        this.id = (element != null) ? element.attributeValue("id") : null;
+        this.id = (element != null) ? element.attributeValue(XFormsConstants.ID_QNAME) : null;
         this.prefixedId = XFormsUtils.getPrefixedId(effectiveId);
         this.effectiveId = effectiveId;
     }
@@ -139,7 +139,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public XBLBindings.Scope getChildElementScope(Element element) {
-        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue("id"));
+        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue(XFormsConstants.ID_QNAME));
     }
 
     /**
@@ -431,7 +431,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public String getMediatype() {
         if (mediatype == null)
-            mediatype = controlElement.attributeValue("mediatype");
+            mediatype = controlElement.attributeValue(XFormsConstants.MEDIATYPE_QNAME);
         return mediatype;
     }
 
@@ -1171,7 +1171,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                 // Find context object for XPath evaluation
                 final Element contextElement = lhhaElement.getParent();
-                final String contextStaticId = contextElement.attributeValue("id");
+                final String contextStaticId = contextElement.attributeValue(XFormsConstants.ID_QNAME);
                 final String contextEffectiveId;
                 if (contextStaticId == null) {
                     // Assume we are at the top-level
@@ -1179,7 +1179,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     contextEffectiveId = control.container.getFirstControlEffectiveId();
                 } else {
                     // Not at top-level, find containing object
-                    final XFormsControl ancestorContextControl = findAncestorContextControl(contextStaticId, lhhaElement.attributeValue("id"));
+                    final XFormsControl ancestorContextControl = findAncestorContextControl(contextStaticId, lhhaElement.attributeValue(XFormsConstants.ID_QNAME));
                     if (ancestorContextControl != null) {
                         contextStack.setBinding(ancestorContextControl);
                         contextEffectiveId = ancestorContextControl.effectiveId;

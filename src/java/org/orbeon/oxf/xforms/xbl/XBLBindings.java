@@ -264,7 +264,7 @@ public class XBLBindings {
         int xblBindingCount = 0;
         for (Iterator j = xblDocument.getRootElement().elements(XFormsConstants.XBL_BINDING_QNAME).iterator(); j.hasNext(); xblBindingCount++) {
             final Element currentBindingElement = (Element) j.next();
-            final String currentElementAttribute = currentBindingElement.attributeValue("element");
+            final String currentElementAttribute = currentBindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
 
             if (currentElementAttribute != null) {
 

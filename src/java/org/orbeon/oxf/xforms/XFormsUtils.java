@@ -460,7 +460,7 @@ public class XFormsUtils {
         // Try to get value attribute
         // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
         {
-            final String valueAttribute = childElement.attributeValue("value");
+            final String valueAttribute = childElement.attributeValue(XFormsConstants.VALUE_QNAME);
             final boolean hasValueAttribute = valueAttribute != null;
             if (hasValueAttribute) {
                 final List<Item> currentNodeset = currentBindingContext.getNodeset();
@@ -485,7 +485,7 @@ public class XFormsUtils {
         // Try to get linking attribute
         // NOTE: This is deprecated in XForms 1.1
         {
-            final String srcAttributeValue = childElement.attributeValue("src");
+            final String srcAttributeValue = childElement.attributeValue(XFormsConstants.SRC_QNAME);
             final boolean hasSrcAttribute = srcAttributeValue != null;
             if (hasSrcAttribute) {
                 try {

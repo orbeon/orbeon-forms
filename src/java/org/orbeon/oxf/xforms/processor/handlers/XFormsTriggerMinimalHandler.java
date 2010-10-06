@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -78,7 +76,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 //                final Element controlElement = triggerControl.getControlElement();
 //                final Element loadElement = controlElement.element(XFormsConstants.XFORMS_LOAD_QNAME);
 //                if (loadElement != null && XFormsEvents.XFORMS_DOM_ACTIVATE.equals(loadElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME))) {
-//                    final String resource = loadElement.attributeValue("resource");
+//                    final String resource = loadElement.attributeValue(XFormsConstants.RESOURCE_QNAME);
 //                    if (resource != null && resource.indexOf('{') == -1) {
 //                        // Static resource URL
 //                        hrefValue = resource;

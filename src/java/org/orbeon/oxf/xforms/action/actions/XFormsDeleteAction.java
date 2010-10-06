@@ -44,7 +44,7 @@ public class XFormsDeleteAction extends XFormsAction {
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String atAttribute = actionElement.attributeValue("at");
-        final String contextAttribute = actionElement.attributeValue("context");
+        final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
 
         final List<Item> collectionToUpdate = contextStack.getCurrentNodeset();
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;

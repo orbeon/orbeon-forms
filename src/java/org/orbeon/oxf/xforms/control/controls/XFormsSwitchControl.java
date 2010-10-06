@@ -169,15 +169,15 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     private String findDefaultSelectedCaseId() {
-        final List<Element> caseElements = Dom4jUtils.elements(getControlElement(), XFormsConstants.CASE_QNAME);
+        final List<Element> caseElements = Dom4jUtils.elements(getControlElement(), XFormsConstants.XFORMS_CASE_QNAME);
         for (final Element caseElement: caseElements) {
             if (XFormsCaseControl.isDefaultSelected(caseElement)) {
                 // Found first case with selected="true"
-                return caseElement.attributeValue("id");
+                return caseElement.attributeValue(XFormsConstants.ID_QNAME);
             }
         }
         // Didn't find a case with selected="true" so return first case
-        return caseElements.get(0).attributeValue("id");
+        return caseElements.get(0).attributeValue(XFormsConstants.ID_QNAME);
     }
 
     @Override

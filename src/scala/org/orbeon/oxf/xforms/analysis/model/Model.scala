@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms._
 
 
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
-import org.orbeon.oxf.xforms.analysis.XPathAnalysis2
+import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.ContentHandlerHelper
@@ -71,7 +71,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
                 override def computeBindingAnalysis(element: Element) = {
                     if (defaultInstancePrefixedId != null)
                         // Start with instance('defaultInstanceId')
-                        analyzeXPath(staticState, null, getModelPrefixedId, XPathAnalysis2.buildInstanceString(defaultInstancePrefixedId))
+                        analyzeXPath(staticState, null, getModelPrefixedId, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId))
                     else
                         null
                 }
@@ -139,7 +139,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
             val isValidateMIP = Model.VALIDATE_MIP_NAMES.contains(name)
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
 
-            var analysis: XPathAnalysis = XPathAnalysis2.CONSTANT_NEGATIVE_ANALYSIS // default to negative, analyzeXPath() can change that
+            var analysis: XPathAnalysis = PathMapXPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS // default to negative, analyzeXPath() can change that
 
             def analyzeXPath(parentAnalysis: SimpleAnalysis) {
                 // TODO: handle model variables + xf:bind/@name
@@ -206,7 +206,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
         // Create children binds
         val children: Seq[Bind] = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) map (new Bind(_, Bind.this))
 
-        var refAnalysis: XPathAnalysis = XPathAnalysis2.CONSTANT_NEGATIVE_ANALYSIS // default to negative, analyzeXPath() can change that
+        var refAnalysis: XPathAnalysis = PathMapXPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS // default to negative, analyzeXPath() can change that
 
 //        def getRelevant = mipNameToXPathMIP.get(Model.RELEVANT)
 //        def getReadonly = mipNameToXPathMIP.get(Model.READONLY)
@@ -326,7 +326,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
                 override def computeBindingAnalysis(element: Element): XPathAnalysis = {
                     if (defaultInstancePrefixedId != null)
                         // Start with instance('defaultInstanceId')
-                        analyzeXPath(staticState, null, getModelPrefixedId, XPathAnalysis2.buildInstanceString(defaultInstancePrefixedId))
+                        analyzeXPath(staticState, null, getModelPrefixedId, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId))
                     else
                         null
                 }

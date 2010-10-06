@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.saxon.expr.StaticProperty;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.XPathException;
@@ -34,5 +33,11 @@ public class Last extends XFormsFunction {
     @Override
     public int getIntrinsicDependencies() {
         return StaticProperty.DEPENDS_ON_LAST;
+    }
+
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // Leave everything unchanged
+        return pathMapNodeSet;
     }
 }

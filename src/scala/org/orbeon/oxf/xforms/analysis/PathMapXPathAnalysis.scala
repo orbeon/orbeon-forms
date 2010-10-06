@@ -29,12 +29,14 @@ import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.expr.PathMap.PathMapArc
 import collection.mutable.{LinkedHashSet, Stack, Set}
 
-class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, namespaceMapping: NamespaceMapping,
-                     baseAnalysis: XPathAnalysis, inScopeVariables: java.util.Map[String, SimpleAnalysis],
-                     inScopeAncestorContexts: java.util.Map[String, SimpleAnalysis],
-                     scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String,
-                     locationData: LocationData, element: Element) extends XPathAnalysis {
+import java.util.{Map => JMap, HashMap => JHashMap}
 
+class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: String, namespaceMapping: NamespaceMapping,
+                           baseAnalysis: XPathAnalysis, inScopeVariables: JMap[String, SimpleAnalysis],
+                           inScopeAncestorContexts: collection.Map[String, SimpleAnalysis],
+                           scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String,
+                           locationData: LocationData, element: Element)
+        extends XPathAnalysis {
     
     private val expression = XPathCache.createExpression(staticState.getXPathConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
 
@@ -55,7 +57,7 @@ class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, na
     
     try {
         // In-scope variables
-        val variables = new java.util.HashMap[String, PathMap]
+        val variables = new JHashMap[String, PathMap]
         if (inScopeVariables != null) {
             for (entry <- inScopeVariables.entrySet) {
                 val valueAnalysis = entry.getValue.getValueAnalysis
@@ -64,12 +66,10 @@ class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, na
         }
 
         // In-scope ancestor contexts for xxf:context(), etc.
-        val contexts = new java.util.HashMap[String, PathMap]
-        if (inScopeAncestorContexts != null) {
-            for (entry <- inScopeAncestorContexts.entrySet) {
-                val bindingAnalysis = entry.getValue.getBindingAnalysis
-                contexts.put(entry.getKey, if (bindingAnalysis != null && bindingAnalysis.figuredOutDependencies) bindingAnalysis.pathmap else null)
-            }
+        val contexts = new JHashMap[String, PathMap]
+        for (entry <- inScopeAncestorContexts.entrySet) {
+            val bindingAnalysis = entry.getValue.getBindingAnalysis
+            contexts.put(entry.getKey, if (bindingAnalysis != null && bindingAnalysis.figuredOutDependencies) bindingAnalysis.pathmap else null)
         }
 
         val pathmap =
@@ -227,7 +227,7 @@ class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, na
                     if (!hasParameter) {
                         // instance() resolves to default instance for scope
                         if (defaultInstancePrefixedId != null) {
-                            sb.append(XPathAnalysis2.buildInstanceString(defaultInstancePrefixedId))
+                            sb.append(PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId))
 
                                 // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
                                 // TODO: not needed anymore because model now set before it is analyzed
@@ -274,7 +274,7 @@ class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, na
 
                                 if (prefixedInstanceId != null) {
                                     // Instance found
-                                    sb.append(XPathAnalysis2.buildInstanceString(prefixedInstanceId))
+                                    sb.append(PathMapXPathAnalysis.buildInstanceString(prefixedInstanceId))
 
                                         // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
                                         // TODO: not needed anymore because model now set before it is analyzed
@@ -338,7 +338,7 @@ class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, na
             if (set.nonEmpty) {
                 helper.startElement(enclosingElementName)
                 for (value <- set)
-                    helper.element(elementName, XPathAnalysis2.getDisplayPath(value))
+                    helper.element(elementName, PathMapXPathAnalysis.getDisplayPath(value))
                 helper.endElement()
             }
         }
@@ -467,7 +467,7 @@ class XPathAnalysis2(staticState: XFormsStaticState, val xpathString: String, na
     }
 }
 
-object XPathAnalysis2 {
+object PathMapXPathAnalysis {
 
     class ConstantXPathAnalysis(positive: Boolean) extends XPathAnalysis {
 
@@ -515,7 +515,7 @@ object XPathAnalysis2 {
     }
 
     // For unit tests
-    def getInternalPath(namespaces: java.util.Map[String, String], path: String): String = {
+    def getInternalPath(namespaces: JMap[String, String], path: String): String = {
         val pool = XPathCache.getGlobalConfiguration.getNamePool
 
         {

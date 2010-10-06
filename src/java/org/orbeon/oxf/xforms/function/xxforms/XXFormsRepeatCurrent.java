@@ -48,8 +48,13 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
         // NOTE: This does the same as xxf:context()
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
         if (contextIdExpression instanceof StringLiteral) {
-            // Ask PathMap for the result
+            // Id specified, ask PathMap for the result
             return pathMap.getPathForContext(((StringLiteral) contextIdExpression).getStringValue());
+        } else if (contextIdExpression == null) {
+            // Ask PathMap for the result
+            // TODO
+            pathMap.setInvalidated(true);
+            return null;
         } else {
             // Argument is not static so we can't figure it out
             pathMap.setInvalidated(true);

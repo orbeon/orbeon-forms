@@ -76,6 +76,8 @@ public class ContainerAnalysis extends ControlAnalysis {
 
     @Override
     public void freeTransientState() {
+        // Free standard stuff
+        super.freeTransientState();
         // Free this since this information is only useful while building sub-controls
         containedVariables = null;
     }

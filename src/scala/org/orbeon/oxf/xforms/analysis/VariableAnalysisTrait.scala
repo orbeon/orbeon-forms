@@ -43,7 +43,7 @@ trait VariableAnalysisTrait {
                         return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute)
                     } else {
                         // Value is constant
-                        return XPathAnalysis2.CONSTANT_ANALYSIS
+                        return PathMapXPathAnalysis.CONSTANT_ANALYSIS
                     }
                 }
             }
@@ -57,7 +57,7 @@ trait VariableAnalysisTrait {
                 return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute)
             } else {
                 // Value is constant
-                return XPathAnalysis2.CONSTANT_ANALYSIS
+                return PathMapXPathAnalysis.CONSTANT_ANALYSIS
             }
         }
     }

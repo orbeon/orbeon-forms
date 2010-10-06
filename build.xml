@@ -265,7 +265,7 @@
 
         <scalac destdir="${build.classes.dir}"
             classpathref="class.path"
-            fork="false" encoding="utf-8">
+            fork="true" encoding="utf-8" jvmargs="-Xmx300m">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <src path="${scala-src.dir}"/>

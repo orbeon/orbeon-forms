@@ -134,14 +134,15 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
 
     def refreshDone() {
 
-        getLogger.logDebug("dependencies", "refresh done",
-            Array("bindings updated", bindingUpdateCount.toString,
-                  "values updated", valueUpdateCount.toString,
-                  "MIPs updated", mipUpdateCount.toString,
-                  "Binding XPath optimized", bindingXPathOptimizedCount.toString,
-                  "Value XPath optimized", valueXPathOptimizedCount.toString,
-                  "MIP XPath optimized", mipXPathOptimizedCount.toString,
-                  "Total XPath optimized", (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString): _*)
+        if (getLogger.isDebugEnabled)
+            getLogger.logDebug("dependencies", "refresh done",
+                Array("bindings updated", bindingUpdateCount.toString,
+                      "values updated", valueUpdateCount.toString,
+                      "MIPs updated", mipUpdateCount.toString,
+                      "Binding XPath optimized", bindingXPathOptimizedCount.toString,
+                      "Value XPath optimized", valueXPathOptimizedCount.toString,
+                      "MIP XPath optimized", mipXPathOptimizedCount.toString,
+                      "Total XPath optimized", (bindingXPathOptimizedCount + valueXPathOptimizedCount + mipXPathOptimizedCount).toString): _*)
 
         for (modelState <- modelStates.values)
             modelState.refreshDone()
@@ -223,7 +224,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 , controlAnalysis.bindingXPathEvaluations)
                         }
 
-                    if (tempResult.requireUpdate) {
+                    if (tempResult.requireUpdate && getLogger.isDebugEnabled) {
                         getLogger.logDebug("dependencies", "binding requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", controlAnalysis.getBindingAnalysis.xpathString): _*)
                     }
@@ -265,7 +266,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                         tempValueAnalysis.intersectsValue(getModifiedPaths)
                                 , if (controlAnalysis.hasValueXPath) 1 else 0)
                         }
-                    if (tempUpdateResult.requireUpdate && tempValueAnalysis != null) {
+                    if (tempUpdateResult.requireUpdate && tempValueAnalysis != null && getLogger.isDebugEnabled) {
                         getLogger.logDebug("dependencies", "value requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.xpathString): _*)
                     }
@@ -351,7 +352,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                             || mipAnalysis.intersectsValue(getModifiedPaths)
                                     , 1)
                             }
-                        if (tempUpdateResult.requireUpdate && mipAnalysis != null) {
+                        if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled) {
                             getLogger.logDebug("dependencies", "MIP requires update",
                                 Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", mipAnalysis.xpathString): _*)
                         }
@@ -388,7 +389,7 @@ object PathMapXPathDependencies {
         }
 
         // Join instance('...') and a fingerprint representation of the element and attribute nodes
-        XPathAnalysis2.buildInstanceString(instance.getPrefixedId) ::
+        PathMapXPathAnalysis.buildInstanceString(instance.getPrefixedId) ::
             (if (ancestorOrSelf.size > 1) // first is the root element, which we skip as we use instance('...') instead
                 ancestorOrSelf.tail map (node => node.getNodeKind match {
                     case ELEMENT_NODE => node.getFingerprint

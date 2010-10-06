@@ -118,7 +118,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('default')/a"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('default')/a"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -148,7 +148,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to default ==================================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('default')/b"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('default')/b"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -178,7 +178,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to instance2 ================================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance2')/a"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance2')/a"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -208,7 +208,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to instance2 ================================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance2')/b"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance2')/b"));
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -312,7 +312,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('default')/value"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('default')/value"));
 
             assertFalse(dependencies.requireBindingUpdate("values"));
             assertTrue(dependencies.requireValueUpdate("values"));
@@ -340,7 +340,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to instance1 ============================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance1')"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance1')"));
 
             // No binding update
             assertFalse(dependencies.requireBindingUpdate("output1"));
@@ -373,7 +373,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
             
             // == Value change to instance2 ============================================================================
-            dependencies.setModifiedPathTest(XPathAnalysis2.getInternalPath(namespaces, "instance('instance2')"));
+            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance2')"));
 
             // No binding update
             assertFalse(dependencies.requireBindingUpdate("output1"));

@@ -17,8 +17,8 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
-import org.orbeon.oxf.xforms.analysis.XPathAnalysis2;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -40,7 +40,7 @@ public class RootAnalysis extends ContainerAnalysis {
             final Instance defaultInstance = containingModel().getDefaultInstance();
             if (defaultInstance != null) {
                 // Start with instance('defaultInstanceId')
-                return analyzeXPath(staticState(), null, prefixedId(), XPathAnalysis2.buildInstanceString(defaultInstance.prefixedId()));
+                return analyzeXPath(staticState(), null, prefixedId(), PathMapXPathAnalysis.buildInstanceString(defaultInstance.prefixedId()));
             } else {
                 return null;
             }

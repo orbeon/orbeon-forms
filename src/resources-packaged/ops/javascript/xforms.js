@@ -2888,7 +2888,6 @@ ORBEON.xforms.FlatNesting = {
         // Determine if this a group or a repeat
         var isGroup = FN.isGroupBegin(startNode);
         var isRepeat = FN.isRepeatDelimiter(startNode);
-        YAHOO.util.Assert.isTrue(isGroup || isRepeat);
 
         // Iterate over previous sibling nodes
         var depth = 0;
@@ -2923,7 +2922,6 @@ ORBEON.xforms.FlatNesting = {
         // Determine if this a group or a repeat
         var isGroup = this.isGroupBegin(startNode);
         var isRepeat = this.isRepeatDelimiter(startNode);
-        YAHOO.util.Assert.isTrue(isGroup || isRepeat);
 
         // Iterate of following sibling nodes
         var depth = 0;

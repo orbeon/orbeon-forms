@@ -93,6 +93,8 @@ h1.fr-form-title {
 
 .fb-edit-items { text-decoration: none; display: block; clear: both }
 
+#fb-toolbox .xbl-fr-alert-dialog {display: none } /* Because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll */
+
 /* ***** Dialogs **************************************************************************************************** */
 
 /* Metadata editor dialog */

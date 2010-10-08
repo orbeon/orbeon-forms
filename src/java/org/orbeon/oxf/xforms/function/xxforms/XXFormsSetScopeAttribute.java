@@ -20,6 +20,7 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.Map;
 
@@ -39,7 +40,10 @@ public class XXFormsSetScopeAttribute extends XFormsFunction {
 
             // Prepare value
             final Object value;
-            if (item instanceof AtomicValue) {
+            if (item instanceof StringValue) {
+                // Wrap it as Saxon's StringValue doesn't implement equals(), see comments below
+                value = new StringValueWithEquals(((StringValue) item).getStringValueCS());
+            } else if (item instanceof AtomicValue) {
                 // Store as is
                 value = item;
             } else if (item instanceof NodeInfo) {
@@ -54,6 +58,23 @@ public class XXFormsSetScopeAttribute extends XFormsFunction {
             // Store value
             // TODO: It seems that Jetty sometimes fails down the line here by calling equals() on the value.
             scope.put(attributeName, value);
+        }
+    }
+
+    // Version of StringValue which supports equals().
+    // Saxon throws on equals() to make a point that a collation should be used for StringValue comparison.
+    // Here, we don't really care about equality, but we want to implement equals() as e.g. Jetty calls equals() on
+    // objects stored into the session. See:
+    // http://forge.ow2.org/tracker/index.php?func=detail&aid=315528&group_id=168&atid=350207
+    public static class StringValueWithEquals extends StringValue {
+        public StringValueWithEquals(CharSequence value) {
+            super(value);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            // Compare the CharSequence
+            return other instanceof StringValue && getStringValueCS().equals(((StringValue) other).getStringValueCS());
         }
     }
 }

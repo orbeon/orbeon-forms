@@ -20,10 +20,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.SingletonIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 import org.xml.sax.InputSource;
@@ -38,6 +35,7 @@ public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
     protected SequenceIterator convertAttributeValue(XPathContext xpathContext, Object attributeObject, String contentType, String key) throws XPathException {
         if (attributeObject instanceof AtomicValue) {
             // Found atomic value
+            // NOTE: This can be a XXFormsSetScopeAttribute.StringValueWithEquals
             return SingletonIterator.makeIterator((AtomicValue) attributeObject);
         } else if (attributeObject != null) {
             // Found something else, hopefully convertible to SAXStore

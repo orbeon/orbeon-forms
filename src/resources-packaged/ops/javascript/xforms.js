@@ -4439,6 +4439,8 @@ ORBEON.widgets.YUICalendar = function() {
 
             // Align overlay the best we can
             inputField = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[0];
+            // For minimal triggers, the element that gets the xforms-input-input is the image, and it doesn't have an id, so here we generate one
+            YAHOO.util.Dom.generateId(inputField);
             // 1. Show overlay below the input field
             yuiOverlay.cfg.setProperty("constraintoviewport", false);
             yuiOverlay.cfg.setProperty("context", [inputField.id, YAHOO.widget.Overlay.TOP_LEFT, YAHOO.widget.Overlay.BOTTOM_LEFT]);

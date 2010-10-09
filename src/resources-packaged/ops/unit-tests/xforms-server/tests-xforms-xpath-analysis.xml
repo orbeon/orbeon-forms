@@ -3357,5 +3357,66 @@
             </request>
         </output>
     </test>
+
+    <test description="Simple use of xxf:serialize() function" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:exf="http://www.exforms.org/exf/1-0"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="i1">
+                            <instance/>
+                        </xf:instance>
+                        <xf:instance id="i2">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="o1" value="xxf:serialize(instance()/foo/bar, 'xml')"/>
+                    <xf:output id="o2" value="xxf:serialize(instance('i2')/foo/bar, 'html')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <control name="output" scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:serialize(instance()/foo/bar, 'xml'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i1')/foo/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:serialize(instance('i2')/foo/bar, 'html'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i2')/foo/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
     
 </group>

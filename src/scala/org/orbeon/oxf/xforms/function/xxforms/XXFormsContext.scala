@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ *  Copyright (C) 2010 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
+import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
+import org.orbeon.oxf.common.OXFException
 
 /**
  * The xxforms:context() function allows you to obtain the single-node binding for an enclosing xforms:group,
  * xforms:repeat, or xforms:switch. It takes one mandatory string parameter containing the id of an enclosing grouping
  * XForms control. For xforms:repeat, the context returned is the context of the current iteration.
  */
-class XXFormsContext extends XFormsFunction {
+class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
         // Match on context expression
@@ -49,20 +50,11 @@ class XXFormsContext extends XFormsFunction {
                 // Argument is literal and we have a context to ask
                 pathMap.getPathMapContext match {
                     case context: SimpleAnalysis#SimplePathMapContext =>
-                        // Get context id by evaluating expression
+                        // Get static context id
                         val contextStaticId = contextIdExpression.getStringValue
-                        // Get PathMap for context id
-                        context.getInScopeContexts.get(contextStaticId) match {
-                            case Some(simpleAnalysis) if simpleAnalysis.getBindingAnalysis != null && simpleAnalysis.getBindingAnalysis.figuredOutDependencies =>
-                                // Clone the PathMap first because the nodes returned must belong to this PathMap
-                                val clonedContextPathMap = simpleAnalysis.getBindingAnalysis.pathmap.clone
-                                pathMap.addRoots(clonedContextPathMap.getPathMapRoots)
-                                clonedContextPathMap.findFinalNodes
-                            case None =>
-                                // Probably the id passed doesn't match any ancestor id
-                                pathMap.setInvalidated(true)
-                                null
-                        }
+                        // Handle context
+                        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
+                    case _ => throw new OXFException("Can't process PathMap because context is not of expected type.")
                 }
             case _ =>
                 // Argument is not literal so we can't figure it out

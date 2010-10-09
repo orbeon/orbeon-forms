@@ -867,6 +867,7 @@ public class PathMap implements Cloneable {
             final Expression rootExpression = rootNode.rootExpression;
             out.println();
             rootExpression.explain(out);
+            out.println();
             showStep(out, "", rootExpression, rootNode);
             out.println("\nTREE FOR EXPRESSION " + i);
             showArcs(out, rootNode, 2);

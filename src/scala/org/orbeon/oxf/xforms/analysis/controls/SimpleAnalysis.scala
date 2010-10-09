@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ *  Copyright (C) 2010 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -48,6 +48,7 @@ abstract class SimpleAnalysis(val staticState: XFormsStaticState, val scope: XBL
     val hasNodeBinding = hasRef || hasBind
     val bindingXPathEvaluations = (if (hasContext) 1 else 0) + (if (hasRef) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
 
+    private var contextAnalysis: XPathAnalysis = null// TODO!
     private var bindingAnalysis: XPathAnalysis = null
     private var valueAnalysis: XPathAnalysis = null
 

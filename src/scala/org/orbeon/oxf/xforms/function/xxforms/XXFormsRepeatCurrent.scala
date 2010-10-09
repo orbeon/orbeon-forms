@@ -17,11 +17,12 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 
 import org.orbeon.oxf.xforms.XFormsControls
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
+import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
+import org.orbeon.oxf.common.OXFException
 
 /**
  * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
@@ -29,8 +30,8 @@ import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
  *
  * This function must be called from within an xforms:repeat.
  */
+class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
 
-class XXFormsRepeatCurrent extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext): Item = {
 
         // Note that this is deprecated. Move to warning later?
@@ -50,19 +51,6 @@ class XXFormsRepeatCurrent extends XFormsFunction {
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
 
-        def matchSimpleAnalysis(analysisOption: Option[SimpleAnalysis]): PathMapNodeSet = analysisOption match {
-            // TODO: This is the same match as in XXFormsContext
-            case Some(simpleAnalysis) if simpleAnalysis.getBindingAnalysis != null && simpleAnalysis.getBindingAnalysis.figuredOutDependencies =>
-                // Clone the PathMap first because the nodes returned must belong to this PathMap
-                val clonedContextPathMap = simpleAnalysis.getBindingAnalysis.pathmap.clone
-                pathMap.addRoots(clonedContextPathMap.getPathMapRoots)
-                clonedContextPathMap.findFinalNodes
-            case None =>
-                // Probably the id passed doesn't match any ancestor id
-                pathMap.setInvalidated(true)
-                null
-        }
-
         // Match on context expression
         getRepeatIdExpression match {
             case Some(repeatIdExpression: StringLiteral) =>
@@ -70,14 +58,16 @@ class XXFormsRepeatCurrent extends XFormsFunction {
                 pathMap.getPathMapContext match {
                     case context: SimpleAnalysis#SimplePathMapContext =>
                         // Get PathMap for context id
-                        matchSimpleAnalysis(context.getInScopeContexts.get(repeatIdExpression.getStringValue))
+                        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
+                    case _ => throw new OXFException("Can't process PathMap because context is not of expected type.")
                 }
             case None =>
                 // Argument is not specified, ask PathMap for the result
                 pathMap.getPathMapContext match {
                     case context: SimpleAnalysis#SimplePathMapContext =>
                         // Get PathMap for context id
-                        matchSimpleAnalysis(context.getInScopeRepeat)
+                        matchSimpleAnalysis(pathMap, context.getInScopeRepeat)
+                    case _ => throw new OXFException("Can't process PathMap because context is not of expected type.")
                 }
             case _ =>
                 // Argument is not literal so we can't figure it out
@@ -88,4 +78,3 @@ class XXFormsRepeatCurrent extends XFormsFunction {
 
     private def getRepeatIdExpression = if (argument.length == 0) None else Some(argument(0))
 }
-

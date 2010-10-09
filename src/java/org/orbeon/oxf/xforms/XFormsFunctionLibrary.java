@@ -20,12 +20,12 @@ import org.orbeon.oxf.xforms.function.Last;
 import org.orbeon.oxf.xforms.function.exforms.*;
 import org.orbeon.oxf.xforms.function.xxforms.*;
 import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.functions.Aggregate;
 import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.*;
-import org.orbeon.saxon.value.SequenceType;
-import org.orbeon.saxon.value.Value;
+import org.orbeon.saxon.value.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,17 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     static {
         StandardFunction.Entry e;
 
+        // Saxon's last() function doesn't do what we need
         e = register("last", Last.class, 0, 0, 0, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
+
+        // Forward these to our own implementation so we can handle PathMap
+        e = register("count", org.orbeon.oxf.xforms.function.Aggregate.class, Aggregate.COUNT, 1, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
+            StandardFunction.arg(e, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE, Int64Value.ZERO);
+        e = register("avg", org.orbeon.oxf.xforms.function.Aggregate.class, Aggregate.AVG, 1, 1, BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ZERO_OR_ONE);
+            StandardFunction.arg(e, 0, BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ZERO_OR_MORE, EmptySequence.getInstance());
+        e = register("sum", org.orbeon.oxf.xforms.function.Aggregate.class, Aggregate.SUM, 1, 2, BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ZERO_OR_ONE);
+            StandardFunction.arg(e, 0, BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ZERO_OR_MORE, null);
+            StandardFunction.arg(e, 1, BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
 
         // 7.6 Boolean Functions
 
@@ -226,7 +236,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:serialize
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}serialize", Serialize.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}serialize", XXFormsSerialize.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
         StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 

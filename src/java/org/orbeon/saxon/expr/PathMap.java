@@ -1,16 +1,16 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
+* Copyright (C) 2010 Orbeon, Inc.
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of the
+* GNU Lesser General Public License as published by the Free Software Foundation; either version
+* 2.1 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU Lesser General Public License for more details.
+*
+* The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
 package org.orbeon.saxon.expr;
 
 import org.orbeon.saxon.Configuration;
@@ -30,32 +30,46 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 /**
- * A PathMap is a description of all the paths followed by an expression.
- * It is a set of trees. Each tree contains as its root an expression that selects
- * nodes without any dependency on the context. The arcs in the tree are axis steps.
- * So the expression doc('a.xml')/a[b=2]/c has a single root (the call on doc()), with
- * a single arc representing child::a, this leads to a node which has two further arcs
- * representing child::b and child::c. Because element b is atomized, there will also be
- * an arc for the step descendant::text() indicating the requirement to access the text
- * nodes of the element.
- *
- * <p>The current implementation works only for XPath 2.0 expressions (for example, constructs
- * like xsl:for-each-group are not handled.)</p>
- *
- * <p>This class, together with the overloaded method
- * {@link Expression#addToPathMap(PathMap, org.orbeon.saxon.expr.PathMap.PathMapNodeSet)} can be
- * seen as an implementation of the static path analysis algorithm given in section 4 of
- * <a href="http://www-db.research.bell-labs.com/user/simeon/xml_projection.pdf">A. Marian and J. Simeon,
- * Projecting XML Documents, VLDB 2003</a>.</p>
- */
+* A PathMap is a description of all the paths followed by an expression.
+* It is a set of trees. Each tree contains as its root an expression that selects
+* nodes without any dependency on the context. The arcs in the tree are axis steps.
+* So the expression doc('a.xml')/a[b=2]/c has a single root (the call on doc()), with
+* a single arc representing child::a, this leads to a node which has two further arcs
+* representing child::b and child::c. Because element b is atomized, there will also be
+* an arc for the step descendant::text() indicating the requirement to access the text
+* nodes of the element.
+*
+* <p>The current implementation works only for XPath 2.0 expressions (for example, constructs
+* like xsl:for-each-group are not handled.)</p>
+*
+* <p>This class, together with the overloaded method
+* {@link Expression#addToPathMap(PathMap, org.orbeon.saxon.expr.PathMap.PathMapNodeSet)} can be
+* seen as an implementation of the static path analysis algorithm given in section 4 of
+* <a href="http://www-db.research.bell-labs.com/user/simeon/xml_projection.pdf">A. Marian and J. Simeon,
+* Projecting XML Documents, VLDB 2003</a>.</p>
+*/
 
 public class PathMap implements Cloneable {
 
     private List<PathMapRoot> pathMapRoots = new ArrayList<PathMapRoot>();        // a list of PathMapRoot objects
     private HashMap<Binding, PathMapNodeSet> pathsForVariables = new HashMap<Binding, PathMapNodeSet>();  // a map from a variable Binding to a PathMapNodeSet
 
+    // ORBEON
     private Map<String, PathMap> inScopeVariables;
-    private Map<String, PathMap> inScopeAncestorContexts;
+
+    public void setInScopeVariables(Map<String, PathMap> inScopeVariables) {
+        this.inScopeVariables = inScopeVariables;
+    }
+
+    private Object pathMapContext;
+
+    public Object getPathMapContext() {
+        return pathMapContext;
+    }
+
+    public void setPathMapContext(Object pathMapContext) {
+        this.pathMapContext = pathMapContext;
+    }
 
     private boolean invalidated;    // whether during PathMap construction it is found that we cannot produce a meaningful result
 
@@ -398,18 +412,13 @@ public class PathMap implements Cloneable {
     }
 
     // ORBEON
-    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables, Map<String, PathMap> inScopeAncestorContexts) {
+    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables, Object pathMapContext) {
 
-        setProperties(inScopeVariables, inScopeAncestorContexts);
+        setInScopeVariables(inScopeVariables);
+        setPathMapContext(pathMapContext);
 
         final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
         updateFinalNodes(finalNodes);
-    }
-
-    // ORBEON
-    public void setProperties(Map<String, PathMap> inScopeVariables, Map<String, PathMap> inScopeAncestorContexts) {
-        this.inScopeVariables = inScopeVariables;
-        this.inScopeAncestorContexts = inScopeAncestorContexts;
     }
 
     /**
@@ -463,39 +472,26 @@ public class PathMap implements Cloneable {
             return localResult;
 
         // ORBEON
+        if (pathMapContext != null) {
+            // Check external variables
+            // Clone the PathMap first because the nodes returned must belong to this PathMap
+            final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
+            if (variablePathMap != null) {
+                final PathMap clonedVariablePathMap = variablePathMap.clone();
+                addRoots(clonedVariablePathMap.getPathMapRoots());
+                return clonedVariablePathMap.findFinalNodes();
+            } else {
+                // TODO: when can this happen? it does seem to happen, e.g. w/ names like zz:zz1303689357 for internal LetExpression
 
-        // Check external variables
-        // Clone the PathMap first because the nodes returned must belong to this PathMap
-        final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
-        if (variablePathMap != null) {
-            final PathMap clonedVariablePathMap = variablePathMap.clone();
-            addRoots(clonedVariablePathMap.getPathMapRoots());
-            return clonedVariablePathMap.findFinalNodes();
-        } else {
-            // TODO: when can this happen? it does seem to happen, e.g. w/ names like zz:zz1303689357 for internal LetExpression
+                // Only invalidate if this is not a local variable, i.e. if this is a reference to an external variable. In
+                // this case, there is no local slot number.
+                if (binding.getLocalSlotNumber() == -1)
+                    invalidated = true;
 
-            // Only invalidate if this is not a local variable, i.e. if this is a reference to an external variable. In
-            // this case, there is no local slot number.
-            if (binding.getLocalSlotNumber() == -1)
-                invalidated = true;
-
-            return null;
-        }
-    }
-
-    // ORBEON: this for xxf:context() and similar
-    public PathMapNodeSet getPathForContext(String contextStaticId) {
-        // Clone the PathMap first because the nodes returned must belong to this PathMap
-        final PathMap contextPathMap = inScopeAncestorContexts.get(contextStaticId);
-        if (contextPathMap != null) {
-            final PathMap clonedContextPathMap = contextPathMap.clone();
-            addRoots(clonedContextPathMap.getPathMapRoots());
-            return clonedContextPathMap.findFinalNodes();
-        } else {
-            // Probably the id passed is invalid
-            invalidated = true;
-            return null;
-        }
+                return null;
+            }
+        } else
+            throw new IllegalStateException("No PathMapContext set to obtain variable binding: " + binding.getVariableQName().getDisplayName());
     }
 
     public boolean isInvalidated() {

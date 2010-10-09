@@ -33,7 +33,7 @@ import java.util.{Map => JMap, HashMap => JHashMap}
 
 class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: String, namespaceMapping: NamespaceMapping,
                            baseAnalysis: XPathAnalysis, inScopeVariables: JMap[String, SimpleAnalysis],
-                           inScopeAncestorContexts: collection.Map[String, SimpleAnalysis],
+                           pathMapContext: AnyRef,
                            scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String,
                            locationData: LocationData, element: Element)
         extends XPathAnalysis {
@@ -65,42 +65,32 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
             }
         }
 
-        // In-scope ancestor contexts for xxf:context(), etc.
-        val contexts = new JHashMap[String, PathMap]
-        for (entry <- inScopeAncestorContexts.entrySet) {
-            val bindingAnalysis = entry.getValue.getBindingAnalysis
-            contexts.put(entry.getKey, if (bindingAnalysis != null && bindingAnalysis.figuredOutDependencies) bindingAnalysis.pathmap else null)
-        }
-
         val pathmap =
-            if (baseAnalysis == null) {
-                // We are at the top, start with a new PathMap
-                new PathMap(expression, variables, contexts)
+            if (baseAnalysis == null || (expression.getDependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) == 0) {
+                // Start with a new PathMap if:
+                // o we are at the top (i.e. does not have a context)
+                // o or the expression does not depend on the context item
+                new PathMap(expression, variables, pathMapContext)
             } else {
-                if ((expression.getDependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
-                    // Expression depends on the context item
-    
-                    if (baseAnalysis.figuredOutDependencies) {
-                        // We clone the base analysis and add to an existing PathMap
-                        val clonedPathmap = baseAnalysis.pathmap.clone
-                        clonedPathmap.setProperties(variables, contexts)
-    
-                        val newNodeset = expression.addToPathMap(clonedPathmap, clonedPathmap.findFinalNodes)
-    
-                        if (!clonedPathmap.isInvalidated)
-                            clonedPathmap.updateFinalNodes(newNodeset)
+                // Expression has a context and depends on the context item
+                if (baseAnalysis.figuredOutDependencies) {
+                    // We clone the base analysis and add to an existing PathMap
+                    val clonedPathmap = baseAnalysis.pathmap.clone
+                    clonedPathmap.setInScopeVariables(variables)
+                    clonedPathmap.setPathMapContext(pathMapContext)
 
-                        clonedPathmap
-                    } else {
-                        // Base analysis failed, we fail analysis too
-                        this.pathmap = null
-                        this.figuredOutDependencies = false
-    
-                        null
-                    }
+                    val newNodeset = expression.addToPathMap(clonedPathmap, clonedPathmap.findFinalNodes)
+
+                    if (!clonedPathmap.isInvalidated)
+                        clonedPathmap.updateFinalNodes(newNodeset)
+
+                    clonedPathmap
                 } else {
-                    // Expression does not depend on the context item
-                    new PathMap(expression, variables, contexts)
+                    // Base analysis failed, we fail analysis too
+                    this.pathmap = null
+                    this.figuredOutDependencies = false
+
+                    null
                 }
             }
 
@@ -213,7 +203,7 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
     }
 
     private def createPath(sb: StringBuilder, stack: Stack[Expression], scope: XBLBindings#Scope, containingModelPrefixedId: String,
-                           defaultInstancePrefixedId: String, node: PathMap.PathMapNode ): Boolean = {
+                           defaultInstancePrefixedId: String, node: PathMap.PathMapNode): Boolean = {
 
         // Local class used as marker for a rewritten StringLiteral in an expression
         class PrefixedIdStringLiteral(value: CharSequence) extends StringLiteral(value)

@@ -25,7 +25,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 
 import java.util.{Map => JMap}
 import collection.mutable.LinkedHashMap
-
 /**
  * Hold the static analysis for an XForms object.
  */
@@ -113,7 +112,7 @@ abstract class SimpleAnalysis(val staticState: XFormsStaticState, val scope: XBL
                     if (containingModel.defaultInstancePrefixedId != null) {
                         // Start with instance('defaultInstanceId')
                         new PathMapXPathAnalysis(staticState, PathMapXPathAnalysis.buildInstanceString(containingModel.defaultInstancePrefixedId),
-                            null, null, null, Map.empty, scope, containingModel.prefixedId, containingModel.defaultInstancePrefixedId, locationData, element)
+                            null, null, null, null, scope, containingModel.prefixedId, containingModel.defaultInstancePrefixedId, locationData, element)
                     } else
                         // No instance
                         null
@@ -132,16 +131,26 @@ abstract class SimpleAnalysis(val staticState: XFormsStaticState, val scope: XBL
 
     def analyzeXPath(staticState: XFormsStaticState, baseAnalysis: XPathAnalysis, prefixedId: String, xpathString: String): XPathAnalysis = {
         return new PathMapXPathAnalysis(staticState, xpathString, staticState.getMetadata.getNamespaceMapping(prefixedId),
-            baseAnalysis, getInScopeVariables, getInScopeContexts, scope, getModelPrefixedId, getDefaultInstancePrefixedId, locationData, element)
+            baseAnalysis, getInScopeVariables, new SimplePathMapContext, scope, getModelPrefixedId, getDefaultInstancePrefixedId, locationData, element)
     }
 
     def getLevel: Int = if (parentAnalysis == null) 0 else parentAnalysis.getLevel + 1
 
     /**
-     * Return a map of static id => analysis for all the ancestor-or-self in scope.
+     * Context used by our functions
      */
-    def getInScopeContexts: collection.Map[String, SimpleAnalysis] =
-        LinkedHashMap(SimpleAnalysis.getAllAncestorOrSelfAnalysisInScope(this, scope) map (analysis => (analysis.staticId, analysis)): _*)
+    class SimplePathMapContext {
+        /**
+         * Return a map of static id => analysis for all the ancestor-or-self in scope.
+         */
+        def getInScopeContexts: collection.Map[String, SimpleAnalysis] =
+            LinkedHashMap(SimpleAnalysis.getAllAncestorOrSelfAnalysisInScope(SimpleAnalysis.this, scope) map (analysis => (analysis.staticId, analysis)): _*)
+
+        /**
+         * Return analysis for closest ancestor repeat.
+         */
+        def getInScopeRepeat = SimpleAnalysis.getAllAncestorOrSelfAnalysisInScope(SimpleAnalysis.this, scope) find (_.isInstanceOf[RepeatAnalysis])
+    }
 
     def freeTransientState() {
         if (getBindingAnalysis != null)

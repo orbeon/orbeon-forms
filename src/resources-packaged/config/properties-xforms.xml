@@ -36,6 +36,9 @@
     -->
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.error"                          value="submission-error-body"/>
 
+    <!-- XPath analysis (PE) -->
+    <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
+
     <!-- TODO: new output formats depending on language; also support short/medium/long/full? -->
     <property as="xs:string"  name="oxf.xforms.format.output.*.*.date"                  value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.*.*.dateTime"              value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>

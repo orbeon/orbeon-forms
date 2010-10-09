@@ -275,7 +275,7 @@
         <javac destdir="${build.classes.dir}"
             classpathref="class.path"
             debug="${build.debug}" optimize="off" target="1.5" source="1.5"
-            fork="false" memoryInitialSize="128m" memoryMaximumSize="300m" encoding="utf-8">
+            fork="true" memoryInitialSize="128m" memoryMaximumSize="300m" encoding="utf-8">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>

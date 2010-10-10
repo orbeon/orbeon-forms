@@ -48,9 +48,9 @@ abstract class SimpleAnalysis(val staticState: XFormsStaticState, val scope: XBL
     val hasNodeBinding = hasRef || hasBind
     val bindingXPathEvaluations = (if (hasContext) 1 else 0) + (if (hasRef) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
 
-    private var contextAnalysis: XPathAnalysis = null// TODO!
-    private var bindingAnalysis: XPathAnalysis = null
-    private var valueAnalysis: XPathAnalysis = null
+    private var contextAnalysis: XPathAnalysis = null// TODO
+    private var bindingAnalysis: XPathAnalysis = null// TODO: Option[XPathAnalysis]
+    private var valueAnalysis: XPathAnalysis = null  // TODO: Option[XPathAnalysis]
 
     def analyzeXPath() {
         bindingAnalysis = computeBindingAnalysis(element)

@@ -99,15 +99,15 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
             this.figuredOutDependencies = false
         } else {
 
-            println("xxx expressions")
-            println(expression.toString())
-            pathmap.diagnosticDump(System.out)
+//            println("Before")
+//            println(expression.toString())
+//            pathmap.diagnosticDump(System.out)
 
             // Try to reduce ancestor axis
             reduceAncestorAxis(pathmap)
 
-            println("xxx after")
-            pathmap.diagnosticDump(System.out)// xxx
+//            println("After")
+//            pathmap.diagnosticDump(System.out)
 
             this.pathmap = pathmap
 

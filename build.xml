@@ -316,6 +316,7 @@
               <exclude name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
               <exclude name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
               <exclude name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
+              <exclude name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
           </fileset>
           <fileset dir="${resources-packaged.dir}">
               <include name="config/*-processors.xml"/>
@@ -328,6 +329,7 @@
               <include name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
               <include name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
               <include name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
+              <include name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
           </fileset>
         </jar>
 

@@ -22,9 +22,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -344,6 +342,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             // CSS: rewrite url() in content
 
             final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+            final ExternalContext.Response response = externalContext.getResponse();
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 
@@ -404,8 +403,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                         // Rewrite URL and output it as an absolute path
                         try {
                             final String resolvedURI = NetUtils.resolveURI(initialURI, resourcePath);
-                            final String rewrittenURI = URLRewriterUtils.rewriteResourceURL(externalContext.getRequest(),
-                                    resolvedURI, matchAllPathMatcher, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+                            // Rewrite through response
+                            final String rewrittenURI = response.rewriteResourceURL(resolvedURI, false);
 
                             outputWriter.write("url(" + rewrittenURI + ")");
                         } catch (Exception e) {

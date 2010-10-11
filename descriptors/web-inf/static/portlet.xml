@@ -7,7 +7,7 @@
         <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet2Delegate</portlet-class>
         <supports>
             <mime-type>text/html</mime-type>
-            <portlet-mode>edit</portlet-mode>
+            <portlet-mode>view</portlet-mode>
         </supports>
         <init-param>
             <name>oxf.main-processor.name</name>
@@ -28,16 +28,35 @@
         <portlet-info>
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
-        <portlet-preferences>
-            <preference>
-                <name>web-site</name>
-                <value>http://www.orbeon.com/</value>
-            </preference>
-            <preference>
-                <name>favorite-animals</name>
-                <value>cat, dog</value>
-            </preference>
-        </portlet-preferences>
+    </portlet>
+
+    <!-- Sample separate deployment portlet (for Orbeon Forms running directly within a portlet) -->
+    <portlet>
+        <portlet-name>orbeon-filter-sample-portlet</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OrbeonPortletFilterSample</portlet-class>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+        </supports>
+        <init-param>
+            <name>oxf.main-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.main-processor.input.config</name>
+            <value>oxf:/config/prologue-portlet.xpl</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
+        </init-param>
+        <portlet-info>
+            <title>Orbeon Forms Filter Sample Portlet</title>
+        </portlet-info>
     </portlet>
 
     <!-- Define the Orbeon portlet XForms filter (for handling XForms within your own portlets) -->
@@ -56,8 +75,8 @@
     <!-- Uncomment and configure this to map the Orbeon portlet XForms filter -->
     <!--
     <filter-mapping>
-        <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
-        <portlet-name>my-portlet</portlet-name>
+        <filter-name>orbeon-filter-sample-portlet</filter-name>
+        <portlet-name>orbeon-separate-sample-portlet</portlet-name>
     </filter-mapping>
     -->
     

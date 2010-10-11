@@ -14,6 +14,24 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.functions.Serialize
-import org.orbeon.oxf.xforms.function.AddToPathMap
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+import org.orbeon.saxon.expr.PathMap
 
-class XXFormsSerialize extends Serialize with AddToPathMap
+class XXFormsSerialize extends Serialize {
+    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet) = {
+
+        argument(0).addToPathMap(pathMap, pathMapNodeSet) match {
+            case result: PathMap.PathMapNodeSet =>
+                // TODO: This is a temporary fix: only the root node of the tree to serialize is marked as atomized so that
+                // we can gather dependent values. But in fact the expression is in fact dependent on the entire subtree.
+                result.setAtomized
+            case _ => // NOP
+        }
+
+        // Don't forget the second argument
+        argument(1).addToPathMap(pathMap, pathMapNodeSet)
+
+        // We are an atomic type
+        null
+    }
+}

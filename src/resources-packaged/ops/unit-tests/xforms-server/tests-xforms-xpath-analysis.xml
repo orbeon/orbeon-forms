@@ -577,9 +577,6 @@
                     <!-- TODO: This should be supported -->
                     <xf:input id="u9" ref="root()/a/b"/>
 
-                    <!-- NOTE: must be supported in the future, but there is a bug in the PathMap code as of 2010-10-05 -->
-                    <xf:output id="u10" value="a/count(following-sibling::b)"/>
-
                 </xh:body>
             </xh:html>
         </input>
@@ -655,11 +652,6 @@
                     </binding>
                     <value>
                         <analysis expression="xs:string(.[1])" analyzed="false"/>
-                    </value>
-                </control>
-                <control name="output" scope="" prefixed-id="u10" model-prefixed-id="model" binding="false" value="true">
-                    <value>
-                        <analysis expression="xs:string((a/count(following-sibling::b))[1])" analyzed="false"/>
                     </value>
                 </control>
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
@@ -3379,6 +3371,7 @@
                 <xh:body>
                     <xf:output id="o1" value="xxf:serialize(instance()/foo/bar, 'xml')"/>
                     <xf:output id="o2" value="xxf:serialize(instance('i2')/foo/bar, 'html')"/>
+                    <xf:output id="o3" value="xxf:serialize(instance()/foo/bar, instance('i2')/gaga)"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -3414,7 +3407,195 @@
                         </analysis>
                     </value>
                 </control>
+                <control name="output" scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:serialize(instance()/foo/bar, instance('i2')/gaga))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i1')/foo/bar</path>
+                                <path>instance('i2')/gaga</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="Expressions containing AtomicMappingExpression such as a/count(b) or a/sum(b)" name="oxf:java">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315523&group_id=168&atid=350207 -->
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model" xxf:xpath-analysis="true">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="o11" value="a/count(b)"/>
+                    <xf:output id="o12" value="a/count(following-sibling::b)"/>
+                    <xf:output id="o13" value="a/count(preceding-sibling::b)"/>
+                    <xf:output id="o14" value="a/count(self::a)"/>
+                    <xf:output id="o15" value="a/b/count(ancestor::a)"/>
+                    
+                    <xf:output id="o21" value="a/sum(b)"/>
+                    <xf:output id="o22" value="a/sum(following-sibling::b)"/>
+                    <xf:output id="o23" value="a/sum(preceding-sibling::b)"/>
+                    <xf:output id="o24" value="a/sum(self::a)"/>
+                    <xf:output id="o25" value="a/b/sum(ancestor::a)"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <control name="output" scope="" prefixed-id="o11" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/count(b))[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o12" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/count(following-sibling::b))[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o13" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/count(preceding-sibling::b))[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o14" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/count(self::a))[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o15" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/b/count(ancestor::a))[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o21" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/sum(b))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/a/b</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o22" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/sum(following-sibling::b))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/b</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o23" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/sum(preceding-sibling::b))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/b</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o24" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/sum(self::a))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/a</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o25" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/b/sum(ancestor::a))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/a</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
             </request>
         </output>
     </test>

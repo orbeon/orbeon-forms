@@ -18,7 +18,7 @@ import scala.collection.JavaConversions._
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.functions.SystemFunction
 
-// Rewrite of Saxon addToPathMap
+// Rewrite of Saxon addToPathMap in Scala
 trait AddToPathMap {
 
     this: SystemFunction =>
@@ -43,9 +43,10 @@ trait AddToPathMap {
         // Handle result differently if result type is atomic or not
         getItemType(getExecutable.getConfiguration.getTypeHierarchy) match {
             case atomicType: AtomicType =>
-                // The result will be atomized
-                // NOTE: Orbeon fix, to check w/ MK
-                resultNodeSet.setAtomized()
+                // NOTE: Thought it would be right to call setAtomized(), but it isn't! E.g. count() returns an atomic type,
+                // but it doesn't mean the result of its argument expression is atomized. sum() does, but that's handled by
+                // the atomization of the argument to sum().
+//                resultNodeSet.setAtomized()
                 // If expression returns an atomic value then any nodes accessed don't contribute to the result
                 null
             case _ => resultNodeSet

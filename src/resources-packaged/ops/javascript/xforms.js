@@ -4235,6 +4235,20 @@ ORBEON.widgets.YUICalendar = function() {
                cancel: "Annuleren",
                invalidYear: "Jaar dient een getal te zijn"
             }
+        },
+        "de": {
+            properties: {
+                "MONTHS_LONG": [ "Januar", "Februar", "März", "April", "Mai", "Juni", "July", "August",  "September",  "Oktober",  "November",  "Dezember" ],
+                "WEEKDAYS_SHORT": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+                "START_WEEKDAY": 0
+            },
+            navigator: {
+                month: "Monat",
+                year: "Jahr",
+                submit: "OK",
+                cancel: "Abbrechen",
+                invalidYear: "Jahr muss eine Zahl sein"
+            }
         }
     };
 
@@ -4387,13 +4401,16 @@ ORBEON.widgets.YUICalendar = function() {
 
             // Get language from html/@lang
             var lang = ORBEON.util.Dom.getAttribute(document.documentElement, "lang");
-            // If not language is set there, use English
+            // Default to English if no language is specified
             if (lang == null || lang == "")
                 lang = "en";
             // Just keep first 2 letters (fr_FR becomes fr)
             lang = lang.substring(0, 2);
             // Find resource for selected language
             var resources = RESOURCES[lang];
+            // Default to English if resources are not found
+            if (resources == null)
+                resources = RESOURCES["en"];
             for (var key in resources.properties)
                 yuiCalendar.cfg.setProperty(key, resources.properties[key]);
             var hasNavigator = ORBEON.util.Properties.datePickerNavigator.get();

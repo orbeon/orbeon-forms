@@ -18,7 +18,7 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import javax.portlet.*;
 import javax.portlet.filter.*;
 import java.io.*;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * The Orbeon portlet filter intercepts the output of a portlet, sets up information in the request and forwards the
@@ -116,24 +116,52 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
                 // Submission occurred
 
                 // Set new render parameters if needed
+                final Map<String, String[]> newRenderParameters;
                 if (requestPath != null && requestPath.contains("?")) {
+
+                    // Build map
+                    newRenderParameters = new LinkedHashMap<String, String[]>();
+
                     final String queryString = requestPath.substring(requestPath.indexOf('?') + 1);
                     final StringTokenizer st = new StringTokenizer(queryString, "&");
                     while (st.hasMoreTokens()) {
                         final String nameValue = st.nextToken();
                         if (nameValue.contains("=")) {
                             final int equalIndex = nameValue.indexOf('=');
-                            actionResponse.setRenderParameter(nameValue.substring(0, equalIndex), nameValue.substring(equalIndex + 1));
+                            final String name = nameValue.substring(0, equalIndex);
+                            final String value = nameValue.substring(equalIndex + 1);
+
+                            addValueToStringArrayMap(newRenderParameters, name, value);
                         }
                     }
+
+                    // Set new render parameters on response
+                    for (final Map.Entry<String, String[]> entry : newRenderParameters.entrySet())
+                        actionResponse.setRenderParameter(entry.getKey(), entry.getValue());
+                } else {
+                    // No new render parameters
+                    newRenderParameters = Collections.emptyMap();
                 }
 
                 // Run the chain with a new body (which might be empty)
-                filterChain.doFilter(new BodyRequestWrapper(actionRequest, requestBody, (String) actionRequest.getAttribute(PORTLET_SUBMISSION_MEDIATYPE_ATTRIBUTE)), actionResponse);
+                filterChain.doFilter(new BodyRequestWrapper(actionRequest, requestBody, (String) actionRequest.getAttribute(PORTLET_SUBMISSION_MEDIATYPE_ATTRIBUTE), newRenderParameters), actionResponse);
             }
         } else {
             // Not an Orbeon action: just apply the filter
             filterChain.doFilter(actionRequest, actionResponse);
+        }
+    }
+
+    // NOTE: This is borrowed from StringConversions but we don't want the dependency
+    public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
+        final String[] currentValue = map.get(name);
+        if (currentValue == null) {
+            map.put(name, new String[] { value });
+        } else {
+            final String[] newValue = new String[currentValue.length + 1];
+            System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
+            newValue[currentValue.length] = value;
+            map.put(name, newValue);
         }
     }
 
@@ -296,14 +324,28 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
 
         protected byte[] requestBody;
         protected String mediatype;
+        protected Map<String, String[]> updatedRenderParameters;
 
         private ByteArrayInputStream is;
         private BufferedReader reader;
 
-        public BodyRequestWrapper(ActionRequest request, byte[] requestBody, final String mediatype) {
+        public BodyRequestWrapper(ActionRequest request, byte[] requestBody, final String mediatype, Map<String, String[]> newRenderParameters) {
             super(request);
             this.requestBody = requestBody;
             this.mediatype = mediatype;
+
+            // We make the new render parameters obtained immediately accessible by the filtered portlet. This makes sense
+            // because the behavior must be as if an action had occurred on a client, in which case the action URL would
+            // already contain the new render parameters.
+            // The bottom line is that we:
+            // o update the render parameter on the response so that they stick for future requests (see above)
+            // o make them available to the filtered portlet below
+
+            // Copy existing render parameters
+            this.updatedRenderParameters = new LinkedHashMap(super.getParameterMap());
+            // Add or override all the existing parameters with the new ones if any
+            // NOTE: For a given parameter name, all values a replaced with the new ones (as opposed to being appended)
+            this.updatedRenderParameters.putAll(newRenderParameters);
         }
 
         @Override
@@ -331,6 +373,29 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
         @Override
         public int getContentLength() {
             return requestBody != null ? requestBody.length : 0;
+        }
+
+        // Override all render parameter methods
+
+        @Override
+        public String getParameter(String name) {
+            final String[] values = getParameterValues(name);
+            return values == null || values.length == 0 ? null : values[0];
+        }
+
+        @Override
+        public Map<String, String[]> getParameterMap() {
+            return updatedRenderParameters;
+        }
+
+        @Override
+        public Enumeration<String> getParameterNames() {
+            return Collections.enumeration(updatedRenderParameters.keySet());
+        }
+
+        @Override
+        public String[] getParameterValues(String name) {
+            return updatedRenderParameters.get(name);
         }
     }
 }

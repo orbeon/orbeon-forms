@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /*
 Copyright (c) 2008, Yahoo! Inc. All rights reserved.
@@ -14,16 +14,21 @@ version: 2.5.2
 /* the style of the div around each node */
 .ygtvitem { }  
 
-.ygtvitem table {
-    margin-bottom:0; border:none;
+table.ygtvtable {
+    margin-bottom:0; 
+	border:none;
+	border-collapse:collapse;
 }
 
 /*.ygtvitem td {*/
-.ygtvrow td {
-    border: none; padding: 0;
+td.ygtvcell {
+    border: none; 
+	padding: 0;
 }
-.ygtvrow td a {
+a.ygtvspacer {
 	text-decoration:none;
+	outline-style:none;
+	display:block;
 }
 
 
@@ -31,6 +36,7 @@ version: 2.5.2
 .ygtvtn {
     width:18px; height:22px; 
     background: url(treeview-sprite.gif) 0 -5600px no-repeat; 
+	cursor:pointer ;
 }
 
 /* first or middle sibling, collapsable */
@@ -65,6 +71,7 @@ version: 2.5.2
 .ygtvln {
     width:18px; height:22px; 
     background: url(treeview-sprite.gif) 0 -1600px no-repeat; 
+	cursor:pointer ;
 }
 
 /* Last sibling, collapsable */
@@ -92,6 +99,7 @@ version: 2.5.2
 .ygtvlph,.ygtvlphh { 
     width:18px; height:22px; cursor:pointer ;
     background: url(treeview-sprite.gif) 0 -3200px no-repeat; 
+	cursor:pointer ;
 }
 
 /* Loading icon */
@@ -126,7 +134,7 @@ version: 2.5.2
 	cursor:default;
 }
 
-.ygtvspacer { height: 22px; width: 12px; }
+.ygtvspacer { height: 22px; width: 18px; }
 
 .ygtvfocus {
 	background-color: #c0e0e0;
@@ -136,7 +144,7 @@ version: 2.5.2
 	background-color: #c0e0e0;
 }
 
-.ygtvfocus a , .ygtvrow  td a {
+.ygtvfocus  a  {
 	outline-style:none;
 }
 
@@ -195,4 +203,47 @@ version: 2.5.2
 .ygtv-edit-DateNode   .ygtv-button-container {
 	text-align:right;
 	margin:auto;
+}
+
+.ygtv-highlight .ygtv-highlight0 , .ygtv-highlight .ygtv-highlight0 .ygtvlabel{
+}
+
+.ygtv-highlight .ygtv-highlight1  , .ygtv-highlight .ygtv-highlight1 .ygtvlabel{
+	background-color:blue;
+	color:white;
+}
+
+.ygtv-highlight .ygtv-highlight2  , .ygtv-highlight .ygtv-highlight2 .ygtvlabel {
+	background-color:silver;
+}
+
+.ygtv-highlight .ygtv-highlight0 .ygtvfocus .ygtvlabel,
+.ygtv-highlight .ygtv-highlight1 .ygtvfocus .ygtvlabel,
+.ygtv-highlight .ygtv-highlight2 .ygtvfocus .ygtvlabel {
+	background-color: #c0e0e0;
+}
+
+.ygtv-highlight .ygtvcontent {
+	padding-right: 1em;
+}
+
+.ygtv-checkbox .ygtv-highlight0 .ygtvcontent {
+	padding-left:1em;
+	background:url(check0.gif) no-repeat;
+}
+
+.ygtv-checkbox .ygtv-highlight0 .ygtvfocus.ygtvcontent,
+.ygtv-checkbox .ygtv-highlight1 .ygtvfocus.ygtvcontent ,
+.ygtv-checkbox .ygtv-highlight2 .ygtvfocus.ygtvcontent  {
+	background-color:#c0e0e0;
+}
+
+.ygtv-checkbox .ygtv-highlight1 .ygtvcontent {
+	padding-left:1em;
+	background:url(check1.gif) no-repeat;
+}
+
+.ygtv-checkbox .ygtv-highlight2 .ygtvcontent{
+	padding-left:1em;
+	background:url(check2.gif) no-repeat;
 }

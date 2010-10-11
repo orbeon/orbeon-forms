@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>TreeView with Tooltips</title>
 
@@ -32,13 +34,16 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>TreeView with Tooltips</h1>
 
 <div class="exampleIntro">
-	<p>In this example you see the default presentation for the <a href="http://developer.yahoo.com/yui/treeview/">TreeView Control</a>.  A single <a href="http://developer.yahoo.com/yui/container/tooltip/index.html">YAHOO.widget.Tooltip</a> instance is used to provide tooltips for all nodes.
+	<p>
+In this example you see the default presentation for the <a href="http://developer.yahoo.com/yui/treeview/">TreeView Control</a>.  
+A single <a href="http://developer.yahoo.com/yui/container/tooltip/index.html">YAHOO.widget.Tooltip</a> instance is used to provide tooltips for all nodes.
+</p>
 			
 </div>
 
@@ -76,10 +81,17 @@ var tree;
         for (var i = 0; i < Math.floor((Math.random()*4) + 3); i++) {
             var o = {
                 label: "label-" + i,
+
                 // Tooltip will use the title attribute
                 title: "This is " + "label-" + i
             };
             var tmpNode = new YAHOO.widget.TextNode(o, tree.getRoot(), false);
+
+            // Generate the markup for this node when the tree is first
+            // rendered.  This is necessary in order to make sure tooltips
+            // can be attached to hidden nodes.
+            tmpNode.renderHidden = true;
+
             // save the element id for Tooltip
             contextElements.push(tmpNode.labelElId);
 

@@ -1,14 +1,15 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /* Set the cursor to busy when we are doing something */
 .yui-busy {
     cursor: wait !important;
 }
-.yui-toolbar-container fieldset {
+.yui-toolbar-container fieldset,
+.yui-editor-container fieldset {
     padding: 0;
     margin: 0;
     border: 0;
@@ -16,6 +17,26 @@ version: 2.6.0
 .yui-toolbar-container legend {
     display: none;
 }
+.yui-skin-sam .yui-toolbar-container .yui-button button,
+.yui-skin-sam .yui-toolbar-container .yui-button a,
+.yui-skin-sam .yui-toolbar-container .yui-button a:visited {
+    font-size: 0px;
+}
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-select button,
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-select a,
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-select a:visited,
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-spinbutton button,
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-spinbutton a,
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-spinbutton a:visited {
+    font-size: 12px;
+}
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-spinbutton a.up,
+.yui-skin-sam .yui-toolbar-container .yui-toolbar-spinbutton a.down {
+    font-size: 0;
+    line-height: 0;
+    padding: 0;
+}
+
 /* Setup the container with some padding and zoom it for IE's hasLayout */
 .yui-toolbar-container .yui-toolbar-subcont {
     padding: .25em 0;
@@ -184,7 +205,7 @@ version: 2.6.0
 /* Setup the position and style for the up and down arrows */
 .yui-toolbar-container .yui-toolbar-spinbutton a.up, .yui-toolbar-container .yui-toolbar-spinbutton a.down {
     position: absolute;
-    display: block
+    display: block;
     right: 0;
     cursor: pointer;
     z-index: 1;
@@ -215,6 +236,13 @@ version: 2.6.0
 /* The disbled state of the Editor */
 .yui-editor-container .yui-editor-masked {
     background-color: #CCC;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: .5;
+    filter: alpha(opacity=50);
 }
 /* Style the editable iframe to hide it */
 .yui-editor-container iframe {
@@ -347,6 +375,7 @@ version: 2.6.0
 .yui-editor-panel .height-width span.info {
     font-size: 70%;
     margin-top: 3px;
+    float: none;
 }
 
 /* Border Size/Type button widths */

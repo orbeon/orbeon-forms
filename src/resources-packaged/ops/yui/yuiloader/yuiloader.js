@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /**
  * The YAHOO object is the single global object used by YUI Library.  It
@@ -88,6 +88,15 @@ if (typeof YAHOO == "undefined" || !YAHOO) {
  * </pre>
  * This fails because "long" is a future reserved word in ECMAScript
  *
+ * For implementation code that uses YUI, do not create your components
+ * in the namespaces defined by YUI (
+ * <code>YAHOO.util</code>, 
+ * <code>YAHOO.widget</code>, 
+ * <code>YAHOO.lang</code>, 
+ * <code>YAHOO.tool</code>, 
+ * <code>YAHOO.example</code>, 
+ * <code>YAHOO.env</code>) -- create your own namespace (e.g., 'companyname').
+ *
  * @method namespace
  * @static
  * @param  {String*} arguments 1-n namespaces to create 
@@ -96,7 +105,7 @@ if (typeof YAHOO == "undefined" || !YAHOO) {
 YAHOO.namespace = function() {
     var a=arguments, o=null, i, j, d;
     for (i=0; i<a.length; i=i+1) {
-        d=a[i].split(".");
+        d=(""+a[i]).split(".");
         o=YAHOO;
 
         // YAHOO is implied, so it is ignored if it is included
@@ -146,19 +155,29 @@ YAHOO.log = function(msg, cat, src) {
  *                             and a "build" property at minimum.
  */
 YAHOO.register = function(name, mainClass, data) {
-    var mods = YAHOO.env.modules;
+    var mods = YAHOO.env.modules, m, v, b, ls, i;
+
     if (!mods[name]) {
-        mods[name] = { versions:[], builds:[] };
+        mods[name] = { 
+            versions:[], 
+            builds:[] 
+        };
     }
-    var m=mods[name],v=data.version,b=data.build,ls=YAHOO.env.listeners;
+
+    m  = mods[name];
+    v  = data.version;
+    b  = data.build;
+    ls = YAHOO.env.listeners;
+
     m.name = name;
     m.version = v;
     m.build = b;
     m.versions.push(v);
     m.builds.push(b);
     m.mainClass = mainClass;
+
     // fire the module load listeners
-    for (var i=0;i<ls.length;i=i+1) {
+    for (i=0;i<ls.length;i=i+1) {
         ls[i](m);
     }
     // label the main class
@@ -231,21 +250,31 @@ YAHOO.env.getVersion = function(name) {
  * @static
  */
 YAHOO.env.ua = function() {
-    var o={
+
+        var numberfy = function(s) {
+            var c = 0;
+            return parseFloat(s.replace(/\./g, function() {
+                return (c++ == 1) ? '' : '.';
+            }));
+        },
+
+        nav = navigator,
+
+        o = {
 
         /**
          * Internet Explorer version number or 0.  Example: 6
          * @property ie
          * @type float
          */
-        ie:0,
+        ie: 0,
 
         /**
          * Opera version number or 0.  Example: 9.2
          * @property opera
          * @type float
          */
-        opera:0,
+        opera: 0,
 
         /**
          * Gecko engine revision number.  Will evaluate to 1 if Gecko 
@@ -260,7 +289,7 @@ YAHOO.env.ua = function() {
          * @property gecko
          * @type float
          */
-        gecko:0,
+        gecko: 0,
 
         /**
          * AppleWebKit version.  KHTML browsers that are not WebKit browsers 
@@ -308,64 +337,105 @@ YAHOO.env.ua = function() {
          * @property air
          * @type float
          */
-        air: 0
+        air: 0,
 
-    };
+        /**
+         * Google Caja version number or 0.
+         * @property caja
+         * @type float
+         */
+        caja: nav.cajaVersion,
 
-    var ua=navigator.userAgent, m;
+        /**
+         * Set to true if the page appears to be in SSL
+         * @property secure
+         * @type boolean
+         * @static
+         */
+        secure: false,
 
-    // Modern KHTML browsers should qualify as Safari X-Grade
-    if ((/KHTML/).test(ua)) {
-        o.webkit=1;
-    }
-    // Modern WebKit browsers are at least X-Grade
-    m=ua.match(/AppleWebKit\/([^\s]*)/);
-    if (m&&m[1]) {
-        o.webkit=parseFloat(m[1]);
+        /**
+         * The operating system.  Currently only detecting windows or macintosh
+         * @property os
+         * @type string
+         * @static
+         */
+        os: null
 
-        // Mobile browser check
-        if (/ Mobile\//.test(ua)) {
-            o.mobile = "Apple"; // iPhone or iPod Touch
-        } else {
-            m=ua.match(/NokiaN[^\/]*/);
-            if (m) {
-                o.mobile = m[0]; // Nokia N-series, ex: NokiaN95
-            }
+    },
+
+    ua = navigator && navigator.userAgent, 
+    
+    loc = window && window.location,
+
+    href = loc && loc.href,
+    
+    m;
+
+    o.secure = href && (href.toLowerCase().indexOf("https") === 0);
+
+    if (ua) {
+
+        if ((/windows|win32/i).test(ua)) {
+            o.os = 'windows';
+        } else if ((/macintosh/i).test(ua)) {
+            o.os = 'macintosh';
+        }
+    
+        // Modern KHTML browsers should qualify as Safari X-Grade
+        if ((/KHTML/).test(ua)) {
+            o.webkit=1;
         }
 
-        m=ua.match(/AdobeAIR\/([^\s]*)/);
-        if (m) {
-            o.air = m[0]; // Adobe AIR 1.0 or better
-        }
-
-    }
-
-    if (!o.webkit) { // not webkit
-        // @todo check Opera/8.01 (J2ME/MIDP; Opera Mini/2.0.4509/1316; fi; U; ssr)
-        m=ua.match(/Opera[\s\/]([^\s]*)/);
+        // Modern WebKit browsers are at least X-Grade
+        m=ua.match(/AppleWebKit\/([^\s]*)/);
         if (m&&m[1]) {
-            o.opera=parseFloat(m[1]);
-            m=ua.match(/Opera Mini[^;]*/);
-            if (m) {
-                o.mobile = m[0]; // ex: Opera Mini/2.0.4509/1316
-            }
-        } else { // not opera or webkit
-            m=ua.match(/MSIE\s([^;]*)/);
-            if (m&&m[1]) {
-                o.ie=parseFloat(m[1]);
-            } else { // not opera, webkit, or ie
-                m=ua.match(/Gecko\/([^\s]*)/);
+            o.webkit=numberfy(m[1]);
+
+            // Mobile browser check
+            if (/ Mobile\//.test(ua)) {
+                o.mobile = "Apple"; // iPhone or iPod Touch
+            } else {
+                m=ua.match(/NokiaN[^\/]*/);
                 if (m) {
-                    o.gecko=1; // Gecko detected, look for revision
-                    m=ua.match(/rv:([^\s\)]*)/);
-                    if (m&&m[1]) {
-                        o.gecko=parseFloat(m[1]);
+                    o.mobile = m[0]; // Nokia N-series, ex: NokiaN95
+                }
+            }
+
+            m=ua.match(/AdobeAIR\/([^\s]*)/);
+            if (m) {
+                o.air = m[0]; // Adobe AIR 1.0 or better
+            }
+
+        }
+
+        if (!o.webkit) { // not webkit
+            // @todo check Opera/8.01 (J2ME/MIDP; Opera Mini/2.0.4509/1316; fi; U; ssr)
+            m=ua.match(/Opera[\s\/]([^\s]*)/);
+            if (m&&m[1]) {
+                o.opera=numberfy(m[1]);
+                m=ua.match(/Opera Mini[^;]*/);
+                if (m) {
+                    o.mobile = m[0]; // ex: Opera Mini/2.0.4509/1316
+                }
+            } else { // not opera or webkit
+                m=ua.match(/MSIE\s([^;]*)/);
+                if (m&&m[1]) {
+                    o.ie=numberfy(m[1]);
+                } else { // not opera, webkit, or ie
+                    m=ua.match(/Gecko\/([^\s]*)/);
+                    if (m) {
+                        o.gecko=1; // Gecko detected, look for revision
+                        m=ua.match(/rv:([^\s\)]*)/);
+                        if (m&&m[1]) {
+                            o.gecko=numberfy(m[1]);
+                        }
                     }
                 }
             }
         }
     }
-    
+
     return o;
 }();
 
@@ -379,18 +449,20 @@ YAHOO.env.ua = function() {
  */
 (function() {
     YAHOO.namespace("util", "widget", "example");
+    /*global YAHOO_config*/
     if ("undefined" !== typeof YAHOO_config) {
-        var l=YAHOO_config.listener,ls=YAHOO.env.listeners,unique=true,i;
+        var l=YAHOO_config.listener, ls=YAHOO.env.listeners,unique=true, i;
         if (l) {
             // if YAHOO is loaded multiple times we need to check to see if
             // this is a new config object.  If it is, add the new component
             // load listener to the stack
-            for (i=0;i<ls.length;i=i+1) {
-                if (ls[i]==l) {
-                    unique=false;
+            for (i=0; i<ls.length; i++) {
+                if (ls[i] == l) {
+                    unique = false;
                     break;
                 }
             }
+
             if (unique) {
                 ls.push(l);
             }
@@ -405,7 +477,14 @@ YAHOO.lang = YAHOO.lang || {};
 
 (function() {
 
+
 var L = YAHOO.lang,
+
+    OP = Object.prototype,
+    ARRAY_TOSTRING = '[object Array]',
+    FUNCTION_TOSTRING = '[object Function]',
+    OBJECT_TOSTRING = '[object Object]',
+    NOTHING = [],
 
     // ADD = ["toString", "valueOf", "hasOwnProperty"],
     ADD = ["toString", "valueOf"],
@@ -413,21 +492,13 @@ var L = YAHOO.lang,
     OB = {
 
     /**
-     * Determines whether or not the provided object is an array.
-     * Testing typeof/instanceof/constructor of arrays across frame 
-     * boundaries isn't possible in Safari unless you have a reference
-     * to the other frame to test against its Array prototype.  To
-     * handle this case, we test well-known array properties instead.
-     * properties.
+     * Determines wheather or not the provided object is an array.
      * @method isArray
      * @param {any} o The object being testing
      * @return {boolean} the result
      */
     isArray: function(o) { 
-        if (o) {
-           return L.isNumber(o.length) && L.isFunction(o.splice);
-        }
-        return false;
+        return OP.toString.apply(o) === ARRAY_TOSTRING;
     },
 
     /**
@@ -441,13 +512,24 @@ var L = YAHOO.lang,
     },
     
     /**
-     * Determines whether or not the provided object is a function
+     * Determines whether or not the provided object is a function.
+     * Note: Internet Explorer thinks certain functions are objects:
+     *
+     * var obj = document.createElement("object");
+     * YAHOO.lang.isFunction(obj.getAttribute) // reports false in IE
+     *
+     * var input = document.createElement("input"); // append to body
+     * YAHOO.lang.isFunction(input.focus) // reports false in IE
+     *
+     * You will have to implement additional tests if these functions
+     * matter to you.
+     *
      * @method isFunction
      * @param {any} o The object being testing
      * @return {boolean} the result
      */
     isFunction: function(o) {
-        return typeof o === 'function';
+        return (typeof o === 'function') || OP.toString.apply(o) === FUNCTION_TOSTRING;
     },
         
     /**
@@ -513,9 +595,13 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      * @private
      */
     _IEEnumFix: (YAHOO.env.ua.ie) ? function(r, s) {
-            for (var i=0;i<ADD.length;i=i+1) {
-                var fname=ADD[i],f=s[fname];
-                if (L.isFunction(f) && f!=Object.prototype[fname]) {
+            var i, fname, f;
+            for (i=0;i<ADD.length;i=i+1) {
+
+                fname = ADD[i];
+                f = s[fname];
+
+                if (L.isFunction(f) && f!=OP[fname]) {
                     r[fname]=f;
                 }
             }
@@ -540,17 +626,17 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             throw new Error("extend failed, please check that " +
                             "all dependencies are included.");
         }
-        var F = function() {};
+        var F = function() {}, i;
         F.prototype=superc.prototype;
         subc.prototype=new F();
         subc.prototype.constructor=subc;
         subc.superclass=superc.prototype;
-        if (superc.prototype.constructor == Object.prototype.constructor) {
+        if (superc.prototype.constructor == OP.constructor) {
             superc.prototype.constructor=superc;
         }
     
         if (overrides) {
-            for (var i in overrides) {
+            for (i in overrides) {
                 if (L.hasOwnProperty(overrides, i)) {
                     subc.prototype[i]=overrides[i];
                 }
@@ -586,14 +672,14 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
         if (!s||!r) {
             throw new Error("Absorb failed, verify dependencies.");
         }
-        var a=arguments, i, p, override=a[2];
-        if (override && override!==true) { // only absorb the specified properties
+        var a=arguments, i, p, overrideList=a[2];
+        if (overrideList && overrideList!==true) { // only absorb the specified properties
             for (i=2; i<a.length; i=i+1) {
                 r[a[i]] = s[a[i]];
             }
         } else { // take everything, overwriting only if the third parameter is true
             for (p in s) { 
-                if (override || !(p in r)) {
+                if (overrideList || !(p in r)) {
                     r[p] = s[p];
                 }
             }
@@ -621,8 +707,8 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             throw new Error("Augment failed, verify dependencies.");
         }
         //var a=[].concat(arguments);
-        var a=[r.prototype,s.prototype];
-        for (var i=2;i<arguments.length;i=i+1) {
+        var a=[r.prototype,s.prototype], i;
+        for (i=2;i<arguments.length;i=i+1) {
             a.push(arguments[i]);
         }
         L.augmentObject.apply(this, a);
@@ -722,7 +808,8 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      */
     substitute: function (s, o, f) {
         var i, j, k, key, v, meta, saved=[], token, 
-            DUMP='dump', SPACE=' ', LBRACE='{', RBRACE='}';
+            DUMP='dump', SPACE=' ', LBRACE='{', RBRACE='}',
+            dump, objstr;
 
 
         for (;;) {
@@ -760,17 +847,19 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
                     meta = meta || "";
 
                     // look for the keyword 'dump', if found force obj dump
-                    var dump = meta.indexOf(DUMP);
+                    dump = meta.indexOf(DUMP);
                     if (dump > -1) {
                         meta = meta.substring(4);
                     }
 
+                    objstr = v.toString();
+
                     // use the toString if it is not the Object toString 
                     // and the 'dump' meta info was not found
-                    if (v.toString===Object.prototype.toString||dump>-1) {
+                    if (objstr === OBJECT_TOSTRING || dump > -1) {
                         v = L.dump(v, parseInt(meta, 10));
                     } else {
-                        v = v.toString();
+                        v = objstr;
                     }
                 }
             } else if (!L.isString(v) && !L.isNumber(v)) {
@@ -821,8 +910,8 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
      * @return the new merged object
      */
     merge: function() {
-        var o={}, a=arguments;
-        for (var i=0, l=a.length; i<l; i=i+1) {
+        var o={}, a=arguments, l=a.length, i;
+        for (i=0; i<l; i=i+1) {
             L.augmentObject(o, a[i], true);
         }
         return o;
@@ -862,12 +951,12 @@ return (o && (typeof o === 'object' || L.isFunction(o))) || false;
             throw new TypeError("method undefined");
         }
 
-        if (!L.isArray(d)) {
+        if (d && !L.isArray(d)) {
             d = [data];
         }
 
         f = function() {
-            m.apply(o, d);
+            m.apply(o, d || NOTHING);
         };
 
         r = (periodic) ? setInterval(f, when) : setTimeout(f, when);
@@ -921,7 +1010,7 @@ return (L.isObject(o) || L.isString(o) || L.isNumber(o) || L.isBoolean(o));
  * @param prop {string} the name of the property to test
  * @return {boolean} the result
  */
-L.hasOwnProperty = (Object.prototype.hasOwnProperty) ?
+L.hasOwnProperty = (OP.hasOwnProperty) ?
     function(o, prop) {
         return o && o.hasOwnProperty(prop);
     } : function(o, prop) {
@@ -983,7 +1072,7 @@ YAHOO.augment = L.augmentProto;
 YAHOO.extend = L.extend;
 
 })();
-YAHOO.register("yahoo", YAHOO, {version: "2.6.0", build: "1321"});
+YAHOO.register("yahoo", YAHOO, {version: "2.8.1", build: "19"});
 /**
  * Provides a mechanism to fetch remote resources and
  * insert them into a document
@@ -1067,15 +1156,20 @@ YAHOO.util.Get = function() {
      * @return {HTMLElement} the generated node
      * @private
      */
-    var _linkNode = function(url, win, charset) {
-        var c = charset || "utf-8";
-        return _node("link", {
-                "id":      "yui__dyn_" + (nidx++),
-                "type":    "text/css",
-                "charset": c,
-                "rel":     "stylesheet",
-                "href":    url
-            }, win);
+    var _linkNode = function(url, win, attributes) {
+
+        var o = {
+            id:   "yui__dyn_" + (nidx++),
+            type: "text/css",
+            rel:  "stylesheet",
+            href: url
+        };
+
+        if (attributes) {
+            lang.augmentObject(o, attributes);
+        }
+
+        return _node("link", o, win);
     };
 
     /**
@@ -1086,14 +1180,18 @@ YAHOO.util.Get = function() {
      * @return {HTMLElement} the generated node
      * @private
      */
-    var _scriptNode = function(url, win, charset) {
-        var c = charset || "utf-8";
-        return _node("script", {
-                "id":      "yui__dyn_" + (nidx++),
-                "type":    "text/javascript",
-                "charset": c,
-                "src":     url
-            }, win);
+    var _scriptNode = function(url, win, attributes) {
+        var o = {
+            id:   "yui__dyn_" + (nidx++),
+            type: "text/javascript",
+            src:  url
+        };
+
+        if (attributes) {
+            lang.augmentObject(o, attributes);
+        }
+
+        return _node("script", o, win);
     };
 
     /**
@@ -1173,7 +1271,7 @@ YAHOO.util.Get = function() {
     var _timeout = function(id) {
         var q = queues[id];
         if (q.onTimeout) {
-            var sc=q.context || q;
+            var sc=q.scope || q;
             q.onTimeout.call(sc, _returnData(q));
         }
     };
@@ -1228,7 +1326,7 @@ YAHOO.util.Get = function() {
                 // arbitrary timeout.  It is possible that the browser does
                 // block subsequent script execution in this case for a limited
                 // time.
-                var extra = _scriptNode(null, q.win, q.charset);
+                var extra = _scriptNode(null, q.win, q.attributes);
                 extra.innerHTML='YAHOO.util.Get._finalize("' + id + '");';
                 q.nodes.push(extra); h.appendChild(extra);
 
@@ -1255,9 +1353,9 @@ YAHOO.util.Get = function() {
         }
 
         if (q.type === "script") {
-            n = _scriptNode(url, w, q.charset);
+            n = _scriptNode(url, w, q.attributes);
         } else {
-            n = _linkNode(url, w, q.charset);
+            n = _linkNode(url, w, q.attributes);
         }
 
         // track this node's load progress
@@ -1315,20 +1413,33 @@ YAHOO.util.Get = function() {
      * @private
      */
     var _purge = function(tId) {
-        var q=queues[tId];
-        if (q) {
-            var n=q.nodes, l=n.length, d=q.win.document, 
-                h=d.getElementsByTagName("head")[0];
+        if (queues[tId]) {
+
+            var q     = queues[tId],
+                nodes = q.nodes, 
+                l     = nodes.length, 
+                d     = q.win.document, 
+                h     = d.getElementsByTagName("head")[0],
+                sib, i, node, attr;
 
             if (q.insertBefore) {
-                var s = _get(q.insertBefore, tId);
-                if (s) {
-                    h = s.parentNode;
+                sib = _get(q.insertBefore, tId);
+                if (sib) {
+                    h = sib.parentNode;
                 }
             }
 
-            for (var i=0; i<l; i=i+1) {
-                h.removeChild(n[i]);
+            for (i=0; i<l; i=i+1) {
+                node = nodes[i];
+                if (node.clearAttributes) {
+                    node.clearAttributes();
+                } else {
+                    for (attr in node) {
+                        delete node[attr];
+                    }
+                }
+
+                h.removeChild(node);
             }
 
             q.nodes = [];
@@ -1367,6 +1478,11 @@ YAHOO.util.Get = function() {
         q.scope = q.scope || q.win;
         q.autopurge = ("autopurge" in q) ? q.autopurge : 
                       (type === "script") ? true : false;
+
+        if (opts.charset) {
+            q.attributes = q.attributes || {};
+            q.attributes.charset = opts.charset;
+        }
 
         lang.later(0, q, _next, id);
 
@@ -1619,14 +1735,16 @@ YAHOO.util.Get = function() {
          * <dd>node or node id that will become the new node's nextSibling</dd>
          * </dl>
          * <dt>charset</dt>
-         * <dd>Node charset, default utf-8</dd>
+         * <dd>Node charset, deprecated, use 'attributes'</dd>
+         * <dt>attributes</dt>
+         * <dd>A hash of attributes to apply to dynamic nodes.</dd>
          * <dt>timeout</dt>
          * <dd>Number of milliseconds to wait before aborting and firing the timeout event</dd>
          * <pre>
          * // assumes yahoo, dom, and event are already on the page
          * &nbsp;&nbsp;YAHOO.util.Get.script(
-         * &nbsp;&nbsp;["http://yui.yahooapis.com/2.3.1/build/dragdrop/dragdrop-min.js",
-         * &nbsp;&nbsp;&nbsp;"http://yui.yahooapis.com/2.3.1/build/animation/animation-min.js"], &#123;
+         * &nbsp;&nbsp;["http://yui.yahooapis.com/2.7.0/build/dragdrop/dragdrop-min.js",
+         * &nbsp;&nbsp;&nbsp;"http://yui.yahooapis.com/2.7.0/build/animation/animation-min.js"], &#123;
          * &nbsp;&nbsp;&nbsp;&nbsp;onSuccess: function(o) &#123;
          * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new YAHOO.util.DDProxy("dd1"); // also new o.reference("dd1"); would work
          * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.log("won't cause error because YAHOO is the scope");
@@ -1685,13 +1803,15 @@ YAHOO.util.Get = function() {
          * <dt>insertBefore</dt>
          * <dd>node or node id that will become the new node's nextSibling</dd>
          * <dt>charset</dt>
-         * <dd>Node charset, default utf-8</dd>
+         * <dd>Node charset, deprecated, use 'attributes'</dd>
+         * <dt>attributes</dt>
+         * <dd>A hash of attributes to apply to dynamic nodes.</dd>
          * </dl>
          * <pre>
-         *      YAHOO.util.Get.css("http://yui.yahooapis.com/2.3.1/build/menu/assets/skins/sam/menu.css");
+         *      YAHOO.util.Get.css("http://yui.yahooapis.com/2.7.0/build/menu/assets/skins/sam/menu.css");
          * </pre>
          * <pre>
-         *      YAHOO.util.Get.css(["http://yui.yahooapis.com/2.3.1/build/menu/assets/skins/sam/menu.css",
+         *      YAHOO.util.Get.css(["http://yui.yahooapis.com/2.7.0/build/menu/assets/skins/sam/menu.css",
          * </pre>
          * @return {tId: string} an object containing info about the transaction
          */
@@ -1701,7 +1821,7 @@ YAHOO.util.Get = function() {
     };
 }();
 
-YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
+YAHOO.register("get", YAHOO.util.Get, {version: "2.8.1", build: "19"});
 /**
  * Provides dynamic loading for the YUI library.  It includes the dependency
  * info for the library, and will automatically pull in dependencies for
@@ -1741,8 +1861,8 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
     // 'root': '2.5.2/build/',
     // 'base': 'http://yui.yahooapis.com/2.5.2/build/',
 
-    'root': '2.6.0/build/',
-    'base': 'http://yui.yahooapis.com/2.6.0/build/',
+    'root': '2.8.1/build/',
+    'base': 'http://yui.yahooapis.com/2.8.1/build/',
 
     'comboBase': 'http://yui.yahooapis.com/combo?',
 
@@ -1790,12 +1910,13 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
             'type': 'js',
             'path': 'calendar/calendar-min.js',
             'requires': ['event', 'dom'],
+            supersedes: ['datemeth'],
             'skinnable': true
         },
 
         'carousel': {
             'type': 'js',
-            'path': 'carousel/carousel-beta-min.js',
+            'path': 'carousel/carousel-min.js',
             'requires': ['element'],
             'optional': ['animation'],
             'skinnable': true
@@ -1803,8 +1924,8 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
 
         'charts': {
             'type': 'js',
-            'path': 'charts/charts-experimental-min.js',
-            'requires': ['element', 'json', 'datasource']
+            'path': 'charts/charts-min.js',
+            'requires': ['element', 'json', 'datasource', 'swf']
         },
 
         'colorpicker': {
@@ -1818,7 +1939,15 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
         'connection': {
             'type': 'js',
             'path': 'connection/connection-min.js',
-            'requires': ['event']
+            'requires': ['event'],
+            'supersedes': ['connectioncore']
+        },
+
+        'connectioncore': {
+            'type': 'js',
+            'path': 'connection/connection_core-min.js',
+            'requires': ['event'],
+            'pkg': 'connection'
         },
 
         'container': {
@@ -1861,6 +1990,12 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
             'skinnable': true
         },
 
+        datemath: {
+            'type': 'js',
+            'path': 'datemath/datemath-min.js',
+            'requires': ['yahoo']
+        },
+
         'dom': {
             'type': 'js',
             'path': 'dom/dom-min.js',
@@ -1884,14 +2019,40 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
 
         'element': {
             'type': 'js',
-            'path': 'element/element-beta-min.js',
-            'requires': ['dom', 'event']
+            'path': 'element/element-min.js',
+            'requires': ['dom', 'event'],
+            'optional': ['event-mouseenter', 'event-delegate']
+        },
+
+        'element-delegate': {
+            'type': 'js',
+            'path': 'element-delegate/element-delegate-min.js',
+            'requires': ['element']
         },
 
         'event': {
             'type': 'js',
             'path': 'event/event-min.js',
             'requires': ['yahoo']
+        },
+
+        'event-simulate': {
+            'type': 'js',
+            'path': 'event-simulate/event-simulate-min.js',
+            'requires': ['event']
+        },
+
+        'event-delegate': {
+            'type': 'js',
+            'path': 'event-delegate/event-delegate-min.js',
+            'requires': ['event'],
+            'optional': ['selector']
+        },
+
+        'event-mouseenter': {
+            'type': 'js',
+            'path': 'event-mouseenter/event-mouseenter-min.js',
+            'requires': ['dom', 'event']
         },
 
         'fonts': {
@@ -1920,8 +2081,8 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
 
          'imagecropper': {
              'type': 'js',
-             'path': 'imagecropper/imagecropper-beta-min.js',
-             'requires': ['dom', 'event', 'dragdrop', 'element', 'resize'],
+             'path': 'imagecropper/imagecropper-min.js',
+             'requires': ['dragdrop', 'element', 'resize'],
              'skinnable': true
          },
 
@@ -1940,7 +2101,7 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
          'layout': {
              'type': 'js',
              'path': 'layout/layout-min.js',
-             'requires': ['dom', 'event', 'element'],
+             'requires': ['element'],
              'optional': ['animation', 'dragdrop', 'resize', 'selector'],
              'skinnable': true
          }, 
@@ -1976,8 +2137,16 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
 
         'profilerviewer': {
             'type': 'js',
-            'path': 'profilerviewer/profilerviewer-beta-min.js',
+            'path': 'profilerviewer/profilerviewer-min.js',
             'requires': ['profiler', 'yuiloader', 'element'],
+            'skinnable': true
+        },
+
+        'progressbar': {
+            'type': 'js',
+            'path': 'progressbar/progressbar-min.js',
+            'requires': ['element'],
+            'optional': ['animation'],
             'skinnable': true
         },
 
@@ -2003,14 +2172,14 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
          'resize': {
              'type': 'js',
              'path': 'resize/resize-min.js',
-             'requires': ['dom', 'event', 'dragdrop', 'element'],
+             'requires': ['dragdrop', 'element'],
              'optional': ['animation'],
              'skinnable': true
          },
 
         'selector': {
             'type': 'js',
-            'path': 'selector/selector-beta-min.js',
+            'path': 'selector/selector-min.js',
             'requires': ['yahoo', 'dom']
         },
 
@@ -2031,6 +2200,38 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
             'skinnable': true
         },
 
+        'storage': {
+            'type': 'js',
+            'path': 'storage/storage-min.js',
+            'requires': ['yahoo', 'event', 'cookie'],
+            'optional': ['swfstore']
+        },
+
+         'stylesheet': {
+            'type': 'js',
+            'path': 'stylesheet/stylesheet-min.js',
+            'requires': ['yahoo']
+         },
+
+        'swf': {
+            'type': 'js',
+            'path': 'swf/swf-min.js',
+            'requires': ['element'],
+            'supersedes': ['swfdetect']
+        },
+
+        'swfdetect': {
+            'type': 'js',
+            'path': 'swfdetect/swfdetect-min.js',
+            'requires': ['yahoo']
+        },
+
+        'swfstore': {
+            'type': 'js',
+            'path': 'swfstore/swfstore-min.js',
+            'requires': ['element', 'cookie', 'swf']
+        },
+
         'tabview': {
             'type': 'js',
             'path': 'tabview/tabview-min.js',
@@ -2043,12 +2244,13 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
             'type': 'js',
             'path': 'treeview/treeview-min.js',
             'requires': ['event', 'dom'],
+            'optional': ['json', 'animation', 'calendar'],
             'skinnable': true
         },
 
         'uploader': {
             'type': 'js',
-            'path': 'uploader/uploader-experimental.js',
+            'path': 'uploader/uploader-min.js',
             'requires': ['element']
         },
 
@@ -2088,6 +2290,7 @@ YAHOO.register("get", YAHOO.util.Get, {version: "2.6.0", build: "1321"});
             'type': 'js',
             'path': 'yuitest/yuitest-min.js',
             'requires': ['logger'],
+            'optional': ['event-simulate'],
             'skinnable': true
         }
     }
@@ -3655,7 +3858,7 @@ throw new Error("You must supply an onSuccess handler for your sandbox");
          */
         _filter: function(str) {
             var f = this.filter;
-            return (f) ?  str.replace(new RegExp(f.searchExp), f.replaceStr) : str;
+            return (f) ?  str.replace(new RegExp(f.searchExp, 'g'), f.replaceStr) : str;
         },
 
         /**
@@ -3666,12 +3869,11 @@ throw new Error("You must supply an onSuccess handler for your sandbox");
          * @private
          */
         _url: function(path) {
-            
-            var u = this.base || "", f=this.filter;
-            u = u + path;
-            return this._filter(u);
+            return this._filter((this.base || "") + path);
         }
 
     };
 
 })();
+
+YAHOO.register("yuiloader", YAHOO.util.YUILoader, {version: "2.8.1", build: "19"});

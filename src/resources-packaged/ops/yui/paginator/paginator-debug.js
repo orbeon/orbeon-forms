@@ -1,9 +1,10 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
+(function () {
 /**
  * The Paginator widget provides a set of controls to navigate through paged
  * data.
@@ -12,6 +13,13 @@ version: 2.6.0
  * @uses YAHOO.util.EventProvider
  * @uses YAHOO.util.AttributeProvider
  */
+
+var Dom        = YAHOO.util.Dom,
+    lang       = YAHOO.lang,
+    isObject   = lang.isObject,
+    isFunction = lang.isFunction,
+    isArray    = lang.isArray,
+    isString   = lang.isString;
 
 /**
  * Instantiate a Paginator, passing a configuration object to the contructor.
@@ -28,12 +36,11 @@ version: 2.6.0
  * @param config {Object} Object literal to set instance and ui component
  * configuration.
  */
-YAHOO.widget.Paginator = function (config) {
-    var UNLIMITED = YAHOO.widget.Paginator.VALUE_UNLIMITED,
-        lang      = YAHOO.lang,
-        attrib, initialPage, records, perPage;
+function Paginator(config) {
+    var UNLIMITED = Paginator.VALUE_UNLIMITED,
+        attrib, initialPage, records, perPage, startIndex;
 
-    config = lang.isObject(config) ? config : {};
+    config = isObject(config) ? config : {};
 
     this.initConfig();
 
@@ -41,7 +48,7 @@ YAHOO.widget.Paginator = function (config) {
 
     // Set the basic config keys first
     this.set('rowsPerPage',config.rowsPerPage,true);
-    if (lang.isNumber(config.totalRecords)) {
+    if (Paginator.isNumeric(config.totalRecords)) {
         this.set('totalRecords',config.totalRecords,true);
     }
     
@@ -49,7 +56,7 @@ YAHOO.widget.Paginator = function (config) {
 
     // Update the other config values
     for (attrib in config) {
-        if (lang.hasOwnProperty(config,attrib)) {
+        if (config.hasOwnProperty(attrib)) {
             this.set(attrib,config[attrib],true);
         }
     }
@@ -59,20 +66,20 @@ YAHOO.widget.Paginator = function (config) {
     records     = this.get('totalRecords');
     perPage     = this.get('rowsPerPage');
     if (initialPage > 1 && perPage !== UNLIMITED) {
-        var startIndex = (initialPage - 1) * perPage;
+        startIndex = (initialPage - 1) * perPage;
         if (records === UNLIMITED || startIndex < records) {
             this.set('recordOffset',startIndex,true);
         }
     }
-};
+}
 
 
 // Static members
-YAHOO.lang.augmentObject(YAHOO.widget.Paginator, {
+lang.augmentObject(Paginator, {
     /**
      * Incrementing index used to give instances unique ids.
      * @static
-     * @property id
+     * @property Paginator.id
      * @type number
      * @private
      */
@@ -81,7 +88,7 @@ YAHOO.lang.augmentObject(YAHOO.widget.Paginator, {
     /**
      * Base of id strings used for ui components.
      * @static
-     * @property ID_BASE
+     * @property Paginator.ID_BASE
      * @type string
      * @private
      */
@@ -91,7 +98,7 @@ YAHOO.lang.augmentObject(YAHOO.widget.Paginator, {
      * Used to identify unset, optional configurations, or used explicitly in
      * the case of totalRecords to indicate unlimited pagination.
      * @static
-     * @property VALUE_UNLIMITED
+     * @property Paginator.VALUE_UNLIMITED
      * @type number
      * @final
      */
@@ -101,7 +108,7 @@ YAHOO.lang.augmentObject(YAHOO.widget.Paginator, {
      * Default template used by Paginator instances.  Update this if you want
      * all new Paginators to use a different default template.
      * @static
-     * @property TEMPLATE_DEFAULT
+     * @property Paginator.TEMPLATE_DEFAULT
      * @type string
      */
     TEMPLATE_DEFAULT : "{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}",
@@ -111,7 +118,7 @@ YAHOO.lang.augmentObject(YAHOO.widget.Paginator, {
      * previous, next, first and last pages as well as a rows-per-page
      * dropdown.  Offered as a convenience.
      * @static
-     * @property TEMPLATE_ROWS_PER_PAGE
+     * @property Paginator.TEMPLATE_ROWS_PER_PAGE
      * @type string
      */
     TEMPLATE_ROWS_PER_PAGE : "{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}",
@@ -119,15 +126,41 @@ YAHOO.lang.augmentObject(YAHOO.widget.Paginator, {
     /**
      * Storage object for UI Components
      * @static
-     * @property ui
+     * @property Paginator.ui
      */
-    ui : {}
+    ui : {},
+
+    /**
+     * Similar to YAHOO.lang.isNumber, but allows numeric strings.  This is
+     * is used for attribute validation in conjunction with getters that return
+     * numbers.
+     *
+     * @method Paginator.isNumeric
+     * @param v {Number|String} value to be checked for number or numeric string
+     * @returns {Boolean} true if the input is coercable into a finite number
+     * @static
+     */
+    isNumeric : function (v) {
+        return isFinite(+v);
+    },
+
+    /**
+     * Return a number or null from input
+     *
+     * @method Paginator.toNumber
+     * @param n {Number|String} a number or numeric string
+     * @return Number
+     * @static
+     */
+    toNumber : function (n) {
+        return isFinite(+n) ? +n : null;
+    }
 
 },true);
 
 
 // Instance members and methods
-YAHOO.widget.Paginator.prototype = {
+Paginator.prototype = {
 
     // Instance members
 
@@ -176,8 +209,7 @@ YAHOO.widget.Paginator.prototype = {
      */
     initConfig : function () {
 
-        var UNLIMITED = YAHOO.widget.Paginator.VALUE_UNLIMITED,
-            l         = YAHOO.lang;
+        var UNLIMITED = Paginator.VALUE_UNLIMITED;
 
         /**
          * REQUIRED. Number of records constituting a &quot;page&quot;
@@ -186,7 +218,8 @@ YAHOO.widget.Paginator.prototype = {
          */
         this.setAttributeConfig('rowsPerPage', {
             value     : 0,
-            validator : l.isNumber
+            validator : Paginator.isNumeric,
+            setter    : Paginator.toNumber
         });
 
         /**
@@ -198,12 +231,12 @@ YAHOO.widget.Paginator.prototype = {
         this.setAttributeConfig('containers', {
             value     : null,
             validator : function (val) {
-                if (!l.isArray(val)) {
+                if (!isArray(val)) {
                     val = [val];
                 }
                 for (var i = 0, len = val.length; i < len; ++i) {
-                    if (l.isString(val[i]) || 
-                        (l.isObject(val[i]) && val[i].nodeType === 1)) {
+                    if (isString(val[i]) || 
+                        (isObject(val[i]) && val[i].nodeType === 1)) {
                         continue;
                     }
                     return false;
@@ -211,8 +244,8 @@ YAHOO.widget.Paginator.prototype = {
                 return true;
             },
             method : function (val) {
-                val = YAHOO.util.Dom.get(val);
-                if (!l.isArray(val)) {
+                val = Dom.get(val);
+                if (!isArray(val)) {
                     val = [val];
                 }
                 this._containers = val;
@@ -227,7 +260,8 @@ YAHOO.widget.Paginator.prototype = {
          */
         this.setAttributeConfig('totalRecords', {
             value     : 0,
-            validator : l.isNumber
+            validator : Paginator.isNumeric,
+            setter    : Paginator.toNumber
         });
 
         /**
@@ -242,13 +276,15 @@ YAHOO.widget.Paginator.prototype = {
             value     : 0,
             validator : function (val) {
                 var total = this.get('totalRecords');
-                if (l.isNumber(val)) {
+                if (Paginator.isNumeric(val)) {
+                    val = +val;
                     return total === UNLIMITED || total > val ||
                            (total === 0 && val === 0);
                 }
 
                 return false;
-            }
+            },
+            setter    : Paginator.toNumber
         });
 
         /**
@@ -259,7 +295,8 @@ YAHOO.widget.Paginator.prototype = {
          */
         this.setAttributeConfig('initialPage', {
             value     : 1,
-            validator : l.isNumber
+            validator : Paginator.isNumeric,
+            setter    : Paginator.toNumber
         });
 
         /**
@@ -273,8 +310,8 @@ YAHOO.widget.Paginator.prototype = {
          * @type string
          */
         this.setAttributeConfig('template', {
-            value : YAHOO.widget.Paginator.TEMPLATE_DEFAULT,
-            validator : l.isString
+            value : Paginator.TEMPLATE_DEFAULT,
+            validator : isString
         });
 
         /**
@@ -285,7 +322,7 @@ YAHOO.widget.Paginator.prototype = {
          */
         this.setAttributeConfig('containerClass', {
             value : 'yui-pg-container',
-            validator : l.isString
+            validator : isString
         });
 
         /**
@@ -300,7 +337,7 @@ YAHOO.widget.Paginator.prototype = {
          */
         this.setAttributeConfig('alwaysVisible', {
             value : true,
-            validator : l.isBoolean
+            validator : lang.isBoolean
         });
 
         /**
@@ -310,10 +347,11 @@ YAHOO.widget.Paginator.prototype = {
          * @attribute updateOnChange
          * @type boolean
          * @default false
+         * @deprecated use changeRequest listener that calls setState
          */
         this.setAttributeConfig('updateOnChange', {
             value     : false,
-            validator : l.isBoolean
+            validator : lang.isBoolean
         });
 
 
@@ -327,7 +365,7 @@ YAHOO.widget.Paginator.prototype = {
          * @final
          */
         this.setAttributeConfig('id', {
-            value    : YAHOO.widget.Paginator.id++,
+            value    : Paginator.id++,
             readOnly : true
         });
 
@@ -350,13 +388,12 @@ YAHOO.widget.Paginator.prototype = {
      * @private
      */
     initUIComponents : function () {
-        var ui = YAHOO.widget.Paginator.ui,
+        var ui = Paginator.ui,
             name,UIComp;
         for (name in ui) {
-            if (YAHOO.lang.hasOwnProperty(ui,name)) {
+            if (ui.hasOwnProperty(name)) {
                 UIComp = ui[name];
-                if (YAHOO.lang.isObject(UIComp) &&
-                    YAHOO.lang.isFunction(UIComp.init)) {
+                if (isObject(UIComp) && isFunction(UIComp.init)) {
                     UIComp.init(this);
                 }
             }
@@ -369,11 +406,6 @@ YAHOO.widget.Paginator.prototype = {
      * @private
      */
     initEvents : function () {
-        this.createEvent('recordOffsetChange');
-        this.createEvent('totalRecordsChange');
-        this.createEvent('rowsPerPageChange');
-        this.createEvent('alwaysVisibleChange');
-
         /**
          * Event fired when the Paginator is initially rendered
          * @event render
@@ -458,7 +490,7 @@ YAHOO.widget.Paginator.prototype = {
     _syncRecordOffset : function (e) {
         var v = e.newValue,rpp,state;
         if (e.prevValue !== v) {
-            if (v !== YAHOO.widget.Paginator.VALUE_UNLIMITED) {
+            if (v !== Paginator.VALUE_UNLIMITED) {
                 rpp = this.get('rowsPerPage');
 
                 if (rpp && this.get('recordOffset') >= v) {
@@ -507,7 +539,7 @@ YAHOO.widget.Paginator.prototype = {
      * @protected
      */
     _firePageChange : function (state) {
-        if (YAHOO.lang.isObject(state)) {
+        if (isObject(state)) {
             var current = state.before;
             delete state.before;
             this.fireEvent('pageChange',{
@@ -524,73 +556,101 @@ YAHOO.widget.Paginator.prototype = {
      * Render the pagination controls per the format attribute into the
      * specified container nodes.
      * @method render
+     * @return the Paginator instance
+     * @chainable
      */
     render : function () {
         if (this.get('rendered')) {
-            return;
+            return this;
         }
 
-        // Forgo rendering if only one page and alwaysVisible is off
-        var totalRecords = this.get('totalRecords');
-        if (totalRecords !== YAHOO.widget.Paginator.VALUE_UNLIMITED &&
-            totalRecords < this.get('rowsPerPage') &&
-            !this.get('alwaysVisible')) {
-            return;
+        var template = this.get('template'),
+            state    = this.getState(),
+            // ex. yui-pg0-1 (first paginator, second container)
+            id_base  = Paginator.ID_BASE + this.get('id') + '-',
+            i, len;
+
+        // Assemble the containers, keeping them hidden
+        for (i = 0, len = this._containers.length; i < len; ++i) {
+            this._renderTemplate(this._containers[i],template,id_base+i,true);
         }
 
-        var Dom            = YAHOO.util.Dom,
-            template       = this.get('template'),
-            containerClass = this.get('containerClass');
-
-        // add marker spans to the template html to indicate drop zones
-        // for ui components
-        template = template.replace(/\{([a-z0-9_ \-]+)\}/gi,
-            '<span class="yui-pg-ui $1"></span>');
-        for (var i = 0, len = this._containers.length; i < len; ++i) {
-            var c       = this._containers[i],
-                // ex. yui-pg0-1 (first paginator, second container)
-                id_base = YAHOO.widget.Paginator.ID_BASE + this.get('id') +
-                          '-' + i;
-
-            if (!c) {
-                continue;
-            }
-            // Hide the container while its contents are rendered
-            c.style.display = 'none';
-
-            Dom.addClass(c,containerClass);
-
-            // Place the template innerHTML
-            c.innerHTML = template;
-
-            // Replace each marker with the ui component's render() output
-            var markers = Dom.getElementsByClassName('yui-pg-ui','span',c);
-
-            for (var j = 0, jlen = markers.length; j < jlen; ++j) {
-                var m      = markers[j],
-                    mp     = m.parentNode,
-                    name   = m.className.replace(/\s*yui-pg-ui\s+/g,''),
-                    UIComp = YAHOO.widget.Paginator.ui[name];
-
-                if (YAHOO.lang.isFunction(UIComp)) {
-                    var comp = new UIComp(this);
-                    if (YAHOO.lang.isFunction(comp.render)) {
-                        mp.replaceChild(comp.render(id_base),m);
-                    }
-                }
-            }
-
-            // Show the container allowing page reflow
-            c.style.display = '';
-        }
+        // Show the containers if appropriate
+        this.updateVisibility();
 
         // Set render attribute manually to support its readOnly contract
         if (this._containers.length) {
-            this.setAttributeConfig('rendered',{value:true});
+            this.setAttributeConfig('rendered', { value: true });
 
-            this.fireEvent('render',this.getState());
+            this.fireEvent('render', state);
             // For backward compatibility
-            this.fireEvent('rendered',this.getState());
+            this.fireEvent('rendered', state);
+        }
+
+        return this;
+    },
+
+    /**
+     * Creates the individual ui components and renders them into a container.
+     *
+     * @method _renderTemplate
+     * @param container {HTMLElement} where to add the ui components
+     * @param template {String} the template to use as a guide for rendering
+     * @param id_base {String} id base for the container's ui components
+     * @param hide {Boolean} leave the container hidden after assembly
+     * @protected
+     */
+    _renderTemplate : function (container, template, id_base, hide) {
+        var containerClass = this.get('containerClass'),
+            markers, i, len;
+
+        if (!container) {
+            return;
+        }
+
+        // Hide the container while its contents are rendered
+        Dom.setStyle(container,'display','none');
+
+        Dom.addClass(container, containerClass);
+
+        // Place the template innerHTML, adding marker spans to the template
+        // html to indicate drop zones for ui components
+        container.innerHTML = template.replace(/\{([a-z0-9_ \-]+)\}/gi,
+            '<span class="yui-pg-ui yui-pg-ui-$1"></span>');
+
+        // Replace each marker with the ui component's render() output
+        markers = Dom.getElementsByClassName('yui-pg-ui','span',container);
+
+        for (i = 0, len = markers.length; i < len; ++i) {
+            this.renderUIComponent(markers[i], id_base);
+        }
+
+        if (!hide) {
+            // Show the container allowing page reflow
+            Dom.setStyle(container,'display','');
+        }
+    },
+
+    /**
+     * Replaces a marker node with a rendered UI component, determined by the
+     * yui-pg-ui-(UI component class name) in the marker's className. e.g.
+     * yui-pg-ui-PageLinks => new YAHOO.widget.Paginator.ui.PageLinks(this)
+     *
+     * @method renderUIComponent
+     * @param marker {HTMLElement} the marker node to replace
+     * @param id_base {String} string base the component's generated id
+     */
+    renderUIComponent : function (marker, id_base) {
+        var par    = marker.parentNode,
+            name   = /yui-pg-ui-(\w+)/.exec(marker.className),
+            UIComp = name && Paginator.ui[name[1]],
+            comp;
+
+        if (isFunction(UIComp)) {
+            comp = new UIComp(this);
+            if (isFunction(comp.render)) {
+                par.replaceChild(comp.render(id_base),marker);
+            }
         }
     },
 
@@ -603,6 +663,7 @@ YAHOO.widget.Paginator.prototype = {
         this.fireEvent('destroy');
 
         this.setAttributeConfig('rendered',{value:false});
+        this.unsubscribeAll();
     },
 
     /**
@@ -612,21 +673,22 @@ YAHOO.widget.Paginator.prototype = {
      * @method updateVisibility
      */
     updateVisibility : function (e) {
-        var alwaysVisible = this.get('alwaysVisible');
-        if (e.type === 'alwaysVisibleChange' || !alwaysVisible) {
-            var totalRecords = this.get('totalRecords'),
-                visible = true,
-                rpp = this.get('rowsPerPage'),
-                rppOptions = this.get('rowsPerPageOptions'),
-                i,len;
+        var alwaysVisible = this.get('alwaysVisible'),
+            totalRecords,visible,rpp,rppOptions,i,len;
 
-            if (YAHOO.lang.isArray(rppOptions)) {
+        if (!e || e.type === 'alwaysVisibleChange' || !alwaysVisible) {
+            totalRecords = this.get('totalRecords');
+            visible      = true;
+            rpp          = this.get('rowsPerPage');
+            rppOptions   = this.get('rowsPerPageOptions');
+
+            if (isArray(rppOptions)) {
                 for (i = 0, len = rppOptions.length; i < len; ++i) {
                     rpp = Math.min(rpp,rppOptions[i]);
                 }
             }
 
-            if (totalRecords !== YAHOO.widget.Paginator.VALUE_UNLIMITED &&
+            if (totalRecords !== Paginator.VALUE_UNLIMITED &&
                 totalRecords <= rpp) {
                 visible = false;
             }
@@ -634,7 +696,7 @@ YAHOO.widget.Paginator.prototype = {
             visible = visible || alwaysVisible;
 
             for (i = 0, len = this._containers.length; i < len; ++i) {
-                YAHOO.util.Dom.setStyle(this._containers[i],'display',
+                Dom.setStyle(this._containers[i],'display',
                     visible ? '' : 'none');
             }
         }
@@ -661,16 +723,16 @@ YAHOO.widget.Paginator.prototype = {
      * @return {number}
      */
     getTotalPages : function () {
-        var records = this.get('totalRecords');
-        var perPage = this.get('rowsPerPage');
+        var records = this.get('totalRecords'),
+            perPage = this.get('rowsPerPage');
 
         // rowsPerPage not set.  Can't calculate
         if (!perPage) {
             return null;
         }
 
-        if (records === YAHOO.widget.Paginator.VALUE_UNLIMITED) {
-            return YAHOO.widget.Paginator.VALUE_UNLIMITED;
+        if (records === Paginator.VALUE_UNLIMITED) {
+            return Paginator.VALUE_UNLIMITED;
         }
 
         return Math.ceil(records/perPage);
@@ -683,13 +745,13 @@ YAHOO.widget.Paginator.prototype = {
      * @return {boolean}
      */
     hasPage : function (page) {
-        if (!YAHOO.lang.isNumber(page) || page < 1) {
+        if (!lang.isNumber(page) || page < 1) {
             return false;
         }
 
         var totalPages = this.getTotalPages();
 
-        return (totalPages === YAHOO.widget.Paginator.VALUE_UNLIMITED || totalPages >= page);
+        return (totalPages === Paginator.VALUE_UNLIMITED || totalPages >= page);
     },
 
     /**
@@ -714,7 +776,7 @@ YAHOO.widget.Paginator.prototype = {
         var currentPage = this.getCurrentPage(),
             totalPages  = this.getTotalPages();
 
-        return currentPage && (totalPages === YAHOO.widget.Paginator.VALUE_UNLIMITED || currentPage < totalPages);
+        return currentPage && (totalPages === Paginator.VALUE_UNLIMITED || currentPage < totalPages);
     },
 
     /**
@@ -753,7 +815,7 @@ YAHOO.widget.Paginator.prototype = {
      * @return {Array} [start_index, end_index]
      */
     getPageRecords : function (page) {
-        if (!YAHOO.lang.isNumber(page)) {
+        if (!lang.isNumber(page)) {
             page = this.getCurrentPage();
         }
 
@@ -766,7 +828,7 @@ YAHOO.widget.Paginator.prototype = {
         }
 
         start = (page - 1) * perPage;
-        if (records !== YAHOO.widget.Paginator.VALUE_UNLIMITED) {
+        if (records !== Paginator.VALUE_UNLIMITED) {
             if (start >= records) {
                 return null;
             }
@@ -812,13 +874,13 @@ YAHOO.widget.Paginator.prototype = {
      * changeRequest event
      */
     setRowsPerPage : function (rpp,silent) {
-        if (YAHOO.lang.isNumber(rpp) && rpp > 0 &&
-            rpp !== this.get('rowsPerPage')) {
+        if (Paginator.isNumeric(rpp) && +rpp > 0 &&
+            +rpp !== this.get('rowsPerPage')) {
             if (this.get('updateOnChange') || silent) {
                 this.set('rowsPerPage',rpp);
             } else {
                 this.fireEvent('changeRequest',
-                    this.getState({'rowsPerPage':rpp}));
+                    this.getState({'rowsPerPage':+rpp}));
             }
         }
     },
@@ -839,13 +901,13 @@ YAHOO.widget.Paginator.prototype = {
      * @param silent {boolean} whether to forcibly avoid firing the changeRequest event
      */
     setTotalRecords : function (total,silent) {
-        if (YAHOO.lang.isNumber(total) && total >= 0 &&
-            total !== this.get('totalRecords')) {
+        if (Paginator.isNumeric(total) && +total >= 0 &&
+            +total !== this.get('totalRecords')) {
             if (this.get('updateOnChange') || silent) {
                 this.set('totalRecords',total);
             } else {
                 this.fireEvent('changeRequest',
-                    this.getState({'totalRecords':total}));
+                    this.getState({'totalRecords':+total}));
             }
         }
     },
@@ -867,13 +929,13 @@ YAHOO.widget.Paginator.prototype = {
      * @param silent {boolean} whether to forcibly avoid firing the changeRequest event
      */
     setStartIndex : function (offset,silent) {
-        if (YAHOO.lang.isNumber(offset) && offset >= 0 &&
-            offset !== this.get('recordOffset')) {
+        if (Paginator.isNumeric(offset) && +offset >= 0 &&
+            +offset !== this.get('recordOffset')) {
             if (this.get('updateOnChange') || silent) {
                 this.set('recordOffset',offset);
             } else {
                 this.fireEvent('changeRequest',
-                    this.getState({'recordOffset':offset}));
+                    this.getState({'recordOffset':+offset}));
             }
         }
     },
@@ -903,9 +965,8 @@ YAHOO.widget.Paginator.prototype = {
      * </ul>
      */
     getState : function (changes) {
-        var UNLIMITED = YAHOO.widget.Paginator.VALUE_UNLIMITED,
-            l         = YAHOO.lang,
-            M = Math, min = M.min, max = M.max, floor = M.floor, ceil = M.ceil,
+        var UNLIMITED = Paginator.VALUE_UNLIMITED,
+            M = Math, max = M.max, ceil = M.ceil,
             currentState, state, offset;
 
         function normalizeOffset(offset,total,rpp) {
@@ -940,19 +1001,19 @@ YAHOO.widget.Paginator.prototype = {
             before       : currentState,
 
             rowsPerPage  : changes.rowsPerPage || currentState.rowsPerPage,
-            totalRecords : (l.isNumber(changes.totalRecords) ?
+            totalRecords : (Paginator.isNumeric(changes.totalRecords) ?
                                 max(changes.totalRecords,UNLIMITED) :
-                                currentState.totalRecords)
+                                +currentState.totalRecords)
         };
 
         if (state.totalRecords === 0) {
             state.recordOffset =
             state.page         = 0;
         } else {
-            offset = l.isNumber(changes.page) ?
+            offset = Paginator.isNumeric(changes.page) ?
                         (changes.page - 1) * state.rowsPerPage :
-                        l.isNumber(changes.recordOffset) ?
-                            changes.recordOffset :
+                        Paginator.isNumeric(changes.recordOffset) ?
+                            +changes.recordOffset :
                             currentState.recordOffset;
 
             state.recordOffset = normalizeOffset(offset,
@@ -985,7 +1046,7 @@ YAHOO.widget.Paginator.prototype = {
      * @param state {Object} Object literal of attribute:value pairs to set
      */
     setState : function (state) {
-        if (YAHOO.lang.isObject(state)) {
+        if (isObject(state)) {
             // get flux state based on current state with before state as well
             this._state = this.getState({});
 
@@ -1008,7 +1069,7 @@ YAHOO.widget.Paginator.prototype = {
             this._pageChanged = false;
 
             for (var k in state) {
-                if (state.hasOwnProperty(k)) {
+                if (state.hasOwnProperty(k) && this._configs.hasOwnProperty(k)) {
                     this.set(k,state[k]);
                 }
             }
@@ -1024,7 +1085,10 @@ YAHOO.widget.Paginator.prototype = {
     }
 };
 
-YAHOO.lang.augmentProto(YAHOO.widget.Paginator, YAHOO.util.AttributeProvider);
+lang.augmentProto(Paginator, YAHOO.util.AttributeProvider);
+
+YAHOO.widget.Paginator = Paginator;
+})();
 (function () {
 
 var Paginator = YAHOO.widget.Paginator,
@@ -1043,9 +1107,6 @@ var Paginator = YAHOO.widget.Paginator,
  */
 Paginator.ui.CurrentPageReport = function (p) {
     this.paginator = p;
-
-    p.createEvent('pageReportClassChange');
-    p.createEvent('pageReportTemplateChange');
 
     p.subscribe('recordOffsetChange', this.update,this,true);
     p.subscribe('rowsPerPageChange', this.update,this,true);
@@ -1215,11 +1276,6 @@ var Paginator = YAHOO.widget.Paginator,
 Paginator.ui.PageLinks = function (p) {
     this.paginator = p;
 
-    p.createEvent('pageLinkClassChange');
-    p.createEvent('currentPageClassChange');
-    p.createEvent('pageLinksContainerClassChange');
-    p.createEvent('pageLinksChange');
-
     p.subscribe('recordOffsetChange',this.update,this,true);
     p.subscribe('rowsPerPageChange',this.update,this,true);
     p.subscribe('totalRecordsChange',this.update,this,true);
@@ -1278,7 +1334,7 @@ Paginator.ui.PageLinks.init = function (p) {
      */
     p.setAttributeConfig('pageLinks', {
         value : 10,
-        validator : l.isNumber
+        validator : Paginator.isNumeric
     });
 
     /**
@@ -1481,9 +1537,6 @@ var Paginator = YAHOO.widget.Paginator,
 Paginator.ui.FirstPageLink = function (p) {
     this.paginator = p;
 
-    p.createEvent('firstPageLinkLabelChange');
-    p.createEvent('firstPageLinkClassChange');
-
     p.subscribe('recordOffsetChange',this.update,this,true);
     p.subscribe('rowsPerPageChange',this.update,this,true);
     p.subscribe('totalRecordsChange',this.update,this,true);
@@ -1506,10 +1559,10 @@ Paginator.ui.FirstPageLink.init = function (p) {
     /**
      * Used as innerHTML for the first page link/span.
      * @attribute firstPageLinkLabel
-     * @default '&lt;&lt;&nbsp;first'
+     * @default '&lt;&lt; first'
      */
     p.setAttributeConfig('firstPageLinkLabel', {
-        value : '&lt;&lt;&nbsp;first',
+        value : '&lt;&lt; first',
         validator : l.isString
     });
 
@@ -1576,7 +1629,7 @@ Paginator.ui.FirstPageLink.prototype = {
         this.span.className = c;
         this.span.innerHTML = label;
 
-        this.current = p.get('recordOffset') < 1 ? this.span : this.link;
+        this.current = p.getCurrentPage() > 1 ? this.link : this.span;
         return this.current;
     },
 
@@ -1591,15 +1644,15 @@ Paginator.ui.FirstPageLink.prototype = {
         }
 
         var par = this.current ? this.current.parentNode : null;
-        if (this.paginator.get('recordOffset') < 1) {
-            if (par && this.current === this.link) {
-                par.replaceChild(this.span,this.current);
-                this.current = this.span;
-            }
-        } else {
+        if (this.paginator.getCurrentPage() > 1) {
             if (par && this.current === this.span) {
                 par.replaceChild(this.link,this.current);
                 this.current = this.link;
+            }
+        } else {
+            if (par && this.current === this.link) {
+                par.replaceChild(this.span,this.current);
+                this.current = this.span;
             }
         }
     },
@@ -1646,9 +1699,6 @@ var Paginator = YAHOO.widget.Paginator,
 Paginator.ui.LastPageLink = function (p) {
     this.paginator = p;
 
-    p.createEvent('lastPageLinkLabelChange');
-    p.createEvent('lastPageLinkClassChange');
-
     p.subscribe('recordOffsetChange',this.update,this,true);
     p.subscribe('rowsPerPageChange',this.update,this,true);
     p.subscribe('totalRecordsChange',this.update,this,true);
@@ -1671,10 +1721,10 @@ Paginator.ui.LastPageLink.init = function (p) {
     /**
      * Used as innerHTML for the last page link/span.
      * @attribute lastPageLinkLabel
-     * @default 'last&nbsp;&gt;&gt;'
+     * @default 'last &gt;&gt;'
      */
     p.setAttributeConfig('lastPageLinkLabel', {
-        value : 'last&nbsp;&gt;&gt;',
+        value : 'last &gt;&gt;',
         validator : l.isString
     });
 
@@ -1835,9 +1885,6 @@ var Paginator = YAHOO.widget.Paginator,
 Paginator.ui.NextPageLink = function (p) {
     this.paginator = p;
 
-    p.createEvent('nextPageLinkLabelChange');
-    p.createEvent('nextPageLinkClassChange');
-
     p.subscribe('recordOffsetChange', this.update,this,true);
     p.subscribe('rowsPerPageChange', this.update,this,true);
     p.subscribe('totalRecordsChange', this.update,this,true);
@@ -1860,10 +1907,10 @@ Paginator.ui.NextPageLink.init = function (p) {
     /**
      * Used as innerHTML for the next page link/span.
      * @attribute nextPageLinkLabel
-     * @default 'next&nbsp;&gt;'
+     * @default 'next &gt;'
      */
     p.setAttributeConfig('nextPageLinkLabel', {
-        value : 'next&nbsp;&gt;',
+        value : 'next &gt;',
         validator : l.isString
     });
 
@@ -2003,9 +2050,6 @@ var Paginator = YAHOO.widget.Paginator,
 Paginator.ui.PreviousPageLink = function (p) {
     this.paginator = p;
 
-    p.createEvent('previousPageLinkLabelChange');
-    p.createEvent('previousPageLinkClassChange');
-
     p.subscribe('recordOffsetChange',this.update,this,true);
     p.subscribe('rowsPerPageChange',this.update,this,true);
     p.subscribe('totalRecordsChange',this.update,this,true);
@@ -2028,10 +2072,10 @@ Paginator.ui.PreviousPageLink.init = function (p) {
     /**
      * Used as innerHTML for the previous page link/span.
      * @attribute previousPageLinkLabel
-     * @default '&lt;&nbsp;prev'
+     * @default '&lt; prev'
      */
     p.setAttributeConfig('previousPageLinkLabel', {
-        value : '&lt;&nbsp;prev',
+        value : '&lt; prev',
         validator : l.isString
     });
 
@@ -2098,7 +2142,7 @@ Paginator.ui.PreviousPageLink.prototype = {
         this.span.className = c;
         this.span.innerHTML = label;
 
-        this.current = p.get('recordOffset') < 1 ? this.span : this.link;
+        this.current = p.getCurrentPage() > 1 ? this.link : this.span;
         return this.current;
     },
 
@@ -2113,15 +2157,15 @@ Paginator.ui.PreviousPageLink.prototype = {
         }
 
         var par = this.current ? this.current.parentNode : null;
-        if (this.paginator.get('recordOffset') < 1) {
-            if (par && this.current === this.link) {
-                par.replaceChild(this.span,this.current);
-                this.current = this.span;
-            }
-        } else {
+        if (this.paginator.getCurrentPage() > 1) {
             if (par && this.current === this.span) {
                 par.replaceChild(this.link,this.current);
                 this.current = this.link;
+            }
+        } else {
+            if (par && this.current === this.link) {
+                par.replaceChild(this.span,this.current);
+                this.current = this.span;
             }
         }
     },
@@ -2167,11 +2211,9 @@ var Paginator = YAHOO.widget.Paginator,
 Paginator.ui.RowsPerPageDropdown = function (p) {
     this.paginator = p;
 
-    p.createEvent('rowsPerPageOptionsChange');
-    p.createEvent('rowsPerPageDropdownClassChange');
-
     p.subscribe('rowsPerPageChange',this.update,this,true);
     p.subscribe('rowsPerPageOptionsChange',this.rebuild,this,true);
+    p.subscribe('totalRecordsChange',this._handleTotalRecordsChange,this,true);
     p.subscribe('destroy',this.destroy,this,true);
 
     // TODO: make this work
@@ -2222,6 +2264,15 @@ Paginator.ui.RowsPerPageDropdown.prototype = {
 
 
     /**
+     * option node for the optional All value
+     *
+     * @property all
+     * @type HTMLElement
+     * @protected
+     */
+    all : null,
+
+    /**
      * Generate the select and option nodes and returns the select node.
      * @method render
      * @param id_base {string} used to create unique ids for generated nodes
@@ -2241,6 +2292,41 @@ Paginator.ui.RowsPerPageDropdown.prototype = {
     },
 
     /**
+     * (Re)generate the select options.
+     * @method rebuild
+     */
+    rebuild : function (e) {
+        var p       = this.paginator,
+            sel     = this.select,
+            options = p.get('rowsPerPageOptions'),
+            opt,cfg,val,i,len;
+
+        this.all = null;
+
+        for (i = 0, len = options.length; i < len; ++i) {
+            cfg = options[i];
+            opt = sel.options[i] ||
+                  sel.appendChild(document.createElement('option'));
+            val = l.isValue(cfg.value) ? cfg.value : cfg;
+            opt.innerHTML = l.isValue(cfg.text) ? cfg.text : cfg;
+
+            if (l.isString(val) && val.toLowerCase() === 'all') {
+                this.all  = opt;
+                opt.value = p.get('totalRecords');
+            } else{
+                opt.value = val;
+            }
+
+        }
+
+        while (sel.options.length > options.length) {
+            sel.removeChild(sel.firstChild);
+        }
+
+        this.update();
+    },
+
+    /**
      * Select the appropriate option if changed.
      * @method update
      * @param e {CustomEvent} The calling change event
@@ -2250,42 +2336,45 @@ Paginator.ui.RowsPerPageDropdown.prototype = {
             return;
         }
 
-        var rpp     = this.paginator.get('rowsPerPage'),
+        var rpp     = this.paginator.get('rowsPerPage')+'',
             options = this.select.options,
             i,len;
 
         for (i = 0, len = options.length; i < len; ++i) {
-            if (parseInt(options[i].value,10) === rpp) {
+            if (options[i].value === rpp) {
                 options[i].selected = true;
+                break;
             }
         }
     },
 
+    /**
+     * Listener for the select's onchange event.  Sent to setRowsPerPage method.
+     * @method onChange
+     * @param e {DOMEvent} The change event
+     */
+    onChange : function (e) {
+        this.paginator.setRowsPerPage(
+                parseInt(this.select.options[this.select.selectedIndex].value,10));
+    },
 
     /**
-     * (Re)generate the select options.
-     * @method rebuild
+     * Updates the all option value (and Paginator's rowsPerPage attribute if
+     * necessary) in response to a change in the Paginator's totalRecords.
+     *
+     * @method _handleTotalRecordsChange
+     * @param e {Event} attribute change event
+     * @protected
      */
-    rebuild : function (e) {
-        var p       = this.paginator,
-            sel     = this.select,
-            options = p.get('rowsPerPageOptions'),
-            opt_tem = document.createElement('option'),
-            i,len;
-
-        while (sel.firstChild) {
-            sel.removeChild(sel.firstChild);
+    _handleTotalRecordsChange : function (e) {
+        if (!this.all || (e && e.prevValue === e.newValue)) {
+            return;
         }
 
-        for (i = 0, len = options.length; i < len; ++i) {
-            var node = opt_tem.cloneNode(false),
-                opt  = options[i];
-            node.value = l.isValue(opt.value) ? opt.value : opt;
-            node.innerHTML = l.isValue(opt.text) ? opt.text : opt;
-            sel.appendChild(node);
+        this.all.value = e.newValue;
+        if (this.all.selected) {
+            this.paginator.set('rowsPerPage',e.newValue);
         }
-
-        this.update();
     },
 
     /**
@@ -2297,18 +2386,8 @@ Paginator.ui.RowsPerPageDropdown.prototype = {
         YAHOO.util.Event.purgeElement(this.select);
         this.select.parentNode.removeChild(this.select);
         this.select = null;
-    },
-
-    /**
-     * Listener for the select's onchange event.  Sent to setRowsPerPage method.
-     * @method onChange
-     * @param e {DOMEvent} The change event
-     */
-    onChange : function (e) {
-        this.paginator.setRowsPerPage(
-                parseInt(this.select.options[this.select.selectedIndex].value,10));
     }
 };
 
 })();
-YAHOO.register("paginator", YAHOO.widget.Paginator, {version: "2.6.0", build: "1321"});
+YAHOO.register("paginator", YAHOO.widget.Paginator, {version: "2.8.1", build: "19"});

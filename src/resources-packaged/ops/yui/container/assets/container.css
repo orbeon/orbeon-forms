@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 .yui-overlay,
 .yui-panel-container {
@@ -99,10 +99,9 @@ PLEASE NOTE:
        leverage the provided "hide-scrollbars" and "show-scrollbars" classes to 
        write custom style rules to guard against this bug.
 
-** For more information on this issue, see:
-
+** For more information on this issue, see: 
    + https://bugzilla.mozilla.org/show_bug.cgi?id=187435
-   + SourceForge bug #1723530
+   + YUILibrary bug #1723530
 
 */
 

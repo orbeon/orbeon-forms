@@ -24,11 +24,11 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          script-type="application/xhtml+xml">
-         
-    <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
+
+    <xbl:script type="text/javascript" src="/ops/yui/element/element-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>
     <xbl:script src="/xbl/orbeon/upload/upload.js"/>
-         
+
     <xbl:binding id="fr-upload" element="fr|upload">
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>

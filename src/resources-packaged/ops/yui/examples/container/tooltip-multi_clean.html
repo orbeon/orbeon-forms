@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>One Tooltip, Many Context Elements</title>
 
@@ -19,6 +21,7 @@ body {
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css" />
 <script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../build/animation/animation-min.js"></script>
 <script type="text/javascript" src="../../build/container/container-min.js"></script>
 
 
@@ -54,7 +57,7 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>One Tooltip, Many Context Elements</h1>
@@ -93,7 +96,7 @@ body {
 			a.innerHTML = i + ".  Hover over me to see my Tooltip";
 
 			if (title) {
-			    a.title = title;
+				a.title = title;
 			}
 
 			container.appendChild(a);
@@ -141,8 +144,10 @@ body {
 		// For links in group A which all have titles, this is all we need.
 		// The tooltip text for each context element will be set from the title attribute
 
+		// We'll also setup Tooltip A to use the FADE ContainerEffect
 		var ttA = new YAHOO.widget.Tooltip("ttA", { 
-			context:groupAIds
+			context:groupAIds,
+			effect:{effect:YAHOO.widget.ContainerEffect.FADE,duration:0.20}
 		});
 
 		// For links in group B, we'll set the tooltip text dynamically, 

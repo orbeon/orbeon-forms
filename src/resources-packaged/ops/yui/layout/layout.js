@@ -1,15 +1,14 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /**
  * @description <p>Provides a fixed layout containing, top, bottom, left, right and center layout units. It can be applied to either the body or an element.</p>
  * @namespace YAHOO.widget
  * @requires yahoo, dom, element, event
  * @module layout
- * @beta
  */
 (function() {
     var Dom = YAHOO.util.Dom,
@@ -86,7 +85,7 @@ version: 2.6.0
         * @description An object literal that contains a list of units in the layout
         * @type Object
         */
-        _rendered: null,
+        _units: null,
         /**
         * @private
         * @property _rendered
@@ -142,6 +141,12 @@ version: 2.6.0
                 }
             }
             if (set) {
+                if (h < 0) {
+                    h = 0;
+                }
+                if (w < 0) {
+                    w = 0;
+                }
                 Dom.setStyle(this._doc, 'height', h + 'px');
                 Dom.setStyle(this._doc, 'width', w + 'px');
             }
@@ -341,9 +346,9 @@ version: 2.6.0
 
             var unit = new YAHOO.widget.LayoutUnit(el, unitConfig);
 
-            unit.on('heightChange', this.resize, this, true);
-            unit.on('widthChange', this.resize, this, true);
-            unit.on('gutterChange', this.resize, this, true);
+            unit.on('heightChange', this.resize, { unit: unit }, this);
+            unit.on('widthChange', this.resize, { unit: unit }, this);
+            unit.on('gutterChange', this.resize, { unit: unit }, this);
             this._units[cfg.position] = unit;
 
             if (this._rendered) {
@@ -367,11 +372,27 @@ version: 2.6.0
         },
         /**
         * @method resize
-        * @param {Boolean} set If set to false, it will NOT set the size, just perform the calculations (used for collapsing units)
+        * @param Boolean/Event set If set to false, it will NOT set the size, just perform the calculations (used for collapsing units). This can also have an attribute event passed to it.
         * @description Starts the chain of resize routines that will resize all the units.
         * @return {<a href="YAHOO.widget.Layout.html">YAHOO.widget.Layout</a>} The Layout instance
         */
-        resize: function(set) {
+        resize: function(set, info) {
+            /*
+            * Fixes bug #2528175
+            * If the event comes from an attribute and the value hasn't changed, don't process it.
+            */
+            var ev = set;
+            if (ev && ev.prevValue && ev.newValue) {
+                if (ev.prevValue == ev.newValue) {
+                    if (info) {
+                        if (info.unit) {
+                            if (!info.unit.get('animate')) {
+                                set = false;
+                            }
+                        }
+                    }
+                }
+            }
             set = ((set === false) ? false : true);
             if (set) {
                 var retVal = this.fireEvent('beforeResize');
@@ -390,7 +411,7 @@ version: 2.6.0
             }
             this._setBodySize(set);
             if (set) {
-                this.fireEvent('resize', { target: this, sizes: this._sizes });
+                this.fireEvent('resize', { target: this, sizes: this._sizes, event: ev });
             }
             return this;
         },
@@ -557,6 +578,9 @@ version: 2.6.0
                 value: attr.height || false,
                 validator: YAHOO.lang.isNumber,
                 method: function(h) {
+                    if (h < 0) {
+                        h = 0;
+                    }
                     this.setStyle('height', h + 'px');
                 }
             });
@@ -570,6 +594,9 @@ version: 2.6.0
                 value: attr.width || false,
                 validator: YAHOO.lang.isNumber,
                 method: function(w) {
+                    if (w < 0) {
+                        w = 0;
+                    }
                     this.setStyle('width', w + 'px');
                 }
             });
@@ -649,7 +676,7 @@ version: 2.6.0
     */
     /**
     * @event beforeResize
-    * @description Firef at the beginning of the resize method. If you return false, the resize is cancelled.
+    * @description Fires at the beginning of the resize method. If you return false, the resize is cancelled.
     * @type YAHOO.util.CustomEvent
     */
     /**
@@ -665,7 +692,6 @@ version: 2.6.0
  * @namespace YAHOO.widget
  * @requires yahoo, dom, element, event, layout
  * @optional animation, dragdrop, selector
- * @beta
  */
 (function() {
     var Dom = YAHOO.util.Dom,
@@ -932,6 +958,9 @@ version: 2.6.0
                 var b = this._getBorderSizes(el);
                 w = (w - (b[1] + b[3]));
                 w = this._fixQuirks(el, w, 'w');
+                if (w < 0) {
+                    w = 0;
+                }
                 Dom.setStyle(el, 'width', w + 'px');
             }
             return w;
@@ -949,6 +978,9 @@ version: 2.6.0
                 var b = this._getBorderSizes(el);
                 h = (h - (b[0] + b[2]));
                 h = this._fixQuirks(el, h, 'h');
+                if (h < 0) {
+                    h = 0;
+                }
                 Dom.setStyle(el, 'height', h + 'px');
             }
             return h;
@@ -968,7 +1000,7 @@ version: 2.6.0
                 i1 = 1;
                 i2 = 3;
             }
-            if (this.browser.ie && !this.browser.standardsMode) {
+            if ((this.browser.ie < 8) && !this.browser.standardsMode) {
                 //Internet Explorer - Quirks Mode
                 var b = this._getBorderSizes(el),
                     bp = this._getBorderSizes(el.parentNode);
@@ -1518,6 +1550,11 @@ version: 2.6.0
             */
             this.setAttributeConfig('minWidth', {
                 value: attr.minWidth || false,
+                method: function(v) {
+                    if (this._resize) {
+                        this._resize.set('minWidth', v);
+                    }
+                },
                 validator: YAHOO.lang.isNumber
             });
 
@@ -1528,6 +1565,11 @@ version: 2.6.0
             */
             this.setAttributeConfig('maxWidth', {
                 value: attr.maxWidth || false,
+                method: function(v) {
+                    if (this._resize) {
+                        this._resize.set('maxWidth', v);
+                    }
+                },
                 validator: YAHOO.lang.isNumber
             });
 
@@ -1538,6 +1580,11 @@ version: 2.6.0
             */
             this.setAttributeConfig('minHeight', {
                 value: attr.minHeight || false,
+                method: function(v) {
+                    if (this._resize) {
+                        this._resize.set('minHeight', v);
+                    }
+                },
                 validator: YAHOO.lang.isNumber
             });
 
@@ -1548,6 +1595,11 @@ version: 2.6.0
             */
             this.setAttributeConfig('maxHeight', {
                 value: attr.maxHeight || false,
+                method: function(v) {
+                    if (this._resize) {
+                        this._resize.set('maxHeight', v);
+                    }
+                },
                 validator: YAHOO.lang.isNumber
             });
 
@@ -1561,6 +1613,9 @@ version: 2.6.0
                 validator: Lang.isNumber,
                 method: function(h) {
                     if (!this._collapsing) {
+                        if (h < 0) {
+                            h = 0;
+                        }
                         this.setStyle('height', h + 'px');
                     }
                 }
@@ -1576,6 +1631,9 @@ version: 2.6.0
                 validator: Lang.isNumber,
                 method: function(w) {
                     if (!this._collapsing) {
+                        if (w < 0) {
+                            w = 0;
+                        }
                         this.setStyle('width', w + 'px');
                     }
                 }
@@ -1832,15 +1890,11 @@ version: 2.6.0
                     if (this.get('position') == 'center') {
                         return false;
                     }
-                    if (!this.header) {
+                    if (!this.header && close) {
                         this._createHeader();
                     }
                     var c = Dom.getElementsByClassName('close', 'div', this.header)[0];
                     if (close) {
-// ORBEON: propose moving code above to here
-//                        if (!this.header) {
-//                            this._createHeader();
-//                        }
                         //Force some header text if there isn't any
                         if (!this.get('header')) {
                             this.set('header', '&nbsp;');
@@ -1852,7 +1906,7 @@ version: 2.6.0
                             Event.on(c, 'click', this.close, this, true);
                         }
                         c.title = this.STR_CLOSE;
-                    } else if (c) {
+                    } else if (c && c.parentNode) {
                         Event.purgeElement(c);
                         c.parentNode.removeChild(c);
                     }
@@ -1872,15 +1926,11 @@ version: 2.6.0
                     if (this.get('position') == 'center') {
                         return false;
                     }
-                    if (!this.header) {
+                    if (!this.header && collapse) {
                         this._createHeader();
                     }
                     var c = Dom.getElementsByClassName('collapse', 'div', this.header)[0];
                     if (collapse) {
-// ORBEON: propose moving code above to here
-//                        if (!this.header) {
-//                            this._createHeader();
-//                        }
                         //Force some header text if there isn't any
                         if (!this.get('header')) {
                             this.set('header', '&nbsp;');
@@ -1892,7 +1942,7 @@ version: 2.6.0
                         }
                         c.title = this.STR_COLLAPSE;
                         c.className = 'collapse' + ((this.get('close')) ? ' collapse-close' : '');
-                    } else if (c) {
+                    } else if (c && c.parentNode) {
                         Event.purgeElement(c);
                         c.parentNode.removeChild(c);
                     }
@@ -2022,6 +2072,7 @@ version: 2.6.0
                                     this.get('parent').fireEvent('startResize');
                                     var c = this.get('parent').getUnitByPosition('center');
                                     this._lastCenterScroll = c.get('scroll');
+                                    c.addClass(this._resize.CSS_RESIZING);
                                     c.set('scroll', false);
                                 }
                                 this.fireEvent('startResize');
@@ -2035,6 +2086,7 @@ version: 2.6.0
                                 if (this.get('parent')) {
                                     var c = this.get('parent').getUnitByPosition('center');
                                     c.set('scroll', this._lastCenterScroll);
+                                    c.removeClass(this._resize.CSS_RESIZING);
                                 }
                                 this.resize();
                                 this.fireEvent('endResize');
@@ -2188,7 +2240,7 @@ version: 2.6.0
     */
     /**
     * @event beforeResize
-    * @description Firef at the beginning of the resize method. If you return false, the resize is cancelled.
+    * @description Fired at the beginning of the resize method. If you return false, the resize is cancelled.
     * @type YAHOO.util.CustomEvent
     */
     /**
@@ -2235,4 +2287,4 @@ version: 2.6.0
 
     YAHOO.widget.LayoutUnit = LayoutUnit;
 })();
-YAHOO.register("layout", YAHOO.widget.Layout, {version: "2.6.0", build: "1321"});
+YAHOO.register("layout", YAHOO.widget.Layout, {version: "2.8.1", build: "19"});

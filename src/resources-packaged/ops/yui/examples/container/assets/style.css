@@ -9,7 +9,7 @@ em { font-style:italic }
 
 #hd a#logo { display:block;margin:10px;width:378px; }
 #hd a#logo div { background:url(../assets/yui.gif) no-repeat;height:34px; }
-#hd h1 { font-weight:bold;text-indent:15px; background: url(http://us.i1.yimg.com/us.yimg.com/i/ydn/bg_hd.gif) 0 0 repeat-x #B6CDE1; border:1px solid #93B2CC; position:relative;font-size:110%;padding:5px 0;margin:0 auto;}
+#hd h1 { font-weight:bold;text-indent:15px; background: url(http://l.yimg.com/a/i/ydn/bg_hd.gif) 0 0 repeat-x #B6CDE1; border:1px solid #93B2CC; position:relative;font-size:110%;padding:5px 0;margin:0 auto;}
 #hd { margin-bottom:10px; }
 
 #toc { background-color:#ecf5fa; padding:0; border:1px solid #89d;overflow:hidden;zoom:1}
@@ -30,8 +30,8 @@ em { font-style:italic }
 #toc ul li.active a { color:#000; }
 
 #toc ul li a.printer { padding:0;margin-right:2px;margin-top:-1.5em;display:none;float:right;height:12px;width:12px; }
-#toc ul li.selected a.printer { display:block;background:url(http://us.i1.yimg.com/us.yimg.com/i/us/aut/pltfrm/ic/print_12.gif) no-repeat;cursor:pointer;  }
-#toc ul li.selected a.printer:hover { background:url(http://us.i1.yimg.com/us.yimg.com/i/us/aut/pltfrm/ic/print_12.gif) no-repeat;cursor:pointer;  }
+#toc ul li.selected a.printer { display:block;background:url(http://l.yimg.com/a/i/us/aut/pltfrm/ic/print_12.gif) no-repeat;cursor:pointer;  }
+#toc ul li.selected a.printer:hover { background:url(http://l.yimg.com/a/i/us/aut/pltfrm/ic/print_12.gif) no-repeat;cursor:pointer;  }
 
 #toc ul li em { display:none; }
 #toc ul li.sect { font-weight:bold; color:#fff; background:#ccc; }

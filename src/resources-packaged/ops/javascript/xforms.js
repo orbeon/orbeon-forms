@@ -3196,7 +3196,7 @@ ORBEON.xforms.Events = {
                 if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                     // For select1 list, make sure we have exactly one value selected
                     var select = ORBEON.util.Utils.isNewXHTMLLayout()
-                                  ? YAHOO.util.Dom.getElementsByClassName("", "select", target)[0]
+                                  ? ORBEON.util.Dom.getElementByTagName(target, "select")
                                   : target;
                     if (select.value == "") {
                         // Stop end-user from deselecting last selected value
@@ -5641,7 +5641,7 @@ ORBEON.xforms.Init = {
     _list: function(list) {
         var value = "";
         if (ORBEON.util.Utils.isNewXHTMLLayout())
-            list = YAHOO.util.Dom.getElementsByClassName("", "select", list)[0];
+            list = ORBEON.util.Dom.getElementByTagName(list, "select");
         for (var i = 0; i < list.options.length; i++) {
             var option = list.options[i];
             if (option.selected) {

@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Using the Overlay Manager to Manage Multiple Panels</title>
 
@@ -26,7 +28,7 @@ body {
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Using the Overlay Manager to Manage Multiple Panels</h1>
@@ -42,15 +44,11 @@ body {
 <style type="text/css">
 
 .yui-skin-sam .yui-panel .hd {
-
     background: #F2F2F2;
-    
 }
 
 .yui-skin-sam .yui-panel-container.focused .yui-panel .hd {
-
     background: url(../../build/assets/skins/sam/sprite.png) repeat-x 0 -200px;
-
 }
 
 </style>
@@ -60,21 +58,21 @@ YAHOO.namespace("example.container");
 
 function init() {
 	// Build panel1 based on markup
-	YAHOO.example.container.panel1 = new YAHOO.widget.Panel("panel1", { xy:[150,100],
+	YAHOO.example.container.panel1 = new YAHOO.widget.Panel("panel1", { xy:[250,100],
 																		visible:false,
 																		width:"300px"
 																	  } );
 	YAHOO.example.container.panel1.render();
 
 	// Build panel2 based on markup
-	YAHOO.example.container.panel2 = new YAHOO.widget.Panel("panel2", { xy:[250,200],
+	YAHOO.example.container.panel2 = new YAHOO.widget.Panel("panel2", { xy:[350,150],
 																		visible:false,
 																		width:"300px"
 																	  } );
 	YAHOO.example.container.panel2.render();
 
 	// Build panel3 based on markup
-	YAHOO.example.container.panel3 = new YAHOO.widget.Panel("panel3", { xy:[350,300],
+	YAHOO.example.container.panel3 = new YAHOO.widget.Panel("panel3", { xy:[450,200],
 																		visible:false,
 																		width:"300px"
 																	  } );

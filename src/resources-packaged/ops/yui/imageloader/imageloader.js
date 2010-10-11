@@ -1,16 +1,16 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /**
- * The image loader is a framework to dynamically load images
- * according to certain triggers, enabling faster load times
- * and a more responsive UI.
+ * The ImageLoader Utility is a framework to dynamically load images according to certain triggers,
+ * enabling faster load times and a more responsive UI.
  *
  * @module imageloader
  * @namespace YAHOO.util
+ * @requires yahoo, dom, event
  */
 
 if (typeof(YAHOO.util.ImageLoader) == 'undefined') {
@@ -478,4 +478,4 @@ YAHOO.util.ImageLoader.pngBgImgObj.prototype._applyUrl = function(el) {
 		el.style.backgroundImage = "url('" + this.url + "')";
 	}
 };
-YAHOO.register("imageloader", YAHOO.util.ImageLoader, {version: "2.6.0", build: "1321"});
+YAHOO.register("imageloader", YAHOO.util.ImageLoader, {version: "2.8.1", build: "19"});

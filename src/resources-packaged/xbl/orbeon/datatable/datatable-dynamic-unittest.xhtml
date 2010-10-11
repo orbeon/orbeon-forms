@@ -22,15 +22,16 @@
 
         <xxforms:variable name="basic-nodeset"
             select="
-            for $line in line[string-length(.) &lt; 20] return 
+            for $line in line[string-length(.) &lt; 20] return
                 xxforms:element( 'line', (
-                    xxforms:element('position', count($line/preceding-sibling::*)), 
-                    xxforms:element('text', normalize-space($line)), 
+                    xxforms:element('position', count($line/preceding-sibling::*)),
+                    xxforms:element('text', normalize-space($line)),
                     xxforms:element('length', string-length(normalize-space($line)))
                 ))"/>
 
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-dynamic-unittest.js"/>
         <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
@@ -424,7 +425,7 @@
                             select="if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''"/>
                         <xxforms:variable name="sortedNodeset"
                             select="
-                                    if ($sortOrder='none') 
+                                    if ($sortOrder='none')
                                         then $nodeset
                                         else exf:sort($nodeset,  'length div nb-words' , 'number', $sortOrder)"
                             xmlns:exf="http://www.exforms.org/exf/1-0"/>

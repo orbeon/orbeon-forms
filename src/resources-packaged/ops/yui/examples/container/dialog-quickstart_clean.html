@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
+
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>Dialog Quickstart Example</title>
 
@@ -19,15 +21,56 @@ body {
 <link rel="stylesheet" type="text/css" href="../../build/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="../../build/button/assets/skins/sam/button.css" />
 <link rel="stylesheet" type="text/css" href="../../build/container/assets/skins/sam/container.css" />
-<script type="text/javascript" src="../../build/utilities/utilities.js"></script>
+<script type="text/javascript" src="../../build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="../../build/connection/connection-min.js"></script>
+<script type="text/javascript" src="../../build/element/element-min.js"></script>
 <script type="text/javascript" src="../../build/button/button-min.js"></script>
+<script type="text/javascript" src="../../build/dragdrop/dragdrop-min.js"></script>
 <script type="text/javascript" src="../../build/container/container-min.js"></script>
 
-<!--there is no custom header content for this example-->
+
+<!--begin custom header content for this example-->
+<script type="text/javascript">
+document.documentElement.className = "yui-pe";
+</script>
+
+<style type="text/css">
+#example {
+    height:30em;
+}
+
+label { 
+    display:block;
+    float:left;
+    width:45%;
+    clear:left;
+}
+
+.clear {
+    clear:both;
+}
+
+#resp {
+    margin:10px;
+    padding:5px;
+    border:1px solid #ccc;
+    background:#fff;
+}
+
+#resp li {
+    font-family:monospace
+}
+
+.yui-pe .yui-pe-content {
+    display:none;
+}
+</style>
+
+<!--end custom header content for this example-->
 
 </head>
 
-<body class=" yui-skin-sam">
+<body class="yui-skin-sam">
 
 
 <h1>Dialog Quickstart Example</h1>
@@ -38,18 +81,10 @@ body {
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
-<style>
-#example {height:30em;}
-label { display:block;float:left;width:45%;clear:left; }
-.clear { clear:both; }
-#resp { margin:10px;padding:5px;border:1px solid #ccc;background:#fff;}
-#resp li { font-family:monospace }
-</style>
-
 <script>
 YAHOO.namespace("example.container");
 
-function init() {
+YAHOO.util.Event.onDOMReady(function () {
 	
 	// Define various event handlers for Dialog
 	var handleSubmit = function() {
@@ -66,6 +101,9 @@ function init() {
 	var handleFailure = function(o) {
 		alert("Submission failed: " + o.status);
 	};
+
+    // Remove progressively enhanced content class, just before creating the module
+    YAHOO.util.Dom.removeClass("dialog1", "yui-pe-content");
 
 	// Instantiate the Dialog
 	YAHOO.example.container.dialog1 = new YAHOO.widget.Dialog("dialog1", 
@@ -97,9 +135,7 @@ function init() {
 
 	YAHOO.util.Event.addListener("show", "click", YAHOO.example.container.dialog1.show, YAHOO.example.container.dialog1, true);
 	YAHOO.util.Event.addListener("hide", "click", YAHOO.example.container.dialog1.hide, YAHOO.example.container.dialog1, true);
-}
-
-YAHOO.util.Event.onDOMReady(init);
+});
 </script>
 
 <div>
@@ -107,7 +143,7 @@ YAHOO.util.Event.onDOMReady(init);
 <button id="hide">Hide dialog1</button>
 </div>
 
-<div id="dialog1">
+<div id="dialog1" class="yui-pe-content">
 <div class="hd">Please enter your information</div>
 <div class="bd">
 <form method="POST" action="assets/post.php">

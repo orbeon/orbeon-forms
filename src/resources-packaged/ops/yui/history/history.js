@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /**
  * The Browser History Manager provides the ability to use the back/forward
@@ -186,7 +186,12 @@ YAHOO.util.History = (function () {
 
         var html, doc;
 
-        html = '<html><body><div id="state">' + fqstate + '</div></body></html>';
+        html = '<html><body><div id="state">' +
+                   fqstate.replace(/&/g,'&amp;').
+                           replace(/</g,'&lt;').
+                           replace(/>/g,'&gt;').
+                           replace(/"/g,'&quot;') +
+               '</div></body></html>';
 
         try {
             doc = _histFrame.contentWindow.document;
@@ -345,7 +350,25 @@ YAHOO.util.History = (function () {
 
         if (YAHOO.env.ua.ie) {
 
-            _checkIframeLoaded();
+            if (typeof document.documentMode === "undefined" || document.documentMode < 8) {
+
+                // IE < 8 or IE8 in quirks mode or IE7 standards mode
+                _checkIframeLoaded();
+
+            } else {
+
+                // IE8 in IE8 standards mode
+                YAHOO.util.Event.on(top, "hashchange",
+                    function () {
+                        var hash = _getHash();
+                        _handleFQStateChange(hash);
+                        _storeStates();
+                    });
+
+                _initialized = true;
+                YAHOO.util.History.onLoadEvent.fire();
+
+            }
 
         } else {
 
@@ -415,20 +438,20 @@ YAHOO.util.History = (function () {
          * @method onReady
          * @param {function} fn what to execute when the Browser History Manager is ready.
          * @param {object} obj an optional object to be passed back as a parameter to fn.
-         * @param {boolean|object} override If true, the obj passed in becomes fn's execution scope.
+         * @param {boolean|object} overrideContext If true, the obj passed in becomes fn's execution scope.
          * @see onLoadEvent
          */
-        onReady: function (fn, obj, override) {
+        onReady: function (fn, obj, overrideContext) {
 
             if (_initialized) {
 
                 setTimeout(function () {
                     var ctx = window;
-                    if (override) {
-                        if (override === true) {
+                    if (overrideContext) {
+                        if (overrideContext === true) {
                             ctx = obj;
                         } else {
-                            ctx = override;
+                            ctx = overrideContext;
                         }
                     }
                     fn.call(ctx, "onLoad", [], obj);
@@ -436,7 +459,7 @@ YAHOO.util.History = (function () {
 
             } else {
 
-                YAHOO.util.History.onLoadEvent.subscribe(fn, obj, override);
+                YAHOO.util.History.onLoadEvent.subscribe(fn, obj, overrideContext);
 
             }
         },
@@ -453,10 +476,10 @@ YAHOO.util.History = (function () {
          *     state of the specified module has changed.
          * @param {object} obj An arbitrary object that will be passed as a
          *     parameter to the handler.
-         * @param {boolean} override If true, the obj passed in becomes the
+         * @param {boolean} overrideContext If true, the obj passed in becomes the
          *     execution scope of the listener.
          */
-        register: function (module, initialState, onStateChange, obj, override) {
+        register: function (module, initialState, onStateChange, obj, overrideContext) {
 
             var scope, wrappedFn;
 
@@ -490,10 +513,10 @@ YAHOO.util.History = (function () {
             // If the user chooses to override the scope, we use the
             // custom object passed in as the execution scope.
             scope = null;
-            if (override === true) {
+            if (overrideContext === true) {
                 scope = obj;
             } else {
-                scope = override;
+                scope = overrideContext;
             }
 
             wrappedFn = function (state) {
@@ -526,18 +549,13 @@ YAHOO.util.History = (function () {
                 return;
             }
 
-            if (YAHOO.env.ua.opera) {
-                // Opera cannot be supported because of several problems that
-                // have been reported to the Opera team, but never addressed:
-                //   1) Hash changes are not detected (started happening with
-                //      recent versions of Opera)
-                //   2) The entire DOM gets cached, so when you come back to
-                //      a page, the window's onload event does not get fired,
-                //      which prevents us from initializing the browser history
-                //      manager.
-                // As a consequence, the best thing we can do is to throw an
-                // exception. The application should catch it, and degrade
-                // gracefully. This is the sad state of history management.
+            if (YAHOO.env.ua.opera && typeof history.navigationMode !== "undefined") {
+                // Disable Opera's fast back/forward navigation mode and puts
+                // it in compatible mode. This makes anchor-based history
+                // navigation work after the page has been navigated away
+                // from and re-activated, at the cost of slowing down
+                // back/forward navigation to and from that page.
+                history.navigationMode = "compatible";
             }
 
             if (typeof stateField === "string") {
@@ -554,7 +572,8 @@ YAHOO.util.History = (function () {
 
             _stateField = stateField;
 
-            if (YAHOO.env.ua.ie) {
+            // IE < 8 or IE8 in quirks mode or IE7 standards mode
+            if (YAHOO.env.ua.ie && (typeof document.documentMode === "undefined" || document.documentMode < 8)) {
 
                 if (typeof histFrame === "string") {
                     histFrame = document.getElementById(histFrame);
@@ -645,7 +664,7 @@ YAHOO.util.History = (function () {
 
             fqstate = currentStates.join("&");
 
-            if (YAHOO.env.ua.ie) {
+            if (YAHOO.env.ua.ie && (typeof document.documentMode === "undefined" || document.documentMode < 8)) {
 
                 return _updateIFrame(fqstate);
 
@@ -725,15 +744,16 @@ YAHOO.util.History = (function () {
             // URL-decoded, which creates problems if the state value
             // contained special characters...
             idx = top.location.href.indexOf("#");
-            hash = idx >= 0 ? top.location.href.substr(idx + 1) : top.location.href;
-
-            states = hash.split("&");
-            for (i = 0, len = states.length; i < len; i++) {
-                tokens = states[i].split("=");
-                if (tokens.length === 2) {
-                    moduleName = tokens[0];
-                    if (moduleName === module) {
-                        return unescape(tokens[1]);
+            if (idx >= 0) {
+                hash = top.location.href.substr(idx + 1);
+                states = hash.split("&");
+                for (i = 0, len = states.length; i < len; i++) {
+                    tokens = states[i].split("=");
+                    if (tokens.length === 2) {
+                        moduleName = tokens[0];
+                        if (moduleName === module) {
+                            return unescape(tokens[1]);
+                        }
                     }
                 }
             }
@@ -785,4 +805,4 @@ YAHOO.util.History = (function () {
     };
 
 })();
-YAHOO.register("history", YAHOO.util.History, {version: "2.6.0", build: "1321"});
+YAHOO.register("history", YAHOO.util.History, {version: "2.8.1", build: "19"});

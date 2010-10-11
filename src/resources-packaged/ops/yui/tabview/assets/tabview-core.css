@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /* default space between tabs */
 .yui-navset .yui-nav li,
@@ -16,7 +16,17 @@ version: 2.6.0
 }
 
 .yui-navset .yui-content .yui-hidden {
-    display:none;
+    /* absolute position off-screen and box collapsing used to
+       avoid display:none, which causes issues for some content (firefox
+       restarts flash movies) */
+    border:0;
+    height:0;
+    width:0;
+    padding:0;
+    position:absolute;
+    left:-999999px;
+    overflow:hidden;
+    visibility:hidden;
 }
 
 /* default width for side tabs */
@@ -52,7 +62,8 @@ version: 2.6.0
     zoom:1;
 }
 
-.yui-navset .yui-content {
+.yui-navset .yui-content,
+.yui-navset .yui-content div {
     zoom:1;
 }
 

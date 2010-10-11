@@ -26,7 +26,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/ops/yui/menu/menu-min.js"/>
-    <xbl:script src="/ops/yui/element/element-beta-min.js"/>
+    <xbl:script src="/ops/yui/element/element-min.js"/>
     <xbl:script src="/ops/yui/button/button-min.js"/>
     <xbl:script src="/xbl/orbeon/select1-button/select1-button.js"/>
 

@@ -39,12 +39,13 @@
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/recaptcha-unittest.js"/> -->
     </xhtml:head>
     <xhtml:body>
 
-        
+
         <xforms:switch>
             <xforms:case id="recaptcha-case">
                 <!-- The reCAPTCHA component -->
@@ -64,7 +65,7 @@
             </xforms:case>
             <xforms:case id="success-case">
                 Yes, correct! Wasn't that fun? Yep?<xhtml:br/>
-                Then let's 
+                Then let's
                 <xforms:trigger appearance="minimal">
                     <xforms:label>try again</xforms:label>
                     <xforms:action ev:event="DOMActivate">

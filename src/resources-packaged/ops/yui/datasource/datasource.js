@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 (function () {
 
@@ -136,6 +136,7 @@ util.DataSourceBase = function(oLiveData, oConfigs) {
      *
      * @event dataErrorEvent
      * @param oArgs.request {Object} The request object.
+     * @param oArgs.response {String} The response object (if available).
      * @param oArgs.callback {Object} The callback object.
      * @param oArgs.caller {Object} (deprecated) Use callback.scope.
      * @param oArgs.message {String} The error message.
@@ -312,6 +313,48 @@ _nTransactionId : 0,
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// DataSourceBase private static methods
+//
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Get an XPath-specified value for a given field from an XML node or document.
+ *
+ * @method _getLocationValue
+ * @param field {String | Object} Field definition.
+ * @param context {Object} XML node or document to search within.
+ * @return {Object} Data value or null.
+ * @static
+ * @private
+ */
+_getLocationValue: function(field, context) {
+    var locator = field.locator || field.key || field,
+        xmldoc = context.ownerDocument || context,
+        result, res, value = null;
+
+    try {
+        // Standards mode
+        if(!lang.isUndefined(xmldoc.evaluate)) {
+            result = xmldoc.evaluate(locator, context, xmldoc.createNSResolver(!context.ownerDocument ? context.documentElement : context.ownerDocument.documentElement), 0, null);
+            while(res = result.iterateNext()) {
+                value = res.textContent;
+            }
+        }
+        // IE mode
+        else {
+            xmldoc.setProperty("SelectionLanguage", "XPath");
+            result = context.selectNodes(locator)[0];
+            value = result.value || result.text || null;
+        }
+        return value;
+
+    }
+    catch(e) {
+    }
+},
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // DataSourceBase public static methods
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -349,7 +392,7 @@ issueCallback : function (callback,params,error,scope) {
  * @method DataSourceBase.parseString
  * @param oData {String | Number | Boolean | Date | Array | Object} Data to parse.
  * The special values null and undefined will return null.
- * @return {Number} A string, or null.
+ * @return {String} A string, or null.
  * @static
  */
 parseString : function(oData) {
@@ -374,12 +417,16 @@ parseString : function(oData) {
  * Converts data to type Number.
  *
  * @method DataSourceBase.parseNumber
- * @param oData {String | Number | Boolean | Null} Data to convert. Beware, null
- * returns as 0.
- * @return {Number} A number, or null if NaN.
+ * @param oData {String | Number | Boolean} Data to convert. Note, the following
+ * values return as null: null, undefined, NaN, "". 
+ * @return {Number} A number, or null.
  * @static
  */
 parseNumber : function(oData) {
+    if(!lang.isValue(oData) || (oData === "")) {
+        return null;
+    }
+
     //Convert to number
     var number = oData * 1;
     
@@ -569,6 +616,27 @@ responseType : DS.TYPE_UNKNOWN,
  */
 responseSchema : null,
 
+/**
+ * Additional arguments passed to the JSON parse routine.  The JSON string
+ * is the assumed first argument (where applicable).  This property is not
+ * set by default, but the parse methods will use it if present.
+ *
+ * @property parseJSONArgs
+ * @type {MIXED|Array} If an Array, contents are used as individual arguments.
+ *                     Otherwise, value is used as an additional argument.
+ */
+// property intentionally undefined
+ 
+/**
+ * When working with XML data, setting this property to true enables support for
+ * XPath-syntaxed locators in schema definitions.
+ *
+ * @property useXPath
+ * @type Boolean
+ * @default false
+ */
+useXPath : false,
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DataSourceBase public methods
@@ -752,7 +820,28 @@ clearAllIntervals : function() {
 },
 
 /**
- * First looks for cached response, then sends request to live data.
+ * First looks for cached response, then sends request to live data. The
+ * following arguments are passed to the callback function:
+ *     <dl>
+ *     <dt><code>oRequest</code></dt>
+ *     <dd>The same value that was passed in as the first argument to sendRequest.</dd>
+ *     <dt><code>oParsedResponse</code></dt>
+ *     <dd>An object literal containing the following properties:
+ *         <dl>
+ *         <dt><code>tId</code></dt>
+ *         <dd>Unique transaction ID number.</dd>
+ *         <dt><code>results</code></dt>
+ *         <dd>Schema-parsed data results.</dd>
+ *         <dt><code>error</code></dt>
+ *         <dd>True in cases of data error.</dd>
+ *         <dt><code>cached</code></dt>
+ *         <dd>True when response is returned from DataSource cache.</dd> 
+ *         <dt><code>meta</code></dt>
+ *         <dd>Schema-parsed meta data.</dd>
+ *         </dl>
+ *     <dt><code>oPayload</code></dt>
+ *     <dd>The same value as was passed in as <code>argument</code> in the oCallback object literal.</dd>
+ *     </dl> 
  *
  * @method sendRequest
  * @param oRequest {Object} Request object.
@@ -862,7 +951,7 @@ handleResponse : function(oRequest, oRawResponse, oCallback, oCaller, tId) {
                 this.responseType = DS.TYPE_JSARRAY;
             }
              // xml
-            else if(oRawResponse && oRawResponse.nodeType && oRawResponse.nodeType == 9) {
+            else if(oRawResponse && oRawResponse.nodeType && (oRawResponse.nodeType === 9 || oRawResponse.nodeType === 1 || oRawResponse.nodeType === 11)) {
                 this.responseType = DS.TYPE_XML;
             }
             else if(oRawResponse && oRawResponse.nodeName && (oRawResponse.nodeName.toLowerCase() == "table")) { // table
@@ -882,6 +971,47 @@ handleResponse : function(oRequest, oRawResponse, oCallback, oCaller, tId) {
             if(xhr && oRawResponse && oRawResponse.responseText) {
                 oFullResponse = oRawResponse.responseText; 
             }
+            try {
+                // Convert to JS array if it's a string
+                if(lang.isString(oFullResponse)) {
+                    var parseArgs = [oFullResponse].concat(this.parseJSONArgs);
+                    // Check for YUI JSON Util
+                    if(lang.JSON) {
+                        oFullResponse = lang.JSON.parse.apply(lang.JSON,parseArgs);
+                    }
+                    // Look for JSON parsers using an API similar to json2.js
+                    else if(window.JSON && JSON.parse) {
+                        oFullResponse = JSON.parse.apply(JSON,parseArgs);
+                    }
+                    // Look for JSON parsers using an API similar to json.js
+                    else if(oFullResponse.parseJSON) {
+                        oFullResponse = oFullResponse.parseJSON.apply(oFullResponse,parseArgs.slice(1));
+                    }
+                    // No JSON lib found so parse the string
+                    else {
+                        // Trim leading spaces
+                        while (oFullResponse.length > 0 &&
+                                (oFullResponse.charAt(0) != "{") &&
+                                (oFullResponse.charAt(0) != "[")) {
+                            oFullResponse = oFullResponse.substring(1, oFullResponse.length);
+                        }
+
+                        if(oFullResponse.length > 0) {
+                            // Strip extraneous stuff at the end
+                            var arrayEnd =
+Math.max(oFullResponse.lastIndexOf("]"),oFullResponse.lastIndexOf("}"));
+                            oFullResponse = oFullResponse.substring(0,arrayEnd+1);
+
+                            // Turn the string into an object literal...
+                            // ...eval is necessary here
+                            oFullResponse = eval("(" + oFullResponse + ")");
+
+                        }
+                    }
+                }
+            }
+            catch(e1) {
+            }
             oFullResponse = this.doBeforeParseData(oRequest, oFullResponse, oCallback);
             oParsedResponse = this.parseArrayData(oRequest, oFullResponse);
             break;
@@ -892,17 +1022,18 @@ handleResponse : function(oRequest, oRawResponse, oCallback, oCaller, tId) {
             try {
                 // Convert to JSON object if it's a string
                 if(lang.isString(oFullResponse)) {
+                    var parseArgs = [oFullResponse].concat(this.parseJSONArgs);
                     // Check for YUI JSON Util
                     if(lang.JSON) {
-                        oFullResponse = lang.JSON.parse(oFullResponse);
+                        oFullResponse = lang.JSON.parse.apply(lang.JSON,parseArgs);
                     }
                     // Look for JSON parsers using an API similar to json2.js
                     else if(window.JSON && JSON.parse) {
-                        oFullResponse = JSON.parse(oFullResponse);
+                        oFullResponse = JSON.parse.apply(JSON,parseArgs);
                     }
                     // Look for JSON parsers using an API similar to json.js
                     else if(oFullResponse.parseJSON) {
-                        oFullResponse = oFullResponse.parseJSON();
+                        oFullResponse = oFullResponse.parseJSON.apply(oFullResponse,parseArgs.slice(1));
                     }
                     // No JSON lib found so parse the string
                     else {
@@ -934,7 +1065,9 @@ handleResponse : function(oRequest, oRawResponse, oCallback, oCaller, tId) {
             break;
         case DS.TYPE_HTMLTABLE:
             if(xhr && oRawResponse.responseText) {
-                oFullResponse = oRawResponse.responseText;
+                var el = document.createElement('div');
+                el.innerHTML = oRawResponse.responseText;
+                oFullResponse = el.getElementsByTagName('table')[0];
             }
             oFullResponse = this.doBeforeParseData(oRequest, oFullResponse, oCallback);
             oParsedResponse = this.parseHTMLTableData(oRequest, oFullResponse);
@@ -970,7 +1103,7 @@ handleResponse : function(oRequest, oRawResponse, oCallback, oCaller, tId) {
     }
 
     // Success
-    if(oParsedResponse && !oParsedResponse.error) {
+    if(!oParsedResponse.error) {
         // Last chance to touch the raw response or the parsed response
         oParsedResponse = this.doBeforeCallback(oRequest, oFullResponse, oParsedResponse, oCallback);
         this.fireEvent("responseParseEvent", {request:oRequest,
@@ -1226,7 +1359,6 @@ parseTextData : function(oRequest, oFullResponse) {
             
 },
 
-
 /**
  * Overridable method parses XML data for one result into an object literal.
  *
@@ -1244,33 +1376,40 @@ parseXMLResult : function(result) {
             var field = schema.fields[m];
             var key = (lang.isValue(field.key)) ? field.key : field;
             var data = null;
-            // Values may be held in an attribute...
-            var xmlAttr = result.attributes.getNamedItem(key);
-            if(xmlAttr) {
-                data = xmlAttr.value;
+
+            if(this.useXPath) {
+                data = YAHOO.util.DataSource._getLocationValue(field, result);
             }
-            // ...or in a node
             else {
-                var xmlNode = result.getElementsByTagName(key);
-                if(xmlNode && xmlNode.item(0) && xmlNode.item(0)) {
-                    data = xmlNode.item(0).firstChild.nodeValue;
-                    var item = xmlNode.item(0);
-                    // For IE, then DOM...
-                    data = (item.text) ? item.text : (item.textContent) ? item.textContent : null;
-                    // ...then fallback, but check for multiple child nodes
-                    if(!data) {
-                        var datapieces = [];
-                        for(var j=0, len=item.childNodes.length; j<len; j++) {
-                            if(item.childNodes[j].nodeValue) {
-                                datapieces[datapieces.length] = item.childNodes[j].nodeValue;
+                // Values may be held in an attribute...
+                var xmlAttr = result.attributes.getNamedItem(key);
+                if(xmlAttr) {
+                    data = xmlAttr.value;
+                }
+                // ...or in a node
+                else {
+                    var xmlNode = result.getElementsByTagName(key);
+                    if(xmlNode && xmlNode.item(0)) {
+                        var item = xmlNode.item(0);
+                        // For IE, then DOM...
+                        data = (item) ? ((item.text) ? item.text : (item.textContent) ? item.textContent : null) : null;
+                        // ...then fallback, but check for multiple child nodes
+                        if(!data) {
+                            var datapieces = [];
+                            for(var j=0, len=item.childNodes.length; j<len; j++) {
+                                if(item.childNodes[j].nodeValue) {
+                                    datapieces[datapieces.length] = item.childNodes[j].nodeValue;
+                                }
                             }
-                        }
-                        if(datapieces.length > 0) {
-                            data = datapieces.join("");
+                            if(datapieces.length > 0) {
+                                data = datapieces.join("");
+                            }
                         }
                     }
                 }
             }
+            
+            
             // Safety net
             if(data === null) {
                    data = "";
@@ -1321,38 +1460,45 @@ parseXMLData : function(oRequest, oFullResponse) {
 
     // In case oFullResponse is something funky
     try {
+        // Pull any meta identified
+        if(this.useXPath) {
+            for (k in metaLocators) {
+                oParsedResponse.meta[k] = YAHOO.util.DataSource._getLocationValue(metaLocators[k], oFullResponse);
+            }
+        }
+        else {
+            metaNode = metaNode ? oFullResponse.getElementsByTagName(metaNode)[0] :
+                       oFullResponse;
+
+            if (metaNode) {
+                for (k in metaLocators) {
+                    if (lang.hasOwnProperty(metaLocators, k)) {
+                        loc = metaLocators[k];
+                        // Look for a node
+                        v = metaNode.getElementsByTagName(loc)[0];
+
+                        if (v) {
+                            v = v.firstChild.nodeValue;
+                        } else {
+                            // Look for an attribute
+                            v = metaNode.attributes.getNamedItem(loc);
+                            if (v) {
+                                v = v.value;
+                            }
+                        }
+
+                        if (lang.isValue(v)) {
+                            oParsedResponse.meta[k] = v;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // For result data
         xmlList = (schema.resultNode) ?
             oFullResponse.getElementsByTagName(schema.resultNode) :
             null;
-
-        // Pull any meta identified
-        metaNode = metaNode ? oFullResponse.getElementsByTagName(metaNode)[0] :
-                   oFullResponse;
-
-        if (metaNode) {
-            for (k in metaLocators) {
-                if (lang.hasOwnProperty(metaLocators, k)) {
-                    loc = metaLocators[k];
-                    // Look for a node
-                    v = metaNode.getElementsByTagName(loc)[0];
-
-                    if (v) {
-                        v = v.firstChild.nodeValue;
-                    } else {
-                        // Look for an attribute
-                        v = metaNode.attributes.getNamedItem(loc);
-                        if (v) {
-                            v = v.value;
-                        }
-                    }
-
-                    if (lang.isValue(v)) {
-                        oParsedResponse.meta[k] = v;
-                    }
-                }
-                
-            }
-        }
     }
     catch(e) {
     }
@@ -1488,9 +1634,9 @@ parseJSONData : function(oRequest, oFullResponse) {
                 }
 
                 // Process the results, flattening the records and/or applying parsers if needed
-                //if (fieldParsers.length || fieldPaths.length) {
-                    for (i = resultsList.length - 1; i >= 0; --i) {
-                        var r = resultsList[i], rec = {};
+                for (i = resultsList.length - 1; i >= 0; --i) {
+                    var r = resultsList[i], rec = {};
+                    if(r) {
                         for (j = simpleFields.length - 1; j >= 0; --j) {
                             // Bug 1777850: data might be held in an array
                             rec[simpleFields[j].key] =
@@ -1509,9 +1655,9 @@ parseJSONData : function(oRequest, oFullResponse) {
                                 rec[p] = null;
                             }
                         }
-                        results[i] = rec;
                     }
-                //}
+                    results[i] = rec;
+                }
             }
             else {
                 results = resultsList;
@@ -1558,38 +1704,43 @@ parseHTMLTableData : function(oRequest, oFullResponse) {
     var fields = this.responseSchema.fields;
     var oParsedResponse = {results:[]};
 
-    // Iterate through each TBODY
-    for(var i=0; i<elTable.tBodies.length; i++) {
-        var elTbody = elTable.tBodies[i];
-
-        // Iterate through each TR
-        for(var j=elTbody.rows.length-1; j>-1; j--) {
-            var elRow = elTbody.rows[j];
-            var oResult = {};
-            
-            for(var k=fields.length-1; k>-1; k--) {
-                var field = fields[k];
-                var key = (lang.isValue(field.key)) ? field.key : field;
-                var data = elRow.cells[k].innerHTML;
-
-                // Backward compatibility
-                if(!field.parser && field.converter) {
-                    field.parser = field.converter;
+    if(lang.isArray(fields)) {
+        // Iterate through each TBODY
+        for(var i=0; i<elTable.tBodies.length; i++) {
+            var elTbody = elTable.tBodies[i];
+    
+            // Iterate through each TR
+            for(var j=elTbody.rows.length-1; j>-1; j--) {
+                var elRow = elTbody.rows[j];
+                var oResult = {};
+                
+                for(var k=fields.length-1; k>-1; k--) {
+                    var field = fields[k];
+                    var key = (lang.isValue(field.key)) ? field.key : field;
+                    var data = elRow.cells[k].innerHTML;
+    
+                    // Backward compatibility
+                    if(!field.parser && field.converter) {
+                        field.parser = field.converter;
+                    }
+                    var parser = (typeof field.parser === 'function') ?
+                        field.parser :
+                        DS.Parser[field.parser+''];
+                    if(parser) {
+                        data = parser.call(this, data);
+                    }
+                    // Safety measure
+                    if(data === undefined) {
+                        data = null;
+                    }
+                    oResult[key] = data;
                 }
-                var parser = (typeof field.parser === 'function') ?
-                    field.parser :
-                    DS.Parser[field.parser+''];
-                if(parser) {
-                    data = parser.call(this, data);
-                }
-                // Safety measure
-                if(data === undefined) {
-                    data = null;
-                }
-                oResult[key] = data;
+                oParsedResponse.results[j] = oResult;
             }
-            oParsedResponse.results[j] = oResult;
         }
+    }
+    else {
+        bError = true;
     }
 
     if(bError) {
@@ -1649,7 +1800,7 @@ util.LocalDataSource = function(oLiveData, oConfigs) {
         this.responseType = DS.TYPE_JSARRAY;
     }
     
-    this.constructor.superclass.constructor.call(this, oLiveData, oConfigs); 
+    util.LocalDataSource.superclass.constructor.call(this, oLiveData, oConfigs); 
 };
 
 // LocalDataSource extends DataSourceBase
@@ -1688,11 +1839,29 @@ util.FunctionDataSource = function(oLiveData, oConfigs) {
     this.dataType = DS.TYPE_JSFUNCTION;
     oLiveData = oLiveData || function() {};
     
-    this.constructor.superclass.constructor.call(this, oLiveData, oConfigs); 
+    util.FunctionDataSource.superclass.constructor.call(this, oLiveData, oConfigs); 
 };
 
 // FunctionDataSource extends DataSourceBase
 lang.extend(util.FunctionDataSource, DS, {
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// FunctionDataSource public properties
+//
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Context in which to execute the function. By default, is the DataSource
+ * instance itself. If set, the function will receive the DataSource instance
+ * as an additional argument. 
+ *
+ * @property scope
+ * @type Object
+ * @default null
+ */
+scope : null,
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1716,7 +1885,9 @@ makeConnection : function(oRequest, oCallback, oCaller) {
 
     // Pass the request in as a parameter and
     // forward the return value to the handler
-    var oRawResponse = this.liveData(oRequest);
+    
+    
+    var oRawResponse = (this.scope) ? this.liveData.call(this.scope, oRequest, this) : this.liveData(oRequest);
     
     // Try to sniff data type if it has not been defined
     if(this.responseType === DS.TYPE_UNKNOWN) {
@@ -1777,7 +1948,7 @@ util.ScriptNodeDataSource = function(oLiveData, oConfigs) {
     this.dataType = DS.TYPE_SCRIPTNODE;
     oLiveData = oLiveData || "";
     
-    this.constructor.superclass.constructor.call(this, oLiveData, oConfigs); 
+    util.ScriptNodeDataSource.superclass.constructor.call(this, oLiveData, oConfigs); 
 };
 
 // ScriptNodeDataSource extends DataSourceBase
@@ -1848,6 +2019,19 @@ generateRequestCallback : function(id) {
 },
 
 /**
+ * Overridable method gives implementers access to modify the URI before the dynamic
+ * script node gets inserted. Implementers should take care not to return an
+ * invalid URI.
+ *
+ * @method doBeforeGetScriptNode
+ * @param {String} URI to the script 
+ * @return {String} URI to the script
+ */
+doBeforeGetScriptNode : function(sUri) {
+    return sUri;
+},
+
+/**
  * Overriding method passes query to Get Utility. The returned
  * response is then forwarded to the handleResponse function.
  *
@@ -1908,6 +2092,7 @@ makeConnection : function(oRequest, oCallback, oCaller) {
     // We are now creating a request
     util.ScriptNodeDataSource._nPending++;
     var sUri = this.liveData + oRequest + this.generateRequestCallback(id);
+    sUri = this.doBeforeGetScriptNode(sUri);
     this.getUtility.script(sUri,
             {autopurge: true,
             onsuccess: util.ScriptNodeDataSource._bumpPendingDown,
@@ -1995,7 +2180,7 @@ util.XHRDataSource = function(oLiveData, oConfigs) {
     this.connMgr = this.connMgr || util.Connect;
     oLiveData = oLiveData || "";
     
-    this.constructor.superclass.constructor.call(this, oLiveData, oConfigs); 
+    util.XHRDataSource.superclass.constructor.call(this, oLiveData, oConfigs); 
 };
 
 // XHRDataSource extends DataSourceBase
@@ -2101,13 +2286,13 @@ makeConnection : function(oRequest, oCallback, oCaller) {
     var _xhrSuccess = function(oResponse) {
         // If response ID does not match last made request ID,
         // silently fail and wait for the next response
-        if(oResponse && (this.asyncMode == "ignoreStaleResponses") &&
+        if(oResponse && (this.connXhrMode == "ignoreStaleResponses") &&
                 (oResponse.tId != oQueue.conn.tId)) {
             return null;
         }
         // Error if no response
         else if(!oResponse) {
-            this.fireEvent("dataErrorEvent", {request:oRequest,
+            this.fireEvent("dataErrorEvent", {request:oRequest, response:null,
                     callback:oCallback, caller:oCaller,
                     message:DS.ERROR_DATANULL});
 
@@ -2146,7 +2331,7 @@ makeConnection : function(oRequest, oCallback, oCaller) {
      * @private
      */
     var _xhrFailure = function(oResponse) {
-        this.fireEvent("dataErrorEvent", {request:oRequest,
+        this.fireEvent("dataErrorEvent", {request:oRequest, response: oResponse,
                 callback:oCallback, caller:oCaller,
                 message:DS.ERROR_DATAINVALID});
 
@@ -2363,79 +2548,68 @@ lang.augmentObject(util.DataSource, DS);
      *   <dd>Thousands separator</dd>
      *   <dt>suffix {String}</dd>
      *   <dd>String appended after each number, like " items" (note the space)</dd>
+     *   <dt>negativeFormat</dt>
+     *   <dd>String used as a guide for how to indicate negative numbers.  The first '#' character in the string will be replaced by the number.  Default '-#'.</dd>
      *  </dl>
-     * @return {String} Formatted number for display.
+     * @return {String} Formatted number for display. Note, the following values
+     * return as "": null, undefined, NaN, "".
      */
-    format : function(nData, oConfig) {
-        oConfig = oConfig || {};
-        
-        if(!YAHOO.lang.isNumber(nData)) {
-            nData *= 1;
+    format : function(n, cfg) {
+        if (!isFinite(+n)) {
+            return '';
         }
 
-        if(YAHOO.lang.isNumber(nData)) {
-            var bNegative = (nData < 0);
-            var sOutput = nData + "";
-            var sDecimalSeparator = (oConfig.decimalSeparator) ? oConfig.decimalSeparator : ".";
-            var nDotIndex;
+        n   = !isFinite(+n) ? 0 : +n;
+        cfg = YAHOO.lang.merge(YAHOO.util.Number.format.defaults, (cfg || {}));
 
-            // Manage decimals
-            if(YAHOO.lang.isNumber(oConfig.decimalPlaces)) {
-                // Round to the correct decimal place
-                var nDecimalPlaces = oConfig.decimalPlaces;
-                var nDecimal = Math.pow(10, nDecimalPlaces);
-                sOutput = Math.round(nData*nDecimal)/nDecimal + "";
-                nDotIndex = sOutput.lastIndexOf(".");
+        var neg    = n < 0,        absN   = Math.abs(n),
+            places = cfg.decimalPlaces,
+            sep    = cfg.thousandsSeparator,
+            s, bits, i;
 
-                if(nDecimalPlaces > 0) {
-                    // Add the decimal separator
-                    if(nDotIndex < 0) {
-                        sOutput += sDecimalSeparator;
-                        nDotIndex = sOutput.length-1;
-                    }
-                    // Replace the "."
-                    else if(sDecimalSeparator !== "."){
-                        sOutput = sOutput.replace(".",sDecimalSeparator);
-                    }
-                    // Add missing zeros
-                    while((sOutput.length - 1 - nDotIndex) < nDecimalPlaces) {
-                        sOutput += "0";
-                    }
-                }
+        if (places < 0) {
+            // Get rid of the decimal info
+            s = absN - (absN % 1) + '';
+            i = s.length + places;
+
+            // avoid 123 vs decimalPlaces -4 (should return "0")
+            if (i > 0) {
+                    // leverage toFixed by making 123 => 0.123 for the rounding
+                    // operation, then add the appropriate number of zeros back on
+                s = Number('.' + s).toFixed(i).slice(2) +
+                    new Array(s.length - i + 1).join('0');
+            } else {
+                s = "0";
             }
-            
-            // Add the thousands separator
-            if(oConfig.thousandsSeparator) {
-                var sThousandsSeparator = oConfig.thousandsSeparator;
-                nDotIndex = sOutput.lastIndexOf(sDecimalSeparator);
-                nDotIndex = (nDotIndex > -1) ? nDotIndex : sOutput.length;
-                var sNewOutput = sOutput.substring(nDotIndex);
-                var nCount = -1;
-                for (var i=nDotIndex; i>0; i--) {
-                    nCount++;
-                    if ((nCount%3 === 0) && (i !== nDotIndex) && (!bNegative || (i > 1))) {
-                        sNewOutput = sThousandsSeparator + sNewOutput;
-                    }
-                    sNewOutput = sOutput.charAt(i-1) + sNewOutput;
-                }
-                sOutput = sNewOutput;
-            }
-
-            // Prepend prefix
-            sOutput = (oConfig.prefix) ? oConfig.prefix + sOutput : sOutput;
-
-            // Append suffix
-            sOutput = (oConfig.suffix) ? sOutput + oConfig.suffix : sOutput;
-
-            return sOutput;
+        } else {        // There is a bug in IE's toFixed implementation:
+            // for n in {(-0.94, -0.5], [0.5, 0.94)} n.toFixed() returns 0
+            // instead of -1 and 1. Manually handle that case.
+            s = absN < 1 && absN >= 0.5 && !places ? '1' : absN.toFixed(places);
         }
-        // Still not a Number, just return unaltered
-        else {
-            return nData;
+
+        if (absN > 1000) {
+            bits  = s.split(/\D/);
+            i  = bits[0].length % 3 || 3;
+
+            bits[0] = bits[0].slice(0,i) +
+                      bits[0].slice(i).replace(/(\d{3})/g, sep + '$1');
+
+            s = bits.join(cfg.decimalSeparator);
         }
+
+        s = cfg.prefix + s + cfg.suffix;
+
+        return neg ? cfg.negativeFormat.replace(/#/,s) : s;
     }
- };
-
+};
+YAHOO.util.Number.format.defaults = {
+    decimalSeparator : '.',
+    decimalPlaces    : null,
+    thousandsSeparator : '',
+    prefix : '',
+    suffix : '',
+    negativeFormat : '-#'
+};
 
 
 /****************************************************************************/
@@ -2577,63 +2751,69 @@ var xPad=function (x, pad, r)
      *
      * @method format
      * @param oDate {Date} Date.
-     * @param oConfig {Object} (Optional) Optional configuration values:
+     * @param oConfig {Object} (Optional) Object literal of configuration values:
      *  <dl>
-     *   <dt>format {String}</dt>
-     *   <dd>Any format defined by strftime is supported</dd>
-     *  </dl>
-     *  strftime has several format specifiers defined by the Open group at 
-     *  http://www.opengroup.org/onlinepubs/007908799/xsh/strftime.html
-     *
-     *  PHP added a few of its own, defined at http://www.php.net/strftime
-     *
-     *  This javascript implementation supports all the PHP specifiers and a few more.
-     *
-     *  @arg \%a - abbreviated weekday name according to the current locale
-     *  @arg \%A - full weekday name according to the current locale
-     *  @arg \%b - abbreviated month name according to the current locale
-     *  @arg \%B - full month name according to the current locale
-     *  @arg \%c - preferred date and time representation for the current locale
-     *  @arg \%C - century number (the year divided by 100 and truncated to an integer, range 00 to 99)
-     *  @arg \%d - day of the month as a decimal number (range 01 to 31)
-     *  @arg \%D - same as %m/%d/%y
-     *  @arg \%e - day of the month as a decimal number, a single digit is preceded by a space (range ' 1' to '31')
-     *  @arg \%F - same as %Y-%m-%d (ISO 8601 date format)
-     *  @arg \%g - like %G, but without the century
-     *  @arg \%G - The 4-digit year corresponding to the ISO week number
-     *  @arg \%h - same as %b
-     *  @arg \%H - hour as a decimal number using a 24-hour clock (range 00 to 23)
-     *  @arg \%I - hour as a decimal number using a 12-hour clock (range 01 to 12)
-     *  @arg \%j - day of the year as a decimal number (range 001 to 366)
-     *  @arg \%k - hour as a decimal number using a 24-hour clock (range 0 to 23); single digits are preceded by a blank. (See also %H.)
-     *  @arg \%l - hour as a decimal number using a 12-hour clock (range 1 to 12); single digits are preceded by a blank. (See also %I.) 
-     *  @arg \%m - month as a decimal number (range 01 to 12)
-     *  @arg \%M - minute as a decimal number
-     *  @arg \%n - newline character
-     *  @arg \%p - either `AM' or `PM' according to the given time value, or the corresponding strings for the current locale
-     *  @arg \%P - like %p, but lower case
-     *  @arg \%r - time in a.m. and p.m. notation equal to %I:%M:%S %p
-     *  @arg \%R - time in 24 hour notation equal to %H:%M
-     *  @arg \%s - number of seconds since the Epoch, ie, since 1970-01-01 00:00:00 UTC
-     *  @arg \%S - second as a decimal number
-     *  @arg \%t - tab character
-     *  @arg \%T - current time, equal to %H:%M:%S
-     *  @arg \%u - weekday as a decimal number [1,7], with 1 representing Monday
-     *  @arg \%U - week number of the current year as a decimal number, starting with
-     *             the first Sunday as the first day of the first week
-     *  @arg \%V - The ISO 8601:1988 week number of the current year as a decimal number,
-     *             range 01 to 53, where week 1 is the first week that has at least 4 days
-     *             in the current year, and with Monday as the first day of the week.
-     *  @arg \%w - day of the week as a decimal, Sunday being 0
-     *  @arg \%W - week number of the current year as a decimal number, starting with the
-     *             first Monday as the first day of the first week
-     *  @arg \%x - preferred date representation for the current locale without the time
-     *  @arg \%X - preferred time representation for the current locale without the date
-     *  @arg \%y - year as a decimal number without a century (range 00 to 99)
-     *  @arg \%Y - year as a decimal number including the century
-     *  @arg \%z - numerical time zone representation
-     *  @arg \%Z - time zone name or abbreviation
-     *  @arg \%% - a literal `\%' character
+     *   <dt>format &lt;String&gt;</dt>
+     *   <dd>
+     *   <p>
+     *   Any strftime string is supported, such as "%I:%M:%S %p". strftime has several format specifiers defined by the Open group at 
+     *   <a href="http://www.opengroup.org/onlinepubs/007908799/xsh/strftime.html">http://www.opengroup.org/onlinepubs/007908799/xsh/strftime.html</a>
+     *   </p>
+     *   <p>   
+     *   PHP added a few of its own, defined at <a href="http://www.php.net/strftime">http://www.php.net/strftime</a>
+     *   </p>
+     *   <p>
+     *   This javascript implementation supports all the PHP specifiers and a few more.  The full list is below:
+     *   </p>
+     *   <dl>
+     *    <dt>%a</dt> <dd>abbreviated weekday name according to the current locale</dd>
+     *    <dt>%A</dt> <dd>full weekday name according to the current locale</dd>
+     *    <dt>%b</dt> <dd>abbreviated month name according to the current locale</dd>
+     *    <dt>%B</dt> <dd>full month name according to the current locale</dd>
+     *    <dt>%c</dt> <dd>preferred date and time representation for the current locale</dd>
+     *    <dt>%C</dt> <dd>century number (the year divided by 100 and truncated to an integer, range 00 to 99)</dd>
+     *    <dt>%d</dt> <dd>day of the month as a decimal number (range 01 to 31)</dd>
+     *    <dt>%D</dt> <dd>same as %m/%d/%y</dd>
+     *    <dt>%e</dt> <dd>day of the month as a decimal number, a single digit is preceded by a space (range ' 1' to '31')</dd>
+     *    <dt>%F</dt> <dd>same as %Y-%m-%d (ISO 8601 date format)</dd>
+     *    <dt>%g</dt> <dd>like %G, but without the century</dd>
+     *    <dt>%G</dt> <dd>The 4-digit year corresponding to the ISO week number</dd>
+     *    <dt>%h</dt> <dd>same as %b</dd>
+     *    <dt>%H</dt> <dd>hour as a decimal number using a 24-hour clock (range 00 to 23)</dd>
+     *    <dt>%I</dt> <dd>hour as a decimal number using a 12-hour clock (range 01 to 12)</dd>
+     *    <dt>%j</dt> <dd>day of the year as a decimal number (range 001 to 366)</dd>
+     *    <dt>%k</dt> <dd>hour as a decimal number using a 24-hour clock (range 0 to 23); single digits are preceded by a blank. (See also %H.)</dd>
+     *    <dt>%l</dt> <dd>hour as a decimal number using a 12-hour clock (range 1 to 12); single digits are preceded by a blank. (See also %I.) </dd>
+     *    <dt>%m</dt> <dd>month as a decimal number (range 01 to 12)</dd>
+     *    <dt>%M</dt> <dd>minute as a decimal number</dd>
+     *    <dt>%n</dt> <dd>newline character</dd>
+     *    <dt>%p</dt> <dd>either `AM' or `PM' according to the given time value, or the corresponding strings for the current locale</dd>
+     *    <dt>%P</dt> <dd>like %p, but lower case</dd>
+     *    <dt>%r</dt> <dd>time in a.m. and p.m. notation equal to %I:%M:%S %p</dd>
+     *    <dt>%R</dt> <dd>time in 24 hour notation equal to %H:%M</dd>
+     *    <dt>%s</dt> <dd>number of seconds since the Epoch, ie, since 1970-01-01 00:00:00 UTC</dd>
+     *    <dt>%S</dt> <dd>second as a decimal number</dd>
+     *    <dt>%t</dt> <dd>tab character</dd>
+     *    <dt>%T</dt> <dd>current time, equal to %H:%M:%S</dd>
+     *    <dt>%u</dt> <dd>weekday as a decimal number [1,7], with 1 representing Monday</dd>
+     *    <dt>%U</dt> <dd>week number of the current year as a decimal number, starting with the
+     *            first Sunday as the first day of the first week</dd>
+     *    <dt>%V</dt> <dd>The ISO 8601:1988 week number of the current year as a decimal number,
+     *            range 01 to 53, where week 1 is the first week that has at least 4 days
+     *            in the current year, and with Monday as the first day of the week.</dd>
+     *    <dt>%w</dt> <dd>day of the week as a decimal, Sunday being 0</dd>
+     *    <dt>%W</dt> <dd>week number of the current year as a decimal number, starting with the
+     *            first Monday as the first day of the first week</dd>
+     *    <dt>%x</dt> <dd>preferred date representation for the current locale without the time</dd>
+     *    <dt>%X</dt> <dd>preferred time representation for the current locale without the date</dd>
+     *    <dt>%y</dt> <dd>year as a decimal number without a century (range 00 to 99)</dd>
+     *    <dt>%Y</dt> <dd>year as a decimal number including the century</dd>
+     *    <dt>%z</dt> <dd>numerical time zone representation</dd>
+     *    <dt>%Z</dt> <dd>time zone name or abbreviation</dd>
+     *    <dt>%%</dt> <dd>a literal `%' character</dd>
+     *   </dl>
+     *  </dd>
+     * </dl>
      * @param sLocale {String} (Optional) The locale to use when displaying days of week,
      *  months of the year, and other locale specific strings.  The following locales are
      *  built in:
@@ -2813,4 +2993,4 @@ var xPad=function (x, pad, r)
 
 })();
 
-YAHOO.register("datasource", YAHOO.util.DataSource, {version: "2.6.0", build: "1321"});
+YAHOO.register("datasource", YAHOO.util.DataSource, {version: "2.8.1", build: "19"});

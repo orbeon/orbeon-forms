@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.6.0
+http://developer.yahoo.com/yui/license.html
+version: 2.8.1
 */
 /* Place the border around the editor */
 .yui-skin-sam .yui-editor-container {
@@ -99,6 +99,10 @@ version: 2.6.0
 /* Set the image for the collapse button on the toolbar */
 .yui-skin-sam .yui-toolbar-container .collapse {
     background: url(../../../../assets/skins/sam/sprite.png) no-repeat 0 -400px;
+}
+/* Set the image for the collapse button on the toolbar */
+.yui-skin-sam .yui-toolbar-container .collapsed {
+    background: url(../../../../assets/skins/sam/sprite.png) no-repeat 0 -350px;
 }
 /* Position the image and the container */
 .yui-skin-sam .yui-toolbar-container .yui-toolbar-titlebar span.collapse {

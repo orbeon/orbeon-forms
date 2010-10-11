@@ -31,9 +31,9 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- YUI -->
-    <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/element/element-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/event/event-min.js"/>
-    <xbl:script type="text/javascript" src="/ops/yui/selector/selector-beta-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/selector/selector.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/dragdrop/dragdrop-min.js"/>
 
     <!-- Comment/uncomment for normal/debug mode -->

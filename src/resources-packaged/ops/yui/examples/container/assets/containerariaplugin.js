@@ -445,7 +445,7 @@
                     if (oHeader != null) {
                         sID = oHeader.id || Dom.generateId(oHeader);
                         this.cfg.setProperty(_LABELLED_BY, sID);
-                    }
+					}
 
 					setARIARole(this.innerElement, sRole);
 					setRoleForCloseButton.call(this);
@@ -639,3 +639,4 @@
 	}
 
 }());
+YAHOO.register("containerariaplugin", YAHOO.widget.Module, {version: "@VERSION@", build: "@BUILD@"});

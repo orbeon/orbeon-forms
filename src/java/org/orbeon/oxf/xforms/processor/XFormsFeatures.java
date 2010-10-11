@@ -215,7 +215,7 @@ public class XFormsFeatures {
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             // Selector is so far only used offline
-            new ResourceConfig("/ops/yui/selector/selector-beta.js", "/ops/yui/selector/selector-beta-min.js") {
+            new ResourceConfig("/ops/yui/selector/selector.js", "/ops/yui/selector/selector-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
@@ -270,7 +270,7 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "fckeditor"; }
             },
-            new ResourceConfig("/ops/yui/element/element-beta.js", "/ops/yui/element/element-beta-min.js") {
+            new ResourceConfig("/ops/yui/element/element.js", "/ops/yui/element/element-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return isYUIRTEInUse(containingDocument, appearancesMap);
                 }

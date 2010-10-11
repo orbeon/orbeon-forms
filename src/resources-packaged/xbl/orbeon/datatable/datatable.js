@@ -219,7 +219,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
         this.scroll = this.scrollV || this.scrollH;
         this.headBodySplit = this.scroll;
 
-        var tables = YAHOO.util.Selector.query('table', this.divContainer, false);
+        var tables = this.divContainer.getElementsByTagName("table");
         this.headerTable = tables[0];
         this.headerTable.style.height = "";
 
@@ -229,8 +229,8 @@ YAHOO.xbl.fr.Datatable.prototype = {
             this.table = tables[0];
         }
 
-        this.thead = YAHOO.util.Selector.query('thead', this.headerTable, true);
-        this.tbody = YAHOO.util.Selector.query('tbody', this.table, true);
+        this.thead = ORBEON.util.Dom.getElementByTagName(this.headerTable, 'thead');
+        this.tbody = ORBEON.util.Dom.getElementByTagName(this.table, 'tbody');
         this.getAndSetColumns();
         this.id = this.table.getAttribute('id');
         this.originalWidth = YAHOO.xbl.fr.Datatable.utils.getStyle(this.table.parentNode, 'width', 'auto');
@@ -509,7 +509,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 YAHOO.util.Dom.addClass(liner, className);
                 for (var k = 0; k < this.bodyColumns[j].length; k++) {
                     var cell = this.bodyColumns[j][k];
-                    liner = YAHOO.util.Selector.query('div', cell, true);
+                    liner = ORBEON.util.Dom.getElementByTagName(cell, 'div');
                     YAHOO.util.Dom.addClass(liner, className);
 
                 }
@@ -949,7 +949,7 @@ YAHOO.xbl.fr.Datatable.utils = {
 };
 
 YAHOO.xbl.fr.Datatable.colSorter = function (th) {
-    var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
+    var liner = ORBEON.util.Dom.getElementByTagName(th, "div");
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
         var triggerControl = YAHOO.util.Selector.query('.xforms-trigger:not(.xforms-disabled)', liner, true);
         var a = ORBEON.util.Dom.getElementByTagName(triggerControl, "a");

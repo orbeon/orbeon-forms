@@ -28,7 +28,7 @@
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
- 	<xbl:script type="text/javascript" src="/ops/yui/element/element-beta.js"/>
+ 	<xbl:script type="text/javascript" src="/ops/yui/element/element.js"/>
     <xbl:script src="/xbl/orbeon/tabview/tabview.js"/>
     <xbl:script src="/ops/yui/tabview/tabview-min.js"/>
 
@@ -139,7 +139,7 @@
                                                 </xsl:if>
 
                                                 <xsl:apply-templates select="node() except fr:label"/>
-                                                
+
                                                 <!-- Triggers by the JavaScript to notify the XForms code of events -->
                                                 <!-- NOTE: Put them after the content so that xforms:setfocus works -->
                                                 <xforms:trigger id="fr-tabview-select-{position()}" class="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">

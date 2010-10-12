@@ -321,7 +321,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
 //        }
     }
 
-    def hasAnyCalculationBind(model: Model) = model.hasCalculateComputedBind
+    def hasAnyCalculationBind(model: Model) = model.hasCalculateComputedCustomBind
     def hasAnyValidationBind(model: Model) = model.hasValidateBind
 
     def requireModelMIPUpdate(model: Model, bindId: String, mipName: String): Boolean = {

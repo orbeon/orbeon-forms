@@ -121,7 +121,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
     // All binds by static id
     val bindsById = new JLinkedHashMap[String, Bind]// JAVA COLLECTION
 
-    var hasCalculateComputedBind = false // default
+    var hasCalculateComputedCustomBind = false // default
     var hasValidateBind = false // default
 
     // Top-level binds and create static binds hierarchy
@@ -224,7 +224,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
         def hasCustomMip = customMIPNameToXPathMIP.nonEmpty
 
         // Globally remember if we have seen these categories of binds
-        Model.this.hasCalculateComputedBind ||= hasCalculateComputedBind
+        Model.this.hasCalculateComputedCustomBind ||= hasCalculateComputedBind || hasCustomMip
         Model.this.hasValidateBind ||= hasValidateBind
 
         // Return true if analysis succeeded
@@ -258,7 +258,7 @@ class Model(val staticState: XFormsStaticState, val scope: XBLBindings#Scope, va
                             // Remember dependent instances
                             val returnableInstances = refModelAnalysis.getBindingAnalysis.returnableInstances
                             bindInstances.addAll(returnableInstances)
-                            if (hasCustomMip || hasCalculateComputedBind)
+                            if (hasCalculateComputedBind || hasCustomMip)
                                 computedBindExpressionsInstances.addAll(returnableInstances)
 
                             if (hasValidateBind)

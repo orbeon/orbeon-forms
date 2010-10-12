@@ -44,7 +44,8 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
 
             // Find submission object and dispatch submit event to it
-            final Object object = getXBLContainer().getObjectByEffectiveId(submissionId);// xxx fix not effective
+
+            final Object object = getXBLContainer().findResolutionScope(getEffectiveId()).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsSubmitEvent(containingDocument, submission));

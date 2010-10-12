@@ -1649,5 +1649,56 @@
         </output>
     </test>
 
+    <test description="xforms:submit within XBL outer scope resolves submission" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315509&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance/>
+                        </xforms:instance>
+                        <!-- Simulate activation of submit button -->
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-submit"/>
+                        <xforms:submission id="my-submission" method="get" resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replace="instance"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo">
+                        <xforms:submit id="my-submit" submission="my-submission"/>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                                <book>
+                                    <title lang="en">Pale Blue Dot</title>
+                                    <author>Carl Sagan</author>
+                                </book>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 
 </group>

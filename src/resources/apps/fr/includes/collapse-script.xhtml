@@ -65,7 +65,7 @@
         var caseElement = null;
         for (var i = 0; i < possibleElements.length; i++) {
             var currentElement = possibleElements[i];
-            if (!ORBEON.util.Dom.hasClass(currentElement, "xforms-case-begin-end")) {
+            if (!YAHOO.util.Dom.hasClass(currentElement, "xforms-case-begin-end")) {
                 caseElement = currentElement;
                 break;
             }
@@ -73,7 +73,7 @@
         if (caseElement == null)
             return null;
 
-        if (ORBEON.util.Dom.hasClass(caseElement, "xforms-case-begin-end"))
+        if (YAHOO.util.Dom.hasClass(caseElement, "xforms-case-begin-end"))
             return null;
 
         var collapsibleElements = YAHOO.util.Dom.getElementsByClassName("fr-collapsible", null, caseElement);

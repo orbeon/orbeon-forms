@@ -61,7 +61,7 @@ YAHOO.xbl.fr.Currency.prototype = {
         this.visibleInputElement.value = this.numberToCurrency(this.visibleInputElement.value);
         // Update xforms-required-empty/xforms-required-filled and xforms-visited
         ORBEON.xforms.Controls.updateRequiredEmpty(this.groupElement, newValue);
-        if (! ORBEON.util.Dom.hasClass(this.groupElement, "xforms-visited"))
+        if (! YAHOO.util.Dom.hasClass(this.groupElement, "xforms-visited"))
             ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(this.groupElement);
     },
 
@@ -120,7 +120,7 @@ YAHOO.xbl.fr.Currency.prototype = {
         var currencyFormattedValue = this.numberToCurrency(xformsValue);
         this.visibleInputElement.value = this.hasFocus ? this.currencyToNumber(currencyFormattedValue) : currencyFormattedValue;
         // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
-        this.visibleInputElement.disabled = ORBEON.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
+        this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
     },
 
     update: function() {

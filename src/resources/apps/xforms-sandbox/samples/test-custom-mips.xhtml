@@ -101,7 +101,7 @@
                             var output = document.getElementById("name-output·51");
                             YAHOO.util.Assert.isNotNull(output);
                             YAHOO.util.Assert.areEqual("Wyoming", ORBEON.xforms.Controls.getCurrentValue(output));
-                            YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(output, "foo-bar-is-not-n"));
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(output, "foo-bar-is-not-n"));
                         });
                     },
 
@@ -112,7 +112,7 @@
                         }, function() {
                             var output = document.getElementById("name-output·32");
                             YAHOO.util.Assert.areEqual("New Jersey", ORBEON.xforms.Controls.getCurrentValue(output));
-                            YAHOO.util.Assert.isTrue(ORBEON.util.Dom.hasClass(output, "foo-bar-is-n"));
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(output, "foo-bar-is-n"));
                         });
                     }
                 }));

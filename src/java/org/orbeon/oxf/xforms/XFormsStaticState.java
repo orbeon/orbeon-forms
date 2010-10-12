@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.*;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.*;
@@ -1496,9 +1497,10 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         private final Map<String, NamespaceMapping> namespaceMappings = new HashMap<String, NamespaceMapping>();
         private final Map<String, NamespaceMapping> hashes = new LinkedHashMap<String, NamespaceMapping>();
 
+        private long lastModified = -1;                     // last modification date of bindings
         private Map<String, Set<String>> xblBindings;       // Map<String uri, <String localname>>
         private Map<String, String> automaticMappings;      // ns URI -> directory name
-        private List<String> bindingIncludes;    // list of paths
+        private Set<String> bindingIncludes;                // set of paths
 
         // Initial
         public Metadata() {
@@ -1600,7 +1602,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
                 // Remember to include later
                 if (bindingIncludes == null)
-                    bindingIncludes = new ArrayList<String>();
+                    bindingIncludes = new LinkedHashSet<String>();
                 bindingIncludes.add(path);
 
                 return true;
@@ -1630,8 +1632,34 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             localnamesSet.add(localname);
         }
 
-        public List<String> getBindingsIncludes() {
+        public Set<String> getBindingsIncludes() {
             return bindingIncludes;
+        }
+
+        public void updateBindingsLastModified(long lastModified) {
+            this.lastModified = Math.max(this.lastModified, lastModified);
+        }
+
+        /**
+         * Check if the binding includes are up to date.
+         *
+         * @return true iif they are up to date
+         */
+        public boolean checkBindingsIncludes() {
+            if (bindingIncludes != null) {
+                try {
+                    for (final String include : bindingIncludes) {
+                        final long lastModified = ResourceManagerWrapper.instance().lastModified(include, false);
+                        if (lastModified > this.lastModified)
+                            return false;
+                    }
+                } catch (ResourceNotFoundException e) {
+                    // Resource was removed
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

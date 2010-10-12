@@ -196,12 +196,11 @@ public class XBLBindings {
             }
 
             // Get automatically-included XBL documents
-            final List<String> includes = metadata.getBindingsIncludes();
+            final Set<String> includes = metadata.getBindingsIncludes();
             if (includes != null) {
                 for (final String include: includes) {
                     xblDocuments.add(readXBLResource(include));
 //                    System.out.println(Dom4jUtils.domToPrettyString(xblDocuments.get(xblDocuments.size() - 1)));
-
                 }
             }
         }
@@ -224,6 +223,12 @@ public class XBLBindings {
     private Document readXBLResource(String include) {
         final boolean handleXInclude = true; // handle XInclude
         final boolean handleLexical = false; // don't handle comments and other lexical information
+
+        // Update last modified so that dependencies on external XBL files can be handled
+        final long lastModified = ResourceManagerWrapper.instance().lastModified(include, false);
+        metadata.updateBindingsLastModified(lastModified);
+
+        // Read
         return ResourceManagerWrapper.instance().getContentAsDOM4J(include, false, handleXInclude, handleLexical);
     }
 
@@ -365,7 +370,7 @@ public class XBLBindings {
 
                 // Check how many automatic XBL includes we have so far
                 final int initialIncludesCount; {
-                    final List<String> includes = metadata.getBindingsIncludes();
+                    final Set<String> includes = metadata.getBindingsIncludes();
                     initialIncludesCount = includes != null ? includes.size() : 0;
                 }
 
@@ -374,12 +379,13 @@ public class XBLBindings {
                 if (fullShadowTreeDocument != null) {
 
                     // Process newly added automatic XBL includes if any
-                    final List<String> includes = metadata.getBindingsIncludes();
+                    final Set<String> includes = metadata.getBindingsIncludes();
                     final int finalIncludesCount = includes != null ? includes.size() : 0;
                     if (finalIncludesCount > initialIncludesCount) {
                         indentedLogger.startHandleOperation("", "adding XBL bindings");
                         int xblBindingCount = 0;
-                        for (final String include: includes.subList(initialIncludesCount, finalIncludesCount)) {
+                        final List<String> includesAsList = new ArrayList<String>(includes);
+                        for (final String include: includesAsList.subList(initialIncludesCount, finalIncludesCount)) {
                             xblBindingCount += extractXBLBindings(readXBLResource(include), staticState);
                         }
                         indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(finalIncludesCount - initialIncludesCount),

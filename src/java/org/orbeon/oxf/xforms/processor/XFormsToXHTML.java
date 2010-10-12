@@ -36,6 +36,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -185,13 +186,18 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final XFormsStaticState staticState;
                 {
                     final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, stage2CacheableState.getStaticStateDigest());
-                    if (cachedState != null) {
+                    if (cachedState != null && cachedState.getMetadata().checkBindingsIncludes()) {
                         // Found static state in cache
-                        indentedLogger.logDebug("", "found static state by digest in cache");
+                        indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
+
                         staticState = cachedState;
                     } else {
-                        // Not found static state in cache, create static state from input
-                        indentedLogger.logDebug("", "did not find static state by digest in cache");
+                        // Not found static state in cache OR it is out of date, create static state from input
+                        // NOTE: In out of date case, could clone static state and reprocess instead?
+                        if (cachedState != null)
+                            indentedLogger.logDebug("", "found out-of-date static state by digest in cache");
+                        else
+                            indentedLogger.logDebug("", "did not find static state by digest in cache");
 
                         final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, externalContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
                         staticState = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
@@ -233,13 +239,19 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         {
             final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, staticStateBits.staticStateDigest);
-            if (cachedState != null) {
+            if (cachedState != null && cachedState.getMetadata().checkBindingsIncludes()) {
                 // Found static state in cache
-                indentedLogger.logDebug("", "found static state by digest in cache");
+                indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
+
                 staticState[0] = cachedState;
             } else {
-                // Not found in cache, create and initialize static state object
-                indentedLogger.logDebug("", "did not find static state by digest in cache");
+                // Not found static state in cache OR it is out of date, create and initialize static state object
+                // NOTE: In out of date case, could clone static state and reprocess instead?
+                if (cachedState != null)
+                    indentedLogger.logDebug("", "found out-of-date static state by digest in cache");
+                else
+                    indentedLogger.logDebug("", "did not find static state by digest in cache");
+                
                 staticState[0] = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
 
                 // Store in cache
@@ -394,7 +406,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Set caching dependencies for XBL inclusions
         {
             final XFormsStaticState.Metadata metadata = containingDocument.getStaticState().getMetadata();
-            final List<String> includes = metadata.getBindingsIncludes();
+            final Set<String> includes = metadata.getBindingsIncludes();
             if (includes != null) {
                 for (final String include: includes) {
                     stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);

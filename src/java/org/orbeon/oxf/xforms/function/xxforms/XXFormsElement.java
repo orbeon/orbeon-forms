@@ -13,18 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 
@@ -39,7 +34,7 @@ public class XXFormsElement extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         // Element QName
-        final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
+        final Expression qNameExpression = (argument.length < 1) ? null : argument[0];
         final QName qName = getQNameFromExpression(xpathContext, qNameExpression);
 
 //        final String qNameString;
@@ -52,7 +47,7 @@ public class XXFormsElement extends XFormsFunction {
 //        }
 
         // Content sequence
-        final Expression contextExpression = (argument == null || argument.length < 2) ? null : argument[1];
+        final Expression contextExpression = (argument.length < 2) ? null : argument[1];
         final SequenceIterator content = (contextExpression == null) ? null : contextExpression.iterate(xpathContext);
 
         final String qNameURI = qName.getNamespaceURI();

@@ -26,7 +26,7 @@ public class XXFormsBinding extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         // Get control id
-        final Expression controlIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final Expression controlIdExpression = (argument.length == 0) ? null : argument[0];
         final String controlStaticId = (controlIdExpression == null) ? null : controlIdExpression.evaluateAsString(xpathContext).toString();
 
         if (controlStaticId == null)

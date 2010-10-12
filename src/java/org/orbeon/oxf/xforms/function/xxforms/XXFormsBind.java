@@ -32,7 +32,7 @@ public class XXFormsBind extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         // Get bind id
-        final Expression bindIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final Expression bindIdExpression = (argument.length == 0) ? null : argument[0];
         final String bindId = (bindIdExpression == null) ? null : bindIdExpression.evaluateAsString(xpathContext).toString();
 
         // Get bind nodeset

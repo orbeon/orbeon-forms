@@ -31,7 +31,7 @@ public class XXFormsRepeatNodeset extends XFormsFunction {
         final XFormsContextStack contextStack = getContextStack(xpathContext);
 
         // Get repeat id
-        final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final Expression contextIdExpression = (argument.length == 0) ? null : argument[0];
         final String repeatId;
         if (contextIdExpression == null) {
             repeatId = contextStack.getEnclosingRepeatId();

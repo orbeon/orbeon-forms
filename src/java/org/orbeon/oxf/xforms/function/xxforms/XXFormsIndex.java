@@ -27,7 +27,7 @@ public class XXFormsIndex extends Index {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
+        final Expression repeatIdExpression = (argument.length == 0) ? null : argument[0];
         final String repeatId = (repeatIdExpression == null) ? null : repeatIdExpression.evaluateAsString(xpathContext).toString();
 
         if (repeatId == null) {

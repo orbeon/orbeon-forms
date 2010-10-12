@@ -34,11 +34,11 @@ public class XXFormsAttribute extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         // Attribute QName
-        final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
+        final Expression qNameExpression = (argument.length < 1) ? null : argument[0];
         final QName qName = getQNameFromExpression(xpathContext, qNameExpression);
 
         // Attribute value
-        final Expression valueExpression = (argument == null || argument.length < 2) ? null : argument[1];
+        final Expression valueExpression = (argument.length < 2) ? null : argument[1];
         final Item item = (valueExpression == null) ? null : valueExpression.evaluateItem(xpathContext);
         final String value = (item != null) ? item.getStringValue() : "";
 

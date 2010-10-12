@@ -6607,7 +6607,10 @@ ORBEON.xforms.Server = {
                                         yuiRoot.expand();
 
                                         // Re-populate the tree
-                                        ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);
+                                        var treeDiv = documentElement;
+                                        if (ORBEON.util.Utils.isNewXHTMLLayout())
+                                            treeDiv = treeDiv.getElementsByTagName("div")[0];
+                                        ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, itemsetTree);
 
                                         // Expand nodes corresponding to values that were previously expanded
                                         for (var expandedValueIndex = 0; expandedValueIndex < expandedValues.length; expandedValueIndex++) {

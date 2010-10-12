@@ -81,8 +81,8 @@
                     "test-trigger-modal",
                     "test-upload-replace-instance",
                     "test-setbasepaths",
-                    "test-custom-mips",
                     "test-output-update",
+                    "test-custom-mips",
                     "test-repeat",
                     "test-error-ajax",
                     "test-bug-checkbox-update",
@@ -149,41 +149,43 @@
             <xhtml:div>Total time: <xhtml:b><xforms:output value="all-duration"/></xhtml:b></xhtml:div>
         </xhtml:div>
 
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Page</xhtml:th>
-                <xhtml:th>Test case</xhtml:th>
-                <xhtml:th>Test</xhtml:th>
-                <xhtml:th>Result</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat nodeset="reports/report">
-                <xxforms:variable name="report" select="."/>
-                <xforms:repeat nodeset="testcase">
-                    <xxforms:variable name="testcase" select="."/>
-                    <xxforms:variable name="testcase-position" select="position()"/>
-                    <xforms:repeat nodeset="test">
-                        <xhtml:tr>
-                            <xxforms:variable name="test" select="."/>
-                            <xxforms:variable name="test-position" select="position()"/>
-                            <!-- Page -->
-                            <xhtml:td>
-                                <xforms:output value="if ($testcase-position = 1 and $test-position = 1) then $report/@page else ()"/>
-                            </xhtml:td>
-                            <!-- Test case -->
-                            <xhtml:td>
-                                <xforms:output value="if ($test-position = 1) then $testcase/@name else ()"/>
-                            </xhtml:td>
-                            <!-- Test -->
-                            <xhtml:td>
-                                <xforms:output value="$test/@name"/>
-                            </xhtml:td>
-                            <xhtml:td class="{if ($test/@result = 'pass') then 'test-pass' else 'test-fail'}">
-                                <xforms:output value="$test/@message"/>
-                            </xhtml:td>
-                        </xhtml:tr>
+        <xforms:group ref=".[exists(reports/report/testcase/test[@result = 'fail'])]">
+            <xhtml:table class="gridtable">
+                <xhtml:tr>
+                    <xhtml:th>Page</xhtml:th>
+                    <xhtml:th>Test case</xhtml:th>
+                    <xhtml:th>Test</xhtml:th>
+                    <xhtml:th>Result</xhtml:th>
+                </xhtml:tr>
+                <xforms:repeat nodeset="reports/report">
+                    <xxforms:variable name="report" select="."/>
+                    <xforms:repeat nodeset="testcase">
+                        <xxforms:variable name="testcase" select="."/>
+                        <xxforms:variable name="testcase-position" select="position()"/>
+                        <xforms:repeat nodeset="test[@result = 'fail']">
+                            <xhtml:tr>
+                                <xxforms:variable name="test" select="."/>
+                                <xxforms:variable name="test-position" select="position()"/>
+                                <!-- Page -->
+                                <xhtml:td>
+                                    <xforms:output value="$report/@page"/>
+                                </xhtml:td>
+                                <!-- Test case -->
+                                <xhtml:td>
+                                    <xforms:output value="$testcase/@name"/>
+                                </xhtml:td>
+                                <!-- Test -->
+                                <xhtml:td>
+                                    <xforms:output value="$test/@name"/>
+                                </xhtml:td>
+                                <xhtml:td class="test-fail">
+                                    <xforms:output value="$test/@message"/>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xforms:repeat>
                     </xforms:repeat>
                 </xforms:repeat>
-            </xforms:repeat>
-        </xhtml:table>
+            </xhtml:table>
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

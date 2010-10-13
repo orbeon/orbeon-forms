@@ -2115,4 +2115,35 @@
         </output>
     </test>
 
+    <test description="Inline HTML in LHHA doesn't doesn't close elements unnecessarily" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                 xmlns:xf="http://www.w3.org/2002/xforms">
+           <xh:head>
+                <xf:model id="model">
+                    <xf:instance id="instance">
+                        <instance/>
+                    </xf:instance>
+                </xf:model>
+           </xh:head>
+           <xh:body>
+                <xf:input ref=".">
+                    <xf:label>Foo<xh:br/>Bar</xf:label>
+                </xf:input>
+            </xh:body>
+        </xh:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xh:label xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-label" id="xf-1$$l" for="xf-1$xforms-input-1">Foo
+                    <xh:br/>Bar
+                </xh:label>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1" class="xforms-control xforms-input">
+                    <xh:input id="xf-1$xforms-input-1" type="text" name="xf-1$xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

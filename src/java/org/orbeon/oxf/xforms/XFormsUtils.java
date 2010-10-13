@@ -1346,6 +1346,8 @@ public class XFormsUtils {
             this.hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
         }
 
+        private boolean lastIsStart = false;
+
         public void startElement(Element element) {
             if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is an xforms:output nested among other markup
@@ -1446,20 +1448,24 @@ public class XFormsUtils {
                     }
                 }
                 sb.append('>');
+                lastIsStart = true;
             }
         }
 
         public void endElement(Element element) {
-            if (!element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+            if (!lastIsStart && !element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is a regular element, just serialize the end tag to no namespace
+                // UNLESS the element was just opened. This means we output <br>, not <br></br>, etc.
                 sb.append("</");
                 sb.append(element.getName());
                 sb.append('>');
             }
+            lastIsStart = false;
         }
 
         public void text(Text text) {
             sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
+            lastIsStart = false;
         }
     }
 

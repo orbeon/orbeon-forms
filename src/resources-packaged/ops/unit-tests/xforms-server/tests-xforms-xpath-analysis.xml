@@ -3639,5 +3639,89 @@
             </request>
         </output>
     </test>
+
+    <test description="Simple use of position() function" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model" xxf:xpath-analysis="true">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="o11" value="position()"/>
+                    <xf:output id="o12" value="a/position()"/>
+                    <xf:output id="o13" value="a[position() = 1]"/>
+                    <xf:output id="o14" value="a[position() = @p]"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <!-- NOTE: For now there is no information which would allow us to determine whether the position as changed -->
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <control name="output" scope="" prefixed-id="o11" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((position())[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o12" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a/position())[1])" analyzed="true">
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o13" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a[position() = 1])[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/a</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <control name="output" scope="" prefixed-id="o14" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((a[position() = @p])[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/a</path>
+                                <path>instance('instance')/a/@p</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
     
 </group>

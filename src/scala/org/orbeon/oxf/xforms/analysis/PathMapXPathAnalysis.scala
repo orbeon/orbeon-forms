@@ -66,10 +66,12 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
         }
 
         val pathmap =
-            if (baseAnalysis == null || (expression.getDependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) == 0) {
+            if (baseAnalysis == null || (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) == 0) {
                 // Start with a new PathMap if:
                 // o we are at the top (i.e. does not have a context)
-                // o or the expression does not depend on the context item
+                // o or the expression does not depend on the focus
+                // NOTE: We used to test on DEPENDS_ON_CONTEXT_ITEM above, but any use of the focus would otherwise create
+                // a root context expression in PathMap, which is not right.
                 new PathMap(expression, variables, pathMapContext)
             } else {
                 // Expression has a context and depends on the context item

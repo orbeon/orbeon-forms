@@ -156,21 +156,36 @@ ORBEON.util = {
          * Return null when the attribute is not there.
          */
         setAttribute: function(element, name, value) {
-            // IE doesn't support setting the value of some attributes with setAttribute(). So for those attribues,
+
+            // IE doesn't support setting the value of some attributes with setAttribute(). So for those attributes,
             // we set the attribute directly and use this code for all the browser, to avoid having different branches
-            // run for different browsers.
-            if (name == "class") {
-                element.className = value;
-            } else if (name == "colspan") {
-                element.colSpan = value;
-            } else if (name == "rowspan") {
-                element.rowSpan = value;
-            } else if (name == "accesskey") {
-                element.accessKey = value;
-            } else if (name == "tabindex") {
-                element.tabIndex = value;
-            } else if (name == "type") {
-                element.type = value;
+            // run for different browsers. This list comes from jQuery (see comments for exceptions).
+            var ATTRIBUTE_SLOTS =  {
+                "cellspacing": "cellSpacing",
+                "class": "className",
+                "colspan": "colSpan",
+                "for": "htmlFor",
+                "frameborder": "frameBorder",
+                "maxlength": "maxLength",
+                "readonly": "readOnly",
+                "rowspan": "rowSpan",
+                "tabindex": "tabIndex",
+                "usemap": "useMap",
+                "accesskey": "accessKey", // Not sure why jQuery doesn't include 'accesskey', but includes 'tabindex'
+                "type": "type"            // jQuery is doing further processing for 'type'
+            };
+
+            if (ATTRIBUTE_SLOTS[name]) {
+
+                // If the object property is of type integer and the value is an empty string, skip setting the value
+                // to avoid an error on IE. This is a test that, surprisingly, jQuery doesn't do, which means that with
+                // jQuery you might get different results when setting the value of an attribute depending on the
+                // browser. This is particularly important for us as the value of attributes can come from AVTs, which
+                // can become empty if they loose their evaluation context.
+                var key = ATTRIBUTE_SLOTS[name];
+                if (! (value == "" && YAHOO.lang.isNumber(element[key])))
+                    element[key] = value;
+
             } else if (name == "name" && element.tagName.toLowerCase() == "input") {
 
                 // Here we handle a bug in IE6 and IE7 where the browser doesn't support changing the name of form elements.

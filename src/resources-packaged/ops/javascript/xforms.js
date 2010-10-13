@@ -6260,13 +6260,20 @@ ORBEON.xforms.Server = {
 
                 // Everything is fine with the response
 
-                var formID = ORBEON.xforms.Globals.requestForm.id;
-                if (! ORBEON.xforms.Server.keepModelProgressPanelDisplayed(responseXML)) {
-                    // Remove modal progress panel before handling DOM response, as xxf:script may dispatch events and
-                    // we don't want them to be filtered. If there are server events, we don't remove the panel until they
-                    // have been processed, i.e. the request sending the server events returns.
+                // If neither of these two conditions is met, hide the modal progress panel:
+                //      a) The server tells us to do a submission or load, so we don't want to remove it otherwise
+                //         users could start interacting with a page which is going to be replaced shortly.
+                //      b) There is another Ajax request in the queue, which could be the one that triggered the
+                //         display of the modal progress panel, so we don't want to hide before that request ran.
+                // We remove the modal progress panel before handling DOM response, as xxf:script may dispatch
+                // events and we don't want them to be filtered. If there are server events, we don't remove the
+                // panel until they have been processed, i.e. the request sending the server events returns.
+                if (! (ORBEON.xforms.Server.keepModelProgressPanelDisplayed(responseXML)
+                        || ORBEON.xforms.Globals.eventQueue.length > 0)) {
                     ORBEON.util.Utils.hideModalProgressPanel();
                 }
+
+                var formID = ORBEON.xforms.Globals.requestForm.id;
                 ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
                 // Reset changes, as changes are included in this bach of events
                 ORBEON.xforms.Globals.changedIdsRequest = {};

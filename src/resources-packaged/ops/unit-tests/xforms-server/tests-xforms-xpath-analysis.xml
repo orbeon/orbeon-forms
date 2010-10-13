@@ -3599,5 +3599,45 @@
             </request>
         </output>
     </test>
+
+    <test description="Logging of paths containing attributes" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model" xxf:xpath-analysis="true">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="o11" value="@a"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <control name="output" scope="" prefixed-id="o11" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((@a)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/@a</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </control>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
     
 </group>

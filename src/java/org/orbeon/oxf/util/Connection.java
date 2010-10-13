@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
-import org.apache.commons.httpclient.HttpState;
+import org.apache.http.client.CookieStore;
 import org.apache.log4j.Level;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -52,9 +52,9 @@ public class Connection {
     public static final String HTTP_FORWARD_HEADERS_PROPERTY = "oxf.http.forward-headers";
 
     public static final String HTTP_STATE_PROPERTY = "oxf.http.state";
-    private static final String HTTP_STATE_ATTRIBUTE = HTTP_STATE_PROPERTY;
+    private static final String HTTP_COOKIE_STORE_ATTRIBUTE = "oxf.http.cookie-store";
 
-    private HttpState httpState;
+    private CookieStore cookieStore;
     private final StateScope stateScope = getStateScope();
 
     /**
@@ -286,19 +286,19 @@ public class Connection {
     private void loadHttpState(ExternalContext externalContext, IndentedLogger indentedLogger) {
         switch (stateScope) {
             case REQUEST:
-                httpState = (HttpState) externalContext.getRequest().getAttributesMap().get(HTTP_STATE_ATTRIBUTE);
+                cookieStore = (CookieStore) externalContext.getRequest().getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
                 break;
             case SESSION:
                 final ExternalContext.Session session = externalContext.getSession(false);
                 if (session != null)
-                    httpState = (HttpState) session.getAttributesMap().get(HTTP_STATE_ATTRIBUTE);
+                    cookieStore = (CookieStore) session.getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
                 break;
             case APPLICATION:
-                httpState = (HttpState) externalContext.getAttributesMap().get(HTTP_STATE_ATTRIBUTE);
+                cookieStore = (CookieStore) externalContext.getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
                 break;
         }
 
-        if (httpState != null) {
+        if (cookieStore != null) {
             indentedLogger.logDebug(LOG_TYPE, "loaded HTTP state", "scope", stateScope.toString().toLowerCase());
         } else {
             indentedLogger.logDebug(LOG_TYPE, "did not load HTTP state");
@@ -306,35 +306,33 @@ public class Connection {
     }
 
     private void saveHttpState(ExternalContext externalContext, IndentedLogger indentedLogger) {
-        if (httpState != null) {
+        if (cookieStore != null) {
             switch (stateScope) {
                 case REQUEST:
-                    externalContext.getRequest().getAttributesMap().put(HTTP_STATE_ATTRIBUTE, httpState);
+                    externalContext.getRequest().getAttributesMap().put(HTTP_COOKIE_STORE_ATTRIBUTE, cookieStore);
                     break;
                 case SESSION:
                     final ExternalContext.Session session = externalContext.getSession(false);
                     if (session != null)
-                        session.getAttributesMap().put(HTTP_STATE_ATTRIBUTE, httpState);
+                        session.getAttributesMap().put(HTTP_COOKIE_STORE_ATTRIBUTE, cookieStore);
                     break;
                 case APPLICATION:
-                    externalContext.getAttributesMap().put(HTTP_STATE_ATTRIBUTE, httpState);
+                    externalContext.getAttributesMap().put(HTTP_COOKIE_STORE_ATTRIBUTE, cookieStore);
                     break;
             }
 
             if (indentedLogger.isDebugEnabled()) {
                 // Log information about state
-                final org.apache.commons.httpclient.Cookie[] cookies = httpState.getCookies();
-
-                final StringBuilder sb = new StringBuilder();
-                for (org.apache.commons.httpclient.Cookie cookie: cookies) {
-                    if (sb.length() > 0)
-                        sb.append(" | ");
-                    sb.append(cookie.getName());
+                if (cookieStore != null) {
+                    final StringBuilder sb = new StringBuilder();
+                    for (org.apache.http.cookie.Cookie cookie: cookieStore.getCookies()) {
+                        if (sb.length() > 0) sb.append(" | ");
+                        sb.append(cookie.getName());
+                    }
+                    indentedLogger.logDebug(LOG_TYPE, "saved HTTP state",
+                            "scope", stateScope.toString().toLowerCase(),
+                            (sb.length() > 0) ? "cookie names" : null, sb.toString());
                 }
-
-                indentedLogger.logDebug(LOG_TYPE, "saved HTTP state",
-                        "scope", stateScope.toString().toLowerCase(),
-                        (sb.length() > 0) ? "cookie names" : null, sb.toString());
             }
         }
     }
@@ -379,7 +377,7 @@ public class Connection {
                 // Configure HTTPURLConnection
                 if (httpURLConnection != null) {
                     // Set state if possible
-                    httpURLConnection.setHttpState(this.httpState);
+                    httpURLConnection.setCookieStore(this.cookieStore);
 
                     // Set method
                     httpURLConnection.setRequestMethod(httpMethod);
@@ -481,7 +479,7 @@ public class Connection {
                 if (httpURLConnection != null) {
                     // Get state if possible
                     // This is either the state we set above before calling connect(), or a new state if we didn't provide any
-                    this.httpState = httpURLConnection.getHttpState();
+                    this.cookieStore = httpURLConnection.getCookieStore();
                 }
 
                 // Create result

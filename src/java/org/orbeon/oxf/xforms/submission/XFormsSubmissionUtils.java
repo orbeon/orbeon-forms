@@ -13,18 +13,27 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.httpclient.methods.multipart.*;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.dom4j.*;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -33,9 +42,16 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +119,7 @@ public class XFormsSubmissionUtils {
                 private boolean checkInstanceData(Node node) {
                     // Check "valid" MIP
                     if (checkValid && !InstanceData.getValid(node)) return false;
-                    // TODO: should remove the code below, as required-but-empty is now included in notion of validity 
+                    // TODO: should remove the code below, as required-but-empty is now included in notion of validity
                     // Check "required" MIP
                     if (checkRequired) {
                         final boolean isRequired = InstanceData.getRequired(node);
@@ -201,88 +217,81 @@ public class XFormsSubmissionUtils {
     /**
      * Implement support for XForms 1.1 section "11.9.7 Serialization as multipart/form-data".
      *
-     * @param pipelineContext   used only to access the request to remove temporary files
      * @param document          XML document to submit
      * @return                  MultipartRequestEntity
      */
-    public static MultipartRequestEntity createMultipartFormData(final PipelineContext pipelineContext, final Document document) throws IOException {
-
-        final List<PartBase> params = new ArrayList<PartBase>();
+    public static MultipartEntity createMultipartFormData(final Document document) throws IOException {
 
         // Visit document
+        final MultipartEntity multipartEntity = new MultipartEntity();
         document.accept(new VisitorSupport() {
             public final void visit(Element element) {
-                // Only care about elements
+                try {
+                    // Only care about elements
 
-                // Only consider leaves i.e. elements without children elements
-                final List children = element.elements();
-                if (children == null || children.size() == 0) {
+                    // Only consider leaves i.e. elements without children elements
+                    final List children = element.elements();
+                    if (children == null || children.size() == 0) {
 
-                    final String value = element.getText();
-                    {
-                        // Got one!
-                        final String localName = element.getName();
-                        final String nodeType = InstanceData.getType(element);
+                        final String value = element.getText();
+                        {
+                            // Got one!
+                            final String localName = element.getName();
+                            final String nodeType = InstanceData.getType(element);
 
-                        if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(nodeType)) {
-                            // Interpret value as xs:anyURI
+                            if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(nodeType)) {
+                                // Interpret value as xs:anyURI
 
-                            if (InstanceData.getValid(element) && value.trim().length() > 0) {
-                                // Value is valid as per xs:anyURI
-                                final DiskFileItem fileItem = (DiskFileItem) NetUtils.anyURIToFileItem(pipelineContext, value, NetUtils.REQUEST_SCOPE);
-                                addFilePart(element, fileItem, params);
+                                if (InstanceData.getValid(element) && value.trim().length() > 0) {
+                                    // Value is valid as per xs:anyURI
+                                    // Don't close the stream here, as it will get read later when the MultipartEntity
+                                    // we create here is written to an output stream
+                                    addPart(multipartEntity, URLFactory.createURL(value).openStream(), element);
+                                } else {
+                                    // Value is invalid as per xs:anyURI
+                                    // Just use the value as is (could also ignore it)
+                                    multipartEntity.addPart(localName, new StringBody(value, Charset.forName("UTF-8")));
+                                }
+
+                            } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(nodeType)) {
+                                // Interpret value as xs:base64Binary
+
+                                if (InstanceData.getValid(element) && value.trim().length() > 0) {
+                                    // Value is valid as per xs:base64Binary
+                                    addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element);
+                                } else {
+                                    // Value is invalid as per xs:base64Binary
+                                    // Just use the value as is (could also ignore it)
+                                    multipartEntity.addPart(localName, new StringBody(value, Charset.forName("UTF-8")));
+                                }
                             } else {
-                                // Value is invalid as per xs:anyURI
-                                // Just use the value as is (could also ignore it)
-                                params.add(new StringPart(localName, value, "UTF-8"));
+                                // Just use the value as is
+                                multipartEntity.addPart(localName, new StringBody(value, Charset.forName("UTF-8")));
                             }
-
-                        } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(nodeType)) {
-                            // Interpret value as xs:base64Binary
-
-                            if (InstanceData.getValid(element) && value.trim().length() > 0) {
-                                // Value is valid as per xs:base64Binary
-                                final String localURI = NetUtils.base64BinaryToAnyURI(pipelineContext, value, NetUtils.REQUEST_SCOPE);
-                                final DiskFileItem fileItem = (DiskFileItem) NetUtils.anyURIToFileItem(pipelineContext, localURI, NetUtils.REQUEST_SCOPE);
-                                addFilePart(element, fileItem, params);
-                            } else {
-                                // Value is invalid as per xs:base64Binary
-                                // Just use the value as is (could also ignore it)
-                                params.add(new StringPart(localName, value, "UTF-8"));
-                            }
-                        } else {
-                            // Just use the value as is
-                            params.add(new StringPart(localName, value, "UTF-8"));
                         }
                     }
+                } catch (UnsupportedEncodingException e) {
+                    throw new OXFException(e);
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                } catch (IOException e) {
+                    throw new OXFException(e);
                 }
             }
         });
 
-        // Build multipart object
-        final Part[] partsArray = new Part[params.size()];
-        params.toArray(partsArray);
-        return new MultipartRequestEntity(partsArray, new HttpMethodParams());
+        return multipartEntity;
     }
 
-    private static void addFilePart(Element element, DiskFileItem fileItem, List<PartBase> params) {
-        try {
-            // Gather mediatype and filename if known
-            // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
-            // removed during the next recalculate.
-            final String mediatype = InstanceData.getCustom(element, "xxforms-mediatype");
-            final String filename = InstanceData.getCustom(element, "xxforms-filename");
+    static private void addPart(MultipartEntity multipartEntity, InputStream inputStream, Element element) {
+        // Gather mediatype and filename if known
+        // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
+        // removed during the next recalculate.
+        final String mediatype = InstanceData.getCustom(element, "xxforms-mediatype");
+        final String filename = InstanceData.getCustom(element, "xxforms-filename");
+        ContentBody contentBody = new InputStreamBody(inputStream, mediatype, filename);
+        multipartEntity.addPart(element.getName(), contentBody);
 
-            // TODO: if filename == null, then name of fileItem is used, which is probably not what we want
-            final FilePart filePart = new FilePart(element.getName(), new FilePartSource(filename, fileItem.getStoreLocation()), mediatype, null);
-            if (mediatype == null || !mediatype.startsWith("text/")) {
-                // Stupid Apache implementation sets a charset for all mediatypes, not only text types, even if we pass null above
-                filePart.setCharSet(null);
-            }
-            params.add(filePart);
-        } catch (FileNotFoundException e) {
-            throw new OXFException(e);
-        }
     }
 
     /**

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
@@ -427,8 +427,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Serialize
-                final SerializationParameters sp = new SerializationParameters(propertyContext, p, p2,
-                        requestedSerialization, documentToSubmit, overriddenSerializedData);
+                final SerializationParameters sp = new SerializationParameters(p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData);
 
                 /* ***** Execute submission ***************************************************************************** */
 
@@ -935,7 +934,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final String queryString;
         final String actualRequestMediatype;
 
-        public SerializationParameters(PropertyContext propertyContext, SubmissionParameters p, SecondPassParameters p2, String requestedSerialization, Document documentToSubmit, String overriddenSerializedData) throws Exception {
+        public SerializationParameters(SubmissionParameters p, SecondPassParameters p2, String requestedSerialization, Document documentToSubmit, String overriddenSerializedData) throws Exception {
             if (serialize) {
                 final String defaultMediatypeForSerialization;
                 if (overriddenSerializedData != null && !overriddenSerializedData.equals("")) {
@@ -984,17 +983,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Build multipart/form-data body
 
                     // Create and set body
-                    // TODO: cast to PipelineContext
-                    final MultipartRequestEntity multipartFormData = XFormsSubmissionUtils.createMultipartFormData((PipelineContext) propertyContext, documentToSubmit);
+                    final MultipartEntity multipartFormData = XFormsSubmissionUtils.createMultipartFormData(documentToSubmit);
 
                     final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    multipartFormData.writeRequest(os);
+                    multipartFormData.writeTo(os);
 
                     messageBody = os.toByteArray();
                     queryString = null;
 
                     // The mediatype also contains the boundary
-                    defaultMediatypeForSerialization = multipartFormData.getContentType();
+                    defaultMediatypeForSerialization = multipartFormData.getContentType().getValue();
 
                 } else if (requestedSerialization.equals("application/octet-stream")) {
                     // Binary serialization

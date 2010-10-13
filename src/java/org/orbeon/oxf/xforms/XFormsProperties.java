@@ -290,6 +290,8 @@ public class XFormsProperties {
 
     public static final String PIPELINE_TRACE_CLASS_PROPERTY = XFORMS_PROPERTY_PREFIX + "pipeline.trace.class";
 
+    private static final String DEBUG_LOG_XPATH_ANALYSIS = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
+
     // == Global properties ============================================================================================
     /**
      * Return a PropertyDefinition given a property name.
@@ -379,6 +381,10 @@ public class XFormsProperties {
     public static boolean isCacheCombinedResources() {
         return Properties.instance().getPropertySet().getBoolean
                 (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT);
+    }
+
+    public static boolean getDebugLogXPathAnalysis() {
+        return Properties.instance().getPropertySet().getBoolean(DEBUG_LOG_XPATH_ANALYSIS, false);
     }
 
     // == XForms document properties ===================================================================================

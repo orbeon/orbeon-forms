@@ -196,8 +196,9 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         // Analyze
         analyze(propertyContext);
 
-        // XXX DEBUG
-//        dumpAnalysis(propertyContext);
+        // Debug if needed
+        if (XFormsProperties.getDebugLogXPathAnalysis())
+            dumpAnalysis(propertyContext);
     }
 
     private void extract(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, String encodedStaticState) {

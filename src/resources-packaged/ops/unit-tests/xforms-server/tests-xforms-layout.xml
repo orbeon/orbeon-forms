@@ -2130,6 +2130,7 @@
            <xh:body>
                 <xf:input ref=".">
                     <xf:label>Foo<xh:br/>Bar</xf:label>
+                    <xf:help>Foo<xh:div/>Bar</xf:help>
                 </xf:input>
             </xh:body>
         </xh:html>
@@ -2142,6 +2143,8 @@
                 <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1" class="xforms-control xforms-input">
                     <xh:input id="xf-1$xforms-input-1" type="text" name="xf-1$xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
+                <xh:img xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""></xh:img>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-help" id="xf-1$$p">Foo&lt;div&gt;&lt;/div&gt;Bar</xh:span>
             </controls>
         </output>
     </test>

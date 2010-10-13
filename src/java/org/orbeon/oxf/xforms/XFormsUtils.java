@@ -1319,6 +1319,14 @@ public class XFormsUtils {
         private final Element childElement;
         private final boolean hostLanguageAVTs;
 
+        private static String[] voidElementsNames = {
+            // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
+            "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr",
+            // Legacy
+            "basefont", "frame", "isindex"
+        };
+        private static final Set<String> voidElements = new HashSet<String>(Arrays.asList(voidElementsNames));
+
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
         public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
             this.pipelineContext = null;
@@ -1453,11 +1461,12 @@ public class XFormsUtils {
         }
 
         public void endElement(Element element) {
-            if (!lastIsStart && !element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+            final String elementName = element.getName();
+            if ((!lastIsStart || !voidElements.contains(elementName)) && !element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is a regular element, just serialize the end tag to no namespace
                 // UNLESS the element was just opened. This means we output <br>, not <br></br>, etc.
                 sb.append("</");
-                sb.append(element.getName());
+                sb.append(elementName);
                 sb.append('>');
             }
             lastIsStart = false;

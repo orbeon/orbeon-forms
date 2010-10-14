@@ -20,7 +20,7 @@
     <head>
         <title>Espresso Order Demo</title>
         <!-- The model contains data, validation, and other declarative behaviors -->
-        <xf:model id="model" xxf:expose-xpath-types="true">
+        <xf:model id="model" xxf:expose-xpath-types="true" xxf:xpath-analysis="true" xxf:xhtml-layout="span">
             <!-- Instance containing all the item information as well as quantities and totals -->
             <xf:instance id="order">
                 <order xmlns="">
@@ -133,15 +133,15 @@
                 </order>
             </xf:instance>
             <!-- Items -->
-            <xf:bind id="item-bind" nodeset="item">
+            <xf:bind id="item-bind" ref="item">
                 <!-- Mark image URI -->
-                <xf:bind nodeset="image" type="xs:anyURI"/>
+                <xf:bind ref="image" type="xs:anyURI"/>
                 <!-- Mark price as decimal type -->
-                <xf:bind nodeset="price" type="xs:decimal"/>
+                <xf:bind ref="price" type="xs:decimal"/>
                 <!-- Quantity must be non-negative and a multiple of 10 -->
                 <!-- If it's possible, we extract digits from the value to fix user's typos -->
                 <!-- If the value is empty, replace it with 0 -->
-                <xf:bind nodeset="quantity"
+                <xf:bind ref="quantity"
                          type="xs:nonNegativeInteger"
                          constraint=". mod 10 = 0"
                          readonly="false()"
@@ -150,30 +150,18 @@
                                     else if (normalize-space(.)) then . else 0"/>
             </xf:bind>
             <!-- Totals -->
-            <xf:bind nodeset="total">
+            <xf:bind ref="total">
                 <!-- Sum all quantities that are integers -->
                 <!-- Mark the sum as invalid if there is any non-valid quantity -->
-                <xf:bind id="total-units" nodeset="units" type="xs:nonNegativeInteger"
+                <xf:bind id="total-units" ref="units" type="xs:nonNegativeInteger"
                          calculate="sum(../../item/quantity[. castable as xs:integer])"
                          constraint="not((for $v in ../../item/quantity return xxf:valid($v)) = false())"/>
                 <!-- Sum all prices that have integer quantities -->
                 <!-- Mark the sum as invalid if there is any non-valid quantity -->
-                <xf:bind id="total-price" nodeset="price" type="xs:decimal"
+                <xf:bind id="total-price" ref="price" type="xs:decimal"
                          calculate="sum(for $item in ../../item[quantity castable as xs:integer] return $item/price * $item/quantity)"
                          constraint="xxf:valid(../units)"/>
             </xf:bind>
-
-            <!-- Predefined quantities -->
-            <xf:instance id="predefined-quantities">
-                <quantities xmlns=""/>
-            </xf:instance>
-
-            <!-- Initialization of predefined quantities itemset -->
-            <xf:action ev:event="xforms-model-construct-done" xxf:iterate="(0 to 29)">
-                <xxf:variable name="q" select=". * 10" as="xs:integer"/>
-                <xf:insert context="instance('predefined-quantities')" nodeset="*"
-                           origin="xxf:element('item', (xxf:element('label', $q), xxf:element('value', $q)))"/>
-            </xf:action>
 
             <!-- Set focus to first quantity field -->
             <xf:setfocus ev:event="xforms-ready" control="quantity-input"/>
@@ -182,7 +170,7 @@
         <style type="text/css">
             .quantity-select select { width: 8em }
             .quantity-input input { width: 4em }
-            tfoot th { text-align: right }
+            tfoot th, tfoot td { text-align: right }
         </style>
     </head>
     <body>
@@ -206,15 +194,16 @@
                         <td><xf:output value="concat('$ ', price)"/></td>
                         <td>
                             <!-- Predefined quantities dropdown -->
+                            <xxf:variable name="predefined-quantities" select="for $i in (0 to 29) return normalize-space(xs:string($i * 10))" as="xs:string+"/>
                             <xf:select1 class="quantity-select" ref="quantity">
                                 <!-- Show all predefined quantities -->
-                                <xf:itemset nodeset="instance('predefined-quantities')/item">
-                                    <xf:label ref="label"/>
-                                    <xf:value ref="value"/>
+                                <xf:itemset ref="$predefined-quantities">
+                                    <xf:label value="."/>
+                                    <xf:value value="."/>
                                 </xf:itemset>
                                 <!-- The "custom" item is shown only if the current value is not in the set of
                                      predefined values, and its value is set to the current value. -->
-                                <xf:itemset nodeset=".[not(. = instance('predefined-quantities')/item/value)]">
+                                <xf:itemset ref=".[not(xs:string(.) = $predefined-quantities)]">
                                     <xf:label>Custom</xf:label>
                                     <xf:value value="."/>
                                 </xf:itemset>

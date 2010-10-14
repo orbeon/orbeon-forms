@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.*;
@@ -247,7 +247,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getLabelLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.LABEL);
         if (result == null) {
-            final ControlAnalysis.LHHAAnalysis lhhaElement = containingDocument.getStaticState().getLabel(getPrefixedId());
+            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getLabel(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, isSupportHTMLLabels());
             lhha.put(XFormsConstants.LHHA.LABEL, result);
         }
@@ -257,7 +257,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getHelpLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.HELP);
         if (result == null) {
-            final ControlAnalysis.LHHAAnalysis lhhaElement = containingDocument.getStaticState().getHelp(getPrefixedId());
+            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getHelp(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, true);
             lhha.put(XFormsConstants.LHHA.HELP, result);
         }
@@ -267,7 +267,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getHintLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.HINT);
         if (result == null) {
-            final ControlAnalysis.LHHAAnalysis lhhaElement = containingDocument.getStaticState().getHint(getPrefixedId());
+            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getHint(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, isSupportHTMLHints());
             lhha.put(XFormsConstants.LHHA.HINT, result);
         }
@@ -277,7 +277,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getAlertLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.ALERT);
         if (result == null) {
-            final ControlAnalysis.LHHAAnalysis lhhaElement = containingDocument.getStaticState().getAlert(getPrefixedId());
+            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getAlert(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, true);
             lhha.put(XFormsConstants.LHHA.ALERT, result);
         }
@@ -1092,7 +1092,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private static class ConcreteLHHA extends LHHA {
 
         private final XFormsControl control;
-        private final ControlAnalysis.LHHAAnalysis lhhaAnalysis;
+        private final LHHAAnalysis lhhaAnalysis;
         private final Element lhhaElement;
         private final boolean supportsHTML;
 
@@ -1100,13 +1100,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         private boolean isEvaluated;
         private boolean isHTML;
 
-        public ConcreteLHHA(XFormsControl control, ControlAnalysis.LHHAAnalysis lhhaAnalysis, boolean supportsHTML) {
+        public ConcreteLHHA(XFormsControl control, LHHAAnalysis lhhaAnalysis, boolean supportsHTML) {
 
-            assert lhhaAnalysis != null && lhhaAnalysis.element != null : "LHHA analysis/element can't be null";
+            assert lhhaAnalysis != null && lhhaAnalysis.element() != null : "LHHA analysis/element can't be null";
 
             this.control = control;
             this.lhhaAnalysis = lhhaAnalysis;
-            this.lhhaElement = lhhaAnalysis.element;
+            this.lhhaElement = lhhaAnalysis.element();
             this.supportsHTML = supportsHTML;
         }
 
@@ -1160,7 +1160,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
             final XFormsContextStack contextStack = control.getContextStack();
             final String value;
-            if (lhhaAnalysis.isLocal) {
+            if (lhhaAnalysis.isLocal()) {
                 // LHHA is direct child of control, evaluate within context
                 contextStack.setBinding(control);
                 contextStack.pushBinding(propertyContext, lhhaElement, control.effectiveId, control.getChildElementScope(lhhaElement));

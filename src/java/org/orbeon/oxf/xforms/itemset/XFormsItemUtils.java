@@ -19,7 +19,7 @@ import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.controls.Select1Analysis;
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -95,8 +95,8 @@ public class XFormsItemUtils {
         // Optimize static itemsets
         {
             final boolean isStaticItemset; {
-            final Select1Analysis analysis = container.getContainingDocument().getStaticState().getSelect1Analysis(select1Control.getPrefixedId());
-                isStaticItemset = analysis != null && !analysis.hasNonStaticItem;
+            final SelectionControl analysis = container.getContainingDocument().getStaticState().getSelect1Analysis(select1Control.getPrefixedId());
+                isStaticItemset = analysis != null && !analysis.hasNonStaticItem();
             }
 
             if (isStaticItemset)
@@ -164,7 +164,7 @@ public class XFormsItemUtils {
                                     // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
                                     // well. If a node is non-relevant, it should be as if it had not even been part of
                                     // the nodeset.
-                                    final boolean isRelevant = (currentNodeInfo instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentNodeInfo) : true;
+                                    final boolean isRelevant = (!(currentNodeInfo instanceof NodeInfo)) || InstanceData.getInheritedRelevant((NodeInfo) currentNodeInfo);
                                     if (isRelevant) {
                                         final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                                         final Element valueCopyElement;

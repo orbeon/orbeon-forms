@@ -11,6 +11,9 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.oxf.xforms.analysis
 
-class Aggregate extends org.orbeon.saxon.functions.Aggregate with AddToPathMap
+trait ContainerTrait {
+    // Parent container (everybody has one except the root)
+    val parent: Option[ContainerTrait]
+}

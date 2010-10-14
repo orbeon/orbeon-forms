@@ -17,8 +17,8 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -527,7 +527,7 @@ public class ControlTree implements ExternalCopyable {
     }
 
     private void addMissingRepeatIndexes(XFormsStaticState staticState, Map<String, Integer> repeatIdToIndex) {
-        final Map<String, ControlAnalysis> repeats = staticState.getRepeatControlAnalysisMap();
+        final Map<String, ElementAnalysis> repeats = staticState.getRepeatControlAnalysisMap();
         if (repeats != null) {
             for (String repeatPrefixedId: repeats.keySet()) {
                 if (repeatIdToIndex.get(repeatPrefixedId) == null) {

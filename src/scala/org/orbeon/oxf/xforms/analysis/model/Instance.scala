@@ -49,14 +49,14 @@ class Instance(val element: Element, val scope: XBLBindings#Scope) {
     // NOTE: It could make sense to throw here
     val src = {
         val srcAttribute = element.attributeValue(XFormsConstants.SRC_QNAME)
-        if (srcAttribute == null) null else NetUtils.encodeHRRI(srcAttribute.trim, true)
+        if (srcAttribute eq null) null else NetUtils.encodeHRRI(srcAttribute.trim, true)
     }
 
     // Allow "", which will cause an xforms-link-exception at runtime
     // NOTE: It could make sense to throw here
     val resource = {
         val resourceAttribute = element.attributeValue("resource")
-        if (resourceAttribute == null) null else NetUtils.encodeHRRI(resourceAttribute.trim, true)
+        if (resourceAttribute eq null) null else NetUtils.encodeHRRI(resourceAttribute.trim, true)
     }
 
     val (instanceSource, dependencyURL) = {
@@ -70,7 +70,7 @@ class Instance(val element: Element, val scope: XBLBindings#Scope) {
             else
                 null
 
-        if (unresolvedInstanceSource != null && ProcessorImpl.getProcessorInputSchemeInputName(unresolvedInstanceSource) == null)
+        if (unresolvedInstanceSource != null && (ProcessorImpl.getProcessorInputSchemeInputName(unresolvedInstanceSource) eq null))
             (unresolvedInstanceSource, unresolvedInstanceSource)
         else if (unresolvedInstanceSource != null)// input:* doesn't add a URL dependency, but is handled by the pipeline engine
             (unresolvedInstanceSource, null)

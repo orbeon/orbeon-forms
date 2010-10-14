@@ -48,11 +48,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
     public final IndentedLogger indentedLogger;
 
+    // Static representation of this model
     private final Model staticModel;
 
     // Model attributes
-    private final String staticId;
-    private String prefixedId;  // not final because can change if model within repeat iteration
     private String effectiveId; // not final because can change if model within repeat iteration
 
     // Instances
@@ -89,20 +88,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
 
-        // Basic check trying to make sure this is an XForms model
-        // TODO: should rather use schema here or when obtaining document passed to this constructor
-        final Element modelElement = staticModel.document().getRootElement();
-        final String rootNamespaceURI = modelElement.getNamespaceURI();
-        if (!rootNamespaceURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI))
-            throw new ValidationException("Root element of XForms model must be in namespace '"
-                    + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
-                    (LocationData) modelElement.getData());
+        final Element modelElement = staticModel.element();
 
-        staticId = XFormsUtils.getElementStaticId(modelElement);
         this.effectiveId = effectiveId;
 
         // Extract list of instances ids
         {
+            // TODO: use staticModel.instances()
             final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
             if (instanceContainers.isEmpty()) {
                 // No instance in this model
@@ -159,10 +151,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public String getPrefixedId() {
-        if (prefixedId == null) {
-            prefixedId = XFormsUtils.getPrefixedId(effectiveId);
-        }
-        return prefixedId;
+        return staticModel.prefixedId();
     }
 
     public IndentedLogger getIndentedLogger() {
@@ -342,7 +331,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public String getId() {
-        return staticId;
+        return staticModel.staticId();
     }
 
     public String getEffectiveId() {
@@ -354,7 +343,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public LocationData getLocationData() {
-        return (LocationData) staticModel.document().getRootElement().getData();
+        return staticModel.locationData();
     }
 
     public XFormsModelBinds getBinds() {
@@ -367,7 +356,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadSchemasIfNeeded(PropertyContext propertyContext) {
         if (schemaValidator == null) {
-            final Element modelElement = staticModel.document().getRootElement();
+            final Element modelElement = staticModel.element();
             schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
             schemaValidator.loadSchemas(propertyContext, containingDocument);
 
@@ -552,7 +541,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doModelConstruct(PropertyContext propertyContext) {
-        final Element modelElement = staticModel.document().getRootElement();
+        final Element modelElement = staticModel.element();
 
         // 1. All XML Schema loaded (throws xforms-link-exception)
 

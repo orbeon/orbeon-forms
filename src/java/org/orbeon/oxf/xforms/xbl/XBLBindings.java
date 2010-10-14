@@ -23,9 +23,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
-import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
-import org.orbeon.oxf.xforms.analysis.controls.ContainerAnalysis;
+import org.orbeon.oxf.xforms.analysis.*;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xml.SAXStore;
@@ -357,7 +355,7 @@ public class XBLBindings {
     public void processElementIfNeeded(PropertyContext propertyContext, IndentedLogger indentedLogger, Element controlElement,
                                        String controlPrefixedId, LocationData locationData,
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope,
-                                       ContainerAnalysis parentControlAnalysis,
+                                       ContainerTrait parentControlAnalysis,
                                        StringBuilder repeatHierarchyStringBuffer) {
 
         if (xblComponentBindings != null) {

@@ -13,78 +13,60 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.{SimpleAnalysis, ViewAnalysis}
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
-import org.orbeon.oxf.util.PropertyContext
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.dom4j.Element
 
-trait VariableAnalysisTrait {
+/**
+ * Trait representing a variable element, whether in the model or in the view.
+ */
+trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait {
 
-    this: SimpleAnalysis =>
-
+    // Variable name
     val name = element.attributeValue(XFormsConstants.NAME_QNAME)
 
-    def computeVariableValueAnalysis: XPathAnalysis = {
+    override val canHoldValue = true // TODO: not clear that this is useful at this point, see who calls this
 
-        val sequenceElement = element.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME)
-        if (sequenceElement != null) {
-            // Value is provided by nested xxf:sequence/@select
+    override def computeValueAnalysis = {
 
-            // First figure out the scope for xxf:sequence
-            val sequencePrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(sequenceElement))
-            val sequenceScope = staticState.getXBLBindings().getResolutionScopeByPrefixedId(sequencePrefixedId)
+        element.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME) match {
+            case sequenceElement: Element =>
+                // Value is provided by nested xxf:sequence/@select
 
-            val sequenceAnalysis = new ViewAnalysis(staticState, sequenceScope, sequenceElement, this, getInScopeVariables, false) {
-                override def computeValueAnalysis(): XPathAnalysis = {
-                    val selectAttribute = element.attributeValue(XFormsConstants.SELECT_QNAME)
-                    if (selectAttribute != null) {
-                        // Value is provided by @select
-                        val baseAnalysis = findOrCreateBaseAnalysis(this)
-                        return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute)
-                    } else {
-                        // Value is constant
-                        return PathMapXPathAnalysis.CONSTANT_ANALYSIS
-                    }
+                // First figure out the scope for xxf:sequence
+                val sequenceScope = {
+                    val sequencePrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(sequenceElement))
+                    staticStateContext.staticState.getXBLBindings.getResolutionScopeByPrefixedId(sequencePrefixedId)
                 }
-            }
-            sequenceAnalysis.analyzeXPath()
-            return sequenceAnalysis.getValueAnalysis
-        } else {
-            val selectAttribute = element.attributeValue(XFormsConstants.SELECT_QNAME)
-            if (selectAttribute != null) {
-                // Value is provided by @select
-                val baseAnalysis = findOrCreateBaseAnalysis(this)
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute)
-            } else {
-                // Value is constant
-                return PathMapXPathAnalysis.CONSTANT_ANALYSIS
-            }
+
+                val sequenceAnalysis = new SimpleElementAnalysis(staticStateContext, sequenceElement, Some(VariableAnalysisTrait.this), None, sequenceScope) {
+                    override protected def computeValueAnalysis = {
+                        Some(element.attributeValue(XFormsConstants.SELECT_QNAME) match {
+                            case selectAttribute: String =>
+                                // Value is provided by @select
+                                analyzeXPath(getChildrenContext, selectAttribute)
+                            case _ =>
+                                // Value is constant
+                                PathMapXPathAnalysis.CONSTANT_ANALYSIS
+                                // TODO: store constant value?
+                        })
+                    }
+
+                    // Same in-scope variables than the parent variable element
+                    override lazy val inScopeVariables = VariableAnalysisTrait.this.inScopeVariables
+                }
+                sequenceAnalysis.analyzeXPath()
+                sequenceAnalysis.getValueAnalysis
+            case _ =>
+                // No nested xxf:sequence element
+                Some(element.attributeValue(XFormsConstants.SELECT_QNAME) match {
+                    case selectAttribute: String =>
+                        // Value is provided by @select
+                        analyzeXPath(getChildrenContext, selectAttribute)
+                    case _ =>
+                        // Value is constant
+                        PathMapXPathAnalysis.CONSTANT_ANALYSIS
+                        // TODO: store constant value?
+                })
         }
-    }
-
-    def toVariableXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) {
-
-        helper.startElement("variable", Array(
-                "scope", scope.scopeId,
-                "prefixed-id", prefixedId,
-                "model-prefixed-id", getModelPrefixedId,
-                "binding", hasNodeBinding.toString,
-                "value", canHoldValue.toString,
-                "name", name
-        ))
-
-        // Control binding and value analysis
-        if (getBindingAnalysis != null && hasNodeBinding) {
-            helper.startElement("binding")
-            getBindingAnalysis.toXML(propertyContext, helper)
-            helper.endElement()
-        }
-        if (getValueAnalysis != null) {
-            helper.startElement("value")
-            getValueAnalysis.toXML(propertyContext, helper)
-            helper.endElement()
-        }
-
-        helper.endElement()
     }
 }

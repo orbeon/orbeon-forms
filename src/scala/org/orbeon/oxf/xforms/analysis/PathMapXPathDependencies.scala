@@ -94,18 +94,17 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         this.containingDocument = containingDocument
     }
 
-    def getLogger(): IndentedLogger = {
-        if (logger == null) {
+    def getLogger: IndentedLogger = {
+        if (logger eq null) // none was passed
             logger = containingDocument.getControls.getIndentedLogger
-        }
         return logger
     }
 
     def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) {
 
         // Caller must only call this for a mutable node belonging to the given model
-        assert(nodeInfo.isInstanceOf[NodeWrapper])
-        assert(model.getInstanceForNode(nodeInfo).getModel(containingDocument) ==  model)
+        require(nodeInfo.isInstanceOf[NodeWrapper])
+        require(model.getInstanceForNode(nodeInfo).getModel(containingDocument) ==  model)
 
         if (!getModelState(model.getPrefixedId).structuralChanges) {
             // Only care about path changes if there is no structural change for this model, since structural changes
@@ -208,25 +207,25 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             cached match {
                 case Some(result) => result
                 case None => {
-                    val controlAnalysis = staticState.getControlAnalysis(controlPrefixedId)
+                    val elementAnalysis = staticState.getControlAnalysis(controlPrefixedId)
                     val tempResult =
-                        if (controlAnalysis.getBindingAnalysis == null) {
+                        if (elementAnalysis.getBindingAnalysis.isEmpty) {
                             // Control does not have an XPath binding
                             new UpdateResult(false, 0)
-                        } else if (!controlAnalysis.getBindingAnalysis.figuredOutDependencies) {
+                        } else if (!elementAnalysis.getBindingAnalysis.get.figuredOutDependencies) {
                             // Binding dependencies are unknown
                             new UpdateResult(true, 0)// savedEvaluations is N/A
                         } else {
                             // Binding dependencies are known
                             new UpdateResult(
-                                controlAnalysis.getBindingAnalysis.intersectsModels(getStructuralChangeModels) ||
-                                        controlAnalysis.getBindingAnalysis.intersectsBinding(getModifiedPaths)
-                                , controlAnalysis.bindingXPathEvaluations)
+                                elementAnalysis.getBindingAnalysis.get.intersectsModels(getStructuralChangeModels) ||
+                                        elementAnalysis.getBindingAnalysis.get.intersectsBinding(getModifiedPaths)
+                                , elementAnalysis.bindingXPathEvaluations)
                         }
 
                     if (tempResult.requireUpdate && getLogger.isDebugEnabled) {
                         getLogger.logDebug("dependencies", "binding requires update",
-                                Array("prefixed id", controlPrefixedId, "XPath", controlAnalysis.getBindingAnalysis.xpathString): _*)
+                                Array("prefixed id", controlPrefixedId, "XPath", elementAnalysis.getBindingAnalysis.get.xpathString): _*)
                     }
 
                     modifiedBindingCache.put(controlPrefixedId, tempResult)
@@ -253,22 +252,22 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                     val controlAnalysis = staticState.getControlAnalysis(controlPrefixedId)
                     val tempValueAnalysis = controlAnalysis.getValueAnalysis
                     val tempUpdateResult =
-                        if (tempValueAnalysis == null) {
+                        if (tempValueAnalysis.isEmpty) {
                             // Control does not have a value
                             new UpdateResult(true, 0)//TODO: should be able to return false here; change once markDirty is handled better
-                        } else if (!tempValueAnalysis.figuredOutDependencies) {
+                        } else if (!tempValueAnalysis.get.figuredOutDependencies) {
                             // Value dependencies are unknown
                             new UpdateResult(true, 0)// savedEvaluations is N/A
                         } else {
                             // Value dependencies are known
                             new UpdateResult(
-                                tempValueAnalysis.intersectsModels(getStructuralChangeModels) ||
-                                        tempValueAnalysis.intersectsValue(getModifiedPaths)
-                                , if (controlAnalysis.hasValueXPath) 1 else 0)
+                                tempValueAnalysis.get.intersectsModels(getStructuralChangeModels) ||
+                                        tempValueAnalysis.get.intersectsValue(getModifiedPaths)
+                                , if (controlAnalysis.value.isDefined) 1 else 0)
                         }
-                    if (tempUpdateResult.requireUpdate && tempValueAnalysis != null && getLogger.isDebugEnabled) {
+                    if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && getLogger.isDebugEnabled) {
                         getLogger.logDebug("dependencies", "value requires update",
-                                Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.xpathString): _*)
+                                Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
                     }
 
                     modifiedValueCache.put(controlPrefixedId, tempUpdateResult)
@@ -276,7 +275,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                 }
             }
 
-        if (updateResult.requireUpdate && valueAnalysis != null) {// TODO: see above, check on valueAnalysis only because non-value controls still call this method
+        if (updateResult.requireUpdate && valueAnalysis.isDefined) {// TODO: see above, check on valueAnalysis only because non-value controls still call this method
             valueUpdateCount += 1
         } else {
             // Update not required
@@ -329,7 +328,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         val bind = model.bindsById.get(bindId)
         val mip = bind.getMIP(mipName)
 
-        if (mip == null)
+        if (mip eq null)
             false // no such MIP
         else {
             val cached = modifiedMIPCache.get(bind.prefixedId)

@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.analysis.controls.Select1Analysis;
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -184,8 +184,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @return                      true iif control has a static set of items
      */
     public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
-        final Select1Analysis analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
-        return analysis != null && !analysis.hasNonStaticItem;
+        final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
+        return analysis != null && !analysis.hasNonStaticItem();
     }
 
     /**
@@ -196,8 +196,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @return                      true iif control is a multiple-selection control
      */
     public static boolean isMultiple(XFormsContainingDocument containingDocument, String prefixedId) {
-        final Select1Analysis analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
-        return analysis != null && analysis.isMultiple;
+        final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
+        return analysis != null && analysis.isMultiple();
     }
 
     public boolean isOpenSelection() {
@@ -325,8 +325,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     private boolean mustSendItemsetUpdate(PropertyContext propertyContext, XFormsSelect1Control otherSelect1Control) {
-        final Select1Analysis analysis = containingDocument.getStaticState().getSelect1Analysis(getPrefixedId());
-        if (analysis != null && !analysis.hasNonStaticItem) {
+        final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(getPrefixedId());
+        if (analysis != null && !analysis.hasNonStaticItem()) {
             // There is no need to send an update:
             //
             // 1. Items are static...

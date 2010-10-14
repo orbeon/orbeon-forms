@@ -14,15 +14,15 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
 import org.orbeon.saxon.expr.PathMap
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 
 
 trait MatchSimpleAnalysis {
-    def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[SimpleAnalysis]): PathMapNodeSet = analysisOption match {
-        case Some(simpleAnalysis) if simpleAnalysis.getBindingAnalysis != null && simpleAnalysis.getBindingAnalysis.figuredOutDependencies =>
+    def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[ElementAnalysis]): PathMapNodeSet = analysisOption match {
+        case Some(simpleAnalysis) if simpleAnalysis.getBindingAnalysis.isDefined && simpleAnalysis.getBindingAnalysis.get.figuredOutDependencies =>
             // Clone the PathMap first because the nodes returned must belong to this PathMap
-            val clonedContextPathMap = simpleAnalysis.getBindingAnalysis.pathmap.clone
+            val clonedContextPathMap = simpleAnalysis.getBindingAnalysis.get.pathmap.clone
             pathMap.addRoots(clonedContextPathMap.getPathMapRoots)
             clonedContextPathMap.findFinalNodes
         case _ =>

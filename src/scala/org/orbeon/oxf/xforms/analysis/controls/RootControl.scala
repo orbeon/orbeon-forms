@@ -11,17 +11,15 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.analysis.model
+package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
-import org.dom4j.Element
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xforms.XFormsStaticState
+import org.orbeon.oxf.xforms.analysis.ContainerTrait
 
-class ModelAnalysis(staticState: XFormsStaticState, scope: XBLBindings#Scope, element: Element,
-                    parentAnalysis: SimpleAnalysis, val inScopeVariables: java.util.Map[String, SimpleAnalysis],
-                    canHoldValue: Boolean, containingModel: Model)
-        extends SimpleAnalysis(staticState, scope, element, parentAnalysis, canHoldValue, containingModel) {
-
-    def getInScopeVariables = inScopeVariables
+/**
+ * Single root container for the entire controls hierarchy.
+ */
+class RootControl(staticState: XFormsStaticState) extends ContainerTrait {
+    // Root has no parent
+    val parent = None
 }

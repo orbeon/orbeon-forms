@@ -11,6 +11,11 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.oxf.xforms.analysis
 
-class Aggregate extends org.orbeon.saxon.functions.Aggregate with AddToPathMap
+import model.Model
+import org.orbeon.oxf.xforms.xbl.XBLBindings
+/**
+ * NOTE: There is always a scope, but the model can be missing if there is no model, e.g. in model-less XBL components.
+ */
+case class ScopeModel(val scope: XBLBindings#Scope, val containingModel: Option[Model])

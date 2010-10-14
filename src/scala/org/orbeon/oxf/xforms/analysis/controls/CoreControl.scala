@@ -11,6 +11,12 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.oxf.xforms.analysis.controls
 
-class Aggregate extends org.orbeon.saxon.functions.Aggregate with AddToPathMap
+import org.dom4j.Element
+import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.xbl.XBLBindings
+
+class CoreControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+        extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope)
+        with ViewTrait with LeafTrait with LHHATrait

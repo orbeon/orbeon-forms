@@ -11,6 +11,7 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.oxf.xforms.analysis.controls
 
-class Aggregate extends org.orbeon.saxon.functions.Aggregate with AddToPathMap
+
+trait LeafTrait

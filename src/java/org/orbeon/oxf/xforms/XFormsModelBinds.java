@@ -54,12 +54,12 @@ public class XFormsModelBinds {
     private final XFormsContainingDocument containingDocument;  // current containing document
     private final XPathDependencies dependencies;
 
-    private final List<Element> bindElements;
     private List<Bind> topLevelBinds = new ArrayList<Bind>();
     private Map<String, Bind> singleNodeContextBinds = new HashMap<String, Bind>();
     private Map<Item, List<BindIteration>> iterationsForContextNodeInfo = new HashMap<Item, List<BindIteration>>();
     private List<Bind> offlineBinds = new ArrayList<Bind>();
-    private Map<String, String> variableNamesToIds = new HashMap<String, String>();
+    // TODO: move to static state
+    private Map<String, String> variableNamesToIds = new HashMap<String, String>(); // name -> static id
 
     private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
 
@@ -93,7 +93,6 @@ public class XFormsModelBinds {
         this.dependencies = this.containingDocument.getXPathDependencies();
 
         this.staticModel = model.getStaticModel();
-        this.bindElements = staticModel.bindElements();
 
         // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
         // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
@@ -120,7 +119,7 @@ public class XFormsModelBinds {
         variableNamesToIds.clear();
 
         // Iterate through all top-level bind elements
-        for (final Element currentBindElement: bindElements) {
+        for (final Element currentBindElement: staticModel.bindElements()) {
             // Create and remember as top-level bind
             final Bind currentBind = new Bind(propertyContext, currentBindElement, true);
             topLevelBinds.add(currentBind);

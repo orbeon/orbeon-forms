@@ -13,11 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.saxon.expr.PathMap
 import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.saxon.expr.PathMap
 
-trait XPathAnalysis {
+/**
+ * Abstract representation of an XPath analysis.
+ */
+abstract class XPathAnalysis {
+
     def pathmap: PathMap
 
     def xpathString: String
@@ -31,18 +35,18 @@ trait XPathAnalysis {
     def returnableInstances: collection.Set[String]
 
     // Return true if any path matches
-    // TODO: for now naively just check exact paths
+    // NOTE: For now just check exact paths. Later must be smarter?
     def intersectsBinding(touchedPaths: collection.Set[String]) = valueDependentPaths exists (touchedPaths contains _): Boolean
 
     // Return true if any path matches
-    // TODO: for now naively just check exact paths
+    // NOTE: For now just check exact paths. Later must be smarter?
     def intersectsValue(touchedPaths: collection.Set[String]) = intersectsBinding(touchedPaths) || (returnablePaths exists (touchedPaths contains _)): Boolean
 
     def intersectsModels(touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _): Boolean
 
-    def combine(other: XPathAnalysis): Unit
+    def combine(other: XPathAnalysis): XPathAnalysis
 
     def toXML(propertyContext: PropertyContext , helper: ContentHandlerHelper)
 
-    def freeTransientState()
+    def freeTransientState() {}
 }

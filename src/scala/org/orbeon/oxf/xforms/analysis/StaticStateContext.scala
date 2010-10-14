@@ -11,6 +11,17 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function
+package org.orbeon.oxf.xforms.analysis
 
-class Aggregate extends org.orbeon.saxon.functions.Aggregate with AddToPathMap
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.oxf.xforms.XFormsStaticState
+import org.orbeon.oxf.util.PropertyContext
+
+
+class StaticStateContext(val staticState: XFormsStaticState, val controlsDocument: DocumentWrapper, val index: Int) {
+    // this would just be used by the XPath cache for statistics, just don't care for now
+    val propertyContext = new PropertyContext {
+        def getAttribute(key: Any) = null
+        def setAttribute(key: Any, o: Any) = {}
+    }
+}

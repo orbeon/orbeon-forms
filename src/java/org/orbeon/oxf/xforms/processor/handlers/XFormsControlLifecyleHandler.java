@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.*;
@@ -203,26 +203,26 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     private boolean hasLocalLabel() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        final ControlAnalysis.LHHAAnalysis analysis = staticState.getLabel(prefixedId);
-        return analysis != null && analysis.isLocal;
+        final LHHAAnalysis analysis = staticState.getLabel(prefixedId);
+        return analysis != null && analysis.isLocal();
     }
 
     private boolean hasLocalHint() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        final ControlAnalysis.LHHAAnalysis analysis = staticState.getHint(prefixedId);
-        return analysis != null && analysis.isLocal;
+        final LHHAAnalysis analysis = staticState.getHint(prefixedId);
+        return analysis != null && analysis.isLocal();
     }
 
     private boolean hasLocalHelp() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        final ControlAnalysis.LHHAAnalysis analysis = staticState.getHelp(prefixedId);
-        return analysis != null && analysis.isLocal;
+        final LHHAAnalysis analysis = staticState.getHelp(prefixedId);
+        return analysis != null && analysis.isLocal();
     }
 
     private boolean hasLocalAlert() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        final ControlAnalysis.LHHAAnalysis analysis = staticState.getAlert(prefixedId);
-        return analysis != null && analysis.isLocal;
+        final LHHAAnalysis analysis = staticState.getAlert(prefixedId);
+        return analysis != null && analysis.isLocal();
     }
 
     protected boolean isMustOutputControl(XFormsControl control) {

@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
-import org.orbeon.oxf.xforms.analysis.controls.SimpleAnalysis
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**
  * The xxforms:context() function allows you to obtain the single-node binding for an enclosing xforms:group,
@@ -49,7 +49,7 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
             case Some(contextIdExpression: StringLiteral) =>
                 // Argument is literal and we have a context to ask
                 pathMap.getPathMapContext match {
-                    case context: SimpleAnalysis#SimplePathMapContext =>
+                    case context: SimpleElementAnalysis#SimplePathMapContext =>
                         // Get static context id
                         val contextStaticId = contextIdExpression.getStringValue
                         // Handle context

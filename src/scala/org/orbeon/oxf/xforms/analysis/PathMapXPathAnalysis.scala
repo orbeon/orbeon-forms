@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.SimpleAnalysis
 import org.orbeon.saxon.expr._
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
@@ -30,14 +29,15 @@ import org.orbeon.saxon.expr.PathMap.PathMapArc
 import collection.mutable.{LinkedHashSet, Stack, Set}
 
 import java.util.{Map => JMap, HashMap => JHashMap}
+import org.orbeon.saxon.`type`.AtomicType
 
 class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: String, namespaceMapping: NamespaceMapping,
-                           baseAnalysis: XPathAnalysis, inScopeVariables: JMap[String, SimpleAnalysis],
+                           baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableAnalysisTrait],
                            pathMapContext: AnyRef,
                            scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String,
                            locationData: LocationData, element: Element)
         extends XPathAnalysis {
-    
+
     private val expression = XPathCache.createExpression(staticState.getXPathConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
 
     // TODO: Figure out way to make all fields vals
@@ -54,31 +54,27 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
     var dependentModels = new LinkedHashSet[String]
     var dependentInstances = new LinkedHashSet[String]
     var returnableInstances = new LinkedHashSet[String]
-    
+
     try {
         // In-scope variables
-        val variables = new JHashMap[String, PathMap]
-        if (inScopeVariables != null) {
-            for (entry <- inScopeVariables.entrySet) {
-                val valueAnalysis = entry.getValue.getValueAnalysis
-                variables.put(entry.getKey, if (valueAnalysis != null) valueAnalysis.pathmap else null)
-            }
-        }
+        val variablePathMaps = new JHashMap[String, PathMap]
+        for ((name, variableControl) <- inScopeVariables; valueAnalysis = variableControl.getValueAnalysis; if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies)
+            variablePathMaps.put(name, valueAnalysis match {case Some(analysis) if analysis.figuredOutDependencies => analysis.pathmap; case _ => null})
 
         val pathmap =
-            if (baseAnalysis == null || (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) == 0) {
+            if (baseAnalysis.isEmpty || (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) == 0) {
                 // Start with a new PathMap if:
                 // o we are at the top (i.e. does not have a context)
                 // o or the expression does not depend on the focus
                 // NOTE: We used to test on DEPENDS_ON_CONTEXT_ITEM above, but any use of the focus would otherwise create
                 // a root context expression in PathMap, which is not right.
-                new PathMap(expression, variables, pathMapContext)
+                new PathMap(expression, variablePathMaps, pathMapContext)
             } else {
                 // Expression has a context and depends on the context item
-                if (baseAnalysis.figuredOutDependencies) {
+                if (baseAnalysis.get.figuredOutDependencies) {
                     // We clone the base analysis and add to an existing PathMap
-                    val clonedPathmap = baseAnalysis.pathmap.clone
-                    clonedPathmap.setInScopeVariables(variables)
+                    val clonedPathmap = baseAnalysis.get.pathmap.clone
+                    clonedPathmap.setInScopeVariables(variablePathMaps)
                     clonedPathmap.setPathMapContext(pathMapContext)
 
                     val newNodeset = expression.addToPathMap(clonedPathmap, clonedPathmap.findFinalNodes)
@@ -96,7 +92,7 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
                 }
             }
 
-        if (pathmap == null || pathmap.isInvalidated) {
+        if ((pathmap eq null) || pathmap.isInvalidated) {
             this.pathmap = null
             this.figuredOutDependencies = false
         } else {
@@ -132,9 +128,44 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
                     element, "expression", xpathString))
     }
 
-    def combine(other: XPathAnalysis) {
+    def externalAnalysisExperiment(expression: Expression, pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
 
-        assert (figuredOutDependencies && other.figuredOutDependencies)
+        expression match {
+
+            case other =>
+                val dependsOnFocus = (other.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
+                val attachmentPoint = pathMapNodeSet match {
+                    case null if dependsOnFocus =>
+                        // Result is new ContextItemExpression
+                        val contextItemExpression = new ContextItemExpression
+                        contextItemExpression.setContainer(expression.getContainer)
+                        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(contextItemExpression))
+                    case _ =>
+                        // All other cases
+                        if (dependsOnFocus) pathMapNodeSet else null
+                }
+
+                val resultNodeSet = new PathMap.PathMapNodeSet
+                for (child <- other.iterateSubExpressions)
+                    resultNodeSet.addNodeSet(externalAnalysisExperiment(child.asInstanceOf[Expression], pathMap, attachmentPoint))
+
+                // Handle result differently if result type is atomic or not
+                other.getItemType(other.getExecutable.getConfiguration.getTypeHierarchy) match {
+                    case atomicType: AtomicType =>
+                        // NOTE: Thought it would be right to call setAtomized(), but it isn't! E.g. count() returns an atomic type,
+                        // but it doesn't mean the result of its argument expression is atomized. sum() does, but that's handled by
+                        // the atomization of the argument to sum().
+        //                resultNodeSet.setAtomized()
+                        // If expression returns an atomic value then any nodes accessed don't contribute to the result
+                        null
+                    case _ => resultNodeSet
+                }
+        }
+    }
+
+    def combine(other: XPathAnalysis): XPathAnalysis = {
+
+        require(figuredOutDependencies && other.figuredOutDependencies)
 
         pathmap.addRoots(other.pathmap.getPathMapRoots)
         valueDependentPaths ++= other.valueDependentPaths
@@ -142,6 +173,10 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
         dependentModels ++= other.dependentModels
         dependentInstances ++= other.dependentInstances
         returnableInstances ++= other.returnableInstances
+
+        // TODO: return new XPathAnalysis
+
+        this
     }
 
     /**
@@ -454,7 +489,7 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
         true
     }
 
-    def freeTransientState() {
+    override def freeTransientState() {
         this.pathmap = null
     }
 }
@@ -463,8 +498,8 @@ object PathMapXPathAnalysis {
 
     class ConstantXPathAnalysis(positive: Boolean) extends XPathAnalysis {
 
-        def xpathString = null
         def pathmap = null
+        def xpathString = null
 
         def returnableInstances = Set.empty[String]
         def dependentInstances = Set.empty[String]
@@ -473,9 +508,8 @@ object PathMapXPathAnalysis {
         def valueDependentPaths = Set.empty[String]
         def figuredOutDependencies = positive
 
-        def combine(other: XPathAnalysis) { throw new UnsupportedOperationException() }
-
-        def freeTransientState = {}//NOP
+        def combine(other: XPathAnalysis): XPathAnalysis =
+            if (!figuredOutDependencies || !other.figuredOutDependencies) CONSTANT_NEGATIVE_ANALYSIS else other
 
         def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = {
             helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))

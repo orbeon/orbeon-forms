@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.saxon.om.FastStringBuffer;
@@ -407,7 +407,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         {
             // Statically obtain attributes information
             final XFormsStaticState staticState = containingDocument.getStaticState();
-            final ControlAnalysis.LHHAAnalysis lhhaAnalysis;
+            final LHHAAnalysis lhhaAnalysis;
             final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
@@ -425,7 +425,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 throw new IllegalStateException("Illegal type requested");
             }
 
-            labelHintHelpAlertAttributes = (lhhaAnalysis != null) ? XMLUtils.getSAXAttributes(lhhaAnalysis.element) : null;
+            labelHintHelpAlertAttributes = (lhhaAnalysis != null) ? XMLUtils.getSAXAttributes(lhhaAnalysis.element()) : null;
         }
 
         if (labelHintHelpAlertAttributes != null || isAlert) {

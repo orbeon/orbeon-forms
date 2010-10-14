@@ -121,7 +121,9 @@
 
     <!-- Show dialog -->
     <xforms:action ev:event="xxforms-dialog-open">
-        <!-- Remember values -->
+
+        <!-- Clear all local values -->
+        <xforms:setvalue xxforms:iterate="*[not(*)]" ref="."/>
 
         <xxforms:variable name="control" select="event('control')"/>
 

@@ -150,6 +150,9 @@
         <!-- Copy over values -->
         <xxforms:variable name="instance" select="instance('fb-section-details-instance')" as="element()"/>
 
+        <!-- Clear all local values -->
+        <xforms:setvalue xxforms:iterate="$instance/*[not(*)]" ref="."/>
+
         <xxforms:variable name="section-name" select="event('fr:section-name')" as="xs:string"/>
 
         <xforms:setvalue ref="$instance/section-name" value="$section-name"/>

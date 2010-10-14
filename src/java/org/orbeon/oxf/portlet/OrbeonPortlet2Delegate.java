@@ -219,7 +219,8 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
                 // The result of an action with the current parameters was a
                 // stream that we cached. Replay that stream and replace URLs.
                 // CHECK: what about mode / state? If they change, we ignore them totally.
-                response.setContentType(bufferedResponse.getContentType());
+                if (bufferedResponse.getContentType() != null)// NPE in portal otherwise
+                    response.setContentType(bufferedResponse.getContentType());
                 response.setTitle(bufferedResponse.getTitle() != null ? bufferedResponse.getTitle() : getTitle(request));
                 bufferedResponse.write(response);
             } else {
@@ -232,7 +233,8 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
                 // rewriting algorithm only operates on Strings for now.
                 final Portlet2ExternalContext.DirectResponseTemp directResponse
                         = (Portlet2ExternalContext.DirectResponseTemp) externalContext.getResponse();
-                response.setContentType(directResponse.getContentType());
+                if (directResponse.getContentType() != null)// NPE in portal otherwise
+                    response.setContentType(directResponse.getContentType());
                 response.setTitle(directResponse.getTitle() != null ? directResponse.getTitle() : getTitle(request));
                 directResponse.write(response);
             }
@@ -254,7 +256,8 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
             // rewriting algorithm only operates on Strings for now.
             final Portlet2ExternalContext.DirectResponseTemp directResponse
                     = (Portlet2ExternalContext.DirectResponseTemp) externalContext.getResponse();
-            response.setContentType(directResponse.getContentType());
+            if (directResponse.getContentType() != null)// NPE in portal otherwise
+                response.setContentType(directResponse.getContentType());
             directResponse.write(response);
         } catch (Exception e) {
             throw new PortletException(OXFException.getRootThrowable(e));

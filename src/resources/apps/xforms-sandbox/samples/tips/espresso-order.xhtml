@@ -1,0 +1,251 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <head>
+        <title>Espresso Order Demo</title>
+        <!-- The model contains data, validation, and other declarative behaviors -->
+        <xf:model id="model" xxf:expose-xpath-types="true">
+            <!-- Instance containing all the item information as well as quantities and totals -->
+            <xf:instance id="order">
+                <order xmlns="">
+                    <item>
+                        <name>Special Club 2009 - Singatoba</name>
+                        <image src="img/00748.gif"/>
+                        <price>0.62</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Dulsão do Brasil</name>
+                        <image src="img/02463.jpg"/>
+                        <price>0.62</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Indriya from India</name>
+                        <image src="img/02466.jpg"/>
+                        <price>0.62</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Rosabaya de Colombia</name>
+                        <image src="img/02460.jpg"/>
+                        <price>0.62</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Ristretto</name>
+                        <image src="img/00746.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Arpeggio</name>
+                        <image src="img/00673.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Roma</name>
+                        <image src="img/00747.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Decaffeinato Intenso</name>
+                        <image src="img/00707.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Livanto</name>
+                        <image src="img/00712.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Capriccio</name>
+                        <image src="img/00674.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Volluto</name>
+                        <image src="img/00751.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Cosi</name>
+                        <image src="img/00676.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Decaffeinato</name>
+                        <image src="img/00706.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Fortissio Lungo</name>
+                        <image src="img/02455.jpg"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Vivalto</name>
+                        <image src="img/02458.jpg"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Finezzo Lungo (new)</name>
+                        <image src="img/02428.jpg"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <item>
+                        <name>Decaffeinato Lungo</name>
+                        <image src="img/00708.gif"/>
+                        <price>0.55</price>
+                        <quantity/>
+                    </item>
+                    <total>
+                        <units/>
+                        <price/>
+                    </total>
+                </order>
+            </xf:instance>
+            <!-- Items -->
+            <xf:bind id="item-bind" nodeset="item">
+                <!-- Mark image URI -->
+                <xf:bind nodeset="image" type="xs:anyURI"/>
+                <!-- Mark price as decimal type -->
+                <xf:bind nodeset="price" type="xs:decimal"/>
+                <!-- Quantity must be non-negative and a multiple of 10 -->
+                <!-- If it's possible, we extract digits from the value to fix user's typos -->
+                <!-- If the value is empty, replace it with 0 -->
+                <xf:bind nodeset="quantity"
+                         type="xs:nonNegativeInteger"
+                         constraint=". mod 10 = 0"
+                         readonly="false()"
+                         calculate="if (matches(xs:string(.), '[^\d]*\d+.*'))
+                                    then xs:integer(replace(xs:string(.), '[^\d]*(\d+).*', '$1')) idiv 10 * 10
+                                    else if (normalize-space(.)) then . else 0"/>
+            </xf:bind>
+            <!-- Totals -->
+            <xf:bind nodeset="total">
+                <!-- Sum all quantities that are integers -->
+                <!-- Mark the sum as invalid if there is any non-valid quantity -->
+                <xf:bind id="total-units" nodeset="units" type="xs:nonNegativeInteger"
+                         calculate="sum(../../item/quantity[. castable as xs:integer])"
+                         constraint="not((for $v in ../../item/quantity return xxf:valid($v)) = false())"/>
+                <!-- Sum all prices that have integer quantities -->
+                <!-- Mark the sum as invalid if there is any non-valid quantity -->
+                <xf:bind id="total-price" nodeset="price" type="xs:decimal"
+                         calculate="sum(for $item in ../../item[quantity castable as xs:integer] return $item/price * $item/quantity)"
+                         constraint="xxf:valid(../units)"/>
+            </xf:bind>
+
+            <!-- Predefined quantities -->
+            <xf:instance id="predefined-quantities">
+                <quantities xmlns=""/>
+            </xf:instance>
+
+            <!-- Initialization of predefined quantities itemset -->
+            <xf:action ev:event="xforms-model-construct-done" xxf:iterate="(0 to 29)">
+                <xxf:variable name="q" select=". * 10" as="xs:integer"/>
+                <xf:insert context="instance('predefined-quantities')" nodeset="*"
+                           origin="xxf:element('item', (xxf:element('label', $q), xxf:element('value', $q)))"/>
+            </xf:action>
+
+            <!-- Set focus to first quantity field -->
+            <xf:setfocus ev:event="xforms-ready" control="quantity-input"/>
+
+        </xf:model>
+        <style type="text/css">
+            .quantity-select select { width: 8em }
+            .quantity-input input { width: 4em }
+            tfoot th { text-align: right }
+        </style>
+    </head>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Description</th>
+                    <th>Unit Price</th>
+                    <th colspan="2">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Repeat over all items -->
+                <xf:repeat bind="item-bind">
+                    <tr>
+                        <!-- Display item name -->
+                        <td><xf:output ref="name"/></td>
+                        <!-- Use an AVT to set the image src and alt attributes -->
+                        <td><img src="/apps/xforms-sandbox/samples/tips/{image/@src}" alt="{name}"/></td>
+                        <!-- Display unit price -->
+                        <td><xf:output value="concat('$ ', price)"/></td>
+                        <td>
+                            <!-- Predefined quantities dropdown -->
+                            <xf:select1 class="quantity-select" ref="quantity">
+                                <!-- Show all predefined quantities -->
+                                <xf:itemset nodeset="instance('predefined-quantities')/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                                <!-- The "custom" item is shown only if the current value is not in the set of
+                                     predefined values, and its value is set to the current value. -->
+                                <xf:itemset nodeset=".[not(. = instance('predefined-quantities')/item/value)]">
+                                    <xf:label>Custom</xf:label>
+                                    <xf:value value="."/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </td>
+                        <!-- Manual quantity input -->
+                        <td><xf:input id="quantity-input" class="quantity-input" ref="quantity"/></td>
+                        <!-- Separate alert for quantity input -->
+                        <td><xf:alert for="quantity-input"/></td>
+                    </tr>
+                </xf:repeat>
+            </tbody>
+            <tfoot>
+                <!-- Totals -->
+                <tr>
+                    <!-- Label -->
+                    <th colspan="4"><xf:label for="total-units-output">Total Units:</xf:label></th>
+                    <!-- Output total -->
+                    <td><xf:output id="total-units-output" bind="total-units"/></td>
+                    <!-- Alert -->
+                    <td><xf:alert for="total-units-output"/></td>
+                </tr>
+                <tr>
+                    <!-- Label -->
+                    <th colspan="4"><xf:label for="total-price-output">Total Price:</xf:label></th>
+                    <!-- Output total -->
+                    <td><xf:output id="total-price-output" bind="total-price"/></td>
+                    <!-- Alert -->
+                    <td><xf:alert for="total-price-output"/></td>
+                </tr>
+            </tfoot>
+        </table>
+    </body>
+</html>

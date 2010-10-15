@@ -352,11 +352,13 @@ ORBEON.util = {
 
         /**
          * Similar to root.getElementsByTagName(tagName), but:
-         *      Returns only one element.
+         *
          *      Returns root if root.tagName == tagName.
+         *      Returns only one element (the first if there are many).
          *      Can take an array of tagName if there are alternatives.
          */
         getElementByTagName: function(root, tagName) {
+
             var result = null;
 
             if (YAHOO.lang.isArray(tagName)) {
@@ -372,7 +374,7 @@ ORBEON.util = {
                     result = root;
                 } else {
                     var matches = root.getElementsByTagName(tagName);
-                    if (matches.length == 1) result = matches[0];
+                    if (matches.length != 0) result = matches[0];
                 }
             }
             return result;

@@ -339,12 +339,15 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "offline"; }
             },
+
             new ResourceConfig("/ops/javascript/encryption/utf-8.js", "/ops/javascript/encryption/utf-8-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
                     return XFormsProperties.isOfflineMode(containingDocument);
                 }
                 public String getFeatureName() { return "offline"; }
             },
+            // Underscore library
+            new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             // XForms client
             new ResourceConfig("/ops/javascript/xforms.js", "/ops/javascript/xforms-min.js")
     };

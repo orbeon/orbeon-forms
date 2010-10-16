@@ -44,6 +44,10 @@
 
                 name: "Checkbox selection update bug",
 
+                /**
+                 * [ #315557 ] Checkbox with both itemset and value changing ends up in incorrect state
+                 * http://forge.ow2.org/tracker/index.php?func=detail&aid=315557&group_id=168&atid=350207
+                 */
                 testUpdateItemset: function() {
                     var radioSpan = document.getElementById("value-selection");
                     var radios = radioSpan.getElementsByTagName("input");

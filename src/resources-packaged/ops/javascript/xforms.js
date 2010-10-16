@@ -39,6 +39,25 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
 /* * * * * * Utility functions * * * * * */
 
+/**
+ * Functions we add to Underscore.js
+ */
+_.mixin({
+    take: function(obj, interceptor, context) {
+        return interceptor.call(context, obj);
+    },
+    match: function(obj) {
+        function compareMaybe(f) { return _.isFunction(f) ? f(obj) : f == obj; }
+        function applyMaybe(f) { return _.isFunction(f) ? f(obj) : f; }
+        for (var i = 1; i < arguments.length - 1; i = i + 2)
+            if (compareMaybe(arguments[i])) return applyMaybe(arguments[i+1]);
+        return arguments.length % 2 == 0 ? applyMaybe(arguments[arguments.length - 1]) : obj;
+    },
+    returns: function(obj) {
+        return _.bind(_.identity, this, obj);
+    }
+});
+
 var ORBEON = ORBEON || {};
 ORBEON.util = ORBEON.util || {};
 ORBEON.xforms = ORBEON.xforms || {};
@@ -353,31 +372,24 @@ ORBEON.util = {
         /**
          * Similar to root.getElementsByTagName(tagName), but:
          *
-         *      Returns root if root.tagName == tagName.
-         *      Returns only one element (the first if there are many).
-         *      Can take an array of tagName if there are alternatives.
+         *    1. Returns root if root.tagName == tagName.
+         *    2. Returns only one element (the first if there are many).
+         *    3. Can take an array of tagName if there are alternatives.
+         *
+         * @param {Element}                 root            Root node from which we start the search
+         * @param {string|Array.<string>}   tagNameOrArray  Tag name we're looking for
          */
-        getElementByTagName: function(root, tagName) {
-
-            var result = null;
-
-            if (YAHOO.lang.isArray(tagName)) {
-                // Multiple possible tag name, try each one
-                var tagNames = tagName;
-                for (var tagNameIndex = 0; tagNameIndex < tagNames.length; tagNameIndex++) {
-                    var tagName = tagNames[tagNameIndex];
-                    var result = ORBEON.util.Dom.getElementByTagName(root, tagName);
-                    if (result != null) break
-                }
-            } else {
-                if (root.tagName.toLowerCase() == tagName) {
-                    result = root;
-                } else {
-                    var matches = root.getElementsByTagName(tagName);
-                    if (matches.length != 0) result = matches[0];
-                }
-            }
-            return result;
+        getElementByTagName: function(root, tagNameOrArray) {
+            var result = _.isArray(tagNameOrArray)
+                ? _(tagNameOrArray).chain()
+                    .map(_.bind(arguments.callee, null, root))
+                    .compact()
+                    .first()
+                    .value()
+                : root.tagName.toLowerCase() == tagNameOrArray
+                    ? root
+                    : root.getElementsByTagName(tagNameOrArray)[0];
+            return _.isUndefined(result) ? null : result;
         },
 
         isAncestorOrSelfHidden: function(element) {

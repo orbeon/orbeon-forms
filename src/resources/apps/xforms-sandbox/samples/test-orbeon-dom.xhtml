@@ -1,0 +1,60 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Orbeon DOM utility methods</xhtml:title>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript">
+            <![CDATA[
+                (function() {
+
+                    var YA = YAHOO.util.Assert;
+                    var YD = YAHOO.util.Dom;
+                    var OD = ORBEON.util.Dom;
+
+                    YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+                        name: "Orbeon DOM utility methods",
+                        testReturnsSelf:  function() { YA.areEqual(YD.get("span1"), OD.getElementByTagName(YD.get("span1"), "span"), "when root has the required tag name, returns root"); },
+                        testReturnsFirst: function() { YA.areEqual(YD.get("span1"), OD.getElementByTagName(YD.get("container"), "span"), "returns first child with specified tag name"); },
+                        testReturnsArray: function() { YA.areEqual(YD.get("p1"),    OD.getElementByTagName(YD.get("container"), ["a", "p"]), "support array of tag names"); },
+                        testReturnsNull:  function() { YA.isNull(                   OD.getElementByTagName(YD.get("container"), "a"), "returns null when it can't find an element with the specified tag name"); }
+                    }));
+
+                    ORBEON.util.Test.onOrbeonLoadedRunTest();
+                })();
+            ]]>
+        </xhtml:script>
+        <xforms:model/>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div id="container">
+            <xhtml:span id="span1">
+                <xhtml:span id="span2"/>
+            </xhtml:span>
+            <xhtml:p id="p1"/>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

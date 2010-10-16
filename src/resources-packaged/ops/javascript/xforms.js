@@ -1269,9 +1269,22 @@ ORBEON.util.Test = {
                 else setTimeout(arguments.callee);
             })();
         }
+    },
+
+    /**
+     * Function to be call in every test to start the test when the page is loaded.
+     */
+    onOrbeonLoadedRunTest: function() {
+        ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+            if (parent && parent.TestManager) {
+                parent.TestManager.load();
+            } else {
+                new YAHOO.tool.TestLogger();
+                YAHOO.tool.TestRunner.run();
+            }
+        });
     }
 };
-
 
 /**
  * This object contains function designed to be called from JavaScript code

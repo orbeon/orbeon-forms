@@ -54,7 +54,7 @@
         var currentSectionId = ORBEON.xforms.Document.getValue("fr-current-section-id-input");
         var currentSectionRepeatIndexes = ORBEON.xforms.Document.getValue("fr-current-section-repeat-indexes-input");
 
-        var switchElement = ORBEON.util.Dom.getElementById("switch-" + currentSectionId +
+        var switchElement = ORBEON.util.Dom.get("switch-" + currentSectionId +
                                                            (currentSectionRepeatIndexes == "" ? "" : XFORMS_SEPARATOR_1 + currentSectionRepeatIndexes)) ;
         if (switchElement == null)
             return null;

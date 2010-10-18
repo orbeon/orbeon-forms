@@ -610,7 +610,7 @@
     <!-- Mark all active alerts as visited -->
     <xxforms:script ev:event="fr-visit-alerts">
         <![CDATA[
-        var rootElement = ORBEON.util.Dom.getElementById("fr-form");
+        var rootElement = ORBEON.util.Dom.get("fr-form");
         var elements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active", "label", rootElement);
         for (var i = 0; i < elements.length; i++) {
             var element = elements[i];

@@ -327,14 +327,14 @@
                 <!-- Handle offline mode -->
                 <!--<xxforms:script ev:event="xforms-submit-done">-->
                     <!--if (ORBEON.xforms.Document.isOfflineAvailable()) {-->
-                        <!--var noFormDataDiv = ORBEON.util.Dom.getElementById("fr-no-form-data");-->
+                        <!--var noFormDataDiv = ORBEON.util.Dom.get("fr-no-form-data");-->
                         <!--// If the table is empty, skip this-->
                         <!--if (YAHOO.util.Dom.hasClass(noFormDataDiv, "xforms-disabled")) {-->
                             <!--var summaryIndex = 1;-->
                             <!--while (true) {-->
                                 <!--// Check if there is an item at this index; otherwise stop.-->
                                 <!--var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;-->
-                                <!--if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;-->
+                                <!--if (ORBEON.util.Dom.get(nameControlId) == null) break;-->
                                 <!--// Get URL for edit page of this form-->
                                 <!--var name = ORBEON.xforms.Document.getValue(nameControlId);-->
                                 <!--var url = window.location.href + "/" + name + "/edit";-->

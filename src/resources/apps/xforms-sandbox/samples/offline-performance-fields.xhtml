@@ -51,7 +51,7 @@
                 YAHOO.util.Event.addListener("set-values-trigger", "click", function() {
                     for (var i = 1; i &lt;= 300; i++) {
                         var controlID = "field" + XFORMS_SEPARATOR_1 + i;
-                        var control = ORBEON.util.Dom.getElementById(controlID);
+                        var control = ORBEON.util.Dom.get(controlID);
                         ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
                         ORBEON.xforms.Document.setValue(controlID, "123-" + i);
                     }
@@ -61,7 +61,7 @@
                 YAHOO.util.Event.addListener("clear-values-trigger", "click", function() {
                     for (var i = 1; i &lt;= 300; i++) {
                         var controlID = "field" + XFORMS_SEPARATOR_1 + i;
-                        var control = ORBEON.util.Dom.getElementById(controlID);
+                        var control = ORBEON.util.Dom.get(controlID);
                         ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
                         ORBEON.xforms.Document.setValue(controlID, "");
                     }

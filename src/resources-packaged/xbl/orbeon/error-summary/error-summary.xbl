@@ -53,7 +53,7 @@
 
                     for (var j = 0; j < observers.length; j++) {
                         var observer = observers[j];
-                        var observerElement = ORBEON.util.Dom.getElementById(observer);
+                        var observerElement = ORBEON.util.Dom.get(observer);
                         var controlElements = YAHOO.util.Dom.getElementsByClassName("xforms-control", null, observerElement);
                         for (var i = 0; i < controlElements.length; i++) {
                             var controlElement = controlElements[i];
@@ -82,7 +82,7 @@
 
                     for (var j = 0; j < observers.length; j++) {
                         var observer = observers[j];
-                        var observerElement = ORBEON.util.Dom.getElementById(observer);
+                        var observerElement = ORBEON.util.Dom.get(observer);
                         var controlElements = YAHOO.util.Dom.getElementsByClassName("xforms-control", null, observerElement);
                         for (var i = 0; i < controlElements.length; i++) {
                             var controlElement = controlElements[i];

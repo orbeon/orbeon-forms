@@ -32,7 +32,7 @@
                 var resultSet = database.execute("select url, name, value from Offline_Form_Info order by url, name");
 
                 // Make sure list is empty to start with
-                var formsUl = ORBEON.util.Dom.getElementById("fr-forms-list");
+                var formsUl = ORBEON.util.Dom.get("fr-forms-list");
                 while (formsUl.firstChild)
                     formsUl.removeChild(formsUl.firstChild);
                 // Iterate over name/value pairs

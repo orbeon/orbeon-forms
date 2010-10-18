@@ -53,7 +53,7 @@
                     Event = YAHOO.util.Event;
 
                 Event.onDOMReady(function() {
-                    var layoutElement = ORBEON.util.Dom.getElementById("fb-layout");
+                    var layoutElement = ORBEON.util.Dom.get("fb-layout");
                     layoutElement.style.height = YAHOO.util.Dom.getViewportHeight() + "px";
 
                     var layout = new YAHOO.widget.Layout(layoutElement, {

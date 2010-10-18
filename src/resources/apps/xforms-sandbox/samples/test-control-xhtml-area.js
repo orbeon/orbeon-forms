@@ -1,11 +1,11 @@
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "HTML Area",
-	
+
     settingValue: function(htmlIn, htmlOut) {
         var testCase = this;
         window.setTimeout(function() {
-            ORBEON.widgets.RTE.onRendered(ORBEON.util.Dom.getElementById("xhtml-editor"), function() {
+            ORBEON.widgets.RTE.onRendered(ORBEON.util.Dom.get("xhtml-editor"), function() {
                 testCase.resume(function() {
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         ORBEON.xforms.Document.setValue("xhtml-editor", htmlIn);

@@ -92,6 +92,7 @@
             <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
             <xforms:action if="$form-data">
                 <!-- An id is provided, but the form data is also available in the request, so we use that first -->
+                <xforms:message level="xxforms:log-debug">Loading document by id from request: <xforms:output value="$document"/></xforms:message>
                 <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
@@ -100,6 +101,7 @@
             </xforms:action>
             <xforms:action if="not($form-data)">
                 <!-- Load document with that id from persistence layer -->
+                <xforms:message level="xxforms:log-debug">Loading document by id from submission: <xforms:output value="$document"/></xforms:message>
                 <xforms:send submission="fr-get-document-submission"/>
             </xforms:action>
         </xforms:action>
@@ -116,11 +118,22 @@
                 </xforms:action>
                 <!-- Do we accept data posted to this page? -->
                 <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
-                    <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
-                    <!-- Do we have data posted to this form? -->
-                    <xforms:action if="$form-data">
-                        <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
-                        <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
+                    <xxforms:variable name="mediatype" select="xxforms:get-request-header('Content-Type')" as="xs:string?"/>
+                    <xxforms:variable name="is-xml-mediatype" select="starts-with($mediatype, 'application/xml') or starts-with($mediatype, 'text/xml')" as="xs:boolean"/>
+                    <!-- Do we have data posted to this form as XML? -->
+                    <xforms:action if="$is-xml-mediatype">
+                        <xforms:message level="xxforms:log-debug">Loading document submitted to the page as XML</xforms:message>
+                        <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
+                        <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
+                    </xforms:action>
+                    <!-- Do we have data posted to this form as a parameter? -->
+                    <xforms:action if="not($is-xml-mediatype)">
+                        <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
+                        <xforms:action if="$form-data">
+                            <xforms:message level="xxforms:log-debug">Loading document submitted to the page as parameter</xforms:message>
+                            <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
+                            <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
+                        </xforms:action>
                     </xforms:action>
                 </xforms:action>
             </xforms:action>

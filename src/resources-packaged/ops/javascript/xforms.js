@@ -5087,7 +5087,7 @@ ORBEON.xforms.Init = {
                             var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
                                 scope: keyListener,
                                 correctScope: false,
-                                fn: function(event, event, keyListener) {
+                                fn: function(eventName, eventObject, keyListener) {
                                     // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
                                     var targetId = keyListener.observer;
                                     var additionalAttributes = ["text", keyListener.text];

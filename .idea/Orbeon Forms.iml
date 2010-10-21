@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
-    <facet type="Scala" name="Scala">
-      <configuration />
+    <facet type="scala" name="Scala">
+      <configuration>
+        <option name="compilerLibraryLevel" value="Project" />
+        <option name="compilerLibraryName" value="scala-2.8.0" />
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
@@ -19,9 +22,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Orbeon Forms" level="project" />
-    <orderEntry type="library" name="eXist" level="application" />
-    <orderEntry type="library" exported="" name="HttpClient" level="application" />
-    <orderEntry type="library" name="Scala" level="project" />
+    <orderEntry type="library" name="scala-2.8.0" level="project" />
+    <orderEntry type="library" name="Saxon" level="application" />
   </component>
 </module>
 

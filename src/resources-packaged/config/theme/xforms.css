@@ -56,18 +56,29 @@ html body .xforms-form .xforms-disabled a,
     display: none;
 }
 
-html body .xforms-form input.xforms-disabled,
+/**
+ * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
+ * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
+ * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
+ * doesn't require us to update disabled attributes on controls during the life of the page.
+ */
+    /* Disabled in nospan mode */
+    html body .xforms-form input.xforms-disabled,
     html body .xforms-form select.xforms-disabled,
     html body .xforms-form button.xforms-disabled,
+    /* Disabled in span mode */
+    html body .xforms-form .xforms-disabled input,
+    html body .xforms-form .xforms-disabled select,
+    html body .xforms-form .xforms-disabled button,
+    /* Deselected in nospan mode */
     html body .xforms-form input.xforms-case-deselected,
     html body .xforms-form select.xforms-case-deselected,
     html body .xforms-form button.xforms-case-deselected,
-    html body .xforms-form .xforms-case-deselected input.xforms-case-selected,
-    html body .xforms-form .xforms-case-deselected select.xforms-case-selected,
-    html body .xforms-form .xforms-case-deselected button.xforms-case-selected {
-
-    visibility: hidden; /* Hide disabled form controls, so they can't get the focus (otherwise tabbing will go through the disabled controls) */
-}
+    /* Deselected in span mode */
+    html body .xforms-form .xforms-case-deselected input,
+    html body .xforms-form .xforms-case-deselected select,
+    html body .xforms-form .xforms-case-deselected button
+    { visibility: hidden; }
 
 /* Special visibility rule for table borders */
 html body .xforms-form tr.xforms-disabled,

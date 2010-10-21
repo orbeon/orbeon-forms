@@ -22,7 +22,7 @@
     <!-- Add safe elements to this list -->
     <xsl:template match="*:a | *:b | *:i | *:ul | *:li | *:ol | *:p | *:span | *:u | *:div | *:br | *:strong | *:em
                             | *:img | *:h1 | *:h2 | *:h3 | *:h4 | *:h5 | *:font
-                            | *:table | *:tbody | *:tr | *:td | *:th" priority="2">
+                            | *:table | *:tbody | *:tr | *:td | *:th | *:blockquote | *:sub | *:sup" priority="2">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*|node()"/>
         </xsl:element>

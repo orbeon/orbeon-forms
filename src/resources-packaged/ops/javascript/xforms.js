@@ -37,1276 +37,1306 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 //     FCK_CUSTOM_CONFIG
 //     USER_LANGUAGE
 
-/* * * * * * Utility functions * * * * * */
+(function() {
 
-/**
- * Functions we add to Underscore.js
- */
-_.mixin({
-    take: function(obj, interceptor, context) {
-        return interceptor.call(context, obj);
-    },
-    match: function(obj) {
-        function compareMaybe(f) { return _.isFunction(f) ? f(obj) : f == obj; }
-        function applyMaybe(f) { return _.isFunction(f) ? f(obj) : f; }
-        for (var i = 1; i < arguments.length - 1; i = i + 2)
-            if (compareMaybe(arguments[i])) return applyMaybe(arguments[i+1]);
-        return arguments.length % 2 == 0 ? applyMaybe(arguments[arguments.length - 1]) : obj;
-    },
-    returns: function(obj) {
-        return _.bind(_.identity, this, obj);
-    }
-});
+    /**
+     * Shortcuts
+     */
+    var YD, OD;
+    _.defer(function() {
+        YD = YAHOO.util.Dom;
+        OD = ORBEON.util.Dom;
+    });
 
-var ORBEON = ORBEON || {};
-ORBEON.util = ORBEON.util || {};
+    /**
+     * Functions we add to the awesome Underscore.js
+     */
+    _.mixin({
+
+        /**
+         * Allows functions not part part Underscore.js to be used in chains.
+         *
+         * @see <a href="http://jsfiddle.net/avernet/uVnu2/">Example using take()</a>
+         *
+         * @param {*}               obj             Object passed as a parameter to the object
+         * @param {function(*): *}  interceptor     Function applied to the current object
+         * @param {?*}              context         Optional object on which the function is applied
+         */
+        take: function(obj, interceptor, context) {
+            return interceptor.call(context, obj);
+        },
+
+        /**
+         * This function is an alternative to using if/then/else, and is (very!) loosely inspired by Scala's pattern
+         * matching (and very far from being as powerful!).
+         *
+         * @see <a href="http://programming-scala.labs.oreilly.com/ch03.html#PatternMatching">Pattern matching in Scala</a>
+         * @see <a href="http://jsfiddle.net/avernet/NpCmv/">Example using match()</a>
+         *
+         * @param obj
+         */
+        match: function(obj) {
+            function compareMaybe(f) { return _.isFunction(f) ? f(obj) : f == obj; }
+            function applyMaybe(f) { return _.isFunction(f) ? f(obj) : f; }
+            for (var i = 1; i < arguments.length - 1; i = i + 2)
+                if (compareMaybe(arguments[i])) return applyMaybe(arguments[i+1]);
+            return arguments.length % 2 == 0 ? applyMaybe(arguments[arguments.length - 1]) : obj;
+        },
+
+        returns: function(obj) {
+            return _.bind(_.identity, this, obj);
+        }
+    });
+
+    this.ORBEON = this.ORBEON || {};
+    this.ORBEON.util = {
+
+        /**
+         * The IE version of those methods does not store anything in the
+         * elements as this has some negative side effects like IE reloading
+         * background images set with CSS on the element.
+         */
+        IEDom: {
+            /**
+             * Orbeon version of getting Elements by Name in IE
+             */
+            getElementsByName: function(element, localName, namespace) {
+                return element.getElementsByTagName(namespace == null ? localName : namespace + ":" + localName);
+            }
+        },
+
+        /**
+         * The hasClass, addClass and removeClass methods use a cache of the
+         * classes for a give element for quick lookup. After having parsed the
+         * className a first time we store that information in the orbeonClasses
+         * map on the given element.
+         */
+        MozDom: {
+            /**
+             * Optimized version of getting Elements by Name on Mozilla
+             * Firefox 2 assumes there are no other elements with the
+             * same local name that are in a different namespace. This has
+             * been fixed in Firefox 3 / Gecko 1.9. See https://bugzilla.mozilla.org/show_bug.cgi?id=206053
+             */
+            getElementsByName: function(element, localName, namespace) {
+                return element.getElementsByTagName((ORBEON.xforms.Globals.isFF3OrNewer && namespace != null ? namespace + ":" : "") + localName);
+            }
+        },
+
+        /**
+         *  Utilities to deal with the DOM that supplement what is provided by YAHOO.util.Dom.
+         */
+        Dom: {
+
+            ELEMENT_TYPE: 1,
+
+            isElement: function(node) {
+                return node.nodeType == this.ELEMENT_TYPE;
+            },
+
+            /**
+             * In February 2010, we determined that the particular bug we work around in safeGetElementById() cannot
+             * happen in the vast majority of the cases. So instead, we call document.getElementById() directly.
+             * Between February 2010 and October 2010, we have been calling here YAHOO.util.Dom.get() which was pretty
+             * much directly calling document.getElementById(). In October 2010, we upgraded to YUI 2.8. YUI 2.8 version
+             * of ORBEON.util.Dom.get() started working around IE's bug, sometimes incorrectly returning null on IE in a
+             * case where an element with the specified id did exist. So we are now here calling document.getElementById()
+             * directly instead of going through YUI.
+             *
+             * @param {!string} controlId
+             */
+            get: function(controlId) {
+                return document.getElementById(controlId);
+            },
+
+            /**
+             * This is a "safe" version of document.getElementById(), which gets around bug in IE and Opera 8.2 where
+             * getElementById() by return an element with name equal to the specified id (instead of id equal to the
+             * specified id), or an element which before being cloned used to have that id.
+             *
+             * Even when IE is being used, we almost never fall in one of the cases where we must use this method. So
+             * unless it has been determined that this method must be used, code should use the regular getElementById().
+             *
+             * Also see: http://www.csb7.com/test/ie_getelementbyid_bug/index.php
+             *
+             * @param {!string} controlId
+             */
+            safeGet: function(controlId) {
+                var result = document.getElementById(controlId);
+                if (result && (result.id != controlId) && document.all) {
+                    result = null;
+                    var documentAll = document.all[controlId];
+                    if (documentAll) {
+                        if (documentAll.length) {
+                            for (var i = 0; i < documentAll.length; i++) {
+                                if (documentAll[i].id == controlId) {
+                                    result = documentAll[i];
+                                    break;
+                                }
+                            }
+                        } else {
+                            result = documentAll;
+                        }
+                    }
+                }
+                return result;
+            },
+
+            /**
+             * Return null when the attribute is not there.
+             */
+            getAttribute: function(element, name) {
+                if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                    // IE incorrectly already return null when the attribute is not there,
+                    // but this happens to be what we want to do here
+                    return element.getAttribute(name);
+                } else {
+                    // Other browsers that follow the spec return an empty string when the attribute is not there,
+                    // so we use hasAttribute() which is not implemented by IE to detect that case.
+                    if (element.hasAttribute(name)) {
+                        if (ORBEON.xforms.Globals.isRenderingEngineWebCore) {
+                            return ORBEON.util.String.replace(element.getAttribute(name), "&#38;", "&");
+                        } else {
+                            return element.getAttribute(name);
+                        }
+                    } else {
+                        return null;
+                    }
+                }
+            },
+
+            /**
+             * Return null when the attribute is not there.
+             */
+            setAttribute: function(element, name, value) {
+
+                // IE doesn't support setting the value of some attributes with setAttribute(). So for those attributes,
+                // we set the attribute directly and use this code for all the browser, to avoid having different branches
+                // run for different browsers. This list comes from jQuery (see comments for exceptions).
+                var ATTRIBUTE_SLOTS =  {
+                    "cellspacing": "cellSpacing",
+                    "class": "className",
+                    "colspan": "colSpan",
+                    "for": "htmlFor",
+                    "frameborder": "frameBorder",
+                    "maxlength": "maxLength",
+                    "readonly": "readOnly",
+                    "rowspan": "rowSpan",
+                    "tabindex": "tabIndex",
+                    "usemap": "useMap",
+                    "accesskey": "accessKey", // Not sure why jQuery doesn't include 'accesskey', but includes 'tabindex'
+                    "type": "type"            // jQuery is doing further processing for 'type'
+                };
+
+                if (ATTRIBUTE_SLOTS[name]) {
+
+                    // If the object property is of type integer and the value is an empty string, skip setting the value
+                    // to avoid an error on IE. This is a test that, surprisingly, jQuery doesn't do, which means that with
+                    // jQuery you might get different results when setting the value of an attribute depending on the
+                    // browser. This is particularly important for us as the value of attributes can come from AVTs, which
+                    // can become empty if they loose their evaluation context.
+                    var key = ATTRIBUTE_SLOTS[name];
+                    if (! (value == "" && YAHOO.lang.isNumber(element[key])))
+                        element[key] = value;
+
+                } else if (name == "name" && element.tagName.toLowerCase() == "input") {
+
+                    // Here we handle a bug in IE6 and IE7 where the browser doesn't support changing the name of form elements.
+                    // If changing the name doesn't work, we create the whole element with a new name and insert it into the DOM.
+                    // This behavior is documented by Microsoft: http://msdn.microsoft.com/en-us/library/ms534184(VS.85).aspx
+
+                    // Try to change the name
+                    element.setAttribute(name, value);
+
+                    // Check if changing the name worked. For this we need access to the form for this element, which
+                    // we only have if the element is inside a form (it won't if the element is detached from the document).
+                    // If we can't find the form for this element, we just hope for the best.
+                    if (YAHOO.lang.isObject(element.form)) {
+                        var controlsWithName = element.form[value];
+                        var nameChangeSuccessful = false;
+                        if (controlsWithName && YAHOO.lang.isNumber(controlsWithName.length)) {
+                            // Get around issue with YAHOO.lang.isArray, as reported in YUI list:
+                            // http://www.nabble.com/YAHOO.lang.isArray-doesn%27t-recognize-object-as-array-td22694312.html
+                            for (var controlIndex = 0; controlIndex < controlsWithName.length; controlIndex++) {
+                                if (controlsWithName[controlIndex] == element)
+                                    nameChangeSuccessful = true;
+                            }
+                        } else if (YAHOO.lang.isObject(controlsWithName)) {
+                            if (controlsWithName == element)
+                                nameChangeSuccessful = true;
+                        }
+
+                        if (!nameChangeSuccessful) {
+                            // Get HTML for the element
+                            var elementSource = element.outerHTML;
+                            // Remove the name attribute
+                            elementSource = elementSource.replace(new RegExp(" name=.*( |>)", "g"), "$1");
+                            // Add the name attribute with the new value
+                            elementSource = elementSource.replace(new RegExp(">"), " name=\"" + value + "\">");
+                            var newElement = document.createElement(elementSource);
+                            // Replacing current element by newly created one
+                            element.parentNode.insertBefore(newElement, element);
+                            element.parentNode.removeChild(element);
+                        }
+                    }
+                } else {
+                    element.setAttribute(name, value);
+                }
+            },
+
+            getChildElementByIndex: function(parent, position) {
+                for (var i = 0; i < parent.childNodes.length; i++) {
+                    var child = parent.childNodes[i];
+                    if (ORBEON.util.Dom.isElement(child)) {
+                        if (position == 0) return child;
+                        position--;
+                    }
+                }
+                return null;
+            },
+
+            getChildElementByClass: function(parent, clazz) {
+                for (var i = 0; i < parent.childNodes.length; i++) {
+                    var child = parent.childNodes[i];
+                    if (ORBEON.util.Dom.isElement(child) && YAHOO.util.Dom.hasClass(child, clazz)) {
+                        return child;
+                    }
+                }
+                return null;
+            },
+
+            getChildElementsByClass: function(parent, clazz) {
+                var nodes = [];
+                for (var i = 0; i < parent.childNodes.length; i++) {
+                    var child = parent.childNodes[i];
+                    if (ORBEON.util.Dom.isElement(child) && YAHOO.util.Dom.hasClass(child, clazz)) {
+                        nodes[nodes.length] = child;
+                    }
+                }
+                return nodes.length == 0 ? null : nodes;
+            },
+
+            nextSiblingElement: function(element) {
+                while (true) {
+                    var candidate = element.nextSibling;
+                    if (candidate == null) return null;
+                    if (ORBEON.util.Dom.isElement(candidate)) return candidate;
+                }
+            },
+
+            stringToDom: function(xmlString) {
+                if (document.implementation.createDocument) {
+                    return (new DOMParser()).parseFromString(xmlString, "application/xml");
+                } else if (window.ActiveXObject) {
+                    var dom = new ActiveXObject("Microsoft.XMLDOM");
+                    dom.async = "false";
+                    dom.loadXML(xmlString);
+                    return dom;
+                }
+                return null;
+            },
+
+            clearUploadControl: function(uploadElement) {
+
+                var inputElement = YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, uploadElement)[0];
+                var parentElement = inputElement.parentNode;
+                var newInputElement = document.createElement("input");
+                YAHOO.util.Dom.addClass(newInputElement, inputElement.className);
+                newInputElement.setAttribute("type", inputElement.type);
+                newInputElement.setAttribute("name", inputElement.name);
+                newInputElement.setAttribute("size", inputElement.size);
+                newInputElement.setAttribute("unselectable", "on");// the server sets this, so we have to set it again
+                parentElement.replaceChild(newInputElement, inputElement);
+                return null;
+            },
+
+            /**
+             * Use W3C DOM API to get the content of an element.
+             */
+            getStringValue: function(element) {
+                if (element.innerText == null) {
+                    // Use W3C DOM API
+                    var result = "";
+                    for (var i = 0; i < element.childNodes.length; i++) {
+                        var child = element.childNodes[i];
+                        if (child.nodeType == TEXT_TYPE)
+                            result += child.nodeValue;
+                    }
+                    return result;
+                } else {
+                    // Use IE's innerText, which is faster on IE
+                    return element.innerText;
+                }
+            },
+
+            /**
+             * Use W3C DOM API to set the content of an element.
+             */
+            setStringValue: function(element, text) {
+                if (element.innerText == null) {
+                    // Use W3C DOM API
+                    // Remove content
+                    while (element.childNodes.length > 0)
+                        element.removeChild(element.firstChild);
+                    // Add specified text
+                    var textNode = element.ownerDocument.createTextNode(text);
+                    element.appendChild(textNode);
+                } else {
+                    // Use IE's innerText, which is faster on IE
+                    element.innerText = text;
+                }
+            },
+
+            /**
+             * Nudge element after a short delay for IE6/7 to force IE to "do the right thing".
+             */
+            nudgeAfterDelay: function(element) {
+                if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7) {
+                    var tables = element.getElementsByTagName("table");
+                    window.setTimeout(function() {
+                        element.className = element.className;
+                        for (var tableIndex = 0; tableIndex < tables.length; tableIndex++) {
+                            var table = tables[tableIndex];
+                            table.className = table.className;
+                        }
+                    }, ORBEON.util.Properties.internalShortDelay.get());
+                }
+            },
+
+            /**
+             * Similar to root.getElementsByTagName(tagName), but:
+             *
+             *    1. Returns root if root.tagName == tagName.
+             *    2. Returns only one element (the first if there are many).
+             *    3. Can take an array of tagName if there are alternatives.
+             *
+             * @param {Element}                 root            Root node from which we start the search
+             * @param {string|Array.<string>}   tagNameOrArray  Tag name we're looking for
+             */
+            getElementByTagName: function(root, tagNameOrArray) {
+                var result = _.isArray(tagNameOrArray)
+                    ? _(tagNameOrArray).chain()
+                        .map(_.bind(arguments.callee, null, root))
+                        .compact()
+                        .first()
+                        .value()
+                    : root.tagName.toLowerCase() == tagNameOrArray
+                        ? root
+                        : root.getElementsByTagName(tagNameOrArray)[0];
+                return _.isUndefined(result) ? null : result;
+            },
+
+            isAncestorOrSelfHidden: function(element) {
+                while (true) {
+                    if (element == null) return false;
+                    if (! YAHOO.lang.isUndefined(element.style) && YAHOO.util.Dom.getStyle(element, "display") == "none") return true;
+                    element = element.parentNode;
+                }
+            },
+
+            /**
+             * Applies a function to all the HTML form elements under a root element, including the root if it is a
+             * form element.
+             */
+            applyOnFormElements: function(root, fn, obj, overrideContext) {
+                var FORM_TAG_NAMES = ["input", "textarea", "select", "button"];
+                ORBEON.util.Utils.apply(FORM_TAG_NAMES, function(tagName) {
+                    if (root.tagName.toLowerCase() == tagName)
+                        if (overrideContext) fn.call(obj, root); else fn(root);
+                    ORBEON.util.Utils.apply(root.getElementsByTagName(tagName), fn, obj, overrideContext);
+                }, null, false);
+            },
+
+            /**
+             * Test a function ancestor-or-self::* and returns true as soon as the function returns true, or false of the
+             * function always returns false.
+             */
+            existsAncestorOrSelf: function(node, fn, obj, overrideContext) {
+                while (true) {
+                    if (overrideContext ? fn.call(obj, node) : fn(node)) return true;
+                    node = node.parentNode;
+                    if (node == null || node == document) break;
+                }
+                return false;
+            }
+        },
+
+        /**
+         * General purpose methods on string
+         */
+        String: {
+            replace: function(text, placeholder, replacement) {
+                // Don't try to do the replacement if the string does not contain the placeholder
+                return text.indexOf(placeholder) == -1 ? text :
+                       text.replace(new RegExp(placeholder, "g"), replacement);
+            },
+
+            /**
+             * Evaluates JavaScript which can contain return characters we need to remove
+             */
+            eval: function(javascriptString) {
+                javascriptString = ORBEON.util.String.replace(javascriptString, "\n", " ");
+                javascriptString = ORBEON.util.String.replace(javascriptString, "\r", " ");
+                return eval(javascriptString);
+            },
+
+            /**
+             * Escape text that appears in an HTML attribute which we use in an innerHTML.
+             */
+            escapeAttribute: function(text) {
+                return ORBEON.util.String.replace(text, '"', '&quot;');
+            },
+
+            /**
+             * Escape text that appears in an HTML attribute which we use in an innerHTML.
+             */
+            escapeHTMLMinimal: function(text) {
+                text = ORBEON.util.String.replace(text, '&', '&amp;');
+                return ORBEON.util.String.replace(text, '<', '&lt;');
+            },
+
+            /**
+             * Checks if a string ends with another string.
+             */
+            endsWith: function(text, suffix) {
+                var index = text.lastIndexOf(suffix);
+                return index != -1 && index + suffix.length == text.length;
+            },
+
+            normalizeSerializedHTML: function(text) {
+                // Mmmh, the caller might pass an integer, e.g. for the slider. Not sure if fixing this here is the best way.
+                if (typeof text == "string") {
+                    return text.replace(XFORMS_REGEXP_CR, "");
+                } else {
+                    return text;
+                }
+            }
+        },
+
+        /**
+         * Utility functions dealing with dates and times.
+         *
+         * Credits - This is based and inspired by:
+         *     Simon Willison's Magic date parser (http://simon.incutio.com/archive/2003/10/06/betterDateInput)
+         *     Stoyan Stefanov's Magic time parsing (http://www.phpied.com/javascript-time-input/)
+         */
+        DateTime: {
+
+            magicTimeToJSDate: function(magicTime) {
+                return ORBEON.util.DateTime._magicToJSDate(magicTime, ORBEON.util.DateTime._timeParsePatterns);
+            },
+
+            magicDateToJSDate: function(magicDate) {
+                return ORBEON.util.DateTime._magicToJSDate(magicDate, ORBEON.util.DateTime._dateParsePatterns);
+            },
+
+            _magicToJSDate: function(magicTimeDate, parsePatterns) {
+                for (var i = 0; i < parsePatterns.length; i++) {
+                    var re = parsePatterns[i].re;
+                    var handler = parsePatterns[i].handler;
+                    var bits = re.exec(magicTimeDate);
+                    if (bits) {
+                        return handler(bits);
+                    }
+                }
+                return null;
+            },
+
+            jsDateToISOTime: function(jsDate) {
+                return ORBEON.util.DateTime._padAZero(jsDate.getHours())
+                       + ':'
+                       + ORBEON.util.DateTime._padAZero(jsDate.getMinutes())
+                       + ':'
+                       + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
+            },
+
+            jsDateToISODate: function(jsDate) {
+                return jsDate.getFullYear()
+                       + '-' + ORBEON.util.DateTime._padAZero(jsDate.getMonth() + 1)
+                       + '-' + ORBEON.util.DateTime._padAZero(jsDate.getDate());
+            },
+
+            jsDateToISODateTime: function(jsDateDate, jsDateTime) {
+                return ORBEON.util.DateTime.jsDateToISODate(jsDateDate) + "T" + ORBEON.util.DateTime.jsDateToISOTime(jsDateTime);
+            },
+
+            jsDateToformatDisplayTime: function(jsDate) {
+                if (ORBEON.util.Properties.formatInputTime.get() == "[H]:[m]:[s]") {
+                    // EU time
+                    return jsDate.getHours() + ":"
+                            + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
+                            + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
+                } else {
+                    // Default: [h]:[m]:[s] [P]
+                    // US time
+                    return (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12) + ":"
+                            + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
+                            + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())
+                            + (jsDate.getHours() < 12 ? " a.m." : " p.m.");
+                }
+            },
+
+            jsDateToformatDisplayDate: function(jsDate) {
+                var inputDateFormat = ORBEON.util.Properties.formatInputDate.get(); // e.g. "[D01].[M01].[Y]"
+                var inputDateFormatParts = inputDateFormat.split(new RegExp("[\\[\\]]")); // e.g. ["", "D01", ".", "M01", ".", "Y", ""]
+                var result = [];
+                for (var inputDateFormatPartIndex = 0; inputDateFormatPartIndex < inputDateFormatParts.length; inputDateFormatPartIndex++) {
+                    var inputDateFormatPart = inputDateFormatParts[inputDateFormatPartIndex];
+
+                    function padAndPush(dateOperation) {
+                        var part = dateOperation.apply(jsDate).toString();
+                        if (inputDateFormatPart.indexOf("01") == 1 && part.length < 2) part = "0" + part;
+                        result.push(part);
+                    }
+
+                    if (inputDateFormatPart == "") ; // NOP: the first and last part will be an empty string
+                    else if (inputDateFormatPart.indexOf("D") == 0) padAndPush(jsDate.getDate);
+                    else if (inputDateFormatPart.indexOf("M") == 0) padAndPush(function() { return this.getMonth() + 1; });
+                    else if (inputDateFormatPart.indexOf("Y") == 0) padAndPush(jsDate.getFullYear);
+                    else result.push(inputDateFormatPart);
+                }
+                return result.join("");
+            },
+
+            /**
+             * Array of objects, each has:
+             * <ul><li>'re' - a regular expression</li>
+             * <li>'handler' - a function for creating a date from something
+             *     that matches the regular expression</li>
+             * Handlers may throw errors if string is unparseable.
+             */
+            _timeParsePatterns: [
+                // Now
+                {   re: /^now$/i,
+                    handler: function() {
+                        return new Date();
+                    }
+                },
+                // 12:34:56 p.m.
+                {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(p|pm|p\.m\.)$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = parseInt(bits[1], 10);
+                        if (h < 12) {h += 12;}
+                        d.setHours(h);
+                        d.setMinutes(parseInt(bits[2], 10));
+                        d.setSeconds(parseInt(bits[3], 10));
+                        return d;
+                    }
+                },
+                // 12:34 p.m.
+                {   re: /^(\d{1,2}):(\d{1,2}) ?(p|pm|p\.m\.)$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = parseInt(bits[1], 10);
+                        if (h < 12) {h += 12;}
+                        d.setHours(h);
+                        d.setMinutes(parseInt(bits[2], 10));
+                        d.setSeconds(0);
+                        return d;
+                    }
+                },
+                // 12 p.m.
+                {   re: /^(\d{1,2}) ?(p|pm|p\.m\.)$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = parseInt(bits[1], 10);
+                        if (h < 12) {h += 12;}
+                        d.setHours(h);
+                        d.setMinutes(0);
+                        d.setSeconds(0);
+                        return d;
+                    }
+                },
+                // 12:34:56 (a.m.)
+                {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(a|am|a\.m\.)?$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = parseInt(bits[1], 10);
+                        if (! YAHOO.lang.isUndefined(bits[4]) && bits[4] != "") h = h % 12;
+                        d.setHours(h);
+                        d.setMinutes(parseInt(bits[2], 10));
+                        d.setSeconds(parseInt(bits[3], 10));
+                        return d;
+                    }
+                },
+                // 12:34 (a.m.)
+                {   re: /^(\d{1,2}):(\d{1,2}) ?(a|am|a\.m\.)?$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = parseInt(bits[1], 10);
+                        if (! YAHOO.lang.isUndefined(bits[3]) && bits[3] != "") h = h % 12;
+                        d.setHours(h);
+                        d.setMinutes(parseInt(bits[2], 10));
+                        d.setSeconds(0);
+                        return d;
+                    }
+                },
+                // 12 (a.m.)
+                {   re: /^(\d{1,2}) ?(a|am|a\.m\.)?$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = parseInt(bits[1], 10);
+                        if (! YAHOO.lang.isUndefined(bits[2]) && bits[2] != "") h = h % 12;
+                        d.setHours(h);
+                        d.setMinutes(0);
+                        d.setSeconds(0);
+                        return d;
+                    }
+                },
+                // hhmmss
+                {   re: /^(\d{1,6})$/,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var h = bits[1].substring(0,2);
+                        var m = parseInt(bits[1].substring(2,4), 10);
+                        var s = parseInt(bits[1].substring(4,6), 10);
+                        if (isNaN(m)) {m = 0;}
+                        if (isNaN(s)) {s = 0;}
+                        d.setHours(parseInt(h, 10));
+                        d.setMinutes(parseInt(m, 10));
+                        d.setSeconds(parseInt(s, 10));
+                        return d;
+                    }
+                }
+            ],
+
+            _dateParsePatterns: [
+
+                // NOTE: Date() months are 0-based
+                // Create date in one shot when possible, because if you set year, then month, then day, sometimes the result is incorrect!
+
+                // Today
+                {   re: /^tod/i,
+                    handler: function() {
+                        return new Date();
+                    }
+                },
+                // Tomorrow
+                {   re: /^tom/i,
+                    handler: function() {
+                        var d = new Date();
+                        d.setDate(d.getDate() + 1);
+                        return d;
+                    }
+                },
+                // Yesterday
+                {   re: /^yes/i,
+                    handler: function() {
+                        var d = new Date();
+                        d.setDate(d.getDate() - 1);
+                        return d;
+                    }
+                },
+                // 4th
+                {   re: /^(\d{1,2})(st|nd|rd|th)?$/i,
+                    handler: function(bits) {
+                        var d = new Date();
+                        d.setDate(parseInt(bits[1], 10));
+                        return d;
+                    }
+                },
+                // 4th Jan
+                {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
+                    handler: function(bits) {
+                        return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
+                    }
+                },
+                // 4th Jan 2003
+                {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
+                    handler: function(bits) {
+                        return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
+                    }
+                },
+                // Jan 4th
+                {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
+                    handler: function(bits) {
+                        return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
+                    }
+                },
+                // Jan 4th 2003
+                {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
+                    handler: function(bits) {
+                        return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
+                    }
+                },
+                // next Tuesday - this is suspect due to weird meaning of "next"
+                {   re: /^next (\w+)$/i,
+                    handler: function(bits) {
+                        var d = new Date();
+                        var day = d.getDay();
+                        var newDay = ORBEON.util.DateTime._parseWeekday(bits[1]);
+                        var addDays = newDay - day;
+                        if (newDay <= day) {
+                            addDays += 7;
+                        }
+                        d.setDate(d.getDate() + addDays);
+                        return d;
+                    }
+                },
+                // last Tuesday
+                {   re: /^last (\w+)$/i,
+                    handler: function(bits) {
+                        throw new Error("Not yet implemented");
+                    }
+                },
+                // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
+                {   re: /^(\d{1,2}).(\d{1,2}).(\d{2,4})$/,
+                    handler: function(bits) {
+                        var d;
+                        if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
+                            // Day first
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                        } else {
+                            // Month first
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
+                        }
+                        return d;
+                    }
+                },
+                // mm/dd (American style without year) or dd/mm (European style without year)
+                {   re: /^(\d{1,2}).(\d{1,2})$/,
+                    handler: function(bits) {
+                        var d;
+                        if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
+                        } else {
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                        }
+                        return d;
+                    }
+                },
+                // yyyy-mm-dd (ISO style)
+                {   re: /(^\d{4})-(\d{1,2})-(\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
+                    handler: function(bits) {
+                        return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
+                    }
+                }
+            ],
+
+            /**
+             * Helper function to pad a leading zero to an integer
+             * if the integer consists of one number only.
+             * This function s not related to the algo, it's for
+             * getReadable()'s purposes only.
+             *
+             * @param s An integer value
+             * @return string The input padded with a zero if it's one number int
+             */
+            _padAZero: function(s) {
+                s = s.toString();
+                if (s.length == 1) {
+                    return '0' + s;
+                } else {
+                    return s;
+                }
+            },
+
+            _monthNames: "January February March April May June July August September October November December".split(" "),
+            _weekdayNames: "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "),
+
+            /**
+             *  Takes a string, returns the index of the month matching that string, throws
+             *  an error if 0 or more than 1 matches
+             */
+            _parseMonth: function(month) {
+                var matches = ORBEON.util.DateTime._monthNames.filter(function(item) {
+                    return new RegExp("^" + month, "i").test(item);
+                });
+                if (matches.length == 0) {
+                    throw new Error("Invalid month string");
+                }
+                if (matches.length > 1) {
+                    throw new Error("Ambiguous month");
+                }
+                return ORBEON.util.DateTime._monthNames.indexOf(matches[0]);
+            },
+
+            /* Same as parseMonth but for days of the week */
+            _parseWeekday: function(weekday) {
+                var matches = ORBEON.util.DateTime._weekdayNames.filter(function(item) {
+                    return new RegExp("^" + weekday, "i").test(item);
+                });
+                if (matches.length == 0) {
+                    throw new Error("Invalid day string");
+                }
+                if (matches.length > 1) {
+                    throw new Error("Ambiguous weekday");
+                }
+                return ORBEON.util.DateTime._weekdayNames.indexOf(matches[0]);
+            },
+
+            _currentYear: new Date().getFullYear(),
+            _parseYear: function(year) {
+                year = parseInt(year, 10);
+                if (year < 100) {
+                    var twentiethCentury = 1900 + year;
+                    var twentyFirstCentury = 2000 + year;
+                    year = Math.abs(twentiethCentury - ORBEON.util.DateTime._currentYear) < Math.abs(twentyFirstCentury - ORBEON.util.DateTime._currentYear)
+                        ? twentiethCentury : twentyFirstCentury;
+                }
+                return year;
+            },
+
+            _newDate: function(year, month, day) {
+                var result = new Date(year, month, day);
+                return result.getFullYear() == year && result.getMonth() == month && result.getDate() == day
+                    ? result : null;
+            }
+        },
+
+        Property: function() {
+            var Property = function(name, defaultValue) {
+                this.name = name;
+                this.defaultValue = defaultValue;
+            };
+
+            Property.prototype.get = function() {
+                return YAHOO.lang.isUndefined(opsXFormsProperties) || YAHOO.lang.isUndefined(opsXFormsProperties[this.name])
+                    ? this.defaultValue : opsXFormsProperties[this.name];
+            };
+
+            return Property;
+        }(),
+
+        Properties: {
+            init: function() {
+                this.sessionHeartbeat = new ORBEON.util.Property("session-heartbeat", true);
+                this.sessionHeartbeatDelay = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
+                this.revisitHandling = new ORBEON.util.Property("revisit-handling", "restore");
+                this.fckEditorBasePath = new ORBEON.util.Property("fck-editor-base-path", "/ops/fckeditor/");
+                this.delayBeforeIncrementalRequest = new ORBEON.util.Property("delay-before-incremental-request", 500);
+                this.delayBeforeForceIncrementalRequest = new ORBEON.util.Property("delay-before-force-incremental-request", 2000);
+                this.delayBeforeGeckoCommunicationError = new ORBEON.util.Property("delay-before-gecko-communication-error", 5000);
+                this.delayBeforeCloseMinimalDialog = new ORBEON.util.Property("delay-before-close-minimal-dialog", 5000);
+                this.delayBeforeAjaxTimeout = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
+                this.internalShortDelay = new ORBEON.util.Property("internal-short-delay", 100);
+                this.delayBeforeDisplayLoading = new ORBEON.util.Property("delay-before-display-loading", 500);
+                this.debugWindowHeight = new ORBEON.util.Property("debug-window-height", 600);
+                this.debugWindowWidth = new ORBEON.util.Property("debug-window-width", 300);
+                this.loadingMinTopPadding = new ORBEON.util.Property("loading-min-top-padding", 10);
+                this.helpHandler = new ORBEON.util.Property("help-handler", false);
+                this.helpTooltip = new ORBEON.util.Property("help-tooltip", false);
+                this.offlineSupport = new ORBEON.util.Property("offline", false);
+                this.formatInputTime = new ORBEON.util.Property("format.input.time", "[h] =[m] =[s] [P]");
+                this.formatInputDate = new ORBEON.util.Property("format.input.date", "[M]/[D]/[Y]");
+                this.datePicker = new ORBEON.util.Property("datepicker", "yui");
+                this.datePickerNavigator = new ORBEON.util.Property("datepicker.navigator", true);
+                this.datePickerTwoMonths = new ORBEON.util.Property("datepicker.two-months", false);
+                this.htmlEditor = new ORBEON.util.Property("htmleditor", "yui");
+                this.showErrorDialog = new ORBEON.util.Property("show-error-dialog", true);
+                this.clientEventMode = new ORBEON.util.Property("client.events.mode", "default");
+                this.clientEventsFilter = new ORBEON.util.Property("client.events.filter", "");
+                this.resourcesVersioned = new ORBEON.util.Property("oxf.resources.versioned", false);
+                this.resourcesVersionNumber = new ORBEON.util.Property("oxf.resources.version-number", "");
+                this.newXHTMLLayout = new ORBEON.util.Property("new-xhtml-layout", false);
+                this.xhtmlLayout = new ORBEON.util.Property("xhtml-layout", "nospan");
+                this.retryDelayIncrement = new ORBEON.util.Property("retry.delay-increment", 5000);
+                this.retryMaxDelay = new ORBEON.util.Property("retry.max-delay", 30000);
+            }
+        },
+
+        /**
+         * Utility methods that don't in any other category
+         */
+        Utils: {
+            logMessage: function(message) {
+                if (typeof console != "undefined") {
+                    console.log(message); // Normal use; do not remove
+                }
+            },
+
+            isNewXHTMLLayout: function() {
+                return ORBEON.util.Properties.newXHTMLLayout.get()
+                    || ORBEON.util.Properties.xhtmlLayout.get() != "nospan";
+            },
+
+            hideModalProgressPanel: function() {
+                if (ORBEON.xforms.Globals.modalProgressPanel) {
+                    ORBEON.xforms.Globals.modalProgressPanel.hide();
+                    // We set it to null when hiding so we have an easy way of knowing of the panel is visible or not.
+                    // See: http://www.nabble.com/Is-Panel-visible--td22139417.html
+                    ORBEON.xforms.Globals.modalProgressPanel = null;
+                }
+            },
+
+            displayModalProgressPanel: function(formID) {
+                if (!ORBEON.xforms.Globals.modalProgressPanel) {
+                    ORBEON.xforms.Globals.modalProgressPanel =
+                    new YAHOO.widget.Panel("wait", {
+                        width: "60px",
+                        fixedcenter: true,
+                        close: false,
+                        draggable: false,
+                        zindex: 4,
+                        modal: true,
+                        visible: true
+                    });
+                    ORBEON.xforms.Globals.modalProgressPanel.setBody('<img alt="Processing, please wait" src="'
+                            + ORBEON.xforms.Globals.resourcesBaseURL[formID] + '/ops/images/xforms/processing.gif"/>');
+                    ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
+                }
+                ORBEON.xforms.Globals.modalProgressPanel.show();
+            },
+
+            countOccurrences: function(str, character) {
+                var count = 0;
+                var pos = str.indexOf(character);
+                while ( pos != -1 ) {
+                    count++;
+                    pos = str.indexOf(character,pos+1);
+                }
+                return count;
+            },
+
+            /**
+             * For example: appendToEffectivefId("foo·1", "bar") returns "foobar·1"
+             */
+            appendToEffectiveId: function(effectiveId, ending) {
+                var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(effectiveId);
+                return prefixedId + ending + ORBEON.util.Utils.getEffectiveIdSuffixWithSeparator(effectiveId);
+            },
+
+            /**
+             * For example: getEffectiveIdNoSuffix("foo·1-2") returns "foo"
+             */
+            getEffectiveIdNoSuffix: function(effectiveId) {
+                if (effectiveId == null)
+                    return null;
+
+                var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
+                if (suffixIndex != -1) {
+                    return effectiveId.substring(0, suffixIndex);
+                } else {
+                    return effectiveId;
+                }
+            },
+
+            /**
+             * For example: getEffectiveIdNoSuffix("foo·1-2") returns "·1-2"
+             */
+            getEffectiveIdSuffixWithSeparator: function(effectiveId) {
+                if (effectiveId == null)
+                    return null;
+
+                var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
+                if (suffixIndex != -1) {
+                    return effectiveId.substring(suffixIndex);
+                } else {
+                    return "";
+                }
+            },
+
+            getLocalName: function(element) {
+                if (element.nodeType == 1) {
+                    return element.tagName.indexOf(":") == -1
+                            ? element.tagName
+                            : element.tagName.substr(element.tagName.indexOf(":") + 1);
+                } else {
+                    return null;
+                }
+            },
+
+            addSuffixToIdsAndRemoveDisabled: function(element, idSuffix, repeatDepth) {
+
+                // Remove disabled, as form fields have a 'disabled' attribute so tabbing skips over form elements in the repeat template
+                element.removeAttribute("disabled");
+
+                // Compute new id
+                var idSuffixWithDepth = idSuffix;
+                for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
+                    idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
+
+                // Update id attribute
+                if (element.id) {
+                    element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
+                }
+
+                // Update for attribute
+                if (element.htmlFor)
+                    element.htmlFor = ORBEON.util.Utils.appendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+
+                // Update name attribute
+                if (element.name) {
+                    var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
+                    if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
+                            && ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                        // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
+                        // cause the name in the programming model to change in the collection of elements". This has a implication
+                        // for radio buttons where using a same name for a set of radio buttons is used to group them together.
+                        // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
+
+                        // NOTE: Here we only fix the case of radio button groups. However, the name attribute issue is present
+                        // for other controls as well. With IE versions (including IE 8 in quirks mode) that exhibit this bug,
+                        // you cannot safely call document.getElementById() of a form element within a template once the template
+                        // has been cloned. For example, in a template:
+                        //
+                        // <span id="my-input"><input id="my-input$$c" name="my-input">...
+                        //
+                        // getElementById("my-input") correctly returns <span id="my-input">
+                        //
+                        // Now clone the template. getElementById("my-input") now returns <input id="my-input$$c·1" name="my-input﻿·1">
+                        //
+                        // That's because IE mixes up the element id and the name, AND the name "my-input" incorrectly points to
+                        // the cloned element.
+                        //
+                        // This seems fixed in IE 8 and up in standards mode.
+                        //
+                        // If we wanted to fix this, we could run the code below also for <textarea> and for all <input>, not
+                        // only those with type="radio". We should also try to detect the issue so that we do not run this for IE
+                        // 8 in standards mode.
+                        var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
+                        for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
+                            var attribute = element.attributes[attributeIndex];
+                            if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
+                                clone.setAttribute(attribute.nodeName, attribute.nodeValue);
+                        }
+                        YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);
+                        YAHOO.util.Event.addListener(clone, "blur", ORBEON.xforms.Events.blur);
+                        YAHOO.util.Event.addListener(clone, "change", ORBEON.xforms.Events.change);
+                        element.replaceNode(clone);
+                    } else {
+                        element.name = newName;
+                    }
+                }
+
+                // Recurse through children
+                for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+                    var childNode = element.childNodes[childIndex];
+                    if (childNode.nodeType == ELEMENT_TYPE) {
+                        if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
+                        ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(childNode, idSuffix, repeatDepth);
+                        if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
+                    }
+                }
+            },
+
+            getClassForRepeatId: function(repeatId) {
+                var depth = 1;
+                var currentRepeatId = repeatId;
+                while (true) {
+                    currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
+                    if (currentRepeatId == null) break;
+                    depth = (depth == 4) ? 1 : depth + 1;
+                }
+                return "xforms-repeat-selected-item-" + depth;
+            },
+
+            // Replace in a tree a placeholder by some other string in text nodes and attribute values
+            stringReplace: function(node, placeholder, replacement) {
+
+                function stringReplaceWorker(node, placeholderRegExp, replacement) {
+                    switch (node.nodeType) {
+                        case ELEMENT_TYPE:
+                            for (var i = 0; i < node.attributes.length; i++) {
+                                var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
+                                if (newValue != node.attributes[i].value)
+                                    ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
+                            }
+                            for (var i = 0; i < node.childNodes.length; i++)
+                                stringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
+                            break;
+                        case TEXT_TYPE:
+                            var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
+                            if (newValue != node.nodeValue)
+                                node.nodeValue = newValue;
+                            break;
+                    }
+                }
+
+                // Escape dollar signs we might have in the placeholder or replacement so they can be used in regexp
+                placeholder = placeholder.replace(new RegExp("\\$", "g"), "\\$");
+                replacement = replacement.replace(new RegExp("\\$", "g"), "$$$$");
+
+                var placeholderRegExp = new RegExp(placeholder, "g");
+                stringReplaceWorker(node, placeholderRegExp, replacement);
+            },
+
+            appendRepeatSuffix: function(id, suffix) {
+                if (suffix == "")
+                    return id;
+
+                // Remove "-" at the beginning of the suffix, if any
+                if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
+                    suffix = suffix.substring(1);
+
+                // Add suffix with the right separator
+                id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+                id += suffix;
+
+                return id;
+            },
+
+            /**
+             * Locate the delimiter at the given position starting from a repeat begin element.
+             *
+             * @param repeatId      Can be either a pure repeat ID, such as "foobar" or an ID that contains information of its
+             *                      position relative to its parents, such as "foobar.1". The former happens when we handle an
+             *                      event such as <xxf:repeat-index id="foobar" old-index="4" new-index="6"/>. In this case
+             *                      "foobar" means the "foobar at 'index' in the current foobar list". The latter happens when we handle
+             *                      an event such as <xxf:repeat-iteration id="foobar.1" relevant="false" iteration="10"/>, which
+             *                      does not necessarily apply to the current "foobar".
+             * @param index
+             */
+            findRepeatDelimiter: function(repeatId, index) {
+
+                // Find id of repeat begin for the current repeatId
+                var parentRepeatIndexes = "";
+                {
+                    var currentId = repeatId;
+                    while (true) {
+                        var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
+                        if (parent == null) break;
+                        var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
+                        parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
+                                + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
+                        currentId = parent;
+                    }
+                }
+
+                var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
+                var beginElement = ORBEON.util.Dom.get(beginElementId);
+                if (!beginElement) return null;
+                var cursor = beginElement;
+                var cursorPosition = 0;
+                while (true) {
+                        while (cursor.nodeType != ELEMENT_TYPE || !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
+                        cursor = cursor.nextSibling;
+                        if (!cursor) return null;
+                    }
+                    cursorPosition++;
+                    if (cursorPosition == index) break;
+                    cursor = cursor.nextSibling;
+                }
+
+                return cursor;
+            },
+
+            /**
+             * Check whether a region is completely visible (i.e. is fully inside the viewport).
+             * Note: this function is different than the function with the same name in YUI.
+             */
+            fitsInViewport: function(element) {
+
+                // Viewport coordinates
+                var viewportFirstTop = YAHOO.util.Dom.getDocumentScrollTop();
+                var viewportFirstLeft = YAHOO.util.Dom.getDocumentScrollLeft();
+                var viewportSecondTop = viewportFirstTop + YAHOO.util.Dom.getViewportHeight();
+                var viewportSecondLeft = viewportFirstLeft + YAHOO.util.Dom.getViewportWidth();
+                var viewportRegion = new YAHOO.util.Region(viewportFirstTop, viewportSecondLeft, viewportSecondTop, viewportFirstLeft);
+
+                // Element coordinates
+                var elementRegion = YAHOO.util.Dom.getRegion(element);
+
+                return viewportRegion.top <= elementRegion.top && viewportRegion.left <= elementRegion.left
+                    && elementRegion.bottom <= viewportRegion.bottom && elementRegion.right <= viewportRegion.right;
+            },
+
+            /**
+             * Applies a function to all the elements of an array, and discards the value returned by the function, if any.
+             */
+            apply: function(array, fn, obj, overrideContext) {
+                for (var arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
+                    var arrayElement = array[arrayIndex];
+                    if (overrideContext) fn.call(obj, arrayElement); else fn(arrayElement);
+                }
+            }
+        },
+
+        /**
+         * Utility function to make testing with YUI Test easier.
+         */
+        Test: {
+            /**
+             * Tests that rely on instances having a certain value should start by callng this utility function
+             */
+            executeWithInitialInstance: function(testCase, testFunction) {
+                ORBEON.testing.executeCausingAjaxRequest(testCase, function() {
+                    ORBEON.xforms.Document.dispatchEvent("main-model", "restore-instance");
+                }, function() {
+                    testFunction.call(testCase);
+                });
+            },
+
+            /**
+             * Runs a first function as part of a YUI test case, waits for all Ajax requests (if any) that might ensue
+             * to terminate, then run a second function.
+             *
+             * This doesn't use the ajaxResponseProcessedEvent, because we want this to work in cases where we have zero
+             * or more than one Ajax requests.
+             */
+            executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
+
+                function checkAjaxReceived() {
+                    if (ORBEON.xforms.Globals.requestInProgress || ORBEON.xforms.Globals.eventQueue.length > 0) {
+                        // Wait another 100 ms
+                        setTimeout(checkAjaxReceived, 100);
+                    } else {
+                        // We done with Ajax requests, continue with the test
+                        testCase.resume(function() {
+                            afterAjaxResponseFunction.call(testCase);
+                        });
+                    }
+                }
+
+                causingAjaxRequestFunction.call(testCase);
+                setTimeout(checkAjaxReceived, 100);
+                testCase.wait(20000);
+            },
+
+            /**
+             * Similar to executeCausingAjaxRequest
+             */
+            executeSequenceCausingAjaxRequest: function(testCase, tests) {
+                if (tests.length > 0) {
+                    var testTuple = tests.shift();
+                    ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
+                        testTuple[0].call(testCase);
+                    }, function() {
+                        testTuple[1].call(testCase);
+                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(testCase, tests);
+                    });
+                }
+            },
+
+            /**
+             * Starts Firebug Lite if Firebug is not already available (as it is most of the time on Firefox)
+             */
+            startFirebugLite: function() {
+                if (! window.firebug) {
+                    var firebugScript = document.createElement("script");
+                    firebugScript.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');
+                    document.body.appendChild(firebugScript);
+                    (function(){
+                        if (window.firebug) firebug.init();
+                        else setTimeout(arguments.callee);
+                    })();
+                }
+            },
+
+            /**
+             * Function to be call in every test to start the test when the page is loaded.
+             */
+            onOrbeonLoadedRunTest: function() {
+                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                    if (parent && parent.TestManager) {
+                        parent.TestManager.load();
+                    } else {
+                        new YAHOO.tool.TestLogger();
+                        YAHOO.tool.TestRunner.run();
+                    }
+                });
+            }
+        }
+    };
+
+    ORBEON.util.Properties.init();
+})();
+
 ORBEON.xforms = ORBEON.xforms || {};
 ORBEON.widgets = ORBEON.widgets || {};  // Legacy name used by non-XBL components
 ORBEON.widget = ORBEON.widget || {};    // New name to follow the same convention used by YUI
 ORBEON.xforms.Globals = ORBEON.xforms.Globals || {};
-
-ORBEON.util = {
-
-    /**
-     * The IE version of those methods does not store anything in the
-     * elements as this has some negative side effects like IE reloading
-     * background images set with CSS on the element.
-     */
-    IEDom: {
-        /**
-         * Orbeon version of getting Elements by Name in IE
-         */
-        getElementsByName: function(element, localName, namespace) {
-            return element.getElementsByTagName(namespace == null ? localName : namespace + ":" + localName);
-        }
-    },
-
-    /**
-     * The hasClass, addClass and removeClass methods use a cache of the
-     * classes for a give element for quick lookup. After having parsed the
-     * className a first time we store that information in the orbeonClasses
-     * map on the given element.
-     */
-    MozDom: {
-        /**
-         * Optimized version of getting Elements by Name on Mozilla
-         * Firefox 2 assumes there are no other elements with the
-         * same local name that are in a different namespace. This has
-         * been fixed in Firefox 3 / Gecko 1.9. See https://bugzilla.mozilla.org/show_bug.cgi?id=206053
-         */
-        getElementsByName: function(element, localName, namespace) {
-            return element.getElementsByTagName((ORBEON.xforms.Globals.isFF3OrNewer && namespace != null ? namespace + ":" : "") + localName);
-        }
-    },
-
-    /**
-     *  Utilities to deal with the DOM that supplement what is provided by YAHOO.util.Dom.
-     */
-    Dom: {
-
-        ELEMENT_TYPE: 1,
-
-        isElement: function(node) {
-            return node.nodeType == this.ELEMENT_TYPE;
-        },
-
-        /**
-         * In February 2010, we determined that the particular bug we work around in safeGetElementById() cannot
-         * happen in the vast majority of the cases. So instead, we call document.getElementById() directly.
-         * Between February 2010 and October 2010, we have been calling here YAHOO.util.Dom.get() which was pretty
-         * much directly calling document.getElementById(). In October 2010, we upgraded to YUI 2.8. YUI 2.8 version
-         * of ORBEON.util.Dom.get() started working around IE's bug, sometimes incorrectly returning null on IE in a
-         * case where an element with the specified id did exist. So we are now here calling document.getElementById()
-         * directly instead of going through YUI.
-         *
-         * @param {!string} controlId
-         */
-        get: function(controlId) {
-            return document.getElementById(controlId);
-        },
-
-        /**
-         * This is a "safe" version of document.getElementById(), which gets around bug in IE and Opera 8.2 where
-         * getElementById() by return an element with name equal to the specified id (instead of id equal to the
-         * specified id), or an element which before being cloned used to have that id.
-         *
-         * Even when IE is being used, we almost never fall in one of the cases where we must use this method. So
-         * unless it has been determined that this method must be used, code should use the regular getElementById().
-         *
-         * Also see: http://www.csb7.com/test/ie_getelementbyid_bug/index.php
-         *
-         * @param {!string} controlId
-         */
-        safeGet: function(controlId) {
-            var result = document.getElementById(controlId);
-            if (result && (result.id != controlId) && document.all) {
-                result = null;
-                var documentAll = document.all[controlId];
-                if (documentAll) {
-                    if (documentAll.length) {
-                        for (var i = 0; i < documentAll.length; i++) {
-                            if (documentAll[i].id == controlId) {
-                                result = documentAll[i];
-                                break;
-                            }
-                        }
-                    } else {
-                        result = documentAll;
-                    }
-                }
-            }
-            return result;
-        },
-
-        /**
-         * Return null when the attribute is not there.
-         */
-        getAttribute: function(element, name) {
-            if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-                // IE incorrectly already return null when the attribute is not there,
-                // but this happens to be what we want to do here
-                return element.getAttribute(name);
-            } else {
-                // Other browsers that follow the spec return an empty string when the attribute is not there,
-                // so we use hasAttribute() which is not implemented by IE to detect that case.
-                if (element.hasAttribute(name)) {
-                    if (ORBEON.xforms.Globals.isRenderingEngineWebCore) {
-                        return ORBEON.util.String.replace(element.getAttribute(name), "&#38;", "&");
-                    } else {
-                        return element.getAttribute(name);
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-
-        /**
-         * Return null when the attribute is not there.
-         */
-        setAttribute: function(element, name, value) {
-
-            // IE doesn't support setting the value of some attributes with setAttribute(). So for those attributes,
-            // we set the attribute directly and use this code for all the browser, to avoid having different branches
-            // run for different browsers. This list comes from jQuery (see comments for exceptions).
-            var ATTRIBUTE_SLOTS =  {
-                "cellspacing": "cellSpacing",
-                "class": "className",
-                "colspan": "colSpan",
-                "for": "htmlFor",
-                "frameborder": "frameBorder",
-                "maxlength": "maxLength",
-                "readonly": "readOnly",
-                "rowspan": "rowSpan",
-                "tabindex": "tabIndex",
-                "usemap": "useMap",
-                "accesskey": "accessKey", // Not sure why jQuery doesn't include 'accesskey', but includes 'tabindex'
-                "type": "type"            // jQuery is doing further processing for 'type'
-            };
-
-            if (ATTRIBUTE_SLOTS[name]) {
-
-                // If the object property is of type integer and the value is an empty string, skip setting the value
-                // to avoid an error on IE. This is a test that, surprisingly, jQuery doesn't do, which means that with
-                // jQuery you might get different results when setting the value of an attribute depending on the
-                // browser. This is particularly important for us as the value of attributes can come from AVTs, which
-                // can become empty if they loose their evaluation context.
-                var key = ATTRIBUTE_SLOTS[name];
-                if (! (value == "" && YAHOO.lang.isNumber(element[key])))
-                    element[key] = value;
-
-            } else if (name == "name" && element.tagName.toLowerCase() == "input") {
-
-                // Here we handle a bug in IE6 and IE7 where the browser doesn't support changing the name of form elements.
-                // If changing the name doesn't work, we create the whole element with a new name and insert it into the DOM.
-                // This behavior is documented by Microsoft: http://msdn.microsoft.com/en-us/library/ms534184(VS.85).aspx
-
-                // Try to change the name
-                element.setAttribute(name, value);
-
-                // Check if changing the name worked. For this we need access to the form for this element, which
-                // we only have if the element is inside a form (it won't if the element is detached from the document).
-                // If we can't find the form for this element, we just hope for the best.
-                if (YAHOO.lang.isObject(element.form)) {
-                    var controlsWithName = element.form[value];
-                    var nameChangeSuccessful = false;
-                    if (controlsWithName && YAHOO.lang.isNumber(controlsWithName.length)) {
-                        // Get around issue with YAHOO.lang.isArray, as reported in YUI list:
-                        // http://www.nabble.com/YAHOO.lang.isArray-doesn%27t-recognize-object-as-array-td22694312.html
-                        for (var controlIndex = 0; controlIndex < controlsWithName.length; controlIndex++) {
-                            if (controlsWithName[controlIndex] == element)
-                                nameChangeSuccessful = true;
-                        }
-                    } else if (YAHOO.lang.isObject(controlsWithName)) {
-                        if (controlsWithName == element)
-                            nameChangeSuccessful = true;
-                    }
-
-                    if (!nameChangeSuccessful) {
-                        // Get HTML for the element
-                        var elementSource = element.outerHTML;
-                        // Remove the name attribute
-                        elementSource = elementSource.replace(new RegExp(" name=.*( |>)", "g"), "$1");
-                        // Add the name attribute with the new value
-                        elementSource = elementSource.replace(new RegExp(">"), " name=\"" + value + "\">");
-                        var newElement = document.createElement(elementSource);
-                        // Replacing current element by newly created one
-                        element.parentNode.insertBefore(newElement, element);
-                        element.parentNode.removeChild(element);
-                    }
-                }
-            } else {
-                element.setAttribute(name, value);
-            }
-        },
-
-        getChildElementByIndex: function(parent, position) {
-            for (var i = 0; i < parent.childNodes.length; i++) {
-                var child = parent.childNodes[i];
-                if (ORBEON.util.Dom.isElement(child)) {
-                    if (position == 0) return child;
-                    position--;
-                }
-            }
-            return null;
-        },
-
-        getChildElementByClass: function(parent, clazz) {
-            for (var i = 0; i < parent.childNodes.length; i++) {
-                var child = parent.childNodes[i];
-                if (ORBEON.util.Dom.isElement(child) && YAHOO.util.Dom.hasClass(child, clazz)) {
-                    return child;
-                }
-            }
-            return null;
-        },
-
-        getChildElementsByClass: function(parent, clazz) {
-            var nodes = [];
-            for (var i = 0; i < parent.childNodes.length; i++) {
-                var child = parent.childNodes[i];
-                if (ORBEON.util.Dom.isElement(child) && YAHOO.util.Dom.hasClass(child, clazz)) {
-                    nodes[nodes.length] = child;
-                }
-            }
-            return nodes.length == 0 ? null : nodes;
-        },
-
-        nextSiblingElement: function(element) {
-            while (true) {
-                var candidate = element.nextSibling;
-                if (candidate == null) return null;
-                if (ORBEON.util.Dom.isElement(candidate)) return candidate;
-            }
-        },
-
-        stringToDom: function(xmlString) {
-            if (document.implementation.createDocument) {
-                return (new DOMParser()).parseFromString(xmlString, "application/xml");
-            } else if (window.ActiveXObject) {
-                var dom = new ActiveXObject("Microsoft.XMLDOM");
-                dom.async = "false";
-                dom.loadXML(xmlString);
-                return dom;
-            }
-            return null;
-        },
-
-        clearUploadControl: function(uploadElement) {
-
-            var inputElement = YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, uploadElement)[0];
-            var parentElement = inputElement.parentNode;
-            var newInputElement = document.createElement("input");
-            YAHOO.util.Dom.addClass(newInputElement, inputElement.className);
-            newInputElement.setAttribute("type", inputElement.type);
-            newInputElement.setAttribute("name", inputElement.name);
-            newInputElement.setAttribute("size", inputElement.size);
-            newInputElement.setAttribute("unselectable", "on");// the server sets this, so we have to set it again
-            parentElement.replaceChild(newInputElement, inputElement);
-            return null;
-        },
-
-        /**
-         * Use W3C DOM API to get the content of an element.
-         */
-        getStringValue: function(element) {
-            if (element.innerText == null) {
-                // Use W3C DOM API
-                var result = "";
-                for (var i = 0; i < element.childNodes.length; i++) {
-                    var child = element.childNodes[i];
-                    if (child.nodeType == TEXT_TYPE)
-                        result += child.nodeValue;
-                }
-                return result;
-            } else {
-                // Use IE's innerText, which is faster on IE
-                return element.innerText;
-            }
-        },
-
-        /**
-         * Use W3C DOM API to set the content of an element.
-         */
-        setStringValue: function(element, text) {
-            if (element.innerText == null) {
-                // Use W3C DOM API
-                // Remove content
-                while (element.childNodes.length > 0)
-                    element.removeChild(element.firstChild);
-                // Add specified text
-                var textNode = element.ownerDocument.createTextNode(text);
-                element.appendChild(textNode);
-            } else {
-                // Use IE's innerText, which is faster on IE
-                element.innerText = text;
-            }
-        },
-
-        /**
-         * Nudge element after a short delay for IE6/7 to force IE to "do the right thing".
-         */
-        nudgeAfterDelay: function(element) {
-            if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7) {
-                var tables = element.getElementsByTagName("table");
-                window.setTimeout(function() {
-                    element.className = element.className;
-                    for (var tableIndex = 0; tableIndex < tables.length; tableIndex++) {
-                        var table = tables[tableIndex];
-                        table.className = table.className;
-                    }
-                }, ORBEON.util.Properties.internalShortDelay.get());
-            }
-        },
-
-        /**
-         * Similar to root.getElementsByTagName(tagName), but:
-         *
-         *    1. Returns root if root.tagName == tagName.
-         *    2. Returns only one element (the first if there are many).
-         *    3. Can take an array of tagName if there are alternatives.
-         *
-         * @param {Element}                 root            Root node from which we start the search
-         * @param {string|Array.<string>}   tagNameOrArray  Tag name we're looking for
-         */
-        getElementByTagName: function(root, tagNameOrArray) {
-            var result = _.isArray(tagNameOrArray)
-                ? _(tagNameOrArray).chain()
-                    .map(_.bind(arguments.callee, null, root))
-                    .compact()
-                    .first()
-                    .value()
-                : root.tagName.toLowerCase() == tagNameOrArray
-                    ? root
-                    : root.getElementsByTagName(tagNameOrArray)[0];
-            return _.isUndefined(result) ? null : result;
-        },
-
-        isAncestorOrSelfHidden: function(element) {
-            while (true) {
-                if (element == null) return false;
-                if (! YAHOO.lang.isUndefined(element.style) && YAHOO.util.Dom.getStyle(element, "display") == "none") return true;
-                element = element.parentNode;
-            }
-        },
-
-        /**
-         * Applies a function to all the HTML form elements under a root element, including the root if it is a
-         * form element.
-         */
-        applyOnFormElements: function(root, fn, obj, overrideContext) {
-            var FORM_TAG_NAMES = ["input", "textarea", "select", "button"];
-            ORBEON.util.Utils.apply(FORM_TAG_NAMES, function(tagName) {
-                if (root.tagName.toLowerCase() == tagName)
-                    if (overrideContext) fn.call(obj, root); else fn(root);
-                ORBEON.util.Utils.apply(root.getElementsByTagName(tagName), fn, obj, overrideContext);
-            }, null, false);
-        },
-
-        /**
-         * Test a function ancestor-or-self::* and returns true as soon as the function returns true, or false of the
-         * function always returns false.
-         */
-        existsAncestorOrSelf: function(node, fn, obj, overrideContext) {
-            while (true) {
-                if (overrideContext ? fn.call(obj, node) : fn(node)) return true;
-                node = node.parentNode;
-                if (node == null || node == document) break;
-            }
-            return false;
-        }
-    },
-
-    /**
-     * General purpose methods on string
-     */
-    String: {
-        replace: function(text, placeholder, replacement) {
-            // Don't try to do the replacement if the string does not contain the placeholder
-            return text.indexOf(placeholder) == -1 ? text :
-                   text.replace(new RegExp(placeholder, "g"), replacement);
-        },
-
-        /**
-         * Evaluates JavaScript which can contain return characters we need to remove
-         */
-        eval: function(javascriptString) {
-            javascriptString = ORBEON.util.String.replace(javascriptString, "\n", " ");
-            javascriptString = ORBEON.util.String.replace(javascriptString, "\r", " ");
-            return eval(javascriptString);
-        },
-
-        /**
-         * Escape text that appears in an HTML attribute which we use in an innerHTML.
-         */
-        escapeAttribute: function(text) {
-            return ORBEON.util.String.replace(text, '"', '&quot;');
-        },
-
-        /**
-         * Escape text that appears in an HTML attribute which we use in an innerHTML.
-         */
-        escapeHTMLMinimal: function(text) {
-            text = ORBEON.util.String.replace(text, '&', '&amp;');
-            return ORBEON.util.String.replace(text, '<', '&lt;');
-        },
-
-        /**
-         * Checks if a string ends with another string.
-         */
-        endsWith: function(text, suffix) {
-            var index = text.lastIndexOf(suffix);
-            return index != -1 && index + suffix.length == text.length;
-        },
-
-        normalizeSerializedHTML: function(text) {
-            // Mmmh, the caller might pass an integer, e.g. for the slider. Not sure if fixing this here is the best way.
-            if (typeof text == "string") {
-                return text.replace(XFORMS_REGEXP_CR, "");
-            } else {
-                return text;
-            }
-        }
-    },
-
-    /**
-     * Utility functions dealing with dates and times.
-     *
-     * Credits - This is based and inspired by:
-     *     Simon Willison's Magic date parser (http://simon.incutio.com/archive/2003/10/06/betterDateInput)
-     *     Stoyan Stefanov's Magic time parsing (http://www.phpied.com/javascript-time-input/)
-     */
-    DateTime: {
-
-        magicTimeToJSDate: function(magicTime) {
-            return ORBEON.util.DateTime._magicToJSDate(magicTime, ORBEON.util.DateTime._timeParsePatterns);
-        },
-
-        magicDateToJSDate: function(magicDate) {
-            return ORBEON.util.DateTime._magicToJSDate(magicDate, ORBEON.util.DateTime._dateParsePatterns);
-        },
-
-        _magicToJSDate: function(magicTimeDate, parsePatterns) {
-            for (var i = 0; i < parsePatterns.length; i++) {
-                var re = parsePatterns[i].re;
-                var handler = parsePatterns[i].handler;
-                var bits = re.exec(magicTimeDate);
-                if (bits) {
-                    return handler(bits);
-                }
-            }
-            return null;
-        },
-
-        jsDateToISOTime: function(jsDate) {
-            return ORBEON.util.DateTime._padAZero(jsDate.getHours())
-                   + ':'
-                   + ORBEON.util.DateTime._padAZero(jsDate.getMinutes())
-                   + ':'
-                   + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
-        },
-
-        jsDateToISODate: function(jsDate) {
-            return jsDate.getFullYear()
-                   + '-' + ORBEON.util.DateTime._padAZero(jsDate.getMonth() + 1)
-                   + '-' + ORBEON.util.DateTime._padAZero(jsDate.getDate());
-        },
-
-        jsDateToISODateTime: function(jsDateDate, jsDateTime) {
-            return ORBEON.util.DateTime.jsDateToISODate(jsDateDate) + "T" + ORBEON.util.DateTime.jsDateToISOTime(jsDateTime);
-        },
-
-        jsDateToformatDisplayTime: function(jsDate) {
-            if (ORBEON.util.Properties.formatInputTime.get() == "[H]:[m]:[s]") {
-                // EU time
-                return jsDate.getHours() + ":"
-                        + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
-                        + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
-            } else {
-                // Default: [h]:[m]:[s] [P]
-                // US time
-                return (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12) + ":"
-                        + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
-                        + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())
-                        + (jsDate.getHours() < 12 ? " a.m." : " p.m.");
-            }
-        },
-
-        jsDateToformatDisplayDate: function(jsDate) {
-            var inputDateFormat = ORBEON.util.Properties.formatInputDate.get(); // e.g. "[D01].[M01].[Y]"
-            var inputDateFormatParts = inputDateFormat.split(new RegExp("[\\[\\]]")); // e.g. ["", "D01", ".", "M01", ".", "Y", ""]
-            var result = [];
-            for (var inputDateFormatPartIndex = 0; inputDateFormatPartIndex < inputDateFormatParts.length; inputDateFormatPartIndex++) {
-                var inputDateFormatPart = inputDateFormatParts[inputDateFormatPartIndex];
-
-                function padAndPush(dateOperation) {
-                    var part = dateOperation.apply(jsDate).toString();
-                    if (inputDateFormatPart.indexOf("01") == 1 && part.length < 2) part = "0" + part;
-                    result.push(part);
-                }
-
-                if (inputDateFormatPart == "") ; // NOP: the first and last part will be an empty string
-                else if (inputDateFormatPart.indexOf("D") == 0) padAndPush(jsDate.getDate);
-                else if (inputDateFormatPart.indexOf("M") == 0) padAndPush(function() { return this.getMonth() + 1; });
-                else if (inputDateFormatPart.indexOf("Y") == 0) padAndPush(jsDate.getFullYear);
-                else result.push(inputDateFormatPart);
-            }
-            return result.join("");
-        },
-
-        /**
-         * Array of objects, each has:
-         * <ul><li>'re' - a regular expression</li>
-         * <li>'handler' - a function for creating a date from something
-         *     that matches the regular expression</li>
-         * Handlers may throw errors if string is unparseable.
-         */
-        _timeParsePatterns: [
-            // Now
-            {   re: /^now$/i,
-                handler: function() {
-                    return new Date();
-                }
-            },
-            // 12:34:56 p.m.
-            {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(p|pm|p\.m\.)$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = parseInt(bits[1], 10);
-                    if (h < 12) {h += 12;}
-                    d.setHours(h);
-                    d.setMinutes(parseInt(bits[2], 10));
-                    d.setSeconds(parseInt(bits[3], 10));
-                    return d;
-                }
-            },
-            // 12:34 p.m.
-            {   re: /^(\d{1,2}):(\d{1,2}) ?(p|pm|p\.m\.)$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = parseInt(bits[1], 10);
-                    if (h < 12) {h += 12;}
-                    d.setHours(h);
-                    d.setMinutes(parseInt(bits[2], 10));
-                    d.setSeconds(0);
-                    return d;
-                }
-            },
-            // 12 p.m.
-            {   re: /^(\d{1,2}) ?(p|pm|p\.m\.)$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = parseInt(bits[1], 10);
-                    if (h < 12) {h += 12;}
-                    d.setHours(h);
-                    d.setMinutes(0);
-                    d.setSeconds(0);
-                    return d;
-                }
-            },
-            // 12:34:56 (a.m.)
-            {   re: /^(\d{1,2}):(\d{1,2}):(\d{1,2}) ?(a|am|a\.m\.)?$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = parseInt(bits[1], 10);
-                    if (! YAHOO.lang.isUndefined(bits[4]) && bits[4] != "") h = h % 12;
-                    d.setHours(h);
-                    d.setMinutes(parseInt(bits[2], 10));
-                    d.setSeconds(parseInt(bits[3], 10));
-                    return d;
-                }
-            },
-            // 12:34 (a.m.)
-            {   re: /^(\d{1,2}):(\d{1,2}) ?(a|am|a\.m\.)?$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = parseInt(bits[1], 10);
-                    if (! YAHOO.lang.isUndefined(bits[3]) && bits[3] != "") h = h % 12;
-                    d.setHours(h);
-                    d.setMinutes(parseInt(bits[2], 10));
-                    d.setSeconds(0);
-                    return d;
-                }
-            },
-            // 12 (a.m.)
-            {   re: /^(\d{1,2}) ?(a|am|a\.m\.)?$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = parseInt(bits[1], 10);
-                    if (! YAHOO.lang.isUndefined(bits[2]) && bits[2] != "") h = h % 12;
-                    d.setHours(h);
-                    d.setMinutes(0);
-                    d.setSeconds(0);
-                    return d;
-                }
-            },
-            // hhmmss
-            {   re: /^(\d{1,6})$/,
-                handler: function(bits) {
-                    var d = new Date();
-                    var h = bits[1].substring(0,2);
-                    var m = parseInt(bits[1].substring(2,4), 10);
-                    var s = parseInt(bits[1].substring(4,6), 10);
-                    if (isNaN(m)) {m = 0;}
-                    if (isNaN(s)) {s = 0;}
-                    d.setHours(parseInt(h, 10));
-                    d.setMinutes(parseInt(m, 10));
-                    d.setSeconds(parseInt(s, 10));
-                    return d;
-                }
-            }
-        ],
-
-        _dateParsePatterns: [
-
-            // NOTE: Date() months are 0-based
-            // Create date in one shot when possible, because if you set year, then month, then day, sometimes the result is incorrect!
-
-            // Today
-            {   re: /^tod/i,
-                handler: function() {
-                    return new Date();
-                }
-            },
-            // Tomorrow
-            {   re: /^tom/i,
-                handler: function() {
-                    var d = new Date();
-                    d.setDate(d.getDate() + 1);
-                    return d;
-                }
-            },
-            // Yesterday
-            {   re: /^yes/i,
-                handler: function() {
-                    var d = new Date();
-                    d.setDate(d.getDate() - 1);
-                    return d;
-                }
-            },
-            // 4th
-            {   re: /^(\d{1,2})(st|nd|rd|th)?$/i,
-                handler: function(bits) {
-                    var d = new Date();
-                    d.setDate(parseInt(bits[1], 10));
-                    return d;
-                }
-            },
-            // 4th Jan
-            {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
-                handler: function(bits) {
-                    return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
-                }
-            },
-            // 4th Jan 2003
-            {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
-                handler: function(bits) {
-                    return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
-                }
-            },
-            // Jan 4th
-            {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
-                handler: function(bits) {
-                    return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
-                }
-            },
-            // Jan 4th 2003
-            {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
-                handler: function(bits) {
-                    return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
-                }
-            },
-            // next Tuesday - this is suspect due to weird meaning of "next"
-            {   re: /^next (\w+)$/i,
-                handler: function(bits) {
-                    var d = new Date();
-                    var day = d.getDay();
-                    var newDay = ORBEON.util.DateTime._parseWeekday(bits[1]);
-                    var addDays = newDay - day;
-                    if (newDay <= day) {
-                        addDays += 7;
-                    }
-                    d.setDate(d.getDate() + addDays);
-                    return d;
-                }
-            },
-            // last Tuesday
-            {   re: /^last (\w+)$/i,
-                handler: function(bits) {
-                    throw new Error("Not yet implemented");
-                }
-            },
-            // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
-            {   re: /^(\d{1,2}).(\d{1,2}).(\d{2,4})$/,
-                handler: function(bits) {
-                    var d;
-                    if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
-                        // Day first
-                        d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
-                    } else {
-                        // Month first
-                        d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
-                    }
-                    return d;
-                }
-            },
-            // mm/dd (American style without year) or dd/mm (European style without year)
-            {   re: /^(\d{1,2}).(\d{1,2})$/,
-                handler: function(bits) {
-                    var d;
-                    if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
-                        d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
-                    } else {
-                        d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
-                    }
-                    return d;
-                }
-            },
-            // yyyy-mm-dd (ISO style)
-            {   re: /(^\d{4})-(\d{1,2})-(\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
-                handler: function(bits) {
-                    return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
-                }
-            }
-        ],
-
-        /**
-         * Helper function to pad a leading zero to an integer
-         * if the integer consists of one number only.
-         * This function s not related to the algo, it's for
-         * getReadable()'s purposes only.
-         *
-         * @param s An integer value
-         * @return string The input padded with a zero if it's one number int
-         */
-        _padAZero: function(s) {
-            s = s.toString();
-            if (s.length == 1) {
-                return '0' + s;
-            } else {
-                return s;
-            }
-        },
-
-        _monthNames: "January February March April May June July August September October November December".split(" "),
-        _weekdayNames: "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "),
-
-        /**
-         *  Takes a string, returns the index of the month matching that string, throws
-         *  an error if 0 or more than 1 matches
-         */
-        _parseMonth: function(month) {
-            var matches = ORBEON.util.DateTime._monthNames.filter(function(item) {
-                return new RegExp("^" + month, "i").test(item);
-            });
-            if (matches.length == 0) {
-                throw new Error("Invalid month string");
-            }
-            if (matches.length > 1) {
-                throw new Error("Ambiguous month");
-            }
-            return ORBEON.util.DateTime._monthNames.indexOf(matches[0]);
-        },
-
-        /* Same as parseMonth but for days of the week */
-        _parseWeekday: function(weekday) {
-            var matches = ORBEON.util.DateTime._weekdayNames.filter(function(item) {
-                return new RegExp("^" + weekday, "i").test(item);
-            });
-            if (matches.length == 0) {
-                throw new Error("Invalid day string");
-            }
-            if (matches.length > 1) {
-                throw new Error("Ambiguous weekday");
-            }
-            return ORBEON.util.DateTime._weekdayNames.indexOf(matches[0]);
-        },
-
-        _currentYear: new Date().getFullYear(),
-        _parseYear: function(year) {
-            year = parseInt(year, 10);
-            if (year < 100) {
-                var twentiethCentury = 1900 + year;
-                var twentyFirstCentury = 2000 + year;
-                year = Math.abs(twentiethCentury - ORBEON.util.DateTime._currentYear) < Math.abs(twentyFirstCentury - ORBEON.util.DateTime._currentYear)
-                    ? twentiethCentury : twentyFirstCentury;
-            }
-            return year;
-        },
-
-        _newDate: function(year, month, day) {
-            var result = new Date(year, month, day);
-            return result.getFullYear() == year && result.getMonth() == month && result.getDate() == day
-                ? result : null;
-        }
-    },
-
-    Property: function() {
-        var Property = function(name, defaultValue) {
-            this.name = name;
-            this.defaultValue = defaultValue;
-        };
-
-        Property.prototype.get = function() {
-            return YAHOO.lang.isUndefined(opsXFormsProperties) || YAHOO.lang.isUndefined(opsXFormsProperties[this.name])
-                ? this.defaultValue : opsXFormsProperties[this.name];
-        };
-
-        return Property;
-    }(),
-
-    Properties: {
-        init: function() {
-            this.sessionHeartbeat = new ORBEON.util.Property("session-heartbeat", true);
-            this.sessionHeartbeatDelay = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
-            this.revisitHandling = new ORBEON.util.Property("revisit-handling", "restore");
-            this.fckEditorBasePath = new ORBEON.util.Property("fck-editor-base-path", "/ops/fckeditor/");
-            this.delayBeforeIncrementalRequest = new ORBEON.util.Property("delay-before-incremental-request", 500);
-            this.delayBeforeForceIncrementalRequest = new ORBEON.util.Property("delay-before-force-incremental-request", 2000);
-            this.delayBeforeGeckoCommunicationError = new ORBEON.util.Property("delay-before-gecko-communication-error", 5000);
-            this.delayBeforeCloseMinimalDialog = new ORBEON.util.Property("delay-before-close-minimal-dialog", 5000);
-            this.delayBeforeAjaxTimeout = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
-            this.internalShortDelay = new ORBEON.util.Property("internal-short-delay", 100);
-            this.delayBeforeDisplayLoading = new ORBEON.util.Property("delay-before-display-loading", 500);
-            this.debugWindowHeight = new ORBEON.util.Property("debug-window-height", 600);
-            this.debugWindowWidth = new ORBEON.util.Property("debug-window-width", 300);
-            this.loadingMinTopPadding = new ORBEON.util.Property("loading-min-top-padding", 10);
-            this.helpHandler = new ORBEON.util.Property("help-handler", false);
-            this.helpTooltip = new ORBEON.util.Property("help-tooltip", false);
-            this.offlineSupport = new ORBEON.util.Property("offline", false);
-            this.formatInputTime = new ORBEON.util.Property("format.input.time", "[h] =[m] =[s] [P]");
-            this.formatInputDate = new ORBEON.util.Property("format.input.date", "[M]/[D]/[Y]");
-            this.datePicker = new ORBEON.util.Property("datepicker", "yui");
-            this.datePickerNavigator = new ORBEON.util.Property("datepicker.navigator", true);
-            this.datePickerTwoMonths = new ORBEON.util.Property("datepicker.two-months", false);
-            this.htmlEditor = new ORBEON.util.Property("htmleditor", "yui");
-            this.showErrorDialog = new ORBEON.util.Property("show-error-dialog", true);
-            this.clientEventMode = new ORBEON.util.Property("client.events.mode", "default");
-            this.clientEventsFilter = new ORBEON.util.Property("client.events.filter", "");
-            this.resourcesVersioned = new ORBEON.util.Property("oxf.resources.versioned", false);
-            this.resourcesVersionNumber = new ORBEON.util.Property("oxf.resources.version-number", "");
-            this.newXHTMLLayout = new ORBEON.util.Property("new-xhtml-layout", false);
-            this.xhtmlLayout = new ORBEON.util.Property("xhtml-layout", "nospan");
-            this.retryDelayIncrement = new ORBEON.util.Property("retry.delay-increment", 5000);
-            this.retryMaxDelay = new ORBEON.util.Property("retry.max-delay", 30000);
-        }
-    }
-};
-
-ORBEON.util.Properties.init();
-
-/**
- * Utility methods that don't in any other category
- */
-ORBEON.util.Utils = {
-    logMessage: function(message) {
-        if (typeof console != "undefined") {
-            console.log(message); // Normal use; do not remove
-        }
-    },
-
-    isNewXHTMLLayout: function() {
-        return ORBEON.util.Properties.newXHTMLLayout.get()
-            || ORBEON.util.Properties.xhtmlLayout.get() != "nospan";
-    },
-
-    hideModalProgressPanel: function() {
-        if (ORBEON.xforms.Globals.modalProgressPanel) {
-            ORBEON.xforms.Globals.modalProgressPanel.hide();
-            // We set it to null when hiding so we have an easy way of knowing of the panel is visible or not.
-            // See: http://www.nabble.com/Is-Panel-visible--td22139417.html
-            ORBEON.xforms.Globals.modalProgressPanel = null;
-        }
-    },
-
-    displayModalProgressPanel: function(formID) {
-        if (!ORBEON.xforms.Globals.modalProgressPanel) {
-            ORBEON.xforms.Globals.modalProgressPanel =
-            new YAHOO.widget.Panel("wait", {
-                width: "60px",
-                fixedcenter: true,
-                close: false,
-                draggable: false,
-                zindex: 4,
-                modal: true,
-                visible: true
-            });
-            ORBEON.xforms.Globals.modalProgressPanel.setBody('<img alt="Processing, please wait" src="'
-                    + ORBEON.xforms.Globals.resourcesBaseURL[formID] + '/ops/images/xforms/processing.gif"/>');
-            ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
-        }
-        ORBEON.xforms.Globals.modalProgressPanel.show();
-    },
-
-    countOccurrences: function(str, character) {
-        var count = 0;
-        var pos = str.indexOf(character);
-        while ( pos != -1 ) {
-            count++;
-            pos = str.indexOf(character,pos+1);
-        }
-        return count;
-    },
-
-    /**
-     * For example: appendToEffectivefId("foo·1", "bar") returns "foobar·1"
-     */
-    appendToEffectiveId: function(effectiveId, ending) {
-        var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(effectiveId);
-        return prefixedId + ending + ORBEON.util.Utils.getEffectiveIdSuffixWithSeparator(effectiveId);
-    },
-
-    /**
-     * For example: getEffectiveIdNoSuffix("foo·1-2") returns "foo"
-     */
-    getEffectiveIdNoSuffix: function(effectiveId) {
-        if (effectiveId == null)
-            return null;
-
-        var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
-        if (suffixIndex != -1) {
-            return effectiveId.substring(0, suffixIndex);
-        } else {
-            return effectiveId;
-        }
-    },
-
-    /**
-     * For example: getEffectiveIdNoSuffix("foo·1-2") returns "·1-2"
-     */
-    getEffectiveIdSuffixWithSeparator: function(effectiveId) {
-        if (effectiveId == null)
-            return null;
-
-        var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
-        if (suffixIndex != -1) {
-            return effectiveId.substring(suffixIndex);
-        } else {
-            return "";
-        }
-    },
-
-    getLocalName: function(element) {
-        if (element.nodeType == 1) {
-            return element.tagName.indexOf(":") == -1
-                    ? element.tagName
-                    : element.tagName.substr(element.tagName.indexOf(":") + 1);
-        } else {
-            return null;
-        }
-    },
-
-    addSuffixToIdsAndRemoveDisabled: function(element, idSuffix, repeatDepth) {
-
-        // Remove disabled, as form fields have a 'disabled' attribute so tabbing skips over form elements in the repeat template
-        element.removeAttribute("disabled");
-
-        // Compute new id
-        var idSuffixWithDepth = idSuffix;
-        for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-            idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
-
-        // Update id attribute
-        if (element.id) {
-            element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
-        }
-
-        // Update for attribute
-        if (element.htmlFor)
-            element.htmlFor = ORBEON.util.Utils.appendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
-
-        // Update name attribute
-        if (element.name) {
-            var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
-            if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
-                    && ORBEON.xforms.Globals.isRenderingEngineTrident) {
-                // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
-                // cause the name in the programming model to change in the collection of elements". This has a implication
-                // for radio buttons where using a same name for a set of radio buttons is used to group them together.
-                // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
-
-                // NOTE: Here we only fix the case of radio button groups. However, the name attribute issue is present
-                // for other controls as well. With IE versions (including IE 8 in quirks mode) that exhibit this bug,
-                // you cannot safely call document.getElementById() of a form element within a template once the template
-                // has been cloned. For example, in a template:
-                //
-                // <span id="my-input"><input id="my-input$$c" name="my-input">...
-                //
-                // getElementById("my-input") correctly returns <span id="my-input">
-                //
-                // Now clone the template. getElementById("my-input") now returns <input id="my-input$$c·1" name="my-input﻿·1">
-                //
-                // That's because IE mixes up the element id and the name, AND the name "my-input" incorrectly points to
-                // the cloned element.
-                //
-                // This seems fixed in IE 8 and up in standards mode.
-                //
-                // If we wanted to fix this, we could run the code below also for <textarea> and for all <input>, not
-                // only those with type="radio". We should also try to detect the issue so that we do not run this for IE
-                // 8 in standards mode.
-                var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
-                for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
-                    var attribute = element.attributes[attributeIndex];
-                    if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
-                        clone.setAttribute(attribute.nodeName, attribute.nodeValue);
-                }
-                YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);
-                YAHOO.util.Event.addListener(clone, "blur", ORBEON.xforms.Events.blur);
-                YAHOO.util.Event.addListener(clone, "change", ORBEON.xforms.Events.change);
-                element.replaceNode(clone);
-            } else {
-                element.name = newName;
-            }
-        }
-
-        // Recurse through children
-        for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-            var childNode = element.childNodes[childIndex];
-            if (childNode.nodeType == ELEMENT_TYPE) {
-                if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
-                ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(childNode, idSuffix, repeatDepth);
-                if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
-            }
-        }
-    },
-
-    getClassForRepeatId: function(repeatId) {
-        var depth = 1;
-        var currentRepeatId = repeatId;
-        while (true) {
-            currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
-            if (currentRepeatId == null) break;
-            depth = (depth == 4) ? 1 : depth + 1;
-        }
-        return "xforms-repeat-selected-item-" + depth;
-    },
-
-    // Replace in a tree a placeholder by some other string in text nodes and attribute values
-    stringReplace: function(node, placeholder, replacement) {
-
-        function stringReplaceWorker(node, placeholderRegExp, replacement) {
-            switch (node.nodeType) {
-                case ELEMENT_TYPE:
-                    for (var i = 0; i < node.attributes.length; i++) {
-                        var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
-                        if (newValue != node.attributes[i].value)
-                            ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
-                    }
-                    for (var i = 0; i < node.childNodes.length; i++)
-                        stringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
-                    break;
-                case TEXT_TYPE:
-                    var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
-                    if (newValue != node.nodeValue)
-                        node.nodeValue = newValue;
-                    break;
-            }
-        }
-
-        // Escape dollar signs we might have in the placeholder or replacement so they can be used in regexp
-        placeholder = placeholder.replace(new RegExp("\\$", "g"), "\\$");
-        replacement = replacement.replace(new RegExp("\\$", "g"), "$$$$");
-
-        var placeholderRegExp = new RegExp(placeholder, "g");
-        stringReplaceWorker(node, placeholderRegExp, replacement);
-    },
-
-    appendRepeatSuffix: function(id, suffix) {
-        if (suffix == "")
-            return id;
-
-        // Remove "-" at the beginning of the suffix, if any
-        if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
-            suffix = suffix.substring(1);
-
-        // Add suffix with the right separator
-        id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
-        id += suffix;
-
-        return id;
-    },
-
-    /**
-     * Locate the delimiter at the given position starting from a repeat begin element.
-     *
-     * @param repeatId      Can be either a pure repeat ID, such as "foobar" or an ID that contains information of its
-     *                      position relative to its parents, such as "foobar.1". The former happens when we handle an
-     *                      event such as <xxf:repeat-index id="foobar" old-index="4" new-index="6"/>. In this case
-     *                      "foobar" means the "foobar at 'index' in the current foobar list". The latter happens when we handle
-     *                      an event such as <xxf:repeat-iteration id="foobar.1" relevant="false" iteration="10"/>, which
-     *                      does not necessarily apply to the current "foobar".
-     * @param index
-     */
-    findRepeatDelimiter: function(repeatId, index) {
-
-        // Find id of repeat begin for the current repeatId
-        var parentRepeatIndexes = "";
-        {
-            var currentId = repeatId;
-            while (true) {
-                var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
-                if (parent == null) break;
-                var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-                parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
-                        + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
-                currentId = parent;
-            }
-        }
-
-        var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
-        var beginElement = ORBEON.util.Dom.get(beginElementId);
-        if (!beginElement) return null;
-        var cursor = beginElement;
-        var cursorPosition = 0;
-        while (true) {
-                while (cursor.nodeType != ELEMENT_TYPE || !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
-                cursor = cursor.nextSibling;
-                if (!cursor) return null;
-            }
-            cursorPosition++;
-            if (cursorPosition == index) break;
-            cursor = cursor.nextSibling;
-        }
-
-        return cursor;
-    },
-
-    /**
-     * Check whether a region is completely visible (i.e. is fully inside the viewport).
-     * Note: this function is different than the function with the same name in YUI.
-     */
-    fitsInViewport: function(element) {
-
-        // Viewport coordinates
-        var viewportFirstTop = YAHOO.util.Dom.getDocumentScrollTop();
-        var viewportFirstLeft = YAHOO.util.Dom.getDocumentScrollLeft();
-        var viewportSecondTop = viewportFirstTop + YAHOO.util.Dom.getViewportHeight();
-        var viewportSecondLeft = viewportFirstLeft + YAHOO.util.Dom.getViewportWidth();
-        var viewportRegion = new YAHOO.util.Region(viewportFirstTop, viewportSecondLeft, viewportSecondTop, viewportFirstLeft);
-
-        // Element coordinates
-        var elementRegion = YAHOO.util.Dom.getRegion(element);
-
-        return viewportRegion.top <= elementRegion.top && viewportRegion.left <= elementRegion.left
-            && elementRegion.bottom <= viewportRegion.bottom && elementRegion.right <= viewportRegion.right;
-    },
-
-    /**
-     * Applies a function to all the elements of an array, and discards the value returned by the function, if any.
-     */
-    apply: function(array, fn, obj, overrideContext) {
-        for (var arrayIndex = 0; arrayIndex < array.length; arrayIndex++) {
-            var arrayElement = array[arrayIndex];
-            if (overrideContext) fn.call(obj, arrayElement); else fn(arrayElement);
-        }
-    }
-};
-
-/**
- * Utility function to make testing with YUI Test easier.
- */
-ORBEON.util.Test = {
-    /**
-     * Tests that rely on instances having a certain value should start by callng this utility function
-     */
-    executeWithInitialInstance: function(testCase, testFunction) {
-        ORBEON.testing.executeCausingAjaxRequest(testCase, function() {
-            ORBEON.xforms.Document.dispatchEvent("main-model", "restore-instance");
-        }, function() {
-            testFunction.call(testCase);
-        });
-    },
-
-    /**
-     * Runs a first function as part of a YUI test case, waits for all Ajax requests (if any) that might ensue
-     * to terminate, then run a second function.
-     *
-     * This doesn't use the ajaxResponseProcessedEvent, because we want this to work in cases where we have zero
-     * or more than one Ajax requests.
-     */
-    executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
-
-        function checkAjaxReceived() {
-            if (ORBEON.xforms.Globals.requestInProgress || ORBEON.xforms.Globals.eventQueue.length > 0) {
-                // Wait another 100 ms
-                setTimeout(checkAjaxReceived, 100);
-            } else {
-                // We done with Ajax requests, continue with the test
-                testCase.resume(function() {
-                    afterAjaxResponseFunction.call(testCase);
-                });
-            }
-        }
-
-        causingAjaxRequestFunction.call(testCase);
-        setTimeout(checkAjaxReceived, 100);
-        testCase.wait(20000);
-    },
-
-    /**
-     * Similar to executeCausingAjaxRequest
-     */
-    executeSequenceCausingAjaxRequest: function(testCase, tests) {
-        if (tests.length > 0) {
-            var testTuple = tests.shift();
-            ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
-                testTuple[0].call(testCase);
-            }, function() {
-                testTuple[1].call(testCase);
-                ORBEON.util.Test.executeSequenceCausingAjaxRequest(testCase, tests);
-            });
-        }
-    },
-
-    /**
-     * Starts Firebug Lite if Firebug is not already available (as it is most of the time on Firefox)
-     */
-    startFirebugLite: function() {
-        if (! window.firebug) {
-            var firebugScript = document.createElement("script");
-            firebugScript.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');
-            document.body.appendChild(firebugScript);
-            (function(){
-                if (window.firebug) firebug.init();
-                else setTimeout(arguments.callee);
-            })();
-        }
-    },
-
-    /**
-     * Function to be call in every test to start the test when the page is loaded.
-     */
-    onOrbeonLoadedRunTest: function() {
-        ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-            if (parent && parent.TestManager) {
-                parent.TestManager.load();
-            } else {
-                new YAHOO.tool.TestLogger();
-                YAHOO.tool.TestRunner.run();
-            }
-        });
-    }
-};
 
 /**
  * This object contains function designed to be called from JavaScript code
@@ -2228,11 +2258,11 @@ ORBEON.xforms.Controls = {
                 // parent which is either a disabled case (xforms-case-deselected) or a non-relevant
                 // group (xforms-disabled).
                 var hasParentDisabledOrNonRelevant = ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
-                        return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
-                            || YAHOO.util.Dom.hasClass(node, "xforms-case-deselected-subsequent")
-                            || YAHOO.util.Dom.hasClass(node, "xforms-disabled")
-                            || YAHOO.util.Dom.hasClass(node, "xforms-disabled-subsequent");
-                    }, null, false);
+                    return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
+                                || YAHOO.util.Dom.hasClass(node, "xforms-case-deselected-subsequent")
+                                || YAHOO.util.Dom.hasClass(node, "xforms-disabled")
+                                || YAHOO.util.Dom.hasClass(node, "xforms-disabled-subsequent");
+                }, null, false);
                 if (! hasParentDisabledOrNonRelevant) {
                     ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
                 }
@@ -2845,7 +2875,7 @@ ORBEON.xforms.FlatNesting = {
     },
 
     /**
-     * Start applying foldFunction to descendants of startNode. When
+     * Start applying foldFunction to descendants of startNode.
      *
      * @param startNode
      * @param startValue
@@ -4756,6 +4786,10 @@ ORBEON.xforms.Init = {
     },
 
     document: function() {
+
+//        _.each(document.forms["xforms-form"].elements, function(element) {
+//            ORBEON.xforms.Controls.setDisabledOnFormElement(element, false);
+//        });
 
         ORBEON.xforms.Globals = {
             // Booleans used for browser detection

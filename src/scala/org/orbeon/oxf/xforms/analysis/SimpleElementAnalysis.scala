@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
  * Representation of a common XForms element supporting optional context, binding and value.
  */
 class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element: Element, parent: Option[ContainerTrait], preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
-        extends ElementAnalysis(element, parent, preceding) {
+        extends ElementAnalysis(element, parent, preceding) with ContainerTrait {
 
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?

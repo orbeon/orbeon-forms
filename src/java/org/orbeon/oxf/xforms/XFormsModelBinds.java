@@ -58,8 +58,6 @@ public class XFormsModelBinds {
     private Map<String, Bind> singleNodeContextBinds = new HashMap<String, Bind>();
     private Map<Item, List<BindIteration>> iterationsForContextNodeInfo = new HashMap<Item, List<BindIteration>>();
     private List<Bind> offlineBinds = new ArrayList<Bind>();
-    // TODO: move to static state
-    private Map<String, String> variableNamesToIds = new HashMap<String, String>(); // name -> static id
 
     private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
 
@@ -116,7 +114,6 @@ public class XFormsModelBinds {
         singleNodeContextBinds.clear();
         iterationsForContextNodeInfo.clear();
         offlineBinds.clear();
-        variableNamesToIds.clear();
 
         // Iterate through all top-level bind elements
         for (final Element currentBindElement: staticModel.bindElements()) {
@@ -685,11 +682,11 @@ public class XFormsModelBinds {
 
     private Map<String, ValueRepresentation> getVariables(NodeInfo contextNodeInfo) {
 
-        if (variableNamesToIds.size() > 0) {
+        if (staticModel.bindNamesToIds().size() > 0) {
             final Map<String, ValueRepresentation> bindVariablesValues = new HashMap<String, ValueRepresentation>();
 
             // Add bind variables
-            for (Map.Entry<String, String> currentEntry: variableNamesToIds.entrySet()) {
+            for (Map.Entry<String, String> currentEntry : staticModel.bindNamesToIds().entrySet()) {
                 final String currentVariableName = currentEntry.getKey();
                 final String currentBindId = currentEntry.getValue();
 
@@ -1161,21 +1158,13 @@ public class XFormsModelBinds {
 
     public class Bind {
 
-        private Element bindElement;
-        private String id;          // bind id
-        private String name;        // bind name
+        private Model.Bind staticBind;
         private List<Item> nodeset;       // actual nodeset for this bind
 
         private List<BindIteration> childrenIterations; // List<BindIteration>
 
         public Bind(PropertyContext propertyContext, Element bindElement, boolean isSingleNodeContext) {
-            this.bindElement = bindElement;
-            this.id = XFormsUtils.getElementStaticId(bindElement);
-            this.name = bindElement.attributeValue(XFormsConstants.NAME_QNAME);
-
-            // Remember variables
-            if (name != null)
-                variableNamesToIds.put(name, id);
+            this.staticBind = staticModel.bindsById().get(XFormsUtils.getElementStaticId(bindElement));
 
             // If this bind is marked for offline handling, remember it
             if ("true".equals(bindElement.attributeValue(XFormsConstants.XXFORMS_OFFLINE_QNAME)))
@@ -1201,7 +1190,7 @@ public class XFormsModelBinds {
                 // only has one associated bind object, so this is the desired target bind object whose nodeset is used in
                 // the Single Node Binding or Node Set Binding"
                 if (isSingleNodeContext)
-                    singleNodeContextBinds.put(id, this);
+                    singleNodeContextBinds.put(staticBind.staticId(), this);
 
                 final List<Element> childElements = Dom4jUtils.elements(bindElement, XFormsConstants.XFORMS_BIND_QNAME);
                 if (childElements.size() > 0) {
@@ -1253,11 +1242,11 @@ public class XFormsModelBinds {
         }
 
         public String getId() {
-            return id;
+            return staticBind.staticId();
         }
 
         public String getName() {
-            return name;
+            return staticBind.name();
         }
 
         public List<Item> getNodeset() {
@@ -1265,47 +1254,43 @@ public class XFormsModelBinds {
         }
 
         public LocationData getLocationData() {
-            return new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement);
+            return staticBind.locationData();
         }
 
         public Element getBindElement() {
-            return bindElement;
+            return staticBind.element();
         }
 
-//        public Map getNamespaceMappings() {
-//            containingDocument.getNamespaceMappings(model.getPrefix(), getId());
-//        }
-
         public String getRelevant() {
-            return bindElement.attributeValue(XFormsConstants.RELEVANT_QNAME);
+            return staticBind.getRelevant();
         }
 
         public String getCalculate() {
-            return bindElement.attributeValue(XFormsConstants.CALCULATE_QNAME);
+            return staticBind.getCalculate();
         }
 
         public String getType() {
-            return bindElement.attributeValue(XFormsConstants.TYPE_QNAME);
+            return staticBind.getType();
         }
 
         public String getConstraint() {
-            return bindElement.attributeValue(XFormsConstants.CONSTRAINT_QNAME);
+            return staticBind.getConstraint();
         }
 
         public String getRequired() {
-            return bindElement.attributeValue(XFormsConstants.REQUIRED_QNAME);
+            return staticBind.getRequired();
         }
 
         public String getReadonly() {
-            return bindElement.attributeValue(XFormsConstants.READONLY_QNAME);
+            return staticBind.getReadonly();
         }
 
         public String getXXFormsDefault() {
-            return bindElement.attributeValue(XFormsConstants.XXFORMS_DEFAULT_QNAME);
+            return staticBind.getInitialValue();
         }
 
         public Map<String, Model.Bind.MIP> getCustomMips() {// NOTE: IntelliJ marks Model.Bind as an error, but it compiles fine
-            return staticModel.customMIPs().get(this.id);
+            return staticModel.customMIPs().get(staticBind.staticId());
         }
     }
 

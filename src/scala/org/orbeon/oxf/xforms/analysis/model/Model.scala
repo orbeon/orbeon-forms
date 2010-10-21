@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
 import org.orbeon.oxf.util.PropertyContext
-import java.util.{Map => JMap, Collections => JCollections, LinkedHashMap => JLinkedHashMap, LinkedHashSet => JLinkedHashSet, Set => JSet}
+import java.util.{Map => JMap, HashMap => JHashMap, Collections => JCollections, LinkedHashMap => JLinkedHashMap, LinkedHashSet => JLinkedHashSet, Set => JSet}
 import org.orbeon.oxf.xforms._
 
 
@@ -135,6 +135,8 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             yield new Bind(bindElement, this, preceding)
     }
 
+    val bindNamesToIds: JMap[String, String] = new JHashMap[String, String]
+
     // Represent a static <xf:bind> element
     class Bind(element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis])
             extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope)
@@ -165,6 +167,11 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         // Globally remember binds ids
         Model.this.bindIds.add(staticId)
         Model.this.bindsById.put(staticId, Bind.this)
+
+        // Remember variables mappings
+        val name = element.attributeValue(XFormsConstants.NAME_QNAME)
+        if (name != null)
+            bindNamesToIds.put(name, staticId)
 
         // Built-in XPath MIPs
         val mipNameToXPathMIP =
@@ -202,18 +209,22 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         // Create children binds
         val children: Seq[Bind] = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) map (new Bind(_, Bind.this, preceding))
 
-        var refAnalysis: XPathAnalysis = PathMapXPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS // default to negative, analyzeXPath() can change that
+        def getMIP(mipName: String) = allMIPNameToXPathMIP.get(mipName)
 
-//        def getRelevant = mipNameToXPathMIP.get(Model.RELEVANT)
-//        def getReadonly = mipNameToXPathMIP.get(Model.READONLY)
-//        def getRequired = mipNameToXPathMIP.get(Model.REQUIRED)
-//        def getConstraint = mipNameToXPathMIP.get(Model.CONSTRAINT)
-//        def getCalculate = mipNameToXPathMIP.get(Model.CALCULATE)
-//        def getInitialValue = mipNameToXPathMIP.get(Model.INITIAL_VALUE)
-//        def getType = typeMIP
-//        def getCustom(mipName: String) = customMIPNameToXPathMIP.get(mipName)
+        // For Java callers (can return null)
+        def getRelevant = getMIPExpression(Model.RELEVANT)
+        def getReadonly = getMIPExpression(Model.READONLY)
+        def getRequired = getMIPExpression(Model.REQUIRED)
+        def getConstraint = getMIPExpression(Model.CONSTRAINT)
+        def getCalculate = getMIPExpression(Model.CALCULATE)
+        def getInitialValue = getMIPExpression(Model.INITIAL_VALUE)
+        def getType = typeMIP.orNull
+        def getCustom(mipName: String) = getMIPExpression(mipName)  
 
-        def getMIP(mipName: String) = allMIPNameToXPathMIP.get(mipName).getOrElse(null)
+        def getMIPExpression(mipName: String) = getMIP(mipName) match {
+            case Some(mip) => mip.expression
+            case None => null
+        }
 
         def hasCalculateComputedBind = Model.QNAME_TO_XPATH_COMPUTED_MIP_NAME exists (mipNameToXPathMIP contains _._2)
         def hasValidateBind = typeMIP.isDefined || (Model.QNAME_TO_XPATH_VALIDATE_MIP_NAME exists (mipNameToXPathMIP contains _._2))

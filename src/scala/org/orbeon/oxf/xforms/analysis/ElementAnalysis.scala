@@ -54,7 +54,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
     final def getModelPrefixedId = scopeModel.containingModel match { case Some(model) => Some(model.prefixedId); case None => None }
     final def getDefaultInstancePrefixedId = scopeModel.containingModel match { case Some(model) => model.defaultInstancePrefixedId; case None => None }
 
-    // Classes (no longer used)
+    // Classes (not used at this time)
     val classes = ""
 
     // XPath analysis

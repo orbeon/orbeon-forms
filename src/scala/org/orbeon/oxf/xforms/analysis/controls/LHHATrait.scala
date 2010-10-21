@@ -31,7 +31,7 @@ trait LHHATrait extends SimpleElementAnalysis {
     val nestedAlert = findNestedLHHA(XFormsConstants.ALERT_QNAME)
 
     private def findNestedLHHA(qName: QName) = findNestedLHHAElement(qName) match {
-        case Some(lhhaElement) => Some(new LHHAAnalysis(staticStateContext, scopeModel.scope, lhhaElement, parent.get, true))
+        case Some(lhhaElement) => Some(new LHHAAnalysis(staticStateContext, scopeModel.scope, lhhaElement, LHHATrait.this, true))
         case None => None
     }
 
@@ -47,7 +47,7 @@ trait LHHATrait extends SimpleElementAnalysis {
         require(lhhaElement ne null)
 
         // TODO: This must be set in the proper parent context as context/variables can be different
-        val lhhaAnalysis = Some(new LHHAAnalysis(staticStateContext, scopeModel.scope, lhhaElement, parent.get, false))
+        val lhhaAnalysis = Some(new LHHAAnalysis(staticStateContext, scopeModel.scope, lhhaElement, LHHATrait.this, false))
 
         lhhaElement.getQName match {
             case XFormsConstants.LABEL_QNAME => externalLabel = lhhaAnalysis

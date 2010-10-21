@@ -324,50 +324,48 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     def hasAnyValidationBind(model: Model) = model.hasValidateBind
 
     def requireModelMIPUpdate(model: Model, bindId: String, mipName: String): Boolean = {
-
         val bind = model.bindsById.get(bindId)
-        val mip = bind.getMIP(mipName)
-
-        if (mip eq null)
-            false // no such MIP
-        else {
-            val cached = modifiedMIPCache.get(bind.prefixedId)
-            val updateResult =
-                cached match {
-                    case Some(result) => result
-                    case None => {
-                        val mipAnalysis = mip.analysis
-                        val tempUpdateResult =
-                            if (!mipAnalysis.figuredOutDependencies) {
-                                // Value dependencies are unknown
-                                new UpdateResult(true, 0)// savedEvaluations is N/A
-                            } else if (getModelState(model.prefixedId).mipDirty(mip)) {
-                                // Value dependencies are known but the MIP is dirty because validation or calculation binds are dirty
-                                new UpdateResult(true, 0)// savedEvaluations is N/A
-                            } else {
-                                // Value dependencies are known
-                                new UpdateResult(
-                                    mipAnalysis.intersectsModels(getStructuralChangeModels)
-                                            || mipAnalysis.intersectsValue(getModifiedPaths)
-                                    , 1)
+        bind.getMIP(mipName) match {
+            case Some(mip) =>
+                val cached = modifiedMIPCache.get(bind.prefixedId)
+                val updateResult =
+                    cached match {
+                        case Some(result) => result
+                        case None => {
+                            val mipAnalysis = mip.analysis
+                            val tempUpdateResult =
+                                if (!mipAnalysis.figuredOutDependencies) {
+                                    // Value dependencies are unknown
+                                    new UpdateResult(true, 0)// savedEvaluations is N/A
+                                } else if (getModelState(model.prefixedId).mipDirty(mip)) {
+                                    // Value dependencies are known but the MIP is dirty because validation or calculation binds are dirty
+                                    new UpdateResult(true, 0)// savedEvaluations is N/A
+                                } else {
+                                    // Value dependencies are known
+                                    new UpdateResult(
+                                        mipAnalysis.intersectsModels(getStructuralChangeModels)
+                                                || mipAnalysis.intersectsValue(getModifiedPaths)
+                                        , 1)
+                                }
+                            if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled) {
+                                getLogger.logDebug("dependencies", "MIP requires update",
+                                    Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", mipAnalysis.xpathString): _*)
                             }
-                        if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled) {
-                            getLogger.logDebug("dependencies", "MIP requires update",
-                                Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", mipAnalysis.xpathString): _*)
+
+                            modifiedMIPCache.put(bind.prefixedId, tempUpdateResult)
+                            tempUpdateResult
                         }
-
-                        modifiedMIPCache.put(bind.prefixedId, tempUpdateResult)
-                        tempUpdateResult
                     }
-                }
 
-            if (updateResult.requireUpdate) {
-                mipUpdateCount += 1
-            } else {
-                // Update not required
-                mipXPathOptimizedCount += updateResult.savedEvaluations
-            }
-            updateResult.requireUpdate
+                if (updateResult.requireUpdate) {
+                    mipUpdateCount += 1
+                } else {
+                    // Update not required
+                    mipXPathOptimizedCount += updateResult.savedEvaluations
+                }
+                updateResult.requireUpdate
+            case None =>
+                false // no such MIP
         }
     }
 }

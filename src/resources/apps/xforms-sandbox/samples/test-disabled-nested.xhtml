@@ -140,6 +140,10 @@
                 });
             ]]>
         </xhtml:script>
+        <xhtml:style type="text/css">
+            .xforms-label { width: 11em; display: inline-block; text-align: right; padding-right: 1em }
+            .xforms-repeat-selected-item-1 { background-color: transparent }
+        </xhtml:style>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance>
                 <instance>
@@ -171,11 +175,17 @@
         <xhtml:fieldset>
             <xhtml:legend>Groups nested</xhtml:legend>
             <xforms:group ref=".[enabled[@section = 'outer'] = 'true']" id="outer-group-nested">
-                <xforms:input ref="input" id="group-nested-outer-input-1"/>
+                <xforms:input ref="input" id="group-nested-outer-input-1">
+                    <xforms:label>Group nested outer 1</xforms:label>
+                </xforms:input>
                 <xforms:group ref=".[enabled[@section = 'inner'] = 'true']" id="inner-group-nested">
-                    <xforms:input ref="input" id="group-nested-inner-input"/>
+                    <xforms:input ref="input" id="group-nested-inner-input">
+                        <xforms:label>Group nested inner</xforms:label>
+                    </xforms:input>
                 </xforms:group>
-                <xforms:input ref="input" id="group-nested-outer-input-2"/>
+                <xforms:input ref="input" id="group-nested-outer-input-2">
+                    <xforms:label>Group nested outer 2</xforms:label>
+                </xforms:input>
                 <fr:button id="group-nested-outer-button">
                     <xforms:label>Button</xforms:label>
                 </fr:button>
@@ -187,15 +197,21 @@
                 <xhtml:tr>
                     <xforms:group ref=".[enabled[@section = 'outer'] = 'true']" id="outer-group-flat">
                         <xhtml:td>
-                            <xforms:input ref="input" id="group-flat-outer-input-1"/>
+                            <xforms:input ref="input" id="group-flat-outer-input-1">
+                                <xforms:label>Group flat outer 1</xforms:label>
+                            </xforms:input>
                         </xhtml:td>
                         <xforms:group ref=".[enabled[@section = 'inner'] = 'true']" id="inner-group-flat">
                             <xhtml:td>
-                                <xforms:input ref="input" id="group-flat-inner-input"/>
+                                <xforms:input ref="input" id="group-flat-inner-input">
+                                    <xforms:label>Group flat inner</xforms:label>
+                                </xforms:input>
                             </xhtml:td>
                         </xforms:group>
                         <xhtml:td>
-                            <xforms:input ref="input" id="group-flat-outer-input-2"/>
+                            <xforms:input ref="input" id="group-flat-outer-input-2">
+                                <xforms:label>Group flat outer 2</xforms:label>
+                            </xforms:input>
                         </xhtml:td>
                         <xhtml:td>
                             <fr:button id="group-flat-outer-button">
@@ -209,11 +225,17 @@
         <xhtml:fieldset>
             <xhtml:legend>Repeats (iteration relevance)</xhtml:legend>
             <xforms:repeat nodeset="instance()/enabled[@section = 'outer']" id="outer-repeat-iteration">
-                <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-1"/>
+                <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-1">
+                    <xforms:label>Repeat iteration outer 1</xforms:label>
+                </xforms:input>
                 <xforms:repeat nodeset="instance()/enabled[@section = 'inner']" id="inner-repeat-iteration">
-                    <xforms:input ref="instance()/input" id="repeat-iteration-inner-input"/>
+                    <xforms:input ref="instance()/input" id="repeat-iteration-inner-input">
+                        <xforms:label>Repeat iteration inner</xforms:label>
+                    </xforms:input>
                 </xforms:repeat>
-                <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-2"/>
+                <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-2">
+                    <xforms:label>Repeat iteration outer 2</xforms:label>
+                </xforms:input>
                 <fr:button id="repeat-iteration-outer-button">
                     <xforms:label>Button</xforms:label>
                 </fr:button>
@@ -222,11 +244,17 @@
         <xhtml:fieldset>
             <xhtml:legend>Repeats (repeat relevance)</xhtml:legend>
             <xforms:repeat nodeset="instance()[enabled[@section = 'outer'] = 'true']" id="outer-repeat-repeat">
-                <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-1"/>
+                <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-1">
+                    <xforms:label>Repeat repeat outer 1</xforms:label>
+                </xforms:input>
                 <xforms:repeat nodeset="instance()[enabled[@section = 'inner'] = 'true']" id="inner-repeat-repeat">
-                    <xforms:input ref="instance()/input" id="repeat-repeat-inner-input"/>
+                    <xforms:input ref="instance()/input" id="repeat-repeat-inner-input">
+                        <xforms:label>Repeat repeat inner</xforms:label>
+                    </xforms:input>
                 </xforms:repeat>
-                <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-2"/>
+                <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-2">
+                    <xforms:label>Repeat repeat outer 2</xforms:label>
+                </xforms:input>
                 <fr:button id="repeat-repeat-outer-button">
                     <xforms:label>Button</xforms:label>
                 </fr:button>
@@ -237,14 +265,20 @@
             <xforms:switch>
                 <xforms:case id="outer-disabled"/>
                 <xforms:case id="outer-enabled">
-                    <xforms:input ref="input" id="case-outer-input-1"/>
+                    <xforms:input ref="input" id="case-outer-input-1">
+                        <xforms:label>Case outer 1</xforms:label>
+                    </xforms:input>
                     <xforms:switch>
                         <xforms:case id="inner-disabled"/>
                         <xforms:case id="inner-enabled">
-                            <xforms:input ref="input" id="case-inner-input"/>
+                            <xforms:input ref="input" id="case-inner-input">
+                                <xforms:label>Case inner</xforms:label>
+                            </xforms:input>
                         </xforms:case>
                     </xforms:switch>
-                    <xforms:input ref="input" id="case-outer-input-2"/>
+                    <xforms:input ref="input" id="case-outer-input-2">
+                        <xforms:label>Case outer 2</xforms:label>
+                    </xforms:input>
                     <fr:button id="case-outer-button">
                         <xforms:label>Button</xforms:label>
                     </fr:button>

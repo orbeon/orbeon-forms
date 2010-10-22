@@ -54,7 +54,7 @@
         </input>
         <output name="response">
            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-               <xxf:dynamic-state>
+                <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
@@ -79,9 +79,12 @@
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
                         <xxf:control id="my-inplace-input$xf-8" class="fr-inplace-hint">[Hint hint!]</xxf:control>
-                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" label="Apply"/>
-                        <xxf:control id="my-inplace-input$xf-18" class="fr-inplace-cancel" label="Cancel"/>
+                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit"/>
+                        <xxf:control id="my-inplace-input$xf-15$xf-22" class="yui-button yui-push-button fr-inplace-rename"/>
+                        <xxf:control id="my-inplace-input$xf-15$xf-23" label="Apply"/>
+                        <xxf:control id="my-inplace-input$xf-16" class="fr-inplace-cancel" label="Cancel"/>
                     </xxf:control-values>
+                    <xxf:script name="my_inplace_input_xf_15_xf_25_xforms_function" target-id="my-inplace-input$xf-15$xf-23" observer-id="my-inplace-input$xf-15$xf-23"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -138,7 +141,9 @@
                         <xxf:control id="my-inplace-input$xf-8" readonly="true">42</xxf:control>
                         <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-18" class="fr-inplace-cancel" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-15$xf-22" class="yui-button yui-push-button fr-inplace-rename" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-15$xf-23" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-16" class="fr-inplace-cancel" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

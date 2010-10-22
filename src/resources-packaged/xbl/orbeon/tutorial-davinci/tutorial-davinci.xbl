@@ -21,7 +21,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-davinci">
+    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci">
         <xbl:implementation>
             <!-- Local model -->
             <xforms:model>

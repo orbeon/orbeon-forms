@@ -1256,7 +1256,6 @@
                                         <xforms:value value="."/>
                                     </xforms:itemset>
                                 </xforms:select>
-                                <fr:xforms-inspector/>
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>

@@ -21,7 +21,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-input">
+    <xbl:binding element="fr|tutorial-input" id="fr-tutorial-input">
         <xbl:template>
             <!-- Outer group implementing the single-node binding -->
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">

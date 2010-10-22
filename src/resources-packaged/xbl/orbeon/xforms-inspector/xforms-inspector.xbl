@@ -20,7 +20,7 @@
             xmlns:xbl="http://www.w3.org/ns/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xbl:binding element="fr|xforms-inspector">
+    <xbl:binding element="fr|xforms-inspector" id="fr-xforms-inspector">
         <xbl:resources>
             <xbl:style>
 .fr-xforms-inspector {

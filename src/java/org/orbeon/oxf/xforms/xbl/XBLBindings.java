@@ -430,7 +430,9 @@ public class XBLBindings {
                     xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
                     // Remember id of binding
-                    xblBindingIds.put(controlPrefixedId, XFormsUtils.getElementStaticId(bindingElement));
+                    final String bindingId = XFormsUtils.getElementStaticId(bindingElement);
+                    assert bindingId != null : "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(bindingElement);
+                    xblBindingIds.put(controlPrefixedId, bindingId);
 
                     // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
                     // TODO: should do this here, in order to include only the scripts and resources actually used

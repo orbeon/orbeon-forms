@@ -1132,8 +1132,8 @@
                                 <xforms:instance xmlns="" id="instance">
                                     <form/>
                                 </xforms:instance>
-                                <xforms:bind nodeset="value2" relevant="../value1 != '42'"/>
-                                <xforms:bind nodeset="value3" readonly="../value1 = '42'"/>
+                                <xforms:bind id="b1" nodeset="value2" relevant="../value1 != '42'"/>
+                                <xforms:bind id="b2" nodeset="value3" readonly="../value1 = '42'"/>
                             </xforms:model>
                         </models>
                     </p:input>

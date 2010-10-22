@@ -127,6 +127,9 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     var hasCalculateComputedCustomBind = false // default
     var hasValidateBind = false // default
 
+    // Bind name -> id mapping
+    val bindNamesToIds: JMap[String, String] = new JHashMap[String, String]
+
     // Top-level binds and create static binds hierarchy
     val topLevelBinds: Seq[Bind] = {
         // NOTE: For now, do as if binds follow all top-level variables
@@ -134,8 +137,6 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         for (bindElement <- Dom4jUtils.elements(element, XFORMS_BIND_QNAME))
             yield new Bind(bindElement, this, preceding)
     }
-
-    val bindNamesToIds: JMap[String, String] = new JHashMap[String, String]
 
     // Represent a static <xf:bind> element
     class Bind(element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis])

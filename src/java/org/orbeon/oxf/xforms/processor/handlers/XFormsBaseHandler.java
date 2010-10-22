@@ -81,19 +81,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     /**
      * Whether the control is disabled in the resulting HTML. Occurs when:
-     *
-     * o control is null
-     * o control is non-relevant
+     * 
      * o control is readonly but not static readonly
      *
      * @param control   control to check or null if no concrete control available
      * @return          whether the control is to be marked as disabled
      */
     protected boolean isHTMLDisabled(XFormsControl control) {
-        return control == null
-                || !control.isRelevant()
-//                || !handlerContext.getCaseVisibility() // no longer do this as it is better handled with CSS
-                || (control instanceof XFormsSingleNodeControl) && ((XFormsSingleNodeControl) control).isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
+        return
+//                control == null || !control.isRelevant() ||
+//                !handlerContext.getCaseVisibility() || // no longer do this as it is better handled with CSS
+                (control instanceof XFormsSingleNodeControl) && ((XFormsSingleNodeControl) control).isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
     }
 
     protected static void outputDisabledAttribute(AttributesImpl newAttributes) {

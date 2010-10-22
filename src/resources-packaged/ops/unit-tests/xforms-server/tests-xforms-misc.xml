@@ -1009,14 +1009,14 @@
                         <xhtml:span id="xforms-select-full-template" class="xforms-template">
                             <xhtml:span class="xforms-deselected">
                                 <xhtml:label for="$xforms-item-effective-id$">
-                                    <xhtml:input id="$xforms-item-effective-id$" type="checkbox" name="$xforms-effective-id$" value="$xforms-template-value$" disabled="disabled"/>$xforms-template-label$
+                                    <xhtml:input id="$xforms-item-effective-id$" type="checkbox" name="$xforms-effective-id$" value="$xforms-template-value$"/>$xforms-template-label$
                                 </xhtml:label>
                             </xhtml:span>
                         </xhtml:span>
                         <xhtml:span id="xforms-select1-full-template" class="xforms-template">
                             <xhtml:span class="xforms-deselected">
                                 <xhtml:label for="$xforms-item-effective-id$">
-                                    <xhtml:input id="$xforms-item-effective-id$" type="radio" name="$xforms-effective-id$" value="$xforms-template-value$" disabled="disabled"/>$xforms-template-label$
+                                    <xhtml:input id="$xforms-item-effective-id$" type="radio" name="$xforms-effective-id$" value="$xforms-template-value$"/>$xforms-template-label$
                                 </xhtml:label>
                             </xhtml:span>
                         </xhtml:span>

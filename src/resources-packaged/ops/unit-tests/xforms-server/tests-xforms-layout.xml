@@ -2058,7 +2058,7 @@
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:span id="s1c1i1" class="xforms-control xforms-input xforms-case-deselected">
-                    <xhtml:input id="s1c1i1$xforms-input-1" type="text" name="s1c1i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                    <xhtml:input id="s1c1i1$xforms-input-1" type="text" name="s1c1i1$xforms-input-1" value="" class="xforms-input-input"/>
                 </xhtml:span>
                 <xhtml:span id="s1c1i2" class="xforms-control xforms-input xforms-disabled xforms-case-deselected">
                     <xhtml:input id="s1c1i2$xforms-input-1" type="text" name="s1c1i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
@@ -2076,7 +2076,7 @@
                     <xhtml:input id="s1c2i3$xforms-input-1" type="text" name="s1c2i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:span id="s2c1s1c1i1" class="xforms-control xforms-input xforms-case-selected">
-                    <xhtml:input id="s2c1s1c1i1$xforms-input-1" type="text" name="s2c1s1c1i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                    <xhtml:input id="s2c1s1c1i1$xforms-input-1" type="text" name="s2c1s1c1i1$xforms-input-1" value="" class="xforms-input-input"/>
                 </xhtml:span>
                 <xhtml:span id="s2c1s1c1i2" class="xforms-control xforms-input xforms-disabled xforms-case-selected">
                     <xhtml:input id="s2c1s1c1i2$xforms-input-1" type="text" name="s2c1s1c1i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
@@ -2085,7 +2085,7 @@
                     <xhtml:input id="s2c1s1c1i3$xforms-input-1" type="text" name="s2c1s1c1i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:span id="s2c1s1c2i1" class="xforms-control xforms-input xforms-case-deselected">
-                    <xhtml:input id="s2c1s1c2i1$xforms-input-1" type="text" name="s2c1s1c2i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                    <xhtml:input id="s2c1s1c2i1$xforms-input-1" type="text" name="s2c1s1c2i1$xforms-input-1" value="" class="xforms-input-input"/>
                 </xhtml:span>
                 <xhtml:span id="s2c1s1c2i2" class="xforms-control xforms-input xforms-disabled xforms-case-deselected">
                     <xhtml:input id="s2c1s1c2i2$xforms-input-1" type="text" name="s2c1s1c2i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
@@ -2094,7 +2094,7 @@
                     <xhtml:input id="s2c1s1c2i3$xforms-input-1" type="text" name="s2c1s1c2i3$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:span id="s2c2s1c1i1" class="xforms-control xforms-input xforms-case-deselected">
-                    <xhtml:input id="s2c2s1c1i1$xforms-input-1" type="text" name="s2c2s1c1i1$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
+                    <xhtml:input id="s2c2s1c1i1$xforms-input-1" type="text" name="s2c2s1c1i1$xforms-input-1" value="" class="xforms-input-input"/>
                 </xhtml:span>
                 <xhtml:span id="s2c2s1c1i2" class="xforms-control xforms-input xforms-disabled xforms-case-deselected">
                     <xhtml:input id="s2c2s1c1i2$xforms-input-1" type="text" name="s2c2s1c1i2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>

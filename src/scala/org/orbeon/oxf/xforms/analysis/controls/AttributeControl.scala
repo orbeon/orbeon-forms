@@ -24,5 +24,5 @@ class AttributeControl(staticStateContext: StaticStateContext, element: Element,
 
     // Attribute control uses an AVT
     // TODO: Add support for AVT
-    override def computeValueAnalysis = Some(PathMapXPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS)
+    override def computeValueAnalysis = Some(ConstantNegativeAnalysis(value.get)) // we must have a value
 }

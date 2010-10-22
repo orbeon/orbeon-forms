@@ -46,7 +46,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait {
                                 analyzeXPath(getChildrenContext, selectAttribute)
                             case _ =>
                                 // Value is constant
-                                PathMapXPathAnalysis.CONSTANT_ANALYSIS
+                                ConstantPositiveAnalysis()
                                 // TODO: store constant value?
                         })
                     }
@@ -64,7 +64,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait {
                         analyzeXPath(getChildrenContext, selectAttribute)
                     case _ =>
                         // Value is constant
-                        PathMapXPathAnalysis.CONSTANT_ANALYSIS
+                        ConstantPositiveAnalysis()
                         // TODO: store constant value?
                 })
         }

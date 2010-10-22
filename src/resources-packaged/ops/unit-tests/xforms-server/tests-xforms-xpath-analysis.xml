@@ -4189,5 +4189,450 @@
             </request>
         </output>
     </test>
-    
+
+    <test description="Basic LHHA analysis" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m1">
+                        <xf:instance id="i11">
+                            <instance/>
+                        </xf:instance>
+                        <xf:instance id="i12">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                    <xf:model id="m2">
+                        <xf:instance id="i21">
+                            <instance/>
+                        </xf:instance>
+                        <xf:instance id="i22">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="i1" ref="instance()">
+                        <xf:label ref="@label"/>
+                        <xf:help ref="@help"/>
+                        <xf:hint ref="@hint"/>
+                        <xf:alert ref="@alert"/>
+                    </xf:input>
+                    <!-- Other attributes -->
+                    <xf:input id="i2" ref="instance()">
+                        <!-- Use of @context -->
+                        <xf:label context="instance('i12')" ref="@label"/>
+                        <!-- Use of @model -->
+                        <xf:help model="m2" context="instance('i22')" ref="@label"/>
+                        <!-- Combined use of attributes -->
+                        <xf:hint model="m2" context="instance('i22')" ref="resource" value="@label"/>
+                        <!-- Use of xxf:context() -->
+                        <xf:alert value="xxf:context('i2')/@label2"/>
+                    </xf:input>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <input scope="" prefixed-id="i1" model-prefixed-id="m1" binding="true" value="true">
+                    <binding>
+                        <analysis expression="instance()" analyzed="true">
+                            <returnable>
+                                <path>instance('i11')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i11</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                    <help>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@help</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </help>
+                    <hint>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@hint</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </hint>
+                    <alert>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@alert</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </alert>
+                </input>
+                <input scope="" prefixed-id="i2" model-prefixed-id="m1" binding="true" value="true">
+                    <binding>
+                        <analysis expression="instance()" analyzed="true">
+                            <returnable>
+                                <path>instance('i11')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i11</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i12')/@label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i12</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                    <help>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i22')/@label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i22</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </help>
+                    <hint>
+                        <analysis expression="xs:string((@label)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i22')/resource/@label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i22</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </hint>
+                    <alert>
+                        <analysis expression="xs:string((xxf:context('i2')/@label2)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@label2</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </alert>
+                </input>
+                <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true"/>
+                <model scope="" prefixed-id="m2" default-instance-prefixed-id="i21" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="LHHA analysis with nested outputs" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m1">
+                        <xf:instance id="i11">
+                            <instance/>
+                        </xf:instance>
+                        <xf:instance id="i12">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                    <xf:model id="m2">
+                        <xf:instance id="i21">
+                            <instance/>
+                        </xf:instance>
+                        <xf:instance id="i22">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="i5" ref="instance()">
+                        <!-- Simple xf:output -->
+                        <xf:label>
+                            <xh:span><xf:output ref="@label"/></xh:span>
+                        </xf:label>
+                        <!-- 2 simple xf:output -->
+                        <xf:help>
+                            <xh:span><xf:output ref="@help1"/> - <xf:output model="m2" ref="@help2"/></xh:span>
+                        </xf:help>
+                        <!-- Output we can't analyze -->
+                        <xf:hint>
+                            <xh:span><xf:output ref="@help1"/> - <xf:output value="index('my-repeat')"/></xh:span>
+                        </xf:hint>
+                    </xf:input>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <input scope="" prefixed-id="i5" model-prefixed-id="m1" binding="true" value="true">
+                    <binding>
+                        <analysis expression="instance()" analyzed="true">
+                            <returnable>
+                                <path>instance('i11')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i11</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                    <help>
+                        <analysis expression="(xs:string(.[1])) | (xs:string(.[1]))" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i21')/@help2</path>
+                                <path>instance('i11')/@help1</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i21</instance>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </help>
+                    <hint>
+                        <analysis expression="(xs:string((index('my-repeat'))[1])) | (xs:string(.[1]))" analyzed="false"/>
+                    </hint>
+                </input>
+                <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true"/>
+                <model scope="" prefixed-id="m2" default-instance-prefixed-id="i21" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="XBL outer scope refers to view variable" name="oxf:java" exclude="true">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+
+                        <xf:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xf:repeat id="foo-repeat" xbl:attr="ref=repeat-ref" xxbl:scope="outer"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xxf:variable name="bar" select="instance()/bar"/>
+                    <fr:foo id="my-foo" repeat-ref="$bar"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+
+            </request>
+        </output>
+    </test>
+
+    <test description="Bind with name attribute" name="oxf:java" exclude="true">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m1">
+                        <xf:instance id="i11">
+                            <instance/>
+                        </xf:instance>
+                        <xf:bind id="b1" name="name1" ref=".">
+                            <xf:bind id="b2" name="name2" ref="foo"/>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group ref="$name1">
+                        <xf:input id="id1" ref="$name2"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true">
+                    <binds>
+                        <bind id="b1" ref=".">
+                            <binding>
+                                <analysis expression="." analyzed="true">
+                                    <returnable>
+                                        <path>instance('i11')</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>m1</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i11</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i11</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </binding>
+                            <bind id="b2" ref="foo">
+                                <binding>
+                                    <analysis expression="foo" analyzed="true">
+                                        <returnable>
+                                            <path>instance('i11')/foo</path>
+                                        </returnable>
+                                        <dependent-models>
+                                            <model>m1</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i11</instance>
+                                        </dependent-instances>
+                                        <returnable-instances>
+                                            <instance>i11</instance>
+                                        </returnable-instances>
+                                    </analysis>
+                                </binding>
+                            </bind>
+                        </bind>
+                    </binds>
+                    <bind-instances>
+                        <instance>i11</instance>
+                    </bind-instances>
+                </model>
+            </request>
+        </output>
+    </test>
+
 </group>

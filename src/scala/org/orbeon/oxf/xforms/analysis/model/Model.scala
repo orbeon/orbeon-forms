@@ -47,7 +47,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
     override def getChildrenContext = defaultInstancePrefixedId match {
         case Some(defaultInstancePrefixedId) => // instance('defaultInstanceId')
-            Some(new PathMapXPathAnalysis(staticStateContext.staticState, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
+            Some(PathMapXPathAnalysis(staticStateContext.staticState, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
                 null, None, Map.empty[String, VariableAnalysisTrait], null, scope, prefixedId, defaultInstancePrefixedId, locationData, element))
         case None => None // no instance
     }
@@ -150,7 +150,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             val isValidateMIP = Model.VALIDATE_MIP_NAMES.contains(name)
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
 
-            var analysis: XPathAnalysis = PathMapXPathAnalysis.CONSTANT_NEGATIVE_ANALYSIS // default to negative, analyzeXPath() can change that
+            var analysis: XPathAnalysis = ConstantNegativeAnalysis(expression) // default to negative, analyzeXPath() can change that
 
             def analyzeXPath() {
 

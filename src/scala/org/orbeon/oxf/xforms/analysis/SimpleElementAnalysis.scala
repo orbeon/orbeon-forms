@@ -109,7 +109,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
     }
 
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
-        new PathMapXPathAnalysis(staticStateContext.staticState, xpathString, staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId),
+        PathMapXPathAnalysis(staticStateContext.staticState, xpathString, staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId),
             contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, getModelPrefixedId.orNull, getDefaultInstancePrefixedId.orNull, locationData, element)
 
     /**

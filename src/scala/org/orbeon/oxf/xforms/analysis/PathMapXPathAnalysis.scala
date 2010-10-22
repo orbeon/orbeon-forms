@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.saxon.expr._
-import scala.collection.JavaConversions._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.dom4j.Element
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
@@ -26,341 +25,89 @@ import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.expr.PathMap.PathMapArc
-import collection.mutable.{LinkedHashSet, Stack, Set}
+import collection.mutable.{LinkedHashSet, Stack}
 
 import java.util.{Map => JMap, HashMap => JHashMap}
-import org.orbeon.saxon.`type`.AtomicType
 
-class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: String, namespaceMapping: NamespaceMapping,
-                           baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableAnalysisTrait],
-                           pathMapContext: AnyRef,
-                           scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String,
-                           locationData: LocationData, element: Element)
+class PathMapXPathAnalysis(val xpathString: String,
+                           var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
+                           val figuredOutDependencies: Boolean,
+                           val valueDependentPaths: collection.Set[String],
+                           val returnablePaths: collection.Set[String],
+                           val dependentModels: collection.Set[String],
+                           val dependentInstances: collection.Set[String],
+                           val returnableInstances: collection.Set[String])
         extends XPathAnalysis {
-
-    private val expression = XPathCache.createExpression(staticState.getXPathConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
-
-    // TODO: Figure out way to make all fields vals
-
-    // This is used during analysis and can be freed afterwards
-    var pathmap: PathMap = _
-
-    var figuredOutDependencies: Boolean = _
-
-    // We use LinkedHashSet to keep e.g. unit tests reproducible
-    var valueDependentPaths = new LinkedHashSet[String]
-    var returnablePaths = new LinkedHashSet[String]
-
-    var dependentModels = new LinkedHashSet[String]
-    var dependentInstances = new LinkedHashSet[String]
-    var returnableInstances = new LinkedHashSet[String]
-
-    try {
-        // In-scope variables
-        val variablePathMaps = new JHashMap[String, PathMap]
-        for ((name, variableControl) <- inScopeVariables; valueAnalysis = variableControl.getValueAnalysis; if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies)
-            variablePathMaps.put(name, valueAnalysis match {case Some(analysis) if analysis.figuredOutDependencies => analysis.pathmap; case _ => null})
-
-        val pathmap =
-            if (baseAnalysis.isEmpty || (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) == 0) {
-                // Start with a new PathMap if:
-                // o we are at the top (i.e. does not have a context)
-                // o or the expression does not depend on the focus
-                // NOTE: We used to test on DEPENDS_ON_CONTEXT_ITEM above, but any use of the focus would otherwise create
-                // a root context expression in PathMap, which is not right.
-                new PathMap(expression, variablePathMaps, pathMapContext)
-            } else {
-                // Expression has a context and depends on the context item
-                if (baseAnalysis.get.figuredOutDependencies) {
-                    // We clone the base analysis and add to an existing PathMap
-                    val clonedPathmap = baseAnalysis.get.pathmap.clone
-                    clonedPathmap.setInScopeVariables(variablePathMaps)
-                    clonedPathmap.setPathMapContext(pathMapContext)
-
-                    val newNodeset = expression.addToPathMap(clonedPathmap, clonedPathmap.findFinalNodes)
-
-                    if (!clonedPathmap.isInvalidated)
-                        clonedPathmap.updateFinalNodes(newNodeset)
-
-                    clonedPathmap
-                } else {
-                    // Base analysis failed, we fail analysis too
-                    this.pathmap = null
-                    this.figuredOutDependencies = false
-
-                    null
-                }
-            }
-
-        if ((pathmap eq null) || pathmap.isInvalidated) {
-            this.pathmap = null
-            this.figuredOutDependencies = false
-        } else {
-
-//            println("Before")
-//            println(expression.toString())
-//            pathmap.diagnosticDump(System.out)
-
-            // Try to reduce ancestor axis
-            reduceAncestorAxis(pathmap)
-
-//            println("After")
-//            pathmap.diagnosticDump(System.out)
-
-            this.pathmap = pathmap
-
-            // Produce resulting paths
-            this.figuredOutDependencies = processPaths(scope, containingModelPrefixedId, defaultInstancePrefixedId)
-
-            if (!this.figuredOutDependencies) {
-                // This really shouldn't be touched if we can't figure out dependencies, but they are so clear them here
-                valueDependentPaths.clear()
-                returnablePaths.clear()
-                dependentModels.clear()
-                dependentInstances.clear()
-                returnableInstances.clear()
-            }
-        }
-
-    } catch {
-        case e: Exception =>
-            throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "analysing XPath expression",
-                    element, "expression", xpathString))
-    }
-
-    def externalAnalysisExperiment(expression: Expression, pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
-
-        expression match {
-
-            case other =>
-                val dependsOnFocus = (other.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
-                val attachmentPoint = pathMapNodeSet match {
-                    case null if dependsOnFocus =>
-                        // Result is new ContextItemExpression
-                        val contextItemExpression = new ContextItemExpression
-                        contextItemExpression.setContainer(expression.getContainer)
-                        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(contextItemExpression))
-                    case _ =>
-                        // All other cases
-                        if (dependsOnFocus) pathMapNodeSet else null
-                }
-
-                val resultNodeSet = new PathMap.PathMapNodeSet
-                for (child <- other.iterateSubExpressions)
-                    resultNodeSet.addNodeSet(externalAnalysisExperiment(child.asInstanceOf[Expression], pathMap, attachmentPoint))
-
-                // Handle result differently if result type is atomic or not
-                other.getItemType(other.getExecutable.getConfiguration.getTypeHierarchy) match {
-                    case atomicType: AtomicType =>
-                        // NOTE: Thought it would be right to call setAtomized(), but it isn't! E.g. count() returns an atomic type,
-                        // but it doesn't mean the result of its argument expression is atomized. sum() does, but that's handled by
-                        // the atomization of the argument to sum().
-        //                resultNodeSet.setAtomized()
-                        // If expression returns an atomic value then any nodes accessed don't contribute to the result
-                        null
-                    case _ => resultNodeSet
-                }
-        }
-    }
 
     def combine(other: XPathAnalysis): XPathAnalysis = {
 
-        require(figuredOutDependencies && other.figuredOutDependencies)
-
-        pathmap.addRoots(other.pathmap.getPathMapRoots)
-        valueDependentPaths ++= other.valueDependentPaths
-        returnablePaths ++= other.returnablePaths
-        dependentModels ++= other.dependentModels
-        dependentInstances ++= other.dependentInstances
-        returnableInstances ++= other.returnableInstances
-
-        // TODO: return new XPathAnalysis
-
-        this
+        if (!figuredOutDependencies || !other.figuredOutDependencies)
+            // Either side is negative, return a constant negative with the combined expression
+            ConstantNegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
+        else
+            other match {
+                case other: XPathAnalysis.ConstantXPathAnalysis =>
+                    // Other is constant positive analysis, so just return this
+                    this
+                case other: PathMapXPathAnalysis =>
+                    // Both are PathMap analysis so actually combine
+                    new PathMapXPathAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString),
+                        {
+                            val newPathmap = pathmap.get.clone
+                            newPathmap.addRoots(other.pathmap.get.clone.getPathMapRoots)
+                            Some(newPathmap)
+                        },
+                        true,
+                        valueDependentPaths ++ other.valueDependentPaths,
+                        returnablePaths ++ other.returnablePaths,
+                        dependentModels ++ other.dependentModels,
+                        dependentInstances ++ other.dependentInstances,
+                        returnableInstances ++ other.returnableInstances)
+                case _ =>
+                    throw new IllegalStateException // should not happen
+            }
     }
 
-    /**
-     * Process the pathmap to extract paths and other information useful for handling dependencies.
-     */
-    private def processPaths(scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String): Boolean = {
-        val stack = new Stack[Expression]
-
-        def processNode(node: PathMap.PathMapNode, scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String, ancestorAtomized: Boolean): Boolean = {
-            var success = true
-            if (node.getArcs.length == 0 || node.isReturnable || node.isAtomized || ancestorAtomized) {
-
-                val sb = new StringBuilder
-                success &= createPath(sb, stack, scope, containingModelPrefixedId, defaultInstancePrefixedId, node)
-                if (success) {
-//                    System.out.println("yyy path " + sb.toString)
-
-                    if (sb.nonEmpty) {
-                        // A path was created
-
-                        // NOTE: A same node can be both returnable AND atomized in a given expression
-                        val s = sb.toString
-                        if (node.isReturnable)
-                            returnablePaths.add(s)
-                        if (node.isAtomized)
-                            valueDependentPaths.add(s)
-                    } else {
-                        // NOP: don't add the path as this is not considered a dependency
-                    }
-                } else {
-                    // We can't deal with this path so stop here
-                    return false
-                }
-            }
-
-            // Process children nodes
-            if (node.getArcs.nonEmpty) {
-                for (arc <- node.getArcs) {
-                    stack.push(arc.getStep)
-                    success &= processNode(arc.getTarget, scope, containingModelPrefixedId, defaultInstancePrefixedId, node.isAtomized)
-                    if (!success) {
-                        return false
-                    }
-                    stack.pop()
-                }
-            }
-
-            // We managed to deal with this path
-            true
-        }
-
-        for (root <- pathmap.getPathMapRoots) {
-            stack.push(root.getRootExpression)
-            val success = processNode(root, scope, containingModelPrefixedId, defaultInstancePrefixedId, false)
-            if (!success)
-                return false
-            stack.pop()
-        }
-        true
-    }
-
-    private def createPath(sb: StringBuilder, stack: Stack[Expression], scope: XBLBindings#Scope, containingModelPrefixedId: String,
-                           defaultInstancePrefixedId: String, node: PathMap.PathMapNode): Boolean = {
-
-        // Local class used as marker for a rewritten StringLiteral in an expression
-        class PrefixedIdStringLiteral(value: CharSequence) extends StringLiteral(value)
-
-        for (expression <- stack reverse) {
-            expression match {
-                case instanceExpression: FunctionCall
-                        if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] => {
-
-                    val hasParameter = instanceExpression.getArguments.nonEmpty
-                    if (!hasParameter) {
-                        // instance() resolves to default instance for scope
-                        if (defaultInstancePrefixedId != null) {
-                            sb.append(PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId))
-
-                                // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
-                                // TODO: not needed anymore because model now set before it is analyzed
-                                val defaultModelForInstance = staticState.getModelByInstancePrefixedId(defaultInstancePrefixedId)
-                                val dependentModelPrefixedId = if (defaultModelForInstance != null) defaultModelForInstance.prefixedId else containingModelPrefixedId
-                                dependentModels.add(dependentModelPrefixedId)
-
-
-                            dependentInstances.add(defaultInstancePrefixedId)
-                            if (node.isReturnable)
-                                returnableInstances.add(defaultInstancePrefixedId)
-
-                            // Rewrite expression to add/replace its argument with a prefixed instance id
-                            instanceExpression.setArguments(Array(new StringLiteral(defaultInstancePrefixedId)))
-                        } else {
-                            // Model does not have a default instance
-                            // This is successful, but the path must not be added
-                            sb.setLength(0)
-                            return true
-                        }
-                    } else {
-                        val instanceNameExpression = instanceExpression.getArguments()(0)
-                        instanceNameExpression match {
-                            case stringLiteral: StringLiteral => {
-                                val originalInstanceId = stringLiteral.getStringValue
-                                val searchAncestors = expression.isInstanceOf[XXFormsInstance]
-
-                                // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an instance() StringLiteral parameter twice
-                                val alreadyRewritten = instanceNameExpression.isInstanceOf[PrefixedIdStringLiteral]
-
-                                val prefixedInstanceId =
-                                    if (alreadyRewritten)
-                                        // Parameter is already a prefixed id
-                                        originalInstanceId
-                                    else if (searchAncestors)
-                                        // xxforms:instance()
-                                        staticState.findInstancePrefixedId(scope, originalInstanceId)
-                                    else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
-                                        // HACK: datatable e.g. uses instance(prefixedId)!
-                                        originalInstanceId
-                                    else
-                                        // Normal use of instance()
-                                        scope.getPrefixedIdForStaticId(originalInstanceId)
-
-                                if (prefixedInstanceId != null) {
-                                    // Instance found
-                                    sb.append(PathMapXPathAnalysis.buildInstanceString(prefixedInstanceId))
-
-                                        // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
-                                        // TODO: not needed anymore because model now set before it is analyzed
-                                        val modelForInstance = staticState.getModelByInstancePrefixedId(prefixedInstanceId)
-                                        val dependentModelPrefixedId = if (modelForInstance != null) modelForInstance.prefixedId else containingModelPrefixedId
-                                        dependentModels.add(dependentModelPrefixedId)
-
-                                    dependentInstances.add(prefixedInstanceId)
-                                    if (node.isReturnable)
-                                        returnableInstances.add(prefixedInstanceId)
-                                    // If needed, rewrite expression to replace its argument with a prefixed instance id
-                                    if (!alreadyRewritten)
-                                        instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(prefixedInstanceId)))
-                                } else {
-                                    // Instance not found (could be reference to unknown instance e.g. author typo!)
-                                    // TODO: must also catch case where id is found but does not correspond to instance
-                                    // TODO: warn in log
-                                    // This is successful, but the path must not be added
-                                    sb.setLength(0)
-                                    return true
-                                }
-                            }
-                            case _ => {
-                                // Non-literal instance name
-                                return false
-                            }
-                        }
-                    }
-                }
-                case axisExpression: AxisExpression => {
-                    axisExpression.getAxis match {
-                        case Axis.SELF => // NOP
-                        case axis @ (Axis.CHILD | Axis.ATTRIBUTE) => {
-                            // Child or attribute axis
-                            if (sb.nonEmpty)
-                                sb.append('/')
-                            val fingerprint = axisExpression.getNodeTest.getFingerprint
-                            if (fingerprint != -1) {
-                                if (axis == Axis.ATTRIBUTE)
-                                    sb.append("@")
-                                sb.append(fingerprint)
-                            } else {
-                                // Unnamed node
-                                return false
-                            }
-                        }
-                        case _ => return false // Unhandled axis
-                    }
-                }
-                case _ => return false // unhandled expression
-            }
-        }
-        true
-    }
+//    def externalAnalysisExperiment(expression: Expression, pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
+//
+//        expression match {
+//
+//            case other =>
+//                val dependsOnFocus = (other.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
+//                val attachmentPoint = pathMapNodeSet match {
+//                    case null if dependsOnFocus =>
+//                        // Result is new ContextItemExpression
+//                        val contextItemExpression = new ContextItemExpression
+//                        contextItemExpression.setContainer(expression.getContainer)
+//                        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(contextItemExpression))
+//                    case _ =>
+//                        // All other cases
+//                        if (dependsOnFocus) pathMapNodeSet else null
+//                }
+//
+//                val resultNodeSet = new PathMap.PathMapNodeSet
+//                for (child <- other.iterateSubExpressions)
+//                    resultNodeSet.addNodeSet(externalAnalysisExperiment(child.asInstanceOf[Expression], pathMap, attachmentPoint))
+//
+//                // Handle result differently if result type is atomic or not
+//                other.getItemType(other.getExecutable.getConfiguration.getTypeHierarchy) match {
+//                    case atomicType: AtomicType =>
+//                        // NOTE: Thought it would be right to call setAtomized(), but it isn't! E.g. count() returns an atomic type,
+//                        // but it doesn't mean the result of its argument expression is atomized. sum() does, but that's handled by
+//                        // the atomization of the argument to sum().
+//        //                resultNodeSet.setAtomized()
+//                        // If expression returns an atomic value then any nodes accessed don't contribute to the result
+//                        null
+//                    case _ => resultNodeSet
+//                }
+//        }
+//    }
 
     def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) {
 
         helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
 
-        def setToXML(set: Set[String], enclosingElementName: String, elementName: String) {
+        def setToXML(set: collection.Set[String], enclosingElementName: String, elementName: String) {
             if (set.nonEmpty) {
                 helper.startElement(enclosingElementName)
                 for (value <- set)
@@ -378,6 +125,284 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
         helper.endElement()
     }
 
+    override def freeTransientState(): Unit = pathmap = None
+}
+
+object PathMapXPathAnalysis {
+
+    /**
+     * Create a new XPathAnalysis based on an initial XPath expression.
+     */
+    def apply(staticState: XFormsStaticState, xpathString: String, namespaceMapping: NamespaceMapping,
+              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableAnalysisTrait],
+              pathMapContext: AnyRef, scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String,
+              locationData: LocationData, element: Element): XPathAnalysis = {
+
+        try {
+            // Create expression
+            val expression = XPathCache.createExpression(staticState.getXPathConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
+
+            // In-scope variables
+            val variablePathMaps = new JHashMap[String, PathMap]
+            for ((name, variableControl) <- inScopeVariables; valueAnalysis = variableControl.getValueAnalysis; if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies)
+                variablePathMaps.put(name, valueAnalysis match {
+                    case Some(analysis: PathMapXPathAnalysis) if analysis.figuredOutDependencies => analysis.pathmap.get
+                    case _ => null
+                })
+
+            def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
+
+            val pathmap: Option[PathMap] =
+                baseAnalysis match {
+                    case Some(baseAnalysis: PathMapXPathAnalysis) if dependsOnFocus =>
+                        // Expression depends on the context and has a context which has a pathmap
+
+                        // We clone the base analysis and add to an existing PathMap
+                        val clonedPathmap = baseAnalysis.pathmap.get.clone
+                        clonedPathmap.setInScopeVariables(variablePathMaps)
+                        clonedPathmap.setPathMapContext(pathMapContext)
+
+                        val newNodeset = expression.addToPathMap(clonedPathmap, clonedPathmap.findFinalNodes)
+
+                        if (!clonedPathmap.isInvalidated)
+                            clonedPathmap.updateFinalNodes(newNodeset)
+
+                        Some(clonedPathmap)
+                    case Some(baseAnalysis) if dependsOnFocus =>
+                        // Expression depends on the context but the context doesn't have a pathmap
+                        //
+                        // o if context is constant negative, clearly we can't handle this
+                        // o if context is constant positive, should we try something? TODO
+                        None
+                    case _ =>
+                        // Start with a new PathMap if:
+                        // o we are at the top (i.e. does not have a context)
+                        // o or the expression does not depend on the focus
+                        // NOTE: We used to test on DEPENDS_ON_CONTEXT_ITEM above, but any use of the focus would otherwise create
+                        // a root context expression in PathMap, which is not right.
+                        Some(new PathMap(expression, variablePathMaps, pathMapContext))
+                }
+
+            pathmap match {
+                case Some(pathmap) if !pathmap.isInvalidated =>
+
+                    //            println("Expression:")
+                    //            println(expression.toString())
+                    //            println("PathMap before")
+                    //            pathmap.diagnosticDump(System.out)
+
+                    // Try to reduce ancestor axis before anything else
+                    reduceAncestorAxis(pathmap)
+
+                    //            println("PathMap after")
+                    //            pathmap.diagnosticDump(System.out)
+
+                    // We use LinkedHashSet to keep e.g. unit tests reproducible
+                    val valueDependentPaths = new LinkedHashSet[String]
+                    val returnablePaths = new LinkedHashSet[String]
+
+                    val dependentModels = new LinkedHashSet[String]
+                    val dependentInstances = new LinkedHashSet[String]
+                    val returnableInstances = new LinkedHashSet[String]
+
+                    // Process the pathmap to extract paths and other information useful for handling dependencies.
+                    def processPaths(scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String): Boolean = {
+                        val stack = new Stack[Expression]
+
+                        def createPath(sb: StringBuilder, scope: XBLBindings#Scope, containingModelPrefixedId: String,
+                                       defaultInstancePrefixedId: String, node: PathMap.PathMapNode): Boolean = {
+
+                            // Local class used as marker for a rewritten StringLiteral in an expression
+                            class PrefixedIdStringLiteral(value: CharSequence) extends StringLiteral(value)
+
+                            for (expression <- stack reverse) {
+                                expression match {
+                                    case instanceExpression: FunctionCall
+                                            if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] => {
+
+                                        val hasParameter = instanceExpression.getArguments.nonEmpty
+                                        if (!hasParameter) {
+                                            // instance() resolves to default instance for scope
+                                            if (defaultInstancePrefixedId != null) {
+                                                sb.append(PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId))
+
+                                                    // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
+                                                    // TODO: not needed anymore because model now set before it is analyzed
+                                                    val defaultModelForInstance = staticState.getModelByInstancePrefixedId(defaultInstancePrefixedId)
+                                                    val dependentModelPrefixedId = if (defaultModelForInstance != null) defaultModelForInstance.prefixedId else containingModelPrefixedId
+                                                    dependentModels.add(dependentModelPrefixedId)
+
+
+                                                dependentInstances.add(defaultInstancePrefixedId)
+                                                if (node.isReturnable)
+                                                    returnableInstances.add(defaultInstancePrefixedId)
+
+                                                // Rewrite expression to add/replace its argument with a prefixed instance id
+                                                instanceExpression.setArguments(Array(new StringLiteral(defaultInstancePrefixedId)))
+                                            } else {
+                                                // Model does not have a default instance
+                                                // This is successful, but the path must not be added
+                                                sb.setLength(0)
+                                                return true
+                                            }
+                                        } else {
+                                            val instanceNameExpression = instanceExpression.getArguments()(0)
+                                            instanceNameExpression match {
+                                                case stringLiteral: StringLiteral => {
+                                                    val originalInstanceId = stringLiteral.getStringValue
+                                                    val searchAncestors = expression.isInstanceOf[XXFormsInstance]
+
+                                                    // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an instance() StringLiteral parameter twice
+                                                    val alreadyRewritten = instanceNameExpression.isInstanceOf[PrefixedIdStringLiteral]
+
+                                                    val prefixedInstanceId =
+                                                        if (alreadyRewritten)
+                                                            // Parameter is already a prefixed id
+                                                            originalInstanceId
+                                                        else if (searchAncestors)
+                                                            // xxforms:instance()
+                                                            staticState.findInstancePrefixedId(scope, originalInstanceId)
+                                                        else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
+                                                            // HACK: datatable e.g. uses instance(prefixedId)!
+                                                            originalInstanceId
+                                                        else
+                                                            // Normal use of instance()
+                                                            scope.getPrefixedIdForStaticId(originalInstanceId)
+
+                                                    if (prefixedInstanceId != null) {
+                                                        // Instance found
+                                                        sb.append(PathMapXPathAnalysis.buildInstanceString(prefixedInstanceId))
+
+                                                            // Static state doesn't yet know about the model if this expression is within the model. In this case, use containingModelPrefixedId
+                                                            // TODO: not needed anymore because model now set before it is analyzed
+                                                            val modelForInstance = staticState.getModelByInstancePrefixedId(prefixedInstanceId)
+                                                            val dependentModelPrefixedId = if (modelForInstance != null) modelForInstance.prefixedId else containingModelPrefixedId
+                                                            dependentModels.add(dependentModelPrefixedId)
+
+                                                        dependentInstances.add(prefixedInstanceId)
+                                                        if (node.isReturnable)
+                                                            returnableInstances.add(prefixedInstanceId)
+                                                        // If needed, rewrite expression to replace its argument with a prefixed instance id
+                                                        if (!alreadyRewritten)
+                                                            instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(prefixedInstanceId)))
+                                                    } else {
+                                                        // Instance not found (could be reference to unknown instance e.g. author typo!)
+                                                        // TODO: must also catch case where id is found but does not correspond to instance
+                                                        // TODO: warn in log
+                                                        // This is successful, but the path must not be added
+                                                        sb.setLength(0)
+                                                        return true
+                                                    }
+                                                }
+                                                case _ => {
+                                                    // Non-literal instance name
+                                                    return false
+                                                }
+                                            }
+                                        }
+                                    }
+                                    case axisExpression: AxisExpression => {
+                                        axisExpression.getAxis match {
+                                            case Axis.SELF => // NOP
+                                            case axis @ (Axis.CHILD | Axis.ATTRIBUTE) => {
+                                                // Child or attribute axis
+                                                if (sb.nonEmpty)
+                                                    sb.append('/')
+                                                val fingerprint = axisExpression.getNodeTest.getFingerprint
+                                                if (fingerprint != -1) {
+                                                    if (axis == Axis.ATTRIBUTE)
+                                                        sb.append("@")
+                                                    sb.append(fingerprint)
+                                                } else {
+                                                    // Unnamed node
+                                                    return false
+                                                }
+                                            }
+                                            case _ => return false // Unhandled axis
+                                        }
+                                    }
+                                    case _ => return false // unhandled expression
+                                }
+                            }
+                            true
+                        }
+
+                        def processNode(node: PathMap.PathMapNode, scope: XBLBindings#Scope, containingModelPrefixedId: String, defaultInstancePrefixedId: String, ancestorAtomized: Boolean): Boolean = {
+                            var success = true
+                            if (node.getArcs.length == 0 || node.isReturnable || node.isAtomized || ancestorAtomized) {
+
+                                val sb = new StringBuilder
+                                success &= createPath(sb, scope, containingModelPrefixedId, defaultInstancePrefixedId, node)
+                                if (success) {
+                //                    System.out.println("yyy path " + sb.toString)
+
+                                    if (sb.nonEmpty) {
+                                        // A path was created
+
+                                        // NOTE: A same node can be both returnable AND atomized in a given expression
+                                        val s = sb.toString
+                                        if (node.isReturnable)
+                                            returnablePaths.add(s)
+                                        if (node.isAtomized)
+                                            valueDependentPaths.add(s)
+                                    } else {
+                                        // NOP: don't add the path as this is not considered a dependency
+                                    }
+                                } else {
+                                    // We can't deal with this path so stop here
+                                    return false
+                                }
+                            }
+
+                            // Process children nodes
+                            if (node.getArcs.nonEmpty) {
+                                for (arc <- node.getArcs) {
+                                    stack.push(arc.getStep)
+                                    success &= processNode(arc.getTarget, scope, containingModelPrefixedId, defaultInstancePrefixedId, node.isAtomized)
+                                    if (!success) {
+                                        return false
+                                    }
+                                    stack.pop()
+                                }
+                            }
+
+                            // We managed to deal with this path
+                            true
+                        }
+
+                        for (root <- pathmap.getPathMapRoots) {
+                            stack.push(root.getRootExpression)
+                            val success = processNode(root, scope, containingModelPrefixedId, defaultInstancePrefixedId, false)
+                            if (!success)
+                                return false
+                            stack.pop()
+                        }
+                        true
+                    }
+
+                    if (processPaths(scope, containingModelPrefixedId, defaultInstancePrefixedId))
+                        // Success
+                        new PathMapXPathAnalysis(xpathString, Some(pathmap), true, valueDependentPaths, returnablePaths, dependentModels, dependentInstances, returnableInstances)
+                    else
+                        // Failure
+                        ConstantNegativeAnalysis(xpathString)
+
+                case _ =>
+                    // Failure
+                    ConstantNegativeAnalysis(xpathString)
+            }
+
+        } catch {
+            case e: Exception =>
+                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "analysing XPath expression",
+                        element, "expression", xpathString))
+        }
+
+    }
+
+    /**
+     * Given a raw PathMap, try to reduce ancestor and other axes.
+     */
     private def reduceAncestorAxis(pathmap: PathMap): Boolean = {
 
         // Utility class to hold node and ark as otherwise we can't go back to the node from an arc
@@ -488,36 +513,6 @@ class PathMapXPathAnalysis(staticState: XFormsStaticState, val xpathString: Stri
         }
         true
     }
-
-    override def freeTransientState() {
-        this.pathmap = null
-    }
-}
-
-object PathMapXPathAnalysis {
-
-    class ConstantXPathAnalysis(positive: Boolean) extends XPathAnalysis {
-
-        def pathmap = null
-        def xpathString = null
-
-        def returnableInstances = Set.empty[String]
-        def dependentInstances = Set.empty[String]
-        def dependentModels = Set.empty[String]
-        def returnablePaths = Set.empty[String]
-        def valueDependentPaths = Set.empty[String]
-        def figuredOutDependencies = positive
-
-        def combine(other: XPathAnalysis): XPathAnalysis =
-            if (!figuredOutDependencies || !other.figuredOutDependencies) CONSTANT_NEGATIVE_ANALYSIS else other
-
-        def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = {
-            helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
-        }
-    }
-
-    val CONSTANT_ANALYSIS = new ConstantXPathAnalysis(true)
-    val CONSTANT_NEGATIVE_ANALYSIS = new ConstantXPathAnalysis(false)
 
     // For debugging/logging
     def getDisplayPath(path: String): String = {

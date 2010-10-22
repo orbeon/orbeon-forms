@@ -2244,33 +2244,6 @@ ORBEON.xforms.Controls = {
         }
     },
 
-    /**
-     * Updates the disabled attribute on all the form elements below a certain root element. This function is used when
-     * a section of the form because relevant or non-relevant, and when a case becomes selected or non-selected.
-     */
-    setDisabledOnTree: function(root, disabled) {
-        ORBEON.util.Dom.applyOnFormElements(root, function(element) {
-            if (disabled) {
-                // If the root becomes disabled, make all the form controls under that root disabled
-                ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
-            } else {
-                // If the root becomes enabled, mark the form controls under the root enabled only if they don't have a
-                // parent which is either a disabled case (xforms-case-deselected) or a non-relevant
-                // group (xforms-disabled).
-                var hasParentDisabledOrNonRelevant = ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
-                    return YAHOO.util.Dom.hasClass(node, "xforms-case-deselected")
-                                || YAHOO.util.Dom.hasClass(node, "xforms-case-deselected-subsequent")
-                                || YAHOO.util.Dom.hasClass(node, "xforms-disabled")
-                                || YAHOO.util.Dom.hasClass(node, "xforms-disabled-subsequent");
-                }, null, false);
-                if (! hasParentDisabledOrNonRelevant) {
-                    ORBEON.xforms.Controls.setDisabledOnFormElement(element, disabled);
-                }
-            }
-        }, null, false);
-
-    },
-
     setRelevant: function(control, isRelevant) {
         var FN = ORBEON.xforms.FlatNesting;
 
@@ -2304,10 +2277,6 @@ ORBEON.xforms.Controls = {
                     }
                 }
             }
-
-            // Add/remove the disabled attribute on form controls
-            var formFieldDisabled = ! isRelevant || ORBEON.xforms.Controls.isReadonly(control);
-            ORBEON.xforms.Controls.setDisabledOnTree(control, formFieldDisabled);
         }
     },
 
@@ -2395,7 +2364,7 @@ ORBEON.xforms.Controls = {
                 && ! YAHOO.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal"))
                 || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
             // Button
-            var button = ORBEON.util.Dom.getElementByTagName(control, "button");;
+            var button = ORBEON.util.Dom.getElementByTagName(control, "button");
             ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
             // Also update class xforms-trigger-readonly to style the a inside the span (in span layout, for IE6)
@@ -2971,8 +2940,6 @@ ORBEON.xforms.FlatNesting = {
             } else {
                 YD.addClass(node, "xforms-disabled-subsequent");
             }
-            // Update disabled attribute on form controls
-            OC.setDisabledOnTree(node, ! isRelevant);
             return false;
         }, true);
     }
@@ -4786,10 +4753,6 @@ ORBEON.xforms.Init = {
     },
 
     document: function() {
-
-//        _.each(document.forms["xforms-form"].elements, function(element) {
-//            ORBEON.xforms.Controls.setDisabledOnFormElement(element, false);
-//        });
 
         ORBEON.xforms.Globals = {
             // Booleans used for browser detection
@@ -7392,8 +7355,6 @@ ORBEON.xforms.Server = {
                                                     YAHOO.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
                                                     YAHOO.util.Dom.removeClass(cursor, "xforms-case-selected");
                                                 }
-                                                // Update disabled attribute on form elements
-                                                ORBEON.xforms.Controls.setDisabledOnTree(cursor, ! visible);
                                                 // Keep track of changed element for FCK workaround (see below)
                                                 elementsWithVisibilityChanged[elementsWithVisibilityChanged.length] = cursor;
                                             }

@@ -84,7 +84,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
      *
      * o control is null
      * o control is non-relevant
-     * o control is in non-relevant case
      * o control is readonly but not static readonly
      *
      * @param control   control to check or null if no concrete control available
@@ -93,7 +92,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     protected boolean isHTMLDisabled(XFormsControl control) {
         return control == null
                 || !control.isRelevant()
-                || !handlerContext.getCaseVisibility()
+//                || !handlerContext.getCaseVisibility() // no longer do this as it is better handled with CSS
                 || (control instanceof XFormsSingleNodeControl) && ((XFormsSingleNodeControl) control).isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
     }
 

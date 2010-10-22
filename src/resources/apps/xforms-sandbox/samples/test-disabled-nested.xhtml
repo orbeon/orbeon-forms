@@ -130,19 +130,19 @@
                     }
                 }));
 
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                    if (parent && parent.TestManager) {
-                        parent.TestManager.load();
-                    } else {
-                        new YAHOO.tool.TestLogger();
-                        YAHOO.tool.TestRunner.run();
-                    }
-                });
+//                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+//                    if (parent && parent.TestManager) {
+//                        parent.TestManager.load();
+//                    } else {
+//                        new YAHOO.tool.TestLogger();
+//                        YAHOO.tool.TestRunner.run();
+//                    }
+//                });
             ]]>
         </xhtml:script>
         <xhtml:style type="text/css">
             .xforms-label { width: 11em; display: inline-block; text-align: right; padding-right: 1em }
-            .xforms-repeat-selected-item-1 { background-color: transparent }
+            .xforms-repeat-selected-item-1, .xforms-repeat-selected-item-2 { background-color: transparent }
         </xhtml:style>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance>

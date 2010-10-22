@@ -29,8 +29,8 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
     @Override
     protected boolean isMustOutputContainerElement() {
-        // Don't output a container element unless in full update
-        return handlerContext.isFullUpdate();
+        // If we are the top-level of a full update, output a delimiter anyway
+        return handlerContext.isFullUpdateTopLevelControl(getEffectiveId());
     }
 
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {

@@ -330,7 +330,7 @@ public class ControlsComparator {
             //
             final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
             controller.setOutput(new DeferredXMLReceiverImpl(new XHTMLRewrite().getRewriteXMLReceiver(externalContext,
-                    new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getXmlReceiver()), true), true)));
+                    new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getXmlReceiver()), true), true)));// NOTE: skip the root element
 
             // Create handler context
             final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, externalContext, control2.getEffectiveId()) {
@@ -349,7 +349,7 @@ public class ControlsComparator {
             {
                 // Replay into SAX pipeline
                 controller.startDocument();
-                // new SAXLoggerProcessor.DebugContentHandler()
+//                mark.replay(new SAXLoggerProcessor.DebugXMLReceiver(controller));
                 mark.replay(controller);
                 controller.endDocument();
             }

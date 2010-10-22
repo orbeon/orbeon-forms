@@ -37,8 +37,8 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
 
     @Override
     protected boolean isMustOutputContainerElement() {
-        // Don't output a container element unless in full update
-        return handlerContext.isFullUpdate();
+        // If we are the top-level of a full update, output a delimiter anyway
+        return handlerContext.isFullUpdateTopLevelControl(getEffectiveId());
     }
 
     @Override

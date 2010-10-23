@@ -13,131 +13,182 @@
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript">
             <![CDATA[
-                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+            YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-                    name: "Nested disabled",
+                name: "Nested disabled",
+
+                /**
+                 * For both groups and cases, when not shown, any form field inside the group or case should
+                 * have the disabled attribute set, so it can't be reached by tabbing.
+                 */
+                testDisabledOnInputs: function() {
+                    var YA = YAHOO.util.Assert;
+                    var YD = YAHOO.util.Dom;
+                    var OD = ORBEON.util.Dom;
+                    var testCase = this;
+                    var visibleButton = OD.get("toggle-outer").getElementsByTagName("button")[0];
 
                     /**
-                     * For both groups and cases, when not shown, any form field inside the group or case should
-                     * have the disabled attribute set, so it can't be reached by tabbing.
+                     * Assert that inputs in the groups/cases have the disabled attribute set or not set, as specified
+                     * by the attributes.
                      */
-                    testDisabledOnInputs: function() {
-                        var YA = YAHOO.util.Assert;
+                    function assertInputDisabled(outerDisabled, innerDisabled, continuation) {
 
                         /**
-                         * Assert that inputs in the groups/cases have the disabled attribute set or not set, as specified
-                         * by the attributes.
+                         * Checks that a given form control (input, button) inside a control is able or not to get the focus.
                          */
-                        function assertInputDisabled(outerDisabled, innerDisabled) {
-
-                            function assertInputWorker(expected, groupOrCaseOrRepeat, innerOrOuter, index) {
-                                var inputControlId = groupOrCaseOrRepeat + "-" + innerOrOuter + "-input" + index;
-                                var control = YAHOO.util.Dom.get(inputControlId);
-                                if (control == null) {
-                                    YA.isTrue(expected, "can't find input id " + inputControlId + " (should be there as it is expected to be relevant)");
-                                } else {
-                                    var input = control.getElementsByTagName("input")[0];
-                                    var message = "input " + inputControlId  + " has not expected disabled state";
-                                    if (expected != input.disabled) { console.log(input); }
-                                    YA.areEqual(expected, input.disabled, message);
-                                }
-                            }
-
-                            function assertButtonWorker(expected, id) {
-                                var buttonControl = YAHOO.util.Dom.get(id);
-                                if (buttonControl == null) {
-                                    YA.isTrue(expected, "can't find button id " + id + " (should be there as it is expected to be relevant)");
-                                } else {
-                                    var htmlButton = buttonControl.getElementsByTagName("button")[0];
-                                    YA.areEqual(expected, htmlButton.disabled, "button " + id + " has not the expected disabled state");
-                                }
-                            }
-
-                            assertInputWorker(outerDisabled, "group-nested", "outer", "-1");
-                            assertInputWorker(outerDisabled, "group-nested", "outer", "-2");
-                            assertInputWorker(innerDisabled, "group-nested", "inner", "");
-                            assertInputWorker(outerDisabled, "repeat-iteration", "outer", "-1" + XFORMS_SEPARATOR_1 + "1");
-                            assertInputWorker(outerDisabled, "repeat-iteration", "outer", "-2" + XFORMS_SEPARATOR_1 + "1");
-                            assertInputWorker(innerDisabled, "repeat-iteration", "inner", XFORMS_SEPARATOR_1 + "1-1");
-                            assertInputWorker(outerDisabled, "repeat-repeat", "outer", "-1" + XFORMS_SEPARATOR_1 + "1");
-                            assertInputWorker(outerDisabled, "repeat-repeat", "outer", "-2" + XFORMS_SEPARATOR_1 + "1");
-                            assertInputWorker(innerDisabled, "repeat-repeat", "inner", XFORMS_SEPARATOR_1 + "1-1");
-                            assertInputWorker(outerDisabled, "case", "outer", "-1");
-                            assertInputWorker(outerDisabled, "case", "outer", "-2");
-                            assertInputWorker(innerDisabled, "case", "inner", "");
-                            assertButtonWorker(outerDisabled, "group-nested-outer-button");
-                            assertButtonWorker(outerDisabled, "group-flat-outer-button");
-                            assertButtonWorker(outerDisabled, "repeat-iteration-outer-button" + XFORMS_SEPARATOR_1 + "1");
-                            assertButtonWorker(outerDisabled, "repeat-repeat-outer-button" + XFORMS_SEPARATOR_1 + "1");
-                            assertButtonWorker(outerDisabled, "case-outer-button");
+                        function assertCanGetFocus(expectedDisabled, control, tagName, continuation) {
+                            // Set focus on the button at the top of the page
+                            visibleButton.focus();
+                            testCase.wait(function() {
+                                // Try setting the focus on the input field
+                                var formElement = control.getElementsByTagName(tagName)[0];
+                                formElement.focus();
+                                testCase.wait(function() {
+                                    // Check if the input got the focus
+                                    var formControlGotFocus = ORBEON.xforms.Globals.currentFocusControlId == control.id;
+                                    var message = control.id + " has not expected disabled state";
+                                    YA.areEqual(! expectedDisabled, formControlGotFocus, message);
+                                    continuation();
+                                }, 0);
+                            }, 0);
                         }
 
-                        // Initial state: everything is disabled
-                        assertInputDisabled(true, true);
-                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [[
-                            // Enable just inner
-                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]); },
-                            // Inputs in inner should still be disabled as outer is disabled
-                            function() { assertInputDisabled(true, true); }
-                        ], [
-                            // Get back to the initial state where outer and inner are disabled
-                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]); },
-                            // As at the beginning, everything should be disabled
-                            function() { assertInputDisabled(true, true); }
-                        ], [
-                            // Enable just outer
-                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
-                            // Inputs in outer should be enabled and input in inner should still be disabled
-                            function() { assertInputDisabled(false, true); }
-                        ], [
-                            // Enable inner
-                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]); },
-                            // Now everything is enabled (that is pretty simple)
-                            function() { assertInputDisabled(false, false); }
-                        ], [
+                        function assertInputWorker(expectedDisabled, groupOrCaseOrRepeat, innerOrOuter, index, continuation) {
+                            var inputControlId = groupOrCaseOrRepeat + "-" + innerOrOuter + "-input" + index;
+                            var control = OD.get(inputControlId);
+                            if (control == null) {
+                                YA.isTrue(expectedDisabled, "can't find input id " + inputControlId + " (should be there as it is expected to be relevant)");
+                                continuation();
+                            } else {
+                                assertCanGetFocus(expectedDisabled, control, "input", continuation);
+                            }
+                        }
+
+                        function assertButtonWorker(expectedDisabled, id, continuation) {
+                            var buttonControl = OD.get(id);
+                            if (buttonControl == null) {
+                                YA.isTrue(expectedDisabled, "can't find button id " + id + " (should be there as it is expected to be relevant)");
+                                continuation();
+                            } else {
+                                var triggerControl = YD.getElementsByClassName("xforms-trigger", null, buttonControl)[0];
+                                assertCanGetFocus(expectedDisabled, triggerControl, "button", continuation);
+                            }
+                        }
+
+                        var tests = [
+                            _.bind(assertInputWorker, this, outerDisabled, "group-nested", "outer", "-1"),
+                            _.bind(assertInputWorker, this, outerDisabled, "group-nested", "outer", "-2"),
+                            _.bind(assertInputWorker, this, innerDisabled, "group-nested", "inner", ""),
+                            _.bind(assertInputWorker, this, outerDisabled, "repeat-iteration", "outer", "-1" + XFORMS_SEPARATOR_1 + "1"),
+                            _.bind(assertInputWorker, this, outerDisabled, "repeat-iteration", "outer", "-2" + XFORMS_SEPARATOR_1 + "1"),
+                            _.bind(assertInputWorker, this, innerDisabled, "repeat-iteration", "inner", XFORMS_SEPARATOR_1 + "1-1"),
+                            _.bind(assertInputWorker, this, outerDisabled, "repeat-repeat", "outer", "-1" + XFORMS_SEPARATOR_1 + "1"),
+                            _.bind(assertInputWorker, this, outerDisabled, "repeat-repeat", "outer", "-2" + XFORMS_SEPARATOR_1 + "1"),
+                            _.bind(assertInputWorker, this, innerDisabled, "repeat-repeat", "inner", XFORMS_SEPARATOR_1 + "1-1"),
+                            _.bind(assertInputWorker, this, outerDisabled, "case", "outer", "-1"),
+                            _.bind(assertInputWorker, this, outerDisabled, "case", "outer", "-2"),
+                            _.bind(assertInputWorker, this, innerDisabled, "case", "inner", ""),
+                            _.bind(assertButtonWorker, this, outerDisabled, "group-nested-outer-button"),
+                            _.bind(assertButtonWorker, this, outerDisabled, "group-flat-outer-button"),
+                            _.bind(assertButtonWorker, this, outerDisabled, "repeat-iteration-outer-button" + XFORMS_SEPARATOR_1 + "1"),
+                            _.bind(assertButtonWorker, this, outerDisabled, "repeat-repeat-outer-button" + XFORMS_SEPARATOR_1 + "1"),
+                            _.bind(assertButtonWorker, this, outerDisabled, "case-outer-button")
+                        ];
+
+                        function runTests() {
+                            if (tests.length != 0) {
+                                var currentTest = tests.shift();
+                                currentTest(runTests);
+                            } else {
+                                continuation();
+                            }
+                        }
+
+                        runTests();
+                    }
+
+                    var testsTuples = [
+                        // Enable just outer
+                        function() {
+                            YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]);
+                        },
+                        // Inputs in outer should be enabled and input in inner should still be disabled
+                        _.bind(assertInputDisabled, this, false, true),
+                        // Enable inner
+                        function() {
+                            YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]);
+                        },
+                        // Now everything is enabled (that is pretty simple)
+                        _.bind(assertInputDisabled, this, false, false),
+                        // Get back to the initial state where outer and inner are disabled
+                        function() {
+                            YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]);
+                            YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]);
+                        },
+                        // Nothing to test
+                        function(continuation) {
+                            continuation();
+                        }
+                    ];
+
+                    function runTuples() {
+                        if (testsTuples.length != 0) {
+                            // One more Ajax/test tuple to run
+                            var causingAjax = testsTuples.shift();
+                            var testContinuation = testsTuples.shift();
+                            ORBEON.util.Test.executeCausingAjaxRequest(testCase, causingAjax, _.bind(testContinuation, this, runTuples));
+                        }
+                    }
+
+                    // Initial state: everything is disabled, then start changing state
+                    assertInputDisabled(true, true, runTuples);
+                },
+
+                /**
+                 * When a YUI button is built from a disabled button, YUI creates a disabled button. If the button is
+                 * in a non-selected case, we need to make sure the YUI button is enabled when the case becomes
+                 * selected.
+                 */
+                testDisabledOnYUIButton: function() {
+
+                    function assertButtonDisabled(groupOrCase) {
+                        var yuiButton = YAHOO.util.Dom.getElementsByClassName("yui-button", null, groupOrCase + "-outer-button")[0];
+                        YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(yuiButton, "yui-button-disabled"), "yui button in " + groupOrCase + " must not be disabled");
+                    }
+
+                    ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [
+                        [
+                            // Enable outer so button becomes visible
+                            function() {
+                                YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]);
+                            },
+                            // Buttons must not be disabled
+                            function() {
+                                assertButtonDisabled("group");
+                                assertButtonDisabled("case");
+                            }
+                        ],
+                        [
                             // Get back to the initial state where outer and inner are disabled
                             function() {
                                 YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]);
-                                YAHOO.util.UserAction.click(document.getElementById("toggle-inner").getElementsByTagName("button")[0]);
                             },
-                            function() {}
+                            function() {
+                            }
                         ]
-                        ]);
-                    },
+                    ]);
+                }
+            }));
 
-                    /**
-                     * When a YUI button is built from a disabled button, YUI creates a disabled button. If the button is
-                     * in a non-selected case, we need to make sure the YUI button is enabled when the case becomes
-                     * selected.
-                     */
-                    testDisabledOnYUIButton: function() {
-
-                        function assertButtonDisabled(groupOrCase) {
-                            var yuiButton = YAHOO.util.Dom.getElementsByClassName("yui-button", null, groupOrCase + "-outer-button")[0];
-                            YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(yuiButton, "yui-button-disabled"), "yui button in " + groupOrCase + " must not be disabled");
-                        }
-
-                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(this, [[
-                            // Enable outer so button becomes visible
-                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
-                            // Buttons must not be disabled
-                            function() { assertButtonDisabled("group"); assertButtonDisabled("case"); }
-                        ], [
-                            // Get back to the initial state where outer and inner are disabled
-                            function() { YAHOO.util.UserAction.click(document.getElementById("toggle-outer").getElementsByTagName("button")[0]); },
-                            function() {}
-                        ]]);
-                    }
-                }));
-
-//                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-//                    if (parent && parent.TestManager) {
-//                        parent.TestManager.load();
-//                    } else {
-//                        new YAHOO.tool.TestLogger();
-//                        YAHOO.tool.TestRunner.run();
-//                    }
-//                });
+            ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+                if (parent && parent.TestManager) {
+                    parent.TestManager.load();
+                } else {
+                    new YAHOO.tool.TestLogger();
+                    YAHOO.tool.TestRunner.run();
+                }
+            });
             ]]>
         </xhtml:script>
         <xhtml:style type="text/css">

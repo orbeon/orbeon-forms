@@ -48,7 +48,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     override def getChildrenContext = defaultInstancePrefixedId match {
         case Some(defaultInstancePrefixedId) => // instance('defaultInstanceId')
             Some(PathMapXPathAnalysis(staticStateContext.staticState, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
-                null, None, Map.empty[String, VariableAnalysisTrait], null, scope, prefixedId, defaultInstancePrefixedId, locationData, element))
+                null, None, Map.empty[String, VariableAnalysisTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element))
         case None => None // no instance
     }
 

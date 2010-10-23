@@ -50,10 +50,6 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
     val bindingXPathEvaluations = (if (context.isDefined) 1 else 0) + (if (ref.isDefined) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
     val canHoldValue = false // by default
 
-    // Convenience model methods
-    final def getModelPrefixedId = scopeModel.containingModel match { case Some(model) => Some(model.prefixedId); case None => None }
-    final def getDefaultInstancePrefixedId = scopeModel.containingModel match { case Some(model) => model.defaultInstancePrefixedId; case None => None }
-
     // Classes (not used at this time)
     val classes = ""
 
@@ -93,6 +89,8 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
     def javaToXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = toXML(propertyContext, helper)()
 
     def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
+
+        def getModelPrefixedId = scopeModel.containingModel match { case Some(model) => Some(model.prefixedId); case None => None }
 
         helper.startElement(element.getName,
             attributes match {

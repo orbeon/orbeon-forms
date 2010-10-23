@@ -108,13 +108,14 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
         }
     }
 
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
-        PathMapXPathAnalysis(staticStateContext.staticState, xpathString, staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId),
-            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, getModelPrefixedId.orNull, getDefaultInstancePrefixedId.orNull, locationData, element)
+    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis = {
 
-    /**
-     * Context used by our functions
-     */
+        def getDefaultInstancePrefixedId = scopeModel.containingModel match { case Some(model) => model.defaultInstancePrefixedId; case None => None }
+
+        PathMapXPathAnalysis(staticStateContext.staticState, xpathString, staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId),
+            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, getDefaultInstancePrefixedId, locationData, element)
+    }
+
     class SimplePathMapContext {
         /**
          * Return a map of static id => analysis for all the ancestor-or-self in scope.

@@ -51,6 +51,9 @@
                         <xf:instance id="i6">
                             <instance/>
                         </xf:instance>
+                        <xf:instance id="i7">
+                            <instance/>
+                        </xf:instance>
 
                         <xf:bind ref="instance('i1')" id="bv1" type="xs:integer"/>
                         <xf:bind ref="instance('i2')" id="bv2" constraint="true()"/>

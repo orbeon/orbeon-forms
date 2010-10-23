@@ -141,8 +141,8 @@
                                                 <xsl:apply-templates select="node() except fr:label"/>
 
                                                 <!-- Triggers by the JavaScript to notify the XForms code of events -->
-                                                <!-- NOTE: Put them after the content so that xforms:setfocus works -->
-                                                <xforms:trigger id="fr-tabview-select-{position()}" class="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">
+                                                <!-- We put them after the content so that xforms:setfocus works -->
+                                                <xforms:trigger id="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">
                                                     <xforms:label/>
                                                     <xforms:action ev:event="DOMActivate">
                                                         <xforms:dispatch name="fr-select" target="fr-tabview-select-{position()}"/>
@@ -151,7 +151,7 @@
                                                         </xforms:setvalue>
                                                     </xforms:action>
                                                 </xforms:trigger>
-                                                <xforms:trigger id="fr-tabview-deselect-{position()}" class="fr-tabview-deselect-{position()}" style="display: none" xxbl:scope="inner">
+                                                <xforms:trigger id="fr-tabview-deselect-{position()}" style="display: none" xxbl:scope="inner">
                                                     <xforms:label/>
                                                     <xforms:dispatch ev:event="DOMActivate" name="fr-deselect" target="fr-tabview-deselect-{position()}"/>
                                                 </xforms:trigger>

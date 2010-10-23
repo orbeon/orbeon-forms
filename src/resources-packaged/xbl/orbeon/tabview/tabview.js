@@ -32,15 +32,14 @@ YAHOO.xbl.fr.TabView.prototype = {
      */
     activeTabChange: function(event) {
         function getTrigger(selectDeselect, index) {
-            var trigger = YAHOO.util.Dom.getElementsByClassName
-                ("fr-tabview-" + selectDeselect + "-" + (index + 1), null, this.container)[0];
+            var trigger = ORBEON.util.Dom.get(this.container.id + "$" + "fr-tabview-" + selectDeselect + "-" + (index + 1));
             return ORBEON.util.Dom.getElementByTagName(trigger, "button");
         }
 
         // Deselect other tabs
-        getTrigger("deselect", this.yuiTabView.getTabIndex(event.prevValue)).click();
+        getTrigger.call(this, "deselect", this.yuiTabView.getTabIndex(event.prevValue)).click();
         // Select new tab
-        getTrigger("select", this.yuiTabView.getTabIndex(event.newValue)).click();
+        getTrigger.call(this, "select", this.yuiTabView.getTabIndex(event.newValue)).click();
     },
 
     /**

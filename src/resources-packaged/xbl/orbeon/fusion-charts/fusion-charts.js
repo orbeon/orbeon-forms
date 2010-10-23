@@ -32,8 +32,8 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         var width = ORBEON.xforms.Document.getValue(widthElement.id);
         var heightElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-height", null, this.container)[0];
         var height = ORBEON.xforms.Document.getValue(heightElement.id);
-
-        var pathToSwf = ORBEON.xforms.Globals.resourcesBaseURL + uriToSwf + "/" + swf + ".swf?registerWithJS=1";
+        var resourcesBaseURL = ORBEON.xforms.Globals.resourcesBaseURL[ORBEON.xforms.Controls.getForm(this.container).id];
+        var pathToSwf = resourcesBaseURL + uriToSwf + "/" + swf + ".swf?registerWithJS=1";
         this.fusionChart = new FusionCharts(pathToSwf, this.container.id + "-fusion", width, height, "0", "0");
 
         this.updateChart();

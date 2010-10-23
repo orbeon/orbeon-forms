@@ -24,10 +24,10 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
-import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xforms.XFormsConstants._
 import java.lang.String
 import collection.immutable.List
+import collection.mutable.{LinkedHashSet, LinkedHashMap}
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -56,7 +56,6 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     val inScopeVariables = Map.empty[String, VariableAnalysisTrait]
 
     // Instance objects
-    // SEE: http://stackoverflow.com/questions/3827964/scala-for-comprehension-returning-an-ordered-map
     val instances = LinkedHashMap((
         for {
             instanceElement <- Dom4jUtils.elements(element, XFORMS_INSTANCE_QNAME)
@@ -87,7 +86,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                 variableElement <- variableElements
                 analysis = new SimpleElementAnalysis(staticStateContext, variableElement, Some(Model.this), preceding, scope) with VariableAnalysisTrait
             } yield {
-                preceding = Some(analysis) // side effect
+                preceding = Some(analysis) // side effect used by next iteration
                 analysis
             }
         buffer.toList
@@ -96,28 +95,14 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     val variablesMap: Map[String, VariableAnalysisTrait] = Map(variablesList map (variable => (variable.name -> variable)): _*)
 
     // Handle binds
-    val bindElements = Dom4jUtils.elements(element, XFORMS_BIND_QNAME)// JAVA COLLECTION
-    val (bindIds: JSet[String],
-         customMIPs: JMap[String, JMap[String, Bind#MIP]], // bind static id => MIP mapping
-         bindInstances: JSet[String],                      // instances to which binds apply (i.e. bind/@ref point to them)
-         computedBindExpressionsInstances: JSet[String],   // instances to which computed binds apply
-         validationBindInstances: JSet[String]) =          // instances to which validation binds apply
-        // TODO: use and produce variables introduced with xf:bind/@name
-        if (hasBinds) {
-            // Analyse binds
-            (new JLinkedHashSet[String],
-             new JLinkedHashMap[String, JMap[String, Bind#MIP]],
-             new JLinkedHashSet[String],
-             new JLinkedHashSet[String],
-             new JLinkedHashSet[String])
-        } else {
-            // Easy case to figure out
-            (JCollections.emptySet[String],
-             JCollections.emptyMap[String, JMap[String, Bind#MIP]],
-             JCollections.emptySet[String],
-             JCollections.emptySet[String],
-             JCollections.emptySet[String])
-        }
+    val bindElements = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) // JAVA COLLECTION
+    val bindIds = new LinkedHashSet[String]
+    val customMIPs = new JLinkedHashMap[String, JMap[String, Bind#MIP]] // bind static id => MIP mapping JAVA COLLECTION
+    val bindInstances = new LinkedHashSet[String]                       // instances to which binds apply (i.e. bind/@ref point to them)
+    val computedBindExpressionsInstances = new LinkedHashSet[String]    // instances to which computed binds apply
+    val validationBindInstances = new LinkedHashSet[String]             // instances to which validation binds apply
+
+    // TODO: use and produce variables introduced with xf:bind/@name
 
     var figuredAllBindRefAnalysis = !hasBinds // default value sets to true if no binds
 
@@ -150,7 +135,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             val isValidateMIP = Model.VALIDATE_MIP_NAMES.contains(name)
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
 
-            var analysis: XPathAnalysis = ConstantNegativeAnalysis(expression) // default to negative, analyzeXPath() can change that
+            var analysis: XPathAnalysis = NegativeAnalysis(expression) // default to negative, analyzeXPath() can change that
 
             def analyzeXPath() {
 

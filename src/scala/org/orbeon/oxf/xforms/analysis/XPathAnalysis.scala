@@ -72,17 +72,15 @@ object XPathAnalysis {
     def combineXPathStrings(s1: String, s2: String) = "(" + s1 + ") | (" + s2 + ")"
 }
 
-object ConstantNegativeAnalysis {
+object NegativeAnalysis {
     def apply(xpathString: String): XPathAnalysis = new XPathAnalysis.ConstantXPathAnalysis(xpathString, false) {
-        override def combine(other: XPathAnalysis) = ConstantNegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
+        override def combine(other: XPathAnalysis) = NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
     }
 }
 
-object ConstantPositiveAnalysis {
+object StringAnalysis {
 
-    private val CONSTANT_ANALYSIS = ConstantPositiveAnalysis("'CONSTANT'")
-
-    def apply(xpathString: String): XPathAnalysis = new XPathAnalysis.ConstantXPathAnalysis(xpathString, true) {
+    private val CONSTANT_ANALYSIS = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
         override def combine(other: XPathAnalysis) = other
     }
 

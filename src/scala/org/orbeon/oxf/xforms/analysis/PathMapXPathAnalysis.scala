@@ -1,4 +1,4 @@
-/**
+    /**
  *  Copyright (C) 2010 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -43,7 +43,7 @@ class PathMapXPathAnalysis(val xpathString: String,
 
         if (!figuredOutDependencies || !other.figuredOutDependencies)
             // Either side is negative, return a constant negative with the combined expression
-            ConstantNegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
+            NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
         else
             other match {
                 case other: XPathAnalysis.ConstantXPathAnalysis =>
@@ -142,11 +142,17 @@ object PathMapXPathAnalysis {
             // Create expression
             val expression = XPathCache.createExpression(staticState.getXPathConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
 
+            val stringPathmap = new PathMap(new StringLiteral(""))
+
             // In-scope variables
             val variablePathMaps = new JHashMap[String, PathMap]
             for ((name, variableControl) <- inScopeVariables; valueAnalysis = variableControl.getValueAnalysis; if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies)
                 variablePathMaps.put(name, valueAnalysis match {
+                    // Valid PathMap
                     case Some(analysis: PathMapXPathAnalysis) if analysis.figuredOutDependencies => analysis.pathmap.get
+                    // Constant string
+                    case Some(analysis) if analysis.figuredOutDependencies => stringPathmap
+                    // Can't handle the other cases
                     case _ => null
                 })
 
@@ -171,9 +177,9 @@ object PathMapXPathAnalysis {
                     case Some(baseAnalysis) if dependsOnFocus =>
                         // Expression depends on the context but the context doesn't have a pathmap
                         //
-                        // o if context is constant negative, clearly we can't handle this
-                        // o if context is constant positive, should we try something? TODO
-                        None
+                        // o if context is constant positive, context is a constant string
+                        // o if context is constant negative, we can't handle this
+                        if (baseAnalysis.figuredOutDependencies) Some(stringPathmap) else None
                     case _ =>
                         // Start with a new PathMap if:
                         // o we are at the top (i.e. does not have a context)
@@ -385,11 +391,11 @@ object PathMapXPathAnalysis {
                         new PathMapXPathAnalysis(xpathString, Some(pathmap), true, valueDependentPaths, returnablePaths, dependentModels, dependentInstances, returnableInstances)
                     else
                         // Failure
-                        ConstantNegativeAnalysis(xpathString)
+                        NegativeAnalysis(xpathString)
 
                 case _ =>
                     // Failure
-                    ConstantNegativeAnalysis(xpathString)
+                    NegativeAnalysis(xpathString)
             }
 
         } catch {

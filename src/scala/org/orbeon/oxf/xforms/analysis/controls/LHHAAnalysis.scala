@@ -70,7 +70,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
                             val attributes = element.attributes
                             for (o <- attributes; attributeValue = o.asInstanceOf[Attribute].getValue; if XFormsUtils.maybeAVT(attributeValue)) {
                                 // TODO: handle AVTs
-                                analyses = List(ConstantNegativeAnalysis(attributeValue)) // not supported just yet
+                                analyses = List(NegativeAnalysis(attributeValue)) // not supported just yet
                             }
                         }
                     }
@@ -80,11 +80,11 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
                 })
 
                 // Combine all
-                Some((ConstantPositiveAnalysis() /: analyses) (_ combine _))
+                Some((StringAnalysis() /: analyses) (_ combine _))
             }
         } else
             // Value of LHHA is 100% static and analysis is constant
-            Some(ConstantPositiveAnalysis())
+            Some(StringAnalysis())
     }
 }
 

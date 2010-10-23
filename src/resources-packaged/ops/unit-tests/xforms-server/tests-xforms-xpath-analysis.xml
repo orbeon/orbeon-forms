@@ -4524,6 +4524,69 @@
         </output>
     </test>
 
+    <test description="Constant variable" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                        <xxf:variable name="foo">Foo</xxf:variable>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xxf:variable name="bar">Bar</xxf:variable>
+                    <xf:input id="i1" ref="$foo"/>
+                    <xf:output id="o1" value="concat(gaga, $bar)"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <variable scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
+                    <value>
+                        <analysis expression="'CONSTANT'" analyzed="true"/>
+                    </value>
+                </variable>
+                <input scope="" prefixed-id="i1" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="$foo" analyzed="true"/>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true"/>
+                    </value>
+                </input>
+                <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((concat(gaga, $bar))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/gaga</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
+                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="foo">
+                        <value>
+                            <analysis expression="'CONSTANT'" analyzed="true"/>
+                        </value>
+                    </variable>
+                </model>
+            </request>
+        </output>
+    </test>
+
     <test description="XBL outer scope refers to view variable" name="oxf:java" exclude="true">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -4533,7 +4596,6 @@
                      xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
-
                         <xf:instance id="instance">
                             <instance>
                                 <foo>42</foo>
@@ -4588,49 +4650,7 @@
         </input>
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
-                <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true">
-                    <binds>
-                        <bind id="b1" ref=".">
-                            <binding>
-                                <analysis expression="." analyzed="true">
-                                    <returnable>
-                                        <path>instance('i11')</path>
-                                    </returnable>
-                                    <dependent-models>
-                                        <model>m1</model>
-                                    </dependent-models>
-                                    <dependent-instances>
-                                        <instance>i11</instance>
-                                    </dependent-instances>
-                                    <returnable-instances>
-                                        <instance>i11</instance>
-                                    </returnable-instances>
-                                </analysis>
-                            </binding>
-                            <bind id="b2" ref="foo">
-                                <binding>
-                                    <analysis expression="foo" analyzed="true">
-                                        <returnable>
-                                            <path>instance('i11')/foo</path>
-                                        </returnable>
-                                        <dependent-models>
-                                            <model>m1</model>
-                                        </dependent-models>
-                                        <dependent-instances>
-                                            <instance>i11</instance>
-                                        </dependent-instances>
-                                        <returnable-instances>
-                                            <instance>i11</instance>
-                                        </returnable-instances>
-                                    </analysis>
-                                </binding>
-                            </bind>
-                        </bind>
-                    </binds>
-                    <bind-instances>
-                        <instance>i11</instance>
-                    </bind-instances>
-                </model>
+
             </request>
         </output>
     </test>

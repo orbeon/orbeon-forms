@@ -399,7 +399,7 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 /* ***** Tree ******************************************************************************************************* */
 /* Fix for Firefox issue when clicking on the first "-" in span mode
    http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
-.xforms-select1-appearance-xxforms-tree { display: block }
+.xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { display: block }
 
 /* Yellow highlight for selected item */
 .xforms-form .ygtvcontent .xforms-tree-label-selected,

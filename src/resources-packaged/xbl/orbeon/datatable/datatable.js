@@ -140,6 +140,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
     colSorters: [],
     masterRow: null,                                            // Header "master" row
     headerColumns: [],
+    delayedDraw: null,                                          // A version of draw with all the arguments bound
 
     /**
      * Initialize a datatable.
@@ -165,10 +166,10 @@ YAHOO.xbl.fr.Datatable.prototype = {
                     this.rowsUpdateUUID = this.columnsUpdateUUID;
                 } else {
                     // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
-                    var thiss = this;
-                    setTimeout(function() {
-                        thiss.draw(innerTableWidth);
-                    }, 100);
+                    // Store a curried version of draw(), to avoid creating a new closure which can't be garbage
+                    // collected every 100 ms
+                    if (this.delayedDraw == null) this.delayedDraw = _.bind(this.draw, this, innerTableWidth);
+                    setTimeout(this.delayedDraw, 100);
                 }
             } else {
                 this.updateColumns();
@@ -201,7 +202,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
      *  Is the component displayed?
      */
     isDisplayed: function() {
-
         var region = YAHOO.util.Region.getRegion(this.container);
         return region.left >= 0 && region.top >= 0 && region.left < region.right && region.top < region.bottom;
     },

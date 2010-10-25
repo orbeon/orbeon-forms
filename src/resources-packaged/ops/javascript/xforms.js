@@ -7275,7 +7275,7 @@ ORBEON.xforms.Server = {
                                     // setting the innerHTML, so set focus it again
                                     if (! YAHOO.util.Dom.inDocument(ORBEON.xforms.Globals.currentFocusControlElement, document)) {
                                         var focusControl = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
-                                        if (focusControl != null) ORBEON.xforms.Controls.setFocus(focusControl);
+                                        if (focusControl != null) ORBEON.xforms.Controls.setFocus(ORBEON.xforms.Globals.currentFocusControlId);
                                     }
                                 }
 

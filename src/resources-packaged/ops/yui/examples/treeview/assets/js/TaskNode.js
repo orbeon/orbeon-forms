@@ -1,5 +1,5 @@
 /**
- * The check box marks a task complete.  It is a simulated form field 
+ * The check box marks a task complete.  It is a simulated form field
  * with three states ...
  * 0=unchecked, 1=some children checked, 2=all children checked
  * When a task is clicked, the state of the nodes and parent and children
@@ -21,7 +21,7 @@ YAHOO.widget.TaskNode = function(oData, oParent, expanded, checked) {
         this.logger = YAHOO;
     }
 
-    if (oData) { 
+    if (oData) {
         this.init(oData, oParent, expanded);
         this.setUpLabel(oData);
         this.setUpCheck(checked);
@@ -54,7 +54,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
         // the parent's display state
         if (checked && checked === true) {
             this.check();
-        // otherwise the parent needs to be updated only if its checkstate 
+        // otherwise the parent needs to be updated only if its checkstate
         // needs to change from fully selected to partially selected
         } else if (this.parent && 2 === this.parent.checkState) {
              this.updateParent();
@@ -64,7 +64,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
         /**
          * Custom event that is fired when the check box is clicked.  The
          * custom event is defined on the tree instance, so there is a single
-         * event that handles all nodes in the tree.  The node clicked is 
+         * event that handles all nodes in the tree.  The node clicked is
          * provided as an argument.  Note, your custom node implentation can
          * implement its own node specific events this way.
          *
@@ -85,23 +85,23 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
      * @for YAHOO.widget.TaskNode
      * @type string
      */
-    getCheckElId: function() { 
-        return "ygtvcheck" + this.index; 
+    getCheckElId: function() {
+        return "ygtvcheck" + this.index;
     },
 
     /**
      * Returns the check box element
      * @return the check html element (img)
      */
-    getCheckEl: function() { 
-        return document.getElementById(this.getCheckElId()); 
+    getCheckEl: function() {
+        return document.getElementById(this.getCheckElId());
     },
 
     /**
      * The style of the check element, derived from its current state
      * @return {string} the css style for the current check state
      */
-    getCheckStyle: function() { 
+    getCheckStyle: function() {
         return "ygtvcheck" + this.checkState;
     },
 
@@ -109,15 +109,15 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
      * Returns the link that will invoke this node's check toggle
      * @return {string} returns the link required to adjust the checkbox state
      */
-    getCheckLink: function() { 
-        return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," + 
+    getCheckLink: function() {
+        return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," +
             this.index + ").checkClick()";
     },
 
     /**
      * Invoked when the user clicks the check box
      */
-    checkClick: function() { 
+    checkClick: function() {
         this.logger.log("previous checkstate: " + this.checkState);
         if (this.checkState === 0) {
             this.check();
@@ -132,14 +132,14 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
     /**
      * Override to get the check click event
      */
-    onCheckClick: function() { 
+    onCheckClick: function() {
         this.logger.log("onCheckClick: " + this);
     },
 
     /**
      * Refresh the state of this node's parent, and cascade up.
      */
-    updateParent: function() { 
+    updateParent: function() {
         var p = this.parent;
 
         if (!p || !p.updateParent) {
@@ -181,7 +181,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
      * If the node has been rendered, update the html to reflect the current
      * state of the node.
      */
-    updateCheckHtml: function() { 
+    updateCheckHtml: function() {
         if (this.parent && this.parent.childrenRendered) {
             this.getCheckEl().className = this.getCheckStyle();
         }
@@ -189,10 +189,10 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
 
     /**
      * Updates the state.  The checked property is true if the state is 1 or 2
-     * 
+     *
      * @param the new check state
      */
-    setCheckState: function(state) { 
+    setCheckState: function(state) {
         this.checkState = state;
         this.checked = (state > 0);
     },
@@ -200,7 +200,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
     /**
      * Check this node
      */
-    check: function() { 
+    check: function() {
         this.logger.log("check");
         this.setCheckState(2);
         for (var i=0, l=this.children.length; i<l; i=i+1) {
@@ -216,7 +216,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
     /**
      * Uncheck this node
      */
-    uncheck: function() { 
+    uncheck: function() {
         this.setCheckState(0);
         for (var i=0, l=this.children.length; i<l; i=i+1) {
             var c = this.children[i];
@@ -229,7 +229,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
     },
 
     // Overrides YAHOO.widget.TextNode
-    getNodeHtml: function() { 
+    getNodeHtml: function() {
         this.logger.log("Generating html");
         var sb = [];
 
@@ -238,8 +238,9 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
 
 
         sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';
-        sb[sb.length] = '<tr>';
-        
+        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+        sb[sb.length] = '<tr class="ygtvrow">';
+
         for (var i=0;i<this.depth;++i) {
             //sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '">&#160;</td>';
             sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '"><div class="ygtvspacer"></div></td>';
@@ -268,7 +269,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
         sb[sb.length] = ' onclick="javascript:' + this.getCheckLink() + '">';
         //sb[sb.length] = '&#160;</td>';
         sb[sb.length] = '<div class="ygtvspacer"></div></td>';
-        
+
 
         sb[sb.length] = '<td>';
         sb[sb.length] = '<a';

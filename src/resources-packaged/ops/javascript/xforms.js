@@ -3265,7 +3265,10 @@ ORBEON.xforms.Events = {
         // If we already have a tooltip for this control, but that the control is not in the page anymore, destroy the tooltip
         if (YAHOO.lang.isObject(tooltipForControl[control.id])) {
             if (! YAHOO.util.Dom.inDocument(tooltipForControl[control.id].orbeonControl, document)) {
-                tooltipForControl[control.id].destroy();
+                // Prevent the tooltip from becoming visible on mouseover
+                tooltipForControl[control.id].cfg.setProperty("disabled", true);
+                // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
+                tooltipForControl[control.id].hide();
                 tooltipForControl[control.id] = null;
             }
         }

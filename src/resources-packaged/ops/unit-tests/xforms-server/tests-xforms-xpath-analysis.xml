@@ -4590,6 +4590,69 @@
         </output>
     </test>
 
+    <test description="LHHA referring to model variable" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m1">
+                        <xf:instance id="i11">
+                            <instance label=""/>
+                        </xf:instance>
+                        <xxf:variable name="label" select="instance()/@label"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="g1">
+                        <xf:label id="l1" ref="$label"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <group scope="" prefixed-id="g1" model-prefixed-id="m1" binding="false" value="false">
+                    <label>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i11')/@label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i11</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                </group>
+                <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true">
+                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="false" value="true" name="label">
+                        <value>
+                            <analysis expression="instance()/@label" analyzed="true">
+                                <returnable>
+                                    <path>instance('i11')/@label</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>m1</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i11</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i11</instance>
+                                </returnable-instances>
+                            </analysis>
+                        </value>
+                    </variable>
+                </model>
+            </request>
+        </output>
+    </test>
+
     <test description="XBL outer scope refers to view variable" name="oxf:java" exclude="true">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>

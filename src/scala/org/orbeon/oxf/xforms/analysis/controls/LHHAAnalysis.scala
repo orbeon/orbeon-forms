@@ -25,6 +25,8 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
                    element: Element, parent: ContainerTrait, val isLocal: Boolean)
         extends SimpleElementAnalysis(staticStateContext, element, Some(parent), None, scope) {
 
+    require(parent ne null)
+
     val staticValue: Option[String] =
         if (LHHAAnalysis.hasStaticValue(staticStateContext, element))
             // TODO: figure out whether to allow HTML or not (could default to true?)
@@ -40,7 +42,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
         if (staticValue.isEmpty) {
 
             // Delegate to concrete implementation
-            val delegateAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(parent), None, scope) with ContainerTrait with ValueTrait
+            val delegateAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(parent), None, scope) with ValueTrait with ViewTrait
             delegateAnalysis.analyzeXPath()
 
             if (ref.isDefined || value.isDefined) {

@@ -81,12 +81,15 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
         // Iterate and resolve all variables in order
         var preceding: Option[ElementAnalysis] = None
+
+        def getUpdatePreceding(newPreceding: ElementAnalysis): Unit = preceding = Some(newPreceding)
+
         val buffer =
             for {
                 variableElement <- variableElements
                 analysis = new SimpleElementAnalysis(staticStateContext, variableElement, Some(Model.this), preceding, scope) with VariableAnalysisTrait
+                unused: Unit = getUpdatePreceding(analysis)
             } yield {
-                preceding = Some(analysis) // side effect used by next iteration
                 analysis
             }
         buffer.toList

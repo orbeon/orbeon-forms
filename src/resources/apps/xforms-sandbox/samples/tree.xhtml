@@ -156,140 +156,140 @@
                     </xforms:select1>
                 </xhtml:td>
                 <xhtml:td>
-                    <!--<xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">-->
-                        <!--<xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">-->
-                            <!--<xforms:label ref="@label"/>-->
-                            <!--<xforms:value ref="@value"/>-->
-                        <!--</xforms:itemset>-->
-                    <!--</xforms:select1>-->
+                    <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                            <xforms:label ref="@label"/>
+                            <xforms:value ref="@value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
                 </xhtml:td>
             </xhtml:tr>
-            <!--<xhtml:tr>-->
-                <!--<xhtml:td>-->
-                    <!--<xxforms:variable name="current-items"-->
-                        <!--select="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>-->
-                    <!--<xhtml:p>-->
-                        <!--<xforms:output ref="select">-->
-                            <!--<xforms:label>Multiple selection:</xforms:label>-->
-                        <!--</xforms:output>-->
-                    <!--</xhtml:p>-->
-                    <!--<xhtml:p>-->
-                        <!--<xforms:trigger appearance="minimal">-->
-                            <!--<xforms:label>Remove selected</xforms:label>-->
-                            <!--<xforms:delete ev:event="DOMActivate" nodeset="$current-items"/>-->
-                        <!--</xforms:trigger>-->
-                    <!--</xhtml:p>-->
-                    <!--<xhtml:p>-->
-                        <!--<xforms:trigger appearance="minimal">-->
-                            <!--<xforms:label>Add new item</xforms:label>-->
-                            <!--<xforms:insert ev:event="DOMActivate" nodeset="$current-items[last()]" origin="instance('template-instance')"/>-->
-                        <!--</xforms:trigger>-->
-                    <!--</xhtml:p>-->
-                <!--</xhtml:td>-->
-                <!--<xhtml:td>-->
-                    <!--<xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">-->
-                        <!--<xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">-->
-                            <!--<xforms:label ref="@label"/>-->
-                            <!--<xforms:value ref="@value"/>-->
-                        <!--</xforms:itemset>-->
-                    <!--</xforms:select>-->
-                <!--</xhtml:td>-->
-                <!--<xhtml:td>-->
-                    <!--<xforms:select ref="select" appearance="xxforms:tree" id="tree4" incremental="false">-->
-                        <!--<xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">-->
-                            <!--<xforms:label ref="@label"/>-->
-                            <!--<xforms:value ref="@value"/>-->
-                        <!--</xforms:itemset>-->
-                    <!--</xforms:select>-->
-                <!--</xhtml:td>-->
-            <!--</xhtml:tr>-->
-            <!--<xhtml:tr>-->
-                <!--<xhtml:td>-->
-                    <!--<xforms:output ref="select">-->
-                        <!--<xforms:label>Multiple selection (no itemset):</xforms:label>-->
-                    <!--</xforms:output>-->
-                <!--</xhtml:td>-->
-                <!--<xhtml:td>-->
-                    <!--<xforms:select ref="select" appearance="xxforms:tree" id="tree5" incremental="true">-->
-                        <!--<xforms:choices>-->
-                            <!--<xforms:label>Encyclopedia</xforms:label>-->
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>Science</xforms:label>-->
-                                <!--<xforms:value>sc1</xforms:value>-->
-                            <!--</xforms:item>-->
-                            <!--<xforms:choices>-->
-                                <!--<xforms:label>Culture</xforms:label>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Art</xforms:label>-->
-                                    <!--<xforms:value>ar1</xforms:value>-->
-                                <!--</xforms:item>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Craft</xforms:label>-->
-                                    <!--<xforms:value>cr1</xforms:value>-->
-                                <!--</xforms:item>-->
-                            <!--</xforms:choices>-->
-                        <!--</xforms:choices>-->
-                        <!--<xforms:choices>-->
-                            <!--<xforms:label>Encyclopedia</xforms:label>-->
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>Science</xforms:label>-->
-                                <!--<xforms:value>sc2</xforms:value>-->
-                            <!--</xforms:item>-->
-                            <!--<xforms:choices>-->
-                                <!--<xforms:label>Culture</xforms:label>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Art</xforms:label>-->
-                                    <!--<xforms:value>ar2</xforms:value>-->
-                                <!--</xforms:item>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Craft</xforms:label>-->
-                                    <!--<xforms:value>cr2</xforms:value>-->
-                                <!--</xforms:item>-->
-                            <!--</xforms:choices>-->
-                        <!--</xforms:choices>-->
-                    <!--</xforms:select>-->
-                <!--</xhtml:td>-->
-                <!--<xhtml:td>-->
-                    <!--<xforms:select ref="select" appearance="xxforms:tree" id="tree6" incremental="false">-->
-                        <!--<xforms:choices>-->
-                            <!--<xforms:label>Encyclopedia</xforms:label>-->
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>Science</xforms:label>-->
-                                <!--<xforms:value>sc1</xforms:value>-->
-                            <!--</xforms:item>-->
-                            <!--<xforms:choices>-->
-                                <!--<xforms:label>Culture</xforms:label>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Art</xforms:label>-->
-                                    <!--<xforms:value>ar1</xforms:value>-->
-                                <!--</xforms:item>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Craft</xforms:label>-->
-                                    <!--<xforms:value>cr1</xforms:value>-->
-                                <!--</xforms:item>-->
-                            <!--</xforms:choices>-->
-                        <!--</xforms:choices>-->
-                        <!--<xforms:choices>-->
-                            <!--<xforms:label>Encyclopedia</xforms:label>-->
-                            <!--<xforms:item>-->
-                                <!--<xforms:label>Science</xforms:label>-->
-                                <!--<xforms:value>sc2</xforms:value>-->
-                            <!--</xforms:item>-->
-                            <!--<xforms:choices>-->
-                                <!--<xforms:label>Culture</xforms:label>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Art</xforms:label>-->
-                                    <!--<xforms:value>ar2</xforms:value>-->
-                                <!--</xforms:item>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>Craft</xforms:label>-->
-                                    <!--<xforms:value>cr2</xforms:value>-->
-                                <!--</xforms:item>-->
-                            <!--</xforms:choices>-->
-                        <!--</xforms:choices>-->
-                    <!--</xforms:select>-->
-                <!--</xhtml:td>-->
-            <!--</xhtml:tr>-->
+            <xhtml:tr>
+                <xhtml:td>
+                    <xxforms:variable name="current-items"
+                        select="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
+                    <xhtml:p>
+                        <xforms:output ref="select">
+                            <xforms:label>Multiple selection:</xforms:label>
+                        </xforms:output>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Remove selected</xforms:label>
+                            <xforms:delete ev:event="DOMActivate" nodeset="$current-items"/>
+                        </xforms:trigger>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Add new item</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="$current-items[last()]" origin="instance('template-instance')"/>
+                        </xforms:trigger>
+                    </xhtml:p>
+                </xhtml:td>
+                <xhtml:td>
+                    <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                            <xforms:label ref="@label"/>
+                            <xforms:value ref="@value"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </xhtml:td>
+                <xhtml:td>
+                    <xforms:select ref="select" appearance="xxforms:tree" id="tree4" incremental="false">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                            <xforms:label ref="@label"/>
+                            <xforms:value ref="@value"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:output ref="select">
+                        <xforms:label>Multiple selection (no itemset):</xforms:label>
+                    </xforms:output>
+                </xhtml:td>
+                <xhtml:td>
+                    <xforms:select ref="select" appearance="xxforms:tree" id="tree5" incremental="true">
+                        <xforms:choices>
+                            <xforms:label>Encyclopedia</xforms:label>
+                            <xforms:item>
+                                <xforms:label>Science</xforms:label>
+                                <xforms:value>sc1</xforms:value>
+                            </xforms:item>
+                            <xforms:choices>
+                                <xforms:label>Culture</xforms:label>
+                                <xforms:item>
+                                    <xforms:label>Art</xforms:label>
+                                    <xforms:value>ar1</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>Craft</xforms:label>
+                                    <xforms:value>cr1</xforms:value>
+                                </xforms:item>
+                            </xforms:choices>
+                        </xforms:choices>
+                        <xforms:choices>
+                            <xforms:label>Encyclopedia</xforms:label>
+                            <xforms:item>
+                                <xforms:label>Science</xforms:label>
+                                <xforms:value>sc2</xforms:value>
+                            </xforms:item>
+                            <xforms:choices>
+                                <xforms:label>Culture</xforms:label>
+                                <xforms:item>
+                                    <xforms:label>Art</xforms:label>
+                                    <xforms:value>ar2</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>Craft</xforms:label>
+                                    <xforms:value>cr2</xforms:value>
+                                </xforms:item>
+                            </xforms:choices>
+                        </xforms:choices>
+                    </xforms:select>
+                </xhtml:td>
+                <xhtml:td>
+                    <xforms:select ref="select" appearance="xxforms:tree" id="tree6" incremental="false">
+                        <xforms:choices>
+                            <xforms:label>Encyclopedia</xforms:label>
+                            <xforms:item>
+                                <xforms:label>Science</xforms:label>
+                                <xforms:value>sc1</xforms:value>
+                            </xforms:item>
+                            <xforms:choices>
+                                <xforms:label>Culture</xforms:label>
+                                <xforms:item>
+                                    <xforms:label>Art</xforms:label>
+                                    <xforms:value>ar1</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>Craft</xforms:label>
+                                    <xforms:value>cr1</xforms:value>
+                                </xforms:item>
+                            </xforms:choices>
+                        </xforms:choices>
+                        <xforms:choices>
+                            <xforms:label>Encyclopedia</xforms:label>
+                            <xforms:item>
+                                <xforms:label>Science</xforms:label>
+                                <xforms:value>sc2</xforms:value>
+                            </xforms:item>
+                            <xforms:choices>
+                                <xforms:label>Culture</xforms:label>
+                                <xforms:item>
+                                    <xforms:label>Art</xforms:label>
+                                    <xforms:value>ar2</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>Craft</xforms:label>
+                                    <xforms:value>cr2</xforms:value>
+                                </xforms:item>
+                            </xforms:choices>
+                        </xforms:choices>
+                    </xforms:select>
+                </xhtml:td>
+            </xhtml:tr>
         </xhtml:table>
     </xhtml:body>
 </xhtml:html>

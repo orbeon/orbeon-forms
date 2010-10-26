@@ -73,14 +73,11 @@
                                 if (button == null) {
                                     <!-- If the button is disabled, enabled it while the YUI button is initialized,
                                          otherwise the YUI button becomes disabled -->
-                                    var htmlButton = yuiButtonSpan.getElementsByTagName("button")[0];
-                                    var isDisabled = htmlButton.disabled;
-                                    if (isDisabled) ORBEON.xforms.Controls.setDisabledOnFormElement(htmlButton, false);
                                     button = new YAHOO.widget.Button(yuiButtonSpan);
-                                    if (isDisabled) ORBEON.xforms.Controls.setDisabledOnFormElement(htmlButton, true);
                                     <!-- TODO: once we can pass values from XForms to JavaScript we'll be able to get rid of the XSLT used here -->
                                     <xsl:if test="/fr:button/@tabindex">button.set("tabindex", <xsl:value-of select="/fr:button/@tabindex"/>);</xsl:if>
                                 }
+                                button.set("disabled", YAHOO.util.Dom.hasClass(event.target, "xforms-readonly"));
                             }
                         </xxforms:script>
                         <xxforms:script ev:event="xforms-readonly">

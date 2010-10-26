@@ -69,7 +69,7 @@ public class Variable {
         this.selectAttribute = valueElement.attributeValue(XFormsConstants.SELECT_QNAME);
     }
 
-    private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext, boolean useCache) {
+    private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext) {
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
             variableValue = new StringValue(valueElement.getStringValue());
@@ -92,7 +92,7 @@ public class Variable {
                     final XFormsFunction.Context functionContext = contextStack.getFunctionContext(sourceEffectiveId);
                     variableValue = XPathCache.evaluateAsExtent(pipelineContext,
                             currentNodeset, bindingContext.getPosition(),
-                            selectAttribute, container.getNamespaceMappings(valueElement), bindingContext.getInScopeVariables(useCache),
+                            selectAttribute, container.getNamespaceMappings(valueElement), bindingContext.getInScopeVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
                     contextStack.returnFunctionContext();
                 } else {
@@ -109,11 +109,11 @@ public class Variable {
         return variableName;
     }
 
-    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext, boolean useCache) {
+    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext) {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;
-            evaluate(pipelineContext, sourceEffectiveId, pushOuterContext, useCache);
+            evaluate(pipelineContext, sourceEffectiveId, pushOuterContext);
         }
 
         // Return value and rewrap if necessary

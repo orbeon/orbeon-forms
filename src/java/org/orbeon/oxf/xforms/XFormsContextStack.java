@@ -174,7 +174,7 @@ public class XFormsContextStack {
 //                final XFormsModel tempModel = functionContext.getModel();
 //                final XFormsFunction.Context functionContext = getFunctionContext(sourceEffectiveId);
                 getFunctionContext(sourceEffectiveId);
-                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true, true), newScope);
+                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true), newScope);
                 returnFunctionContext();
 //                functionContext.setModel(tempModel);
 //                functionContext.setSourceEffectiveId(tempSourceEffectiveId);
@@ -843,7 +843,6 @@ public class XFormsContextStack {
         public final XBLBindings.Scope scope;
 
         private List<VariableInfo> variables;
-        private Map<String, ValueRepresentation> inScopeVariablesMap; // cached variable map
 
         public BindingContext(BindingContext parent, XFormsModel model, List<Item> nodeSet, int position, String elementId,
                               boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext,
@@ -935,7 +934,6 @@ public class XFormsContextStack {
 
         public void setVariables(List<VariableInfo> variableInfo) {
             this.variables = variableInfo;
-            this.inScopeVariablesMap = null;
         }
 
         public List<VariableInfo> getVariables() {
@@ -948,43 +946,28 @@ public class XFormsContextStack {
          * @return  map of variable name to value
          */
         public Map<String, ValueRepresentation> getInScopeVariables() {
-            return getInScopeVariables(true);
-        }
-
-        public Map<String, ValueRepresentation> getInScopeVariables(boolean useCache) {
-
-            // TODO: Remove useCache completely or implement better cache!
-            // Force use cache to false, because when not all bindings are updated, variables can get out of date
-            useCache = false;
-
             // TODO: Variables in scope in the view must not include the variables defined in another model, but must include all view variables.
-            if (inScopeVariablesMap == null || !useCache) {
-                final Map<String, ValueRepresentation> tempVariablesMap = new HashMap<String, ValueRepresentation>();
+            final Map<String, ValueRepresentation> tempVariablesMap = new HashMap<String, ValueRepresentation>();
 
-                BindingContext currentBindingContext = this; // start with current BindingContext
-                do {
-                    if (currentBindingContext.scope == scope) { // consider only BindingContext with same scope and skip others
-                        final List<VariableInfo> currentInfo = currentBindingContext.variables;
-                        if (currentInfo != null) {
-                            for (VariableInfo variableInfo: currentInfo) {
-                                final String currentName = variableInfo.variableName;
-                                if (currentName != null && tempVariablesMap.get(currentName) == null) {
-                                    // The binding defines a variable and there is not already a variable with that name
-                                    tempVariablesMap.put(variableInfo.variableName, variableInfo.variableValue);
-                                }
+            BindingContext currentBindingContext = this; // start with current BindingContext
+            do {
+                if (currentBindingContext.scope == scope) { // consider only BindingContext with same scope and skip others
+                    final List<VariableInfo> currentInfo = currentBindingContext.variables;
+                    if (currentInfo != null) {
+                        for (VariableInfo variableInfo: currentInfo) {
+                            final String currentName = variableInfo.variableName;
+                            if (currentName != null && tempVariablesMap.get(currentName) == null) {
+                                // The binding defines a variable and there is not already a variable with that name
+                                tempVariablesMap.put(variableInfo.variableName, variableInfo.variableValue);
                             }
                         }
                     }
+                }
 
-                    currentBindingContext = currentBindingContext.parent;
-                } while (currentBindingContext != null);
+                currentBindingContext = currentBindingContext.parent;
+            } while (currentBindingContext != null);
 
-                if (!useCache)
-                    return tempVariablesMap;
-
-                inScopeVariablesMap = tempVariablesMap;
-            }
-            return inScopeVariablesMap;
+            return tempVariablesMap;
         }
 
         public static class VariableInfo {

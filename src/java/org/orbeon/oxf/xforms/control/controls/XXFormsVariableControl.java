@@ -22,9 +22,7 @@ import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.EmptySequence;
 import org.orbeon.saxon.value.Value;
@@ -78,7 +76,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
         if (isRelevant()) {
             // Control is relevant
             getContextStack().setBinding(this);
-            value = variable.getVariableValue(propertyContext, getEffectiveId(), false, true);
+            value = variable.getVariableValue(propertyContext, getEffectiveId(), false);
         } else {
             // Control is not relevant
             // NOTE: Nobody should use this variable if it's non-relevant, but right now we still have possible uses

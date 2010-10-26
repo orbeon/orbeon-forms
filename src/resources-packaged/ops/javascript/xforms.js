@@ -3243,7 +3243,7 @@ ORBEON.xforms.Events = {
             // Incremental control: treat keypress as a value change event
             if (YAHOO.util.Dom.hasClass(target, "xforms-incremental")) {
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false);
+                ORBEON.xforms.Server.fireEvents([event], true);
             }
 
             // Resize wide text area

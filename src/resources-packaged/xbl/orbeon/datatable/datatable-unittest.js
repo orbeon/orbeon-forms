@@ -29,7 +29,7 @@ var testCase = {
                     // Setting maxLength to 100 adds new rows in the tables
                     ORBEON.xforms.Document.setValue("maxLength", "100");
                 }, function() {
-                    // If the tables have been correctly updated, their cells styles (IE) or classes (FF) should be set 
+                    // If the tables have been correctly updated, their cells styles (IE) or classes (FF) should be set
                     var table1 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table·1');
                     var table2 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table·2');
                     thiss.checkCellClasses(table1, true);
@@ -408,7 +408,7 @@ var testCase = {
     ,
 
     EOS: ""
-}
+};
 
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {

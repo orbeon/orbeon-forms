@@ -26,8 +26,8 @@
  */
 
 YAHOO.namespace("xbl.fr");
-
 YAHOO.xbl.fr.Datatable = function() {};
+ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Datatable, "xbl-fr-datatable");
 
 /**
  * Used to manage the datatables that are located in a page
@@ -88,7 +88,7 @@ YAHOO.xbl.fr.DatatableManager = {
             var datatable = YAHOO.xbl.fr.Datatable._instances[id];
             if (datatable.isDisplayed()) {
                 datatable.isInitialized = false;
-                datatable.draw(datatable.innerTableWidth);
+                datatable.draw();
             }
         }
     },
@@ -98,8 +98,6 @@ YAHOO.xbl.fr.DatatableManager = {
 
 // Set the event listener for window resize events
 YAHOO.util.Event.addListener(window, "resize", YAHOO.xbl.fr.DatatableManager.resize);
-
-ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Datatable, "xbl-fr-datatable");
 
 /*
  * Datatable class
@@ -142,15 +140,20 @@ YAHOO.xbl.fr.Datatable.prototype = {
     headerColumns: [],
     delayedDraw: null,                                          // A version of draw with all the arguments bound
 
+    init: function() {
+        /** @type {HTMLElement} */  var innerTableWidthSpan = YAHOO.util.Dom.getElementsByClassName("fr-dt-inner-table-width", null, this.container)[0];
+        /** @type {String} */       var innerTableWidthText = ORBEON.util.Dom.getStringValue(innerTableWidthSpan);
+        this.innerTableWidth = innerTableWidthText == "" ? null : parseInt(innerTableWidthText);
+        this.draw();
+    },
+
     /**
      * Initialize a datatable.
      * Runs on xforms-enabled.
      *
      * @param innerTableWidth
      */
-    draw: function (innerTableWidth) {
-        // Initializes a datatable (called by xforms-enabled events)
-        this.innerTableWidth = innerTableWidth;
+    draw: function() {
 
         // We don't care about datatable that are disabled (we'll receive a new event when they'll be enabled again)
         // TODO: check if this test is still needed
@@ -168,7 +171,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                     // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
                     // Store a curried version of draw(), to avoid creating a new closure which can't be garbage
                     // collected every 100 ms
-                    if (this.delayedDraw == null) this.delayedDraw = _.bind(this.draw, this, innerTableWidth);
+                    if (this.delayedDraw == null) this.delayedDraw = _.bind(this.draw, this);
                     setTimeout(this.delayedDraw, 100);
                 }
             } else {
@@ -750,7 +753,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 this.reset();
                 this.isInitialized = false;
                 thiss = this;
-                this.draw(this.innerTableWidth);
+                this.draw();
             }
             // Otherwise, we've already done an update for this dynamic state!
         }

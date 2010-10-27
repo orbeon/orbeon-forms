@@ -534,11 +534,16 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // Check LHHA
         for (final Map.Entry<XFormsConstants.LHHA, LHHA> entry: lhha.entrySet()) {
-            final XFormsConstants.LHHA key = entry.getKey();
-            final LHHA value = entry.getValue();
+            final XFormsConstants.LHHA lhhaName = entry.getKey();
+            final LHHA lhha = entry.getValue();
 
-            if (value != null && !value.isDirty() && xpathDependencies.requireLHHAUpdate(key, getPrefixedId()))
-                value.markDirty();
+            if (lhha != null &&
+                    !lhha.isDirty() && // no need to go further if already dirty
+                    (relevant != wasRelevant || // also mark dirty if control becomes relevant or non-relevant
+                        relevant && xpathDependencies.requireLHHAUpdate(lhhaName, getPrefixedId()))) // only check dependencies if clean and remains relevant
+                        // and if control is clean and remains non-relevant, no need to mark dirty as it's value remains null
+                        // NOTE: Ideally nobody should call to get the value of LHHA elements if the control is not relevant
+                lhha.markDirty();
         }
 
         // For now clear this all the time

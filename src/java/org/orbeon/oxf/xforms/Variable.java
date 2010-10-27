@@ -34,6 +34,8 @@ import java.util.List;
 
 /**
  * Represents an exforms:variable / xxforms:variable element.
+ *
+ * TODO: Use more static information.
  */
 public class Variable {
 
@@ -139,11 +141,6 @@ public class Variable {
     public LocationData getLocationData() {
         return (LocationData) variableElement.getData();
     }
-
-//    public void testAs() {
-//        final String testAs = "element(foobar)";
-//        new XSLVariable().makeSequenceType(testAs);
-//    }
 
     /**
      * This iterator rewraps NodeWrapper elements so that the original NodeWrapper is discarded and a new one created.

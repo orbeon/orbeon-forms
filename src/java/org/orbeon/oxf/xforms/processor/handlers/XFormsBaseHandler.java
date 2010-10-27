@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -461,7 +462,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                     }
                 } else {
                     // For help and hint, consider "non-relevant" if empty
-                    final boolean isHintHelpRelevant = control.isRelevant() && !(labelHintHelpAlertValue == null || labelHintHelpAlertValue.equals(""));
+                    final boolean isHintHelpRelevant = control.isRelevant() && StringUtils.isNotEmpty(labelHintHelpAlertValue);
                     if (!isHintHelpRelevant) {
                         if (classes.length() > 0)
                             classes.append(' ');
@@ -572,7 +573,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         // Only output content when there value is non-empty
-        if (labelValue != null && !labelValue.equals("")) {
+        if (StringUtils.isNotEmpty(labelValue)) {
             if (mustOutputHTMLFragment) {
                 XFormsUtils.streamHTMLFragment(xmlReceiver, labelValue, null, xhtmlPrefix);
             } else {

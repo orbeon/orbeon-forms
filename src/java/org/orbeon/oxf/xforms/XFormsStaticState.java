@@ -755,22 +755,22 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
     public LHHAAnalysis getLabel(String prefixedId) {
         final ElementAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getLabel() : null;
+        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getLHHA("label") : null;
     }
 
     public LHHAAnalysis getHelp(String prefixedId) {
         final ElementAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getHelp() : null;
+        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getLHHA("help") : null;
     }
 
     public LHHAAnalysis getHint(String prefixedId) {
         final ElementAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getHint() : null;
+        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getLHHA("hint") : null;
     }
 
     public LHHAAnalysis getAlert(String prefixedId) {
         final ElementAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getAlert() : null;
+        return (controlAnalysis instanceof LHHATrait) ? ((LHHATrait) controlAnalysis).getLHHA("alert") : null;
     }
 
     /**

@@ -22,7 +22,7 @@ trait SelectionControl extends SimpleElementAnalysis {
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
-    // TODO: check do we support other attributes?
+    // TODO: fix this, seems incorrect: if there is an itemset, consider dynamic; also handle AVTs on any child element of label/value
     val hasNonStaticItem = XPathCache.evaluateSingle(staticStateContext.propertyContext, staticStateContext.controlsDocument.wrap(element),
             "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]])",
             XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]

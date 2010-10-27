@@ -70,7 +70,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     val defaultInstancePrefixedId = Option(if (hasInstances) scope.getFullPrefix + defaultInstanceStaticId else null)
 
     // Handle variables
-    val variablesList: List[VariableAnalysisTrait] = {
+    val variablesSeq: Seq[VariableAnalysisTrait] = {
 
         // Get xxf:variable, exf:variable and xf:variable (in fact *:variable) elements
         val variableElements = Dom4jUtils.elements(element) filter (_.getName == XXFORMS_VARIABLE_NAME)
@@ -80,22 +80,22 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         // more thinking is needed wrt the processing model.
 
         // Iterate and resolve all variables in order
-        var preceding: Option[ElementAnalysis] = None
+        var preceding: Option[SimpleElementAnalysis with VariableAnalysisTrait] = None
 
-        def getUpdatePreceding(newPreceding: ElementAnalysis): Unit = preceding = Some(newPreceding)
-
-        val buffer =
-            for {
-                variableElement <- variableElements
-                analysis = new SimpleElementAnalysis(staticStateContext, variableElement, Some(Model.this), preceding, scope) with VariableAnalysisTrait
-                unused: Unit = getUpdatePreceding(analysis)
-            } yield {
-                analysis
+        for {
+            variableElement <- variableElements
+            analysis = {
+                val result = new SimpleElementAnalysis(staticStateContext, variableElement, Some(Model.this), preceding, scope) with VariableAnalysisTrait
+                preceding = Some(result)
+                result
             }
-        buffer.toList
+        } yield {
+            analysis
+        }
     }
 
-    val variablesMap: Map[String, VariableAnalysisTrait] = Map(variablesList map (variable => (variable.name -> variable)): _*)
+    val variablesMap: Map[String, VariableAnalysisTrait] = Map(variablesSeq map (variable => (variable.name -> variable)): _*)
+    val jVariablesMap: JMap[String, VariableAnalysisTrait] = variablesMap
 
     // Handle binds
     val bindElements = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) // JAVA COLLECTION
@@ -121,7 +121,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     // Top-level binds and create static binds hierarchy
     val topLevelBinds: Seq[Bind] = {
         // NOTE: For now, do as if binds follow all top-level variables
-        val preceding = if (variablesList.isEmpty) None else Some(variablesList.head)
+        val preceding = if (variablesSeq.isEmpty) None else Some(variablesSeq.last)
         for (bindElement <- Dom4jUtils.elements(element, XFORMS_BIND_QNAME))
             yield new Bind(bindElement, this, preceding)
     }
@@ -294,7 +294,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         super.analyzeXPath()
 
         // Variables
-        for (variable <- variablesList)
+        for (variable <- variablesSeq)
             variable.analyzeXPath()
         
         // Binds: analyze all binds and return whether all of them were successfully analyzed
@@ -322,7 +322,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                 "analyzed-binds", figuredAllBindRefAnalysis.toString
         )) {
             // Output variable information
-            for (variable <- variablesList)
+            for (variable <- variablesSeq)
                 variable.toXML(propertyContext, helper) {}
 
             // Output binds information
@@ -350,7 +350,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     }
 
     override def freeTransientState() {
-        for (variable <- variablesList)
+        for (variable <- variablesSeq)
             variable.freeTransientState()
 
         for (bind <- topLevelBinds)

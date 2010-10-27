@@ -27,12 +27,21 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
 
     require(parent ne null)
 
-    val staticValue: Option[String] =
-        if (LHHAAnalysis.hasStaticValue(staticStateContext, element))
+    // TODO: make use of static value
+    //
+    // o output static value in HTML markup and repeat templates
+    // o if has static value, don't attempt to compare values upon diff, and never send new related information to client
+    val (staticValue, containsHTML) =
+        if (LHHAAnalysis.hasStaticValue(staticStateContext, element)) {
             // TODO: figure out whether to allow HTML or not (could default to true?)
-            Option(XFormsUtils.getStaticChildElementValue(element, true, null))
-        else
-            None
+            val containsHTML = Array(false)
+            (Option(XFormsUtils.getStaticChildElementValue(element, true, containsHTML)), containsHTML(0))
+        } else
+            (None, false)
+
+    def debugOut(): Unit =
+        if (staticValue.isDefined)
+            println("static value for control " + prefixedId + " => " + staticValue.get)
 
     // Consider that LHHA don't have context/binding
     override protected def computeContextAnalysis = None
@@ -91,14 +100,10 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
 }
 
 object LHHAAnalysis {
-
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
-
-        // Try to figure out if we have a dynamic LHHA element. This attempts to cover all cases, including nested
-        // xforms:output controls. Also check for AVTs on @class and @style.
-        // TODO: check do we support other attributes?
+        // Try to figure out if we have a dynamic LHHA element, including nested xforms:output and AVTs.
         XPathCache.evaluateSingle(staticStateContext.propertyContext, staticStateContext.controlsDocument.wrap(lhhaElement),
-            "not(exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]]))",
+            "not(exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
             XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
     }
 }

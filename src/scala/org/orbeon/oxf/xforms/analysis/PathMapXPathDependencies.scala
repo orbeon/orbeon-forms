@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import controls.LHHATrait
 import model.Model
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.om.NodeInfo
@@ -208,25 +209,23 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                 case Some(result) => result
                 case None => {
                     val elementAnalysis = staticState.getControlAnalysis(controlPrefixedId)
-                    val tempResult =
-                        if (elementAnalysis.getBindingAnalysis.isEmpty) {
+                    val tempResult = elementAnalysis.getBindingAnalysis match {
+                        case None =>
                             // Control does not have an XPath binding
                             new UpdateResult(false, 0)
-                        } else if (!elementAnalysis.getBindingAnalysis.get.figuredOutDependencies) {
+                        case Some(analysis) if !analysis.figuredOutDependencies =>
                             // Binding dependencies are unknown
                             new UpdateResult(true, 0)// savedEvaluations is N/A
-                        } else {
+                        case Some(analysis) =>
                             // Binding dependencies are known
                             new UpdateResult(
-                                elementAnalysis.getBindingAnalysis.get.intersectsModels(getStructuralChangeModels) ||
-                                        elementAnalysis.getBindingAnalysis.get.intersectsBinding(getModifiedPaths)
+                                analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsBinding(getModifiedPaths)
                                 , elementAnalysis.bindingXPathEvaluations)
-                        }
+                    }
 
-                    if (tempResult.requireUpdate && getLogger.isDebugEnabled) {
+                    if (tempResult.requireUpdate && getLogger.isDebugEnabled)
                         getLogger.logDebug("dependencies", "binding requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", elementAnalysis.getBindingAnalysis.get.xpathString): _*)
-                    }
 
                     modifiedBindingCache.put(controlPrefixedId, tempResult)
                     tempResult
@@ -251,24 +250,21 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                 case None => {
                     val controlAnalysis = staticState.getControlAnalysis(controlPrefixedId)
                     val tempValueAnalysis = controlAnalysis.getValueAnalysis
-                    val tempUpdateResult =
-                        if (tempValueAnalysis.isEmpty) {
+                    val tempUpdateResult = tempValueAnalysis match {
+                        case None =>
                             // Control does not have a value
                             new UpdateResult(true, 0)//TODO: should be able to return false here; change once markDirty is handled better
-                        } else if (!tempValueAnalysis.get.figuredOutDependencies) {
+                        case Some(analysis) if !analysis.figuredOutDependencies =>
                             // Value dependencies are unknown
                             new UpdateResult(true, 0)// savedEvaluations is N/A
-                        } else {
+                        case Some(analysis) =>
                             // Value dependencies are known
-                            new UpdateResult(
-                                tempValueAnalysis.get.intersectsModels(getStructuralChangeModels) ||
-                                        tempValueAnalysis.get.intersectsValue(getModifiedPaths)
+                            new UpdateResult(analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsValue(getModifiedPaths)
                                 , if (controlAnalysis.value.isDefined) 1 else 0)
-                        }
-                    if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && getLogger.isDebugEnabled) {
+                    }
+                    if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && getLogger.isDebugEnabled)
                         getLogger.logDebug("dependencies", "value requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
-                    }
 
                     modifiedValueCache.put(controlPrefixedId, tempUpdateResult)
                     (tempUpdateResult, tempValueAnalysis)
@@ -285,9 +281,16 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     }
 
     def requireLHHAUpdate(lhha: XFormsConstants.LHHA, controlPrefixedId: String): Boolean = {
-        // TODO
-//        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId)
-        true
+        staticState.getControlAnalysis(controlPrefixedId) match {
+            case control: LHHATrait => // control found
+                control.getAnalysis(lhha.name.toLowerCase) match {
+                    case analysis: XPathAnalysis if !analysis.figuredOutDependencies => false // dependencies are unknown
+                    case analysis: XPathAnalysis => analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsValue(getModifiedPaths) // dependencies are known
+                    case null => false // control does not have this LHHA
+
+                }
+            case _ => false
+        }
     }
 
     def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = {
@@ -343,8 +346,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 } else {
                                     // Value dependencies are known
                                     new UpdateResult(
-                                        mipAnalysis.intersectsModels(getStructuralChangeModels)
-                                                || mipAnalysis.intersectsValue(getModifiedPaths)
+                                        mipAnalysis.intersectsModels(getStructuralChangeModels) || mipAnalysis.intersectsValue(getModifiedPaths)
                                         , 1)
                                 }
                             if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled) {

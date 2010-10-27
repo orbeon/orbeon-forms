@@ -960,7 +960,8 @@ public class ControlTree implements ExternalCopyable {
             } else {
                 final XFormsControl currentControl = effectiveIdsToControls.get(controlEffectiveId);
                 // TODO: do this better: null in create mode for now; what about with relevance optimization?
-                if (currentControl != null) {
+                final boolean hasModelAttribute = currentControlElement.attribute(XFormsConstants.MODEL_QNAME) != null;
+                if (currentControl != null && !hasModelAttribute) { // TODO TEMP HACK: don't optimize if there is a @model attribute, as that causes model variable evaluation!
                     // Push existing binding without re-evaluating
                     currentContextStack.pushBinding(currentControl.getBindingContext());
                     optimizedCount++;

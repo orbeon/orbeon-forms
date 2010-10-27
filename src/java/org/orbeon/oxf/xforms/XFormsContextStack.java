@@ -170,14 +170,9 @@ public class XFormsContextStack {
                 // but because BindingContext caches variables in scope, after a first request for in-scope variables,
                 // further variables values could not be added. The method below temporarily adds more elements on the
                 // stack but it is safer.
-//                final String tempSourceEffectiveId = functionContext.getSourceEffectiveId();
-//                final XFormsModel tempModel = functionContext.getModel();
-//                final XFormsFunction.Context functionContext = getFunctionContext(sourceEffectiveId);
                 getFunctionContext(sourceEffectiveId);
                 pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true), newScope);
                 returnFunctionContext();
-//                functionContext.setModel(tempModel);
-//                functionContext.setSourceEffectiveId(tempSourceEffectiveId);
 
                 // Add VariableInfo created during above pushVariable(). There must be only one!
                 if (variableInfos == null)

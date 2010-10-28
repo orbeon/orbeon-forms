@@ -17,7 +17,6 @@
     var OT = ORBEON.util.Test;
     var YA = YAHOO.util.Assert;
     var YD = YAHOO.util.Dom;
-    var YU = YAHOO.util.UserAction;
 
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -44,8 +43,8 @@
             };
         },
 
-        toggleReadonly: function() { YAHOO.log("Toggle readonly"); YU.click(OD.getElementByTagName(OD.get("toggle-readonly"), "button")); },
-        toggleRelevant: function() { YAHOO.log("Toggle relevant"); YU.click(OD.getElementByTagName(OD.get("toggle-relevant"), "button")); },
+        toggleReadonly: function() { YAHOO.log("Toggle readonly"); OD.getElementByTagName(OD.get("toggle-readonly"), "button").click(); },
+        toggleRelevant: function() { YAHOO.log("Toggle relevant"); OD.getElementByTagName(OD.get("toggle-relevant"), "button").click(); },
 
         /**
          * [ #315586 ] fr:button: if becomes non-readonly while non-relevant, when it becomes relevant, it still shows as readonly

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import controls.RepeatControl
 import org.dom4j.Element
 import org.orbeon.oxf.xml.dom4j.{LocationData, ExtendedLocationData}
 import org.orbeon.oxf.xforms.xbl.XBLBindings
@@ -84,6 +85,20 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
      * element context if there is no binding.
      */
     def getChildrenContext: Option[XPathAnalysis] = if (hasNodeBinding) getBindingAnalysis else getContextAnalysis
+
+    /**
+     * Return the closest ancestor repeat if any.
+     */
+    val closestInScopeRepeat: Option[RepeatControl] = parent match {
+        case Some(repeat: RepeatControl) => Some(repeat)
+        case Some(container: SimpleElementAnalysis) => container.closestInScopeRepeat
+        case _ => None
+    }
+
+    /**
+     * Whether this is within a repeat.
+     */
+    def isWithinRepeat = closestInScopeRepeat.isDefined
 
     // API for Java
     def javaToXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = toXML(propertyContext, helper)()

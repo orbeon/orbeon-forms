@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.XFormsConstants
 import org.dom4j.{QName, Element}
 import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.xforms.analysis.{XPathAnalysis, StaticStateContext, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{StaticStateContext, SimpleElementAnalysis}
 import collection.mutable.LinkedHashMap
 
 /**
@@ -42,12 +42,9 @@ trait LHHATrait extends SimpleElementAnalysis {
     // Java API (allowed to return null)
     def getLHHA(lhhaType: String): LHHAAnalysis = lhha.get(lhhaType).orNull
 
-    // Java API (allowed to return null)
-    def getAnalysis(lhhaType: String): XPathAnalysis = {
-        lhha.get(lhhaType) match {
-            case Some(analysis) => analysis.getValueAnalysis.orNull
-            case None => null
-        }
+    def getLHHAValueAnalysis(lhhaType: String) = lhha.get(lhhaType) match {
+        case Some(analysis) => analysis.getValueAnalysis
+        case None => None
     }
 
     override def analyzeXPath() = {

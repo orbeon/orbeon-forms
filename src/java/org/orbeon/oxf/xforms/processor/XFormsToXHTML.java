@@ -473,6 +473,8 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Process the entire input
             annotatedDocument.replay(new ExceptionWrapperXMLReceiver(controller, "converting XHTML+XForms document to XHTML"));
         }
+
+        containingDocument.afterInitialResponse();
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,

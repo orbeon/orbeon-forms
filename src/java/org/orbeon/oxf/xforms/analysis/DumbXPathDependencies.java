@@ -49,6 +49,26 @@ public class DumbXPathDependencies implements XPathDependencies {
         // NOP
     }
 
+    public void afterInitialResponse() {
+        // NOP
+    }
+
+    public void beforeUpdateResponse() {
+        // NOP
+    }
+
+    public void afterUpdateResponse() {
+        // NOP
+    }
+
+    public void notifyComputeLHHA() {
+        // NOP
+    }
+
+    public void notifyOptimizeLHHA() {
+        // NOP
+    }
+
     public boolean requireBindingUpdate(String controlPrefixedId) {
         // Always update
         return true;

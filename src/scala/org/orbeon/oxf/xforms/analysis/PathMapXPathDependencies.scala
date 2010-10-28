@@ -21,6 +21,7 @@ import collection.mutable.{HashSet, HashMap, Set}
 import org.orbeon.saxon.dom4j.NodeWrapper
 import org.orbeon.oxf.xforms._
 import org.w3c.dom.Node._
+import org.orbeon.oxf.common.OXFException
 
 class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsStaticState)// Constructor for unit tests
         extends XPathDependencies {
@@ -79,6 +80,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     private val modifiedBindingCache = new HashMap[String, UpdateResult]
     private val modifiedValueCache = new HashMap[String, UpdateResult]
     private val modifiedMIPCache = new HashMap[String, UpdateResult]
+    private val modifiedLHHACache = new HashMap[String, Boolean]
 
     // Statistics
     private var bindingUpdateCount: Int = 0
@@ -88,6 +90,12 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     private var bindingXPathOptimizedCount: Int = 0
     private var valueXPathOptimizedCount: Int = 0
     private var mipXPathOptimizedCount: Int = 0
+
+    private var lhhaEvaluationCount: Int = 0
+    private var lhhaOptimizedCount: Int = 0
+    private var lhhaUnknownDependencies: Int = 0
+    private var lhhaMissCount: Int = 0
+    private var lhhaHitCount: Int = 0
 
     def this(containingDocument: XFormsContainingDocument) {
         // Defer logger initialization as controls might not have been initialized at time this constructor is called.
@@ -155,6 +163,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         modifiedBindingCache.clear()
         modifiedValueCache.clear()
         modifiedMIPCache.clear()
+        modifiedLHHACache.clear()
 
         bindingUpdateCount = 0
         valueUpdateCount = 0
@@ -163,6 +172,35 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         bindingXPathOptimizedCount = 0
         valueXPathOptimizedCount = 0
         mipXPathOptimizedCount = 0
+    }
+
+    def afterInitialResponse {
+        outputLHHAStats()
+    }
+
+    def beforeUpdateResponse {
+        lhhaEvaluationCount = 0
+        lhhaOptimizedCount = 0
+        lhhaUnknownDependencies = 0
+        lhhaMissCount = 0
+        lhhaHitCount = 0
+    }
+
+    def afterUpdateResponse {
+        outputLHHAStats()
+    }
+
+    def notifyComputeLHHA: Unit = lhhaEvaluationCount += 1
+    def notifyOptimizeLHHA: Unit = lhhaOptimizedCount += 1
+
+    private def outputLHHAStats() {
+        if (getLogger.isDebugEnabled)
+            getLogger.logDebug("dependencies", "summary after response",
+                Array("lhha evaluations", lhhaEvaluationCount.toString,
+                      "lhha optimized", lhhaOptimizedCount.toString,
+                      "lhha unknown dependencies", lhhaUnknownDependencies.toString,
+                      "lhha intersections", lhhaHitCount.toString,
+                      "lhha disjoints", lhhaMissCount.toString): _*)
     }
 
     private def getModifiedPaths: Set[String] = {
@@ -208,8 +246,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             cached match {
                 case Some(result) => result
                 case None => {
-                    val elementAnalysis = staticState.getControlAnalysis(controlPrefixedId)
-                    val tempResult = elementAnalysis.getBindingAnalysis match {
+                    val control = staticState.getControlAnalysis(controlPrefixedId)
+                    val tempResult = control.getBindingAnalysis match {
                         case None =>
                             // Control does not have an XPath binding
                             new UpdateResult(false, 0)
@@ -220,14 +258,15 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                             // Binding dependencies are known
                             new UpdateResult(
                                 analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsBinding(getModifiedPaths)
-                                , elementAnalysis.bindingXPathEvaluations)
+                                , control.bindingXPathEvaluations)
                     }
 
                     if (tempResult.requireUpdate && getLogger.isDebugEnabled)
                         getLogger.logDebug("dependencies", "binding requires update",
-                                Array("prefixed id", controlPrefixedId, "XPath", elementAnalysis.getBindingAnalysis.get.xpathString): _*)
+                                Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
-                    modifiedBindingCache.put(controlPrefixedId, tempResult)
+                    if (control.isWithinRepeat)
+                        modifiedBindingCache.put(controlPrefixedId, tempResult)
                     tempResult
                 }
             }
@@ -248,8 +287,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             cached match {
                 case Some(result) => (result, if (result.requireUpdate) staticState.getControlAnalysis(controlPrefixedId).getValueAnalysis else null)
                 case None => {
-                    val controlAnalysis = staticState.getControlAnalysis(controlPrefixedId)
-                    val tempValueAnalysis = controlAnalysis.getValueAnalysis
+                    val control = staticState.getControlAnalysis(controlPrefixedId)
+                    val tempValueAnalysis = control.getValueAnalysis
                     val tempUpdateResult = tempValueAnalysis match {
                         case None =>
                             // Control does not have a value
@@ -260,13 +299,14 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                         case Some(analysis) =>
                             // Value dependencies are known
                             new UpdateResult(analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsValue(getModifiedPaths)
-                                , if (controlAnalysis.value.isDefined) 1 else 0)
+                                , if (control.value.isDefined) 1 else 0)
                     }
                     if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && getLogger.isDebugEnabled)
                         getLogger.logDebug("dependencies", "value requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
-                    modifiedValueCache.put(controlPrefixedId, tempUpdateResult)
+                    if (control.isWithinRepeat)
+                        modifiedValueCache.put(controlPrefixedId, tempUpdateResult)
                     (tempUpdateResult, tempValueAnalysis)
                 }
             }
@@ -281,15 +321,26 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     }
 
     def requireLHHAUpdate(lhha: XFormsConstants.LHHA, controlPrefixedId: String): Boolean = {
-        staticState.getControlAnalysis(controlPrefixedId) match {
-            case control: LHHATrait => // control found
-                control.getAnalysis(lhha.name.toLowerCase) match {
-                    case analysis: XPathAnalysis if !analysis.figuredOutDependencies => false // dependencies are unknown
-                    case analysis: XPathAnalysis => analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsValue(getModifiedPaths) // dependencies are known
-                    case null => false // control does not have this LHHA
-
+        modifiedLHHACache.get(controlPrefixedId) match {
+            case Some(result) => result // cached
+            case None => // not cached
+                staticState.getControlAnalysis(controlPrefixedId) match {
+                    case control: LHHATrait => // control found
+                        val result = control.getLHHAValueAnalysis(lhha.name.toLowerCase) match {
+                            case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
+                                lhhaUnknownDependencies += 1
+                                true
+                            case Some(analysis) => // dependencies are known
+                                val result = analysis.intersectsModels(getStructuralChangeModels) || analysis.intersectsValue(getModifiedPaths)
+                                if (result) lhhaHitCount += 1 else lhhaMissCount += 1
+                                result
+                            case None => throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhha.name.toLowerCase)
+                        }
+                        if (control.isWithinRepeat)
+                            modifiedLHHACache.put(controlPrefixedId, result)
+                        result
+                    case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
                 }
-            case _ => false
         }
     }
 

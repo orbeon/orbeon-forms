@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.RepeatControl
 import org.dom4j.Element
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.common.ValidationException
@@ -126,6 +125,6 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
         /**
          * Return analysis for closest ancestor-of-self repeat in scope.
          */
-        def getInScopeRepeat = ElementAnalysis.getAllAncestorsOrSelfInScope(SimpleElementAnalysis.this) find (_.isInstanceOf[RepeatControl])
+        def getInScopeRepeat = closestInScopeRepeat
     }
 }

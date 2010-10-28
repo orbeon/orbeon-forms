@@ -1159,6 +1159,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
 
+    public void afterInitialResponse() {
+        // Tell dependencies
+        xpathDependencies.afterInitialResponse();
+    }
+
     /**
      * Prepare the document for a sequence of external events.
      *
@@ -1170,6 +1175,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Clear containing document state
         // NOTE: This should no longer be needed here as it's done on afterSendingResponse()
         clearClientState();
+
+        // Tell dependencies
+        xpathDependencies.beforeUpdateResponse();
 
         // Remember OutputStream
         this.response = response;
@@ -1206,6 +1214,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     public void afterUpdateResponse() {
         clearClientState();
         xformsControls.afterUpdateResponse();
+        // Tell dependencies
+        xpathDependencies.afterUpdateResponse();
     }
 
     public void rememberLastAjaxResponse(SAXStore response) {

@@ -31,6 +31,13 @@ public interface XPathDependencies {
     void refreshStart();
     void refreshDone();
 
+    void afterInitialResponse();
+    void beforeUpdateResponse();
+    void afterUpdateResponse();
+
+    void notifyComputeLHHA();
+    void notifyOptimizeLHHA();
+
     boolean requireBindingUpdate(String controlPrefixedId);
     boolean requireValueUpdate(String controlPrefixedId);
     boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId);

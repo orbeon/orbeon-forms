@@ -18,9 +18,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 
 /**
- * Represent the lifecycle of an XForms document from the point of view of an Ajax request.
+ * Represent the lifecycle of an XForms document from the point of view of requests/responses.
  */
 public interface XFormsDocumentLifecycle {
+    void afterInitialResponse();
     void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response, boolean handleGoingOnline);
     void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event, boolean handleGoingOnline);
     void afterExternalEvents(PipelineContext pipelineContext, boolean handleGoingOnline);

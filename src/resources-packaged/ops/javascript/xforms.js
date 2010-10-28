@@ -1340,6 +1340,16 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         YAHOO.tool.TestRunner.run();
                     }
                 });
+            },
+
+            /**
+             * Simulate the user clicking on a button.
+             *
+             * @param id    Button id.
+             * @return {void}
+             */
+            click: function(id) {
+                OD.getElementByTagName(OD.get(id), "button").click();
             }
         }
     };
@@ -2498,9 +2508,9 @@ ORBEON.xforms.Controls = {
         // Save current value as server value. We usually do this on focus, but for control where we set the focus
         // with xforms:setfocus, we still receive the focus event when the value changes, but after the change event
         // (which means we then don't send the new value to the server).
-        if (typeof ORBEON.xforms.Globals.serverValue[controlId] == "undefined") {
+        if (ORBEON.xforms.ServerValueStore.get(controlId) == null) {
             var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
-            ORBEON.xforms.Globals.serverValue[controlId] = currentValue;
+            ORBEON.xforms.ServerValueStore.set(controlId, currentValue);
         }
     },
 
@@ -2775,10 +2785,10 @@ ORBEON.xforms.Controls = {
     },
 
     /**
-     * Called when a control is removed from the DOM. We garbage collect all the information we might store about this control.
+     * Called when a control is removed from the DOM. We trash all the information we might store about this control.
      */
     deleteControl: function(control) {
-        ORBEON.xforms.Globals.serverValue[control.id] = null;
+        ORBEON.xforms.ServerValueStore.remove(control.id);
         ORBEON.xforms.Globals.hintTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
@@ -3033,10 +3043,10 @@ ORBEON.xforms.Events = {
             if (targetControlElement != null) {
                 // Store initial value of control if we don't have a server value already, and if this is is not a list
                 // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
-                if (typeof ORBEON.xforms.Globals.serverValue[targetControlElement.id] == "undefined"
+                if (ORBEON.xforms.ServerValueStore.get(targetControlElement.id) == null
                         && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-select-appearance-compact")) {
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(targetControlElement);
-                    ORBEON.xforms.Globals.serverValue[targetControlElement.id] = controlCurrentValue;
+                    ORBEON.xforms.ServerValueStore.set(targetControlElement.id, controlCurrentValue);
                 }
             }
 
@@ -4633,7 +4643,7 @@ ORBEON.widgets.RTE = function() {
                 // it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
                 // Then in executeNextRequest() we ignore the value change because it is the same the server value.
                 var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(control);
-                ORBEON.xforms.Globals.serverValue[control.id] = controlCurrentValue;
+                ORBEON.xforms.ServerValueStore.set(control.id, controlCurrentValue);
                 // Fire event we have a custom event listener from this RTE
                 if (YAHOO.lang.isObject(renderedCustomEvents[control.id]))
                     renderedCustomEvents[control.id].fire();
@@ -4809,7 +4819,6 @@ ORBEON.xforms.Init = {
             yuiCalendar: null,                   // Reusable calendar widget
             tooltipLibraryInitialized: false,
             changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
-            serverValue: {},                     // Values on controls known to the server
             autoCompleteLastKeyCode: {},         // Stores the last key entered for each auto-complete field
             autoCompleteOpen: {},
             loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
@@ -5331,7 +5340,7 @@ ORBEON.xforms.Init = {
 
     _range: function(range) {
         range.tabIndex = 0;
-        ORBEON.xforms.Globals.serverValue[range.id] = "0";
+        ORBEON.xforms.ServerValueStore.set(range.id, 0);
 
         // In both cases the background <div> element must already have an id
         var backgroundDiv;
@@ -5450,7 +5459,7 @@ ORBEON.xforms.Init = {
         if (! YAHOO.lang.isUndefined(treeArray))
             ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
         // Save value in tree
-        ORBEON.xforms.Globals.serverValue[controlId] = treeDiv.value
+        ORBEON.xforms.ServerValueStore.set(controlId, treeDiv.value);
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         yuiTree.subscribe("enterKeyPressed", ORBEON.xforms.Events.treeLabelClick);
@@ -5598,7 +5607,7 @@ ORBEON.xforms.Init = {
                 value += option.value;
             }
         }
-        ORBEON.xforms.Globals.serverValue[list.id] = value;
+        ORBEON.xforms.ServerValueStore.set(list.id, value);
     },
 
     /**
@@ -5662,6 +5671,76 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
         if (isVisible)
             ORBEON.xforms.Controls.showDialog(dialog.id, null);
+    }
+};
+
+/**
+ * Store for values are we think they are known to the server.
+ *
+ * @namespace ORBEON.xforms
+ * @class ServerValueStore
+ */
+ORBEON.xforms.ServerValueStore = {
+
+    /** @private @type {Object.<string, HTMLElement>} */    _idToControl: {},
+    /** @private @type {Object.<string, string>} */         _idToValue: {},
+
+    /**
+     * Stores a value for a control which we know the server knows about.
+     *
+     * @param {!string} id       Id of the control
+     * @param {!string} value    Value for the control
+     * @returns {void}
+     */
+    set: function(id, value) {
+        this._idToControl[id] = ORBEON.util.Dom.get(id);
+        this._idToValue[id] = value;
+    },
+
+    /**
+     * Returns the value of a control as known by the server, or null if we don't know what the value known by the
+     * server is.
+     *
+     * @param {!string} id      Id of the control
+     * @return {string}         Value of null
+     */
+    get: function(id) {
+        var cachedControl = this._idToControl[id];
+        if (cachedControl == null) {
+            // We known nothing about this control
+            return null;
+        } else if (cachedControl == ORBEON.util.Dom.get(id)) {
+            // We have the value and it is for the right control
+            return ORBEON.xforms.ServerValueStore._idToValue[id];
+        } else {
+            // We have a value but it is for an obsolete control
+            this._idToControl[id] = null;
+            ORBEON.xforms.ServerValueStore._idToValue[id] = null;
+            return null;
+        }
+    },
+
+    /**
+     * Removes the value we know for a specific control.
+     *
+     * @param {!string} id
+     * @return {void}
+     */
+    remove: function(id) {
+        this._idToControl[id] = null;
+        this._idToValue[id] = null;
+    },
+
+    /**
+     * Got through all the server, check that each one of for a control which is still in the DOM, and if not purge it.
+     *
+     * @return {void}
+     */
+    purgeExpired: function() {
+        _.each(_.keys(this._idToControl), function(id) {
+            if (! YAHOO.util.Dom.inDocument(this._idToControl[id]))
+                this.remove(id);
+        })
     }
 };
 
@@ -5922,13 +6001,13 @@ ORBEON.xforms.Server = {
                                     // Haven't yet seen this control in current block of events
 
                                     // Don't send change value 1) for xforms:upload or 2) if the server already knows about the value of this control
-                                    if (YAHOO.util.Dom.hasClass(ORBEON.util.Dom.get(event.targetId), "xforms-upload") ||
-                                        (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
-                                                && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value)) {
+                                    var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
+                                    if (! YAHOO.util.Dom.hasClass(ORBEON.util.Dom.get(event.targetId), "xforms-upload") &&
+                                            (serverValue == null || serverValue != event.value)) {
 
                                         // Add event
                                         seenControlValue[event.targetId] = event;
-                                        ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
+                                        ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
                                         newEvents.push(event);
                                     }
                                 } else {
@@ -5937,7 +6016,7 @@ ORBEON.xforms.Server = {
                                     // Keep latest value
                                     seenControlValue[event.targetId].value = event.value;
                                     // Update server value
-                                    ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
+                                    ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
                                 }
                             } else {
                                 // Any non-value change event is a boundary between event blocks
@@ -6607,12 +6686,12 @@ ORBEON.xforms.Server = {
                                             // Since we are removing an element that can contain controls, remove the known server value
                                             if (lastElementToDelete.nodeType == ELEMENT_TYPE) {
                                                 YAHOO.util.Dom.getElementsByClassName("xforms-control", null, lastElementToDelete, function(control) {
-                                                    ORBEON.xforms.Globals.serverValue[control.id] = null;
+                                                    ORBEON.xforms.ServerValueStore.remove(control.id);
                                                 });
                                                 // We also need to check this on the "root", as the getElementsByClassName() function only returns sub-elements
                                                 // of the specified root and doesn't include the root in its search.
                                                 if (YAHOO.util.Dom.hasClass(lastElementToDelete, "xforms-control"))
-                                                    ORBEON.xforms.Globals.serverValue[lastElementToDelete.id] = null;
+                                                    ORBEON.xforms.ServerValueStore.remove(lastElementToDelete.id);
                                             }
                                             lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                             lastElementToDelete = previous;
@@ -6871,9 +6950,9 @@ ORBEON.xforms.Server = {
                                     var isLeafControl = YAHOO.util.Dom.hasClass(documentElement, "xforms-control");
 
                                     // Save new value sent by server (upload controls don't carry their value the same way as other controls)
-                                    var previousServerValue = ORBEON.xforms.Globals.serverValue[controlId];
+                                    var previousServerValue = ORBEON.xforms.ServerValueStore.get(controlId);
                                     if (! YAHOO.util.Dom.hasClass(documentElement, "xforms-upload"))
-                                        ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
+                                        ORBEON.xforms.ServerValueStore.set(controlId, newControlValue);
 
                                     // Handle migration of control from non-static to static if needed
                                     var isStaticReadonly = YAHOO.util.Dom.hasClass(documentElement, "xforms-static");
@@ -7174,7 +7253,7 @@ ORBEON.xforms.Server = {
                                                     // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
                                                     // value for the field, since the current value is different from the server value, we will incorrectly think that the
                                                     // user modified the field, and won't update the field with the value provided by the server.
-                                                    ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                    ORBEON.xforms.ServerValueStore.set(documentElement.id, ORBEON.xforms.Controls.getCurrentValue(documentElement));
                                                 }
                                             }
                                         }

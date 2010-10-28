@@ -28,7 +28,7 @@
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-update-full.js"/>
-        <xforms:model xxforms:xhtml-layout="span" xxforms:ajax.update.full.threshold="0">
+        <xforms:model xxforms:xhtml-layout="span" xxforms:ajax.update.full.threshold="1">
             <xforms:instance id="ui">
                 <ui>
                     <show-one>true</show-one>
@@ -37,10 +37,12 @@
                     <focus-restore>Initial</focus-restore>
                     <focus-non-relevant-no-error>Initial</focus-non-relevant-no-error>
                     <focus-readonly-no-error>Initial</focus-readonly-no-error>
+                    <server-value>false</server-value>
                 </ui>
             </xforms:instance>
             <xforms:bind nodeset="focus-non-relevant-no-error" relevant=". != 'Non-relevant'"/>
             <xforms:bind nodeset="focus-readonly-no-error" readonly=". = 'Read-only'"/>
+            <xforms:bind nodeset="server-value" type="xs:boolean"/>
             <xforms:instance id="numbers">
                 <numbers>
                     <number value="1">One</number>
@@ -126,8 +128,19 @@
             </xforms:group>
         </xhtml:fieldset>
         <xhtml:fieldset>
-            <xhtml:legend>No error when control having the focus becomes disabled</xhtml:legend>
-
+            <xhtml:legend>Resetting server values</xhtml:legend>
+            <fr:button id="server-value-true">
+                <xforms:label>Set to true</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="server-value">true</xforms:setvalue>
+            </fr:button>
+            <fr:button id="server-value-false">
+                <xforms:label>Set to false</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="server-value">false</xforms:setvalue>
+            </fr:button>
+            <xforms:group id="server-value-group"  xxforms:update="full">
+                <xforms:input ref="server-value" id="server-value-input"/>
+            </xforms:group>
+            <xforms:output ref="server-value" id="server-value-output"/>
         </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

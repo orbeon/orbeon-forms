@@ -23,29 +23,52 @@
 
         name: "Button",
 
-        // [ #315586 ] fr:button: if becomes non-readonly while non-relevant, when it becomes relevant, it still shows as readonly
-        // http://forge.ow2.org/tracker/index.php?func=detail&aid=315586&group_id=168&atid=350207
+        /**
+         * Check that buttons is the expected state when it comes to them being readonly and relevant.
+         *
+         * @param {boolean} readonly    Should they be readonly?
+         * @param {boolean} relevant    Should they be relevant?
+         */
+        checkButtonState: function(readonly, relevant) {
+            return function() {
+                _.each(["my-button-normal", "my-button-full-update"], function(buttonId) {
+                    if (relevant) {
+                        YA.areEqual(readonly,
+                            YD.hasClass(YD.getElementsByClassName("yui-button", null, buttonId)[0], "yui-button-disabled"),
+                            buttonId + ": class yui-button-disabled is not in the expected state");
+                        YA.areEqual(readonly,
+                            OD.getElementByTagName(OD.get(buttonId), "button").disabled,
+                            buttonId + ": disabled attribute is not in the expected state");
+                    }
+                });
+            };
+        },
+
+        toggleReadonly: function() { YAHOO.log("Toggle readonly"); YU.click(OD.getElementByTagName(OD.get("toggle-readonly"), "button")); },
+        toggleRelevant: function() { YAHOO.log("Toggle relevant"); YU.click(OD.getElementByTagName(OD.get("toggle-relevant"), "button")); },
+
+        /**
+         * [ #315586 ] fr:button: if becomes non-readonly while non-relevant, when it becomes relevant, it still shows as readonly
+         * http://forge.ow2.org/tracker/index.php?func=detail&aid=315586&group_id=168&atid=350207
+         */
         testNonReadonlyWhileNonRelevant: function() {
-            OT.executeSequenceCausingAjaxRequest(this, [[
-                function() { YU.click(OD.getElementByTagName(OD.get("toggle-readonly"), "button")); },
-                function() {}
-            ],[
-                function() { YU.click(OD.getElementByTagName(OD.get("toggle-relevant"), "button")); },
-                function() {}
-            ], [
-                function() { YU.click(OD.getElementByTagName(OD.get("toggle-readonly"), "button")); },
-                function() {}
-            ], [
-                function() { YU.click(OD.getElementByTagName(OD.get("toggle-relevant"), "button")); },
-                function() {
-                    YA.isFalse(
-                            YD.hasClass(YD.getElementsByClassName("yui-button", null, "my-button")[0], "yui-button-disabled"),
-                            "button should not have the disabled class");
-                    YA.isFalse(
-                            OD.getElementByTagName(OD.get("my-button"), "button").disabled,
-                            "button should not have the disabled attribute set");
-                }
-            ]]);
+            (this.checkButtonState(false, true))();
+            OT.executeSequenceCausingAjaxRequest(this, [
+                [ this.toggleReadonly, this.checkButtonState(true, true) ],
+                [ this.toggleRelevant, this.checkButtonState(true, false) ],
+                [ this.toggleReadonly, this.checkButtonState(false, false) ],
+                [ this.toggleRelevant, this.checkButtonState(false, true) ]
+            ]);
+        },
+
+        /**
+         * Make sure the tabindex is correctly set on the HTML button.
+         */
+        testTabIndex: function() {
+            function tabIndex(buttonId) { return OD.get(buttonId).getElementsByTagName("button")[0].tabIndex; }
+            YA.areEqual(42, tabIndex("my-button-normal"));
+            YA.areEqual(0, tabIndex("my-button-full-update"));
+
         }
     }));
 

@@ -28,8 +28,8 @@
 
          script-type="application/xhtml+xml">
     <xbl:script type="text/javascript" src="/ops/yui/element/element-min.js"/>
-    <xbl:script type="text/javascript" src="/ops/yui/button/button.js"/>
-    <!--<xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>-->
+    <xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/button/button.js"/>
     <xbl:binding id="fr-button" element="fr|button">
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
@@ -55,54 +55,21 @@
             <xforms:group class="yui-button yui-push-button{if (/fr:button/@class) then concat(' ', /fr:button/@class) else ''}"
                           xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
                 <xhtml:span class="first-child">
+                    <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
+                    <xsl:if test="/fr:button/@tabindex">
+                        <xhtml:span class="fr-button-tabindex" style="display: none">
+                            <xsl:value-of select="/fr:button/@tabindex"/>
+                        </xhtml:span>
+                    </xsl:if>
                     <!-- Bind trigger so it can handle read-only -->
                     <xforms:trigger xbl:attr="xxforms:modal">
                         <xsl:if test="exists(/fr:button/(@ref, @bind))">
                             <xsl:attribute name="ref">.</xsl:attribute>
                         </xsl:if>
                         <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
-
-                        <xxforms:script ev:event="xforms-enabled">
-                            if (event.target) {
-                                <!-- Node used to initialize YUI button -->
-                                var yuiButtonSpan = event.target.parentNode.parentNode;
-                                <!-- See if we already have a button initialized for this node, and proceed only if don't -->
-                                <!-- TODO: This basic test can fail on repeats, where we might not receive an xforms-enabled
-                                     on a newly added iteration. Instead, we should create an XBL class for the button. -->
-                                var button = YAHOO.widget.Button.getButton(yuiButtonSpan.id);
-                                if (button == null) {
-                                    <!-- If the button is disabled, enabled it while the YUI button is initialized,
-                                         otherwise the YUI button becomes disabled -->
-                                    button = new YAHOO.widget.Button(yuiButtonSpan);
-                                    <!-- TODO: once we can pass values from XForms to JavaScript we'll be able to get rid of the XSLT used here -->
-                                    <xsl:if test="/fr:button/@tabindex">button.set("tabindex", <xsl:value-of select="/fr:button/@tabindex"/>);</xsl:if>
-                                }
-                                button.set("disabled", YAHOO.util.Dom.hasClass(event.target, "xforms-readonly"));
-                            }
-                        </xxforms:script>
-                        <xxforms:script ev:event="xforms-readonly">
-                            if (event.target) {
-                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                                if (button != null)
-                                    button.set("disabled", true);
-                            }
-                        </xxforms:script>
-                        <xxforms:script ev:event="xforms-readwrite">
-                            if (event.target) {
-                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                                if (button != null)
-                                    button.set("disabled", false);
-                            }
-                        </xxforms:script>
-                        <xxforms:script ev:event="xxforms-iteration-moved">
-                            <!-- Update readonly when the button moves to another iteration; we'll be able to get rid
-                                 of this once we have fixed ids in iterations -->
-                            if (event.target) {
-                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                                if (button != null)
-                                    button.set("disabled", YAHOO.util.Dom.hasClass(event.target, "xforms-readonly"));
-                            }
-                        </xxforms:script>
+                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxforms:script>
+                        <xxforms:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxforms:script>
+                        <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxforms:script>
                     </xforms:trigger>
                 </xhtml:span>
             </xforms:group>

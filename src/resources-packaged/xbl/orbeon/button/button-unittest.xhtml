@@ -22,7 +22,7 @@
 
     <xhtml:head>
         <xhtml:title>Button</xhtml:title>
-        <xforms:model>
+        <xforms:model xxforms:ajax.update.full.threshold="1">
             <xforms:instance id="instance">
                 <instance>
                     <button/>
@@ -47,8 +47,13 @@
             <xforms:label>Toggle readonly</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
         </fr:button>
-        <fr:button ref="button" id="my-button">
-            <xforms:label>Button</xforms:label>
+        <fr:button ref="button" id="my-button-normal" tabindex="42">
+            <xforms:label>Normal button</xforms:label>
         </fr:button>
+        <xforms:group id="full-update" xxforms:update="full">
+            <fr:button ref="button" id="my-button-full-update">
+                <xforms:label>Full update button</xforms:label>
+            </fr:button>
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

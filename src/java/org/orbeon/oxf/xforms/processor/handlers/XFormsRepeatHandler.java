@@ -58,14 +58,33 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
+        // Compute user classes only once for all iterations
+        final String userClasses; {
+            final StringBuilder sb = new StringBuilder();
+            appendControlUserClasses(attributes, control, sb);
+            userClasses = sb.toString();
+        }
+
         // Place interceptor on output
         final DeferredXMLReceiver savedOutput = handlerContext.getController().getOutput();
         final OutputInterceptor outputInterceptor = !isMustGenerateDelimiters ? null : new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
+
+            // Classes on first delimiter
+            private final String firstDelimiterClasses;
+            {
+                final StringBuilder classes = new StringBuilder("xforms-repeat-begin-end");
+                if (!userClasses.isEmpty()) {
+                    classes.append(' ');
+                    classes.append(userClasses);
+                }
+                firstDelimiterClasses = classes.toString();
+            }
+
             public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                 // Delimiter: begin repeat
                 if (isMustGenerateBeginEndDelimiters) {
                     outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end",
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), firstDelimiterClasses,
                             "repeat-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
                     outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                             outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
@@ -81,6 +100,8 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
             final int currentRepeatIndex = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : repeatControl.getIndex();
             final int currentRepeatIterations = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : repeatControl.getSize();
 
+            final StringBuilder addedClasses = new StringBuilder(200);
+
             // Unroll repeat
             for (int i = 1; i <= currentRepeatIterations; i++) {
                 if (outputInterceptor != null && i > 1) {
@@ -95,17 +116,29 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
                 final int numberOfParentRepeats = handlerContext.countParentRepeats();
 
                 // Determine classes to add on root elements and around root characters
-                final StringBuilder addedClasses;
                 {
-                    addedClasses = new StringBuilder(200);
+                    addedClasses.setLength(0);
+
+                    // Selected iteration
                     if (isCurrentIterationSelected && !isStaticReadonly(repeatControl)) {
                         addedClasses.append("xforms-repeat-selected-item-");
                         addedClasses.append(Integer.toString((numberOfParentRepeats % 4) + 1));
                     }
-                    if (!isCurrentIterationRelevant)
-                        addedClasses.append(" xforms-disabled");
-                    // Add classes such as DnD classes, etc.
-                    addRepeatClasses(addedClasses, attributes);
+                    // User classes
+                    if (!userClasses.isEmpty()) {
+                        if (addedClasses.length() > 0)
+                            addedClasses.append(' ');
+                        addedClasses.append(userClasses);
+                    }
+                    // MIP classes
+                    // Q: Could use handleMIPClasses()?
+                    if (!isCurrentIterationRelevant) {
+                        if (addedClasses.length() > 0)
+                            addedClasses.append(' ');
+                        addedClasses.append("xforms-disabled");
+                    }
+                    // DnD classes
+                    addDnDClasses(addedClasses, attributes);
                 }
                 if (outputInterceptor != null)
                     outputInterceptor.setAddedClasses(addedClasses.toString());
@@ -136,7 +169,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
             final StringBuilder addedClasses = new StringBuilder(isTopLevelRepeat ? "xforms-repeat-template" : "");
 
             // Add classes such as DnD classes, etc.
-            addRepeatClasses(addedClasses, attributes);
+            addDnDClasses(addedClasses, attributes);
 
             if (outputInterceptor != null)
                 outputInterceptor.setAddedClasses(addedClasses.toString());
@@ -171,12 +204,14 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
         }
     }
 
-    private static void addRepeatClasses(StringBuilder sb, Attributes attributes) {
+    private static void addDnDClasses(StringBuilder sb, Attributes attributes) {
 
         final String dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd");
         if (dndAttribute != null && !dndAttribute.equals("none")) {
 
-            sb.append(" xforms-dnd");
+            if (sb.length() > 0)
+                sb.append(' ');
+            sb.append("xforms-dnd");
 
             if (dndAttribute.equals("vertical"))
                 sb.append(" xforms-dnd-vertical");

@@ -50,26 +50,30 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
 
+            // Classes on top-level elements and characters and on the first delimiter
             final String elementClasses;
             {
-                // Get classes
-                // As of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
                 final StringBuilder classes = new StringBuilder();
-                handleMIPClasses(classes, getPrefixedId(), control);
+                appendControlUserClasses(attributes, control, classes);
+                // NOTE: Could also use getInitialClasses(uri, localname, attributes, control), but then we get the
+                // xforms-group-appearance-xxforms-separator class. Is that desirable?
+                handleMIPClasses(classes, getPrefixedId(), control); // as of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
                 elementClasses = classes.toString();
             }
 
-            final String firstDelimiterClasses;
-            {
-                final StringBuilder classes = new StringBuilder("xforms-group-begin-end");
-                if (elementClasses.length() > 0) {
-                    classes.append(' ');
-                    classes.append(elementClasses);
-                }
-                firstDelimiterClasses = classes.toString();
-            }
-
             outputInterceptor = new OutputInterceptor(currentSavedOutput, groupElementQName, new OutputInterceptor.Listener() {
+
+                // Classes on first delimiter
+                private final String firstDelimiterClasses;
+                {
+                    final StringBuilder classes = new StringBuilder("xforms-group-begin-end");
+                    if (!elementClasses.isEmpty()) {
+                        classes.append(' ');
+                        classes.append(elementClasses);
+                    }
+                    firstDelimiterClasses = classes.toString();
+                }
+
                 public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                     // Delimiter: begin group
                     if (isMustGenerateBeginEndDelimiters) {
@@ -86,7 +90,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
             outputInterceptor.setAddedClasses(elementClasses);
         } else if (isHTMLDisabled(control)) {
             // In noscript, if the group not visible, set output to a black hole
-            handlerContext.getController().setOutput(new DeferredXMLReceiverAdapter());
+            controller.setOutput(new DeferredXMLReceiverAdapter());
         }
 
         // Don't support label, help, alert, or hint and other appearances, only the content!
@@ -111,7 +115,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
             }
         } else if (isHTMLDisabled(control)) {
             // In noscript, group was not visible, restore output
-            handlerContext.getController().setOutput(currentSavedOutput);
+            controller.setOutput(currentSavedOutput);
         }
 
         // Don't support help, alert, or hint!

@@ -247,43 +247,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         final StringBuilder sb = new StringBuilder(50);
         // User-defined classes go first
-        {
-            {
-                final String attributeValue = controlAttributes.getValue("class");
-                final String value;
-                if (attributeValue != null) {
-
-                    if (!XFormsUtils.maybeAVT(attributeValue)) {
-                        // Definitely not an AVT
-                        value = attributeValue;
-                    } else {
-                        // Possible AVT
-                        if (control != null) {
-                            // Ask the control if possible
-                            value = control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
-                        } else {
-                            // Otherwise we can't compute it
-                            value = null;
-                        }
-                    }
-
-                    if (value != null) {
-                        if (sb.length() > 0)
-                            sb.append(' ');
-                        sb.append(value);
-                    }
-                }
-            }
-            {
-                // TODO: Do we need to support this? Should just use @class
-                final String value = controlAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
-                if (value != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(value);
-                }
-            }
-        }
+        appendControlUserClasses(controlAttributes, control, sb);
 
         // Control name
         {
@@ -359,6 +323,46 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             sb.append(" xforms-static");
 
         return sb;
+    }
+
+    protected void appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
+        // @class
+        {
+            final String attributeValue = controlAttributes.getValue("class");
+            final String value;
+            if (attributeValue != null) {
+
+                if (!XFormsUtils.maybeAVT(attributeValue)) {
+                    // Definitely not an AVT
+                    value = attributeValue;
+                } else {
+                    // Possible AVT
+                    if (control != null) {
+                        // Ask the control if possible
+                        value = control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+                    } else {
+                        // Otherwise we can't compute it
+                        value = null;
+                    }
+                }
+
+                if (value != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(value);
+                }
+            }
+        }
+        // @xhtml:class
+        // TODO: Do we need to support this? Should just use @class
+        {
+            final String value = controlAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
+            if (value != null) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append(value);
+            }
+        }
     }
 
     protected boolean isStaticReadonly(XFormsControl control) {

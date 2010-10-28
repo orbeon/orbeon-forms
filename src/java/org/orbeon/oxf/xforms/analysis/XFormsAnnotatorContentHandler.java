@@ -171,7 +171,10 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                    // Remember this subtree has a full udpate
                     addMark(reusableStringArray[0], templateSAXStore.getElementMark());
+                    // Add a class to help the client
+                    attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
                 }
             }
 

@@ -11,79 +11,89 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+(function() {
+    var OD = ORBEON.util.Dom;
+    var OT = ORBEON.util.Test;
+    var YA = YAHOO.util.Assert;
+    var YD = YAHOO.util.Dom;
 
-YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+    YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "Full update",
+        name: "Full update",
 
-    /**
-     * Test a group around a group around a tr is correctly hidden and shown again when becoming disabled 
-     * and then back enabled.
-     */
-    testGroupAroundTr: function() {
-        var groupBegin = document.getElementById("group-begin-group-update-full" + XFORMS_SEPARATOR_1 + "2");
-        var button = ORBEON.util.Dom.getElementByTagName(document.getElementById("toggle-two"), "button");
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            button.click();
-        }, function() {
-            var tr = YAHOO.util.Dom.getNextSibling(groupBegin);
-            YAHOO.util.Assert.areEqual("tr", tr.tagName.toLowerCase());
-            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(tr, "xforms-disabled"));
-            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+        /**
+         * Test a group around a group around a tr is correctly hidden and shown again when becoming disabled
+         * and then back enabled.
+         */
+        testGroupAroundTr: function() {
+            var groupBegin = document.getElementById("group-begin-group-update-full" + XFORMS_SEPARATOR_1 + "2");
+            var button = OD.getElementByTagName(OD.get("toggle-two"), "button");
+            OT.executeCausingAjaxRequest(this, function() {
                 button.click();
             }, function() {
-                var tr = YAHOO.util.Dom.getNextSibling(groupBegin);
-                YAHOO.util.Assert.areEqual("tr", tr.tagName.toLowerCase());
-                YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(tr, "xforms-disabled"));
+                var tr = YD.getNextSibling(groupBegin);
+                YA.areEqual("tr", tr.tagName.toLowerCase());
+                YA.isTrue(YD.hasClass(tr, "xforms-disabled"));
+                OT.executeCausingAjaxRequest(this, function() {
+                    button.click();
+                }, function() {
+                    var tr = YD.getNextSibling(groupBegin);
+                    YA.areEqual("tr", tr.tagName.toLowerCase());
+                    YA.isFalse(YD.hasClass(tr, "xforms-disabled"));
+                });
             });
-        });
-    },
+        },
 
-    /**
-     * Test full update of a case.
-     */
-    testCase: function() {
-        var caseBegin = document.getElementById("xforms-case-begin-case-1");
-        var button = ORBEON.util.Dom.getElementByTagName(document.getElementById("increment-case-value"), "button");
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            button.click();
-        }, function() {
-            var span = YAHOO.util.Dom.getNextSibling(caseBegin);
-            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(span, "xforms-control"));
-            YAHOO.util.Assert.areEqual("2", ORBEON.xforms.Controls.getCurrentValue(span));
-        });
-    },
+        /**
+         * Test full update of a case.
+         */
+        testCase: function() {
+            var caseBegin = document.getElementById("xforms-case-begin-case-1");
+            var button = OD.getElementByTagName(OD.get("increment-case-value"), "button");
+            OT.executeCausingAjaxRequest(this, function() {
+                button.click();
+            }, function() {
+                var span = YD.getNextSibling(caseBegin);
+                YA.isTrue(YD.hasClass(span, "xforms-control"));
+                YA.areEqual("2", ORBEON.xforms.Controls.getCurrentValue(span));
+            });
+        },
 
-    /**
-     * Test that after doing the innerHTML, we restore the focus to the control that previously had the focus.
-     */
-    testRestoreFocus: function() {
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            ORBEON.util.Dom.getElementByTagName(document.getElementById("first-input"), "input").focus();
-        }, function() {
-            YAHOO.util.Assert.areEqual(ORBEON.xforms.Globals.currentFocusControlElement, 
-                document.getElementById("first-input"), 
-                "focus is restored to first input box");
-        });
-    },
+        /**
+         * Test that after doing the innerHTML, we restore the focus to the control that previously had the focus.
+         */
+        testRestoreFocus: function() {
+            OT.executeCausingAjaxRequest(this, function() {
+                OD.getElementByTagName(document.getElementById("focus-restore"), "input").focus();
+            }, function() {
+                YA.areEqual(ORBEON.xforms.Globals.currentFocusControlElement,
+                    document.getElementById("focus-restore"),
+                    "focus is restored to first input box");
+            });
+        },
 
-    /**
-     * Test we don't have an error if the control that had the focus disappears.
-     */
-    testFocusNoError: function() {
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            ORBEON.util.Dom.getElementByTagName(document.getElementById("second-input"), "input").focus();
-        }, function() {
-            // nop
-        });
-    }
-}));
+        /**
+         * Test we don't have an error if the control that had the focus disappears.
+         */
+        testFocusNonRelevantNoError: function() {
+            OT.executeCausingAjaxRequest(this, function() {
+                OD.getElementByTagName(OD.get("focus-non-relevant-no-error"), "input").focus();
+            }, function() {
+                // nop
+            });
+        },
 
-ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-    if (parent && parent.TestManager) {
-        parent.TestManager.load();
-    } else {
-        new YAHOO.tool.TestLogger();
-        YAHOO.tool.TestRunner.run();
-    }
-});
+        /**
+         * Test we don't have an error if the control that had the focus becomes readonly.
+         */
+        testFocusReadonlyNoError: function() {
+            OT.executeCausingAjaxRequest(this, function() {
+                OD.getElementByTagName(OD.get("focus-readonly-no-error"), "input").focus();
+            }, function() {
+                // nop
+            });
+        }
+    }));
+
+    OT.onOrbeonLoadedRunTest();
+})();

@@ -336,8 +336,22 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 return null;
             },
 
-            clearUploadControl: function(uploadElement) {
+            /**
+             * A safe way to focus on a form element, as IE can complains when we try to set the focus on non-visible
+             * control. This can happen because of error in the XForms code, or in cases where we try to restore
+             * the focus to a control which in the meantime has disappeared or became readonly. The precise IE error
+             * we would get if we didn't catch the exception would be: "Can't move focus to the control because it is
+             * invisible, not enabled, or if a type that does not accept the focus."
+             *
+             * @param {HTMLElement} element
+             * @return void
+             */
+            focus: function(element) {
+                try { element.focus(); }
+                catch (e) { /* NOP */ }
+            },
 
+            clearUploadControl: function(uploadElement) {
                 var inputElement = YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, uploadElement)[0];
                 var parentElement = inputElement.parentNode;
                 var newInputElement = document.createElement("input");
@@ -2463,7 +2477,7 @@ ORBEON.xforms.Controls = {
                     }
                 }
                 // Set focus on either selected item if we found one or on first item otherwise
-                formInputs[foundSelected ? itemIndex : 0].focus();
+                ORBEON.util.Dom.focus(formInputs[foundSelected ? itemIndex : 0]);
             }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
@@ -2477,9 +2491,8 @@ ORBEON.xforms.Controls = {
             // Generic code to find focusable descendant-or-self HTML element and focus on it
             var htmlControlNames = [ "input", "textarea", "select", "button", "a" ];
             var htmlControl = ORBEON.util.Dom.getElementByTagName(control, htmlControlNames);
-            // If we found a control, and the control is visible, set the focus on it
-            if (htmlControl != null && ! ORBEON.util.Dom.isAncestorOrSelfHidden(htmlControl))
-                    htmlControl.focus();
+            // If we found a control set the focus on it
+            if (htmlControl != null) ORBEON.util.Dom.focus(htmlControl);
         }
 
         // Save current value as server value. We usually do this on focus, but for control where we set the focus

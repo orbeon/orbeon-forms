@@ -89,6 +89,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
     });
 
     this.ORBEON = this.ORBEON || {};
+    this.ORBEON.onJavaScriptLoaded = new YAHOO.util.CustomEvent("javascript-loaded");
+
     this.ORBEON.util = {
 
         /**
@@ -465,9 +467,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * Test a function ancestor-or-self::* and returns true as soon as the function returns true, or false of the
              * function always returns false.
              */
-            existsAncestorOrSelf: function(node, fn, obj, overrideContext) {
+            existsAncestorOrSelf: function(node, fn) {
                 while (true) {
-                    if (overrideContext ? fn.call(obj, node) : fn(node)) return true;
+                    if (fn(node)) return true;
                     node = node.parentNode;
                     if (node == null || node == document) break;
                 }
@@ -1794,7 +1796,7 @@ ORBEON.xforms.Controls = {
     isInRepeatTemplate: function(element) {
         return ORBEON.util.Dom.existsAncestorOrSelf(element, function(node) {
             return YAHOO.util.Dom.hasClass(node, "xforms-repeat-template")
-        }, null, false);
+        });
     },
 
     /**
@@ -2843,7 +2845,7 @@ ORBEON.xforms.FlatNesting = {
     foldAncestors: function(startNode, startValue, foldFunction, stopValue) {
         var FN = ORBEON.xforms.FlatNesting;
 
-        // Determine if this a group or a repeat
+        // Determine if this is a group or a repeat
         var isGroup = FN.isGroupBegin(startNode);
         var isRepeat = FN.isRepeatDelimiter(startNode);
 
@@ -3949,6 +3951,74 @@ ORBEON.xforms.action = {
     }
 };
 
+(function() {
+
+    var OUD = ORBEON.util.Dom;
+    var YUD = YAHOO.util.Dom;
+
+    ORBEON.xforms.FullUpdate = {
+
+        /** @private @type {Object.<string, Array.<string>>} */                 _fullUpdateToComponents: {},
+        /** @private @type {Object.<string, boolean>} */                        _knownComponents: {},
+        /** @private @type {Object.<string, function(HTMLElement): Object>} */  _componentsXblClass: {},
+
+        clinit: function() {
+            ORBEON.xforms.XBL.componentInitialized.subscribe(this.onComponentInitialized, this, true);
+        },
+
+        /**
+         * Called whenever a component is initialized.
+         *
+         * @param component
+         * @return {void}
+         */
+        onComponentInitialized: function(component) {
+            if (! this._knownComponents[component.container.id]) {
+
+                // Find if this instance is in a full update container
+                /** @type {HTMLElement} */ var fullUpdate = null;
+                OUD.existsAncestorOrSelf(component.container, function(node) {
+                    return YUD.hasClass(node, "xforms-update-full") ? (fullUpdate = node, true) : false;
+                });
+
+                // This component is inside a full update
+                if (fullUpdate != null) {
+                    // Remember that component is associated with full update
+                    if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
+                    this._fullUpdateToComponents[fullUpdate.id].push(component.container.id);
+                    // Remember factory for this component
+                    this._componentsXblClass[component.container.id] = component.xblClass;
+                }
+
+                // Remember we looked at this one, so we don't have to do it again
+                this._knownComponents[component.container.id] = true;
+            }
+        },
+
+        /**
+         * Called when a full update is performed.
+         *
+         * @param {!string} fullUpdateId    Id of the control that contains the section that was updated.
+         */
+        onFullUpdateDone: function(fullUpdateId) {
+            var me = this;
+            var componentIds = this._fullUpdateToComponents[fullUpdateId];
+            if (componentIds) {
+                _.each(componentIds, function(componentId) {
+                    /** @type {HTMLElement} */ var componentContainer = OUD.get(componentId);
+                    if (componentContainer != null) {
+                        // Call instance which will call init if necessary
+                        var component = me._componentsXblClass[componentId].instance(componentContainer);
+                        if (component.enabled) component.enabled();
+                    }
+                });
+            }
+        }
+    };
+
+    ORBEON.onJavaScriptLoaded.subscribe(ORBEON.xforms.FullUpdate.clinit, ORBEON.xforms.FullUpdate, true);
+})();
+
 // TODO: Should have generic code to call init() on all static classes, if we determine this is a good practice
 ORBEON.xforms.action.Message.clinit();
 
@@ -3996,6 +4066,7 @@ ORBEON.xforms.XBL = {
                         if (! this.initialized) {
                             originalInit.call(this);
                             this.initialized = true;
+                            ORBEON.xforms.XBL.componentInitialized.fire(this);
                         }
                     }
                 }
@@ -4025,6 +4096,7 @@ ORBEON.xforms.XBL = {
                 var instance = this._instances[container.id];
                 if (YAHOO.lang.isUndefined(instance) || YAHOO.lang.isNull(instance) || instance.container != container) {
                     instance = new xblClass(container);
+                    instance.xblClass = xblClass;
                     instance.container = container;
                     if (hasInit) {
                         instance.initialized = false;
@@ -4035,7 +4107,9 @@ ORBEON.xforms.XBL = {
                 return instance;
             }
         };
-    }
+    },
+
+    componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)
 };
 
 ORBEON.widgets.Base = function() {
@@ -7324,6 +7398,7 @@ ORBEON.xforms.Server = {
                                     if (documentElement != null) {
                                         // Found container
                                         documentElement.innerHTML = innerHTML;
+                                        ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
                                     } else {
                                         // Insertion between delimiters
                                         function insertBetweenDelimiters(prefix) {
@@ -8870,4 +8945,6 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
         ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     }
 }
+
+ORBEON.onJavaScriptLoaded.fire();
 //ORBEON.util.Test.startFirebugLite();

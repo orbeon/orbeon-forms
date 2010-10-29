@@ -28,6 +28,7 @@
                     <button/>
                     <relevant>true</relevant>
                     <readonly>false</readonly>
+                    <trigger-full-update-increment>1</trigger-full-update-increment>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="button" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
@@ -47,10 +48,15 @@
             <xforms:label>Toggle readonly</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
         </fr:button>
+        <fr:button id="trigger-full-update">
+            <xforms:label>Trigger full update</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="trigger-full-update-increment" value=". + 1"/>
+        </fr:button>
         <fr:button ref="button" id="my-button-normal" tabindex="42">
             <xforms:label>Normal button</xforms:label>
         </fr:button>
         <xforms:group id="full-update" xxforms:update="full">
+            <xforms:output value="trigger-full-update-increment" style="display: none"/>
             <fr:button ref="button" id="my-button-full-update">
                 <xforms:label>Full update button</xforms:label>
             </fr:button>

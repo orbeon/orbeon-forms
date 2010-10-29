@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xforms.MapSet
 
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.
@@ -24,8 +25,8 @@ abstract class XPathAnalysis {
     val xpathString: String
     val figuredOutDependencies: Boolean
 
-    val valueDependentPaths: collection.Set[String]
-    val returnablePaths: collection.Set[String]
+    val valueDependentPaths: MapSet[String, String]
+    val returnablePaths: MapSet[String, String]
 
     val dependentModels: collection.Set[String]
     val dependentInstances: collection.Set[String]
@@ -33,13 +34,13 @@ abstract class XPathAnalysis {
 
     // Return true if any path matches
     // NOTE: For now just check exact paths. Later must be smarter?
-    def intersectsBinding(touchedPaths: collection.Set[String]) = valueDependentPaths exists (touchedPaths contains _): Boolean
+    def intersectsBinding(touchedPaths: MapSet[String, String]) = valueDependentPaths intersects touchedPaths
 
     // Return true if any path matches
     // NOTE: For now just check exact paths. Later must be smarter?
-    def intersectsValue(touchedPaths: collection.Set[String]) = intersectsBinding(touchedPaths) || (returnablePaths exists (touchedPaths contains _)): Boolean
+    def intersectsValue(touchedPaths: MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
 
-    def intersectsModels(touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _): Boolean
+    def intersectsModels(touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _)
 
     /**
      * Combine this analysis with another one and return a new analysis.
@@ -51,6 +52,11 @@ abstract class XPathAnalysis {
     def freeTransientState() {}
 }
 
+/**
+ * Represent a path into an instance.
+ */
+case class InstancePath(instancePrefixedId: String, path: String)
+
 object XPathAnalysis {
 
     // Constant analysis, positive or negative
@@ -61,8 +67,8 @@ object XPathAnalysis {
         val returnableInstances = Set.empty[String]
         val dependentInstances = Set.empty[String]
         val dependentModels = Set.empty[String]
-        val returnablePaths = Set.empty[String]
-        val valueDependentPaths = Set.empty[String]
+        val returnablePaths = MapSet.empty[String, String]
+        val valueDependentPaths = MapSet.empty[String, String]
 
         def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) =
             helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))

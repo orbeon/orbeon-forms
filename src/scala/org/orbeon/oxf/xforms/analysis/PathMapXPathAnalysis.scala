@@ -19,21 +19,20 @@ import org.dom4j.Element
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import org.orbeon.saxon.expr.PathMap.PathMapArc
-import collection.mutable.{LinkedHashSet, Stack}
-
 import java.util.{Map => JMap, HashMap => JHashMap}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
+import collection.mutable.{LinkedHashSet, Stack}
+import org.orbeon.oxf.xforms.{MapSet, XFormsConstants, XFormsContainingDocument, XFormsStaticState}
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
                            val figuredOutDependencies: Boolean,
-                           val valueDependentPaths: collection.Set[String],
-                           val returnablePaths: collection.Set[String],
+                           val valueDependentPaths: MapSet[String, String],
+                           val returnablePaths: MapSet[String, String],
                            val dependentModels: collection.Set[String],
                            val dependentInstances: collection.Set[String],
                            val returnableInstances: collection.Set[String])
@@ -58,8 +57,8 @@ class PathMapXPathAnalysis(val xpathString: String,
                             Some(newPathmap)
                         },
                         true,
-                        valueDependentPaths ++ other.valueDependentPaths,
-                        returnablePaths ++ other.returnablePaths,
+                        valueDependentPaths.combine(other.valueDependentPaths),
+                        returnablePaths.combine(other.returnablePaths),
                         dependentModels ++ other.dependentModels,
                         dependentInstances ++ other.dependentInstances,
                         returnableInstances ++ other.returnableInstances)
@@ -72,20 +71,23 @@ class PathMapXPathAnalysis(val xpathString: String,
 
         helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
 
-        def setToXML(set: collection.Set[String], enclosingElementName: String, elementName: String) {
-            if (set.nonEmpty) {
+        def toXML(traversable: Traversable[String], enclosingElementName: String, elementName: String) {
+            if (traversable.nonEmpty) {
                 helper.startElement(enclosingElementName)
-                for (value <- set)
+                for (value <- traversable)
                     helper.element(elementName, PathMapXPathAnalysis.getDisplayPath(value))
                 helper.endElement()
             }
         }
 
-        setToXML(valueDependentPaths, "value-dependent", "path")
-        setToXML(returnablePaths, "returnable", "path")
-        setToXML(dependentModels, "dependent-models", "model")
-        setToXML(dependentInstances, "dependent-instances", "instance")
-        setToXML(returnableInstances, "returnable-instances", "instance")
+        def mapSetToSet(mapSet: MapSet[String, String]) = mapSet map (entry => PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
+
+        toXML(mapSetToSet(valueDependentPaths), "value-dependent", "path")
+        toXML(mapSetToSet(returnablePaths), "returnable", "path")
+
+        toXML(dependentModels, "dependent-models", "model")
+        toXML(dependentInstances, "dependent-instances", "instance")
+        toXML(returnableInstances, "returnable-instances", "instance")
 
         helper.endElement()
     }
@@ -168,9 +170,9 @@ object PathMapXPathAnalysis {
                     //            println("PathMap after")
                     //            pathmap.diagnosticDump(System.out)
 
-                    // We use LinkedHashSet to keep e.g. unit tests reproducible
-                    val valueDependentPaths = new LinkedHashSet[String]
-                    val returnablePaths = new LinkedHashSet[String]
+                    // We use LinkedHashMap/LinkedHashSet in part to keep unit tests reproducible
+                    val valueDependentPaths = new MapSet[String, String]
+                    val returnablePaths = new MapSet[String, String]
 
                     val dependentModels = new LinkedHashSet[String]
                     val dependentInstances = new LinkedHashSet[String]
@@ -180,129 +182,59 @@ object PathMapXPathAnalysis {
                     def processPaths(): Boolean = {
                         val stack = new Stack[Expression]
 
-                        def createPath(node: PathMap.PathMapNode): Option[String] = {
+                        def createInstancePath(node: PathMap.PathMapNode): String Either Option[InstancePath] = {
 
-                            // Resulting path
-                            val sb = new StringBuilder
+                            // Expressions from root to leaf
+                            val expressions = stack.reverse
 
-                            // Local class used as marker for a rewritten StringLiteral in an expression
-                            class PrefixedIdStringLiteral(value: CharSequence) extends StringLiteral(value)
-
-                            def addInstance(instancePrefixedId: String) {
-                                sb.append(PathMapXPathAnalysis.buildInstanceString(instancePrefixedId))
-
-                                val model = staticState.getModelByInstancePrefixedId(instancePrefixedId)
-                                if (model eq null)
-                                    throw new OXFException("Reference to invalid instance: " + instancePrefixedId)
-                                dependentModels.add(model.prefixedId)
-                                dependentInstances.add(instancePrefixedId)
-
-                                if (node.isReturnable)
-                                    returnableInstances.add(instancePrefixedId)
-                            }
-
-                            for (expression <- stack reverse) expression match {
-                                case instanceExpression: FunctionCall
-                                        if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] => {
-
-                                    val hasParameter = instanceExpression.getArguments.nonEmpty
-                                    if (!hasParameter) {
-                                        // instance() resolves to default instance for scope
-                                        defaultInstancePrefixedId match {
-                                            case Some(defaultInstancePrefixedId) =>
-                                                addInstance(defaultInstancePrefixedId)
-
-                                                // Rewrite expression to add/replace its argument with a prefixed instance id
-                                                instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(defaultInstancePrefixedId)))
-                                            case None =>
-                                                // Model does not have a default instance
-                                                // This is successful, but the path must not be added
-                                                return Some("")
-                                        }
-                                    } else {
-                                        val instanceNameExpression = instanceExpression.getArguments()(0)
-                                        instanceNameExpression match {
-                                            case stringLiteral: StringLiteral =>
-                                                val originalInstanceId = stringLiteral.getStringValue
-                                                val searchAncestors = expression.isInstanceOf[XXFormsInstance]
-
-                                                // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an instance() StringLiteral parameter twice
-                                                val alreadyRewritten = instanceNameExpression.isInstanceOf[PrefixedIdStringLiteral]
-
-                                                val prefixedInstanceId =
-                                                    if (alreadyRewritten)
-                                                        // Parameter is already a prefixed id
-                                                        originalInstanceId
-                                                    else if (searchAncestors)
-                                                        // xxforms:instance()
-                                                        staticState.findInstancePrefixedId(scope, originalInstanceId)
-                                                    else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
-                                                        // HACK: datatable e.g. uses instance(prefixedId)!
-                                                        originalInstanceId
-                                                    else
-                                                        // Normal use of instance()
-                                                        scope.getPrefixedIdForStaticId(originalInstanceId)
-
-                                                if (prefixedInstanceId ne null) {
-                                                    // Instance found
-                                                    addInstance(prefixedInstanceId)
-
-                                                    // If needed, rewrite expression to replace its argument with a prefixed instance id
-                                                    if (!alreadyRewritten)
-                                                        instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(prefixedInstanceId)))
-                                                } else {
-                                                    // Instance not found (could be reference to unknown instance e.g. author typo!)
-                                                    // TODO: must also catch case where id is found but does not correspond to instance
-                                                    // TODO: warn in log
-                                                    // This is successful, but the path must not be added
-                                                    return Some("")
-                                                }
-                                            case _ => return None // non-literal instance name
-                                        }
+                            // Start with first expression
+                            extractInstancePrefixedId(staticState, scope, expressions.head, defaultInstancePrefixedId) match {
+                                // First expression is instance() expression we can handle
+                                case Right(Some(instancePrefixedId)) =>
+                                    // Continue with rest of expressions
+                                    buildPath(expressions.tail) match {
+                                        case Right(path) => Right(Some(InstancePath(instancePrefixedId, path)))
+                                        case Left(reason) => Left(reason)
                                     }
-                                }
-                                case axisExpression: AxisExpression => axisExpression.getAxis match {
-                                    case Axis.SELF => // NOP
-                                    case axis @ (Axis.CHILD | Axis.ATTRIBUTE) =>
-                                        // Child or attribute axis
-                                        if (sb.nonEmpty)
-                                            sb.append('/')
-                                        val fingerprint = axisExpression.getNodeTest.getFingerprint
-                                        if (fingerprint != -1) {
-                                            if (axis == Axis.ATTRIBUTE)
-                                                sb.append("@")
-                                            sb.append(fingerprint)
-                                        } else {
-                                            // Unnamed node
-                                            return None
-                                        }
-                                    case _ => return None // unhandled axis
-                                }
-                                case _ => return None // unhandled expression
+                                // First expression is instance() but there is no default instance so we don't add the path
+                                // (This can happen because we translate everything to start with instance() even if there is actually no default instance.)
+                                case Right(None) => Right(None)
+                                // Unable to handle first expression
+                                case Left(reason) => Left(reason)
                             }
-                            Some(sb.toString)
                         }
 
                         def processNode(node: PathMap.PathMapNode, ancestorAtomized: Boolean = false): Boolean = {
 
                             if (node.getArcs.isEmpty || node.isReturnable || node.isAtomized || ancestorAtomized)
-                                createPath(node) match {
-                                    case Some(path) if path.nonEmpty =>
-                                        // A path was created
+                                createInstancePath(node) match {
+                                    case Right(Some(instancePath)) =>
+                                        // An instance path was created
+
+                                        // Remember dependencies for this path
+                                        val instancePrefixedId = instancePath.instancePrefixedId
+                                        val model = staticState.getModelByInstancePrefixedId(instancePrefixedId)
+                                        if (model eq null)
+                                            throw new OXFException("Reference to invalid instance: " + instancePrefixedId)
+                                        dependentModels.add(model.prefixedId)
+                                        dependentInstances.add(instancePrefixedId)
+
                                         // NOTE: A same node can be both returnable AND atomized in a given expression
-                                        if (node.isReturnable)
-                                            returnablePaths.add(path)
+                                        if (node.isReturnable) {
+                                            returnableInstances.add(instancePrefixedId)
+                                            returnablePaths.put(instancePath.instancePrefixedId, instancePath.path)
+                                        }
                                         if (node.isAtomized)
-                                            valueDependentPaths.add(path)
-                                    case Some(_) => // NOP: don't add the path as this is not considered a dependency
-                                    case None => return false // we can't deal with this path so stop here
+                                            valueDependentPaths.put(instancePath.instancePrefixedId, instancePath.path)
+                                    case Right(None) => // NOP: don't add the path as this is not considered a dependency
+                                    case Left(_) => return false // we can't deal with this path so stop here
                                 }
 
                             // Process children nodes if any
                             for (arc <- node.getArcs) {
                                 stack.push(arc.getStep)
                                 if (!processNode(arc.getTarget, node.isAtomized))
-                                    return false
+                                    return false // we can't deal with this path so stop here
                                 stack.pop()
                             }
 
@@ -336,6 +268,99 @@ object PathMapXPathAnalysis {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "analysing XPath expression",
                         element, "expression", xpathString))
         }
+    }
+
+    private def extractInstancePrefixedId(staticState: XFormsStaticState, scope: XBLBindings#Scope, expression: Expression,
+                                          defaultInstancePrefixedId: Option[String]): String Either Option[String] = {
+
+        // Local class used as marker for a rewritten StringLiteral in an expression
+        class PrefixedIdStringLiteral(value: CharSequence) extends StringLiteral(value)
+
+        expression match {
+            case instanceExpression: FunctionCall
+                    if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] =>
+
+                val hasParameter = instanceExpression.getArguments.nonEmpty
+                if (!hasParameter) {
+                    // instance() resolves to default instance for scope
+                    defaultInstancePrefixedId match {
+                        case Some(defaultInstancePrefixedId) =>
+                            // Rewrite expression to add/replace its argument with a prefixed instance id
+                            instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(defaultInstancePrefixedId)))
+
+                            Right(Some(defaultInstancePrefixedId))
+                        case None =>
+                            // Model does not have a default instance
+                            // This is successful, but the path must not be added
+                            Right(None)
+                    }
+                } else {
+                    val instanceNameExpression = instanceExpression.getArguments()(0)
+                    instanceNameExpression match {
+                        case stringLiteral: StringLiteral =>
+                            val originalInstanceId = stringLiteral.getStringValue
+                            val searchAncestors = expression.isInstanceOf[XXFormsInstance]
+
+                            // This is a trick: we use RewrittenStringLiteral as a marker so we don't rewrite an instance() StringLiteral parameter twice
+                            val alreadyRewritten = instanceNameExpression.isInstanceOf[PrefixedIdStringLiteral]
+
+                            val prefixedInstanceId =
+                                if (alreadyRewritten)
+                                    // Parameter is already a prefixed id
+                                    originalInstanceId
+                                else if (searchAncestors)
+                                    // xxf:instance()
+                                    staticState.findInstancePrefixedId(scope, originalInstanceId)
+                                else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
+                                    // HACK: datatable e.g. uses instance(prefixedId)!
+                                    originalInstanceId
+                                else
+                                    // Normal use of instance()
+                                    scope.getPrefixedIdForStaticId(originalInstanceId)
+
+                            if (prefixedInstanceId ne null) {
+                                // Instance found
+
+                                // If needed, rewrite expression to replace its argument with a prefixed instance id
+                                if (!alreadyRewritten)
+                                    instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(prefixedInstanceId)))
+
+                                Right(Some(prefixedInstanceId))
+                            } else {
+                                // Instance not found (could be reference to unknown instance e.g. author typo!)
+                                // TODO: must also catch case where id is found but does not correspond to instance
+                                // TODO: warn in log
+                                // This is successful, but the path must not be added
+                                Right(None)
+                            }
+                        case _ => Left("Can't handle non-literal instance name")
+                    }
+                }
+            case _ => Left("Can't handle expression not starting with instance()")
+        }
+    }
+
+    private def buildPath(expressions: Seq[Expression]): String Either String = {
+        val sb = new StringBuilder
+        for (expression <- expressions) expression match {
+            case axisExpression: AxisExpression => axisExpression.getAxis match {
+                case Axis.SELF => // NOP
+                case axis @ (Axis.CHILD | Axis.ATTRIBUTE) =>
+                    // Child or attribute axis
+                    if (sb.nonEmpty)
+                        sb.append('/')
+                    val fingerprint = axisExpression.getNodeTest.getFingerprint
+                    if (fingerprint != -1) {
+                        if (axis == Axis.ATTRIBUTE)
+                            sb.append("@")
+                        sb.append(fingerprint)
+                    } else
+                        return Left("Can't handle path because of unnamed node: *")
+                case axis => return Left("Can't handle path because of unhandled axis: " + Axis.axisName(axis))
+            }
+            case expression: Expression => return Left("Can't handle path because of unhandled expression: " + expression.getClass.getName)
+        }
+        Right(sb.toString)
     }
 
     /**
@@ -455,15 +480,20 @@ object PathMapXPathAnalysis {
 
         {
             for (token <- path split '/') yield {
-                val (optionalAt, number) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
+                if (token.startsWith("instance(")) {
+                    // instance(...)
+                    token
+                } else {
+                    val (optionalAt, number) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
 
-                optionalAt + {
-                    try {
-                        // Obtain QName
-                        pool.getDisplayName(number.toInt)
-                    } catch {
-                        // Shouldn't happen, right? But since this is for debugging we output the token.
-                        case e: NumberFormatException => token
+                    optionalAt + {
+                        try {
+                            // Obtain QName
+                            pool.getDisplayName(number.toInt)
+                        } catch {
+                            // Shouldn't happen, right? But since this is for debugging we output the token.
+                            case e: NumberFormatException => token
+                        }
                     }
                 }
             }

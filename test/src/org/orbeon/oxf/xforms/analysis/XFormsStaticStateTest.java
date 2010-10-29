@@ -118,7 +118,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('default')/a"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("default", namespaces, "a");
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -148,7 +149,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to default ==================================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('default')/b"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("default", namespaces, "b");
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -178,7 +180,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to instance2 ================================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance2')/a"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("instance2", namespaces, "a");
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -208,7 +211,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Value change to instance2 ================================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance2')/b"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("instance2", namespaces, "b");
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
             assertFalse(dependencies.requireBindingUpdate("trigger2"));
@@ -238,6 +242,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Structural change to model1 ==============================================================================
+            dependencies.refreshStart();
             dependencies.markStructuralChangeTest("model1");
 
             assertTrue(dependencies.requireBindingUpdate("trigger1"));
@@ -268,6 +273,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
 
             // == Structural change to model2 ==============================================================================
+            dependencies.refreshStart();
             dependencies.markStructuralChangeTest("model2");
 
             assertFalse(dependencies.requireBindingUpdate("trigger1"));
@@ -312,7 +318,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to default ==================================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('default')/value"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("default", namespaces, "value");
 
             assertFalse(dependencies.requireBindingUpdate("values"));
             assertTrue(dependencies.requireValueUpdate("values"));
@@ -324,6 +331,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
             assertFalse(dependencies.requireBindingUpdate("input"));
             assertTrue(dependencies.requireValueUpdate("input"));
+            dependencies.refreshDone();
         }
     }
     
@@ -340,7 +348,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //            staticState.dumpAnalysis(pipelineContext);
 
             // == Value change to instance1 ============================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance1')"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("instance1", namespaces, "");
 
             // No binding update
             assertFalse(dependencies.requireBindingUpdate("output1"));
@@ -373,7 +382,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             dependencies.refreshDone();
             
             // == Value change to instance2 ============================================================================
-            dependencies.setModifiedPathTest(PathMapXPathAnalysis.getInternalPath(namespaces, "instance('instance2')"));
+            dependencies.refreshStart();
+            dependencies.setModifiedPathTest("instance2", namespaces, "");
 
             // No binding update
             assertFalse(dependencies.requireBindingUpdate("output1"));
@@ -402,6 +412,8 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             assertTrue(dependencies.requireValueUpdate("output3c"));
             assertTrue(dependencies.requireValueUpdate("output4c"));
             assertTrue(dependencies.requireValueUpdate("output5b"));
+
+            dependencies.refreshDone();
         }
     }
 

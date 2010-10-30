@@ -6074,9 +6074,8 @@ ORBEON.xforms.Server = {
                                 if (seenControlValue[event.targetId] == null) {
                                     // Haven't yet seen this control in current block of events
 
-                                    // Don't send change value 1) for xforms:upload or 2) if the server already knows about the value of this control
                                     var serverValue = ORBEON.xforms.ServerValueStore.get(event.targetId);
-                                    if (! YAHOO.util.Dom.hasClass(ORBEON.util.Dom.get(event.targetId), "xforms-upload") &&
+                                    if (YAHOO.util.Dom.hasClass(ORBEON.util.Dom.get(event.targetId), "xforms-upload") ||
                                             (serverValue == null || serverValue != event.value)) {
 
                                         // Add event

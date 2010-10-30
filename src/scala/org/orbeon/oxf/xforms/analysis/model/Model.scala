@@ -267,6 +267,9 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
             for (mip <- allMIPNameToXPathMIP.values)
                 mip.analysis.freeTransientState()
+
+            for (child <- children)
+                child.freeTransientState()
         }
 
         override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
@@ -350,6 +353,9 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     }
 
     override def freeTransientState() {
+
+        super.freeTransientState()
+
         for (variable <- variablesSeq)
             variable.freeTransientState()
 

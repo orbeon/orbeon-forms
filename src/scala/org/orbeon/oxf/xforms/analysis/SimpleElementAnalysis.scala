@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.analysis
 import org.dom4j.Element
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 
 /**
  * Representation of a common XForms element supporting optional context, binding and value.
@@ -105,6 +105,11 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
                     case None => None // no model
                 }
         }
+    }
+
+    protected def getChildElementScope(childElement: Element) = {
+        val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(childElement))
+        staticStateContext.staticState.getXBLBindings.getResolutionScopeByPrefixedId(childPrefixedId)
     }
 
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis = {

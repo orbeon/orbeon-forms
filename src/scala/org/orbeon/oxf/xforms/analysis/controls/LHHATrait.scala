@@ -28,14 +28,14 @@ trait LHHATrait extends SimpleElementAnalysis {
     private val lhha = LinkedHashMap.empty[String, LHHAAnalysis]
     for (qName <- List(XFormsConstants.LABEL_QNAME, XFormsConstants.HELP_QNAME, XFormsConstants.HINT_QNAME, XFormsConstants.ALERT_QNAME))
         findNestedLHHAElement(qName) match  {
-            case Some(lhhaElement) => lhha += (lhhaElement.getName -> new LHHAAnalysis(staticStateContext, scopeModel.scope, lhhaElement, LHHATrait.this, true))
+            case Some(lhhaElement) => lhha += (lhhaElement.getName -> new LHHAAnalysis(staticStateContext, getChildElementScope(lhhaElement), lhhaElement, LHHATrait.this, true))
             case None =>
         }
 
     protected def findNestedLHHAElement(qName: QName) = Option(element.element(qName))
 
     def setExternalLHHA(staticStateContext: StaticStateContext, lhhaElement: Element) {
-        lhha += (lhhaElement.getName -> new LHHAAnalysis(staticStateContext, scopeModel.scope, lhhaElement, LHHATrait.this, false))
+        lhha += (lhhaElement.getName -> new LHHAAnalysis(staticStateContext, getChildElementScope(lhhaElement), lhhaElement, LHHATrait.this, false))
         // TODO: This must be set in the proper parent context as context/variables can be different
     }
 
@@ -63,7 +63,10 @@ trait LHHATrait extends SimpleElementAnalysis {
         }
     }
 
-    override def freeTransientState(): Unit = getAllLHHA foreach (_.freeTransientState())
+    override def freeTransientState() {
+        super.freeTransientState()
+        getAllLHHA foreach (_.freeTransientState())
+    }
 
     private def getAllLHHA = lhha.values
 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.dom4j.Element
 
 /**
@@ -33,10 +33,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait {
                 // Value is provided by nested xxf:sequence/@select
 
                 // First figure out the scope for xxf:sequence
-                val sequenceScope = {
-                    val sequencePrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(sequenceElement))
-                    staticStateContext.staticState.getXBLBindings.getResolutionScopeByPrefixedId(sequencePrefixedId)
-                }
+                val sequenceScope = getChildElementScope(sequenceElement)
 
                 val sequenceAnalysis = new SimpleElementAnalysis(staticStateContext, sequenceElement, Some(VariableAnalysisTrait.this), None, sequenceScope) {
                     override protected def computeValueAnalysis = {

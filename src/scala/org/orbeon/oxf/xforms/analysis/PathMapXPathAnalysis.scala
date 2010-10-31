@@ -476,6 +476,10 @@ object PathMapXPathAnalysis {
      * Given an internal path, get a display path (for debugging/logging).
      */
     def getDisplayPath(path: String): String = {
+
+        // Special case of empty path
+        if (path.isEmpty) return path
+
         val pool = XPathCache.getGlobalConfiguration.getNamePool
 
         {
@@ -504,6 +508,10 @@ object PathMapXPathAnalysis {
      * Given a display path, get an internal path (for unit tests).
      */
     def getInternalPath(namespaces: JMap[String, String], path: String): String = {
+
+        // Special case of empty path
+        if (path.isEmpty) return path
+
         val pool = XPathCache.getGlobalConfiguration.getNamePool
 
         {

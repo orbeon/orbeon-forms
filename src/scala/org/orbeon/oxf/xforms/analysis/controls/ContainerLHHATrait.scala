@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants
 
 trait ContainerLHHATrait extends LHHATrait {
 
-    override protected def findNestedLHHAElement(qName: QName) = {
+    override protected def findNestedLHHAElement(qName: QName) =
         // For e.g. <xforms:group>, consider only nested element without @for attribute
         // NOTE: Should probably be child::xforms:label[not(exists(@for))] to get first such element, but e.g. group
         // label if any should probably be first anyway.
@@ -26,5 +26,4 @@ trait ContainerLHHATrait extends LHHATrait {
             case lhhaElement: Element if lhhaElement.attribute(XFormsConstants.FOR_QNAME) eq null => Some(lhhaElement)
             case _ => None
         }
-    }
 }

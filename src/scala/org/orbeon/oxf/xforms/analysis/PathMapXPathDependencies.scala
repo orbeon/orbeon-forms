@@ -36,16 +36,9 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         var calculateClean = false   // start dirty
         var validateClean = false    // start dirty
 
-        def refreshDone() {
-            structuralChanges = false
-
-            calculateClean = false
-            validateClean = false
-        }
-
         def markValueChanged(node: NodeInfo) {
             val instance = containingDocument.getInstanceForNode(node)
-            RefreshState.modifiedPaths.put(instance.getPrefixedId, PathMapXPathDependencies.createFingerprintPath(instance, node))
+            RefreshState.modifiedPaths.put(instance.getPrefixedId, PathMapXPathDependencies.createFingerprintedPath(node))
         }
 
         def markStructuralChange() {
@@ -58,6 +51,19 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         def rebuildDone() {
             calculateClean = false
             validateClean = false
+        }
+
+        // TODO: Scenario that can break this:
+        // recalculate -> value change -> xxf-value-changed -> insert -> calculateClean = false -> recalculateDone -> calculateClean = true
+        // although following rebuild will set calculateClean = false, this is not right and might still lead to issues
+
+        // Say that for this model, calculate binds are clean and can be checked for modifications based on value changes
+        def recalculateDone(): Unit = calculateClean = true
+        // Say that for this model, validate binds are clean and can be checked for modifications based on value changes
+        def revalidateDone(): Unit = validateClean = true
+
+        def refreshDone() {
+            structuralChanges = false
         }
 
         def mipDirty(mip: Model#Bind#MIP): Boolean = mip.isValidateMIP && !validateClean || !calculateClean
@@ -161,23 +167,12 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         }
     }
 
-    def markStructuralChange(model: XFormsModel, instance: XFormsInstance) {
+    def markStructuralChange(model: XFormsModel, instance: XFormsInstance): Unit =
         getModelState(model.getPrefixedId).markStructuralChange()
-    }
 
-    def rebuildDone(model: Model) {
-        getModelState(model.prefixedId).rebuildDone()
-    }
-
-    def recalculateDone(model: Model) {
-        // Say that for this model, calculate binds are clean and can be checked for modifications based on value changes
-        getModelState(model.prefixedId).calculateClean = true
-    }
-
-    def revalidateDone(model: Model) {
-        // Say that for this model, validate binds are clean and can be checked for modifications based on value changes
-        getModelState(model.prefixedId).validateClean = true
-    }
+    def rebuildDone(model: Model): Unit =  getModelState(model.prefixedId).rebuildDone()
+    def recalculateDone(model: Model): Unit = getModelState(model.prefixedId).recalculateDone()
+    def revalidateDone(model: Model): Unit = getModelState(model.prefixedId).revalidateDone()
 
     def refreshStart() {
         inRefresh = true
@@ -400,37 +395,35 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                 val updateResult =
                     cached match {
                         case Some(result) => result
-                        case None => {
+                        case None =>
                             val mipAnalysis = mip.analysis
                             val tempUpdateResult =
-                                if (!mipAnalysis.figuredOutDependencies) {
+                                if (!mipAnalysis.figuredOutDependencies)
                                     // Value dependencies are unknown
                                     new UpdateResult(true, 0)// savedEvaluations is N/A
-                                } else if (getModelState(model.prefixedId).mipDirty(mip)) {
+                                else if (getModelState(model.prefixedId).mipDirty(mip))
                                     // Value dependencies are known but the MIP is dirty because validation or calculation binds are dirty
                                     new UpdateResult(true, 0)// savedEvaluations is N/A
-                                } else {
+                                else
                                     // Value dependencies are known
                                     new UpdateResult(
                                         mipAnalysis.intersectsModels(RefreshState.getStructuralChangeModels) || mipAnalysis.intersectsValue(RefreshState.modifiedPaths)
                                         , 1)
-                                }
-                            if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled) {
+
+                            if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled)
                                 getLogger.logDebug("dependencies", "MIP requires update",
                                     Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", mipAnalysis.xpathString): _*)
-                            }
 
                             modifiedMIPCache.put(bind.prefixedId, tempUpdateResult)
                             tempUpdateResult
                         }
-                    }
 
-                if (updateResult.requireUpdate) {
+                if (updateResult.requireUpdate)
                     mipUpdateCount += 1
-                } else {
+                else
                     // Update not required
                     mipXPathOptimizedCount += updateResult.savedEvaluations
-                }
+
                 updateResult.requireUpdate
             case None =>
                 false // no such MIP
@@ -443,7 +436,7 @@ object PathMapXPathDependencies {
     /**
      * Create a fingerprinted path of the form: 3142/1425/@1232 from a node.
      */
-    private def createFingerprintPath(instance: XFormsInstance, node: NodeInfo): String = {
+    private def createFingerprintedPath(node: NodeInfo): String = {
 
         // Create an immutable list with ancestor-or-self nodes up to but not including the document node
         var ancestorOrSelf: List[NodeInfo] = Nil
@@ -453,7 +446,7 @@ object PathMapXPathDependencies {
             currentNode = currentNode.getParent
         }
 
-        // Join instance('...') and a fingerprint representation of the element and attribute nodes
+        // Fingerprint representation of the element and attribute nodes
         (if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
             ancestorOrSelf.tail map (node => node.getNodeKind match {
                 case ELEMENT_NODE => node.getFingerprint

@@ -11,12 +11,15 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.analysis
+package org.orbeon.oxf.xforms.analysis.controls
 
-import model.Model
+import org.dom4j._
+import org.orbeon.oxf.xforms._
+import analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 
-/**
- * NOTE: There is always a scope, but the model can be missing if there is no model, e.g. in model-less XBL components.
- */
-case class ScopeModel(scope: XBLBindings#Scope, containingModel: Option[Model])
+class LocalLHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+        extends LHHAAnalysis(staticStateContext, element, parent, preceding, scope) {
+
+    val isLocal = true
+}

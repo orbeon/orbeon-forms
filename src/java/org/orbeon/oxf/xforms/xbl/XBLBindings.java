@@ -24,6 +24,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.*;
+import org.orbeon.oxf.xforms.analysis.controls.ExternalLHHAAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xml.SAXStore;
@@ -56,7 +57,7 @@ public class XBLBindings {
 
     private final boolean logShadowTrees;                   // whether to log shadow trees as they are built
 
-    // Static xbl:xbl information
+    // Static xbl:xbl
     private Map<QName, XFormsControlFactory.Factory> xblComponentsFactories;    // Map<QName bindingQName, Factory> of QNames to component factory
     private Map<QName, Element> xblComponentBindings;       // Map<QName bindingQName, Element bindingElement> of QNames to bindings
     private List<Element> xblScripts;                       // List<Element xblScriptElements>
@@ -64,7 +65,7 @@ public class XBLBindings {
     private Map<QName, List<Element>> xblHandlers;          // Map<QName bindingQName, List<Element handlerElement>>
     private Map<QName, List<Document>> xblImplementations;  // Map<QName bindingQName, List<Document>>
 
-    // Concrete XBL bindings information
+    // Concrete XBL bindings
     private Map<String, Document> xblFullShadowTrees;       // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
     private Map<String, Document> xblCompactShadowTrees;    // Map<String treePrefixedId, Document> (without full content, only the XForms controls)
     private Map<String, String> xblBindingIds;              // Map<String treePrefixedId, String bindingId>
@@ -356,7 +357,7 @@ public class XBLBindings {
                                        String controlPrefixedId, LocationData locationData,
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope,
                                        ContainerTrait parentControlAnalysis,
-                                       StringBuilder repeatHierarchyStringBuffer) {
+                                       StringBuilder repeatHierarchyStringBuffer, final List<ExternalLHHAAnalysis> externalLHHA) {
 
         if (xblComponentBindings != null) {
             final Element bindingElement = xblComponentBindings.get(controlElement.getQName());
@@ -471,7 +472,7 @@ public class XBLBindings {
 
                     // Analyze the component tree
                     staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newInnerScope, compactShadowTreeDocument.getRootElement(),
-                            parentControlAnalysis, repeatHierarchyStringBuffer);
+                            parentControlAnalysis, repeatHierarchyStringBuffer, externalLHHA);
                 }
             }
         }

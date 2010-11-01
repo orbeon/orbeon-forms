@@ -107,7 +107,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
         }
     }
 
-    protected def getChildElementScope(childElement: Element) = {
+    def getChildElementScope(childElement: Element) = {
         val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(childElement))
         staticStateContext.staticState.getXBLBindings.getResolutionScopeByPrefixedId(childPrefixedId)
     }

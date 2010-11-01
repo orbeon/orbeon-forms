@@ -14,30 +14,31 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.dom4j.{QName, Element}
+import org.dom4j.QName
 import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.xforms.analysis.{StaticStateContext, SimpleElementAnalysis}
 import collection.mutable.LinkedHashMap
-
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 /**
- * Trait representing an element supporting LHHA elements (children or external).
+ * Trait representing an element supporting LHHA elements (nested or external).
  */
 trait LHHATrait extends SimpleElementAnalysis {
 
+    // All LHHA, nested or external
     private val lhha = LinkedHashMap.empty[String, LHHAAnalysis]
+
+    // Process nested LHHA
     for (qName <- List(XFormsConstants.LABEL_QNAME, XFormsConstants.HELP_QNAME, XFormsConstants.HINT_QNAME, XFormsConstants.ALERT_QNAME))
         findNestedLHHAElement(qName) match  {
-            case Some(lhhaElement) => lhha += (lhhaElement.getName -> new LHHAAnalysis(staticStateContext, getChildElementScope(lhhaElement), lhhaElement, LHHATrait.this, true))
+            case Some(lhhaElement) => lhha += (lhhaElement.getName -> new LocalLHHAAnalysis(staticStateContext, lhhaElement, LHHATrait.this, None, getChildElementScope(lhhaElement)))
             case None =>
         }
 
     protected def findNestedLHHAElement(qName: QName) = Option(element.element(qName))
 
-    def setExternalLHHA(staticStateContext: StaticStateContext, lhhaElement: Element) {
-        lhha += (lhhaElement.getName -> new LHHAAnalysis(staticStateContext, getChildElementScope(lhhaElement), lhhaElement, LHHATrait.this, false))
-        // TODO: This must be set in the proper parent context as context/variables can be different
-    }
+    // Set external LHHA
+    def setExternalLHHA(lhhaAnalysis: LHHAAnalysis): Unit =
+        lhha += (lhhaAnalysis.element.getName -> lhhaAnalysis)
 
     // Java API (allowed to return null)
     def getLHHA(lhhaType: String): LHHAAnalysis = lhha.get(lhhaType).orNull

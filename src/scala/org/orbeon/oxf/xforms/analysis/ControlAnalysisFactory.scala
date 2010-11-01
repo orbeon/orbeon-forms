@@ -47,6 +47,8 @@ object ControlAnalysisFactory {
                 new RepeatControl(staticStateContext, controlElement, parent, Option(preceding), scope)
             case qName if hasXBLBinding =>
                 new ComponentControl(staticStateContext, controlElement, parent, Option(preceding), scope)
+            case LABEL_QNAME | HELP_QNAME | HINT_QNAME | ALERT_QNAME =>
+                new ExternalLHHAAnalysis(staticStateContext, controlElement, parent, Option(preceding), scope)
             case qName =>
                 throw new OXFException("Invalid control name: " + qName.getQualifiedName)
         }

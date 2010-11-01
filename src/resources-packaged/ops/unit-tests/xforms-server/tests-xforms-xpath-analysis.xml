@@ -4653,7 +4653,43 @@
         </output>
     </test>
 
-    <test description="XBL outer scope refers to view variable" name="oxf:java" exclude="true">
+    <test description="Bind with name attribute" name="oxf:java" exclude="true">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m1">
+                        <xf:instance id="i11">
+                            <instance/>
+
+
+
+
+
+                        </xf:instance>
+                        <xf:bind id="b1" name="name1" ref=".">
+                            <xf:bind id="b2" name="name2" ref="foo"/>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group ref="$name1">
+                        <xf:input id="id1" ref="$name2"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+
+            </request>
+        </output>
+    </test>
+
+    <test description="Label output in different scope" name="oxf:java" exclude="true">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -4672,45 +4708,16 @@
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
-                                <xf:repeat id="foo-repeat" xbl:attr="ref=repeat-ref" xxbl:scope="outer"/>
+                                <xf:group id="foo-group">
+                                    <xf:label id="foo-label"><xf:output id="foo-output" xxbl:scope="outer" xbl:attr="ref=label-ref"/></xf:label>
+                                </xf:group>
                             </xbl:template>
                         </xbl:binding>
                     </xbl:xbl>
                 </xh:head>
                 <xh:body>
                     <xxf:variable name="bar" select="instance()/bar"/>
-                    <fr:foo id="my-foo" repeat-ref="$bar"/>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="analysis">
-            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
-
-            </request>
-        </output>
-    </test>
-
-    <test description="Bind with name attribute" name="oxf:java" exclude="true">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
-        <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
-                <xh:head>
-                    <xf:model xxf:xpath-analysis="true" id="m1">
-                        <xf:instance id="i11">
-                            <instance/>
-                        </xf:instance>
-                        <xf:bind id="b1" name="name1" ref=".">
-                            <xf:bind id="b2" name="name2" ref="foo"/>
-                        </xf:bind>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:group ref="$name1">
-                        <xf:input id="id1" ref="$name2"/>
-                    </xf:group>
+                    <fr:foo id="my-foo" label-ref="$bar"/>
                 </xh:body>
             </xh:html>
         </input>

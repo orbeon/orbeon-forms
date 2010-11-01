@@ -21,11 +21,12 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.dom4j._
 import scala.collection.JavaConversions._
 
-class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Scope,
-                   element: Element, parent: ContainerTrait, val isLocal: Boolean)
-        extends SimpleElementAnalysis(staticStateContext, element, Some(parent), None, scope) {
+abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+        extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) {
 
     require(parent ne null)
+
+    val isLocal: Boolean
 
     // TODO: make use of static value
     //
@@ -72,8 +73,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, scope: XBLBindings#Sc
                     def startElement(element: Element) {
                         if (element.getQName == XFormsConstants.XFORMS_OUTPUT_QNAME) {
                             // Add dependencies
-                            // TODO XXX: scope must match element, right? check status here
-                            val outputAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, scope) with ValueTrait
+                            val outputAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element)) with ValueTrait
                             outputAnalysis.analyzeXPath()
                             if (outputAnalysis.getValueAnalysis.isDefined)
                                 analyses = outputAnalysis.getValueAnalysis.get :: analyses

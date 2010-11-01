@@ -57,10 +57,6 @@
                         <xhtml:td>
                             <xforms:input ref="label[@xml:lang = $itemset-lang]" id="fb-itemset-label-input">
                                 <xforms:label ref="$form-resources/dialog-itemsets/label/label"/>
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!--<xforms:insert origin="instance('fb-item-template')" nodeset=".."/>-->
-                                    <!--<xforms:setfocus control="fb-itemset-label-input"/>-->
-                                <!--</xforms:action>-->
                             </xforms:input>
                         </xhtml:td>
                         <xhtml:td>
@@ -70,10 +66,6 @@
                                 <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
                                     <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s+') return lower-case($w), '-')"/>
                                 </xforms:action>
-                                <!--<xforms:action ev:event="DOMActivate">-->
-                                    <!--<xforms:insert origin="instance('fb-item-template')" nodeset=".."/>-->
-                                    <!--<xforms:setfocus control="fb-itemset-label-input"/>-->
-                                <!--</xforms:action>-->
                             </xforms:input>
                         </xhtml:td>
                     </xhtml:tr>

@@ -24,6 +24,8 @@
     <orderEntry type="library" name="Orbeon Forms" level="project" />
     <orderEntry type="library" name="scala-2.8.0" level="project" />
     <orderEntry type="library" name="Saxon" level="application" />
+    <orderEntry type="library" name="eXist" level="application" />
+    <orderEntry type="library" name="HttpClient" level="application" />
   </component>
 </module>
 

@@ -228,6 +228,7 @@
                         <instance>i7</instance>
                     </bind-instances>
                     <computed-binds-instances>
+                        <instance>i3</instance>
                         <instance>i4</instance>
                         <instance>i5</instance>
                         <instance>i6</instance>

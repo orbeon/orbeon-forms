@@ -167,6 +167,9 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             for ((qName, name) <- Model.QNAME_TO_XPATH_MIP_NAME; attributeValue = element.attributeValue(qName); if attributeValue ne null)
                 yield (name -> new MIP(name, attributeValue))
 
+        // Type MIP is special as it is not an XPath expression
+        val typeMIP = Option(element.attributeValue(TYPE_QNAME))
+
         // Custom MIPs
         val customMIPNameToXPathMIP = Predef.Map((
             for {
@@ -192,9 +195,6 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         // All XPath MIPs
         val allMIPNameToXPathMIP = mipNameToXPathMIP ++ customMIPNameToXPathMIP
 
-        // Type MIP is special as it is not an XPath expression
-        val typeMIP = Option(element.attributeValue(TYPE_QNAME))
-
         // Create children binds
         val children: Seq[Bind] = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) map (new Bind(_, Bind.this, preceding))
 
@@ -215,8 +215,8 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             case None => null
         }
 
-        def hasCalculateComputedBind = Model.QNAME_TO_XPATH_COMPUTED_MIP_NAME exists (mipNameToXPathMIP contains _._2)
-        def hasValidateBind = typeMIP.isDefined || (Model.QNAME_TO_XPATH_VALIDATE_MIP_NAME exists (mipNameToXPathMIP contains _._2))
+        def hasCalculateComputedBind = mipNameToXPathMIP exists (_._2 isCalculateComputedMIP)
+        def hasValidateBind = typeMIP.isDefined || (mipNameToXPathMIP exists (_._2 isValidateMIP))
         def hasCustomMip = customMIPNameToXPathMIP.nonEmpty
 
         // Globally remember if we have seen these categories of binds
@@ -231,7 +231,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
             // Match on whether we have a @ref or not
             ref match {
-                case Some(refValue) => {
+                case Some(refValue) =>
                     getBindingAnalysis match {
                         case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
                             // There is a binding and analysis succeeded
@@ -251,10 +251,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                     // MIP analysis
                     for (mip <- allMIPNameToXPathMIP.values)
                         mip.analyzeXPath()
-                }
-                case None => {
-                    // No binding so don't look at MIPs
-                }
+                case None => // No binding so don't look at MIPs
             }
 
             // Analyze children and compute result
@@ -375,9 +372,14 @@ object Model {
     val INITIAL_VALUE = "initial-value"
     val TYPE = "type"
 
+    // NOTE: "required" is special: it is evaluated during recalculate, but used during revalidate. In effect both
+    // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
+    // "required" MIP, not on the XPath of it. See also what we would need for xxf:valid(), etc. functions.
+
     val QNAME_TO_XPATH_COMPUTED_MIP_NAME = Predef.Map(
         RELEVANT_QNAME -> RELEVANT,
         READONLY_QNAME -> READONLY,
+        REQUIRED_QNAME -> REQUIRED,
         CALCULATE_QNAME -> CALCULATE,
         XXFORMS_DEFAULT_QNAME -> INITIAL_VALUE)
 
@@ -385,7 +387,7 @@ object Model {
         REQUIRED_QNAME -> REQUIRED,
         CONSTRAINT_QNAME -> CONSTRAINT)
 
-    val QNAME_TO_VALIDATE_MIP_NAME = QNAME_TO_XPATH_VALIDATE_MIP_NAME + (TYPE_QNAME -> TYPE)
+    private val QNAME_TO_VALIDATE_MIP_NAME = QNAME_TO_XPATH_VALIDATE_MIP_NAME + (TYPE_QNAME -> TYPE)
     val QNAME_TO_XPATH_MIP_NAME = QNAME_TO_XPATH_COMPUTED_MIP_NAME ++ QNAME_TO_XPATH_VALIDATE_MIP_NAME
 
     val CALCULATE_MIP_NAMES = Set(QNAME_TO_XPATH_COMPUTED_MIP_NAME.values.toSeq: _*)

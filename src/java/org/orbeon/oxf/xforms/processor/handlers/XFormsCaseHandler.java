@@ -80,7 +80,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
                 private final String firstDelimiterClasses;
                 {
                     final StringBuilder classes = new StringBuilder("xforms-case-begin-end");
-                    if (!elementClasses.isEmpty()) {
+                    if (elementClasses.length() > 0) {
                         classes.append(' ');
                         classes.append(elementClasses);
                     }

@@ -67,7 +67,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 private final String firstDelimiterClasses;
                 {
                     final StringBuilder classes = new StringBuilder("xforms-group-begin-end");
-                    if (!elementClasses.isEmpty()) {
+                    if (elementClasses.length() > 0) {
                         classes.append(' ');
                         classes.append(elementClasses);
                     }

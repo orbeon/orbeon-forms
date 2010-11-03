@@ -73,7 +73,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
             private final String firstDelimiterClasses;
             {
                 final StringBuilder classes = new StringBuilder("xforms-repeat-begin-end");
-                if (!userClasses.isEmpty()) {
+                if (userClasses.length() > 0) {
                     classes.append(' ');
                     classes.append(userClasses);
                 }
@@ -125,7 +125,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
                         addedClasses.append(Integer.toString((numberOfParentRepeats % 4) + 1));
                     }
                     // User classes
-                    if (!userClasses.isEmpty()) {
+                    if (userClasses.length() > 0) {
                         if (addedClasses.length() > 0)
                             addedClasses.append(' ');
                         addedClasses.append(userClasses);

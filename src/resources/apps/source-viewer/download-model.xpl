@@ -23,7 +23,8 @@
             <config xsl:version="2.0">
                 <xsl:variable name="applications-list" select="document('oxf:/apps-list.xml')" as="document-node()"/>
                 <xsl:variable name="application-id" select="/*/application-id" as="xs:string"/>
-                <xsl:variable name="application" select="$applications-list//application[@id = $application-id]" as="element()"/>
+                <!-- Take first one in case the app id appears more than once in the app list -->
+                <xsl:variable name="application" select="($applications-list//application[@id = $application-id])[1]" as="element()"/>
                 <xsl:variable name="url" select="concat('oxf:/apps/', $application/@id, '/', string(/*/source-url))" as="xs:string"/>
                 <url><xsl:value-of select="$url"/></url>
                 <mode>binary</mode>

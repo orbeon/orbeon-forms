@@ -22,6 +22,8 @@
 
         name: "Button",
 
+        isButtonYuiDisabled: function(buttonId) { return YUD.hasClass(YUD.getElementsByClassName("yui-button", null, buttonId)[0], "yui-button-disabled"); },
+
         /**
          * Check that buttons is the expected state when it comes to them being readonly and relevant.
          *
@@ -33,13 +35,13 @@
                 _.each(["my-button-normal", "my-button-full-update"], function(buttonId) {
                     if (relevant) {
                         YUA.areEqual(readonly,
-                            YUD.hasClass(YUD.getElementsByClassName("yui-button", null, buttonId)[0], "yui-button-disabled"),
+                            this.isButtonYuiDisabled(buttonId),
                             buttonId + ": class yui-button-disabled is not in the expected state");
                         YUA.areEqual(readonly,
                             OUD.getElementByTagName(OUD.get(buttonId), "button").disabled,
                             buttonId + ": disabled attribute is not in the expected state");
                     }
-                });
+                }, this);
             };
         },
 
@@ -52,7 +54,7 @@
          * http://forge.ow2.org/tracker/index.php?func=detail&aid=315586&group_id=168&atid=350207
          */
         testNonReadonlyWhileNonRelevant: function() {
-            (this.checkButtonState(false, true))();
+            (this.checkButtonState(false, true)).call(this);
             OUT.executeSequenceCausingAjaxRequest(this, [
                 [ this.toggleReadonly, this.checkButtonState(true, true) ],
                 [ this.toggleRelevant, this.checkButtonState(true, false) ],
@@ -78,6 +80,23 @@
             OUT.executeSequenceCausingAjaxRequest(this, [
                 [ this.toggleReadonly, this.checkButtonState(true, true) ],
                 [ this.triggerFullUpdate, this.checkButtonState(true, true) ]
+            ]);
+        },
+
+        /**
+         * Check the button is properly initialized when added to a repeat. We check that it is initialized by checking
+         * that the class yui-button-disabled has been appropriately set.
+         */
+        testInitInRepeat: function() {
+            function checkIsDisabled(count) {
+                for (var index = 1; index < count; index++)
+                    YUA.isTrue(this.isButtonYuiDisabled("init-in-repeat" + XFORMS_SEPARATOR_1 + index),
+                            "button " + index + " is expected to be disabled");
+            }
+            checkIsDisabled.call(this, 1);
+            OUT.executeSequenceCausingAjaxRequest(this, [
+                [ _.bind(OUT.click, OUT, "init-add"), _.bind(checkIsDisabled, this, 2) ],
+                [ _.bind(OUT.click, OUT, "init-add"), _.bind(checkIsDisabled, this, 3) ]
             ]);
         }
     }));

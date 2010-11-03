@@ -29,9 +29,13 @@
                     <relevant>true</relevant>
                     <readonly>false</readonly>
                     <trigger-full-update-increment>1</trigger-full-update-increment>
+                    <component-init>
+                        <button/>
+                    </component-init>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="button" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
+            <xforms:bind nodeset="component-init/button" readonly="true()"/>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -40,26 +44,43 @@
         <xhtml:script type="text/javascript" src="/xbl/orbeon/button/button-unittest.js"/>
     </xhtml:head>
     <xhtml:body>
-        <fr:button id="toggle-relevant">
-            <xforms:label>Toggle relevant</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
-        </fr:button>
-        <fr:button id="toggle-readonly">
-            <xforms:label>Toggle readonly</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
-        </fr:button>
-        <fr:button id="trigger-full-update">
-            <xforms:label>Trigger full update</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="trigger-full-update-increment" value=". + 1"/>
-        </fr:button>
-        <fr:button ref="button" id="my-button-normal" tabindex="42">
-            <xforms:label>Normal button</xforms:label>
-        </fr:button>
-        <xforms:group id="full-update" xxforms:update="full">
-            <xforms:output value="trigger-full-update-increment" style="display: none"/>
-            <fr:button ref="button" id="my-button-full-update">
-                <xforms:label>Full update button</xforms:label>
+        <xhtml:fieldset>
+            <xhtml:legend>Relevant / readonly</xhtml:legend>
+            <fr:button id="toggle-relevant">
+                <xforms:label>Toggle relevant</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
             </fr:button>
-        </xforms:group>
+            <fr:button id="toggle-readonly">
+                <xforms:label>Toggle readonly</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+            </fr:button>
+            <fr:button id="trigger-full-update">
+                <xforms:label>Trigger full update</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="trigger-full-update-increment" value=". + 1"/>
+            </fr:button>
+            <fr:button ref="button" id="my-button-normal" tabindex="42">
+                <xforms:label>Normal button</xforms:label>
+            </fr:button>
+            <xforms:group id="full-update" xxforms:update="full">
+                <xforms:output value="trigger-full-update-increment" style="display: none"/>
+                <fr:button ref="button" id="my-button-full-update">
+                    <xforms:label>Full update button</xforms:label>
+                </fr:button>
+            </xforms:group>
+        </xhtml:fieldset>
+        <xhtml:fieldset>
+            <xhtml:legend>Component initialization inside repeat</xhtml:legend>
+            <xforms:group xxforms:update="full">
+                <fr:button id="init-add">
+                    <xforms:label>Add</xforms:label>
+                    <xforms:insert ev:event="DOMActivate" nodeset="component-init/button" position="before" at="1"/>
+                </fr:button>
+                <xforms:repeat nodeset="component-init/button">
+                    <fr:button ref="." id="init-in-repeat">
+                        <xforms:label>In repeat</xforms:label>
+                    </fr:button>
+                </xforms:repeat>
+            </xforms:group>
+        </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

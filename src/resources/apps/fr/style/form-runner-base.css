@@ -373,7 +373,7 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 .fr-grid .xbl-fr-autocomplete .xforms-input input { width: 140px }
 
 /* Make HTML editor shorter by default */
-.fr-grid textarea.xforms-mediatype-text-html { height: 10.1em } /* NOTE: with Firefox, 10em makes bottom line disappear */
+.fr-grid textarea.xforms-mediatype-text-html, .fr-grid .xforms-mediatype-text-html textarea { height: 10.1em } /* NOTE: with Firefox, 10em makes bottom line disappear */
 
 /* Set this again as default is 100% above */
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */

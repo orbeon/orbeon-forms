@@ -43,6 +43,8 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
         final String elementName;
         if (handlerContext.isNoScript()) {
+            // Noscript mode
+
             // We need a name to detect activation
             containerAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
@@ -111,6 +113,8 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
             // In JS-free mode, all buttons are submit inputs or image inputs
             containerAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, inputType);
         } else {
+            // Script mode
+
             // Just a button without action
             containerAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "button");
             elementName = "button";

@@ -2078,7 +2078,8 @@ ORBEON.xforms.Controls = {
         "hint": "$$t",
         "help": "$$p",
         "help-image": "$$i",
-        "alert": "$$a"
+        "alert": "$$a",
+        "control": "$$c"
     },
 
     _classNameToRegexp: {
@@ -2151,11 +2152,12 @@ ORBEON.xforms.Controls = {
     getLabelMessage: function(control) {
         if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
                 || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
-            if (control.tagName.toLowerCase() == "input") {
-                // Image
-                return control.alt;
+            if (ORBEON.util.Utils.isNewXHTMLLayout()) {
+                // Element is "label" and "control" at the same time so use "control"
+                var labelElement = ORBEON.xforms.Controls._getControlLHHA(control, "control");
+                return labelElement.innerHTML;
             } else {
-                // Link or button
+                // Element is either <button> or <a>
                 return control.innerHTML;
             }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
@@ -2176,14 +2178,12 @@ ORBEON.xforms.Controls = {
     setLabelMessage: function(control, message) {
         if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
                 || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
-            var linkButtonElement = ORBEON.util.Utils.isNewXHTMLLayout()
-                ? YAHOO.util.Dom.getFirstChild(control) : control;
-            if (linkButtonElement.tagName.toLowerCase() == "input") {
-                // Image
-                linkButtonElement.alt = message;
+            if (ORBEON.util.Utils.isNewXHTMLLayout()) {
+                // Element is "label" and "control" at the same time so use "control"
+                ORBEON.xforms.Controls._setMessage(control, "control", message);
             } else {
-                // Link or button
-                linkButtonElement.innerHTML = message;
+                // Element is either <button> or <a>
+                control.innerHTML = message;
             }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog

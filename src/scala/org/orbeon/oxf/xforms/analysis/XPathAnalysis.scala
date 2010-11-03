@@ -30,7 +30,8 @@ abstract class XPathAnalysis {
 
     val dependentModels: collection.Set[String]
     val dependentInstances: collection.Set[String]
-    val returnableInstances: collection.Set[String]
+
+    def returnableInstances = returnablePaths.keys
 
     // Return true if any path matches
     // NOTE: For now just check exact paths. Later must be smarter?
@@ -64,7 +65,6 @@ object XPathAnalysis {
 
         require(xpathString ne null)
 
-        val returnableInstances = Set.empty[String]
         val dependentInstances = Set.empty[String]
         val dependentModels = Set.empty[String]
         val returnablePaths = MapSet.empty[String, String]

@@ -34,8 +34,7 @@ class PathMapXPathAnalysis(val xpathString: String,
                            val valueDependentPaths: MapSet[String, String],
                            val returnablePaths: MapSet[String, String],
                            val dependentModels: collection.Set[String],
-                           val dependentInstances: collection.Set[String],
-                           val returnableInstances: collection.Set[String])
+                           val dependentInstances: collection.Set[String])
         extends XPathAnalysis {
 
     def combine(other: XPathAnalysis): XPathAnalysis = {
@@ -60,8 +59,7 @@ class PathMapXPathAnalysis(val xpathString: String,
                         valueDependentPaths.combine(other.valueDependentPaths),
                         returnablePaths.combine(other.returnablePaths),
                         dependentModels ++ other.dependentModels,
-                        dependentInstances ++ other.dependentInstances,
-                        returnableInstances ++ other.returnableInstances)
+                        dependentInstances ++ other.dependentInstances)
                 case _ =>
                     throw new IllegalStateException // should not happen
             }
@@ -87,7 +85,7 @@ class PathMapXPathAnalysis(val xpathString: String,
 
         toXML(dependentModels, "dependent-models", "model")
         toXML(dependentInstances, "dependent-instances", "instance")
-        toXML(returnableInstances, "returnable-instances", "instance")
+        toXML(returnablePaths.keys, "returnable-instances", "instance")
 
         helper.endElement()
     }
@@ -176,7 +174,6 @@ object PathMapXPathAnalysis {
 
                     val dependentModels = new LinkedHashSet[String]
                     val dependentInstances = new LinkedHashSet[String]
-                    val returnableInstances = new LinkedHashSet[String]
 
                     // Process the pathmap to extract paths and other information useful for handling dependencies.
                     def processPaths(): Boolean = {
@@ -220,10 +217,8 @@ object PathMapXPathAnalysis {
                                         dependentInstances.add(instancePrefixedId)
 
                                         // NOTE: A same node can be both returnable AND atomized in a given expression
-                                        if (node.isReturnable) {
-                                            returnableInstances.add(instancePrefixedId)
+                                        if (node.isReturnable)
                                             returnablePaths.put(instancePath.instancePrefixedId, instancePath.path)
-                                        }
                                         if (node.isAtomized)
                                             valueDependentPaths.put(instancePath.instancePrefixedId, instancePath.path)
                                     case Right(None) => // NOP: don't add the path as this is not considered a dependency
@@ -253,7 +248,7 @@ object PathMapXPathAnalysis {
 
                     if (processPaths())
                         // Success
-                        new PathMapXPathAnalysis(xpathString, Some(pathmap), true, valueDependentPaths, returnablePaths, dependentModels, dependentInstances, returnableInstances)
+                        new PathMapXPathAnalysis(xpathString, Some(pathmap), true, valueDependentPaths, returnablePaths, dependentModels, dependentInstances)
                     else
                         // Failure
                         NegativeAnalysis(xpathString)

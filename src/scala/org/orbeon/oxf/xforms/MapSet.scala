@@ -48,6 +48,8 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
         false
     }
 
+    def keys = map.keys
+
     // NOTE: should use ++ operator, but harder to implement properly
     def combine(other: MapSet[A, B]): MapSet[A, B] = {
         val result = new MapSet[A, B]

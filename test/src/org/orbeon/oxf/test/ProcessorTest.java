@@ -141,10 +141,11 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 tests = domSerializer.getDocument(pipelineContext);
             }
 
-            // If there's a test with the "only" attribute, execute only this one
-            Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[@only = 'true'][1] | /tests/group[@only = 'true']/test");
+            // If there are tests with a true "only" attribute but not a true "exclude" attribute, execute only those
+            Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[ancestor-or-self::*/@only = 'true' and not(ancestor-or-self::*/@exclude = 'true')]");
+            // Otherwise, run all tests that are not excluded
             if (!i.hasNext())
-                i = XPathUtils.selectIterator(tests, "/tests/group/test[not(@exclude = 'true')] | /tests/test[not(@exclude = 'true')]");
+                i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[not(ancestor-or-self::*/@exclude = 'true')]");
 
             for (; i.hasNext();) {
                 final Element testNode = (Element) i.next();

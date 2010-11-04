@@ -73,7 +73,7 @@
                 * At this point fr-form-model has already been recalculated
                 * fr-form-model may use us (through $fr-roles) using xforms:bind/@calculate or other MIPs
                 * But we just set the value of all-roles here
-                * So we must recalculcate/revalidate fr-form-model after setting roles here
+                * So we must recalculate/revalidate fr-form-model after setting roles here
 
             -->
             <xforms:action if="instance('fr-roles-instance')/all-roles != ''">
@@ -115,7 +115,7 @@
             <xxforms:variable name="header-roles" as="element(role)*"
                               select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s+')) then $r else ()"/>
             <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
-            
+
             <!-- Remember whether roles configuration was provided -->
             <xxforms:variable name="has-roles" as="xs:boolean" select="exists($all-roles)"/>
             <xforms:setvalue ref="instance('fr-roles-instance')/has-roles" value="$has-roles"/>

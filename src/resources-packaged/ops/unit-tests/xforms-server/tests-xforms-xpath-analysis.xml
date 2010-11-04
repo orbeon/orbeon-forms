@@ -4654,6 +4654,326 @@
         </output>
     </test>
 
+    <test description="External LHHA preceding control and using variable" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance label="" bar=""/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xxf:variable id="bar-variable" name="bar" select="@bar"/>
+                    <xf:label id="my-label" for="my-input" value="$bar"/>
+                    <xf:input id="my-input" ref="instance()"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <variable scope="" prefixed-id="bar-variable" model-prefixed-id="model" binding="false" value="true" name="bar">
+                    <value>
+                        <analysis expression="@bar" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')/@bar</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </value>
+                </variable>
+                <input scope="" prefixed-id="my-input" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="instance()" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string(($bar)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/@bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                </input>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+    
+    <test description="External LHHA positioning and evaluation context" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance label1="" label2="" help2="" help3="">
+                                <value1/>
+                                <nested group-label="" label3="" help1="">
+                                    <value2/>
+                                </nested>
+                                <value3/>
+                            </instance>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <!-- Labels are forward-looking, helps are backward-looking  -->
+                    <xf:label id="label1" for="input1" value="@label1"/>
+                    <xf:input id="input1" ref="value1"/>
+                    <xf:label id="label2" for="input2" value="@label2"/>
+                    <xf:group id="group1" context="nested">
+                        <xf:label id="group-label1" value="@group-label"/>
+                        <xf:input id="input2" ref="value2"/>
+                        <xf:label id="label3" for="input3" value="@label3"/>
+                        <xf:help id="help1" for="input1" value="@help1"/>
+                    </xf:group>
+                    <xf:help id="help2" for="input2" value="@help2"/>
+                    <xf:input id="input3" ref="value3"/>
+                    <xf:help id="help3" for="input3" value="@help3"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <input scope="" prefixed-id="input1" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="value1" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')/value1</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/value1</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string((@label1)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/@label1</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                        <help>
+                            <analysis expression="xs:string((@help1)[1])" analyzed="true">
+                                <value-dependent>
+                                    <path>instance('instance')/nested/@help1</path>
+                                </value-dependent>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>instance</instance>
+                                </dependent-instances>
+                            </analysis>
+                        </help>
+                </input>
+                <group scope="" prefixed-id="group1" model-prefixed-id="model" binding="false" value="false">
+                    <label>
+                        <analysis expression="xs:string((@group-label)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/nested/@group-label</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                </group>
+                <input scope="" prefixed-id="input2" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="value2" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')/nested/value2</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/nested/value2</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string((@label2)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/@label2</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                        <help>
+                            <analysis expression="xs:string((@help2)[1])" analyzed="true">
+                                <value-dependent>
+                                    <path>instance('instance')/@help2</path>
+                                </value-dependent>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>instance</instance>
+                                </dependent-instances>
+                            </analysis>
+                        </help>
+                </input>
+                <input scope="" prefixed-id="input3" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="value3" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')/value3</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/value3</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <label>
+                        <analysis expression="xs:string((@label3)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/nested/@label3</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </label>
+                        <help>
+                            <analysis expression="xs:string((@help3)[1])" analyzed="true">
+                                <value-dependent>
+                                    <path>instance('instance')/@help3</path>
+                                </value-dependent>
+                                <dependent-models>
+                                    <model>model</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>instance</instance>
+                                </dependent-instances>
+                            </analysis>
+                        </help>
+                </input>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
     <test description="Bind with name attribute" name="oxf:java" exclude="true">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>

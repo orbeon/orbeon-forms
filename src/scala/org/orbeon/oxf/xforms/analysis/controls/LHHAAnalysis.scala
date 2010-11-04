@@ -52,7 +52,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
         if (staticValue.isEmpty) {
 
             // Delegate to concrete implementation
-            val delegateAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(parent), None, scope) with ValueTrait with ViewTrait
+            val delegateAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) with ValueTrait with ViewTrait
             delegateAnalysis.analyzeXPath()
 
             if (ref.isDefined || value.isDefined) {

@@ -28,6 +28,7 @@ trait ViewTrait extends SimpleElementAnalysis {
         ElementAnalysis.getClosestPrecedingInScope(this)() match {
             case Some(preceding: VariableAnalysisTrait with ViewTrait) => preceding.viewVariables + (preceding.name -> preceding)
             case Some(preceding: ViewTrait) => preceding.viewVariables
+            case Some(_) => Map.empty // should not happen as all view elements should have ViewTrait
             case None => Map.empty
         }
 

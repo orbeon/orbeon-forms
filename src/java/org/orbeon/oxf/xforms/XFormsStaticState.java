@@ -1415,7 +1415,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
 
                 for (final ElementAnalysis controlAnalysis: controlAnalysisMap.values())
-                    controlAnalysis.javaToXML(propertyContext, helper);
+                    if (!(controlAnalysis instanceof ExternalLHHAAnalysis))// because they are logged as part of their related control
+                        controlAnalysis.javaToXML(propertyContext, helper);
 
                 for (final Model model: modelsByPrefixedId.values())
                     model.javaToXML(propertyContext, helper);

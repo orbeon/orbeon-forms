@@ -50,7 +50,8 @@ trait LHHATrait extends SimpleElementAnalysis {
 
     override def analyzeXPath() = {
         super.analyzeXPath()
-        getAllLHHA foreach (_.analyzeXPath())
+        // Only analyze local LHHA as external LHHA are analyzed like controls
+        getAllLHHA filter (_.isLocal) foreach (_.analyzeXPath())
     }
 
     override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {

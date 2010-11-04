@@ -18,8 +18,11 @@ import analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
+/**
+ * Represent an LHHA element with a "for" attribute. Behaves like a control from the point of view of static analysis.
+ */
 class ExternalLHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
-        extends LHHAAnalysis(staticStateContext, element, parent, preceding, scope) {
+        extends LHHAAnalysis(staticStateContext, element, parent, preceding, scope) with ViewTrait {
 
     val isLocal = false
 

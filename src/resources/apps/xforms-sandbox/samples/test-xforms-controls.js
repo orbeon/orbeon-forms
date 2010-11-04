@@ -44,14 +44,6 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "Readonly and relevant",
 
-    testDisabledOnLoad: function() {
-        // Checking that a disabled field has the 'disabled' attribute when the page is first loaded, so it can't get
-        // the keyboard focus if the user tabs through it
-        var inputContainer = YAHOO.util.Dom.get("disabled-input" + XFORMS_SEPARATOR_1 + "1");
-        var inputField = ORBEON.util.Dom.getElementByTagName(inputContainer, "input");
-        YAHOO.util.Assert.isTrue(inputField.disabled);
-    },
-
     getFormControls: function() {
         var controlsContainer = YAHOO.util.Dom.get("controls");
         var formTagNames = [ "input", "textarea", "select", "button" ];

@@ -14,76 +14,73 @@
 
 (function() {
 
-    var OUD = ORBEON.util.Dom;
-    var YUD = YAHOO.util.Dom;
-    var YUE = YAHOO.util.Event;
+    var OD = ORBEON.util.Dom;
+    var YD = YAHOO.util.Dom;
+    var Event = YAHOO.util.Event;
 
-    ORBEON.xforms.action = {
+    ORBEON.xforms.action.Message = {
 
-        Message: {
+        _messageQueue: [],
+        _messageDialog: null,
 
-            _messageQueue: [],
-            _messageDialog: null,
-
-            clinit: function() {
-                YAHOO.util.Event.onDOMReady(function() {
-                    // Prevent SimpleDialog from registering itself on the form
-                    YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
-                    // Create one single instance of the YUI dialog used for xforms:message
-                    this._messageDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
-                        width: "30em",
-                        fixedcenter: true,
-                        modal: true,
-                        close: false,
-                        visible: false,
-                        draggable: false,
-                        buttons: [{
-                            text: "Close",
-                            handler: {
-                                fn: function() {
-                                    this._messageDialog.hide();
-                                    this._messageQueue.shift();
-                                    if (this._messageQueue.length > 0) this._showMessage();
-                                },
-                                scope: this
+        clinit: function() {
+            YAHOO.util.Event.onDOMReady(function() {
+                // Prevent SimpleDialog from registering itself on the form
+                YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
+                // Create one single instance of the YUI dialog used for xforms:message
+                this._messageDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
+                    width: "30em",
+                    fixedcenter: true,
+                    modal: true,
+                    close: false,
+                    visible: false,
+                    draggable: false,
+                    buttons: [{
+                        text: "Close",
+                        handler: {
+                            fn: function() {
+                                this._messageDialog.hide();
+                                this._messageQueue.shift();
+                                if (this._messageQueue.length > 0) this._showMessage();
                             },
-                            isDefault: false
-                        }]
-                    });
-                    this._messageDialog.setHeader("Message");
-                    this._messageDialog.render(document.body);
+                            scope: this
+                        },
+                        isDefault: false
+                    }]
+                });
+                this._messageDialog.setHeader("Message");
+                this._messageDialog.render(document.body);
 
-                    // Add ARIA attributes
-                    var dialogDiv = OUD.get("xforms-message-dialog");
-                    var bodyDiv = YUD.getElementsByClassName("bd", null, dialogDiv)[0];
-                    bodyDiv.setAttribute("aria-live", "polite");
-                    bodyDiv.setAttribute("role", "alert");
-                }, this, true);
-            },
+                // Add ARIA attributes
+                var dialogDiv = OD.get("xforms-message-dialog");
+                var bodyDiv = YD.getElementsByClassName("bd", null, dialogDiv)[0];
+                bodyDiv.setAttribute("aria-live", "polite");
+                bodyDiv.setAttribute("role", "alert");
+            }, this, true);
+        },
 
-            _showMessage: function() {
-                this._messageDialog.setBody(this._messageQueue[0]);
-                this._messageDialog.show();
-            },
+        _showMessage: function() {
+            this._messageDialog.setBody(this._messageQueue[0]);
+            this._messageDialog.show();
+        },
 
-            /**
-             * Gives an number of messages to show, which will be shown as soon as possible. This is typically called
-             * when the page is first loaded to show messages for xforms:message actions that ran before the HTML
-             * was sent to the client.
-             *
-             * @param {Array.<string>} messages
-             */
-            showMessages: function(messages) {
-                _.each(messages, function(message) { this._messageQueue.push(message); }, this);
-                YUE.onAvailable("xforms-message-dialog", this._showMessage, this, true);
-            },
+        /**
+         * Gives an number of messages to show, which will be shown as soon as possible. This is typically called
+         * when the page is first loaded to show messages for xforms:message actions that ran before the HTML
+         * was sent to the client.
+         *
+         * @param {Array.<string>} messages
+         */
+        showMessages: function(messages) {
+            _.each(messages, function(message) { this._messageQueue.push(message); }, this);
+            Event.onAvailable("xforms-message-dialog", this._showMessage, this, true);
+        },
 
-            execute: function(element) {
-                if (OUD.getAttribute(element, "level") == "modal") {
-                    var message = OUD.getStringValue(element);
-                    this._messageQueue.push(message);
-                    if (this._messageQueue.length == 1) this._showMessage();
-                }
+        execute: function(element) {
+            if (OD.getAttribute(element, "level") == "modal") {
+                var message = OD.getStringValue(element);
+                this._messageQueue.push(message);
+                if (this._messageQueue.length == 1) this._showMessage();
             }
         }
     };

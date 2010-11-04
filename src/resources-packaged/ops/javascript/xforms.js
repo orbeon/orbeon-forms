@@ -1359,7 +1359,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
     ORBEON.util.Properties.init();
 })();
 
-ORBEON.xforms = ORBEON.xforms || {};
+// Define packages
+ORBEON.xforms = {};
+ORBEON.xforms.action = {};
 ORBEON.widgets = ORBEON.widgets || {};  // Legacy name used by non-XBL components
 ORBEON.widget = ORBEON.widget || {};    // New name to follow the same convention used by YUI
 ORBEON.xforms.Globals = ORBEON.xforms.Globals || {};

@@ -98,7 +98,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
 
             final String controlClasses; {
                 final StringBuilder classes = new StringBuilder(isVisible ? "xforms-case-selected" : "xforms-case-deselected");
-                if (!elementClasses.isEmpty()) {
+                if (elementClasses.length() > 0) {
                     classes.append(' ');
                     classes.append(elementClasses);
                 }

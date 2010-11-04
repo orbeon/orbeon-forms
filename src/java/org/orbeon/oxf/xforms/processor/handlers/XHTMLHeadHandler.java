@@ -316,7 +316,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         }
                     }
                 }
-    
+
                 // Offline mode
 //                        if (containingDocument.getStaticState().isHasOfflineSupport()) {
 //                            dynamicProperties.put(XFormsProperties.OFFLINE_SUPPORT_PROPERTY, Boolean.TRUE);
@@ -421,7 +421,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                                 sb.append(", ");
                             } else {
                                 foundModalMessage = true;
-                                sb.append("ORBEON.xforms.Controls.showMessage([");
+                                sb.append("ORBEON.xforms.action.Message.showMessages([");
                             }
                             sb.append("\"");
                             sb.append(XFormsUtils.escapeJavaScript(message.getMessage()));
@@ -483,7 +483,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 sb.append("\"xforms-server\": \"");
                 sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/xforms-server", false));
-                
+
                 sb.append("\",\"resources-base\": \"");
                 sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/", false));
                 sb.append('"');
@@ -572,7 +572,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 sb.append(']');
             }
-            
+
             // Output server events
             if (hasServerEvents) {
                 if (hasPaths || hasInitControls || hasKeyListeners)

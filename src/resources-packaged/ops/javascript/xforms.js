@@ -145,7 +145,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * case where an element with the specified id did exist. So we are now here calling document.getElementById()
              * directly instead of going through YUI.
              *
-             * @param {!string} controlId
+             * @param {string} controlId
              */
             get: function(controlId) {
                 return document.getElementById(controlId);
@@ -3893,64 +3893,6 @@ ORBEON.xforms.Events = {
     yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
 };
 
-ORBEON.xforms.action = {
-
-    Message: {
-
-        _messageQueue: [],
-        _messageDialog: null,
-
-        clinit: function() {
-            YAHOO.util.Event.onDOMReady(function() {
-                // Prevent SimpleDialog from registering itself on the form
-                YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
-                // Create one single instance of the YUI dialog used for xforms:message
-                this._messageDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
-                    width: "30em",
-                    fixedcenter: true,
-                    modal: true,
-                    close: false,
-                    visible: false,
-                    draggable: false,
-                    buttons: [{
-                        text: "Close",
-                        handler: {
-                            fn: function() {
-                                this._messageDialog.hide();
-                                this._messageQueue.shift();
-                                if (this._messageQueue.length > 0) this._showMessage();
-                            },
-                            scope: this
-                        },
-                        isDefault: false
-                    }]
-                });
-                this._messageDialog.setHeader("Message");
-                this._messageDialog.render(document.body);
-
-                // Add ARIA attributes
-                var dialogDiv = ORBEON.util.Dom.get("xforms-message-dialog");
-                var bodyDiv = YAHOO.util.Dom.getElementsByClassName("bd", null, dialogDiv)[0];
-                bodyDiv.setAttribute("aria-live", "polite");
-                bodyDiv.setAttribute("role", "alert");
-            }, this, true);
-        },
-
-        _showMessage: function() {
-            this._messageDialog.setBody(this._messageQueue[0]);
-            this._messageDialog.show();
-        },
-
-        execute: function(element) {
-            var message = ORBEON.util.Dom.getStringValue(element);
-            if (ORBEON.util.Dom.getAttribute(element, "level") == "modal") {
-                this._messageQueue.push(message);
-                if (this._messageQueue.length == 1) this._showMessage();
-            }
-        }
-    }
-};
-
 (function() {
 
     var OUD = ORBEON.util.Dom;
@@ -4018,9 +3960,6 @@ ORBEON.xforms.action = {
 
     ORBEON.onJavaScriptLoaded.subscribe(ORBEON.xforms.FullUpdate.clinit, ORBEON.xforms.FullUpdate, true);
 })();
-
-// TODO: Should have generic code to call init() on all static classes, if we determine this is a good practice
-ORBEON.xforms.action.Message.clinit();
 
 ORBEON.xforms.XBL = {
 
@@ -8944,6 +8883,5 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
         ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     }
 }
-
 ORBEON.onJavaScriptLoaded.fire();
 //ORBEON.util.Test.startFirebugLite();

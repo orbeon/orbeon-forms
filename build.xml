@@ -573,6 +573,7 @@
     <target name="orbeon-minify-js" depends="init">
         <!-- Store those under ${war.dir}/WEB-INF/resources so they can be used in dev mode -->
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/action"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/button"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
@@ -582,73 +583,38 @@
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/ajaxxslt"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/encryption"/>
 
-        <!-- Orbeon xforms.js -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/xforms"/>
-        </antcall>
+        <!-- Orbeon Orbeon's own JavaScript -->
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/xforms"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/action/Message"/></antcall>
 
         <!-- YUI -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/button/button"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/container/container"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/treeview/treeview"/>
-        </antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/button/button"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/container/container"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/treeview/treeview"/></antcall>
 
         <!-- From YUI examples -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/examples/treeview/assets/js/TaskNode"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="yui/examples/treeview/assets/js/CheckOnClickNode"/>
-        </antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/examples/treeview/assets/js/TaskNode"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/examples/treeview/assets/js/CheckOnClickNode"/></antcall>
 
         <!-- JSCalendar -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/jscalendar/calendar"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/jscalendar/lang/calendar-en"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/jscalendar/calendar-setup"/>
-        </antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/jscalendar/calendar"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/jscalendar/lang/calendar-en"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/jscalendar/calendar-setup"/></antcall>
 
         <!-- Autocomplete -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/suggest-common"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/suggest-actb"/>
-        </antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/suggest-common"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/suggest-actb"/></antcall>
 
         <!-- AJAXXSLT -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/ajaxxslt/util"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/ajaxxslt/xmltoken"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/ajaxxslt/dom"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/ajaxxslt/xpath"/>
-        </antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/util"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/xmltoken"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/dom"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/xpath"/></antcall>
 
         <!-- Encryption -->
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/encryption/encryption"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/encryption/md5"/>
-        </antcall>
-        <antcall target="orbeon-minify-maybe-js">
-            <param name="name" value="javascript/encryption/utf-8"/>
-        </antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/encryption/encryption"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/encryption/md5"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/encryption/utf-8"/></antcall>
 
     </target>
 

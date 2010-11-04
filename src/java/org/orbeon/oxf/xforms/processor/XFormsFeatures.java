@@ -349,7 +349,8 @@ public class XFormsFeatures {
             // Underscore library
             new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             // XForms client
-            new ResourceConfig("/ops/javascript/xforms.js", "/ops/javascript/xforms-min.js")
+            new ResourceConfig("/ops/javascript/xforms.js", "/ops/javascript/xforms-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js", "/ops/javascript/orbeon/xforms/action/Message-min.js")
     };
 
     public static class ResourceConfig {

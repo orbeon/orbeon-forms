@@ -66,13 +66,18 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
     private final List<String> xhtmlElementLocalnames = new ArrayList<String>();
 
-    private static final Set<String> TABLE_CONTAINERS  = new HashSet<String>();
+    // Name of container elements that require the use of separators for handling visibility
+    private static final Set<String> SEPARATOR_CONTAINERS = new HashSet<String>();
     static {
-        TABLE_CONTAINERS.add("table");
-        TABLE_CONTAINERS.add("tbody");
-        TABLE_CONTAINERS.add("thead");
-        TABLE_CONTAINERS.add("tfoot");
-        TABLE_CONTAINERS.add("tr");
+        SEPARATOR_CONTAINERS.add("table");
+        SEPARATOR_CONTAINERS.add("tbody");
+        SEPARATOR_CONTAINERS.add("thead");
+        SEPARATOR_CONTAINERS.add("tfoot");
+        SEPARATOR_CONTAINERS.add("tr");
+
+        SEPARATOR_CONTAINERS.add("ol");
+        SEPARATOR_CONTAINERS.add("ul");
+        SEPARATOR_CONTAINERS.add("dl");
     }
 
     private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
@@ -373,7 +378,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     private boolean isClosestXHTMLAncestorTableContainer() {
         if (xhtmlElementLocalnames.size() > 0) {
             final String closestXHTMLElementLocalname = xhtmlElementLocalnames.get(xhtmlElementLocalnames.size() - 1);
-            return TABLE_CONTAINERS.contains(closestXHTMLElementLocalname);
+            return SEPARATOR_CONTAINERS.contains(closestXHTMLElementLocalname);
         }
         return false;
     }

@@ -48,7 +48,7 @@
 						listenerInvoked = "set";
 					},
 					setProperties: function() {
-						ORBEON.util.Properties.showErrorDialog.get() = (((this.testType % 2) == 0) ? "true" : "false");
+						opsXFormsProperties[ORBEON.util.Properties.showErrorDialog.name] = (((this.testType % 2) == 0) ? "true" : "false");
 						if ((this.testType % 4) < 2) {
 							ORBEON.xforms.Events.errorEvent.subscribe(this.myErrorListener);
 						}
@@ -74,7 +74,7 @@
 					triggerTest: function() {
 						var button = YAHOO.util.Dom.get("triggers").getElementsByTagName("button")[this.testType < 4 ? 0 : 1];
 						button.click();
-						this.wait(this.checkConditions, XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
+						this.wait(this.checkConditions, ORBEON.util.Properties.delayBeforeIncrementalRequest.get());
 					},
 					checkConditions: function() {
 						var errorPanel = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel")[0];
@@ -85,7 +85,7 @@
 						listenerInvoked = null;
 						var form = ORBEON.xforms.Controls.getForm(errorPanel);
 						ORBEON.xforms.Globals.formErrorPanel[form.id].hide();
-						opsXFormsProperties[SHOW_ERROR_DIALOG_PROPERTY] = this.initialShowDialogValue;
+						opsXFormsProperties[ORBEON.util.Properties.showErrorDialog.name] = this.initialShowDialogValue;
 
 						YAHOO.util.Assert.areEqual(this.getExpectedVisibility(), visibility);
 						YAHOO.util.Assert.areEqual(this.getExpectedListenerResponse(), listenerValueSet);

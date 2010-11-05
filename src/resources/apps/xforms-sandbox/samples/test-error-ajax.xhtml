@@ -33,106 +33,10 @@
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
-            <![CDATA[
-
-				YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
-                    name: "AJAX error",
-					listenerInvoked: null,
-					testType: null,
-					initialShowDialogValue: ORBEON.util.Properties.showErrorDialog.get(),
-
-					myErrorListener: function(eventName, eventData) {
-						// Handler here.
-						var testCase = this;
-						listenerInvoked = "set";
-					},
-					setProperties: function() {
-						opsXFormsProperties[ORBEON.util.Properties.showErrorDialog.name] = (((this.testType % 2) == 0) ? "true" : "false");
-						if ((this.testType % 4) < 2) {
-							ORBEON.xforms.Events.errorEvent.subscribe(this.myErrorListener);
-						}
-						else {
-							ORBEON.xforms.Events.errorEvent.unsubscribeAll();
-						}
-					},
-
-					doTest: function(type) {
-						this.testType = type;
-						this.setProperties();
-						this.triggerTest();
-					},
-
-					getExpectedVisibility: function() {
-						return ((this.testType % 2) == 0) ? "visible" : "hidden";
-					},
-
-					getExpectedListenerResponse: function() {
-						return ((this.testType % 4) < 2) ? "set" : null;
-					},
-
-					triggerTest: function() {
-						var button = YAHOO.util.Dom.get("triggers").getElementsByTagName("button")[this.testType < 4 ? 0 : 1];
-						button.click();
-						this.wait(this.checkConditions, ORBEON.util.Properties.delayBeforeIncrementalRequest.get());
-					},
-					checkConditions: function() {
-						var errorPanel = YAHOO.util.Dom.getElementsByClassName("xforms-error-panel")[0];
-						var errorPanelContainer = errorPanel.parentNode;
-						var visibility = YAHOO.util.Dom.getStyle(errorPanelContainer.id, "visibility");
-						var listenerValueSet = listenerInvoked ;
-
-						listenerInvoked = null;
-						var form = ORBEON.xforms.Controls.getForm(errorPanel);
-						ORBEON.xforms.Globals.formErrorPanel[form.id].hide();
-						opsXFormsProperties[ORBEON.util.Properties.showErrorDialog.name] = this.initialShowDialogValue;
-
-						YAHOO.util.Assert.areEqual(this.getExpectedVisibility(), visibility);
-						YAHOO.util.Assert.areEqual(this.getExpectedListenerResponse(), listenerValueSet);
-					},
-
-                    testServerSideShowErrorDialogWithListenerRegistered: function() {
-						this.doTest(0);
-                    },
-                    testServerSideHideErrorDialogWithListenerRegistered: function() {
-						this.doTest(1);
-                    },
-                    testServerSideShowErrorDialogWithListenerNotRegistered: function() {
-						this.doTest(2);
-                    },
-                    testServerSideHideErrorDialogWithListenerNotRegistered: function() {
-						this.doTest(3);
-                    },
-					testClientSideShowErrorDialogWithListenerRegistered: function() {
-						this.doTest(4);
-                    },
-                    testClientSideHideErrorDialogWithListenerRegistered: function() {
-						this.doTest(5);
-                    },
-                    testClientSideShowErrorDialogWithListenerNotRegistered: function() {
-						this.doTest(6);
-                    },
-                    testClientSideHideErrorDialogWithListenerNotRegistered: function() {
-						this.doTest(7);
-                    }
-                }));
-
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                    if (parent && parent.TestManager) {
-                        parent.TestManager.load();
-                    } else {
-                        new YAHOO.tool.TestLogger();
-                        YAHOO.tool.TestRunner.run();
-                    }
-                });
-            ]]>
-        </xhtml:script>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-error-ajax.js"/>
     </xhtml:head>
-
     <xhtml:body>
-
         <xforms:input ref="/root/*[number(/root/@position)] treat as element(a)"/>
-
         <xforms:group id="triggers">
         <xforms:trigger>
                 <xforms:label>Server-side XPath error</xforms:label>
@@ -140,15 +44,13 @@
                     <xforms:setvalue ref="/root/@position" value="'2'"/>
                 </xforms:action>
             </xforms:trigger>
-
             <xforms:trigger>
                 <xforms:label>Client-side JS error</xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xxforms:script>
                         try {
                             invalidFunctionCall();
-                        }
-                        catch(e) {
+                        } catch(e) {
                             var form = YAHOO.util.Dom.getElementsByClassName("xforms-form")[0];
                             ORBEON.xforms.Server.exceptionWhenTalkingToServer(e,form.id);
                         }

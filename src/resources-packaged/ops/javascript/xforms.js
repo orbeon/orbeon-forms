@@ -5798,7 +5798,7 @@ ORBEON.xforms.Server = {
      */
     showError: function(title, details, formID) {
         ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
-        if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get() == "true") {
+        if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get()) {
             var formErrorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
             if (formErrorPanel) {
                 // Render the dialog if needed

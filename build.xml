@@ -507,7 +507,7 @@
     </target>
 
     <!-- WAR file -->
-    <target name="orbeon-war" depends="classes, orbeon-minify-js" description="Create exploded WAR file">
+    <target name="orbeon-war" depends="classes" description="Create exploded WAR file">
         <antcall target="war"/>
         <antcall target="war-copy-descriptors">
             <param name="target" value="devel"/>
@@ -619,16 +619,14 @@
     </target>
 
     <target name="orbeon-minify-maybe-js">
-        <echo message="srcfile: ${resources-packaged.dir}/ops/${name}.js"/>
-        <echo message="targetfile: ${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
         <uptodate property="min.uptodate" srcfile="${resources-packaged.dir}/ops/${name}.js" targetfile="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
-        <echo message="Uptodate: ${min.uptodate}"/>
         <antcall target="orbeon-minify-one-js">
             <param name="name" value="${name}"/>
         </antcall>
     </target>
 
     <target name="orbeon-minify-one-js" unless="min.uptodate">
+        <echo message="Minimizing ${resources-packaged.dir}/ops/${name}.js"/>
         <java classname="com.yahoo.platform.yui.compressor.YUICompressor" classpath="${lib.dir}/yuicompressor-2.4.1.jar" fork="false" failonerror="true">
             <arg value="${resources-packaged.dir}/ops/${name}.js"/>
             <arg value="-o"/>

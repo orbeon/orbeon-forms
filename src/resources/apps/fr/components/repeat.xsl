@@ -82,9 +82,9 @@
                             <xsl:for-each select="(fr:body | xhtml:body)/(xhtml:tr[1] | fr:tr[1])/(xhtml:td | fr:td)/*[1]">
                                 <xhtml:th>
                                     <xhtml:div class="yui-dt-liner">
-                                        <xforms:output value="''" class="fr-hidden"><!-- hide the actual output control -->
+                                        <xforms:group>
                                             <xsl:copy-of select="xforms:label | xforms:help"/><!-- | xforms:hint -->
-                                        </xforms:output>
+                                        </xforms:group>
                                     </xhtml:div>
                                 </xhtml:th>
                             </xsl:for-each>

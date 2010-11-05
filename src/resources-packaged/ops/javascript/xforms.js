@@ -6287,7 +6287,6 @@ ORBEON.xforms.Server = {
             upload: ORBEON.xforms.Server.handleResponseUpload,
             failure: ORBEON.xforms.Server.handleFailureUpload
         };
-        ORBEON.xforms.Server.setTimeoutOnCallback(callback);
         YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback);
     },
 

@@ -430,6 +430,7 @@
                                 <!-- Repeat over existing services -->
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
+                                        <xxforms:variable name="current-submission" select="."/>
                                         <xhtml:li>
                                             <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
                                             <xforms:trigger ref="$trigger" appearance="minimal">
@@ -456,7 +457,7 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                     <!-- Delete stuff -->
-                                                    <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
+                                                    <xforms:delete nodeset="$current-submission"/>
                                                     <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
                                                 </xforms:action>
                                             </xforms:trigger>
@@ -484,6 +485,7 @@
                                 <!-- Repeat over existing services -->
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
+                                        <xxforms:variable name="current-submission" select="."/>
                                         <xhtml:li>
                                             <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
                                             <xforms:trigger ref="$trigger" appearance="minimal">
@@ -510,7 +512,7 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                     <!-- Delete stuff -->
-                                                    <xforms:delete nodeset="$model/xforms:submission[@id = context()/@id]"/>
+                                                    <xforms:delete nodeset="$current-submission"/>
                                                     <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
                                                 </xforms:action>
                                             </xforms:trigger>
@@ -538,6 +540,7 @@
                                 <!-- Repeat over existing bindings -->
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="$model/xforms:action[ends-with(@id, '-binding')]">
+                                        <xxforms:variable name="current-action" select="."/>
                                         <xhtml:li>
                                             <xxforms:variable name="binding-name" select="substring-before(@id, '-binding')"/>
                                             <xforms:trigger ref="$trigger" appearance="minimal">
@@ -564,7 +567,7 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                     <!-- Delete stuff -->
-                                                    <xforms:delete nodeset="$model/xforms:action[@id = context()/@id]"/>
+                                                    <xforms:delete nodeset="$current-action"/>
                                                 </xforms:action>
                                             </xforms:trigger>
                                             <xforms:output value="$binding-name"/>

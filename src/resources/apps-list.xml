@@ -20,7 +20,7 @@
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
         <application id="fr/orbeon/contact/summary" label="Contact Form"/>
         <application id="fr/orbeon/controls/new" label="Controls Form"/>
-        <application id="xforms-government/detail/DMV-14/" label="DMV-14 Form"/>
+        <application id="fr/orbeon/dmv-14/new" label="DMV-14 Form"/>
     </section>
     <section label="Essential XForms">
         <application id="xforms-controls" label="XForms Controls"/>

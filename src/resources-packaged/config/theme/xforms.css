@@ -411,9 +411,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
    http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
 .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { display: block }
 
-/* Make sure there is no margin at bottom of table used within tree */
-.xforms-select1-appearance-xxforms-tree table, .xforms-select-appearance-xxforms-tree table { margin-bottom: 0 }
-
 /* Yellow highlight for selected item */
 .xforms-form .ygtvcontent .xforms-tree-label-selected,
 .xforms-form .ygtvcontent .xforms-tree-label-selected:hover { background-color: #ff6 }
@@ -426,3 +423,4 @@ a.ygtvlabel { cursor: pointer; }
 
 /* YUI sets this to a color, but it is hindering more than anything else */
 .ygtvfocus { background-color: transparent }
+.xforms-select-appearance-xxforms-tree table, xforms-select1-appearance-xxforms-tree table { margin: 0 }/* as table style can be globally changed */

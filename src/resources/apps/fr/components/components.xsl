@@ -142,7 +142,7 @@
                     <xsl:apply-templates select="@*|node()"/>
                 </xsl:element>
             </xsl:for-each>
-
+    
             <!-- Process the rest -->
             <xsl:apply-templates select="node() except (xhtml:link | xhtml:style)"/>
 
@@ -184,6 +184,8 @@
             <xsl:if test="$is-form-builder">
                 <xsl:attribute name="xxforms:client.events.filter"/>
             </xsl:if>
+            <!-- Override layout if specified -->
+            <xsl:copy-of select="xxforms:xhtml-layout"/>
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

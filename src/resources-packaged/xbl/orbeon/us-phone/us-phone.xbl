@@ -30,7 +30,7 @@
 
         TODO: Handle better optional vs. required scenarios for validation purposes.
      -->
-    <xbl:binding id="fr-phone-binding" element="fr|us-phone">
+    <xbl:binding id="fr-phone-binding" element="fr|us-phone" xxbl:container="span">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -51,15 +51,6 @@
             </template>
         </metadata>
 
-        <xbl:resources>
-            <xbl:style>
-                .xbl-fr-us-phone .fr-us-phone-area input.xforms-input-input { width: 3em }
-                .xbl-fr-us-phone .fr-us-phone-local input.xforms-input-input { width: 7em }
-                <!-- This is not very elegant but we need a strong rule to override the FR defaults -->
-                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-phone .fr-us-phone-area input.xforms-input-input { width: 3em }
-                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-phone .fr-us-phone-local input.xforms-input-input { width: 7em }
-            </xbl:style>
-        </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
             <xf:model id="number-model">
@@ -105,8 +96,8 @@
 
                     <xf:group class="fr-component-group">
                         <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                        (<xf:input ref="area" class="fr-us-phone-area" xbl:attr="navindex navindex=tabindex"><xf:alert class="xforms-disabled"/></xf:input>)
-                        <xf:input ref="local" class="fr-us-phone-local"><xf:alert class="xforms-disabled"/></xf:input>
+                        (<xf:input ref="area" class="fr-us-phone-area fr-width-3em" xbl:attr="navindex navindex=tabindex"/>)
+                        <xf:input ref="local" class="fr-us-phone-local fr-width-7em"/>
 
                         <!-- React to update to local values -->
                         <xf:action ev:event="xforms-value-changed">

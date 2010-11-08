@@ -21,7 +21,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding id="fr-us-state-binding" element="fr|us-state">
+    <xbl:binding id="fr-us-state-binding" element="fr|us-state" xxbl:container="span">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

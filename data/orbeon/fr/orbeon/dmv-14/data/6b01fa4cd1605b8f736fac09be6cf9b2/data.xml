@@ -1,17 +1,4 @@
-<!--
-  Copyright (C) 2010 Orbeon, Inc.
-
-  This program is free software; you can redistribute it and/or modify it under the terms of the
-  GNU Lesser General Public License as published by the Free Software Foundation; either version
-  2.1 of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
-
-  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  -->
-<form xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:exforms="http://www.exforms.org/exf/1-0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<form>
     <personal-information>
         <last-name>Smith</last-name>
         <first-name>John</first-name>
@@ -31,7 +18,7 @@
         <residence-state>CA</residence-state>
         <residence-zip>94102</residence-zip>
     </residence-address>
-    <mailing-address>
+    <mailing-address show="true">
         <mailing-street-number>456</mailing-street-number>
         <mailing-street-name-1>Pine Avenue</mailing-street-name-1>
         <mailing-street-name-2>Apt 42</mailing-street-name-2>
@@ -65,7 +52,7 @@
         <old-state>CA</old-state>
         <old-zip>12345</old-zip>
     </old-address>
-    <trailer-coach-vessel>
+    <trailer-coach-vessel show="true">
         <vehicle-street-number>456</vehicle-street-number>
         <vehicle-street-name-1>Pine Avenue</vehicle-street-name-1>
         <vehicle-street-name-2>Apt 42</vehicle-street-name-2>

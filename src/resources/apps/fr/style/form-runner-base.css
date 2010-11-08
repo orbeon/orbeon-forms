@@ -485,9 +485,15 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 #fr-view .fr-grid .fr-grid-content .fr-width-2em input.xforms-input-input,
     #fr-view .fr-grid .fr-grid-content input.fr-width-2em,
     #fr-view .fr-grid .fr-grid-content select.fr-width-2em, #fr-view .fr-grid .fr-grid-content .fr-width-2em select { width: 2em }
+#fr-view .fr-grid .fr-grid-content .fr-width-3em input.xforms-input-input,
+    #fr-view .fr-grid .fr-grid-content input.fr-width-3em,
+    #fr-view .fr-grid .fr-grid-content select.fr-width-3em, #fr-view .fr-grid .fr-grid-content .fr-width-3em select { width: 3em }
 #fr-view .fr-grid .fr-grid-content .fr-width-5em input.xforms-input-input,
     #fr-view .fr-grid .fr-grid-content input.fr-width-5em,
     #fr-view .fr-grid .fr-grid-content select.fr-width-5em, #fr-view .fr-grid .fr-grid-content .fr-width-5em select { width: 5em }
+#fr-view .fr-grid .fr-grid-content .fr-width-7em input.xforms-input-input,
+    #fr-view .fr-grid .fr-grid-content input.fr-width-7em,
+    #fr-view .fr-grid .fr-grid-content select.fr-width-7em, #fr-view .fr-grid .fr-grid-content .fr-width-7em select { width: 7em }
 #fr-view .fr-grid .fr-grid-content .fr-width-10em input.xforms-input-input,
     #fr-view .fr-grid .fr-grid-content input.fr-width-10em,
     #fr-view .fr-grid .fr-grid-content select.fr-width-10em, #fr-view .fr-grid .fr-grid-content .fr-width-10em select { width: 10em }

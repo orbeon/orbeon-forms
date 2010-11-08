@@ -60,7 +60,10 @@
         },
 
         _showMessage: function() {
-            this._messageDialog.setBody(this._messageQueue[0]);
+            // Create a span, otherwise setBody() assume the parameters is HTML, while we want it to be text
+            var span = document.createElement("span");
+            OD.setStringValue(span, this._messageQueue[0]);
+            this._messageDialog.setBody(span);
             this._messageDialog.show();
         },
 

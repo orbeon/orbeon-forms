@@ -526,7 +526,8 @@ YAHOO.xbl.fr.Datatable.unittests_lib = {
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
         var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            YAHOO.util.UserAction.click(liner, {clientX: 1});
+            var anchor = liner.getElementsByTagName("a")[0];
+            YAHOO.util.UserAction.click(anchor);
         }, function() {
             this.checkHint(table, columnIndex, expectedHintAfter, 'After click: ');
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);

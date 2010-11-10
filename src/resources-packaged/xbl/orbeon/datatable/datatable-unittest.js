@@ -43,22 +43,19 @@ var testCase = {
             });
 
         });
-    },
+    }
+    ,
 
     test314679: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314679', function() {
-
             var table = YAHOO.util.Dom.get('my-accordion$table-314679$table-314679-table');
             thiss.clickAndCheckSortOrder(table, 1, 'descending', ['three', 'two', 'one'], function() {
-
                 thiss.closeAccordionCase(thiss, '_314679');
-
             });
-
         });
-    },
-
+    }
+    ,
 
     testOptionalScrollhV: function() {
         var thiss = this;

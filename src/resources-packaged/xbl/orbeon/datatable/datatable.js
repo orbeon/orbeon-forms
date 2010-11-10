@@ -182,15 +182,11 @@ YAHOO.xbl.fr.Datatable.prototype = {
     },
 
     /**
-     *  Get the request UUID
+     *  Get the request sequence number
      */
     getRequestUUID: function() {
         var form = ORBEON.xforms.Controls.getForm(this.container);
-        var formDynamicState = ORBEON.xforms.Globals.formDynamicState[form.id];
-        if (formDynamicState !== undefined) {
-            this.lastRequestUUID = formDynamicState.value;
-        }
-        return this.lastRequestUUID;
+        return ORBEON.xforms.Document.getFromClientState(form.id, "sequence");
     },
 
     /**

@@ -61,7 +61,7 @@ YAHOO.xbl.fr.Datatable.unittests_lib = {
                     thiss.openAccordionCase(testCase, targetId, callback);
                 }, 10);
             }
-        }, 100);
+        }, 200);
     },
 
     closeAccordionCase: function (testCase, targetId, callback) {

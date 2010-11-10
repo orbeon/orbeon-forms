@@ -374,7 +374,7 @@ var testCase = {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314210', function() {
             var headerTable = YAHOO.util.Dom.get('my-accordion$table-314210$table-314210-table');
-            YAHOO.util.Assert.isTrue(headerTable.clientWidth > headerTable.parentNode.clientWidth, 'The table header width (' + headerTable.clientWidth + 'px) should be larger than its container width (' + headerTable.parentNode.clientWidth + 'px).');
+            YAHOO.util.Assert.isTrue(headerTable.clientWidth == headerTable.parentNode.clientWidth, 'The table header width (' + headerTable.clientWidth + 'px) should be equal than its container width (' + headerTable.parentNode.clientWidth + 'px).');
             thiss.closeAccordionCase(thiss, '_314210');
         });
     }

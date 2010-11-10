@@ -43,10 +43,7 @@ var testCase = {
             });
 
         });
-    }
-    ,
-
-
+    },
 
     test314679: function() {
         var thiss = this;

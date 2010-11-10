@@ -283,7 +283,7 @@ var testCase = {
     }
     ,
 
-    testWidthsResizeable100pxLeft: function() {
+    testWidthsResizeable50pxLeft: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, 'widths-resizeable', function() {
             var table = YAHOO.util.Dom.get('my-accordion$table-widths-resizeable$table-widths-resizeable-table');
@@ -291,10 +291,10 @@ var testCase = {
             var th2 = table.tHead.rows[0].cells[1];
             var width1 = th1.clientWidth;
             var width2 = th2.clientWidth;
-            thiss.resizeColumn(th2, -100, 10);
+            thiss.resizeColumn(th2, -50, 10);
             thiss.checkTableAndContainerWidths(table);
-            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
-            YAHOO.util.Assert.areEqual(width2 - 100, th2.clientWidth, "The width of the second column should be " + (width2 - 100) + ", not " + th2.clientWidth);
+            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The width of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
+            YAHOO.util.Assert.areEqual(width2 - 50, th2.clientWidth, "The width of the second column should be " + (width2 - 50) + ", not " + th2.clientWidth);
             thiss.checkRowWidth(table.tHead.rows[0]);
             thiss.closeAccordionCase(thiss, 'widths-resizeable');
         });

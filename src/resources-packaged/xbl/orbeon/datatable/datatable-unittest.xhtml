@@ -76,6 +76,7 @@
             </xhtml:ol>
         </xhtml:fieldset>
 
+
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
             <!-- <fr:case selected="true" id="_new">
                 <fr:label>#new: style attributes are not properly copied</fr:label>
@@ -107,7 +108,7 @@
                     </fr:datatable>
                 </xhtml:div>
                 </fr:case>-->
-            <fr:case selected="true" id="repeat-refresh">
+            <fr:case selected="false" id="repeat-refresh">
                 <fr:label>Check that every table in an xforms:repeat gets updated</fr:label>
                 <xhtml:div>
                     <xhtml:p>When embedded in an xforms:repeat, each datatable should properly be updated when its nodeset changes.</xhtml:p>
@@ -136,7 +137,7 @@
                     </xforms:repeat>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314679">
+            <fr:case selected="false" id="_314679">
                 <fr:label>#314679: RFE: add a fr:sortKey attribute to manually define sort keys when needed</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314679&amp;group_id=168&amp;atid=350207"
@@ -165,7 +166,7 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="optional-scrollh-v">
+            <fr:case selected="false" id="optional-scrollh-v">
                 <fr:label>Optional horizontal scrollbar with a vertical scrollbar</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -193,7 +194,7 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="optional-scrollh">
+            <fr:case selected="false" id="optional-scrollh">
                 <fr:label>Optional horizontal scrollbar</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -221,7 +222,7 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314466">
+            <fr:case selected="false" id="_314466">
                 <fr:label>#314466:Datatable generates an error in IE when used within an xxforms:dialog.</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314466&amp;group_id=168&amp;atid=350207"
@@ -257,7 +258,7 @@
                     </xxforms:dialog>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314459">
+            <fr:case selected="false" id="_314459">
                 <fr:label>#314459:Paginated datatables: the page number is not properly set when the datatable is hidden (by an empty context) and
                     show again.</fr:label>
                 <xhtml:div>
@@ -283,7 +284,7 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314415">
+            <fr:case selected="false" id="_314415">
                 <fr:label>#314415:Datatable within an xforms:repeat are not properly initialized when iterations are deleted and added
                     again</fr:label>
                 <xhtml:div>
@@ -311,7 +312,7 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314422">
+            <fr:case selected="false" id="_314422">
                 <fr:label>#314422: Datatable: go to the last page when the current page disappears</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314422&amp;group_id=168&amp;atid=350207"
@@ -340,7 +341,7 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314359">
+            <fr:case selected="false" id="_314359">
                 <fr:label>#314359: Scrollable datatables get their header and body columns desynchronized in Firefox</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314359&amp;group_id=168&amp;atid=350207"
@@ -367,7 +368,7 @@
                     </fr:datatable>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314292">
+            <fr:case selected="false" id="_314292">
                 <fr:label>#314292: Datatable is not properly rendered. It looks like it's slightly shifted to the left in IE6/7</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314292&amp;group_id=168&amp;atid=350207"
@@ -394,7 +395,7 @@
                     </fr:datatable>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="_314217">
+            <fr:case selected="false" id="_314217">
                 <fr:label>#314217: empty horizontally scrollable datatables do not display a scrollbar in Firefox</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314217&amp;group_id=168&amp;atid=350207"
@@ -421,7 +422,7 @@
                     </fr:datatable>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="widths">
+            <fr:case selected="false" id="widths">
                 <fr:label>Check column and table widths</fr:label>
                 <xhtml:div>
                     <xhtml:p>This table is used to check that column and table widths are consistent</xhtml:p>
@@ -447,7 +448,7 @@
                     </fr:datatable>
                 </xhtml:div>
             </fr:case>
-            <fr:case selected="true" id="widths-resizeable">
+            <fr:case selected="false" id="widths-resizeable">
                 <fr:label>Check column and table widths with resizeabled columns</fr:label>
                 <xhtml:div>
                     <xhtml:p>This table is used to check that column and table widths are consistent</xhtml:p>
@@ -573,9 +574,8 @@
             <fr:case selected="true" id="_314210">
                 <fr:label>#314210: 100% width, horizontal scroll, short lines</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207"
-                            >314210</xhtml:a>.</xhtml:p>
-                    <fr:datatable width="100%" scrollable="horizontal" id="table-314210">
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207">314210</xhtml:a>.</xhtml:p>
+                    <fr:datatable width="50%" scrollable="horizontal" id="table-314210">
                         <xhtml:thead>
                             <xhtml:tr>
                                 <xhtml:th>Number</xhtml:th>

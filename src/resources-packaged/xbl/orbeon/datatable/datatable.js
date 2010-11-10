@@ -569,11 +569,10 @@ YAHOO.xbl.fr.Datatable.prototype = {
         var pxWidth;
 
         if (this.originalWidth.indexOf('%') != - 1) {
-
-            if (this.scrollH) {
+            if (this.scrollV) {
                 pxWidth = this.divContainer.clientWidth - 21;
             } else {
-                pxWidth = this.divContainer.clientWidth - 2;
+                pxWidth = this.divContainer.clientWidth;
             }
         } else if (this.originalWidth == 'auto') {
             pxWidth = this.table.clientWidth;

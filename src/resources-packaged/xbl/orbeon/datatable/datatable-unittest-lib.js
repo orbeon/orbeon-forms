@@ -335,7 +335,7 @@ YAHOO.xbl.fr.Datatable.unittests_lib = {
             return;
         }
         var headerTable = this.getHeaderTable(table, isSplit);
-        var classPrefix = 'dt-' + table.id.replace('\$', '-', 'g') + '-col-';
+        var classPrefix = 'dt-' + table.id.replace(/\$/g, '-') + '-col-';
         this.checkCellClassesInARow(headerTable.tHead.rows[0], classPrefix);
         var rows = table.tBodies[0].rows;
         for (var i = 0; i < rows.length; i++) {

@@ -815,7 +815,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                         } else {
                             // Resizing is supported through dynamic styles
                             var className = 'dt-' + this.id + '-col-' + (icol + 1);
-                            className = className.replace('\$', '-', 'g');
+                            className = className.replace(/\$/g, '-');
                             for (var irow = 0; irow < this.bodyColumns[icol].length; irow++) {
                                 var cell = this.bodyColumns[icol][irow];
                                 var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);

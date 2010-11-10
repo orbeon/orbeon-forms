@@ -363,9 +363,10 @@ var testCase = {
 
     test314174: function() {
         var thiss = this;
-        thiss.openAccordionCase(thiss, '_314174');
-        //TODO: test something here!
-        thiss.closeAccordionCase(thiss, '_314174');
+        thiss.openAccordionCase(thiss, '_314174', function() {
+            //TODO: test something here!
+            thiss.closeAccordionCase(thiss, '_314174');
+        });
     }
     ,
 

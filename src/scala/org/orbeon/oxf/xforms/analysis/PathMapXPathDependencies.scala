@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.LHHATrait
+import controls.{SelectionControl, LHHATrait}
 import model.Model
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.om.NodeInfo
@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms._
 import org.w3c.dom.Node._
 import org.orbeon.oxf.common.OXFException
 import java.util.{Map => JMap}
+import java.lang.String
 
 class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsStaticState)// Constructor for unit tests
         extends XPathDependencies {
@@ -93,6 +94,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         val modifiedBindingCache = new HashMap[String, UpdateResult]
         val modifiedValueCache = new HashMap[String, UpdateResult]
         val modifiedLHHACache = new HashMap[String, Boolean]
+        val modifiedItemsetCache = new HashMap[String, Boolean]
 
         // Statistics
         var bindingUpdateCount: Int = 0
@@ -123,6 +125,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             modifiedValueCache.clear()
 
             modifiedLHHACache.clear()
+            modifiedItemsetCache.clear()
 
             bindingUpdateCount = 0
             valueUpdateCount = 0
@@ -141,6 +144,12 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     private var lhhaUnknownDependencies: Int = 0
     private var lhhaMissCount: Int = 0
     private var lhhaHitCount: Int = 0
+
+    private var itemsetEvaluationCount: Int = 0
+    private var itemsetOptimizedCount: Int = 0
+    private var itemsetUnknownDependencies: Int = 0
+    private var itemsetMissCount: Int = 0
+    private var itemsetHitCount: Int = 0
 
     def this(containingDocument: XFormsContainingDocument) {
         // Defer logger initialization as controls might not have been initialized at time this constructor is called.
@@ -223,6 +232,12 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         lhhaUnknownDependencies = 0
         lhhaMissCount = 0
         lhhaHitCount = 0
+
+        itemsetEvaluationCount = 0
+        itemsetOptimizedCount = 0
+        itemsetUnknownDependencies = 0
+        itemsetMissCount = 0
+        itemsetHitCount = 0
     }
 
     def afterUpdateResponse {
@@ -232,14 +247,22 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     def notifyComputeLHHA: Unit = lhhaEvaluationCount += 1
     def notifyOptimizeLHHA: Unit = lhhaOptimizedCount += 1
 
+    def notifyComputeItemset: Unit = itemsetEvaluationCount += 1
+    def notifyOptimizeItemset: Unit = itemsetOptimizedCount += 1
+
     private def outputLHHAStats() {
         if (getLogger.isDebugEnabled)
             getLogger.logDebug("dependencies", "summary after response",
-                Array("lhha evaluations", lhhaEvaluationCount.toString,
-                      "lhha optimized", lhhaOptimizedCount.toString,
-                      "lhha unknown dependencies", lhhaUnknownDependencies.toString,
-                      "lhha intersections", lhhaHitCount.toString,
-                      "lhha disjoints", lhhaMissCount.toString): _*)
+                Array("LHHA evaluations", lhhaEvaluationCount.toString,
+                      "LHHA optimized", lhhaOptimizedCount.toString,
+                      "LHHA unknown dependencies", lhhaUnknownDependencies.toString,
+                      "LHHA intersections", lhhaHitCount.toString,
+                      "LHHA disjoints", lhhaMissCount.toString,
+                      "Itemset evaluations", itemsetEvaluationCount.toString,
+                      "Itemset optimized", itemsetOptimizedCount.toString,
+                      "Itemset unknown dependencies", itemsetUnknownDependencies.toString,
+                      "Itemset intersections", itemsetHitCount.toString,
+                      "Itemset disjoints", itemsetMissCount.toString): _*)
     }
 
     // For unit tests
@@ -341,7 +364,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         updateResult.requireUpdate
     }
 
-    def requireLHHAUpdate(lhha: XFormsConstants.LHHA, controlPrefixedId: String): Boolean = {
+    def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String): Boolean = {
 
         assert(inRefresh) // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
 
@@ -350,7 +373,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             case None => // not cached
                 staticState.getControlAnalysis(controlPrefixedId) match {
                     case control: LHHATrait => // control found
-                        val result = control.getLHHAValueAnalysis(lhha.name.toLowerCase) match {
+                        val result = control.getLHHAValueAnalysis(lhhaName) match {
                             case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
                                 lhhaUnknownDependencies += 1
                                 true
@@ -358,10 +381,38 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.modifiedPaths)
                                 if (result) lhhaHitCount += 1 else lhhaMissCount += 1
                                 result
-                            case None => throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhha.name.toLowerCase)
+                            case None => throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhhaName)
                         }
                         if (control.isWithinRepeat)
                             RefreshState.modifiedLHHACache.put(controlPrefixedId, result)
+                        result
+                    case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
+                }
+        }
+    }
+
+
+    def requireItemsetUpdate(controlPrefixedId: String): Boolean = {
+
+        assert(inRefresh)
+
+        RefreshState.modifiedItemsetCache.get(controlPrefixedId) match {
+            case Some(result) => result // cached
+            case None => // not cached
+                staticState.getControlAnalysis(controlPrefixedId) match {
+                    case control: SelectionControl => // control found
+                        val result = control.getItemsetAnalysis match {
+                            case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
+                                itemsetUnknownDependencies += 1
+                                true
+                            case Some(analysis) => // dependencies are known
+                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.modifiedPaths)
+                                if (result) itemsetHitCount += 1 else itemsetMissCount += 1
+                                result
+                            case None => throw new IllegalStateException("Itemset not analyzed")
+                        }
+                        if (control.isWithinRepeat)
+                            RefreshState.modifiedItemsetCache.put(controlPrefixedId, result)
                         result
                     case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
                 }

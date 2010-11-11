@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -69,6 +70,14 @@ public class DumbXPathDependencies implements XPathDependencies {
         // NOP
     }
 
+    public void notifyComputeItemset() {
+        // NOP
+    }
+
+    public void notifyOptimizeItemset() {
+        // NOP
+    }
+
     public boolean requireBindingUpdate(String controlPrefixedId) {
         // Always update
         return true;
@@ -79,7 +88,12 @@ public class DumbXPathDependencies implements XPathDependencies {
         return true;
     }
 
-    public boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId) {
+    public boolean requireLHHAUpdate(String lhhaName, String controlPrefixedId) {
+        // Always update
+        return true;
+    }
+
+    public boolean requireItemsetUpdate(String controlPrefixedId) {
         // Always update
         return true;
     }

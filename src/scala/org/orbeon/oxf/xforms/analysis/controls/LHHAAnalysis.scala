@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
-import org.orbeon.oxf.xml.dom4j._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
 
 abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
@@ -50,6 +50,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
 
     override protected def computeValueAnalysis = {
         if (staticValue.isEmpty) {
+            // Value is likely not static
 
             // Delegate to concrete implementation
             val delegateAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) with ValueTrait with ViewTrait
@@ -57,7 +58,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
 
             if (ref.isDefined || value.isDefined) {
                 // 1. E.g. <xforms:label model="…" context="…" value|ref="…"/>
-                assert (element.elements.isEmpty) // no children elements allowed in this case
+                assert(element.elements.isEmpty) // no children elements allowed in this case
 
                 // Use value provided by the delegate
                 delegateAnalysis.getValueAnalysis
@@ -67,7 +68,8 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                 // NOTE: We do allow @context and/or @model on LHHA element, which can change the context
 
                 // The subtree can only contain HTML elements interspersed with xf:output. HTML elements may have AVTs.
-                var analyses: List[XPathAnalysis] = Nil
+                var combinedAnalysis: XPathAnalysis = StringAnalysis()
+
                 Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener {
                     val hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs
                     def startElement(element: Element) {
@@ -76,12 +78,12 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                             val outputAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element)) with ValueTrait
                             outputAnalysis.analyzeXPath()
                             if (outputAnalysis.getValueAnalysis.isDefined)
-                                analyses = outputAnalysis.getValueAnalysis.get :: analyses
+                                combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
                         } else if (hostLanguageAVTs) {
                             val attributes = element.attributes
                             for (o <- attributes; attributeValue = o.asInstanceOf[Attribute].getValue; if XFormsUtils.maybeAVT(attributeValue)) {
                                 // TODO: handle AVTs
-                                analyses = List(NegativeAnalysis(attributeValue)) // not supported just yet
+                                combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
                             }
                         }
                     }
@@ -90,8 +92,8 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                     def text(text: Text) {}
                 })
 
-                // Combine all
-                Some((StringAnalysis() /: analyses) (_ combine _))
+                // Result of all combined analyses
+                Some(combinedAnalysis)
             }
         } else
             // Value of LHHA is 100% static and analysis is constant

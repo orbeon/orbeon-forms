@@ -101,9 +101,9 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
     def isWithinRepeat = closestInScopeRepeat.isDefined
 
     // API for Java
-    def javaToXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = toXML(propertyContext, helper)()
+    def javaToXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = toXML(propertyContext, helper, List())({})
 
-    def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
+    def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
 
         def getModelPrefixedId = scopeModel.containingModel match { case Some(model) => Some(model.prefixedId); case None => None }
 

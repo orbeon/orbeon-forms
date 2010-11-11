@@ -2119,21 +2119,21 @@
         <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-                 xmlns:xf="http://www.w3.org/2002/xforms">
-           <xh:head>
-                <xf:model id="model">
-                    <xf:instance id="instance">
-                        <instance/>
-                    </xf:instance>
-                </xf:model>
-           </xh:head>
-           <xh:body>
-                <xf:input ref=".">
-                    <xf:label>Foo<xh:br/>Bar</xf:label>
-                    <xf:help>Foo<xh:div/>Bar</xf:help>
-                </xf:input>
-            </xh:body>
-        </xh:html>
+                     xmlns:xf="http://www.w3.org/2002/xforms">
+               <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+               </xh:head>
+               <xh:body>
+                    <xf:input ref=".">
+                        <xf:label>Foo<xh:br/>Bar</xf:label>
+                        <xf:help>Foo<xh:div/>Bar</xf:help>
+                    </xf:input>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">

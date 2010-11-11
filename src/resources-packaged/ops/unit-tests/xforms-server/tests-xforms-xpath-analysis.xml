@@ -4505,21 +4505,21 @@
                     <help>
                         <analysis expression="(xs:string(.[1])) | (xs:string(.[1]))" analyzed="true">
                             <value-dependent>
-                                <path>instance('i21')/@help2</path>
                                 <path>instance('i11')/@help1</path>
+                                <path>instance('i21')/@help2</path>
                             </value-dependent>
                             <dependent-models>
-                                <model>m2</model>
                                 <model>m1</model>
+                                <model>m2</model>
                             </dependent-models>
                             <dependent-instances>
-                                <instance>i21</instance>
                                 <instance>i11</instance>
+                                <instance>i21</instance>
                             </dependent-instances>
                         </analysis>
                     </help>
                     <hint>
-                        <analysis expression="(xs:string((index('my-repeat'))[1])) | (xs:string(.[1]))" analyzed="false"/>
+                        <analysis expression="(xs:string(.[1])) | (xs:string((index('my-repeat'))[1]))" analyzed="false"/>
                     </hint>
                 </input>
                 <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true"/>
@@ -4974,6 +4974,38 @@
         </output>
     </test>
 
+    <test description="Handling of required upon initialization" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315598&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model xxf:xhtml-layout="span" xxf:xpath-analysis="true">
+                        <xf:instance>
+                            <first-name/>
+                        </xf:instance>
+                        <xf:bind nodeset="instance()" required="true()"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="my-input" ref="instance()">
+                        <xf:alert>First name is mandatory</xf:alert>
+                    </xf:input>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-empty">
+                    <xh:input id="my-input$xforms-input-1" type="text" name="my-input$xforms-input-1" value="" class="xforms-input-input"/>
+                    <xh:span class="xforms-alert-active xforms-alert">First name is mandatory</xh:span>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
+
     <test description="Bind with name attribute" name="oxf:java" exclude="true">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -5045,6 +5077,200 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
 
+            </request>
+        </output>
+    </test>
+
+    <test description="Simple itemset" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:select id="my-select" ref="value">
+                        <xf:itemset ref="../item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                    </xf:select>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <select scope="" prefixed-id="my-select" model-prefixed-id="model" binding="true" value="true">
+                    <binding>
+                        <analysis expression="value" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')/value</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <itemset>
+                        <analysis expression="(xs:string(.[1])) | (xs:string(.[1]))" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')/item/label</path>
+                                <path>instance('instance')/item/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </itemset>
+                </select>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="Complex itemset" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model1">
+                        <xf:instance id="instance1">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                    <xf:model xxf:xpath-analysis="true" id="model2">
+                        <xf:instance id="instance2">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:select id="my-select" ref="value">
+                        <xf:item context="../item">
+                            <xf:label ref="label"/>
+                            <xf:value value="value"/>
+                        </xf:item>
+                        <xf:itemset context="../itemset" ref="item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                        <xf:choices context="../choices">
+                            <xf:label ref="label"/>
+                            <xf:item context="item">
+                                <xf:label ref="label"/>
+                                <xf:value value="value"/>
+                            </xf:item>
+                            <xf:itemset ref="itemset">
+                                <xf:label ref="label"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                            <xf:choices model="model2" context="items">
+                                <xf:item>
+                                    <xf:label ref="item1/label"/>
+                                    <xf:value value="item1/value"/>
+                                </xf:item>
+                                <xf:item context="item2">
+                                    <xf:label ref="label"/>
+                                    <xf:value value="value"/>
+                                </xf:item>
+                            </xf:choices>
+                        </xf:choices>
+                    </xf:select>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <select scope="" prefixed-id="my-select" model-prefixed-id="model1" binding="true" value="true">
+                    <binding>
+                        <analysis expression="value" analyzed="true">
+                            <returnable>
+                                <path>instance('instance1')/value</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance1</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance1</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="xs:string(.[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance1')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <itemset>
+                        <analysis expression="((((((((((((xs:string(.[1])) | (xs:string((value)[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string((value)[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string((item1/value)[1]))) | (xs:string(.[1]))) | (xs:string((value)[1]))" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance1')/item/label</path>
+                                <path>instance('instance1')/item/value</path>
+                                <path>instance('instance1')/itemset/item/label</path>
+                                <path>instance('instance1')/itemset/item/value</path>
+                                <path>instance('instance1')/choices/label</path>
+                                <path>instance('instance1')/choices/item/label</path>
+                                <path>instance('instance1')/choices/item/value</path>
+                                <path>instance('instance1')/choices/itemset/label</path>
+                                <path>instance('instance1')/choices/itemset/value</path>
+                                <path>instance('instance2')/items/item1/label</path>
+                                <path>instance('instance2')/items/item1/value</path>
+                                <path>instance('instance2')/items/item2/label</path>
+                                <path>instance('instance2')/items/item2/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model1</model>
+                                <model>model2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance1</instance>
+                                <instance>instance2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </itemset>
+                </select>
+                <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true"/>
+                <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true"/>
             </request>
         </output>
     </test>

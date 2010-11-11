@@ -323,7 +323,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         )) {
             // Output variable information
             for (variable <- variablesSeq)
-                variable.toXML(propertyContext, helper) {}
+                variable.toXML(propertyContext, helper, List())({})
 
             // Output binds information
             if (topLevelBinds.nonEmpty) {

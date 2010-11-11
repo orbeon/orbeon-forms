@@ -13,9 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.XFormsStaticState
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsStaticState}
+import collection.mutable.Stack
+import org.orbeon.oxf.xforms.analysis.{StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
+import org.dom4j.{Text, Element}
+import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 
 trait SelectionControl extends SimpleElementAnalysis {
 
@@ -29,4 +33,100 @@ trait SelectionControl extends SimpleElementAnalysis {
 
     // Remember information
     val isMultiple = element.getName == "select"
+
+    private var itemsetAnalysis: Option[XPathAnalysis] = None
+    private var itemsetAnalyzed = false
+
+    final def getItemsetAnalysis = { assert(itemsetAnalyzed); itemsetAnalysis }
+
+    override def analyzeXPath() = {
+        super.analyzeXPath()
+        itemsetAnalysis = computeItemsetAnalysis()
+        itemsetAnalyzed = true
+    }
+
+    def computeItemsetAnalysis() = {
+
+        var combinedAnalysis: XPathAnalysis = StringAnalysis()
+
+        Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
+
+            val stack: Stack[SimpleElementAnalysis] = Stack(SelectionControl.this)
+
+            def startElement(element: Element) {
+
+                // Make lazy as might not be used
+                lazy val itemElementAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(stack.top), None, stack.top.getChildElementScope(element)) with ValueTrait with ViewTrait
+
+                element.getQName match {
+
+                    case XFormsConstants.ITEM_QNAME | XFormsConstants.ITEMSET_QNAME =>
+
+                        itemElementAnalysis.analyzeXPath()
+
+                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                        val valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME)
+
+                        require(labelElement ne null)
+                        require(valueElement ne null)
+
+                        val labelAnalysis = new LocalLHHAAnalysis(staticStateContext, labelElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(labelElement))
+                        val valueAnalysis = new LocalLHHAAnalysis(staticStateContext, valueElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(valueElement))
+
+                        labelAnalysis.analyzeXPath()
+                        valueAnalysis.analyzeXPath()
+
+                        combinedAnalysis = combinedAnalysis combine labelAnalysis.getValueAnalysis.get
+                        combinedAnalysis = combinedAnalysis combine valueAnalysis.getValueAnalysis.get
+
+                    case XFormsConstants.CHOICES_QNAME =>
+
+                        itemElementAnalysis.analyzeXPath()
+
+                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                        if (labelElement ne null) { // label is optional
+                            val labelAnalysis = new LocalLHHAAnalysis(staticStateContext, labelElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(labelElement))
+                            labelAnalysis.analyzeXPath()
+
+                            combinedAnalysis = combinedAnalysis combine labelAnalysis.getValueAnalysis.get
+                        }
+
+                        // Always push the container
+                        stack push itemElementAnalysis
+
+                    case _ => // ignore
+                }
+            }
+
+            def endElement(element: Element): Unit =
+                if (element == XFormsConstants.CHOICES_QNAME)
+                    stack pop
+
+            def text(text: Text) = {}
+        })
+
+        Some(combinedAnalysis)
+    }
+
+    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+        super.toXML(propertyContext, helper, attributes) {
+            // Optional content
+            content
+
+            // Itemset details
+            getItemsetAnalysis match {
+                case Some(analysis) =>
+                    helper.startElement("itemset")
+                    analysis.toXML(propertyContext, helper)
+                    helper.endElement()
+                case _ => // NOP
+            }
+        }
+    }
+
+    override def freeTransientState() = {
+        super.freeTransientState
+        if (itemsetAnalyzed && getItemsetAnalysis.isDefined)
+            getItemsetAnalysis.get.freeTransientState()
+    }
 }

@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.common.OXFException
-
 object ControlAnalysisFactory {
 
     def create(staticStateContext: StaticStateContext, parent: ContainerTrait, preceding: ElementAnalysis,

@@ -36,7 +36,7 @@ import java.util.*;
 public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     // Value
-    private String value;
+    private String value; // TODO: use ControlProperty<String>?
 
     // Previous value for refresh
     private String previousValue;

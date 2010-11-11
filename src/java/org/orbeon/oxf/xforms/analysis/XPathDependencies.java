@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -38,9 +39,13 @@ public interface XPathDependencies {
     void notifyComputeLHHA();
     void notifyOptimizeLHHA();
 
+    void notifyComputeItemset();
+    void notifyOptimizeItemset();
+
     boolean requireBindingUpdate(String controlPrefixedId);
     boolean requireValueUpdate(String controlPrefixedId);
-    boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId);
+    boolean requireLHHAUpdate(String lhhaName, String controlPrefixedId);
+    boolean requireItemsetUpdate(String controlPrefixedId);
 
     boolean hasAnyCalculationBind(Model model);
     boolean hasAnyValidationBind(Model model);

@@ -54,14 +54,16 @@ trait LHHATrait extends SimpleElementAnalysis {
         getAllLHHA filter (_.isLocal) foreach (_.analyzeXPath())
     }
 
-    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
-        super.toXML(propertyContext, helper) {
+    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+        super.toXML(propertyContext, helper, attributes) {
             for (analysis <- getAllLHHA) {
                 helper.startElement(analysis.element.getName)
                 if (analysis.getValueAnalysis.isDefined)
                     analysis.getValueAnalysis.get.toXML(propertyContext, helper)
                 helper.endElement()
             }
+
+            content
         }
     }
 

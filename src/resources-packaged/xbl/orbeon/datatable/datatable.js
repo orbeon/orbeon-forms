@@ -166,7 +166,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
                     this.isInitialized = true;
                     this.container.fr_dt_initialized = true;
                     this.columnsUpdateUUID = this.getRequestUUID();
-                    this.rowsUpdateUUID = this.columnsUpdateUUID;
                 } else {
                     // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
                     // Store a curried version of draw(), to avoid creating a new closure which can't be garbage

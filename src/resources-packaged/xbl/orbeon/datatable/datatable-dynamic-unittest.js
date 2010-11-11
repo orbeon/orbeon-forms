@@ -614,11 +614,8 @@ var testCase = {
         });
     },
 
-
     EOS:""
-}
-        ;
-
+};
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
     for (var property in YAHOO.xbl.fr.Datatable.unittests_lib) {

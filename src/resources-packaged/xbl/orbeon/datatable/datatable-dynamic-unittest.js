@@ -579,7 +579,7 @@ var testCase = {
             ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                 ORBEON.xforms.Document.setValue("loading", "false");
             }, function() {
-                var table = YAHOO.util.Dom.get('my-accordion$table-314379$table-314379-table');
+                var table = YAHOO.util.Dom.get('my-accordion$table-314379').getElementsByTagName("table")[0];
                 var th = thiss.getSignificantElementByIndex(table.tHead.rows[0].cells, 1);
                 var width;
                 width = th.clientWidth;

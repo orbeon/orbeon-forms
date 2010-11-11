@@ -11,25 +11,34 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom">
 
     <head>
         <title>Using YUI's datatable</title>
-        <xf:model id="model">
-            <xf:instance id="instance" src="http://search.twitter.com/search.atom?q=xforms&amp;rpp=43"/>
-            <xf:bind nodeset="instance('instance')/atom:entry/atom:published" type="xf:dateTime"/>
-        </xf:model>
+        <xforms:model id="model">
+            <xforms:instance id="instance" src="http://search.twitter.com/search.atom?q=xforms&amp;rpp=43"/>
+            <xforms:bind nodeset="instance('instance')/atom:entry/atom:published" type="xforms:dateTime"/>
+        </xforms:model>
     </head>
     <body>
 
         <h1>Paginated data table widgets (new generation)</h1>
 
-        <p>This sample demonstratres the pagination feature of the datatable widget.</p>
+        <p>This sample demonstrates the pagination feature of the datatable widget.</p>
 
-        <fr:datatable paginated="true" rowsPerPage="5">
-            <!-- Optional <thead>, otherwise try to build one from body -->
+        <fr:button>
+            <xforms:label>Go to page 2</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="my-datatable" name="fr-goto-page">
+                <xxforms:context name="fr-new-page" select="2"/>
+            </xforms:dispatch>
+        </fr:button>
+        
+        <fr:datatable paginated="true" rowsPerPage="5" id="my-datatable">
+            <xforms:action ev:event="fr-goto-page">
+                <xforms:message level="modal" value="concat('Arrived at page: ', event('fr-new-page'))"/>
+            </xforms:action>
             <thead>
                 <tr>
                     <th fr:sortable="true" fr:resizeable="true">Date</th>
@@ -40,15 +49,15 @@
             <tbody>
                 <tr repeat-nodeset="/atom:feed/atom:entry">
                     <td>
-                        <xf:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
+                        <xforms:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
                     </td>
                     <td>
                         <a href="{atom:author/atom:uri}">
-                            <xf:output value="atom:author/atom:name"/>
+                            <xforms:output value="atom:author/atom:name"/>
                         </a>
                     </td>
                     <td>
-                        <xf:output value="atom:title"/>
+                        <xforms:output value="atom:title"/>
                     </td>
                 </tr>
             </tbody>

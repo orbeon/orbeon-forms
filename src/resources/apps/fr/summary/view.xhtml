@@ -548,7 +548,7 @@
                         <div class="fr-clear"/>
                     </xforms:group>
 
-                    <xforms:group ref="instance('fr-summary-instance')">
+                    <xforms:group ref="instance('fr-summary-instance')" xxforms:update="full">
 
                         <!-- Stop propagation of all the UI events here because we don't care about validity and visited properties -->
                         <xforms:action ev:event="#all" ev:propagate="stop"/>
@@ -832,41 +832,40 @@
                             <xforms:group ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
                                 <fr:button ref=".">
                                     <xforms:label>
-                                        <!--<xhtml:img src="/apps/fr/style/delete.gif" alt=""/>-->
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
                                     </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <!-- Parse the selected rows -->
-                                        <xforms:action xxforms:iterate="tokenize(instance('fr-selection-instance'), '\s+')">
-                                            <!--<xxforms:variable name="position" select="." as="xs:integer"/>-->
-                                            <xxforms:variable name="document-name" select="." as="xs:string"/>
-                                            <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
-                                                <xxforms:context name="document-id" select="$document-name"/>
-                                            </xforms:dispatch>
-                                        </xforms:action>
-                                        <!-- Reset search selection and navigation -->
-                                        <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
-                                        <xforms:setindex repeat="documents-repeat" index="1"/>
-                                        <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-                                        <!-- Update search -->
-                                        <xforms:send submission="search-submission"/>
-                                    </xforms:action>
+                                    <!-- Open delete confirmation dialog -->
+                                    <xforms:dispatch ev:event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
                                 </fr:button>
                             </xforms:group>
                         </xhtml:span>
                     </xforms:repeat>
                 </xforms:group>
 
-                <!-- TODO
-                <xforms:trigger>
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/view-xml.gif" alt="XML"/>
-                        <xforms:output ref="$fr-resources/summary/labels/view-xml"/>
-                    </xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="fr-summary-xml"/>
-                </xforms:trigger>
-                -->
+                <!-- Delete confirmation dialog -->
+                <fr:alert-dialog id="delete-confirmation-dialog">
+                    <fr:label ref="$fr-resources/summary/labels/delete-form"/>
+                    <fr:message><xforms:output value="$fr-resources/summary/messages/delete-confirmation"/></fr:message>
+                    <fr:negative-choice/>
+                    <fr:positive-choice>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Parse the selected rows -->
+                            <xforms:action xxforms:iterate="tokenize(instance('fr-selection-instance'), '\s+')">
+                                <xxforms:variable name="document-name" select="." as="xs:string"/>
+                                <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
+                                    <xxforms:context name="document-id" select="$document-name"/>
+                                </xforms:dispatch>
+                            </xforms:action>
+                            <!-- Reset search selection and navigation -->
+                            <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
+                            <xforms:setindex repeat="documents-repeat" index="1"/>
+                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                            <!-- Update search -->
+                            <xforms:send submission="search-submission"/>
+                        </xforms:action>
+                    </fr:positive-choice>
+                </fr:alert-dialog>
             </fr:bottom>
         </fr:view>
     </body>

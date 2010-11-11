@@ -66,6 +66,7 @@
             </paging>
             <messages>
                 <no-form-found><i>No form data was found.</i></no-form-found>
+                <delete-confirmation>Are you sure you want to delete one or more forms?</delete-confirmation>
             </messages>
             <labels>
                 <new-form>New</new-form>
@@ -143,6 +144,8 @@
                 <submit-dialog-close-window>Close window</submit-dialog-close-window>
                 <collapse-all>Collapse all</collapse-all>
                 <expand-all>Expand all</expand-all>
+                <show-content>Show Content</show-content>
+                <hide-content>Hide Content</hide-content>
             </labels>
             <view>
                 <explanation>
@@ -222,6 +225,7 @@
             </paging>
             <messages>
                 <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
+                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires ?</delete-confirmation>
             </messages>
             <labels>
                 <new-form>Nouveau</new-form>
@@ -300,6 +304,8 @@
                 <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
                 <collapse-all>Fermer sections</collapse-all>
                 <expand-all>Ouvrir sections</expand-all>
+                <show-content>Montrer contenu</show-content>
+                <hide-content>Cacher contenu</hide-content>
             </labels>
             <view>
                 <explanation>
@@ -380,6 +386,7 @@
             </paging>
             <messages>
                 <no-form-found><i>No se encontró el formulario.</i></no-form-found>
+                <delete-confirmation>[Are you sure you want to delete one or more forms?]</delete-confirmation>
             </messages>
             <labels>
                 <new-form>Nuevo</new-form><!-- Formulario -->
@@ -457,6 +464,8 @@
                 <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
                 <collapse-all>Cerrar Secciones</collapse-all>
                 <expand-all>Abrir Secciones</expand-all>
+                <show-content>[Show Content]</show-content>
+                <hide-content>[Hide Content]</hide-content>
             </labels>
             <view>
                 <explanation>

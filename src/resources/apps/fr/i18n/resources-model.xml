@@ -97,7 +97,7 @@
         <xforms:insert context="." origin="xxforms:set-session-attribute('fr-language', xs:string($lang))"/>
     </xforms:action>
 
-    <!-- Public variables pointing to current form and Form Runner ressources -->
+    <!-- Public variables pointing to current form and Form Runner resources -->
     <xxforms:variable name="fr-form-resources" select="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
     <xxforms:variable name="fr-fr-resources" select="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
 

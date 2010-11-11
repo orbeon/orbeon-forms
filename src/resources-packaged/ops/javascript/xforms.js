@@ -1352,6 +1352,20 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              */
             click: function(id) {
                 OD.getElementByTagName(OD.get(id), "button").click();
+            },
+
+            /**
+             * Asserts that the specified message is shown in the message panel, and closes the message panel.
+             *
+             * @param   {String} expected   Message we expect to see shown in the message panel
+             * @return  {void}
+             */
+            assertMessage: function(expected) {
+                var messageDialog = OD.get("xforms-message-dialog");
+                var body = YD.getElementsByClassName("bd", null, messageDialog)[0];
+                var actual = OD.getStringValue(OD.getChildElementByIndex(body, 0));
+                YAHOO.util.Assert.areEqual(expected, actual, "didn't get the expected message");
+                OD.getElementByTagName(messageDialog, "button").click();
             }
         }
     };

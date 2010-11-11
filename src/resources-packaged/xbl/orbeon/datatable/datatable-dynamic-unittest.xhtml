@@ -111,7 +111,7 @@
 
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
 
-            <fr:case selected="true" id="hello_world">
+            <fr:case selected="false" id="hello_world">
                 <fr:label>A first basic dynamic datatable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -142,7 +142,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="mixed">
+            <fr:case selected="false" id="mixed">
                 <fr:label>An example of datatable mixing static and dynamic columns</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -182,7 +182,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="mixed-variables">
+            <fr:case selected="false" id="mixed-variables">
                 <fr:label>An example of datatable mixing static and dynamic columns with variables</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -226,7 +226,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="mixed-two-columnsets">
+            <fr:case selected="false" id="mixed-two-columnsets">
                 <fr:label>An example of datatable mixing static and dynamic columns with 2 column sets</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -271,7 +271,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="static">
+            <fr:case selected="false" id="static">
                 <fr:label>An example of datatable with static columns using the dynamic code</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -300,7 +300,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="resize">
+            <fr:case selected="false" id="resize">
                 <fr:label>Testing resizeable columns on a mixed datatable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -339,7 +339,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="sortable">
+            <fr:case selected="false" id="sortable">
                 <fr:label>Testing sortable columns on a mixed datatable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -379,7 +379,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="sorted">
+            <fr:case selected="false" id="sorted">
                 <fr:label>Testing sortable columns on a mixed datatable with a sorted column</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -414,7 +414,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="sortableExternal">
+            <fr:case selected="false" id="sortableExternal">
                 <fr:label>Testing sortable columns on a mixed datatable processed by the application</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -473,7 +473,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="scrollH">
+            <fr:case selected="false" id="scrollH">
                 <fr:label>Testing a mixed datatable that is horizontally scrollable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -512,7 +512,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="update">
+            <fr:case selected="false" id="update">
                 <fr:label>Testing instance updates</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -551,7 +551,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="paginate">
+            <fr:case selected="false" id="paginate">
                 <fr:label>Testing paginated tables</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -590,7 +590,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="paginateMaxPage">
+            <fr:case selected="false" id="paginateMaxPage">
                 <fr:label>Testing paginated tables with a maximum number of pages to display</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -629,7 +629,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <fr:case selected="true" id="paginateExternal">
+            <fr:case selected="false" id="paginateExternal">
                 <fr:label>Testing paginated tables supported by the application</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -677,15 +677,13 @@
                 </xhtml:div>
             </fr:case>
 
-
-            <fr:case selected="true" id="_314379">
+            <fr:case selected="false" id="_314379">
                 <fr:label>Bug #314379</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
                             >#314379</xhtml:a>: Scrollable datatables with dynamic columns get desynchronized after de hide/show cycle</xhtml:p>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="table-314379" scrollable="both" height="200px" width="600px"
-                            loading="xxforms:instance('controls')/loading = 'true'">
+                        <fr:datatable id="table-314379" scrollable="both" height="200px" width="600px" loading="xxforms:instance('controls')/loading = 'true'">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xforms:repeat nodeset="line[1]/*">

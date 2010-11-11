@@ -53,7 +53,7 @@ YAHOO.xbl.fr.Datatable.unittests_lib = {
             // Check if the action has been done and call back
             if (this.isOpenAccordionCase(targetId)) {
                 if (callback) {
-                    callback.call();
+                    callback.call(this);
                 }
             } else {
                 var thiss = this;

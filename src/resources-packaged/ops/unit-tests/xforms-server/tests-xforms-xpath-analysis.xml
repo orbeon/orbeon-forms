@@ -1256,7 +1256,7 @@
             </request>
         </output>
     </test>
-    
+
     <test description="Model variables" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -1951,8 +1951,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <!--<xxf:variable id="xxxvsum" name="xxxsum" select="$foo + $bar"/>-->
-
+                    
                     <xxf:variable id="vsum" name="sum">
                         <xxf:sequence select="$foo + $bar"/>
                     </xxf:variable>
@@ -2124,7 +2123,7 @@
             </request>
         </output>
     </test>
-    
+
     <test description="XBL xxf:variable/xxf:sequence" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -2153,7 +2152,7 @@
                     </xf:model>
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">
-                            <xbl:implementation>    
+                            <xbl:implementation>
                                 <xf:model id="model">
                                     <xf:instance id="instance">
                                         <instance/>
@@ -2549,7 +2548,7 @@
                                             (xxf:attribute('type', xxf:event('xxf:type')),
                                              xxf:attribute('target', xxf:event('xxf:targetid'))))"/>
 
-                    
+
                     <xf:output id="g11" ref="a"/>
 
                 </xh:body>
@@ -3684,7 +3683,7 @@
                     <xf:output id="o13" value="a/count(preceding-sibling::b)"/>
                     <xf:output id="o14" value="a/count(self::a)"/>
                     <xf:output id="o15" value="a/b/count(ancestor::a)"/>
-                    
+
                     <xf:output id="o21" value="a/sum(b)"/>
                     <xf:output id="o22" value="a/sum(following-sibling::b)"/>
                     <xf:output id="o23" value="a/sum(preceding-sibling::b)"/>
@@ -4743,7 +4742,7 @@
             </request>
         </output>
     </test>
-    
+
     <test description="External LHHA positioning and evaluation context" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -5006,81 +5005,6 @@
         </output>
     </test>
 
-    <test description="Bind with name attribute" name="oxf:java" exclude="true">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
-        <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
-                <xh:head>
-                    <xf:model xxf:xpath-analysis="true" id="m1">
-                        <xf:instance id="i11">
-                            <instance/>
-
-
-
-
-
-                        </xf:instance>
-                        <xf:bind id="b1" name="name1" ref=".">
-                            <xf:bind id="b2" name="name2" ref="foo"/>
-                        </xf:bind>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:group ref="$name1">
-                        <xf:input id="id1" ref="$name2"/>
-                    </xf:group>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="analysis">
-            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
-
-            </request>
-        </output>
-    </test>
-
-    <test description="Label output in different scope" name="oxf:java" exclude="true">
-        <input name="config">
-            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
-        </input>
-        <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
-                <xh:head>
-                    <xf:model xxf:xpath-analysis="true" id="model">
-                        <xf:instance id="instance">
-                            <instance>
-                                <foo>42</foo>
-                                <bar>43</bar>
-                            </instance>
-                        </xf:instance>
-                    </xf:model>
-                    <xbl:xbl>
-                        <xbl:binding id="fr-foo" element="fr|foo">
-                            <xbl:template>
-                                <xf:group id="foo-group">
-                                    <xf:label id="foo-label"><xf:output id="foo-output" xxbl:scope="outer" xbl:attr="ref=label-ref"/></xf:label>
-                                </xf:group>
-                            </xbl:template>
-                        </xbl:binding>
-                    </xbl:xbl>
-                </xh:head>
-                <xh:body>
-                    <xxf:variable name="bar" select="instance()/bar"/>
-                    <fr:foo id="my-foo" label-ref="$bar"/>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="analysis">
-            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
-
-            </request>
-        </output>
-    </test>
-
     <test description="Simple itemset" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
@@ -5271,6 +5195,242 @@
                 </select>
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true"/>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="Variable scope within XBL" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:implementation>
+                                <xf:model id="foo-model">
+                                    <xf:instance id="foo-instance">
+                                        <instance/>
+                                    </xf:instance>
+                                </xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <xf:group id="foo-group" xxbl:scope="outer">
+                                    <!-- Pointing to the outer scope -->
+                                    <xxf:variable id="v1" name="v1" select="."/>
+
+                                    <xxf:variable id="v2" name="v2" xxbl:scope="inner">
+                                        <xxf:sequence select="$v1" xxbl:scope="outer"/>
+                                    </xxf:variable>
+                                    <xf:output id="output1" value="$v2" xxbl:scope="inner"/>
+
+                                    <!-- Pointing to the inner scope -->
+                                    <xxf:variable id="v3" name="v3" select="." xxbl:scope="inner"/>
+
+                                    <xxf:variable id="v4" name="v4">
+                                        <xxf:sequence select="$v3" xxbl:scope="inner"/>
+                                    </xxf:variable>
+                                    <xf:output id="output2" value="$v4"/>
+                                </xf:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:foo id="my-foo"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <group scope="" prefixed-id="my-foo$foo-group" model-prefixed-id="model" binding="false" value="false"/>
+                <variable scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="true" name="v1">
+                    <value>
+                        <analysis expression="." analyzed="true">
+                            <returnable>
+                                <path>instance('instance')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </value>
+                </variable>
+                <variable scope="my-foo" prefixed-id="my-foo$v2" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v2">
+                    <value>
+                        <analysis expression="$v1" analyzed="true">
+                            <returnable>
+                                <path>instance('instance')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </value>
+                </variable>
+                <output scope="my-foo" prefixed-id="my-foo$output1" model-prefixed-id="my-foo$foo-model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string(($v2)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <variable scope="my-foo" prefixed-id="my-foo$v3" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v3">
+                    <value>
+                        <analysis expression="." analyzed="true">
+                            <returnable>
+                                <path>instance('my-foo$foo-instance')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>my-foo$foo-model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>my-foo$foo-instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>my-foo$foo-instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </value>
+                </variable>
+                <variable scope="" prefixed-id="my-foo$v4" model-prefixed-id="model" binding="false" value="true" name="v4">
+                    <value>
+                        <analysis expression="$v3" analyzed="true">
+                            <returnable>
+                                <path>instance('my-foo$foo-instance')</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>my-foo$foo-model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>my-foo$foo-instance</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>my-foo$foo-instance</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </value>
+                </variable>
+                <output scope="" prefixed-id="my-foo$output2" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string(($v4)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('my-foo$foo-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>my-foo$foo-model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>my-foo$foo-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
+                <model scope="my-foo" prefixed-id="my-foo$foo-model" default-instance-prefixed-id="my-foo$foo-instance" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
+    <test description="Bind with name attribute" name="oxf:java" exclude="true">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m1">
+                        <xf:instance id="i11">
+                            <instance/>
+
+
+
+
+
+                        </xf:instance>
+                        <xf:bind id="b1" name="name1" ref=".">
+                            <xf:bind id="b2" name="name2" ref="foo"/>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group ref="$name1">
+                        <xf:input id="id1" ref="$name2"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+
+            </request>
+        </output>
+    </test>
+
+    <test description="Label output in different scope" name="oxf:java" exclude="true">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xf:group id="foo-group">
+                                    <xf:label id="foo-label"><xf:output id="foo-output" xxbl:scope="outer" xbl:attr="ref=label-ref"/></xf:label>
+                                </xf:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xxf:variable name="bar" select="instance()/bar"/>
+                    <fr:foo id="my-foo" label-ref="$bar"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+
             </request>
         </output>
     </test>

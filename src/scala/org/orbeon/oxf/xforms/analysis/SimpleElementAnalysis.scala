@@ -28,13 +28,16 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val scopeModel = new ScopeModel(scope, findContainingModel)
 
-    // Default implementation: look at preceding variables
-    // In the view, things work a bit differently as model variables are in scope first
-    lazy val inScopeVariables: Map[String, VariableAnalysisTrait] =
+    lazy val inScopeVariables: Map[String, VariableAnalysisTrait] = getRootVariables ++ treeInScopeVariables
+
+    protected def getRootVariables: Map[String, VariableAnalysisTrait] = Map.empty
+
+    lazy val treeInScopeVariables: Map[String, VariableAnalysisTrait] =
         Map[String, VariableAnalysisTrait]() ++
             (ElementAnalysis.getClosestPrecedingInScope(this)() match {
-                case Some(preceding: VariableAnalysisTrait) => preceding.inScopeVariables + (preceding.name -> preceding)
-                case Some(preceding) => preceding.inScopeVariables
+                case Some(preceding: VariableAnalysisTrait) => preceding.treeInScopeVariables + (preceding.name -> preceding)
+                case Some(preceding: SimpleElementAnalysis) => preceding.treeInScopeVariables
+                case Some(_) => Map.empty // shouldn't happen
                 case None => Map.empty
             })
 

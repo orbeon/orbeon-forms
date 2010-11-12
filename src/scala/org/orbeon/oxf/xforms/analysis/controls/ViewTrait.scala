@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.{VariableAnalysisTrait, ElementAnalysis, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**
  * Handle aspects of an element that are specific to the view.
@@ -23,17 +23,8 @@ trait ViewTrait extends SimpleElementAnalysis {
     // Index of the element in the view
     val index: Int = staticStateContext.index
 
-    // Keep the notion of view variable
-    lazy val viewVariables: Map[String, VariableAnalysisTrait] =
-        ElementAnalysis.getClosestPrecedingInScope(this)() match {
-            case Some(preceding: VariableAnalysisTrait with ViewTrait) => preceding.viewVariables + (preceding.name -> preceding)
-            case Some(preceding: ViewTrait) => preceding.viewVariables
-            case Some(_) => Map.empty // should not happen as all view elements should have ViewTrait
-            case None => Map.empty
-        }
-
-    // View implementation: prepend model variables to view variables
-    override lazy val inScopeVariables: Map[String, VariableAnalysisTrait] =
-        (scopeModel.containingModel match { case Some(model) => model.variablesMap; case None => Map.empty }) ++ viewVariables
-        // TODO: we could optimize this to avoid prepending model variables every time, in case the previous element is in the same model
+    // In the view, in-scope model variables are always first in scope
+    override protected def getRootVariables =
+        scopeModel.containingModel match { case Some(model) => model.variablesMap; case None => Map.empty }
+        // NOTE: we could maybe optimize this to avoid prepending model variables every time, in case the previous element is in the same model
 }

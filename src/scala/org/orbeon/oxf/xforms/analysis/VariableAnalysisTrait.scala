@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import controls.ViewTrait
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.dom4j.Element
 
@@ -48,8 +49,21 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait {
                         })
                     }
 
-                    // Same in-scope variables than the parent variable element
-                    override lazy val inScopeVariables = VariableAnalysisTrait.this.inScopeVariables
+                    // If in same scope as xxf:variable, in-scope variables are the same as xxf:variable because we don't
+                    // want the variable defined by xxf:variable to be in-scope for xxf:sequence. Otherwise, use
+                    // default algorithm.
+
+                    // TODO: This is bad architecture as we duplicate the logic in ViewTrait.
+                    override lazy val inScopeVariables =
+                        if (VariableAnalysisTrait.this.scopeModel.scope == scopeModel.scope)
+                            VariableAnalysisTrait.this.inScopeVariables
+                        else
+                            getRootVariables ++ treeInScopeVariables
+
+                    override protected def getRootVariables = VariableAnalysisTrait.this match {
+                        case _: ViewTrait => scopeModel.containingModel match { case Some(model) => model.variablesMap; case None => Map.empty }
+                        case _ => Map.empty
+                    }
                 }
                 sequenceAnalysis.analyzeXPath()
                 sequenceAnalysis.getValueAnalysis

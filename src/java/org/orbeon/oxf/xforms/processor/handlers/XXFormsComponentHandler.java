@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
 /**
  * Handle elements to which custom components are bound.
@@ -39,7 +37,9 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         final String prefixedId = handlerContext.getIdPrefix() + staticId;
         final String effectiveId = handlerContext.getEffectiveId(attributes);
 
-        final String elementName = "div";
+        final XBLBindings xblBindings = containingDocument.getStaticState().getXBLBindings();
+
+        final String elementName = xblBindings.getContainerElementName(prefixedId);
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
@@ -53,7 +53,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         handlerContext.pushComponentContext(prefixedId);
 
         // Process shadow content if present
-        final Element shadowTree = containingDocument.getStaticState().getXBLBindings().getFullShadowTree(prefixedId);
+        final Element shadowTree = xblBindings.getFullShadowTree(prefixedId);
         if (shadowTree != null) {
             // Tell the controller we are providing a new body
             controller.startBody();

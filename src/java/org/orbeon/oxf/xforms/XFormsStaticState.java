@@ -98,8 +98,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     private Map<String, ElementAnalysis> controlAnalysisMap;                // Map<String controlPrefixedId, ElementAnalysis>: for all controls
 
     // xforms:repeat
-    // TODO: move repeatChildrenMap to RepeatAnalysis
-    private Map<String, List<String>> repeatChildrenMap;                    // Map<String, List> of repeat id to List of children ids
     private String repeatHierarchyString;                                   // contains comma-separated list of space-separated repeat prefixed id and ancestor if any
 
     // XXFormsAttributeControl
@@ -280,10 +278,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         eventHandlerAncestorsMap = new HashMap<String, String>();
         keyHandlers = new ArrayList<XFormsEventHandler>();
         controlAnalysisMap = new LinkedHashMap<String, ElementAnalysis>();
-        repeatChildrenMap = new HashMap<String, List<String>>();
 
         // Iterate over main static controls tree
-        final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
         final XBLBindings.Scope rootScope = xblBindings.getTopLevelScope();
         final ContainerTrait rootControlAnalysis = new RootControl(this);
 
@@ -295,7 +291,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         // Then analyze controls
         analyzeComponentTree(propertyContext, xpathConfiguration, rootScope, controlsDocument.getRootElement(),
-                rootControlAnalysis, repeatHierarchyStringBuffer, externalLHHA);
+                rootControlAnalysis, externalLHHA);
 
         // Process deferred external LHHA elements
         for (final ExternalLHHAAnalysis entry : externalLHHA)
@@ -305,7 +301,47 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
 
         // Finalize repeat hierarchy
-        repeatHierarchyString = repeatHierarchyStringBuffer.toString();
+        if (controlTypes.get("repeat") != null) {
+            final Collection<ElementAnalysis> values = controlTypes.get("repeat").values();
+            if (values != null && values.size() > 0) {
+                final StringBuilder sb = new StringBuilder();
+                for (final ElementAnalysis repeatControl : values) {
+
+                    if (sb.length() > 0)
+                        sb.append(',');
+
+                    sb.append(repeatControl.prefixedId());
+
+                    final ElementAnalysis ancestorRepeat = RepeatControl.getAncestorRepeatOrNull(repeatControl);
+                    if (ancestorRepeat != null) {
+                        // If we have an ancestor, append it
+                        sb.append(' ');
+                        sb.append(ancestorRepeat.prefixedId());
+                    }
+                }
+                repeatHierarchyString = sb.toString();
+            }
+        }
+
+        // Index attribute controls
+        if (controlTypes.get("attribute") != null) {
+            final Collection<ElementAnalysis> values = controlTypes.get("attribute").values();
+            if (values != null && values.size() > 0) {
+                attributeControls = new HashMap<String, Map<String, AttributeControl>>();
+
+                for (final ElementAnalysis value : values) {
+                    final AttributeControl attributeControl = (AttributeControl) value;
+                    final String forPrefixedId = attributeControl.forPrefixedId();
+                    final String nameAttribute = attributeControl.name();
+                    Map<String, AttributeControl> mapForId = attributeControls.get(forPrefixedId);
+                    if (mapForId == null) {
+                        mapForId = new HashMap<String, AttributeControl>();
+                        attributeControls.put(forPrefixedId, mapForId);
+                    }
+                    mapForId.put(nameAttribute, attributeControl);
+                }
+            }
+        }
 
         // Iterate over models to extract event handlers and scripts
         for (final Map.Entry<String, Model> currentEntry: modelsByPrefixedId.entrySet()) {
@@ -1045,7 +1081,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
                                      final XBLBindings.Scope innerScope, Element startElement, final ContainerTrait startControlAnalysis,
-                                     final StringBuilder repeatHierarchyStringBuffer, final List<ExternalLHHAAnalysis> externalLHHA) {
+                                     final List<ExternalLHHAAnalysis> externalLHHA) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
@@ -1072,8 +1108,9 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
-                xblBindings.processElementIfNeeded(propertyContext, indentedLogger, controlElement, controlPrefixedId, locationData,
-                        controlsDocumentInfo, xpathConfiguration, innerScope, parentContainer, repeatHierarchyStringBuffer, externalLHHA);
+                final XBLBindings.ConcreteBinding newConcreteBinding = xblBindings.processElementIfNeeded(propertyContext,
+                        indentedLogger, controlElement, controlPrefixedId, locationData, controlsDocumentInfo, xpathConfiguration,
+                        innerScope);
 
                 // Create and index static control information
                 final ElementAnalysis elementAnalysis; {
@@ -1083,71 +1120,28 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                     elementAnalysis = ControlAnalysisFactory.create(staticStateContext, parentContainer, previousElementAnalysis, controlScope, controlElement);
                 }
 
+                // Index by prefixed id
                 controlAnalysisMap.put(elementAnalysis.prefixedId(), elementAnalysis);
+                // Index by type
                 {
                     Map<String, ElementAnalysis> controlsMap = controlTypes.get(controlName);
                     if (controlsMap == null) {
                         controlsMap = new LinkedHashMap<String, ElementAnalysis>();
                         controlTypes.put(controlName, controlsMap);
                     }
-
                     controlsMap.put(elementAnalysis.prefixedId(), elementAnalysis);
                 }
 
-                // Remember external LHHA
+                // Remember external LHHA if we are one
                 if (elementAnalysis instanceof LHHAAnalysis)
                     externalLHHA.add((ExternalLHHAAnalysis) elementAnalysis);
 
-                // TODO: move repeat and attribute cases below to RepeatAnalysis and AttributeAnalysis
-                if (elementAnalysis instanceof RepeatControl) {
-                    // Gather xforms:repeat information
-                    final ElementAnalysis repeatControl = RepeatControl.getAncestorRepeatOrNull(elementAnalysis);
-
-                    // Find repeat parents
-                    {
-                        // Create repeat hierarchy string
-                        if (repeatHierarchyStringBuffer.length() > 0)
-                            repeatHierarchyStringBuffer.append(',');
-
-                        repeatHierarchyStringBuffer.append(elementAnalysis.prefixedId());
-
-                        if (repeatControl != null) {
-                            // If we have a parent, append it
-                            repeatHierarchyStringBuffer.append(' ');
-                            repeatHierarchyStringBuffer.append(repeatControl.prefixedId());
-                        }
-                    }
-                    // Find repeat children
-                    {
-                        if (repeatControl != null) {
-                            // If we have a parent, tell the parent that it has a child
-                            final String parentRepeatId = repeatControl.prefixedId();
-                            List<String> parentRepeatList = repeatChildrenMap.get(parentRepeatId);
-                            if (parentRepeatList == null) {
-                                parentRepeatList = new ArrayList<String>();
-                                repeatChildrenMap.put(parentRepeatId, parentRepeatList);
-                            }
-                            parentRepeatList.add(elementAnalysis.prefixedId());
-                        }
-
-                    }
-                } else if (elementAnalysis instanceof AttributeControl) {
-                    // Special indexing of xxforms:attribute controls
-                    final String prefixedForAttribute = prefix + controlElement.attributeValue(XFormsConstants.FOR_QNAME);
-                    final String nameAttribute = controlElement.attributeValue(XFormsConstants.NAME_QNAME);
-                    Map<String, AttributeControl> mapForId;
-                    if (attributeControls == null) {
-                        attributeControls = new HashMap<String, Map<String, AttributeControl>>();
-                        mapForId = new HashMap<String, AttributeControl>();
-                        attributeControls.put(prefixedForAttribute, mapForId);
-                    } else {
-                        mapForId = attributeControls.get(prefixedForAttribute);
-                        if (mapForId == null) {
-                            mapForId = new HashMap<String, AttributeControl>();
-                            attributeControls.put(prefixedForAttribute, mapForId);
-                        }
-                    }
-                    mapForId.put(nameAttribute, (AttributeControl) elementAnalysis);
+                // Recursively analyze the binding's component tree if any
+                // NOTE: Do this after creating the binding control as the sub-tree must have the binding control as parent
+                if (newConcreteBinding != null) {
+                    analyzeComponentTree(propertyContext, xpathConfiguration, newConcreteBinding.innerScope,
+                            newConcreteBinding.compactShadowTree.getRootElement(),
+                            (ContainerTrait) elementAnalysis, externalLHHA);
                 }
 
                 return elementAnalysis;

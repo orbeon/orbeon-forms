@@ -1602,7 +1602,7 @@
         </output>
     </test>
 
-    <test description="Layout: non-relevant xforms:output with image mediatype outputs link to default image" name="oxf:pipeline">
+    <test description="Non-relevant xforms:output with image mediatype outputs link to default image" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -1691,7 +1691,7 @@
         </output>
     </test>
 
-    <test description="Layout: blank img/@src AVT links to default image" name="oxf:pipeline">
+    <test description="Blank img/@src AVT links to default image" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

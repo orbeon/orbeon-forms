@@ -44,7 +44,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
         if (staticValue.isDefined)
             println("static value for control " + prefixedId + " => " + staticValue.get)
 
-    // Consider that LHHA don't have context/binding
+    // Consider that LHHA don't have context/binding as we delegate implementation in computeValueAnalysis
     override protected def computeContextAnalysis = None
     override protected def computeBindingAnalysis = None
 
@@ -75,7 +75,8 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                     def startElement(element: Element) {
                         if (element.getQName == XFormsConstants.XFORMS_OUTPUT_QNAME) {
                             // Add dependencies
-                            val outputAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element)) with ValueTrait
+                            val outputAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element))
+                                    with ValueTrait with ViewTrait
                             outputAnalysis.analyzeXPath()
                             if (outputAnalysis.getValueAnalysis.isDefined)
                                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get

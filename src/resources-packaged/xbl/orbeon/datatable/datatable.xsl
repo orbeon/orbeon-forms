@@ -615,7 +615,7 @@
             </xsl:if>
 
             <xsl:if test="$hasLoadingFeature">
-                <xxforms:variable name="fr-dt-loading" xbl:attr="select=loading" xxbl:scope="outer"/>
+                <xxforms:variable name="fr-dt-loading" xbl:attr="select=loading"/>
             </xsl:if>
             <xsl:copy-of select="$pagination"/>
 
@@ -696,7 +696,7 @@
                 <!-- The trick with the spans is working fine for simple case where we don't need to specify the height or width.
                     In other cases, the elements "gain layout" in IE world and the width of the div that contains the
                     scrollbar takes all the page in IE 6 if not explicitely set...-->
-                <xforms:group ref="xxforms:component-context()[$fr-dt-loading = true()]" xxbl:scope="outer">
+                <xforms:group ref="xxforms:component-context()[$fr-dt-loading = true()]">
                     <xforms:action ev:event="xforms-enabled">
                         <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).initLoadingIndicator(this, <xsl:value-of select="$scrollV"/>,
                                 <xsl:value-of select="$scrollH"/>); </xxforms:script>

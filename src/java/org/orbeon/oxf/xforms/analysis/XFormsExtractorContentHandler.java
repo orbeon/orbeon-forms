@@ -403,17 +403,17 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 super.endElement(uri, localname, qName);
             }
 
+            if ((inPreserve || inLHHA) && level == preserveOrLHHALevel) {
+                // Leaving preserved content
+                inPreserve = false;
+                inLHHA = false;
+            }
+
             if (inXFormsOrExtension && !inPreserve) {
                 // Callback for elements of interest
                 if (isXFormsOrExtension || inLHHA) {
                     endXFormsOrExtension(uri, localname, qName);
                 }
-            }
-
-            if ((inPreserve || inLHHA) && level == preserveOrLHHALevel) {
-                // Leaving preserved content
-                inPreserve = false;
-                inLHHA = false;
             }
 
             if (inXFormsOrExtension && level == xformsLevel) {

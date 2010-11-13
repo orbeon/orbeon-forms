@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -35,7 +34,7 @@ import java.util.*;
  */
 public class XFormsItemUtils {
 
-    private static final String[] ATTRIBUTES_TO_PROPAGATE = { "class", "style" };
+    public static final String[] ATTRIBUTES_TO_PROPAGATE = { "class", "style" };
 
     public static String encryptValue(PropertyContext propertyContext, String value) {
         return SecureUtils.encrypt(propertyContext, XFormsProperties.getXFormsPassword(), value);
@@ -89,19 +88,14 @@ public class XFormsItemUtils {
      */
     public static Itemset evaluateItemset(final PropertyContext propertyContext, final XFormsSelect1Control select1Control, boolean setBinding) {
 
-        final boolean isMultiple = select1Control instanceof XFormsSelectControl;
-        final XBLContainer container = select1Control.getXBLContainer();
+        final SelectionControl staticControl = (SelectionControl) select1Control.getElementAnalysis();
 
         // Optimize static itemsets
-        {
-            final boolean isStaticItemset; {
-            final SelectionControl analysis = container.getContainingDocument().getStaticState().getSelect1Analysis(select1Control.getPrefixedId());
-                isStaticItemset = analysis != null && !analysis.hasNonStaticItem();
-            }
+        if (staticControl.hasStaticItemset())
+            return staticControl.evaluateStaticItemset();
 
-            if (isStaticItemset)
-                return evaluateStaticItemsets(container.getContainingDocument(), select1Control.getPrefixedId());
-        }
+        final boolean isMultiple = staticControl.isMultiple();
+        final XBLContainer container = select1Control.getXBLContainer();
 
         final Itemset result = new Itemset();
 
@@ -369,85 +363,5 @@ public class XFormsItemUtils {
         return result;
     }
 
-    public static Itemset evaluateStaticItemsets(final XFormsContainingDocument containingDocument, String prefixedId) {
 
-        final boolean isMultiple = XFormsSelect1Control.isMultiple(containingDocument, prefixedId);
-        
-        final Itemset result = new Itemset();
-
-        final Element controlElement = containingDocument.getStaticState().getControlElement(prefixedId);
-        final boolean isEncryptItemValues = XFormsSelect1Control.isEncryptItemValues(containingDocument, controlElement);
-
-        Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {
-
-            private ItemContainer currentContainer = result;
-
-            public void startElement(Element element) {
-                final String localname = element.getName();
-                if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
-                    // xforms:item
-
-                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
-                    if (labelElement == null)
-                        throw new ValidationException("xforms:item must contain an xforms:label element.", (LocationData) controlElement.getData());
-                    final String label = XFormsUtils.getStaticChildElementValue(labelElement, false, null);
-
-                    final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                    if (valueElement == null)
-                        throw new ValidationException("xforms:item must contain an xforms:value element.", (LocationData) controlElement.getData());
-                    final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
-
-                    final Map<String, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)));
-
-                } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
-                    // xforms:itemset
-
-                    throw new ValidationException("xforms:itemset must not appear in static itemset.", (LocationData) controlElement.getData());
-
-                } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
-                    // xforms:choices
-
-                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
-                    if (labelElement != null) {
-                        final String label = XFormsUtils.getStaticChildElementValue(labelElement, false, null);
-
-                        assert label != null;
-
-                        final Map<String, String> attributes = getAttributes(element);
-                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
-                        currentContainer.addChildItem(newContainer);
-                        currentContainer = newContainer;
-                    }
-                }
-            }
-
-            public void endElement(Element element) {
-                final String localname = element.getName();
-                 if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
-                    // xforms:choices
-
-                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
-                    if (labelElement != null) {
-                        currentContainer = currentContainer.getParent();
-                    }
-                }
-            }
-
-            public void text(Text text) {
-            }
-        });
-        return result;
-    }
-
-    private static Map<String, String> getAttributes(Element itemChoiceItemsetElement) {
-
-        final Map<String, String> result = new LinkedHashMap<String, String>();
-        for (String attributeName: ATTRIBUTES_TO_PROPAGATE) {
-            final String attributeValue = itemChoiceItemsetElement.attributeValue(XFormsConstants.CLASS_QNAME);
-            if (attributeValue != null)
-                result.put(attributeName, attributeValue);
-        }
-        return result;
-    }
 }

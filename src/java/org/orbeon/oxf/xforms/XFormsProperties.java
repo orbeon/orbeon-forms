@@ -122,7 +122,7 @@ public class XFormsProperties {
 
     public enum XHTMLLayout { NOSPAN, SPAN }
 
-    private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
+    public static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
 
     public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
@@ -528,16 +528,8 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, SESSION_HEARTBEAT_PROPERTY);
     }
 
-    public static boolean isEncryptItemValues(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, ENCRYPT_ITEM_VALUES_PROPERTY);
-    }
-
     public static boolean isOfflineMode(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OFFLINE_SUPPORT_PROPERTY);
-    }
-
-    public static int getOfflineRepeatCount(XFormsContainingDocument containingDocument) {
-        return getIntegerProperty(containingDocument, OFFLINE_REPEAT_COUNT_PROPERTY);
     }
 
     public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument) {

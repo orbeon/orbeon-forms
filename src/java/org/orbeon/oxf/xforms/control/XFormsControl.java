@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -114,6 +115,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return id;
     }
 
+    public final String getPrefixedId() {
+     return prefixedId;
+    }
+
+    public ElementAnalysis getElementAnalysis() {
+        return containingDocument.getStaticState().getControlAnalysis(getPrefixedId());
+    }
+
     public final XBLContainer getXBLContainer() {
         return container;
     }
@@ -159,10 +168,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getEffectiveId() {
         return effectiveId;
-    }
-
-    public final String getPrefixedId() {
-        return prefixedId;
     }
 
     protected void setEffectiveId(String effectiveId) {

@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsStaticState}
 import collection.mutable.Stack
-import org.orbeon.oxf.xforms.analysis.{StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
 import org.dom4j.{Text, Element}
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.util.{PropertyContext, XPathCache}
+import org.apache.commons.lang.StringUtils
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.common.ValidationException
+import java.util.{Map => JMap, LinkedHashMap => JLinkedHashMap}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils, XFormsConstants, XFormsStaticState}
+import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
 
 trait SelectionControl extends SimpleElementAnalysis {
 
@@ -27,12 +31,20 @@ trait SelectionControl extends SimpleElementAnalysis {
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
     // TODO: fix this, seems incorrect: if there is an itemset, consider dynamic; also handle AVTs on any child element of label/value
-    val hasNonStaticItem = XPathCache.evaluateSingle(staticStateContext.propertyContext, staticStateContext.controlsDocument.wrap(element),
+    val hasStaticItemset = !XPathCache.evaluateSingle(staticStateContext.propertyContext, staticStateContext.controlsDocument.wrap(element),
             "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]])",
             XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
     // Remember information
     val isMultiple = element.getName == "select"
+    val isOpenSelection = element.attributeValue("selection") == "open"
+    val isNorefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME) == "false"
+
+    val isEncryptValues = {
+        val localEncryptItemValues = element.attributeValue(XFormsConstants.ENCRYPT_ITEM_VALUES)
+        !isOpenSelection && (if (localEncryptItemValues ne null)
+            localEncryptItemValues.toBoolean else staticStateContext.staticState.getBooleanProperty(XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY))
+    }
 
     private var itemsetAnalysis: Option[XPathAnalysis] = None
     private var itemsetAnalyzed = false
@@ -128,5 +140,87 @@ trait SelectionControl extends SimpleElementAnalysis {
         super.freeTransientState
         if (itemsetAnalyzed && getItemsetAnalysis.isDefined)
             getItemsetAnalysis.get.freeTransientState()
+    }
+
+    /**
+     * Evaluate
+     */
+    def evaluateStaticItemset(): Itemset = {
+
+        assert(hasStaticItemset)
+
+        val result = new Itemset
+
+        Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
+
+            private var currentContainer: ItemContainer = result
+
+            def startElement(element: Element) {
+
+                element.getQName match {
+
+                    case XFormsConstants.ITEM_QNAME =>
+                        // xforms:item
+
+                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                        if (labelElement eq null)
+                            throw new ValidationException("xforms:item must contain an xforms:label element.", ElementAnalysis.createLocationData(element))
+                        val label = XFormsUtils.getStaticChildElementValue(labelElement, false, null)
+
+                        val valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME)
+                        if (valueElement eq null)
+                            throw new ValidationException("xforms:item must contain an xforms:value element.", ElementAnalysis.createLocationData(element))
+                        val value = XFormsUtils.getStaticChildElementValue(valueElement, false, null)
+
+                        val attributes = getAttributes(element)
+                        currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)))
+
+                    case XFormsConstants.ITEMSET_QNAME =>
+
+                        // xforms:itemset
+
+                        throw new ValidationException("xforms:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
+
+                    case XFormsConstants.CHOICES_QNAME =>
+
+                        // xforms:choices
+
+                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                        if (labelElement ne null) {
+                            val label = XFormsUtils.getStaticChildElementValue(labelElement, false, null)
+
+                            assert(label ne null)
+
+                            val attributes = getAttributes(element)
+                            val newContainer = new Item(isMultiple, isEncryptValues, attributes, label, null)
+                            currentContainer.addChildItem(newContainer);
+                            currentContainer = newContainer
+                        }
+
+                    case _ => // ignore
+                }
+            }
+
+            def endElement(element: Element): Unit =
+                if (element == XFormsConstants.CHOICES_QNAME) {
+                    // xforms:choices
+                    val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                    if (labelElement ne null)
+                        currentContainer = currentContainer.getParent
+                }
+
+            def text(text: Text) = {}
+
+            private def getAttributes(itemChoiceItemsetElement: Element): JMap[String, String] = {
+                val result = new JLinkedHashMap[String, String]
+                for (attributeName <- XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE) {
+                    val attributeValue = itemChoiceItemsetElement.attributeValue(XFormsConstants.CLASS_QNAME)
+                    if (attributeValue ne null)
+                        result.put(attributeName, attributeValue)
+                }
+                result
+            }
+        })
+        result
     }
 }

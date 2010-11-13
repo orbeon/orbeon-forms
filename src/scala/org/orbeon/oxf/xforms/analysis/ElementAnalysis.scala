@@ -223,5 +223,5 @@ object ElementAnalysis {
     }
 
     def createLocationData(element: Element): ExtendedLocationData =
-        if (element ne null) new ExtendedLocationData(element.getData.asInstanceOf[LocationData], "gathering static XPath information", element) else null
+        if (element ne null) new ExtendedLocationData(element.getData.asInstanceOf[LocationData], "gathering static information", element) else null
 }

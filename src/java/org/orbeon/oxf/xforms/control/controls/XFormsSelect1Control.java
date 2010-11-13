@@ -47,16 +47,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static final String MENU_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
     public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
-    public static final QName ENCRYPT_ITEM_VALUES = new QName("encrypt-item-values", XFormsConstants.XXFORMS_NAMESPACE);
-
     // List of attributes to handle as AVTs for select1 with appearance="full"
     private static final QName[] EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL = {
             XFormsConstants.XXFORMS_GROUP_QNAME
     };
-
-    private final boolean isNorefresh;
-    private final boolean isOpenSelection;
-    private final boolean xxformsEncryptItemValues;
 
     private ControlProperty<Itemset> itemsetProperty = new ControlProperty<Itemset>() {
         @Override
@@ -82,10 +76,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
     public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
-        // TODO: part of static state?
-        this.isNorefresh = "false".equals(element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME));
-        this.isOpenSelection = isOpenSelection(element);
-        this.xxformsEncryptItemValues = isEncryptItemValues(containingDocument, element); 
     }
 
     @Override
@@ -95,6 +85,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
         // NOTE: This doesn't sound like it is the right place to do this, does it?
         if (containingDocument.isRestoringDynamicState(propertyContext))
             getItemset(propertyContext, false);
+    }
+
+    public SelectionControl getSelectionControl() {
+        return (SelectionControl) super.getElementAnalysis();
     }
 
     @Override
@@ -154,7 +148,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         } else if (isStaticItemset(containingDocument, prefixedId)) {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-            return XFormsItemUtils.evaluateStaticItemsets(containingDocument, prefixedId);
+            return ((SelectionControl) containingDocument.getStaticState().getControlAnalysis(prefixedId)).evaluateStaticItemset();
         } else {
             // Not possible so return null
             return null;
@@ -177,7 +171,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (!isRelevant)
                 return null;
 
-            if (isNorefresh) {
+            if (isNorefresh()) {
                 // Items are not automatically refreshed and stored globally
                 // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
                 Itemset constantItemset =  containingDocument.getControls().getConstantItems(getPrefixedId());
@@ -204,38 +198,19 @@ public class XFormsSelect1Control extends XFormsValueControl {
      */
     public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
         final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
-        return analysis != null && !analysis.hasNonStaticItem();
-    }
-
-    /**
-     * Whether the given control is a multiple-selection control.
-     *
-     * @param containingDocument    containing document
-     * @param prefixedId            prefixed id
-     * @return                      true iif control is a multiple-selection control
-     */
-    public static boolean isMultiple(XFormsContainingDocument containingDocument, String prefixedId) {
-        final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
-        return analysis != null && analysis.isMultiple();
+        return analysis.hasStaticItemset();
     }
 
     public boolean isOpenSelection() {
-        return isOpenSelection;
-    }
-
-    public static boolean isOpenSelection(Element controlElement) {
-        return "open".equals(controlElement.attributeValue("selection"));
+        return getSelectionControl().isOpenSelection();
     }
 
     public boolean isEncryptItemValues() {
-        return xxformsEncryptItemValues;
+        return getSelectionControl().isEncryptValues();
     }
 
-    public static boolean isEncryptItemValues(XFormsContainingDocument containingDocument, Element controlElement) {
-        // Local property overrides global property
-        final String isLocalEncryptItemValues = controlElement.attributeValue(ENCRYPT_ITEM_VALUES);
-        return !isOpenSelection(controlElement) && (isLocalEncryptItemValues != null ?
-                "true".equals(isLocalEncryptItemValues) : XFormsProperties.isEncryptItemValues(containingDocument));
+    public boolean isNorefresh() {
+        return getSelectionControl().isNorefresh();
     }
 
     @Override
@@ -355,8 +330,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     private boolean mustSendItemsetUpdate(PropertyContext propertyContext, XFormsSelect1Control otherSelect1Control) {
-        final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(getPrefixedId());
-        if (analysis != null && !analysis.hasNonStaticItem()) {
+        if (getSelectionControl().hasStaticItemset()) {
             // There is no need to send an update:
             //
             // 1. Items are static...

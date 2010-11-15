@@ -25,7 +25,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0" >
+         xmlns:exf="http://www.exforms.org/exf/1-0">
 
     <!--
         Selection control appearing like a box containing rows of checkboxes.
@@ -86,7 +86,7 @@
                     <!-- Variable pointing to external single-node binding -->
                     <xxforms:variable name="result" select="." as="node()?"/>
 
-                    <!-- The tabindex prevents the ul from being able to get the focus on Firefox. Because of the 
+                    <!-- The tabindex prevents the ul from being able to get the focus on Firefox. Because of the
                          overflow-y: scroll, it seems that this element can be tabbed to on Firefox, which is also
                          a problem when using screen readers (JAWS), as the screen readers don't know how to read
                          that element. -->

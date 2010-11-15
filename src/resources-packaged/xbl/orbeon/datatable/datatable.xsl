@@ -21,8 +21,8 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     version="2.0">
 
+    <!-- These optional attributes are used as parameters and are not copied on the generate xhtml:table -->
     <xsl:variable name="parameters">
-        <!-- These optional attributes are used as parameters -->
         <parameter>appearance</parameter>
         <parameter>scrollable</parameter>
         <parameter>width</parameter>
@@ -30,6 +30,8 @@
         <parameter>paginated</parameter>
         <parameter>rowsPerPage</parameter>
         <parameter>sortAndPaginationMode</parameter>
+        <parameter>sort-mode</parameter>
+        <parameter>pagination-mode</parameter>
         <parameter>nbPages</parameter>
         <parameter>maxNbPagesToDisplay</parameter>
         <parameter>page</parameter>
@@ -115,9 +117,16 @@
                 then $pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer + 1
                 else $pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer
             else -1"/>
-    <xsl:variable name="sortAndPaginationMode" select="$pass5/fr:datatable/@sortAndPaginationMode"/>
-    <xsl:variable name="isExternallySortedAndPaginated" select="$sortAndPaginationMode = 'external'"/>
-    <xsl:variable name="isInternallySortedAndPaginated" select="not($isExternallySortedAndPaginated)"/>
+
+    <!-- Variable dealing with sorting and pagination mode -->
+    <xsl:variable name="is-externally-sorted-and-paginated" as="xs:boolean" select="$pass5/fr:datatable/@sortAndPaginationMode = 'external'"/>
+    <xsl:variable name="sort-mode" select="$pass5/fr:datatable/@sort-mode"/>
+    <xsl:variable name="is-externally-sorted" as="xs:boolean" select="$sort-mode = 'external' or $is-externally-sorted-and-paginated"/>
+    <xsl:variable name="is-internally-sorted" as="xs:boolean" select="not($is-externally-sorted)"/>
+    <xsl:variable name="pagination-mode" select="$pass5/fr:datatable/@pagination-mode"/>
+    <xsl:variable name="is-externally-paginated" as="xs:boolean" select="$pagination-mode = 'external' or $is-externally-sorted-and-paginated"/>
+    <xsl:variable name="is-internally-paginated" as="xs:boolean" select="not($is-externally-paginated)"/>
+
     <xsl:variable name="innerTableWidth" select="$pass5/fr:datatable/@innerTableWidth"/>
     <xsl:variable name="innerTableWidthJS" select="if ($innerTableWidth) then concat(&quot;'&quot;, $innerTableWidth, &quot;'&quot;) else 'null'"/>
     <xsl:variable name="innerTableWidthCSS" select="if ($innerTableWidth) then concat('width: ', $innerTableWidth, ';') else ''"/>
@@ -162,6 +171,9 @@
 
     <xsl:template match="/">
 
+        <xsl:if test="$pass5/fr:datatable/@sortAndPaginationMode and ($pass5/fr:datatable/@sort-mode or $pass5/fr:datatable/@pagination-mode)">
+            <xsl:message terminate="yes">You can't use the sortAndPaginationMode attribute, if you have a sort-mode or pagination-mode attribute</xsl:message>
+        </xsl:if>
         <xsl:apply-templates select="$pass5/fr:datatable" mode="dynamic"/>
 
     </xsl:template>
@@ -169,7 +181,7 @@
     <xsl:template name="fr-goto-page">
         <xsl:param name="fr-new-page"/>
         <xsl:choose>
-            <xsl:when test="$isExternallySortedAndPaginated">
+            <xsl:when test="$is-externally-paginated">
                 <xforms:dispatch ev:event="DOMActivate" name="fr-goto-page" target="fr.datatable">
                     <xxforms:context name="fr-new-page" select="{$fr-new-page}"/>
                 </xforms:dispatch>
@@ -334,7 +346,7 @@
             <xforms:model id="datatable-model" xxbl:scope="inner">
                 <xforms:instance id="datatable-instance">
                     <columns xmlns="">
-                        <xsl:if test="$isInternallySortedAndPaginated">
+                        <xsl:if test="$is-internally-sorted">
                             <xsl:attribute name="currentSortColumn">-1</xsl:attribute>
                             <xsl:attribute name="default">true</xsl:attribute>
                         </xsl:if>
@@ -342,7 +354,7 @@
                             <xsl:copy>
                                 <xsl:attribute name="nbColumns"/>
                                 <xsl:attribute name="index"/>
-                                <xsl:if test="$isInternallySortedAndPaginated">
+                                <xsl:if test="$is-internally-sorted">
                                     <xsl:attribute name="currentSortOrder"/>
                                     <xsl:attribute name="nextSortOrder"/>
                                     <xsl:attribute name="type"/>
@@ -403,7 +415,7 @@
             </xforms:model>
 
             <xsl:choose>
-                <xsl:when test="$paginated and $isInternallySortedAndPaginated">
+                <xsl:when test="$paginated and $is-internally-paginated">
                     <xxforms:variable name="page" model="datatable-model" select="instance('page')" xxbl:scope="inner"/>
                     <xxforms:variable name="nbRows" xxbl:scope="inner">
                         <xxforms:sequence select="count({$repeatNodeset})" xxbl:scope="outer"/>
@@ -413,7 +425,7 @@
                         xxbl:scope="inner"/>
                 </xsl:when>
 
-                <xsl:when test="$paginated and $isExternallySortedAndPaginated">
+                <xsl:when test="$paginated and $is-externally-paginated">
                     <xxforms:variable name="page" xxbl:scope="inner">
                         <xxforms:sequence xbl:attr="select=page" xxbl:scope="outer"/>
                     </xxforms:variable>
@@ -740,7 +752,7 @@
 
             <xsl:copy-of select="$pagination"/>
 
-            <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
+            <xsl:if test="$paginated and $is-internally-paginated">
                 <xforms:group model="datatable-model" ref="instance('page')" appearance="xxforms:internal" xxbl:scope="inner">
                     <xforms:input ref="@nbPages" style="display:none;">
                         <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
@@ -793,7 +805,7 @@
                                     <xsl:apply-templates select="node()" mode="dynamic"/>
                                 </xforms:label>
                                 <xsl:choose>
-                                    <xsl:when test="$isExternallySortedAndPaginated">
+                                    <xsl:when test="$is-externally-sorted">
                                         <xforms:hint>
                                             <xforms:output value="{@fr:sortMessage}"/>
                                         </xforms:hint>
@@ -845,9 +857,8 @@
     </xsl:template>
 
     <xsl:template match="header/xhtml:th" mode="dynamic">
-        <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
-            <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external", sortable columns must have fr:sortMessage
-                attributes.</xsl:message>
+        <xsl:if test="$is-externally-sorted and @fr:sortable and not(@fr:sortMessage)">
+            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage attributes.</xsl:message>
         </xsl:if>
         <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}" xxbl:scope="inner"/>
         <xxforms:variable name="columnDesc" model="datatable-model" select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
@@ -890,8 +901,8 @@
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
-        <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
-            <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external", sortable columns must have fr:sortMessage
+        <xsl:if test="$is-internally-sorted and @fr:sortable and not(@fr:sortMessage)">
+            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage
                 attributes.</xsl:message>
         </xsl:if>
 
@@ -916,9 +927,8 @@
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xforms:group ref=".">
                 <xforms:action ev:event="xforms-enabled" xxbl:scope="inner">
-                    <!--<xforms:delete nodeset="$columnSet/column[@position = $position]"/>-->
                     <xsl:choose>
-                        <xsl:when test="$isInternallySortedAndPaginated">
+                        <xsl:when test="$is-internally-sorted">
                             <xforms:insert context="$columnSet" nodeset="column"
                                 origin="xxforms:element('column', (
                             xxforms:attribute('position', $position),
@@ -962,8 +972,8 @@
     </xsl:template>
 
     <xsl:template match="header/xforms:group/xhtml:th" mode="dynamic">
-        <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
-            <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external", sortable columns must have fr:sortMessage
+        <xsl:if test="$is-externally-sorted and @fr:sortable and not(@fr:sortMessage)">
+            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage
                 attributes.</xsl:message>
         </xsl:if>
 
@@ -990,7 +1000,7 @@
                 <xforms:action ev:event="xforms-enabled xforms-value-changed" xxbl:scope="inner">
                     <!--<xforms:delete nodeset="$columnSet/column[@position = $position]"/>-->
                     <xsl:choose>
-                        <xsl:when test="$isInternallySortedAndPaginated">
+                        <xsl:when test="$is-internally-sorted">
                             <xforms:insert context="$columnSet" nodeset="column"
                                 origin="xxforms:element('column', (
                                 xxforms:attribute('position', $position),
@@ -1043,13 +1053,13 @@
 
         <xxforms:variable name="fr-dt-nodeset" xxbl:scope="outer" select="{$repeatNodeset}"/>
 
+        <!-- Handling internal sorting -->
         <xsl:choose>
-
-            <xsl:when test="$isExternallySortedAndPaginated">
-                <xxforms:variable name="fr-dt-rewrittenNodeset" select="$fr-dt-nodeset"/>
+            <xsl:when test="$is-externally-sorted">
+                <xxforms:variable name="fr-dt-rewritten-sorted-nodeset" select="$fr-dt-nodeset"/>
             </xsl:when>
-
             <xsl:otherwise>
+
                 <xxforms:variable name="fr-dt-datatable-instance" xxbl:scope="outer">
                     <xxforms:sequence select="instance('datatable-instance')" xxbl:scope="inner"/>
                 </xxforms:variable>
@@ -1063,64 +1073,62 @@
                     <xxforms:sequence select="instance('datatable-instance')/@default = 'true'" xxbl:scope="inner"/>
                 </xxforms:variable>
 
-                <xxforms:variable name="fr-dt-isSorted" select="$fr-dt-isDefault or $fr-dt-currentSortColumn[@currentSortOrder = @fr:sorted]"
-                    xxbl:scope="outer"/>
+                <xxforms:variable name="fr-dt-isSorted" select="$fr-dt-isDefault or $fr-dt-currentSortColumn[@currentSortOrder = @fr:sorted]" xxbl:scope="outer"/>
 
                 <xxforms:variable name="fr-dt-currentSortColumnType" xxbl:scope="outer"
                     select="
+                        if ($fr-dt-currentSortColumn)
+                            then if ($fr-dt-currentSortColumn/@type != '')
+                                then $fr-dt-currentSortColumn/@type
+                                else for $value in xxforms:evaluate($fr-dt-currentSortColumn/@pathToFirstNode)
+                                    return if ($value instance of node())
+                                        then if (xxforms:type($value) = ({$numberTypesEnumeration}))
+                                            then 'number'
+                                            else 'text'
+                                        else if ($value instance of xs:decimal)
+                                            then 'number'
+                                            else 'text'
+                            else ''"/>
 
-            if ($fr-dt-currentSortColumn)
-                then if ($fr-dt-currentSortColumn/@type != '')
-                    then $fr-dt-currentSortColumn/@type
-                    else for $value in xxforms:evaluate($fr-dt-currentSortColumn/@pathToFirstNode)
-                        return if ($value instance of node())
-                            then if (xxforms:type($value) = ({$numberTypesEnumeration}))
-                                then 'number'
-                                else 'text'
-                            else if ($value instance of xs:decimal)
-                                then 'number'
-                                else 'text'
-                else ''
-
-            "/>
-
-
-                <xsl:if test="$paginated">
-                    <xxforms:variable name="fr-dt-page" xxbl:scope="outer">
-                        <xxforms:sequence select="$page" xxbl:scope="inner"/>
-                    </xxforms:variable>
-                </xsl:if>
-
-                <xxforms:variable name="fr-dt-rewrittenNodeset"
+                <xxforms:variable name="fr-dt-rewritten-sorted-nodeset"
                     select="
-
-                {if ($paginated) then '(' else ''}
-
-                if (not($fr-dt-currentSortColumn) or $fr-dt-currentSortColumn/@currentSortOrder = 'none' or $fr-dt-isSorted)
-                    then $fr-dt-nodeset
-                    else exf:sort($fr-dt-nodeset,  $fr-dt-currentSortColumn/@sortKey , $fr-dt-currentSortColumnType, $fr-dt-currentSortColumn/@currentSortOrder)
-
-                {if ($paginated)
-                    then concat(
-                        ')[position() >= ($fr-dt-page - 1) * '
-                        , $rowsPerPage
-                        , ' + 1 and position() &lt;= $fr-dt-page *'
-                        , $rowsPerPage
-                        ,']')
-                    else ''}
-
-                "
-                />
+                        if (not($fr-dt-currentSortColumn) or $fr-dt-currentSortColumn/@currentSortOrder = 'none' or $fr-dt-isSorted)
+                            then $fr-dt-nodeset
+                            else exf:sort($fr-dt-nodeset,  $fr-dt-currentSortColumn/@sortKey , $fr-dt-currentSortColumnType, $fr-dt-currentSortColumn/@currentSortOrder)
+                    "/>
             </xsl:otherwise>
         </xsl:choose>
 
+        <!-- Handling internal paging -->
+        <xsl:choose>
+            <xsl:when test="not($paginated) or $is-externally-paginated">
+                <xxforms:variable name="fr-dt-rewritten-paginated-nodeset" select="$fr-dt-rewritten-sorted-nodeset"/>
+            </xsl:when>
+            <xsl:otherwise>
 
-        <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
+                <xxforms:variable name="fr-dt-page" xxbl:scope="outer">
+                    <xxforms:sequence select="$page" xxbl:scope="inner"/>
+                </xxforms:variable>
+
+                <xxforms:variable name="fr-dt-rewritten-paginated-nodeset"
+                    select="
+                        $fr-dt-rewritten-sorted-nodeset
+                        {concat(
+                                '[position() >= ($fr-dt-page - 1) * '
+                                , $rowsPerPage
+                                , ' + 1 and position() &lt;= $fr-dt-page *'
+                                , $rowsPerPage
+                                ,']')
+                         }"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
+        <xforms:repeat nodeset="$fr-dt-rewritten-paginated-nodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
 
             <xforms:action ev:event="xxforms-nodeset-changed xforms-enabled xforms-disabled" ev:target="#observer">
                 <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).updateRows(); </xxforms:script>
-                <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
+                <xsl:if test="$paginated and $is-internally-paginated">
                     <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
                     <xforms:setvalue model="datatable-model" ref="instance('page')/@nbPages" value="$nbPages" xxbl:scope="inner"/>
                     <!-- <xforms:setvalue model="datatable-model" ref="instance('page')"
@@ -1283,7 +1291,7 @@
             <xsl:message terminate="yes">Datatable: mismatch, significant element position <xsl:value-of select="$position"/> is a <xsl:value-of
                     select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>repeat </xsl:if>
         <column xmlns="">
-            <xsl:if test="$isInternallySortedAndPaginated">
+            <xsl:if test="$is-internally-sorted">
                 <xsl:attribute name="type"/>
                 <xsl:attribute name="sortKey">
                     <xsl:choose>
@@ -1314,7 +1322,7 @@
                     select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>
         </xsl:if>
         <columnSet xmlns="">
-            <xsl:if test="$isInternallySortedAndPaginated">
+            <xsl:if test="$is-internally-sorted">
                 <xsl:attribute name="sortKey">
                     <xsl:apply-templates select="$body" mode="dyn-sortKey"/>
                 </xsl:attribute>
@@ -1337,7 +1345,7 @@
                     select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>
         </xsl:if>
         <columnSet xmlns="">
-            <xsl:if test="$isInternallySortedAndPaginated">
+            <xsl:if test="$is-internally-sorted">
                 <xsl:attribute name="sortKey">
                     <xsl:apply-templates select="$body" mode="dyn-sortKey"/>
                 </xsl:attribute>

@@ -13,10 +13,11 @@
  */
 
 (function() {
-    var OD = ORBEON.util.Dom;
-    var Test = ORBEON.util.Test;
-    var Assert = YAHOO.util.Assert;
-    var YD = YAHOO.util.Dom;
+    var Assert = YAHOO.util.Assert,
+        OD = ORBEON.util.Dom,
+        Test = ORBEON.util.Test,
+        UserAction = YAHOO.util.UserAction,
+        YD = YAHOO.util.Dom;
 
     var testCase = {
 
@@ -421,9 +422,46 @@
             });
         },
 
+        /**
+         * Test with just sort-mode="external", i.e. sorting is handled by the user while paging is handled by
+         * the datatable.
+         */
+        testInternalPagingExternalSorting: function() {
+            this.openAccordionCase(this, "internal-paging-external-sorting", function() {
+                var container = OD.get("my-accordion$internal-paging-external-sorting"),
+                    table = YD.getElementsByClassName("yui-dt-table", "table", container)[0],
+                    firstOutput  = YD.getElementsByClassName("xforms-output", "span", table)[0],
+                    sortPosition = YD.getElementsByClassName("yui-dt-label", "span", table)[0],
+                    sortTextAnchor = YD.getElementsByClassName("yui-dt-label", "span", table)[1],
+                    nextAnchor = YD.getElementsByClassName("yui-pg-next", "a", container)[0],
+                    firstAnchor = YD.getElementsByClassName("yui-pg-first", "a", container)[0];
+                Assert.areEqual("0", OD.getStringValue(firstOutput), "initially have 1");
+                Test.executeSequenceCausingAjaxRequest(this, [[
+                    // Test internal paging
+                    function() { UserAction.click(nextAnchor); },
+                    function() { Assert.areEqual("5", OD.getStringValue(firstOutput), "go to second page"); }
+                ], [
+                    // Back to first page
+                    function() { UserAction.click(firstAnchor); },
+                    function() { Assert.areEqual("0", OD.getStringValue(firstOutput), "back on first page"); }
+                ], [
+                    // Test external sorting
+                    function() { UserAction.click(sortTextAnchor); },
+                    function() { Assert.areEqual("33", OD.getStringValue(firstOutput), "sorting by text moved the row 33 to the beginning"); }
+                ], [
+                    // Do internal paging after sort
+                    function() { UserAction.click(nextAnchor); },
+                    function() { Assert.areEqual("7", OD.getStringValue(firstOutput), "second page sorted by text"); }
+                ], [
+                    // Back to sorting by position to restore instance in its original state
+                    function() { UserAction.click(sortPosition); UserAction.click(firstAnchor); },
+                    function() { Assert.areEqual("0", OD.getStringValue(firstOutput), "back to initial state"); }
+                ]]);
+            });
+        },
+
         EOS: ""
     };
-
 
     ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         for (var property in YAHOO.xbl.fr.Datatable.unittests_lib) {

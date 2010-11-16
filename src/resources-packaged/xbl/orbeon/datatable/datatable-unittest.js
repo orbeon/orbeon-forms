@@ -230,9 +230,7 @@
                 thiss.checkTableStructure(table, 2, true);
                 thiss.checkCellClasses(table, true);
                 thiss.checkCellStyles(table, true);
-
                 thiss.closeAccordionCase(thiss, '_314359');
-
             });
 
         }
@@ -455,7 +453,10 @@
                 ], [
                     // Back to sorting by position to restore instance in its original state
                     function() { UserAction.click(sortPosition); UserAction.click(firstAnchor); },
-                    function() { Assert.areEqual("0", OD.getStringValue(firstOutput), "back to initial state"); }
+                    function() {
+                        Assert.areEqual("0", OD.getStringValue(firstOutput), "back to initial state");
+                        this.closeAccordionCase(this, "internal-paging-external-sorting");
+                    }
                 ]]);
             });
         },

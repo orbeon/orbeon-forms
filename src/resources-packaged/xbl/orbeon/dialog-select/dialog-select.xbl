@@ -135,7 +135,7 @@
 
                         <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
                              clearly two choices: confirm the selection or cancel -->
-                        <xxforms:dialog id="dialog" close="false" appearance="full" level="modal" class="fr-dialog-select-dialog">
+                        <xxforms:dialog id="dialog" xbl:attr="close" appearance="full" level="modal" class="fr-dialog-select-dialog">
                             <xforms:label value="$resources/title"/>
 
                             <xforms:action ev:event="xxforms-dialog-open">

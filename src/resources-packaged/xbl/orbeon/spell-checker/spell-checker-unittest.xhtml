@@ -75,7 +75,7 @@
         <xforms:repeat nodeset="text">
             <xhtml:div class="block">
                 <xforms:textarea ref="." id="textarea"/>
-                <fr:spell-checker ref="." id="spell-checker"/>
+                <fr:spell-checker ref="." id="spell-checker" close="false"/>
                 <fr:button id="remove-line">
                     <xforms:label>Remove line</xforms:label>
                     <xforms:delete ev:event="DOMActivate" nodeset="."/>

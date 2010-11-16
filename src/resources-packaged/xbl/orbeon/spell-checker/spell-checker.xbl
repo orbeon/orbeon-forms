@@ -144,7 +144,7 @@
                     </fr:button>
 
                     <!-- Spell checking dialog -->
-                    <xxforms:dialog id="spell-checking-dialog" class="fr-spell-checker-dialog">
+                    <xxforms:dialog id="spell-checking-dialog" class="fr-spell-checker-dialog" xbl:attr="close">
                         <xforms:setfocus ev:event="xxforms-dialog-open" control="ignore"/>
                         <xforms:label>Spelling</xforms:label>
                         <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>

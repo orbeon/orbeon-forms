@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import collection.mutable.Stack
-import org.dom4j.{Text, Element}
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.apache.commons.lang.StringUtils
@@ -24,6 +23,7 @@ import java.util.{Map => JMap, LinkedHashMap => JLinkedHashMap}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils, XFormsConstants, XFormsStaticState}
 import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
+import org.dom4j.{QName, Text, Element}
 
 trait SelectionControl extends SimpleElementAnalysis {
 
@@ -70,38 +70,33 @@ trait SelectionControl extends SimpleElementAnalysis {
                 // Make lazy as might not be used
                 lazy val itemElementAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(stack.top), None, stack.top.getChildElementScope(element)) with ValueTrait with ViewTrait
 
+                def processElement(qName: QName, doRequire: Boolean) {
+                    val nestedElement = element.element(qName)
+
+                    if (doRequire)
+                        require(nestedElement ne null)
+
+                    if (nestedElement ne null) {
+                        val nestedAnalysis = new LocalLHHAAnalysis(staticStateContext, nestedElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(nestedElement))
+                        nestedAnalysis.analyzeXPath()
+                        combinedAnalysis = combinedAnalysis combine nestedAnalysis.getValueAnalysis.get
+                    }
+                }
+
                 element.getQName match {
 
                     case XFormsConstants.ITEM_QNAME | XFormsConstants.ITEMSET_QNAME =>
 
                         itemElementAnalysis.analyzeXPath()
 
-                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
-                        val valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME)
-
-                        require(labelElement ne null)
-                        require(valueElement ne null)
-
-                        val labelAnalysis = new LocalLHHAAnalysis(staticStateContext, labelElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(labelElement))
-                        val valueAnalysis = new LocalLHHAAnalysis(staticStateContext, valueElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(valueElement))
-
-                        labelAnalysis.analyzeXPath()
-                        valueAnalysis.analyzeXPath()
-
-                        combinedAnalysis = combinedAnalysis combine labelAnalysis.getValueAnalysis.get
-                        combinedAnalysis = combinedAnalysis combine valueAnalysis.getValueAnalysis.get
+                        processElement(XFormsConstants.LABEL_QNAME, true)
+                        processElement(XFormsConstants.XFORMS_VALUE_QNAME, true)
 
                     case XFormsConstants.CHOICES_QNAME =>
 
                         itemElementAnalysis.analyzeXPath()
 
-                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
-                        if (labelElement ne null) { // label is optional
-                            val labelAnalysis = new LocalLHHAAnalysis(staticStateContext, labelElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(labelElement))
-                            labelAnalysis.analyzeXPath()
-
-                            combinedAnalysis = combinedAnalysis combine labelAnalysis.getValueAnalysis.get
-                        }
+                        processElement(XFormsConstants.LABEL_QNAME, false) // label is optional on xf:choices
 
                         // Always push the container
                         stack push itemElementAnalysis
@@ -143,7 +138,7 @@ trait SelectionControl extends SimpleElementAnalysis {
     }
 
     /**
-     * Evaluate
+     * Evaluate a static itemset.
      */
     def evaluateStaticItemset(): Itemset = {
 
@@ -156,6 +151,16 @@ trait SelectionControl extends SimpleElementAnalysis {
             private var currentContainer: ItemContainer = result
 
             def startElement(element: Element) {
+
+                def getAttributes(itemChoiceItemsetElement: Element) = {
+                    val result = new JLinkedHashMap[QName, String]
+                    for (attributeName <- XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE) {
+                        val attributeValue = itemChoiceItemsetElement.attributeValue(XFormsConstants.CLASS_QNAME)
+                        if (attributeValue ne null)
+                            result.put(attributeName, attributeValue)
+                    }
+                    result
+                }
 
                 element.getQName match {
 
@@ -210,16 +215,6 @@ trait SelectionControl extends SimpleElementAnalysis {
                 }
 
             def text(text: Text) = {}
-
-            private def getAttributes(itemChoiceItemsetElement: Element): JMap[String, String] = {
-                val result = new JLinkedHashMap[String, String]
-                for (attributeName <- XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE) {
-                    val attributeValue = itemChoiceItemsetElement.attributeValue(XFormsConstants.CLASS_QNAME)
-                    if (attributeValue ne null)
-                        result.put(attributeName, attributeValue)
-                }
-                result
-            }
         })
         result
     }

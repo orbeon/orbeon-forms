@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.itemset;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Element;
-import org.dom4j.Text;
+import org.dom4j.*;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -34,7 +33,7 @@ import java.util.*;
  */
 public class XFormsItemUtils {
 
-    public static final String[] ATTRIBUTES_TO_PROPAGATE = { "class", "style" };
+    public static final QName[] ATTRIBUTES_TO_PROPAGATE = { XFormsConstants.CLASS_QNAME, XFormsConstants.STYLE_QNAME, XFormsConstants.XXFORMS_OPEN_QNAME };
 
     public static String encryptValue(PropertyContext propertyContext, String value) {
         return SecureUtils.encrypt(propertyContext, XFormsProperties.getXFormsPassword(), value);
@@ -126,7 +125,7 @@ public class XFormsItemUtils {
                     final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
-                    final Map<String, String> attributes = getAttributes(element);
+                    final Map<QName, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
@@ -201,7 +200,7 @@ public class XFormsItemUtils {
                                             // non-relevant if it is a leaf item. But we don't yet know if this item is
                                             // a leaf item, so we prune such non-relevant items later.
 
-                                            final Map<String, String> attributes = getAttributes(element);
+                                            final Map<QName, String> attributes = getAttributes(element);
                                             currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), value));
                                         } else {
                                             // TODO: handle xforms:copy
@@ -228,7 +227,7 @@ public class XFormsItemUtils {
 
                         // NOTE: returned label can be null in some cases
 
-                        final Map<String, String> attributes = getAttributes(element);
+                        final Map<QName, String> attributes = getAttributes(element);
                         final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
@@ -252,11 +251,11 @@ public class XFormsItemUtils {
                 return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, labelElement, false, null);
             }
 
-            private Map<String, String> getAttributes(Element itemChoiceItemsetElement) {
+            private Map<QName, String> getAttributes(Element itemChoiceItemsetElement) {
                 final String elementEffectiveId = getElementEffectiveId(itemChoiceItemsetElement);
 
-                final Map<String, String> result = new LinkedHashMap<String, String>();
-                for (String attributeName: ATTRIBUTES_TO_PROPAGATE) {
+                final Map<QName, String> result = new LinkedHashMap<QName, String>();
+                for (QName attributeName : ATTRIBUTES_TO_PROPAGATE) {
                     final String attributeValue = itemChoiceItemsetElement.attributeValue(attributeName);
                     if (attributeValue != null)
                         addAttributeAVTValue(itemChoiceItemsetElement, attributeName, attributeValue, elementEffectiveId, result);
@@ -264,7 +263,7 @@ public class XFormsItemUtils {
                 return result;
             }
 
-            private void addAttributeAVTValue(Element itemChoiceItemsetElement, String attributeName, String attributeValue, String elementEffectiveId, Map<String, String> result) {
+            private void addAttributeAVTValue(Element itemChoiceItemsetElement, QName attributeName, String attributeValue, String elementEffectiveId, Map<QName, String> result) {
                 if (!XFormsUtils.maybeAVT(attributeValue)) {
                     // Definitely not an AVT
                     result.put(attributeName, attributeValue);

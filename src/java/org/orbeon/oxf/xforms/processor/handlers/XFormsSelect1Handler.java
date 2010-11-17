@@ -601,11 +601,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     private static void addItemAttributes(Item item, AttributesImpl spanAttributes) {
-        final Map<String, String> itemAttributes = item.getAttributes();
+        final Map<QName, String> itemAttributes = item.getAttributes();
         if (itemAttributes != null && itemAttributes.size() > 0) {
-            for (final Map.Entry<String, String> entry: itemAttributes.entrySet()) {
-                final String attributeName = entry.getKey();
-                if (!attributeName.equals("class")) { // class is handled separately
+            for (final Map.Entry<QName, String> entry: itemAttributes.entrySet()) {
+                final QName attributeQName = entry.getKey();
+                if (!attributeQName.equals(XFormsConstants.CLASS_QNAME)) { // class is handled separately
+                    final String attributeName = Itemset.getAttributeName(attributeQName);
                     spanAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, entry.getValue());
                 }
             }
@@ -613,10 +614,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     private static String getItemClasses(Item item, String initialClasses) {
-        final Map<String, String> itemAttributes = item.getAttributes();
+        final Map<QName, String> itemAttributes = item.getAttributes();
         final StringBuilder sb = (initialClasses != null) ? new StringBuilder(initialClasses) : new StringBuilder();
         if (itemAttributes != null) {
-            final String itemClassValue = itemAttributes.get("class");
+            final String itemClassValue = itemAttributes.get(XFormsConstants.CLASS_QNAME);
             if (itemClassValue != null) {
                 if (sb.length() > 0)
                     sb.append(' ');

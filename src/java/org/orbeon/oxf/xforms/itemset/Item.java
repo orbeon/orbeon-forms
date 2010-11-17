@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.itemset;
 
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.ContentHandler;
@@ -27,7 +28,7 @@ import java.util.*;
 public class Item implements ItemContainer {
 
     private final boolean isEncryptValue; // whether this item is part of an open selection control
-    private final Map<String, String> attributes;
+    private final Map<QName, String> attributes;
     private final String label;
     private final String value;
 
@@ -36,7 +37,7 @@ public class Item implements ItemContainer {
     private ItemContainer parent;
     private List<Item> children;
 
-    public Item(boolean isMultiple, boolean isEncryptValue, Map<String, String> attributes, String label, String value) {
+    public Item(boolean isMultiple, boolean isEncryptValue, Map<QName, String> attributes, String label, String value) {
 
         // NOTE: As of 2010-08-18, label can be null in these cases:
         //
@@ -97,7 +98,7 @@ public class Item implements ItemContainer {
         return children != null && children.size() > 0;
     }
 
-    public Map<String, String> getAttributes() {
+    public Map<QName, String> getAttributes() {
         return attributes;
     }
 

@@ -1,0 +1,60 @@
+<!--
+    Copyright (C) 2010 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>Test with screen reader</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <instance>
+                    <tweet>Testing #JAWS screen reader with Orbeon Forms.</tweet>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .tweet-dialog textarea { width: 20em; display: block; margin-bottom: .5em }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:accordion id="my-accordion" class="fr-accordion-lnf">
+            <fr:case selected="false" id="message-action">
+                <fr:label>Message</fr:label>
+                <fr:button>
+                    <xforms:label>Save</xforms:label>
+                    <xforms:message ev:event="DOMActivate">Document could not be saved.</xforms:message>
+                </fr:button>
+            </fr:case>
+            <fr:case selected="false" id="dialog">
+                <fr:label>Dialog</fr:label>
+                <xxforms:dialog id="tweet-dialog" class="tweet-dialog">
+                    <xforms:setfocus ev:event="xxforms-dialog-open" control="tweet-area"/>
+                    <xforms:label>Your tweet</xforms:label>
+                    <xforms:textarea ref="tweet" id="tweet-area"/>
+                    <fr:button>
+                        <xforms:label>Send</xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="tweet-dialog"/>
+                    </fr:button>
+                </xxforms:dialog>
+                <fr:button>
+                    <xforms:label>Show dialog</xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="tweet-dialog"/>
+                </fr:button>
+            </fr:case>
+        </fr:accordion>
+    </xhtml:body>
+</xhtml:html>

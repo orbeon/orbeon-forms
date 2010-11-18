@@ -17,6 +17,7 @@
       <value defaultName="singleModule" />
     </option>
     <envs />
+    <patterns />
     <RunnerSettings RunnerId="Debug">
       <option name="DEBUG_PORT" value="59352" />
       <option name="TRANSPORT" value="0" />

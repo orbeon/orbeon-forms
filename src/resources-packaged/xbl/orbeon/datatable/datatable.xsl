@@ -901,9 +901,8 @@
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
-        <xsl:if test="$is-internally-sorted and @fr:sortable and not(@fr:sortMessage)">
-            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage
-                attributes.</xsl:message>
+        <xsl:if test="$is-externally-sorted and @fr:sortable and not(@fr:sortMessage)">
+            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage attributes.</xsl:message>
         </xsl:if>
 
         <xxforms:variable name="position" xxbl:scope="inner">
@@ -973,8 +972,7 @@
 
     <xsl:template match="header/xforms:group/xhtml:th" mode="dynamic">
         <xsl:if test="$is-externally-sorted and @fr:sortable and not(@fr:sortMessage)">
-            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage
-                attributes.</xsl:message>
+            <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage attributes.</xsl:message>
         </xsl:if>
 
         <xxforms:variable name="position" xxbl:scope="inner">

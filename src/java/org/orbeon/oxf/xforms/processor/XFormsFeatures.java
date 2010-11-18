@@ -350,6 +350,10 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             // XForms client
             new ResourceConfig("/ops/javascript/xforms.js", "/ops/javascript/xforms-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/Form.js", "/ops/javascript/orbeon/xforms/action/Form-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/Page.js", "/ops/javascript/orbeon/xforms/action/Page-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Control.js", "/ops/javascript/orbeon/xforms/action/control/Control-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js", "/ops/javascript/orbeon/xforms/action/control/Tree-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js", "/ops/javascript/orbeon/xforms/action/Message-min.js")
     };
 

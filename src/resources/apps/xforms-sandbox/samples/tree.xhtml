@@ -149,7 +149,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}" xxforms:open="{count(ancestor-or-self::item) = 1}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>

@@ -46,16 +46,17 @@
                             scope: this
                         },
                         isDefault: false
-                    }]
+                    }],
+                    usearia: true,
+                    role: "alertdialog"
                 });
                 this._messageDialog.setHeader("Message");
                 this._messageDialog.render(document.body);
 
-                // Add ARIA attributes
+                // This is done for JAWS - Without this, on IE 7, JAWS only reads the "close button" when the dialog
+                // opens (it doesn't tell users that the dialog opened, and doesn't read the message).
                 var dialogDiv = OD.get("xforms-message-dialog");
-                var bodyDiv = YD.getElementsByClassName("bd", null, dialogDiv)[0];
-                bodyDiv.setAttribute("aria-live", "polite");
-                bodyDiv.setAttribute("role", "alert");
+                dialogDiv.setAttribute("aria-live", "polite");
             }, this, true);
         },
 

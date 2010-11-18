@@ -42,10 +42,10 @@
             <fr:case selected="false" id="dialog">
                 <fr:label>Dialog</fr:label>
                 <xxforms:dialog id="tweet-dialog" class="tweet-dialog">
-                    <xforms:setfocus ev:event="xxforms-dialog-open" control="tweet-area"/>
+                    <xforms:setfocus ev:event="xxforms-dialog-open" control="send"/>
                     <xforms:label>Your tweet</xforms:label>
                     <xforms:textarea ref="tweet" id="tweet-area"/>
-                    <fr:button>
+                    <fr:button id="send">
                         <xforms:label>Send</xforms:label>
                         <xxforms:hide ev:event="DOMActivate" dialog="tweet-dialog"/>
                     </fr:button>

@@ -393,13 +393,13 @@
         <xxforms:variable name="instance-holder" select="event('instance-holder')"/>
         <xxforms:variable name="resource-holders" select="event('resource-holders')"/>
 
-        <!-- All the xhtml:td elements up to and including the current one -->
-        <xxforms:variable name="tds" select="($current-td/../preceding-sibling::*:tr/*:td, $current-td/preceding-sibling::*:td)"/>
+        <!-- All the xhtml:td elements up to the current one within the current section -->
+        <xxforms:variable name="tds" select="$current-td/preceding::*:td intersect $current-td/ancestor::fr:section[1]//*:td"/>
 
         <!-- Name of the preceding control id -->
         <xxforms:variable name="preceding-control-id" select="substring-before(($tds/*)[last()]/@id, '-control')"/>
 
-        <!--<xforms:message>-->
+        <!--<xforms:message level="xxforms:log-info">-->
             <!--Preceding: <xforms:output value="$preceding-control-id"/>-->
         <!--</xforms:message>-->
 

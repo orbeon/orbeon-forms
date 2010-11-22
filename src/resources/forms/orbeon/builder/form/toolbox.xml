@@ -96,9 +96,11 @@
                                 <xforms:action ev:event="DOMActivate" context="$body">
                                     <!-- Insert section -->
 
+                                    <xxforms:variable name="old-section-index" select="index('fb-top-level-repeat')" as="xs:integer"/>
+
                                     <!-- Insert section template in the UI -->
                                     <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
-                                                   at="index('fb-top-level-repeat')" position="after"
+                                                   at="$old-section-index" position="after"
                                                    origin="instance('fb-section-template')"/>
                                     <xxforms:variable name="new-section" select="(fr:section | fr:repeat | fr:grid)[index('fb-top-level-repeat')]" as="element(fr:section)"/>
 
@@ -121,9 +123,8 @@
 
                                     <!-- Insert container in the instance -->
                                     <xforms:action context="$form-instance">
-                                        <!-- TODO: for now assume a top-level section containing a grid -->
                                         <xforms:insert context="." nodeset="*"
-                                                       at="index('fb-top-level-repeat')" position="after"
+                                                       at="$old-section-index" position="after"
                                                        origin="xxforms:element($new-section-name)"/>
                                     </xforms:action>
 

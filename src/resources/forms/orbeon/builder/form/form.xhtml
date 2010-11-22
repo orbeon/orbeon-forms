@@ -513,7 +513,10 @@
                                                         <xforms:action ev:event="DOMActivate">
                                                             <xforms:insert nodeset="$top-level-block/preceding-sibling::fr:*[1]" position="before" origin="$top-level-block"/>
                                                             <xforms:delete nodeset="$top-level-block"/>
-                                                            <!-- TODO: would be nice to move holders and resources as well -->
+                                                            <!-- Move instance holder -->
+                                                            <xforms:insert origin="$section-holder" nodeset="$section-holder/preceding-sibling::*[1]" position="before"/>
+                                                            <xforms:delete nodeset="$section-holder"/>
+                                                            <!-- TODO: would be nice to resources as well -->
                                                         </xforms:action>
                                                     </xforms:trigger>
                                                     <xforms:trigger appearance="minimal" ref=".[$top-level-block/following-sibling::fr:*]">
@@ -522,7 +525,10 @@
                                                         <xforms:action ev:event="DOMActivate">
                                                             <xforms:insert nodeset="$top-level-block/following-sibling::fr:*[1]" position="after" origin="$top-level-block"/>
                                                             <xforms:delete nodeset="$top-level-block"/>
-                                                            <!-- TODO: would be nice to move holders and resources as well -->
+                                                            <!-- Move instance holder -->
+                                                            <xforms:insert origin="$section-holder" nodeset="$section-holder/following-sibling::*[1]" position="after"/>
+                                                            <xforms:delete nodeset="$section-holder"/>
+                                                            <!-- TODO: would be nice to resources as well -->
                                                         </xforms:action>
                                                     </xforms:trigger>
                                                     <!-- Edit help for section -->

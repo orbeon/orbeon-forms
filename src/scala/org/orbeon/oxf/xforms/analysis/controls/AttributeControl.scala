@@ -16,8 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
-import org.orbeon.oxf.xforms.XFormsConstants
-
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 
 class AttributeControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
         extends CoreControl(staticStateContext, element, parent, preceding, scope)
@@ -27,6 +26,6 @@ class AttributeControl(staticStateContext: StaticStateContext, element: Element,
     // TODO: Add support for AVT
     override def computeValueAnalysis = Some(NegativeAnalysis(value.get)) // we must have a value
 
-    val forPrefixedId = scope.getFullPrefix + element.attributeValue(XFormsConstants.FOR_QNAME)
+    val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, element.attributeValue(XFormsConstants.FOR_QNAME))
     val name = element.attributeValue(XFormsConstants.NAME_QNAME)
 }

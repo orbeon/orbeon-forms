@@ -3740,9 +3740,45 @@
         </output>
     </test>
 
+    <test description="AVTs within XBL with inner and outer scope are processed" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315635&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <!-- NOTE: xxforms-test-preserve-content is handled by wrap-xforms-controls.xpl -->
+                                <xhtml:div class="xxforms-test-preserve-content">
+                                    <xhtml:a id="outer-a" href="/outer/{count(.)}" xxbl:scope="outer"/>
+                                    <xhtml:a id="inner-a" href="/inner/{count(.)}"/>
+                                </xhtml:div>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:div xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" class="xxforms-test-preserve-content">
+                    <xhtml:a id="my-foo$outer-a" href="/outer/1" xxbl:scope="outer"/>
+                    <xhtml:a id="my-foo$inner-a" href="/inner/1"/>
+                </xhtml:div>
+            </controls>
+        </output>
+    </test>
+
     <!--
 
-    TODO: more XLB ids tests:
+    TODO: more XBL ids tests:
 
     * test that LHHA with @for resolve ids in proper context
     * test scoping with ev:observer and repeats/XBL scope

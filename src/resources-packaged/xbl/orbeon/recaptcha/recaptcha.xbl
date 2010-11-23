@@ -78,9 +78,11 @@
                         <xsl:copy-of select="xxbl:parameter(., 'theme')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'lang')"/>
 
-                        <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
-                        <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none">
-                            <xforms:action ev:event="xforms-value-changed">
+                        <xforms:group xxforms:appearance="internal">
+                            <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
+                            <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none"/>
+                            <xforms:action ev:event="xforms-value-changed" if="challenge != '' and response != ''">
+                                <xforms:message level="xxforms:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
                                 <!-- Call API doing the verification -->
                                 <xforms:send submission="verify-submission"/>
                                 <!-- Parse the response -->
@@ -93,8 +95,7 @@
                                     <xxforms:context name="fr-error-code" select="$lines[2]"/>
                                 </xforms:dispatch>
                             </xforms:action>
-                        </xforms:input>
-
+                        </xforms:group>
                         <xhtml:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
                     </xforms:group>
                 </xsl:template>

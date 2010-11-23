@@ -23,6 +23,7 @@
             <xforms:instance>
                 <instance>
                     <tweet>Testing #JAWS screen reader with Orbeon Forms.</tweet>
+                    <dynamic-dialog-message>This is the message you will see/hear initially.</dynamic-dialog-message>
                 </instance>
             </xforms:instance>
         </xforms:model>
@@ -39,8 +40,8 @@
                     <xforms:message ev:event="DOMActivate">Document could not be saved.</xforms:message>
                 </fr:button>
             </fr:case>
-            <fr:case selected="false" id="dialog">
-                <fr:label>Dialog</fr:label>
+            <fr:case selected="false" id="static-dialog-section">
+                <fr:label>Static dialog</fr:label>
                 <xxforms:dialog id="tweet-dialog" class="tweet-dialog">
                     <xforms:setfocus ev:event="xxforms-dialog-open" control="send"/>
                     <xforms:label>Your tweet</xforms:label>
@@ -53,6 +54,31 @@
                 <fr:button>
                     <xforms:label>Show dialog</xforms:label>
                     <xxforms:show ev:event="DOMActivate" dialog="tweet-dialog"/>
+                </fr:button>
+            </fr:case>
+            <fr:case selected="false" id="dynamic-dialog-section">
+                <fr:label>Dynamic dialog</fr:label>
+                <xxforms:dialog id="dynamic-dialog" class="tweet-dialog">
+                    <xforms:setfocus ev:event="xxforms-dialog-open" control="dynamic-dialog-close"/>
+                    <xforms:label>Please note</xforms:label>
+                    <xhtml:div>
+                        <xforms:output ref="dynamic-dialog-message"/>
+                    </xhtml:div>
+                    <fr:button id="dynamic-dialog-close">
+                        <xforms:label>Close</xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="dynamic-dialog"/>
+                    </fr:button>
+                </xxforms:dialog>
+                <fr:button>
+                    <xforms:label>Show dialog</xforms:label>
+                    <xxforms:show ev:event="DOMActivate" dialog="dynamic-dialog"/>
+                </fr:button>
+                <fr:button>
+                    <xforms:label>Update message and show dialog</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue  ref="dynamic-dialog-message">This is the new message you will see/hear.</xforms:setvalue>
+                        <xxforms:show dialog="dynamic-dialog"/>
+                    </xforms:action>
                 </fr:button>
             </fr:case>
         </fr:accordion>

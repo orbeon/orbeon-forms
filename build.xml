@@ -574,6 +574,7 @@
         <!-- Store those under ${war.dir}/WEB-INF/resources so they can be used in dev mode -->
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/action"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/control"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/button"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
@@ -586,6 +587,10 @@
         <!-- Orbeon Orbeon's own JavaScript -->
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/xforms"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/action/Message"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Control"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Tree"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Form"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Page"/></antcall>
 
         <!-- YUI -->
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/button/button"/></antcall>

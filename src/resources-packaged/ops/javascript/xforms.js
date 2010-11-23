@@ -4202,6 +4202,20 @@ ORBEON.widgets.YUICalendar = function() {
                 cancel: "Abbrechen",
                 invalidYear: "Jahr muss eine Zahl sein"
             }
+        },
+        "no": {
+            properties: {
+                "MONTHS_LONG": [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August",  "September",  "Oktober",  "November",  "Desember" ],
+                "WEEKDAYS_SHORT": ["sø", "ma", "ti", "on", "to", "fr", "lø"],
+                "START_WEEKDAY": 1
+            },
+            navigator: {
+                month: "Måned",
+                year: "År",
+                submit: "Ok",
+                cancel: "Avbryt",
+                invalidYear: "År må være et tall"
+            }
         }
     };
 
@@ -4209,7 +4223,7 @@ ORBEON.widgets.YUICalendar = function() {
      * State shared amongst all calendars
      */
 
-    // Set when the calendar is ceated the first time
+    // Set when the calendar is created the first time
     var yuiCalendar = null;
     var calendarDiv = null;
     var yuiOverlay = null;

@@ -6,6 +6,9 @@
     <scope name="Samples" pattern="file[Orbeon Forms]:src/resources/apps/xforms-sandbox/samples/*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
+  </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
       <facet-type id="web">

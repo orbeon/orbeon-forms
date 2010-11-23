@@ -85,7 +85,13 @@ public class XBLTransformer {
                                 contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             }
                         } else {
-                            contentToInsert = null;
+                            // Clone all the element's children if any
+                            // See: http://www.w3.org/TR/xbl/#the-content
+                            contentToInsert = new ArrayList<Node>(element.nodeCount());
+                            for (Object o: element.elements()) {
+                                final Element currentElement = (Element) o;
+                                contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
+                            }
                         }
                     }
 

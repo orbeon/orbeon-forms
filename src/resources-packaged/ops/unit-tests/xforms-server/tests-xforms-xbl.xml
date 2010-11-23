@@ -3776,6 +3776,54 @@
         </output>
     </test>
 
+    <test description="xbl:content" name="oxf:pipeline">
+        <!-- See: http://www.w3.org/TR/xbl/#the-content -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xbl:content includes="nothing *">
+                                    <xforms:output id="output-foo1" value="'Nothing!'"/>
+                                </xbl:content>
+                                <xbl:content includes="something *">
+                                    <xforms:output id="output-foo2" value="'Nothing either!'"/>
+                                </xbl:content>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo">
+                        <something>
+                            <xforms:output id="output-foo3" value="'Something!'"/>
+                        </something>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$output-foo1">Nothing!</xxf:control>
+                        <xxf:control id="my-foo$output-foo3">Something!</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

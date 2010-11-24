@@ -4206,15 +4206,15 @@ ORBEON.widgets.YUICalendar = function() {
         "no": {
             properties: {
                 "MONTHS_LONG": [ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August",  "September",  "Oktober",  "November",  "Desember" ],
-                "WEEKDAYS_SHORT": ["sø", "ma", "ti", "on", "to", "fr", "lø"],
+                "WEEKDAYS_SHORT": ["s\u00F8", "ma", "ti", "on", "to", "fr", "l\u00F8"],
                 "START_WEEKDAY": 1
             },
             navigator: {
-                month: "Måned",
-                year: "År",
+                month: "M\u00E5ned",
+                year: "\u00C5r",
                 submit: "Ok",
                 cancel: "Avbryt",
-                invalidYear: "År må være et tall"
+                invalidYear: "\u00C5r m\u00E5 v\u00E6re et tall"
             }
         }
     };
@@ -8679,7 +8679,6 @@ function xformsDisplayLoading(progressMessage) {
     if (ORBEON.xforms.Globals.requestInProgress == true)
         xformsDisplayIndicator("loading", progressMessage);
 }
-
 // Run xformsPageLoaded when the browser has finished loading the page
 // In case this script is loaded twice, we still want to run the initialization only once
 if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
@@ -8705,7 +8704,6 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
             }
         }
     }
-
     if (!foundDojoContentPane) {
         ORBEON.xforms.Globals.pageLoadedRegistered = true;
         YAHOO.util.Event.throwErrors = true;

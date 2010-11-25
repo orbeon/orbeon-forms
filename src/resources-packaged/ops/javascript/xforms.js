@@ -4705,7 +4705,7 @@ ORBEON.widgets.RTE = function() {
 
         setFocus: function(control) {
             var yuiRTE = rteEditors[control.id];
-            // NOP: not sure what we can do with YUI 2.6. It seems 2.7 has a focus() method.
+            yuiRTE.focus();
         },
 
         onRendered: function(control, callback) {

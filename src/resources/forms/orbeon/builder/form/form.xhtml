@@ -463,20 +463,18 @@
                                             <!-- Respond to section delete confirmation (make sure we only catch this event dispatched directly to the section element) -->
                                             <xforms:action ev:event="fb-confirmation-yes" ev:target="fb-top-level-section-block">
 
-                                                <xxforms:variable name="section-name" select="if (context()/@context) then context()/@context else substring-before(context()/@bind, '-bind')"/>
+                                                <xxforms:variable name="section-name" select="if (context()/@context) then context()/@context else substring-before(context()/@bind, '-bind')" as="xs:string"/>
 
-                                                <!-- Delete holder element for section -->
-                                                <xforms:delete nodeset="$form-instance/*[name() = $section-name]"/>
-                                                <!-- Delete resources for section -->
-                                                <xforms:delete nodeset="$resources/resource/*[name() = $section-name]"/>
-
-                                                <!-- Delete holder element and resources for control -->
-                                                <xforms:action xxforms:iterate="*/*:tr/*:td">
-                                                    <xforms:action if="exists(*)">
-                                                        <xforms:delete nodeset="$form-instance/*[index('fb-top-level-repeat')]/*[name() = context()/*/@ref]"/>
-                                                        <xforms:delete nodeset="$resources/resource/*[name() = context()/*/@ref]"/>
-                                                    </xforms:action>
+                                                <!-- Delete holder elements and resources for controls in section -->
+                                                <xxforms:variable name="control-names" select="*/*:tr/*:td/*/@id/substring-before(., '-control')" as="xs:string*"/>
+                                                <xforms:action xxforms:iterate="$control-names">
+                                                    <xforms:delete nodeset="$form-instance/*[name() = $section-name]/*[name() = context()]"/>
+                                                    <xforms:delete nodeset="$resources/resource/*[name() = context()]"/>
                                                 </xforms:action>
+
+                                                <!-- Delete holder element and resource for section itself -->
+                                                <xforms:delete nodeset="($form-instance/*[name() = $section-name],
+                                                                         $resources/resource/*[name() = $section-name])"/>
 
                                                 <!-- Delete bind -->
                                                 <xforms:delete nodeset="$model//xforms:bind[@nodeset = $section-name]"/>

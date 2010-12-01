@@ -36,10 +36,10 @@
             <xforms:instance id="searched-countries"><empty/></xforms:instance>
             <xforms:instance id="additional-countries">
                 <additional-countries>
-                <country>
-                    <name>United States</name>
-                    <us-code>us2</us-code>
-                </country>
+                    <country>
+                        <name>United States</name>
+                        <us-code>us2</us-code>
+                    </country>
                     <country>
                         <name>Virgin  Islands</name>
                         <us-code>vq2</us-code>
@@ -50,7 +50,7 @@
             <!-- Internal state for this test -->
             <xforms:instance id="selected-countries">
                 <selected-countries>
-                    <static/>
+                    <static>ca</static>
                     <dynamic/>
                 </selected-countries>
             </xforms:instance>
@@ -67,14 +67,11 @@
             <xforms:submission ref="instance('search-dynamic')" id="update-countries" validate="false"
                 method="post" resource="/xforms-controls/services/countries" replace="instance" instance="searched-countries"/>
 
-            <!-- Add second US for testing to list of all countries -->
+            <!-- Add other countries for testing to list of all countries -->
             <xforms:insert ev:event="xforms-model-construct-done"
                 nodeset="instance('all-countries')/country" origin="instance('additional-countries')/*"/>
 
             <xforms:action ev:event="xforms-ready">
-                <xforms:dispatch target="static-autocomplete" name="fr-set-label">
-                    <xxforms:context name="label" select="'Canada'"/>
-                </xforms:dispatch>
                 <xforms:dispatch target="dynamic-autocomplete" name="fr-set-label">
                     <xxforms:context name="label" select="'Canada'"/>
                 </xforms:dispatch>
@@ -122,6 +119,10 @@
             <fr:autocomplete ref="instance('selected-countries')/static" id="static-autocomplete"
                              dynamic-itemset="false" max-results-displayed="4" show-full-itemset-dropdown="true" tabindex="1">
                 <xforms:label>Country code: </xforms:label>
+                <xforms:item>
+                    <xforms:label>[Select...]</xforms:label>
+                    <xforms:value/>
+                </xforms:item>
                 <xforms:itemset nodeset="instance('all-countries')/country">
                     <xforms:label ref="name"/>
                     <xforms:value ref="us-code"/>

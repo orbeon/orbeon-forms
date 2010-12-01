@@ -78,7 +78,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         /**
-         * Checks that the value in the search field is waht we expect it to be.
+         * Checks that the value in the search field is what we expect it to be.
          */
         checkSearchValue: function(staticDynamic, expectedValue, message) {
             var searchValue = ORBEON.xforms.Document.getValue(staticDynamic + "-autocomplete$search");
@@ -113,6 +113,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             }, function() {
                 this.runForStaticDynamic(function(staticDynamic, continuation) {
                     this.checkExternalValue(staticDynamic, "ca");
+                    this.checkSearchValue(staticDynamic, "Canada");
                     continuation.call(this);
                 });
             });

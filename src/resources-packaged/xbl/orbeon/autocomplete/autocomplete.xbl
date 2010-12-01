@@ -93,7 +93,7 @@
                             <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
                                 <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset = 'true')">
                                     <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
-                                    <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]/text()"/>
+                                    <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]"/>
                                     <xxforms:variable name="label" select="$select-items[index-of($values, $external-value)]/label"/>
                                     <xforms:setvalue if="exists($label)" ref="$textfield-value" value="$label"/>
                                 </xforms:action>

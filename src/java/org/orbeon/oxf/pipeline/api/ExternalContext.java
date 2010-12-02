@@ -103,7 +103,7 @@ public interface ExternalContext extends WebAppExternalContext {
         void sendError(int len) throws IOException;
         String getCharacterEncoding();
 
-        void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException;
+        void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException;
 
         void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
 

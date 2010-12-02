@@ -525,9 +525,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
          * @param parameters    parameters to redirect to
          * @param isServerSide  this is ignored for portlets
          * @param isExitPortal  if this is true, the redirect will exit the portal
-         * @param isNoRewrite
          */
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
             if (isCommitted())
                 throw new IllegalStateException("Cannot call sendRedirect if response is already committed.");
             this.redirectPathInfo = pathInfo;
@@ -603,7 +602,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         public DirectResponseTemp() {
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
             throw new IllegalStateException();
         }
     }
@@ -625,7 +624,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             mimeResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
             throw new IllegalStateException();
         }
 

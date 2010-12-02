@@ -1256,7 +1256,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                     pathInfo = resource;
                     parameters = null;
                 }
-                externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false, false);
+                externalContext.getResponse().sendRedirect(externalContext.getResponse().rewriteRenderURL(pathInfo), parameters, false, false);
             } catch (IOException e) {
                 throw new ValidationException(e, getLocationData());
             }

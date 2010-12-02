@@ -439,7 +439,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final String redirectResource = load.getResource();
             indentedLogger.logDebug("", "handling redirect response for xforms:load", "url", redirectResource);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
-            externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
+            externalContext.getResponse().sendRedirect(redirectResource, null, false, false);
 
             // Still send out a null document to signal that no further processing must take place
             XMLUtils.streamNullDocument(xmlReceiver);

@@ -16,9 +16,7 @@ package org.orbeon.oxf.pipeline;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.*;
 
 import java.io.*;
 import java.security.Principal;
@@ -237,7 +235,7 @@ public class SimpleExternalContext implements ExternalContext {
             headers.put(name, value);
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
         }
 
         public void setContentLength(int len) {

@@ -21,17 +21,12 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringConversions;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
@@ -428,7 +423,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             nativeResponse.addHeader(name, value);
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal, boolean isNoRewrite) throws IOException {
+        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
             // Create URL
             if (isServerSide) {
                 // Server-side redirect: do a forward
@@ -447,10 +442,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             } else {
                 // Client-side redirect: send the redirect to the client
                 final String redirectURLString = NetUtils.pathInfoParametersToPathInfoQueryString(pathInfo, parameters);
-                if (!isNoRewrite && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
-                    nativeResponse.sendRedirect(rewriteRenderURL(redirectURLString, null, null));
-                else
-                    nativeResponse.sendRedirect(redirectURLString);
+                nativeResponse.sendRedirect(redirectURLString);
             }
         }
 

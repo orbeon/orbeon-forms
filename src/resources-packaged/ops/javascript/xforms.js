@@ -5000,11 +5000,13 @@ ORBEON.xforms.Init = {
                     } else if (element.name.indexOf("$client-state") != -1) {
                         ORBEON.xforms.Globals.formClientState[formID] = element;
                         if (element.value == "") {
-                            // Store the initial dynamic state in client state. We do this only if formClientState is empty.
+                            // If the client state is empty, store the initial dynamic state (old system) or UUID (new system).
                             // If it is not empty, this means that we already have an initial state stored there, and that this
                             // function runs because the user reloaded or navigated back to this page.
                             ORBEON.xforms.Document.storeInClientState(formID, "initial-dynamic-state",
                                     ORBEON.xforms.Globals.formDynamicState[formID].value);
+                            ORBEON.xforms.Document.storeInClientState(formID, "uuid",
+                                    ORBEON.xforms.Globals.formUUID[formID].value);
                         }
                     } else if (element.name.indexOf("$repeat-tree") != -1) {
                         xformsRepeatTree = element;
@@ -5993,7 +5995,7 @@ ORBEON.xforms.Server = {
                         // Add form UUID
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxforms:uuid>');
-                        requestDocumentString.push(ORBEON.xforms.Globals.formUUID[formID].value);
+                        requestDocumentString.push(ORBEON.xforms.Document.getFromClientState(formID, "uuid"));
                         requestDocumentString.push('</xxforms:uuid>\n');
 
                         // Add request sequence number

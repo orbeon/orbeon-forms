@@ -201,12 +201,7 @@
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt=""/>
                     <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/collapse-all"/>-->
                 </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xsl:for-each select="$input-data//fr:section/@id">
-                        <xforms:toggle case="case-{.}-closed"/>
-                        <xforms:toggle case="case-button-{.}-closed"/>
-                    </xsl:for-each>
-                </xforms:action>
+                <xforms:dispatch ev:event="DOMActivate" name="fr-collapse-all" target="fr-sections-model"/>
             </fr:button>
         </xsl:if>
     </xsl:template>
@@ -218,12 +213,7 @@
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt=""/>
                     <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/expand-all"/>-->
                 </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xsl:for-each select="$input-data//fr:section/@id">
-                        <xforms:toggle case="case-{.}-open"/>
-                        <xforms:toggle case="case-button-{.}-open"/>
-                    </xsl:for-each>
-                </xforms:action>
+                <xforms:dispatch ev:event="DOMActivate" name="fr-expand-all" target="fr-sections-model"/>
             </fr:button>
         </xsl:if>
     </xsl:template>

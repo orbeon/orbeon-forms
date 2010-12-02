@@ -246,6 +246,8 @@
                 <xforms:toggle case="fr-message-validation-error"/>
                 <!-- Mark all active alerts as visited -->
                 <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
+                <!-- Open all sections -->
+                <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
             </xforms:action>
             <xforms:action if="$continue-with-save">
                 <!-- Data valid: proceed with saving attachments and data -->

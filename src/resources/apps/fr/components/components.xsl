@@ -212,7 +212,59 @@
         <!-- NOTE: commenting this out for now as Form Runner does not yet work 100% in offline mode -->
         <!--<xi:include href="oxf:/apps/fr/offline/offline-model.xml" xxi:omit-xml-base="true"/>-->
         <!-- This model handles form sections -->
-        <xi:include href="oxf:/apps/fr/includes/sections-model.xml" xxi:omit-xml-base="true"/>
+        <xforms:model id="fr-sections-model">
+        
+            <!-- TODO: Refactor this into XBL for fr:section, except for fr-expand-all/fr-collapse-all -->
+            
+            <!-- Contain section being currently expanded/collapsed -->
+            <xforms:instance id="fr-current-section-instance">
+                <section xmlns="">
+                    <id/>
+                    <repeat-indexes/>
+                    <section-ids><xsl:value-of select="string-join($input-data//fr:section/@id, ' ')"/></section-ids>
+                </section>
+            </xforms:instance>
+        
+            <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+            <xxforms:variable name="app" select="$parameters/app"/>
+            <xxforms:variable name="form" select="$parameters/form"/>
+            <xxforms:variable name="animate" as="xs:boolean"
+                select="not(property('xxforms:noscript'))
+                            and not(xxforms:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())"/>
+        
+            <!-- Handle section collapse -->
+            <xforms:action ev:event="fr-after-collapse">
+                <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-closed"/>
+                <xforms:toggle case="case-button-{{instance('fr-current-section-instance')/id}}-closed"/>
+            </xforms:action>
+        
+            <!-- Collapse current section -->
+            <xforms:action ev:event="fr-collapse">
+                <!-- Different behavior depending on whether we support script or not -->
+                <xxforms:script if="$animate">frCollapse();</xxforms:script>
+                <xforms:dispatch if="not($animate)" target="fr-sections-model" name="fr-after-collapse"/>
+            </xforms:action>
+        
+            <!-- Expand current section -->
+            <xforms:action ev:event="fr-expand">
+                <xforms:toggle case="case-{{instance('fr-current-section-instance')/id}}-open"/>
+                <xforms:toggle case="case-button-{{instance('fr-current-section-instance')/id}}-open"/>
+                <!-- Only if we support script -->
+                <xxforms:script if="$animate">frExpand();</xxforms:script>
+            </xforms:action>
+
+            <!-- Collapse all sections -->
+            <xforms:action ev:event="fr-collapse-all" xxforms:iterate="tokenize(section-ids, '\s+')">
+                <xforms:toggle case="case-{{.}}-closed"/>
+                <xforms:toggle case="case-button-{{.}}-closed"/>
+            </xforms:action>
+
+            <!-- Expand all sections -->
+            <xforms:action ev:event="fr-expand-all" xxforms:iterate="tokenize(section-ids, '\s+')">
+                <xforms:toggle case="case-{{.}}-open"/>
+                <xforms:toggle case="case-button-{{.}}-open"/>
+            </xforms:action>
+        </xforms:model>
         <!-- This model handles global error summary information -->
         <xforms:model id="fr-error-summary-model">
             <xforms:instance id="fr-error-summary-instance">
@@ -228,7 +280,7 @@
             <!-- Mark all controls as visited when certain buttons are activated -->
             <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button fr-submit-button">
                 <!-- Dispatch to the appropriate error summaries -->
-                <!-- Don't dispatch to top error-summary if not present; but always dispatch to button error summary as it is always included -->
+                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
                 <xsl:if test="$error-summary-top">
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>
                 </xsl:if>
@@ -237,7 +289,7 @@
             <!-- Mark all controls as un-visited when certain buttons are activated -->
             <xforms:action ev:event="fr-unvisit-all">
                 <!-- Dispatch to the appropriate error summaries -->
-                <!-- Don't dispatch to top error-summary if not present; but always dispatch to button error summary as it is always included -->
+                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
                 <xsl:if test="$error-summary-top">
                     <xforms:dispatch name="fr-unvisit-all" targetid="error-summary-control-top"/>
                 </xsl:if>

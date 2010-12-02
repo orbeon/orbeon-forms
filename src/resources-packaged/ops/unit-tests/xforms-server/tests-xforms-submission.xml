@@ -1700,5 +1700,68 @@
         </output>
     </test>
 
+    <test description="Submission replace=&quot;all&quot; upon initialization with content response" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-init.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:ev="http://www.w3.org/2001/xml-events">
+                <xh:head>
+                    <xf:model id="model" xxf:optimize-get-all="false">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                        <xf:send ev:event="xforms-model-construct-done" submission="submission"/>
+                        <xf:submission id="submission" serialization="none" method="get" action="oxf:/ops/unit-tests/test-data/book-diderot.xml"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/xml">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGJvb2s+CiAgICA8ZGV0YWls cz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUgZXQgc29uIG1hw650cmU8L3Rp dGxlPgogICAgICAgIDxhdXRob3I+RGVuaXMgRGlkZXJvdDwvYXV0aG9yPgogICAgICAgIDxsYW5n dWFnZT5mcjwvbGFuZ3VhZ2U+CiAgICAgICAgPGxpbmsvPgogICAgICAgIDxyYXRpbmcvPgogICAg ICAgIDxwdWJsaWNhdGlvbi15ZWFyLz4KICAgICAgICA8cmV2aWV3Lz4KICAgICAgICA8aW1hZ2Ug ZmlsZW5hbWU9IiIgbWVkaWF0eXBlPSIiIHNpemU9IiIvPgogICAgPC9kZXRhaWxzPgogICAgPG5v<?oxf-serializer flush?>
+dGVzPgogICAgICAgIDxub3RlLz4KICAgIDwvbm90ZXM+CjwvYm9vaz4K</document>
+        </output>
+    </test>
+
+    <test description="Submission replace=&quot;all&quot; upon initialization with redirect response" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:ev="http://www.w3.org/2001/xml-events">
+                <xh:head>
+                    <xf:model id="model" xxf:optimize-get-all="true">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+                        <xf:send ev:event="xforms-model-construct-done" submission="submission"/>
+                        <xf:submission id="submission" serialization="none" method="get" action="http://www.google.com/"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:load resource="http://www.google.com/" show="replace"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 
 </group>

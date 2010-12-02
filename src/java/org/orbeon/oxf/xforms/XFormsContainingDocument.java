@@ -156,8 +156,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param pipelineContext           current context
      * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
+     * @param response                  optional response for handling replace="all" during initialization
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, SAXStore annotatedTemplate, XFormsURIResolver uriResolver) {
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, SAXStore annotatedTemplate,
+                                    XFormsURIResolver uriResolver, ExternalContext.Response response) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
         // Remember location data
@@ -197,8 +199,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
-            // Remember URI resolver for initialization
+            // Remember parameters used during initialization
             this.uriResolver = uriResolver;
+            this.response = response;
             this.isInitializing = true;
 
             // Initialize the containing document
@@ -207,11 +210,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
             }
-
-            // Clear URI resolver, since it is of no use after initialization, and it may keep dangerous references (PipelineContext)
-            this.uriResolver = null;
-
-            // NOTE: we clear isInitializing when Ajax requests come in
         }
         indentedLogger.endHandleOperation();
     }
@@ -486,7 +484,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Clear current client state.
      */
     private void clearClientState() {
-        this.isInitializing = false;
+
+        assert !isInitializing;
+        assert response == null;
+        assert uriResolver == null;
 
         this.activeSubmissionFirstPass = null;
         this.replaceAllCallable = null;
@@ -513,16 +514,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         if (loadsToRun != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", submission.getLocationData());
 
-        if (messagesToRun != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", submission.getLocationData());
-
-        // scriptsToRun: it seems reasonable to run scripts up to the point where the submission takes place
-
-        if (focusEffectiveControlId != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", submission.getLocationData());
-
-        if (helpEffectiveControlId != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms-help within a same action sequence.", submission.getLocationData());
+        // NOTE: It seems reasonable to run scripts, messages, focus, and help up to the point where the submission takes place.
 
         // Remember submission
         this.activeSubmissionFirstPass = submission;
@@ -557,10 +549,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Add an XForms message to send to the client.
      */
     public void addMessageToRun(String message, String level) {
-
-        if (activeSubmissionFirstPass != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", activeSubmissionFirstPass.getLocationData());
-
         if (messagesToRun == null)
             messagesToRun = new ArrayList<Message>();
         messagesToRun.add(new Message(message, level));
@@ -819,10 +807,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param effectiveControlId
      */
     public void setClientFocusEffectiveControlId(String effectiveControlId) {
-
-        if (activeSubmissionFirstPass != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", activeSubmissionFirstPass.getLocationData());
-
         this.focusEffectiveControlId = effectiveControlId;
     }
 
@@ -855,10 +839,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param effectiveControlId
      */
     public void setClientHelpEffectiveControlId(String effectiveControlId) {
-
-        if (activeSubmissionFirstPass != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms-help within a same action sequence.", activeSubmissionFirstPass.getLocationData());
-
         this.helpEffectiveControlId = effectiveControlId;
     }
 
@@ -1141,6 +1121,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public void afterInitialResponse() {
+
+        this.uriResolver = null;        // URI resolver is of no use after initialization and it may keep dangerous references (PipelineContext)
+        this.response = null;           // same as above
+        this.isInitializing = false;
+
         // Tell dependencies
         xpathDependencies.afterInitialResponse();
     }

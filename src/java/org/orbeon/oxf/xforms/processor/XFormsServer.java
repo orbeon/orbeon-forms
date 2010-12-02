@@ -17,10 +17,8 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.ResponseAdapter;
 import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -34,10 +32,9 @@ import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -180,7 +177,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Find an output stream for xforms:submission[@replace = 'all']
-        final ExternalContext.Response response = getResponse(xmlReceiver, externalContext);
+        final ExternalContext.Response response = XFormsToXHTML.getResponse(xmlReceiver, externalContext);
 
         // Find or restore containing document from the incoming request
         final XFormsContainingDocument containingDocument
@@ -386,60 +383,6 @@ public class XFormsServer extends ProcessorImpl {
         // NOTE: Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         // hit the document
         XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
-    }
-
-    private ExternalContext.Response getResponse(ContentHandler contentHandler, final ExternalContext externalContext) {
-        ExternalContext.Response response;
-        if (contentHandler != null) {
-            // If a response is written, it will be through a conversion to XML first
-            final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(contentHandler);
-            response = new ResponseAdapter() {
-
-                private String charset;
-                private PrintWriter printWriter;
-
-                @Override
-                public OutputStream getOutputStream() throws IOException {
-                    return contentHandlerOutputStream;
-                }
-
-                @Override
-                public PrintWriter getWriter() throws IOException {
-                    // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
-                    if (printWriter == null) {
-                        printWriter = new PrintWriter(new OutputStreamWriter(contentHandlerOutputStream, charset != null ? charset : CachedSerializer.DEFAULT_ENCODING));
-                    }
-                    return printWriter;
-                }
-
-                @Override
-                public void setContentType(String contentType) {
-                    try {
-                        // Assume that content type is always set, otherwise this won't work
-                        charset = NetUtils.getContentTypeCharset(contentType);
-                        contentHandlerOutputStream.startDocument(contentType);
-                    } catch (SAXException e) {
-                        throw new OXFException(e);
-                    }
-                }
-
-                @Override
-                public Object getNativeResponse() {
-                    return externalContext.getNativeResponse();
-                }
-
-                @Override
-                public void setHeader(String name, String value) {
-                    // TODO: It is not sound that we output headers here as they should be passed to the
-                    // binary document in the pipeline instead.
-                    externalContext.getResponse().setHeader(name, value);
-                }
-            };
-        } else {
-            // We get the actual output response
-            response = externalContext.getResponse();
-        }
-        return response;
     }
 
     private static String[] EVENT_PARAMETERS = new String[] { "dnd-start", "dnd-end", "modifiers", "text" };
@@ -710,7 +653,7 @@ public class XFormsServer extends ProcessorImpl {
      * @throws SAXException
      */
     private void outputNoscriptResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, PipelineContext pipelineContext,
-                                               XMLReceiver xmlReceiver, ExternalContext externalContext) throws IOException, SAXException {
+                                        XMLReceiver xmlReceiver, ExternalContext externalContext) throws IOException, SAXException {
         // This will also cache the containing document if needed
         // QUESTION: Do we actually need to cache if a xforms:submission[@replace = 'all'] happened?
 

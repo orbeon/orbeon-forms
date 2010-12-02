@@ -20,7 +20,6 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.*;
@@ -792,7 +791,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             isNoscript = containingDocument.getStaticState().isNoscript();
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
 
-            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
+            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll && !containingDocument.isInitializing()) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
             isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
             isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT

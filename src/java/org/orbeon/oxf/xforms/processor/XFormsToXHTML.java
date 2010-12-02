@@ -16,10 +16,12 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ResponseAdapter;
 import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
+import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
@@ -31,10 +33,11 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Set;
 
@@ -123,7 +126,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static final boolean DO_TEST_STATE = false;
     private static Stage2CacheableState TEST_STATE;
 
-    private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
+    private void doIt(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
         final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsToXHTML.logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
@@ -149,14 +152,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                             ((Stage2TransientState) XFormsToXHTML.this.getState(pipelineContext)).stage1CacheableState = stage1CacheableState;
 
                             // Read static state from input
-                            stage2CacheableState = readStaticState(pipelineContext, externalContext, indentedLogger, staticState);
+                            stage2CacheableState = readStaticState(pipelineContext, indentedLogger, staticState);
                         }
 
                         // Create containing document and initialize XForms engine
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput,
                                 pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
-                        containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver);
+                        containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
                         gatherInputDependencies(pipelineContext, containingDocument[0], indentedLogger, stage1CacheableState);
@@ -199,7 +202,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         else
                             indentedLogger.logDebug("", "did not find static state by digest in cache");
 
-                        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, externalContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
+                        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
                         staticState = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
 
                         // Store in cache
@@ -208,7 +211,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
 
                 final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
-                containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver);
+                containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
             } else {
                 assert !cachedStatus[0];
                 indentedLogger.logDebug("", "annotated document and static state digest not obtained from cache.");
@@ -233,9 +236,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private Stage2CacheableState readStaticState(PipelineContext pipelineContext, ExternalContext externalContext, IndentedLogger indentedLogger, XFormsStaticState[] staticState) {
+    private Stage2CacheableState readStaticState(PipelineContext pipelineContext, IndentedLogger indentedLogger, XFormsStaticState[] staticState) {
 
-        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, externalContext, indentedLogger, null);
+        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger, null);
 
         {
             final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, staticStateBits.staticStateDigest);
@@ -273,7 +276,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         public final Document staticStateDocument;
         public final String staticStateDigest;
 
-        public StaticStateBits(PipelineContext pipelineContext, ExternalContext externalContext, IndentedLogger indentedLogger, String existingStaticStateDigest) {
+        public StaticStateBits(PipelineContext pipelineContext, IndentedLogger indentedLogger, String existingStaticStateDigest) {
 
             final boolean computeDigest = isLogStaticStateInput || existingStaticStateDigest == null;
 
@@ -425,7 +428,6 @@ public class XFormsToXHTML extends ProcessorImpl {
             // 1. Got a submission with replace="all"
 
             // NOP: Response already sent out by a submission
-            // TODO: modify XFormsModelSubmission accordingly
             indentedLogger.logDebug("", "handling response for submission with replace=\"all\"");
         } else if (loads != null && loads.size() > 0) {
             // 2. Got at least one xforms:load
@@ -482,5 +484,59 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Output XML response
 
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, pipelineContext, null, xmlReceiver, false, true);
+    }
+
+    public static ExternalContext.Response getResponse(ContentHandler contentHandler, final ExternalContext externalContext) {
+        ExternalContext.Response response;
+        if (contentHandler != null) {
+            // If a response is written, it will be through a conversion to XML first
+            final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(contentHandler);
+            response = new ResponseAdapter() {
+
+                private String charset;
+                private PrintWriter printWriter;
+
+                @Override
+                public OutputStream getOutputStream() throws IOException {
+                    return contentHandlerOutputStream;
+                }
+
+                @Override
+                public PrintWriter getWriter() throws IOException {
+                    // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
+                    if (printWriter == null) {
+                        printWriter = new PrintWriter(new OutputStreamWriter(contentHandlerOutputStream, charset != null ? charset : CachedSerializer.DEFAULT_ENCODING));
+                    }
+                    return printWriter;
+                }
+
+                @Override
+                public void setContentType(String contentType) {
+                    try {
+                        // Assume that content type is always set, otherwise this won't work
+                        charset = NetUtils.getContentTypeCharset(contentType);
+                        contentHandlerOutputStream.startDocument(contentType);
+                    } catch (SAXException e) {
+                        throw new OXFException(e);
+                    }
+                }
+
+                @Override
+                public Object getNativeResponse() {
+                    return externalContext.getNativeResponse();
+                }
+
+                @Override
+                public void setHeader(String name, String value) {
+                    // TODO: It is not sound that we output headers here as they should be passed to the
+                    // binary document in the pipeline instead.
+                    externalContext.getResponse().setHeader(name, value);
+                }
+            };
+        } else {
+            // We get the actual output response
+            response = externalContext.getResponse();
+        }
+        return response;
     }
 }

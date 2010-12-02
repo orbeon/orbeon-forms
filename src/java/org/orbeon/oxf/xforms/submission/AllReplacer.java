@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 import java.io.IOException;
@@ -54,6 +52,10 @@ public class AllReplacer extends BaseReplacer {
     }
 
     public static void replace(ConnectionResult connectionResult, final ExternalContext.Response response) throws IOException {
+
+        if (response == null)
+            return; // can be null for some unit tests
+
         // Set content-type
         response.setContentType(connectionResult.getResponseContentType());
 
@@ -67,10 +69,5 @@ public class AllReplacer extends BaseReplacer {
         // End document and close
         outputStream.flush();
         outputStream.close();
-
-        // TODO: [#306918] RFE: Must be able to do replace="all" during initialization.
-        // http://forge.objectweb.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207
-        // Suggestion is to write either binary or XML to processor output ContentHandler,
-        // and make sure the code which would output the XHTML+XForms is disabled.
     }
 }

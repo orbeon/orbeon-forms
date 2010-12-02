@@ -233,15 +233,14 @@ public class XFormsServer extends ProcessorImpl {
                     final Set<String> valueChangeControlIds = new HashSet<String>();
                     if (hasEvents || hasFiles) {
 
-                        // Iterate through events to:
-                        // 1. Reorder events if needed for noscript mode
-                        // 2. Detect whether we got xxforms-online
-                        boolean handleGoingOnline = hasEvents && processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
+                        // Reorder events in noscript mode
+                        if (hasEvents && isNoscript)
+                            processEventsForNoscript(eventElements, containingDocument);
 
                         eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
                         {
                             // Start external events
-                            containingDocument.beforeExternalEvents(pipelineContext, response, handleGoingOnline);
+                            containingDocument.beforeExternalEvents(pipelineContext, response);
 
                             // Handle uploaded files if any
                             if (hasFiles) {
@@ -251,10 +250,10 @@ public class XFormsServer extends ProcessorImpl {
 
                             // Dispatch everything
                             allEvents = hasEvents && createAndDispatchEvents(pipelineContext, containingDocument, eventElements,
-                                    serverEventsCount, valueChangeControlIds, handleGoingOnline);
+                                    serverEventsCount, valueChangeControlIds);
 
                             // End external events
-                            containingDocument.afterExternalEvents(pipelineContext, handleGoingOnline);
+                            containingDocument.afterExternalEvents(pipelineContext);
                         }
                         eventsIndentedLogger.endHandleOperation();
                     } else {
@@ -446,8 +445,7 @@ public class XFormsServer extends ProcessorImpl {
     private static String[] EVENT_PARAMETERS = new String[] { "dnd-start", "dnd-end", "modifiers", "text" };
 
     private boolean createAndDispatchEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
-                                            List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds,
-                                            boolean handleGoingOnline) {
+                                            List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds) {
 
         // NOTE: We store here the last xxforms-value-change-with-focus-change event so
         // we can coalesce values in case several such events are sent for the same
@@ -518,10 +516,6 @@ public class XFormsServer extends ProcessorImpl {
                 } else {
                     // Other normal events
 
-                    // xxforms-offline requires initial dynamic state
-                    if (eventName.equals(XFormsEvents.XXFORMS_OFFLINE))
-                        throw new OXFException("Got xxforms-offline event without initial dynamic state.");
-
                     if (lastSourceControlId != null) {
                         // Send old event
                         createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
@@ -552,7 +546,7 @@ public class XFormsServer extends ProcessorImpl {
 
         // Iterate and dispatch the events
         for (final XFormsEvent event: events) {
-            containingDocument.handleExternalEvent(pipelineContext, event, handleGoingOnline);
+            containingDocument.handleExternalEvent(pipelineContext, event);
         }
 
         return hasAllEvents;
@@ -644,9 +638,7 @@ public class XFormsServer extends ProcessorImpl {
                 bubbles, cancelable, valueString, parameters));
     }
 
-    private boolean processEventsForNoscript(List<Element> eventElements, XFormsContainingDocument containingDocument, IndentedLogger eventsIndentedLogger, boolean noscript) {
-
-        boolean hasXXFormsOnline = false;
+    private void processEventsForNoscript(List<Element> eventElements, XFormsContainingDocument containingDocument) {
 
         final XFormsStaticState staticState = containingDocument.getStaticState();
 
@@ -657,12 +649,7 @@ public class XFormsServer extends ProcessorImpl {
             final Element eventElement = (Element) i.next();
             final String eventName = eventElement.attributeValue("name");
 
-            if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
-                // We got an xxforms-online event
-                hasXXFormsOnline = true;
-            }
-
-            if (noscript && XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
+            if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
                 // Special event for noscript mode
                 final String sourceControlId = eventElement.attributeValue("source-control-id");
                 if (!staticState.isValueControl(sourceControlId)) {
@@ -683,39 +670,33 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Special handling of checkboxes blanking in noscript mode
-        if (noscript) {
-            final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
+        final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
 
-            if (selectFullControls != null) {
+        if (selectFullControls != null) {
 
-                for (Map.Entry<String, XFormsControl> currentEntry: selectFullControls.entrySet()) {
-                    final String currentEffectiveId = currentEntry.getKey();
-                    final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
+            for (Map.Entry<String, XFormsControl> currentEntry: selectFullControls.entrySet()) {
+                final String currentEffectiveId = currentEntry.getKey();
+                final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
 
-                    if (currentControl != null
-                            && (noscriptValueIds == null || noscriptValueIds.get(currentEffectiveId) == null) // control did not have a value set by other events
-                            && currentControl.isRelevant() && !currentControl.isReadonly()) {                 // control is relevant and not readonly
+                if (currentControl != null
+                        && (noscriptValueIds == null || noscriptValueIds.get(currentEffectiveId) == null) // control did not have a value set by other events
+                        && currentControl.isRelevant() && !currentControl.isReadonly()) {                 // control is relevant and not readonly
 
-                        // <xxforms:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
-                        final Element newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME.getQualifiedName(), XFormsConstants.XXFORMS_EVENT_QNAME.getNamespaceURI());
-                        newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
-                        newEventElement.addAttribute("source-control-id", currentEffectiveId);
+                    // <xxforms:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
+                    final Element newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME.getQualifiedName(), XFormsConstants.XXFORMS_EVENT_QNAME.getNamespaceURI());
+                    newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
+                    newEventElement.addAttribute("source-control-id", currentEffectiveId);
 
-                        // Append the blanking event
-                        eventElements.add(newEventElement);
-                    }
+                    // Append the blanking event
+                    eventElements.add(newEventElement);
                 }
-            }
-
-            // Append all noscript activation events
-            if (noscriptActivateEvents != null) {
-                eventElements.addAll(noscriptActivateEvents);
             }
         }
 
-        if (hasXXFormsOnline)
-            eventsIndentedLogger.logDebug("offline", "got xxforms-online event, enabling optimized handling of event sequence");
-        return hasXXFormsOnline;
+        // Append all noscript activation events
+        if (noscriptActivateEvents != null) {
+            eventElements.addAll(noscriptActivateEvents);
+        }
     }
 
     /**
@@ -831,44 +812,27 @@ public class XFormsServer extends ProcessorImpl {
                 }
             }
 
-            // Get encoded state to send to the client (unless computing the list of offline events)
-//            if (!isOfflineEvents) {
-                // State ready to send to the client
-                // Whether the incoming state handling mode is different from the outgoing state handling mode
-//                final boolean isMustChangeStateHandling;
-//                if (containingDocument.goingOffline()) {
-//                    // We force client state if we are going offline, and do not cache as it is likely that the result won't be used soon
-//                    encodedClientState = XFormsStateManager.getEncryptedSerializedClientState(containingDocument, pipelineContext, xformsDecodedClientState);
-//                    // Outgoing mode is always "client", so in effect we are changing when the regular mode is not client
-//                    isMustChangeStateHandling = !xformsDecodedClientState.isClientStateHandling();
-//                } else {
-                    // This will also cache the containing document if needed
-//                    encodedClientState = XFormsStateManager.getEncodedClientStateDoCache(containingDocument, pipelineContext, xformsDecodedClientState, allEvents);
-//                    isMustChangeStateHandling = xformsDecodedClientState.isClientStateHandling() != XFormsProperties.isClientStateHandling(containingDocument);
-//                }
-
-                // Output static state when testing
-                if (testOutputStaticState) {
-                    final String staticState = XFormsStateManager.instance().getClientEncodedStaticState(pipelineContext, containingDocument);
-                    if (staticState != null) {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] {
-                                "container-type", externalContext.getRequest().getContainerType()
-                        });
-                        ch.text(staticState);
-                        ch.endElement();
-                    }
+            // Output static state when testing
+            if (testOutputStaticState) {
+                final String staticState = XFormsStateManager.instance().getClientEncodedStaticState(pipelineContext, containingDocument);
+                if (staticState != null) {
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] {
+                            "container-type", externalContext.getRequest().getContainerType()
+                    });
+                    ch.text(staticState);
+                    ch.endElement();
                 }
+            }
 
-                // Output dynamic state
-                {
-                    final String dynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(pipelineContext, containingDocument);
-                    if (dynamicState != null) {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                        ch.text(dynamicState);
-                        ch.endElement();
-                    }
+            // Output dynamic state
+            {
+                final String dynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(pipelineContext, containingDocument);
+                if (dynamicState != null) {
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
+                    ch.text(dynamicState);
+                    ch.endElement();
                 }
-//            }
+            }
 
             // Output action
             {
@@ -985,52 +949,6 @@ public class XFormsServer extends ProcessorImpl {
                         outputHelpInfo(ch, containingDocument, helpEffectiveControlId);
                     }
                 }
-
-                // Output go offline instruction (unless computing the list of offline events)
-//                {
-//                    if (containingDocument.goingOffline() && !isOfflineEvents) {
-//                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "offline");
-//
-//                        if (xformsDecodedInitialClientState != null) {
-//                            // Do not run this if xformsDecodedInitialClientState is null. The general rule is that
-//                            // when going offline, xformsDecodedInitialClientState must not be null so we can compute
-//                            // the list of diffs to send to the client. However, there is one exception: going back
-//                            // offline in response to an Ajax request asking to go online: currently, the client is
-//                            // unable to pass back the initial dynamic state, so we are unable to produce the list of
-//                            // changes. So we just response xxforms:offline and that's it. The client must then not go
-//                            // back online.
-//
-//
-//                            // Send all the changes between the initial state and the time the form go offline, so when
-//                            // reloading the page the client can apply those changes when the page is reloaded from the
-//                            // client-side database.
-//                            final StringBuilderWriter writer = new StringBuilderWriter();
-//                            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//                            identity.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");// no XML decl.
-//                            identity.setResult(new StreamResult(writer));
-//
-//                            // Output response into writer. We ask for all events, and passing a flag telling that we are
-//                            // processing offline events so as to avoid recursion
-//
-//                            outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, identity, true, true, false, false);
-//
-//                            // List of events needed to update the page from the time the page was initially sent to the
-//                            // client until right before sending the xxforms:offline event.
-//                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "events");
-//                            ch.text(writer.toString());
-//                            ch.endElement();
-//
-//                            // List of offline bind mappings. This allows the client to perform simple handling of
-//                            // validation, relevance, readonly, and required for xforms:bind[@xxforms:offline = 'true'].
-//                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "mappings");
-//                            final String offlineBindMappings = XFormsModelBinds.getOfflineBindMappings(containingDocument);
-//                            ch.text(offlineBindMappings);
-//                            ch.endElement();
-//                        }
-//
-//                        ch.endElement();
-//                    }
-//                }
 
                 ch.endElement();
             }

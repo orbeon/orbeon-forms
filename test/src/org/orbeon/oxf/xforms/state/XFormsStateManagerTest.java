@@ -281,13 +281,13 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             assertNotSame(state1.document, state2.document);// can't be the same because cache is disabled
 
         // Run events if any
-        state2.document.beforeExternalEvents(pipelineContext, null, false);
+        state2.document.beforeExternalEvents(pipelineContext, null);
         if (callback != null) {
             for (final XFormsEvent event: callback.createEvents(state2.document)) {
-                state2.document.handleExternalEvent(pipelineContext, event, false);
+                state2.document.handleExternalEvent(pipelineContext, event);
             }
         }
-        state2.document.afterExternalEvents(pipelineContext, false);
+        state2.document.afterExternalEvents(pipelineContext);
 
         stateManager.beforeUpdateResponse(pipelineContext, state2.document, false);
 

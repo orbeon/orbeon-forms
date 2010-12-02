@@ -22,8 +22,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
  */
 public interface XFormsDocumentLifecycle {
     void afterInitialResponse();
-    void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response, boolean handleGoingOnline);
-    void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event, boolean handleGoingOnline);
-    void afterExternalEvents(PipelineContext pipelineContext, boolean handleGoingOnline);
+    void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response);
+    void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event);
+    void afterExternalEvents(PipelineContext pipelineContext);
     void afterUpdateResponse();
 }

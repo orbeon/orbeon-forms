@@ -888,9 +888,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      *
      * @param pipelineContext   current context
      * @param event             event to dispatch
-     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event, boolean handleGoingOnline) {
+    public void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event) {
 
         final IndentedLogger indentedLogger = getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 
@@ -902,24 +901,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             indentedLogger.startHandleOperation(EVENT_LOG_TYPE, "handling external event", "target id", eventTargetEffectiveId, "event name", eventName);
 
-            // TODO: Is this check still needed?
-            if (handleGoingOnline && eventTarget instanceof XFormsSingleNodeControl) {
-                final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
-                // When going online, ensure rebuild/revalidate before each event
-                rebuildRecalculateIfNeeded(pipelineContext);
-
-                getControls().cloneInitialStateIfNeeded(pipelineContext);
-                
-                // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
-                // the MIPs need to be re-evaluated before being checked below
-                // NOTE: This is almost certainly wrong now (2010-04-08)
-                xformsControl.markDirty(xpathDependencies);
-            }
-
-            if (!handleGoingOnline) {
-                // When not going online, each event is within its own start/end outermost action handler
-                startOutermostActionHandler();
-            }
+            // Each event is within its own start/end outermost action handler
+            startOutermostActionHandler();
             {
                 // Check if the value to set will be different from the current value
                 if (eventTarget instanceof XFormsValueControl && event instanceof XXFormsValueChangeWithFocusChangeEvent) {
@@ -1014,10 +997,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                     dispatchEventCheckTarget(pipelineContext, event);
                 }
             }
-            // When not going online, each event is within its own start/end outermost action handler
-            if (!handleGoingOnline) {
-                endOutermostActionHandler(pipelineContext);
-            }
+            // Each event is within its own start/end outermost action handler
+            endOutermostActionHandler(pipelineContext);
         } finally {
             indentedLogger.endHandleOperation();
         }
@@ -1169,12 +1150,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      *
      * @param pipelineContext   current context
      * @param response          ExternalContext.Response for xforms:submission[@replace = 'all'], or null
-     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response, boolean handleGoingOnline) {
-        // Clear containing document state
-        // NOTE: This should no longer be needed here as it's done on afterSendingResponse()
-        clearClientState();
+    public void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response) {
 
         // Tell dependencies
         xpathDependencies.beforeUpdateResponse();
@@ -1182,28 +1159,19 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Remember OutputStream
         this.response = response;
 
-        // Start outermost action handler here if going online
-        if (handleGoingOnline)
-            startOutermostActionHandler();
-
         // Process completed asynchronous submissions if any
-        processCompletedAsynchronousSubmissions(pipelineContext, handleGoingOnline, false);
+        processCompletedAsynchronousSubmissions(pipelineContext, false, false);
     }
 
     /**
      * End a sequence of external events.
      *
      * @param pipelineContext   current context
-     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void afterExternalEvents(PipelineContext pipelineContext, boolean handleGoingOnline) {
+    public void afterExternalEvents(PipelineContext pipelineContext) {
 
         // Process completed asynchronous submissions if any
-        processCompletedAsynchronousSubmissions(pipelineContext, handleGoingOnline, true);
-
-        // End outermost action handler here if going online
-        if (handleGoingOnline)
-            endOutermostActionHandler(pipelineContext);
+        processCompletedAsynchronousSubmissions(pipelineContext, false, true);
 
         this.response = null;
     }
@@ -1263,23 +1231,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else if (XFormsEvents.XXFORMS_POLL.equals(eventName)) {
             // Poll event for submissions
             // NOP, as we check for async submission in the client event loop
-        } else if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
-            // Internal event for going online
-            goOnline(propertyContext);
-        } else if (XFormsEvents.XXFORMS_OFFLINE.equals(eventName)) {
-            // Internal event for going offline
-            goOffline(propertyContext);
         } else {
             super.performDefaultAction(propertyContext, event);
         }
-    }
-
-    public void goOnline(PropertyContext propertyContext) {
-        // NOP
-    }
-
-    public void goOffline(PropertyContext propertyContext) {
-        // NOP
     }
 
     /**
@@ -1611,8 +1565,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     static {
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.KEYPRESS);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_LOAD);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_OFFLINE);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_ONLINE);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_POLL);
     }
 

@@ -41,8 +41,6 @@ public abstract class BaseSubmission implements Submission {
     }
 
     protected String getAbsoluteSubmissionURL(PropertyContext propertyContext, String resolvedActionOrResource, String queryString) {
-        // Absolute URLs or absolute paths are allowed to a local servlet
-        assert NetUtils.urlHasProtocol(resolvedActionOrResource) || resolvedActionOrResource.startsWith("/");
 
         if ("resource".equals(submission.getUrlType())) {
             // In case, for some reason, author forces a resource URL
@@ -55,6 +53,16 @@ public abstract class BaseSubmission implements Submission {
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         } else {
             // Regular case of service URL
+
+            // NOTE: If the resource or service URL does not start with a protocol or with '/', the URL is resolved against
+            // the request path, then against the service base. Example in servlet environment:
+            //
+            // o action path: my/service
+            // o request URL: http://orbeon.com/orbeon/myapp/mypage
+            // o request path: /myapp/mypage
+            // o service base: http://services.com/myservices/
+            // o resulting service URL: http://services.com/myservices/myapp/my/service
+
             return XFormsUtils.resolveServiceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);

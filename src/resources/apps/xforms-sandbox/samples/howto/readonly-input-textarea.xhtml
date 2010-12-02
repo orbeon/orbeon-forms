@@ -1,0 +1,96 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:howto="http://www.orbeon.com/howto">
+
+    <xhtml:head>
+        <xhtml:title>Readonly text fields and text areas</xhtml:title>
+        <xforms:model xxforms:xhtml-layout="span">
+
+            <xforms:instance>
+                <instance>
+                    <non-readonly>Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly Non-readonly </non-readonly>
+                    <readonly>Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly Readonly </readonly>
+                </instance>
+            </xforms:instance>
+
+            <xforms:bind ref="readonly" readonly="true()"/>
+
+        </xforms:model>
+
+        <xbl:xbl>
+
+            <xbl:binding id="howto-input" element="howto|input">
+                <xbl:template>
+                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxforms:internal">
+                        <xforms:output ref=".[exf:readonly()]" xbl:attr="class">
+                            <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                        </xforms:output>
+                        <xforms:input ref=".[not(exf:readonly())]" xbl:attr="class">
+                            <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                        </xforms:input>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+
+            <xbl:binding id="howto-textarea" element="howto|textarea">
+                <xbl:template>
+                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxforms:internal">
+                        <xforms:output ref=".[exf:readonly()]" xbl:attr="class">
+                            <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                        </xforms:output>
+                        <xforms:textarea ref=".[not(exf:readonly())]" xbl:attr="class">
+                            <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                        </xforms:textarea>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+
+        </xbl:xbl>
+
+        <xhtml:style type="text/css">
+
+            /* XBL adds a div around content; we set display: inline-block so the howto controls behave like other form controls */
+            .xbl-howto-textarea, .xbl-howto-input { display: inline-block; *display: inline }
+            /* Use same vertical-align at the one used by the controls by default */
+            .xbl-howto-textarea .xforms-readonly .xforms-output-output  { vertical-align: text-bottom }
+            .xbl-howto-input    .xforms-readonly .xforms-output-output  { vertical-align: baseline }
+            /* Styling of readonly: gray background */
+            .xbl-howto-textarea .xforms-readonly .xforms-output-output, .xbl-howto-input .xforms-readonly .xforms-output-output { display: inline-block; border: 1px solid gray; background-color: #eee }
+            .xbl-howto-textarea .xforms-readonly .xforms-output-output { overflow-y: scroll }
+            .xbl-howto-input .xforms-readonly .xforms-output-output { overflow: hidden; white-space: nowrap }
+            /* Define standard height and width for all fields */
+            .xforms-textarea textarea, .xbl-howto-textarea .xforms-readonly .xforms-output-output { -moz-box-sizing: inherit; height: 80px; margin: 0 }
+            .xbl-howto-textarea .xforms-readonly .xforms-output-output  { *height: 84px }
+            .xbl-howto-input .xforms-readonly .xforms-output-output { padding-top: 2px; height: 22px; *height: 20px; -moz-box-sizing: inherit }
+            .xbl-howto-input .xforms-readonly .xforms-output-output { vertical-align: middle } /* Temporary workaround for Firefox, which doesn't give a perfect alignment. See: http://goo.gl/QiTqZ */
+            .xforms-textarea textarea, .xforms-input input, .xbl-howto-textarea .xforms-readonly .xforms-output-output, .xbl-howto-input .xforms-readonly .xforms-output-output { width: 12em; -moz-box-sizing: border-box }
+            /* Styling specific to this example (most likely not to be copied in actual code) */
+            .section { margin-bottom: 1em }
+            .xforms-label { padding: 0 .5em 0 1em }
+        </xhtml:style>
+
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div class="section">
+            <xforms:textarea ref="non-readonly"><xforms:label>Label:</xforms:label></xforms:textarea>
+            <xforms:textarea ref="readonly"><xforms:label>Label:</xforms:label></xforms:textarea>
+            <howto:textarea ref="non-readonly"><xforms:label>Label:</xforms:label></howto:textarea>
+            <howto:textarea ref="readonly"><xforms:label>Label:</xforms:label></howto:textarea>
+        </xhtml:div>
+        <xhtml:div class="section">
+            <xforms:input ref="non-readonly"><xforms:label>Label:</xforms:label></xforms:input>
+            <xforms:input ref="readonly"><xforms:label>Label:</xforms:label></xforms:input>
+            <howto:input class="input-x-large-width" ref="non-readonly"><xforms:label>Label:</xforms:label></howto:input>
+            <howto:input class="input-x-large-width" ref="readonly"><xforms:label>Label:</xforms:label></howto:input>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

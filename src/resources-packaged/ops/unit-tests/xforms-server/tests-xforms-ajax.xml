@@ -50,7 +50,7 @@
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>
-                    <p:output name="response" id="xhtml" debug="xxx"/>
+                    <p:output name="response" id="xhtml"/>
                 </p:processor>
 
                 <!-- Request 1: sequence == 1 -->
@@ -78,7 +78,7 @@
                             <xxforms:action/>
                         </xxforms:event-request>
                     </p:input>
-                    <p:output name="response" id="response2" schema-href="/ops/xforms/xforms-server-response.rng" debug="yyy"/>
+                    <p:output name="response" id="response2" schema-href="/ops/xforms/xforms-server-response.rng"/>
                 </p:processor>
 
                 <!-- Request 3: sequence == 2 again -->
@@ -216,6 +216,129 @@
                         <message>Got unexpected request sequence number</message>
                     </exception>
                 </exceptions>
+            </responses>
+        </output>
+    </test>
+
+    <test description="Server sends correct readonly value when control becomes relevant/non-relevant" name="oxf:pipeline"
+          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315661&group_id=168&atid=350207 -->
+
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <input1></input1>
+                                            <input2></input2>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:bind ref="input2" readonly="true()" relevant="../input1 = 'true'"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:input id="input1" ref="input1"/>
+                                <xforms:input id="input2" ref="input2"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" id="xhtml"/>
+                </p:processor>
+
+                <!-- Make control visible -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>1</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">true</xxforms:event>
+                            </xxforms:action>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response1" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Make control invisible -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>2</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">false</xxforms:event>
+                            </xxforms:action>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response2" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Make control visible again -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#xhtml" transform="oxf:xslt">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>3</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <xxforms:action>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">true</xxforms:event>
+                            </xxforms:action>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:output name="response" id="response3" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Aggregate and filter responses -->
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('responses', #response1, #response2, #response3)" transform="oxf:unsafe-xslt">
+                        <xsl:transform version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                            <xsl:import href="xforms-server/wrap-server-decode-nofilter.xsl"/>
+                            <xsl:template match="xxf:dynamic-state"/>
+                        </xsl:transform>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <responses>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:action>
+                        <xxf:control-values>
+                            <xxf:control id="input1">true</xxf:control>
+                            <xxf:control id="input2" readonly="true" relevant="true"/>
+                        </xxf:control-values>
+                    </xxf:action>
+                </xxf:event-response>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:action>
+                        <xxf:control-values>
+                            <xxf:control id="input1">false</xxf:control>
+                            <xxf:control id="input2" readonly="false" relevant="false"/>
+                        </xxf:control-values>
+                    </xxf:action>
+                </xxf:event-response>
+                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:action>
+                        <xxf:control-values>
+                            <xxf:control id="input1">true</xxf:control>
+                            <xxf:control id="input2" readonly="true" relevant="true"/>
+                        </xxf:control-values>
+                    </xxf:action>
+                </xxf:event-response>
             </responses>
         </output>
     </test>

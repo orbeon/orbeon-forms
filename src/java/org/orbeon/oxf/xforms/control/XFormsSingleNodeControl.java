@@ -62,6 +62,13 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
+    protected void onDestroy(PropertyContext propertyContext) {
+        super.onDestroy(propertyContext);
+        // Set default MIPs so that diff picks up the right values
+        setDefaultMIPs();
+    }
+
+    @Override
     protected void onCreate(PropertyContext propertyContext) {
         super.onCreate(propertyContext);
 
@@ -103,7 +110,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 if (XFormsProperties.isReadonly(containingDocument))
                     this.readonly = true;
             } else {
-                // Control is not bound to a node, MIPs get default values
+                // Control is not bound to a node (i.e. bound to an atomic value), MIPs get default values
                 setDefaultMIPs();
             }
         } else {

@@ -30,6 +30,8 @@
     <xi:include href="xforms-server/tests-xforms-functions.xml"/>
     <xi:include href="xforms-server/tests-xforms-validation.xml"/>
 
+    <xi:include href="xforms-server/tests-xforms-ajax.xml"/>
+
     <xi:include href="tests-xpl.xml"/>
     <xi:include href="processor/file.xml"/>
 
@@ -47,8 +49,5 @@
     <xi:include href="url-generator/tests.xml"/>
     <xi:include href="xinclude/tests-xinclude.xml"/>
     <xi:include href="cache/tests-cache.xml"/>
-
-<!--    <xi:include href="tests-tamino.xml"/>-->
-<!--    <xi:include href="tests-ldap.xml"/>-->
 
 </tests>

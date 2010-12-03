@@ -28,8 +28,10 @@
             <xforms:instance id="selected-state">
                 <selected-state>
                     <state>CA</state>
+                    <readonly>false</readonly>
                 </selected-state>
             </xforms:instance>
+            <xforms:bind ref="state" readonly="../readonly = 'true'"/>
 
             <!-- New state added to be added -->
             <xforms:instance id="utopia">
@@ -63,6 +65,10 @@
             <xforms:trigger appearance="minimal">
                 <xforms:label>Set to Oregon</xforms:label>
                 <xforms:setvalue ev:event="DOMActivate" ref="state">OR</xforms:setvalue>
+            </xforms:trigger> |
+            <xforms:trigger appearance="minimal">
+                <xforms:label>Toggle readonly</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="not(. = 'true')"/>
             </xforms:trigger>
         </xhtml:div>
 

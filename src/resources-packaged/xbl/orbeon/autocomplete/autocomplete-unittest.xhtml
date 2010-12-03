@@ -49,13 +49,13 @@
 
             <!-- Internal state for this test -->
             <xforms:instance id="selected-countries">
-                <selected-countries>
+                <selected-countries readonly="false">
                     <static>ca</static>
                     <dynamic/>
                 </selected-countries>
             </xforms:instance>
             <!-- Constraint on selected country -->
-            <xforms:bind nodeset="instance('selected-countries')/*" constraint="starts-with(., 's')"/>
+            <xforms:bind nodeset="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'"/>
 
             <xforms:instance id="configuration">
                 <configuration>
@@ -85,6 +85,11 @@
         <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
     </xhtml:head>
     <xhtml:body>
+
+        <xforms:trigger appearance="minimal">
+            <xforms:label>Toggle readonly</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@readonly" value="not(. = 'true')"/>
+        </xforms:trigger>
 
         <xhtml:h2>Static itemset</xhtml:h2>
 

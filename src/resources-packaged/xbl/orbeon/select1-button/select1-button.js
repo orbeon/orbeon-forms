@@ -43,6 +43,14 @@ YAHOO.xbl.fr.Select1Button.prototype = {
     },
 
     /**
+     * When the button becomes enabled, update its readonly state, as that state might have changed while the button
+     * was disabled, without an xforms-readonly or xforms-readwrite event being dispatched.
+     */
+    enabled: function() {
+        this.yuiButton.set("disabled", YAHOO.util.Dom.hasClass(this.select1ControlId, "xforms-readonly"));
+    },
+
+    /**
      * We can't store a reference to the HTML select as an attribute of this object, as the HTML select gets entirely
      * recreated on IE when the itemset changes.
      */
@@ -90,5 +98,8 @@ YAHOO.xbl.fr.Select1Button.prototype = {
         yuiMenu.clearContent();
         yuiMenu.addItems(this.getMenuItems());
         yuiMenu.render();
-    }
+    },
+
+    readonly:  function() { this.yuiButton.set("disabled", true); },
+    readwrite: function() { this.yuiButton.set("disabled", false); }
 };

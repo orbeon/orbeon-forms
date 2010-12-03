@@ -59,7 +59,10 @@
 
                             <!-- XForms select1 used as a datasource -->
                             <xforms:select1 ref="$external-value" class="fr-select1-button-select1" id="hidden-select" style="display: none">
+                                <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" id="enabled">YAHOO.xbl.fr.Select1Button.instance(this).enabled();</xxforms:script>
                                 <xxforms:script ev:event="xforms-value-changed" id="value-changed" >YAHOO.xbl.fr.Select1Button.instance(this).valueChanged();</xxforms:script>
+                                <xxforms:script ev:event="xforms-readonly" id="readonly">YAHOO.xbl.fr.Select1Button.instance(this).readonly();</xxforms:script>
+                                <xxforms:script ev:event="xforms-readwrite" id="readwrite">YAHOO.xbl.fr.Select1Button.instance(this).readwrite();</xxforms:script>
                                 <xsl:apply-templates select="xforms:itemset | xforms:item"/>
                             </xforms:select1>
 

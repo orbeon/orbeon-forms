@@ -53,9 +53,11 @@
             <xforms:model id="autocomplete-model">
                 <xforms:instance id="autocomplete-instance">
                     <autocomplete>
+                        <readonly>false</readonly>
                         <textfield-value/>
                     </autocomplete>
                 </xforms:instance>
+                <xforms:bind ref="textfield-value" readonly="../readonly = 'true'"/>
             </xforms:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -90,7 +92,13 @@
                             </xforms:select1>
                             <!-- Input with external value -->
                             <xxforms:variable name="textfield-value" model="autocomplete-model" select="textfield-value"/>
+                            <xxforms:variable name="readonly" model="autocomplete-model" select="readonly"/>
                             <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
+                                <!-- Doesn't work because of: http://forge.ow2.org/tracker/index.php?func=detail&aid=315662&group_id=168&atid=350207 -->
+                                <!--<xforms:setvalue ev:event="xforms-readonly" model="autocomplete-model" ref="readonly">true</xforms:setvalue>-->
+                                <!--<xforms:setvalue ev:event="xforms-readwrite" model="autocomplete-model" ref="readonly">false</xforms:setvalue>-->
+                                <xforms:setvalue ev:event="xforms-readonly" ref="$readonly">true</xforms:setvalue>
+                                <xforms:setvalue ev:event="xforms-readwrite" ref="$readonly">false</xforms:setvalue>
                                 <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset = 'true')">
                                     <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
                                     <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]"/>

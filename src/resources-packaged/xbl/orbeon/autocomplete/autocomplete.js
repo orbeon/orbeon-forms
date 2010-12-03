@@ -28,10 +28,7 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
      * Constructor
      */
     init: function() {
-        // We don't support the autocomplete in readonly mode, so completely skip the initialization in that case
         var container  = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container", null, this.container)[0];
-        if (YAHOO.util.Dom.hasClass(container, "xforms-readonly")) return;
-
         this.searchControl = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-search", null, this.container)[0];
         this.searchField = YAHOO.util.Dom.getChildren(this.searchControl)[0];
         var yuiDiv = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-yui-div", null, this.container)[0];

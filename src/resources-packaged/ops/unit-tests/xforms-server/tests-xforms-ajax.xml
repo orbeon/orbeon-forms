@@ -343,4 +343,75 @@
         </output>
     </test>
 
+    <test description="External entity in request is ignored" name="oxf:pipeline"
+          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315668&group_id=168&atid=350207 -->
+
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
+                                        <instance/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:input id="my-input" ref="."/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" id="xhtml"/>
+                </p:processor>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="config">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>1</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                            <!-- Copy action which should not contained the external entity resolved -->
+                            <xsl:copy-of select="doc('input:request')/*/xxforms:action"/>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:input name="data" href="#xhtml"/>
+                    <!-- This causes the file to be parsed, with or without the external entity resolved -->
+                    <p:input name="request" href="xforms-server/ajax-request-with-external-entity.xml"/>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+
+                <!-- Run request -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#request"/>
+                    <p:output name="response" id="response" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Filter response -->
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="#response" transform="oxf:unsafe-xslt">
+                        <xsl:transform version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                            <xsl:template match="/">
+                                <xsl:copy-of select="//xxforms:control-values"/>
+                            </xsl:template>
+                        </xsl:transform>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:control-values xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:control id="my-input">The external entity should be missing:</xxf:control>
+            </xxf:control-values>
+        </output>
+    </test>
+
 </group>

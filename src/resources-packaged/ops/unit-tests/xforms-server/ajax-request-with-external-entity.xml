@@ -1,0 +1,21 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<!DOCTYPE xxforms:event-request [<!ENTITY nbsp "&#160;"><!ENTITY foobar SYSTEM "external-entity.txt">]>
+<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    <xxforms:uuid>9C5314A6-4AFD-2889-C972-EFDBBB4C30E5</xxforms:uuid>
+    <xxforms:sequence>2</xxforms:sequence>
+    <xxforms:action>
+        <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">The external entity should be missing: &foobar;</xxforms:event>
+    </xxforms:action>
+</xxforms:event-request>

@@ -71,20 +71,25 @@
 
                         <!-- Handle DOMActivate event to open/close the switches -->
                         <xforms:action ev:event="DOMActivate" ev:target="{$section-id} button-{$section-id}-open button-{$section-id}-close">
-                            <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/id">
-                                <xsl:value-of select="$section-id"/>
-                            </xforms:setvalue>
-                            <xforms:setvalue model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" value="event('xxforms:repeat-indexes')"/>
-                            <!-- Dispatch fr-collapse or fr-expand -->
-                            <xforms:dispatch target="fr-sections-model"
-                                             name="fr-{{if (xxforms:case('switch-{$section-id}') = 'case-{$section-id}-open') then 'collapse' else 'expand'}}"/>
+                            <xxforms:variable name="expand" select="xxforms:case('switch-{$section-id}') = 'case-{$section-id}-closed'" as="xs:boolean"/>
+                            <xforms:action if="$expand">
+                                <!-- Expand -->
+                                <xforms:toggle case="case-{$section-id}-open"/>
+                                <xforms:toggle case="case-button-{$section-id}-open"/>
+                            </xforms:action>
+                            <xforms:action if="not($expand)">
+                                <!-- Collapse -->
+                                <xforms:toggle case="case-{$section-id}-closed"/>
+                                <xforms:toggle case="case-button-{$section-id}-closed"/>
+                            </xforms:action>
                         </xforms:action>
                     </xsl:if>
 
                     <xsl:choose>
                         <xsl:when test="@editable = 'true'">
+                            <!-- Editable section title -->
                             <xsl:variable name="input" as="element(fr:inplace-input)">
-                                <fr:inplace-input id="{$section-id}-input-closed" ref="{xforms:label/@ref}">
+                                <fr:inplace-input id="{$section-id}-editable-title" ref="{xforms:label/@ref}">
                                     <xsl:apply-templates select="xforms:hint | xforms:alert"/>
                                     <!-- Put a hidden label for the error summary -->
                                     <xforms:label class="fr-hidden" ref="$fr-resources/components/labels/section-name"/>
@@ -118,11 +123,12 @@
                 <xforms:case id="case-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}"/>
                 <!-- Open section -->
                 <xforms:case id="case-{$section-id}-open" selected="{if ($open) then 'true' else 'false'}">
-                    <xhtml:div>
-                        <xhtml:div class="fr-collapsible">
-                            <!-- Section content except label, event handlers, and buttons -->
-                            <xsl:apply-templates select="* except (xforms:label, *[@ev:*], fr:buttons)"/>
-                        </xhtml:div>
+                    <xsl:if test="$is-animate-sections">
+                        <xsl:attribute name="class">xxforms-animate</xsl:attribute>
+                    </xsl:if>
+                    <xhtml:div class="fr-section-content">
+                        <!-- Section content except label, event handlers, and buttons -->
+                        <xsl:apply-templates select="* except (xforms:label, *[@ev:*], fr:buttons)"/>
                     </xhtml:div>
                 </xforms:case>
             </xforms:switch>

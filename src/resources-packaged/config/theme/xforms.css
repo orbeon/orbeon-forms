@@ -92,12 +92,15 @@ html body .xforms-form tr.xforms-disabled,
 }
 
 /**
- * XForms Switch / Case
+ * XForms switch/case
  * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
  */
 .xforms-case-selected {
     position: static;
 }
+
+/* For animated toggle of switch/case */
+.xxforms-animate { overflow: hidden }
 
 /* Special text content that must remain hidden */
 #xforms-repeat-tree, #xforms-repeat-indexes {

@@ -305,12 +305,9 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     padding: 0 7px 0 7px;
 }
 /*.fr-section-container .fr-section-open-close:hover { background-color: #FFFFDD; border: 1px solid #FFFF88 }*/
-
-/* For collapsible sections so that YUI animations work */
-.fr-section-container div.fr-collapsible {
-    overflow: hidden;
+.fr-section-container .fr-section-content {
     margin-left: 22px;
-    padding-bottom: .25em;
+    margin-bottom: .25em;
 }
 
 .fr-section-title .xforms-help-image {

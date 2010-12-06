@@ -202,9 +202,6 @@
             </xforms:group>
 
             <xhtml:span class="fr-hidden">
-                <!-- Hidden field to communicate to the client the current section to collapse or expand -->
-                <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')/id" id="fr-current-section-id-input" class="xforms-disabled"/>
-                <xforms:input model="fr-sections-model" ref="instance('fr-current-section-instance')/repeat-indexes" id="fr-current-section-repeat-indexes-input" class="xforms-disabled"/>
                 <!-- Hidden field to communicate to the client whether the data is safe -->
                 <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe" id="fr-data-safe-input" class="xforms-disabled"/>
             </xhtml:span>

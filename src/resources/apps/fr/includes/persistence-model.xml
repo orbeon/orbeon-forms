@@ -634,53 +634,38 @@
         ]]>
     </xxforms:script>
 
-    <!-- React to failed submission when saving, updating, getting, creating PDF, sending to Alfresco, sending email,
-         or sending to workflow -->
-    <xforms:action ev:event="xforms-submit-error" ev:observer="fr-persistence-model"
-                   ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission fr-workflow-review-submission fr-workflow-confirmation-submission">
-        <!-- Remember there was an error -->
-        <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
-        <!-- Log error -->
-        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:targetid')"/></xforms:message>
-        <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-        <!-- Set error message and show error section in UI -->
-        <xforms:action if="event('error-type') = 'validation-error'">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
-            <xforms:toggle case="fr-message-validation-error"/>
-        </xforms:action>
-        <xforms:action if="event('error-type') != 'validation-error'">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
-            <xforms:toggle case="fr-message-fatal-error"/>
-        </xforms:action>
-        <!-- Mark all active alerts as visited -->
-        <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
+    <!-- React to failed submission -->
+    <xforms:action ev:event="xforms-submit-error"
+                   ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission">
+        <xforms:dispatch name="fr-submit-error" targetid="fr-persistence-model">
+            <xxforms:context name="submission-id" select="event('xxforms:targetid')"/>
+            <xxforms:context name="response-body" select="event('response-body')"/>
+            <xxforms:context name="error-type" select="event('error-type')"/>
+        </xforms:dispatch>
     </xforms:action>
 
-    <!-- TODO: duplicated for now from above, which is no good; we need to implement the @handler attribute and
-         ev:listener to allow for a single xforms:action element, but two ev:listener registrations -->
-    <xforms:action ev:event="xforms-submit-error" ev:observer="fr-alfresco-model">
+    <xforms:action ev:event="fr-submit-error">
         <!-- Remember there was an error -->
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <!-- Log error -->
-        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:targetid')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('submission-id')"/></xforms:message>
         <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
             <xforms:toggle case="fr-message-validation-error"/>
+            <!-- Mark all active alerts as visited -->
+            <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
+            <!-- Open all sections -->
+            <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
         </xforms:action>
         <xforms:action if="event('error-type') != 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
-        <!-- Mark all active alerts as visited -->
-        <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
     </xforms:action>
 
     <!-- React to instance mutation events -->

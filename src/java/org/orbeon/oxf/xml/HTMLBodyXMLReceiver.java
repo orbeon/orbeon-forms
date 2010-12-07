@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.*;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * This ContentHandler receives an XHTML document or pseudo-XHTML document (XHTML in no namespace), and outputs SAX
@@ -47,14 +48,31 @@ public class HTMLBodyXMLReceiver extends ForwardingXMLReceiver {
     public void setDocumentLocator(Locator locator) {
     }
 
-    public void startElement(String uri, String localname, String qName, Attributes
-            attributes) throws SAXException {
+    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         if (!inBody && level == 1 && "body".equals(localname)) {
             inBody = true;
         } else if (inBody && level > 1) {
             final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-            super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
+
+            final Attributes newAttributes;
+
+            // Filter out attributes in a namespace
+            final int attributesCount = attributes.getLength();
+            if (attributesCount > 0) {
+                final AttributesImpl newAttributesImpl = new AttributesImpl();
+                for (int i = 0; i < attributesCount; i++) {
+                    final String currentAttributeName = attributes.getLocalName(i);
+                    final String currentAttributeValue = attributes.getValue(i);
+
+                    if ("".equals(attributes.getURI(i)))
+                        newAttributesImpl.addAttribute("", currentAttributeName, currentAttributeName, ContentHandlerHelper.CDATA, currentAttributeValue);
+                }
+                newAttributes = newAttributesImpl;
+            } else
+                newAttributes = attributes;
+
+            super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, newAttributes);
         }
 
         level++;

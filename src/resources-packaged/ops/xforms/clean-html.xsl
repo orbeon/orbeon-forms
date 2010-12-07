@@ -31,8 +31,8 @@
     <!-- Remove unsafe scripts -->
     <xsl:template match="*:script" priority="2"/>
 
-    <!-- Remove everything that looks like a JavaScript event handler or attribute -->
-    <xsl:template match="@*[not(starts-with(local-name(), 'on')) and not(starts-with(., 'javascript:'))]" priority="2">
+    <!-- Remove everything that looks like a JavaScript event handler or attribute and everything in a namespace -->
+    <xsl:template match="@*[not(starts-with(local-name(), 'on')) and not(starts-with(., 'javascript:')) and namespace-uri() = '']" priority="2">
         <xsl:copy-of select="."/>
     </xsl:template>
 

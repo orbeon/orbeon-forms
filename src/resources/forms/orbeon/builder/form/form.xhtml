@@ -76,11 +76,6 @@
                     // Only make content visible after initialization to prevent expensive relayout
                     YAHOO.util.Dom.setStyle("left1", "display", "block");
                     YAHOO.util.Dom.setStyle("center1", "display", "block");
-
-                    <!-- Set focus on the app name input field when the page loads. This isn't done with xforms:setfocus
-                         because that action would run before the layout is rendered and the dialog visible. -->
-                    if (! YAHOO.util.Dom.hasClass("fb-editor-metadata-dialog", "xforms-initially-hidden"))
-                        ORBEON.xforms.Controls.setFocus("fb-application-name-input");
                 });
             })();
         </xhtml:script>
@@ -90,8 +85,11 @@
     </xhtml:head>
     <xhtml:body>
         <xxforms:dialog id="fb-editor-metadata-dialog" close="false">
-            <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-application-name-input"/>
             <xforms:label value="$form-resources/messages/metadata-title"/>
+
+            <!-- Set initial focus (this should probably be automatically handled by the XForms engine) -->
+            <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-editor-metadata-dialog"/>
+
             <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
             <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
             <xhtml:div>

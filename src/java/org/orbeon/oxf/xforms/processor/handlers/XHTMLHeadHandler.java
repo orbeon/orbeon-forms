@@ -392,13 +392,6 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             if (scriptsToRun != null || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
                 final StringBuilder sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ");
 
-                // Initial setfocus if present
-                if (focusElementId != null) {
-                    sb.append("ORBEON.xforms.Controls.setFocus(\"");
-                    sb.append(XFormsUtils.namespaceId(containingDocument, focusElementId));
-                    sb.append("\");");
-                }
-
                 // Initial xxforms:script executions if present
                 if (scriptsToRun != null) {
                     for (final XFormsContainingDocument.Script script: scriptsToRun) {
@@ -448,6 +441,14 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         }
                         sb.append(");");
                     }
+                }
+
+                // Initial setfocus if present
+                // Seems reasonable to do this after dialogs as focus might be within a dialog
+                if (focusElementId != null) {
+                    sb.append("ORBEON.xforms.Controls.setFocus(\"");
+                    sb.append(XFormsUtils.namespaceId(containingDocument, focusElementId));
+                    sb.append("\");");
                 }
 
                 sb.append(" }");

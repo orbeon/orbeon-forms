@@ -267,6 +267,13 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
+    public boolean setFocus() {
+        // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data". So we
+        // disallow this for now.
+        return false;
+    }
+
+    @Override
     protected boolean addAjaxCustomAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final XFormsOutputControl outputControl1 = (XFormsOutputControl) other;

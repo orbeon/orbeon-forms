@@ -1126,6 +1126,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.response = null;           // same as above
         this.isInitializing = false;
 
+        clearClientState(); // client state can contain e.g. focus information, etc. set during initialization
+
         // Tell dependencies
         xpathDependencies.afterInitialResponse();
     }

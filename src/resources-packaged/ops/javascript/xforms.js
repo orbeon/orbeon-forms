@@ -6859,7 +6859,6 @@ ORBEON.xforms.Server = {
                                         else if (type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean") isBooleanType = true;
                                         else isStringType = true;
 
-                                        var isRecognizedType = isDateType || isTimeType || isDateTimeType || isBooleanType || isStringType;
                                         // Remember that this input has be recreated which means we need to update its value
                                         recreatedInput = true;
 
@@ -6880,7 +6879,6 @@ ORBEON.xforms.Server = {
                                         var childElements = YAHOO.util.Dom.getChildren(documentElement);
                                         for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
                                             var childElement = childElements[childIndex];
-                                            var childTagName = childElement.tagName.toLowerCase();
                                             if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
                                                     && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
                                                     && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")

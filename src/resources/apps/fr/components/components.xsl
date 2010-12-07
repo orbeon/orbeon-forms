@@ -291,8 +291,6 @@
         </xsl:copy>
 
         <xsl:if test="not($is-noscript)">
-            <!-- Handle collapsible sections -->
-            <xi:include href="oxf:/apps/fr/includes/collapse-script.xhtml" xxi:omit-xml-base="true"/>
             <!-- Handle checking dirty status -->
             <xi:include href="oxf:/apps/fr/includes/check-dirty-script.xhtml" xxi:omit-xml-base="true"/>
         </xsl:if>

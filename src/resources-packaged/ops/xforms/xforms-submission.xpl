@@ -122,6 +122,11 @@
                         </xsl:document>
                     </xsl:variable>
 
+                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association.
+                         Set it here. -->
+                    <xsl:value-of select="context:putInSession(concat('oxf.xforms.state.manager.uuid-key.', $uuid), '')"
+                                  xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
+
                     <xxforms:event-request>
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:sequence>1</xxforms:sequence>
@@ -154,7 +159,14 @@
             <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="/">
-                    <xsl:copy-of select="saxon:parse(context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/instance[last()])"/>
+                    <xsl:variable name="dynamic-state" select="context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))" as="document-node()"/>
+
+                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association.
+                         Remove it here so as to not grow the session each time a submission is called. -->
+                    <xsl:value-of select="context:removeFromSession(concat('oxf.xforms.state.manager.uuid-key.', $dynamic-state/@uuid))"/>
+                    
+                    <!-- Copy out the last instance from the dynamic state -->
+                    <xsl:copy-of select="saxon:parse($dynamic-state/dynamic-state/instances/instance[last()])"/>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>

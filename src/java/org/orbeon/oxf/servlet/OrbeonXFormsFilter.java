@@ -69,6 +69,7 @@ public class OrbeonXFormsFilter implements Filter {
             // Check that the session exists for any request to /xforms-server
             // The purpose of this check is that if the application has invalidated the session, we don't want to allow
             // further interactions with a page.
+            // NOTE: With Tomcat, this doesn't seem necessary. Other application servers might work differently.
             if (subRequestPath.startsWith("/xforms-server")) {
                 final HttpSession session = httpRequest.getSession(false);
                 if (session == null)

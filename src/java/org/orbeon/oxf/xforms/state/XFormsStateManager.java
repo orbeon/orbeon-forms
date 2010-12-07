@@ -35,6 +35,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     private static final Logger logger = LoggerFactory.createLogger(XFormsStateManager.class);
     private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
+    private static final String XFORMS_STATE_MANAGER_UUID_KEY_PREFIX = "oxf.xforms.state.manager.uuid-key.";
     private static final String XFORMS_STATE_MANAGER_LISTENER_STATE_KEY_PREFIX = "oxf.xforms.state.manager.session-listeners-key.";
 
     // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
@@ -65,7 +66,25 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param containingDocument    containing document
      */
     public void afterInitialResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+
+        // Remember this UUID in the session
+        addUUIDToSession(propertyContext, containingDocument);
+
         cacheOrStore(propertyContext, containingDocument, true);
+    }
+
+    private void addUUIDToSession(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+        final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
+
+        final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
+        sessionAttributes.put(getUUIDSessionKey(containingDocument.getUUID()), "");
+    }
+
+    private void checkUUIDInSession(ExternalContext.Session session, String uuid) {
+        final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
+        if (sessionAttributes.get(getUUIDSessionKey(uuid)) == null)
+            throw new OXFException("Session has expired. Unable to process incoming request.");
     }
 
     /**
@@ -83,8 +102,9 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
         final String listenerSessionKey = getListenerSessionKey(containingDocument);
-        final String uuid = containingDocument.getUUID();
         if (sessionAttributes.get(listenerSessionKey) == null) {
+
+            final String uuid = containingDocument.getUUID();
 
             // Remove from cache when session expires
             final ExternalContext.Session.SessionListener listener = new ExternalContext.Session.SessionListener() {
@@ -139,6 +159,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     // Public for unit tests
     public static String getListenerSessionKey(XFormsContainingDocument containingDocument) {
         return XFORMS_STATE_MANAGER_LISTENER_STATE_KEY_PREFIX + containingDocument.getUUID();
+    }
+
+    private static String getUUIDSessionKey(String uuid) {
+        return XFORMS_STATE_MANAGER_UUID_KEY_PREFIX + uuid;
     }
 
     /**
@@ -238,6 +262,13 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         final String uuid = getRequestUUID(request);
 
         assert uuid != null;
+
+        // Check that the session contains a key for the requested UUID. This enforces the rule that an incoming request
+        // for a given UUID must belong to the same session that created the document. If the session expires, the
+        // key goes away as well, and the key won't be present. If we don't do this check, the XForms server might
+        // handle requests for a given UUID within a separate session, therefore providing access to other sessions,
+        // which is not desirable.
+        checkUUIDInSession(session, uuid);
 
         // Get static state if any
         final String encodedStaticState;

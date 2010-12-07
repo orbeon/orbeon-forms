@@ -40,6 +40,8 @@
                 <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
                 <xsl:template match="/">
                     <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
+                        <xsl:value-of select="context:putInSession(concat('oxf.xforms.state.manager.uuid-key.', $uuid), '')"/>
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:sequence>1</xxforms:sequence>
                         <xxforms:static-state>

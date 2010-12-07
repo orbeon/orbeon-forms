@@ -101,6 +101,16 @@ public class StaticExternalContext {
         return XFormsUtils.decodeXML(getStaticContext().getPipelineContext(), encodedXML);
     }
 
+    public static void putInSession(String key, String value) {
+        StaticExternalContext.getStaticContext().getExternalContext().getSession(true)
+                .getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).put(key, value);
+    }
+
+    public static void removeFromSession(String key) {
+        StaticExternalContext.getStaticContext().getExternalContext().getSession(true)
+                .getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).remove(key);
+    }
+
     public static boolean isPE() {
         return Version.isPE();
     }

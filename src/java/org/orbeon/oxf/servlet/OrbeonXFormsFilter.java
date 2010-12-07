@@ -63,7 +63,18 @@ public class OrbeonXFormsFilter implements Filter {
 
         if (isOrbeonResourceRequest(requestPath)) {
             // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
+
             final String subRequestPath = requestPath.substring(orbeonContextPath.length());
+
+            // Check that the session exists for any request to /xforms-server
+            // The purpose of this check is that if the application has invalidated the session, we don't want to allow
+            // further interactions with a page.
+            if (subRequestPath.startsWith("/xforms-server")) {
+                final HttpSession session = httpRequest.getSession(false);
+                if (session == null)
+                    throw new ServletException("Session has expired. Unable to process incoming request.");
+            }
+
             getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
             // Forward the request to the Orbeon Forms renderer

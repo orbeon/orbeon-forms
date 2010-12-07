@@ -137,6 +137,7 @@
                                                     <!-- Custom events -->
                                                     <xxforms:script ev:event="fr-toggle" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
                                                 </xsl:if>
+                                                <xxforms:script ev:event="xforms-focus"  ev:phase="capture">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
 
                                                 <xsl:apply-templates select="node() except fr:label"/>
 

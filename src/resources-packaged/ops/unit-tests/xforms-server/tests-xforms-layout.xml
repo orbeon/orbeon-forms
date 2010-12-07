@@ -1371,7 +1371,6 @@
 
                 </xhtml:body>
             </xhtml:html>
-
         </input>
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -1757,24 +1756,24 @@
             </instances>
         </input>
         <output name="response">
-<xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-    <xxf:dynamic-state>
-        <dynamic-state>
-            <instances>
-                <instance id="instance" model-id="model">
-                    <instance>
-                        <image>    </image>
-                    </instance>
-                </instance>
-            </instances>
-        </dynamic-state>
-    </xxf:dynamic-state>
-    <xxf:action>
-        <xxf:control-values>
-            <xxf:attribute id="my-src-avt" for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
-        </xxf:control-values>
-    </xxf:action>
-</xxf:event-response>
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <image>    </image>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="my-src-avt" for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
         </output>
     </test>
 
@@ -2145,6 +2144,34 @@
                 </xh:span>
                 <xh:img xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""></xh:img>
                 <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-help" id="xf-1$$p">Foo&lt;div&gt;&lt;/div&gt;Bar</xh:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="xf:output with text/html mediatype filters out foreign attributes" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315673&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance>&lt;div xmlns:x="x">&lt;p x:y="foo">Hello!&lt;/p>&lt;/div></instance>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-output" value="." mediatype="text/html"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xh:div xmlns:xh="http://www.w3.org/1999/xhtml" id="my-output" class="xforms-control xforms-output xforms-mediatype-text-html xforms-mediatype-text">
+                    <xh:div>
+                        <xh:p>Hello!</xh:p>
+                    </xh:div>
+                </xh:div>
             </controls>
         </output>
     </test>

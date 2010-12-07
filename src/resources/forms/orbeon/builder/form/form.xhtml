@@ -92,8 +92,8 @@
         <xxforms:dialog id="fb-editor-metadata-dialog" close="false">
             <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-application-name-input"/>
             <xforms:label value="$form-resources/messages/metadata-title"/>
-            <!-- Are we editing the metadata for a new or existing form? -->
-            <xxforms:variable name="is-new-form" select="xxforms:bind('application-name-bind') = ''"/>
+            <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
+            <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
             <xhtml:div>
                 <xforms:group appearance="xxforms:internal" ref="instance('fb-metadata-instance')">
                     <xhtml:p>

@@ -1,17 +1,16 @@
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -41,26 +40,27 @@
         <xhtml:script type="text/javascript" src="/ops/javascript/underscore/underscore.js"/>
         <xhtml:script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"/>
         <xhtml:script type="text/javascript">
-            YAHOO.util.Event.onDOMReady(function() {
-                var container = document.getElementById("recaptcha");
-                if (container != null) {
+            <![CDATA[
+                YAHOO.util.Event.onDOMReady(function() {
+                    var container = document.getElementById("recaptcha");
+                    if (container != null) {
+                        // Initialize the reCAPTCHA
+                        var recaptchaDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-div", null, container)[0];
+                        var challengeInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-challenge", null, container)[0].getElementsByTagName("input")[0];
+                        var responseInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-response", null, container)[0].getElementsByTagName("input")[0];
+                        var publicKeyElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-public-key", null, container)[0];
+                        var publicKey = publicKeyElement.getElementsByTagName("input")[0].value;
+                        Recaptcha.create(publicKey, recaptchaDiv.id);
 
-                    // Initialize the reCAPTCHA
-                    var recaptchaDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-div", null, container)[0];
-                    var challengeInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-challenge", null, container)[0].getElementsByTagName("input")[0];
-                    var responseInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-response", null, container)[0].getElementsByTagName("input")[0];
-                    var publicKeyElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-public-key", null, container)[0];
-                    var publicKey = publicKeyElement.getElementsByTagName("input")[0].value;
-                    Recaptcha.create(publicKey, recaptchaDiv.id);
-
-                    // Do verification when users click on "verify"
-                    var verifyButton = document.getElementById("verify-button").getElementsByTagName("button")[0];
-                    YAHOO.util.Event.addListener(verifyButton, "click", function() {
-                        challengeInput.value = Recaptcha.get_challenge();
-                        responseInput.value = Recaptcha.get_response();
-                    });
-                }
-            });
+                        // Do verification when users click on "verify"
+                        var verifyButton = document.getElementById("verify-button").getElementsByTagName("button")[0];
+                        YAHOO.util.Event.addListener(verifyButton, "click", function() {
+                            challengeInput.value = Recaptcha.get_challenge();
+                            responseInput.value = Recaptcha.get_response();
+                        });
+                    }
+                });
+            ]]>
         </xhtml:script>
     </xhtml:head>
     <xhtml:body>

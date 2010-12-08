@@ -349,6 +349,11 @@ public class XFormsServer extends ProcessorImpl {
                 } catch (Throwable e) {
                     // Notify state manager that an error occurred
                     XFormsStateManager.instance().onUpdateError(pipelineContext, containingDocument);
+
+                    // Log body of Ajax request if needed
+                    if (XFormsProperties.getErrorLogging().contains("server-body"))
+                        indentedLogger.logError("", "error processing Ajax update", "request", Dom4jUtils.domToPrettyString(requestDocument));
+
                     throw new OXFException(e);
                 }
 

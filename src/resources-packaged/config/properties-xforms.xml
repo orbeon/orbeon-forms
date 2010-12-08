@@ -32,7 +32,7 @@
     <!--
         Error logging:
 
-        * Data: submission-error-body
+        * Data: submission-error-body server-body
     -->
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.error"                          value="submission-error-body"/>
 

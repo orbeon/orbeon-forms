@@ -242,8 +242,14 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Handle xforms:select1-specific logic
 
             // Decrypt incoming value. With open selection, values are sent to the client.
-            if (isEncryptItemValues())
-                value = XFormsItemUtils.decryptValue(propertyContext, value);
+            if (isEncryptItemValues()) {
+                try {
+                    value = XFormsItemUtils.decryptValue(propertyContext, value);
+                } catch (IllegalArgumentException e) {
+                    getIndentedLogger().logError("", "exception decrypting value", "control id", getEffectiveId(), "value", value);
+                    throw e;
+                }
+            }
 
             // Current control value
             final String controlValue = getValue(propertyContext);

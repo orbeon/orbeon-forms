@@ -948,7 +948,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                     if (checkEventTarget(event)) {
                         // Store value into instance data through the control
                         final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
-                        // NOTE: filesElement is only used by the upload control at the moment
                         valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null);
                     }
 

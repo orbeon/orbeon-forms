@@ -218,36 +218,4 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- === Offline Buttons (alpha code, not supported/documented) === -->
-
-    <xsl:template match="fr:take-offline-button">
-        <fr:button id="take-offline-button" model="fr-persistence-model" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'true') then . else ()">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/take-offline.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
-            </xforms:label>
-            <xxforms:offline ev:event="DOMActivate"/>
-        </fr:button>
-    </xsl:template>
-
-    <xsl:template match="fr:take-online-button">
-        <fr:button id="take-online-button" model="fr-persistence-model" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/take-online.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
-            </xforms:label>
-            <xxforms:online ev:event="DOMActivate"/>
-        </fr:button>
-    </xsl:template>
-
-    <xsl:template match="fr:save-offline-button">
-        <fr:button id="save-offline-button" model="fr-persistence-model" ref="if (xxforms:instance('fr-offline-instance')/is-online = 'false') then . else ()">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/save.gif" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-offline"/></xhtml:span>
-            </xforms:label>
-            <xxforms:offline-save ev:event="DOMActivate"/>
-        </fr:button>
-    </xsl:template>
-
 </xsl:stylesheet>

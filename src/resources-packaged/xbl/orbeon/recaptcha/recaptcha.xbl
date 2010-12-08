@@ -53,8 +53,8 @@
                 </xforms:instance>
                 <xforms:instance id="verify-response-text"><verify-response/></xforms:instance>
                 <xforms:submission id="verify-submission" resource="http://api-verify.recaptcha.net/verify"
-                    ref="instance('verify-request')" method="post" serialization="application/x-www-form-urlencoded"
-                    replace="text" target="instance('verify-response-text')"/>
+                        ref="instance('verify-request')" method="post" serialization="application/x-www-form-urlencoded"
+                        replace="text" target="instance('verify-response-text')"/>
             </xforms:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -85,6 +85,9 @@
                                 <xforms:message level="xxforms:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
                                 <!-- Call API doing the verification -->
                                 <xforms:send submission="verify-submission"/>
+                                <!-- Reset challenge and response, so the next time they are changed we only run the verification when both new values are updated -->
+                                <xforms:setvalue ref="challenge"/>
+                                <xforms:setvalue ref="response"/>
                                 <!-- Parse the response -->
                                 <xxforms:variable name="lines" select="tokenize(instance('verify-response-text'), '\n')"/>
                                 <xxforms:variable name="is-success" select="$lines[1] = 'true'"/>

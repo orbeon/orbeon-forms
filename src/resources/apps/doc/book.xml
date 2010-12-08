@@ -30,7 +30,7 @@
     <menu label="Core Technologies Reference">
         <menu label="XForms">
             <menu-item label="XForms Guide" href="reference-xforms-guide"/>
-            <menu-item label="XForms Extensions" href="reference-xforms-extensions"/>
+            <menu-item label="XForms Extensions" href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-extensions"/>
             <menu-item label="XForms Engine Configuration" href="reference-xforms-configuration"/>
             <menu-item label="XPath Functions" href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-xpath-functions"/>
         </menu>

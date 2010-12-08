@@ -43,70 +43,10 @@
         <section>
             <title>Placement of Controls and Models</title>
             <p>
-                XForms does not specify normatively where XForms controls and models must be placed within an HTML
-                document. The <a href="http://www.w3.org/TR/xforms11/#xforms-in-xhtml-00">convention</a> is to place
-                <code>&lt;xforms:model></code> elements within <code>&lt;xhtml:head></code>, and controls within
-                <code>&lt;xhtml:body></code>. Orbeon Forms is more flexible on this:
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                to the wiki</a>.
             </p>
-            <ul>
-                <li>
-                    <p>
-                        <code>&lt;xforms:model></code> can be placed within <code>&lt;xhtml:head></code> as is usual,
-                        but also under <code>&lt;xhtml:body></code> and even nested within other XForms elements. For
-                        example:
-                    </p>
-                    <xml-source>
-                        <xxforms:dialog id="my-dialog" model="my-dialog-model">
-                            <xforms:label>My Dialog</xforms:label>
-                            <xforms:group>
-                                ...
-                            </xforms:group>
-                            <xforms:model id="my-dialog-model">
-                                <comment> Model used by the dialog </comment>
-                                ...
-                            </xforms:model>
-                        </xxforms:dialog>
-                    </xml-source>
-                    <p>
-                        In this particular case, this allows you to write your dialog as a module in a completely
-                        separate file and to XInclude that file within your main form.
-                    </p>
-                    <p>
-                        At the moment, nested models behave exactly as if they were placed under
-                        <code>&lt;xhtml:head></code>. It is just a syntactic convenience to be able to place them within
-                        elements such as <code>&lt;xxforms:dialog></code>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Attribute Value Templates (AVTs) can be <a href="#avts-xhtml">placed on HTML elements outside
-                        <code>&lt;xhtml:body></code></a>.
-                    </p>
-                    <xml-source>
-                        <xhtml:body lang="{instance('language')}">
-                            ...
-                        </xhtml:body>
-                    </xml-source>
-                </li>
-                <li>
-                    <p>
-                        A single <code>&lt;xforms:output></code> control may be placed within
-                        <code>&lt;xhtml:title></code>. This allows dynamically changing the HTML document title using XForms.
-                    </p>
-                    <xml-source>
-                        <xhtml:title>
-                            <xforms:output value="instance('resources')/title"/>
-                        </xhtml:title>
-                    </xml-source>
-                </li>
-           </ul>
-            <note>
-                <p>
-                    Even though AVTs and <code>&lt;xforms:output></code> elements may be placed before any XForms
-                    model, they are still considered part of the XForms "view" of the XForms document and refer to data placed in
-                    models.
-                </p>
-            </note>
         </section>
         <a name="xxforms-custom-mips"/>
         <section>
@@ -130,35 +70,10 @@
         <section>
             <title>Standalone Label, Hint, Help and Alert Elements</title>
             <p>
-                In XForms, <code>&lt;label></code>, <code>&lt;hint></code>, <code>&lt;help></code> and
-                <code>&lt;alert></code> ("LHHA") elements must always be nested within a control. In HTML on the
-                other hand, the <code>&lt;label></code> element supports a <code>for</code> attribute which relates
-                the element to a control. Orbeon Forms follows HTML and support the <code>for</code> attribute on
-                all the LHHA elements. This allows placing LHHA elements in other locations on the page:
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                to the wiki</a>.
             </p>
-            <xml-source>
-                <table>
-                    <tr>
-                        <td>
-                            <xforms:label for="first-name-control">Please enter your first name:</xforms:label>
-                        </td>
-                        <td>
-                            <xforms:input id="first-name-control" ref="first-name" />
-                        </td>
-                        <td>
-                            <xforms:hint for="first-name-control">Just your first name...</xforms:hint>
-                        </td>
-                    </tr>
-                </table>
-                <p>
-                    <xforms:alert for="first-name-control">Oops the first name is not valid</xforms:alert>
-                </p>
-            </xml-source>
-            <note>
-                <p>
-                    Standalone LHHA elements must not cross <code>&lt;xforms:repeat></code> boundaries.
-                </p>
-            </note>
         </section>
         <a name="readonly-mode"/>
         <section>
@@ -172,216 +87,28 @@
         <a name="xforms-formatting"/>
         <section>
             <title>Formatting</title>
-            <section>
-                <title>Rationale</title>
-                <p>
-                    It is usually recommended to use native XML types within XForms instances, as this guarantees
-                    interoperability and maintainability. For example, a date of January 10, 2005 is stored in ISO
-                    format as: <code>2005-10-01</code>. However it is often necessary to format such values on screen
-                    in a user-readable format, like "January 10, 2005", "10 janvier 2005", or "10. Januar 2005".
-                </p>
-                <p>
-                    Orbeon Forms provides an extension attribute, <code>xxforms:format</code>, for that purpose.
-                    <code>xxforms:format</code> must contain an XPath 2.0 expression. In your XPath expression you can
-                    use all the XPath 2.0 functions, including those for date manipulation (<a
-                    href="http://www.w3.org/TR/2005/CR-xpath-functions-20051103/#durations-dates-times">external
-                    documentation</a>). However since XPath 2.0 functions don't provide any facility for date and time
-                    formatting, you can in this attribute also use the following XSLT 2.0 functions:
-                </p>
-                <ul>
-                    <li><p><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</p></li>
-                    <li><p><code>format-dateTime()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-dateTime">external documentation</a>)</p></li>
-                    <li><p><code>format-time()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-time">external documentation</a>)</p></li>
-                    <li><p><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</p></li>
-                </ul>
-                <p>
-                    The XPath expression is evaluated by the XForms engine whenever the value bound to the
-                    <code>xforms:input</code> control changes and needs to be updated on screen. It is evaluated in the
-                    context of the instance node bound to the control. This means that the current value of the control
-                    can be accessed with "<code>.</code>". Often the value must be converted (for example to a date) in
-                    which case the conversion can be done with a XPath 2.0 constructor such as <code>xs:date(.)</code>
-                    or with as cast such as <code>(. cast as xs:date?)</code>.
-                </p>
-            </section>
-            <section>
-                <title>xforms:output</title>
-                <p>
-                    When using <code>xforms:output</code>, you can control the formatting of the date using the
-                    <code>xxforms:format</code> extension attribute on the <code>xforms:output</code> control.
-                </p>
-                <xml-source show-namespaces="false">
-                    <xforms:output ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
-                    <xforms:output ref="size" xxforms:format="format-number(., '###,##0')"/>
-                </xml-source>
-            </section>
-            <a name="xforms-default-formatting"/>
-            <section>
-                <title>Default Formatting</title>
-                <p>
-                    For both <code>xforms:input</code> and <code>xforms:output</code>, if the bound node is of one of
-                    the following types: <code>xs:date</code>, <code>xs:dateTime</code>, <code>xs:time</code>,
-                    <code>xs:decimal</code>, <code>xs:integer</code>, <code>xs:float</code>, and <code>xs:double</code>,
-                    and if no <code>xxforms:format</code> attribute is present on the control, formatting is based on
-                    <a href="reference-properties">properties</a>. If the properties are missing, a built-in default
-                    formatting is used. The default properties, as well as the built-in defaults, are as follows:
-                </p>
-                <xml-source>
-                    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.decimal"                       value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.integer"                       value="if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
-                </xml-source>
-                <p>
-                    They produce results as follows:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            <code>2004-01-07</code> as <code>xs:date</code> is displayed as <code>Wednesday January 7, 2004</code>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>2004-01-07T04:38:35.123</code> as <code>xs:dateTime</code> is displayed as <code>Wednesday January 7, 2004 04:38:35 UTC</code>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>04:38:35.123</code> as <code>xs:time</code> is displayed as <code>04:38:35 UTC</code>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>123456.789</code> as <code>xs:decimal</code> is displayed as <code>123,456.79</code>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>123456.789</code> as <code>xs:integer</code> is displayed as <code>123,456</code>
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <code>123456.789</code> as <code>xs:float</code> or <code>xs:double</code> is displayed as <code>123,456.789</code>
-                        </p>
-                    </li>
-                </ul>
-                <p>Note:</p>
-                <ul>
-                    <li>
-                        With the "if" condition in the XPath expressions, a value which cannot be converted to the
-                        appropriate type is simply displayed as is.
-                    </li>
-                    <li>
-                        For values of type <tt>xs:time</tt> or <tt>xs:dateTime</tt>, if you wish the time to be
-                        displayed using the current timezone instead of UTC, replace in the <tt>value</tt> attribute
-                        <tt>UTC</tt> by <tt>[ZN]</tt>.
-                    </li>
-                </ul>
-            </section>
+            <p>
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                to the wiki</a>.
+            </p>
         </section>
         <a name="exforms-iterate"/>
         <section>
             <title>Iteration of XForms Actions over Sequences</title>
             <p>
-                Orbeon Forms supports the <code>exforms:iterate</code> attribute, also available as
-                <code>xxforms:iterate</code> attribute, on XForms action elements. Consider the following
-                instances:
-            </p>
-            <xml-source>
-                <xforms:instance id="main-instance">
-                    <instance xmlns=""/>
-                </xforms:instance>
-
-                <xforms:instance id="template-instance">
-                    <book xmlns="">
-                        <title/>
-                        <author/>
-                    </book>
-                </xforms:instance>
-
-                <xforms:instance id="source-instance">
-                    <instance xmlns="">
-                        <title>Don Quixote de la Mancha</title>
-                        <author>Miguel de Cervantes Saavedra</author>
-                        <title>Jacques le fataliste et son maître</title>
-                        <author>Denis Diderot</author>
-                        <title>Childhood's End</title>
-                        <author>Arthur C. Clarke</author>
-                    </instance>
-                </xforms:instance>
-            </xml-source>
-            <p>
-                The following action iterates over the <code>&lt;title></code> elements of
-                <code>source-instance</code>. For each of those, a new <code>&lt;book></code> element, copied from
-                the template stored in <code>template-instance</code>, is inserted into <code>main-instance</code>.
-                Then values from the <code>&lt;title></code> and <code>&lt;author></code> elements are copied over
-                to the new structure. The XForms 1.1 <code>context()</code> function provides access to each of the
-                iterated nodes:
-            </p>
-            <xml-source>
-                <xforms:action ev:event="xforms-ready" xxforms:iterate="instance('source-instance')/title">
-                    <xforms:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
-                    <xforms:setvalue ref="instance('main-instance')/book[last()]/title" value="context()"/>
-                    <xforms:setvalue ref="instance('main-instance')/book[last()]/author" value="context()/following-sibling::author"/>
-                </xforms:action>
-            </xml-source>
-            <p>
-                The resulting <code>main-instance</code> is as follows:
-            </p>
-            <xml-source>
-                <instance>
-                    <book>
-                        <title>Don Quixote de la Mancha</title>
-                        <author>Miguel de Cervantes Saavedra</author>
-                    </book>
-                    <book>
-                        <title>Jacques le fataliste et son maître</title>
-                        <author>Denis Diderot</author>
-                    </book>
-                    <book>
-                        <title>Childhood's End</title>
-                        <author>Arthur C. Clarke</author>
-                    </book>
-                </instance>
-            </xml-source>
-            <p>
-                Note that because Orbeon Forms uses XPath 2.0, <code>xxforms:iterate</code> is not limited to
-                returning node-sets, but can return sequences of items such as strings.
-            </p>
-            <p>
-                For more information about eXforms extensions, please visit the <a
-                href="http://www.exforms.org/conditionals.html#id4484032">eXforms site</a>.
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                to the wiki</a>.
             </p>
         </section>
         <a name="context-attribute"/>
         <section>
             <title>Generalized <code>context</code> attribute</title>
             <p>
-                XForms 1.1 introduces the <code>context</code> attribute on <code>&lt;xforms:insert></code> and
-                <code>&lt;xforms:delete></code>. Orbeon Forms supports this convenient attribute on all XForms
-                elements changing the XPath evaluation context, including controls, actions, binds, and
-                submissions.
-            </p>
-            <p>
-                The <code>context</code> attribute overrides the in-scope XPath evaluation context for an action. It
-                applies before the <code>ref</code> and <code>context</code> attributes, but after the
-                <code>model</code> attribute.
-            </p>
-            <p>
-                One convenient use is to just change the context within a group:
-            </p>
-            <xml-source>
-                <xforms:group context="personal-information">
-                    ...
-                </xforms:group>
-            </xml-source>
-            <p>
-                Note that it is also possible to use <code>ref</code> in this case, but doing so has the side effect
-                of binding the group to an instance data node, which may affect group relevance, for example.
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                to the wiki</a>.
             </p>
         </section>
         <a name="event-context"/>
@@ -450,271 +177,11 @@
         <section>
             <title>Dialogs</title>
             <a name="dialog-dialog"/>
-            <section>
-                <title>The <code>xxforms:dialog</code> Control</title>
-                <p>
-                    You declare dialogs directly under the <code>&lt;xhtml:body></code> element with:
-                </p>
-                <xml-source>
-                    <xxforms:dialog id="my-dialog-id" appearance="full | minimal" level="modeless" close="true" draggable="true" visible="false">
-                        <xforms:label>Dialog title</xforms:label>
-                        Content of the dialog (XHTML + XForms)
-                    </xxforms:dialog>
-                </xml-source>
-                <ul>
-                    <li>
-                        When you have <code>appearance="full"</code> on the dialog, you define the title of the
-                        dialog with the embedded <code>&lt;xforms:label></code> element.
-                    </li>
-                    <li>
-                        Inside an <code>&lt;xxforms:dialog></code> you can use all the XHTML and XForms elements you
-                        can normally use elsewhere on the page. You can have other XForms controls, or show anything
-                        you would like to with HTML.
-                    </li>
-                    <li>
-                        The attributes on the <code>&lt;xxforms:dialog></code> are as follows:
-                    </li>
-                </ul>
-                <table>
-                    <tr>
-                        <th><code>id</code></th>
-                        <td>Mandatory</td>
-                        <td>
-                            The ID of the dialog. You reference this ID when opening the dialog with
-                            <code>&lt;xxforms:show dialog="my-dialog-id"></code>.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>appearance</th>
-                        <td>
-                            Optional. Possible values are:
-                            <ul>
-                                <li><code>full</code> (default)</li>
-                                <li><code>minimal</code></li>
-                            </ul>
-                        </td>
-                        <td>
-                            You can set the appearance to either <code>full</code> or <code>minimal</code>:
-                            <ul>
-                                <li>
-                                    The first screenshot below shows a dialog with <code>appearance="full"</code>
-                                    while the second one shows a dialog with <code>appearance="minimal"</code>.
-                                </li>
-                                <li>
-                                    In general, you will use the minimal dialog when you want to show a limited set
-                                    of information which is related to a certain element in the page. The minimal
-                                    dialog is sometime also referred to as a "drop-down dialog".
-                                </li>
-                                <li>
-                                    Some of the other attributes on <code>&lt;xxforms:dialog></code> can only be
-                                    used for the full or the minimal dialog. You will find more details on this
-                                    below.
-                                </li>
-                            </ul>
-
-                            <img src="../apps/doc/images/reference-xforms-dialog-full.png"/>
-                            <img src="../apps/doc/images/reference-xforms-dialog-minimal.png"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>level</code></th>
-                        <td>
-                            Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
-                            <ul>
-                                <li><code>modal</code> (default)</li>
-                                <li><code>modeless</code></li>
-                            </ul>
-                        </td>
-                        <td>
-                            When set to <code>modal</code> the rest the page is grayed out and you can't interact
-                            with any ontrol on the page outside of the dialog. When set to <code>modeless</code> you
-                            can still use other controls on the page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>close</code></th>
-                        <td>
-                            Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
-                            <ul>
-                                <li><code>true</code> (default)</li>
-                                <li><code>false</code></li>
-                            </ul>
-                        </td>
-                        <td>
-                            A "x" is shown in the dialog title bar when <code>close</code> is set to
-                            <code>true</code>. If you specify <code>close="false"</code>, then you should provide a
-                            way to close the dialog, for instance by having you own "Close" button inside the
-                            dialog. This is typically useful when you want to force users to enter some data before
-                            proceeding and you don't want them to cancel the current operation by closing the
-                            dialog.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>draggable</code></th>
-                        <td>
-                            Optional. Can only be used appearance is set to <code>full</code>. Possible values are:
-                            <ul>
-                                <li><code>true</code> (default)</li>
-                                <li><code>false</code></li>
-                            </ul>
-                        </td>
-                        <td>
-                            When set to <code>false</code>, you won't be able to move dialog on the page by using
-                            drag and drop in the dialog title bar.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>visible</code></th>
-                        <td>
-                            Optional. Whether the dialog is initially visible when the page loads. Possible values
-                            are:
-                            <ul>
-                                <li><code>true</code></li>
-                                <li><code>false</code> (default)</li>
-                            </ul>
-                        </td>
-                        <td>
-                            When set to <code>true</code>, the dialog appears immediately when the page loads.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>neighbor</code></th>
-                        <td>Optional</td>
-                        <td>
-                            Optional. Use only with <code>minimal</code> appearance. The id of the control next to
-                            which the dialog should display when opening.
-                        </td>
-                    </tr>
-                </table>
-            </section>
-            <a name="dialog-show-hide"/>
-            <section added="2008-03-01">
-                <title>The <code>xxforms:show</code> and <code>xxforms:hide</code> Actions</title>
-                <p>
-                    You open a dialog by using the <code>xxforms:show</code> action:
-                </p>
-                <xml-source>
-                    <xforms:trigger>
-                        <xforms:label>Show Dialog</xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="hello-dialog"/>
-                    </xforms:trigger>
-                </xml-source>
-                <p>
-                    If the dialog is already open, no action takes place.
-                </p>
-                <p>
-                    <code>xxforms:show</code> supports the following attributes:
-                </p>
-                <table>
-                    <tr>
-                        <th><code>dialog</code></th>
-                        <td>Mandatory</td>
-                        <td>
-                            The id of an existing dialog to open.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>neighbor</code></th>
-                        <td>Optional</td>
-                        <td>
-                            Optional. Use only with <code>minimal</code> appearance. The id of the control next to
-                            which the dialog should display when opening.
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><code>constrain</code></th>
-                        <td>Optional</td>
-                        <td>
-                            Whether to constrain the dialog to the viewport. Possible values
-                            are:
-                            <ul>
-                                <li><code>true</code> (default)</li>
-                                <li><code>false</code></li>
-                            </ul>
-                        </td>
-                    </tr>
-                </table>
-                <p>
-                    You close a dialog by using the <code>xxforms:hide</code> action:
-                </p>
-                <xml-source>
-                    <xforms:trigger>
-                        <xforms:label>Hide Dialog</xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="hello-dialog"/>
-                    </xforms:trigger>
-                </xml-source>
-                <p>
-                    If the dialog is already closed, no action takes place.
-                </p>
-                <p>
-                    <code>xxforms:hide</code> supports the following attributes:
-                </p>
-                <table>
-                    <tr>
-                        <th><code>dialog</code></th>
-                        <td>Mandatory</td>
-                        <td>
-                            The id of an existing dialog to close.
-                        </td>
-                    </tr>
-                </table>
-            </section>
-            <a name="xxforms-dialog-open"/>
-            <section added="2008-03-01">
-                <title>The <code>xxforms-dialog-open</code> Event</title>
-                <p>
-                    Dispatched in response to: <code>xxforms:show</code> action executed with an existing dialog id.
-                </p>
-                <p>
-                    Target: <code>dialog</code>
-                </p>
-                <p>
-                    Bubbles: Yes
-                </p>
-                <p>
-                    Cancelable: Yes
-                </p>
-                <p>
-                    Context Info: none
-                </p>
-                <p>
-                    Default Action: Open the dialog.
-                </p>
-                <p>
-                    You can respond to this event before the dialog opens, for example to perform initialization of
-                    data:
-                </p>
-                <xml-source>
-                    <xxforms:dialog id="hello-dialog">
-                        <xhtml:div>
-                            Hello!
-                        </xhtml:div>
-                        <xxforms:setvalue ev:event="xxforms-dialog-open" ref="..." value="..."/>
-                    </xxforms:dialog>
-                </xml-source>
-            </section>
-            <a name="xxforms-dialog-close"/>
-            <section added="2008-03-01">
-                <title>The <code>xxforms-dialog-close</code> Event</title>
-                <p>
-                    Dispatched in response to: <code>xxforms:hide</code> action executed with an existing dialog id.
-                </p>
-                <p>
-                    Target: <code>dialog</code>
-                </p>
-                <p>
-                    Bubbles: Yes
-                </p>
-                <p>
-                    Cancelable: Yes
-                </p>
-                <p>
-                    Context Info: none
-                </p>
-                <p>
-                    Default Action: Close the dialog.
-                </p>
-            </section>
+            <p>
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls#TOC-Dialog-control">migrated
+                to the wiki</a>.
+            </p>
         </section>
         <a name="submission-extensions"/>
         <section>
@@ -738,24 +205,18 @@
             <section>
                 <title>Trees with the <code>xxforms:tree</code> Appearance</title>
                 <p>
-                    [TODO: describe the Orbeon Forms <code>xxforms:tree</code> appearance on
-                    <code>xforms:select</code> and <code>xforms:select1</code>]
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls#TOC-Tree-appearance">migrated
+                    to the wiki</a>.
                 </p>
             </section>
             <a name="menu"/>
             <section>
                 <title>Menus with the <code>xxforms:menu</code> Appearance</title>
                 <p>
-                    [TODO: describe the Orbeon Forms <code>xxforms:tree</code> appearance on
-                    <code>xforms:select1</code>]
-                </p>
-            </section>
-            <a name="autocomplete"/>
-            <section>
-                <title>Autocomplete box <code>xxforms:tree</code> Appearance</title>
-                <p>
-                    [TODO: describe the Orbeon Forms <code>xxforms:autocomplete</code> appearance on
-                    <code>xforms:select</code> and <code>xforms:select1</code>]
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls#TOC-Menu-appearance">migrated
+                    to the wiki</a>.
                 </p>
             </section>
             <a name="events-multiple"/>
@@ -771,89 +232,19 @@
             <section>
                 <title><code>xxforms:download</code> Appearance on <code>&lt;xforms:output></code></title>
                 <p>
-                    <code>&lt;xforms:output></code> supports the <code>xxforms:download</code> appearance, which
-                    causes the the resource identified by the single-node binding to be downloadable through a
-                    link.
-                </p>
-                <p>
-                    Like <code>&lt;xforms:upload></code>, when using this appearance,
-                    <code>&lt;xforms:mediatype></code> and <code>&lt;xforms:filename></code> children elements are
-                    allowed (but not the <code>&lt;xxforms:size></code> element). When serving the file, if these
-                    elements are present, they are passed to the resulting HTTP response to provide mediatype and
-                    file name hints to the browser. Example:
-                </p>
-                <xml-source>
-                    <xforms:instance id="my-instance">
-                        <instance>
-                            <file mediatype="" filename="" size=""/>
-                        </instance>
-                    </xforms:instance>
-                    ...
-                    <xforms:upload ref="file">
-                        <xforms:label>Upload</xforms:label>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xforms:filename ref="@filename"/>
-                        <xxforms:size ref="@size"/>
-                    </xforms:upload>
-
-                    <xforms:output ref="file" appearance="xxforms:download">
-                        <xforms:label>Download</xforms:label>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xforms:filename ref="@filename"/>
-                    </xforms:output>
-                </xml-source>
-                <p>
-                    The data type for the resource must be <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                    to the wiki</a>.
                 </p>
             </section>
             <a name="xxforms-radio-button-group"/>
             <section>
                 <title><code>xxforms:group</code> Attribute on <code>&lt;xforms:select1></code> with <code>appearance="full"</code></title>
                 <p>
-                    <code>&lt;xforms:select1></code> supports an extension attribute called <code>xxforms:group</code>
-                    which allows grouping a series of radio buttons together in a way similar to the <code>name</code>
-                    attribute in HTML.
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-other-extensions">migrated
+                    to the wiki</a>.
                 </p>
-                <p>
-                    In general, this attribute is not necessary. It is useful in the following case:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            Multiple <code>&lt;xforms:select1 appearance="full"></code> point to the same node.
-                        </p>
-                    </li>
-                        <li>
-                        <p>
-                            You enable <a
-                            href="http://wiki.orbeon.com/forms/doc/developer-guide/configuration-properties#TOC-Client-Events-Optimizations">deferred
-                            event handling</a> on the client.
-                        </p>
-                    </li>
-                </ul>
-                <p>
-                    The <code>xxforms:group</code> attribute must contain an identifier unique between groups of radio
-                    controls. Example:
-                </p>
-                <xml-source>
-                    <xforms:repeat nodeset="instance('countries')/country">
-                        <xxforms:variable name="country" select="."/>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:select1 appearance="full" ref="instance('selected')" xxforms:group="country-code-group">
-                                    <xforms:item>
-                                        <xforms:label/>
-                                        <xforms:value value="$country/us-code"/>
-                                    </xforms:item>
-                                </xforms:select1>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xforms:repeat>
-                </xml-source>
-                <note>
-                    This attribute does not work in <i>noscript</i> mode yet even though it would be very useful in this
-                    case as well.
-                </note>
             </section>
         </section>
     </body>

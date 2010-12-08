@@ -91,19 +91,14 @@
                                 <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-value"/>
                             </xforms:select1>
                             <!-- Input with external value -->
-                            <xxforms:variable name="textfield-value" model="autocomplete-model" select="textfield-value"/>
-                            <xxforms:variable name="readonly" model="autocomplete-model" select="readonly"/>
                             <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
-                                <!-- Doesn't work because of: http://forge.ow2.org/tracker/index.php?func=detail&aid=315662&group_id=168&atid=350207 -->
-                                <!--<xforms:setvalue ev:event="xforms-readonly" model="autocomplete-model" ref="readonly">true</xforms:setvalue>-->
-                                <!--<xforms:setvalue ev:event="xforms-readwrite" model="autocomplete-model" ref="readonly">false</xforms:setvalue>-->
-                                <xforms:setvalue ev:event="xforms-readonly" ref="$readonly">true</xforms:setvalue>
-                                <xforms:setvalue ev:event="xforms-readwrite" ref="$readonly">false</xforms:setvalue>
+                                <xforms:setvalue ev:event="xforms-readonly" ref="instance()/readonly">true</xforms:setvalue>
+                                <xforms:setvalue ev:event="xforms-readwrite" ref="instance()/readonly">false</xforms:setvalue>
                                 <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset = 'true')">
                                     <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
                                     <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]"/>
                                     <xxforms:variable name="label" select="$select-items[index-of($values, $external-value)]/label"/>
-                                    <xforms:setvalue if="exists($label)" ref="$textfield-value" value="$label"/>
+                                    <xforms:setvalue if="exists($label)" ref="instance()/textfield-value" value="$label"/>
                                 </xforms:action>
                             </xforms:input>
                             <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
@@ -112,7 +107,7 @@
                             </xforms:trigger>
                             <!-- Markup with input for the YUI autocomplete -->
                             <xhtml:div xbl:attr="class style">
-                                <xforms:input id="search" ref="$textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
+                                <xforms:input id="search" ref="instance()/textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
                                     <xforms:action ev:event="xforms-value-changed">
                                         <!-- If the search value is empty, set the external value to empty as well -->
                                         <xforms:action if=". = ''">

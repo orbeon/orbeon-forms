@@ -31,7 +31,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
@@ -165,10 +164,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public Itemset getItemset(PropertyContext propertyContext, final boolean setBinding) {
         try {
             // Non-relevant control does not return an itemset
-            final org.orbeon.saxon.om.Item boundItem = getBoundItem();
-            // TODO: this relevance logic duplicates what's in XFormsSingleNodeControl, which is no good; can we simply use isRelevant()?
-            final boolean isRelevant = boundItem != null && (!(boundItem instanceof NodeInfo) || InstanceData.getInheritedRelevant((NodeInfo) boundItem));
-            if (!isRelevant)
+            if (!isRelevant())
                 return null;
 
             if (isNorefresh()) {

@@ -15,12 +15,12 @@
 */
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.sql.Connection;
@@ -40,7 +40,7 @@ public class ListInitializedTables extends SimpleProcessor {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public void generateData(PipelineContext pipelineContext, ContentHandler contentHandler) throws SAXException {
+    public void generateData(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws SAXException {
         try {
             // Get connection
             Datasource datasource = Datasource.getDatasource(pipelineContext, this, getInputByName(INPUT_DATASOURCE));
@@ -51,7 +51,7 @@ public class ListInitializedTables extends SimpleProcessor {
             ResultSet tables = metaData.getTables(null, null, "ORBEON_%", null);
 
             // Send the result as XML, outputting one row per table
-            ContentHandlerHelper contentHandlerHelper = new ContentHandlerHelper(contentHandler);
+            ContentHandlerHelper contentHandlerHelper = new ContentHandlerHelper(xmlReceiver);
             contentHandlerHelper.startDocument();
             contentHandlerHelper.startElement("tables");
             while (tables.next()) {

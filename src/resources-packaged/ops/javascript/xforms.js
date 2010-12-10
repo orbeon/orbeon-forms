@@ -6785,7 +6785,7 @@ ORBEON.xforms.Server = {
                                     var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
                                     var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
 
-                                    var type = ORBEON.util.Dom.getAttribute(controlElement, "type");
+                                    var newSchemaType = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                     var documentElement = ORBEON.util.Dom.get(controlId);
                                     if (documentElement == null) {
                                         documentElement = ORBEON.util.Dom.get("group-begin-" + controlId);
@@ -6851,137 +6851,139 @@ ORBEON.xforms.Server = {
                                     // Update input control type
                                     // NOTE: This is not ideal: in the future, we would like a template-based mechanism instead.
                                     var recreatedInput = false;
-                                    if (type != null && YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                        var isDateType = false, isTimeType = false, isDateTimeType = false, isBooleanType = false, isStringType = false;
-                                        if (type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date") isDateType = true;
-                                        else if (type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time") isTimeType = true;
-                                        else if (type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime") isDateTimeType = true;
-                                        else if (type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean") isBooleanType = true;
-                                        else isStringType = true;
+                                    if (newSchemaType != null && YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
 
-                                        // Remember that this input has be recreated which means we need to update its value
-                                        recreatedInput = true;
+                                        // For each supported type, declares the recognized schema types and the class used in the DOM
+                                        var INPUT_TYPES = [
+                                            { type: "date",     schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}date", "{http://www.w3.org/2002/xforms}date" ], className: "xforms-type-date" },
+                                            { type: "time",     schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}time", "{http://www.w3.org/2002/xforms}time" ], className: "xforms-type-time" },
+                                            { type: "dateTime", schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}dateTime", "{http://www.w3.org/2002/xforms}dateTime" ], className: "xforms-type-dateTime" },
+                                            { type: "boolean",  schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}boolean", "{http://www.w3.org/2002/xforms}boolean" ], className: "xforms-type-boolean" },
+                                            { type: "string",   schemaTypes: null, className: null }
+                                        ];
 
-                                        // Clean-up document element by removing type classes
-                                        YAHOO.util.Dom.removeClass(documentElement, "xforms-type-string");
-                                        YAHOO.util.Dom.removeClass(documentElement, "xforms-type-date");
-                                        YAHOO.util.Dom.removeClass(documentElement, "xforms-type-time");
-                                        YAHOO.util.Dom.removeClass(documentElement, "xforms-type-dateTime");
-                                        YAHOO.util.Dom.removeClass(documentElement, "xforms-type-boolean");
-                                        YAHOO.util.Dom.removeClass(documentElement, "xforms-incremental");
+                                        /** @type {Object} */ var existingType = _.detect(INPUT_TYPES, function(type) { return type.className == null || YAHOO.util.Dom.hasClass(documentElement, type.className); });
+                                        /** @type {Object} */ var newType = _.detect(INPUT_TYPES, function(type) { return type.schemaTypes == null || _.include(type.schemaTypes, newSchemaType); });
+                                        if (newType != existingType) {
 
-                                        // Minimal control content can be different
-                                        var isMinimal = YAHOO.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
+                                            // Remember that this input has be recreated which means we need to update its value
+                                            recreatedInput = true;
+                                            // Clean-up document element by removing type classes
+                                            _.each(INPUT_TYPES, function(type) { YAHOO.util.Dom.removeClass(documentElement, type.className); });
+                                            YAHOO.util.Dom.removeClass(documentElement, "xforms-incremental");
+                                            // Minimal control content can be different
+                                            var isMinimal = YAHOO.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
 
-                                        // Find the position of the last label before the control "actual content"
-                                        // and remove all elements that are not labels
-                                        var lastLabelPosition = -1;
-                                        var childElements = YAHOO.util.Dom.getChildren(documentElement);
-                                        for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
-                                            var childElement = childElements[childIndex];
-                                            if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
-                                                    && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
-                                                    && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
-                                                    && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
-                                                    && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
-                                                documentElement.removeChild(childElement);
-                                                if (lastLabelPosition == -1)
-                                                    lastLabelPosition = childIndex - 1;
+                                            // Find the position of the last label before the control "actual content"
+                                            // and remove all elements that are not labels
+                                            var lastLabelPosition = -1;
+                                            var childElements = YAHOO.util.Dom.getChildren(documentElement);
+                                            for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
+                                                var childElement = childElements[childIndex];
+                                                if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
+                                                    documentElement.removeChild(childElement);
+                                                    if (lastLabelPosition == -1)
+                                                        lastLabelPosition = childIndex - 1;
+                                                }
                                             }
-                                        }
 
-                                        function insertIntoDocument(nodes) {
-                                            if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-                                                // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
+                                            function insertIntoDocument(nodes) {
+                                                if (ORBEON.util.Utils.isNewXHTMLLayout()) {
+                                                    // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
+                                                    if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
+                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                            documentElement.appendChild(nodes[nodeIndex]);
+                                                    } else if (lastLabelPosition == -1) {
+                                                        var firstChild = YAHOO.util.Dom.getFirstChild(documentElement);
+                                                        for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
+                                                            YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
+                                                    } else {
+                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                            YAHOO.util.Dom.insertAfter(nodes[nodeIndex], childElements[lastLabelPosition]);
+                                                    }
+                                                } else {
+                                                    // Old markup: insert in container, which will be empty
                                                     for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                         documentElement.appendChild(nodes[nodeIndex]);
-                                                } else if (lastLabelPosition == -1) {
-                                                    var firstChild = YAHOO.util.Dom.getFirstChild(documentElement);
-                                                    for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
-                                                        YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
-                                                } else {
-                                                    for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                        YAHOO.util.Dom.insertAfter(nodes[nodeIndex], childElements[lastLabelPosition]);
                                                 }
-                                            } else {
-                                                // Old markup: insert in container, which will be empty
-                                                for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                    documentElement.appendChild(nodes[nodeIndex]);
+                                            }
+
+                                            function createInput(typeClassName, inputIndex) {
+                                                var newInputElement = document.createElement("input");
+                                                newInputElement.setAttribute("type", "text");
+                                                newInputElement.className = "xforms-input-input " + typeClassName;
+                                                newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
+                                                newInputElement.id = newInputElement.name;
+                                                return newInputElement;
+                                            }
+
+                                            var inputLabelElement = ORBEON.xforms.Controls._getControlLHHA(documentElement, "label");
+                                            if (newType.type == "string") {
+                                                var newStringInput = createInput("xforms-type-string", 1);
+                                                insertIntoDocument([newStringInput]);
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-type-string");
+                                                if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
+                                            } else if (newType.type == "date" && !isMinimal) {
+                                                var newDateInput = createInput("xforms-type-date", 1);
+                                                insertIntoDocument([newDateInput]);
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
+                                                if (inputLabelElement != null) inputLabelElement.htmlFor = newDateInput.id;
+                                            } else if (newType.type == "date" && isMinimal) {
+                                                // Create image element
+                                                var image = document.createElement("img");
+                                                image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL[formID] + "/ops/images/xforms/calendar.png");
+                                                image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
+                                                insertIntoDocument([image]);
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
+                                                if (inputLabelElement != null) inputLabelElement.htmlFor = documentElement.id;
+                                            } else if (newType.type == "time") {
+                                                var newTimeInput = createInput("xforms-type-time", 1);
+                                                insertIntoDocument([newTimeInput]);
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-type-time");
+                                                if (inputLabelElement != null) inputLabelElement.htmlFor = newTimeInput.id;
+                                            } else if (newType.type == "dateTime") {
+                                                var newDateTimeInput = createInput("xforms-type-date", 1);
+                                                insertIntoDocument([newDateTimeInput, createInput("xforms-type-time", 2)]);
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-type-dateTime");
+                                                if (inputLabelElement != null) inputLabelElement.htmlFor = newDateTimeInput.id;
+                                            } else if (newType.type == "boolean") {
+
+                                                // Make copy of the template
+                                                var booleanTemplate = ORBEON.util.Dom.get("xforms-select-full-template");
+                                                booleanTemplate = ORBEON.util.Dom.getChildElementByIndex(booleanTemplate, 0);
+                                                var booleanTemplateClone = booleanTemplate.cloneNode(true);
+
+                                                // Remove the label we have in the template for each individual checkbox/radio button
+                                                // Do this because the checkbox label is actually not used, instead the control label is used
+                                                var templateLabelElement = booleanTemplateClone.getElementsByTagName("label")[0];
+                                                var templateInputElement = booleanTemplateClone.getElementsByTagName("input")[0];
+                                                // Move <input> at level of <label> and get rid of label
+                                                templateLabelElement.parentNode.replaceChild(templateInputElement, templateLabelElement);
+
+                                                // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
+                                                var booleanInput = ORBEON.util.Dom.getElementByTagName(booleanTemplateClone, "input");
+                                                booleanInput.removeAttribute("disabled");
+
+                                                // Replace placeholders
+                                                insertIntoDocument([booleanTemplateClone]);
+                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
+                                                var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
+                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-effective-id$", booleanEffectiveId);
+                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-effective-id$", controlId);
+
+                                                // Update classes
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-type-boolean");
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
+                                                YAHOO.util.Dom.addClass(documentElement, "xforms-incremental");
+
+                                                if (inputLabelElement != null) inputLabelElement.htmlFor = booleanEffectiveId;
                                             }
                                         }
-
-                                        function createInput(typeClassName, inputIndex) {
-                                            var newInputElement = document.createElement("input");
-                                            newInputElement.setAttribute("type", "text");
-                                            newInputElement.className = "xforms-input-input " + typeClassName;
-                                            newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
-                                            newInputElement.id = newInputElement.name;
-                                            return newInputElement;
-                                        }
-
-                                        var inputLabelElement = ORBEON.xforms.Controls._getControlLHHA(documentElement, "label");
-                                        if (isStringType) {
-                                            var newStringInput = createInput("xforms-type-string", 1);
-                                            insertIntoDocument([newStringInput]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-string");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
-                                        } else if (isDateType && !isMinimal) {
-                                            var newDateInput = createInput("xforms-type-date", 1);
-                                            insertIntoDocument([newDateInput]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newDateInput.id;
-                                        } else if (isDateType && isMinimal) {
-                                            // Create image element
-                                            var image = document.createElement("img");
-                                            image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL[formID] + "/ops/images/xforms/calendar.png");
-                                            image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
-                                            insertIntoDocument([image]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = documentElement.id;
-                                        } else if (isTimeType) {
-                                            var newTimeInput = createInput("xforms-type-time", 1);
-                                            insertIntoDocument([newTimeInput]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-time");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newTimeInput.id;
-                                        } else if (isDateTimeType) {
-                                            var newDateTimeInput = createInput("xforms-type-date", 1);
-                                            insertIntoDocument([newDateTimeInput, createInput("xforms-type-time", 2)]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-dateTime");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newDateTimeInput.id;
-                                        } else if (isBooleanType) {
-
-                                            // Make copy of the template
-                                            var booleanTemplate = ORBEON.util.Dom.get("xforms-select-full-template");
-                                            booleanTemplate = ORBEON.util.Dom.getChildElementByIndex(booleanTemplate, 0);
-                                            var booleanTemplateClone = booleanTemplate.cloneNode(true);
-
-                                            // Remove the label we have in the template for each individual checkbox/radio button
-                                            // Do this because the checkbox label is actually not used, instead the control label is used
-                                            var templateLabelElement = booleanTemplateClone.getElementsByTagName("label")[0];
-                                            var templateInputElement = booleanTemplateClone.getElementsByTagName("input")[0];
-                                            // Move <input> at level of <label> and get rid of label
-                                            templateLabelElement.parentNode.replaceChild(templateInputElement, templateLabelElement);
-
-                                            // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
-                                            var booleanInput = ORBEON.util.Dom.getElementByTagName(booleanTemplateClone, "input");
-                                            booleanInput.removeAttribute("disabled");
-
-                                            // Replace placeholders
-                                            insertIntoDocument([booleanTemplateClone]);
-                                            ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
-                                            var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
-                                            ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-effective-id$", booleanEffectiveId);
-                                            ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-effective-id$", controlId);
-
-                                            // Update classes
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-boolean");
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-incremental");
-
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = booleanEffectiveId;
-                                        }
-                                    } else if (type != null) {
+                                    } else if (newSchemaType != null) {
                                         // Type has changed for any control but xforms:input
 
                                         var typePrefix = "xforms-type-";
@@ -6996,7 +6998,7 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Add new class
-                                        var typeResult = /}(.*)/.exec(type);
+                                        var typeResult = /}(.*)/.exec(newSchemaType);
                                         if (typeResult != null && typeResult.length >= 2)
                                             YAHOO.util.Dom.addClass(documentElement, typePrefix + typeResult[1]);
                                     }

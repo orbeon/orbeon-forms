@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
-import java.util.{Map => JMap, LinkedHashMap => JLinkedHashMap}
+import java.util.{LinkedHashMap => JLinkedHashMap}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils, XFormsConstants, XFormsStaticState}
 import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
@@ -164,8 +164,7 @@ trait SelectionControl extends SimpleElementAnalysis {
 
                 element.getQName match {
 
-                    case XFormsConstants.ITEM_QNAME =>
-                        // xforms:item
+                    case XFormsConstants.ITEM_QNAME => // xforms:item
 
                         val labelElement = element.element(XFormsConstants.LABEL_QNAME)
                         if (labelElement eq null)
@@ -180,15 +179,11 @@ trait SelectionControl extends SimpleElementAnalysis {
                         val attributes = getAttributes(element)
                         currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)))
 
-                    case XFormsConstants.ITEMSET_QNAME =>
-
-                        // xforms:itemset
+                    case XFormsConstants.ITEMSET_QNAME => // xforms:itemset
 
                         throw new ValidationException("xforms:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
 
-                    case XFormsConstants.CHOICES_QNAME =>
-
-                        // xforms:choices
+                    case XFormsConstants.CHOICES_QNAME => // xforms:choices
 
                         val labelElement = element.element(XFormsConstants.LABEL_QNAME)
                         if (labelElement ne null) {

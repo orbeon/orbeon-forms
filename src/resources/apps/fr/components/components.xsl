@@ -182,6 +182,10 @@
                       xxforms:xpath-analysis="false"
                       xxforms:xhtml-layout="nospan">
 
+            <xsl:if test="$is-form-builder">
+                <xsl:attribute name="xxforms:client.events.filter"/>
+            </xsl:if>
+
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
             <xforms:instance id="fr-parameters-instance" src="input:instance"/>

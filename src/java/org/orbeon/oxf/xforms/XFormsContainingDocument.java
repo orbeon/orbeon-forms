@@ -27,16 +27,24 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
-import org.orbeon.oxf.xforms.state.*;
-import org.orbeon.oxf.xforms.submission.*;
+import org.orbeon.oxf.xforms.state.XFormsState;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
+import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
+import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
+import org.orbeon.oxf.xforms.submission.SubmissionResult;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.Item;
@@ -122,6 +130,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private String containerType;
     private String containerNamespace;
     private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
+
+    // Other state
+    private int pendingUploads;
 
     // Client state
     private XFormsModelSubmission activeSubmissionFirstPass;
@@ -1260,6 +1271,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 }
             }
 
+            // Add upload information
+            dynamicStateElement.addAttribute("pending-uploads", Integer.toString(pendingUploads));
+
             // Serialize instances
             {
                 final Element instancesElement = dynamicStateElement.addElement("instances");
@@ -1339,6 +1353,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 }
             }
         }
+
+        // Restore upload information
+        this.pendingUploads = Integer.parseInt(dynamicStateElement.attributeValue("pending-uploads"));
 
         // Restore annotated page template if present
         {
@@ -1556,6 +1573,28 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
         return ALLOWED_EXTERNAL_EVENTS.contains(eventName);
+    }
+
+    /**
+     * Register that an upload has started.
+     */
+    public void startUpload() {
+        pendingUploads++;
+    }
+
+    /**
+     * Register that an upload has ended.
+     */
+    public void endUpload() {
+        pendingUploads--;
+        assert pendingUploads >= 0;
+    }
+
+    /**
+     * Return the number of pending uploads.
+     */
+    public int getPendingUploads() {
+        return pendingUploads;
     }
 
     /**

@@ -18,15 +18,22 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.control.ExternalCopyable;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsProcessUploadEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsUploadDoneEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -71,10 +78,15 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     @Override
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_PROCESS_UPLOAD.equals(event.getName())) {
+        if (XFormsEvents.XXFORMS_UPLOAD_START.equals(event.getName())) {
+            containingDocument.startUpload();
+        } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
+            containingDocument.endUpload();
+        } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
             // Process upload to this control
-            final XXFormsProcessUploadEvent uploadEvent = (XXFormsProcessUploadEvent) event;
-            handleUploadedFile(propertyContext, true, uploadEvent.getFile(), uploadEvent.getFilename(), uploadEvent.getMediatype(), uploadEvent.getSize(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+            containingDocument.endUpload();
+            final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
+            handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
         } else
             super.performDefaultAction(propertyContext, event);
     }
@@ -359,6 +371,11 @@ public class XFormsUploadControl extends XFormsValueControl {
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_SELECT);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
+        // Do we need this?
+//        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
+        // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_START);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_CANCEL);
     }
 
     @Override

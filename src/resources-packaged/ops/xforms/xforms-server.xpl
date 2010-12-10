@@ -168,7 +168,7 @@
                         <xsl:variable name="events">
                             <xxforms:events>
                                 <xsl:for-each select="$files">
-                                    <xxforms:event name="xxforms-process-upload" source-control-id="{name}" file="{value}" filename="{filename}" content-type="{content-type}" content-length="{content-length}"/>
+                                    <xxforms:event name="xxforms-upload-done" source-control-id="{name}" file="{value}" filename="{filename}" content-type="{content-type}" content-length="{content-length}"/>
                                 </xsl:for-each>
                             </xxforms:events>
                         </xsl:variable>

@@ -299,12 +299,6 @@ public class XFormsOutputControl extends XFormsValueControl {
         return cloned;
     }
 
-//    @Override
-//    public boolean setFocus() {
-//        // Can't focus on output controls
-//        return false;
-//    }
-
     private static final Set<String> IGNORED_EXTERNAL_EVENTS = new HashSet<String>();
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {

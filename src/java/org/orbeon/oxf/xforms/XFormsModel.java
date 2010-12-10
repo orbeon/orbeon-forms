@@ -729,7 +729,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // NOTE: Optimizing with include() for servlets has limitations, in particular
                 // the proper split between servlet path and path info is not done.
-                final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+                final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
                 final ExternalContext.Request request = externalContext.getRequest();
 
                 // TODO: Temporary. Use XFormsModelSubmission to load instances instead
@@ -764,7 +764,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "loading instance into cache", "id", instanceStaticId, "URI", instanceSourceURI);
 
-            final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
                     indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));

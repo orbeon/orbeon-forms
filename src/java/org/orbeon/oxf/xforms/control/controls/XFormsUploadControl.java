@@ -17,15 +17,16 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsProcessUploadEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -41,8 +42,6 @@ import java.util.Set;
 
 /**
  * Represents an xforms:upload control.
- *
- * @noinspection SimplifiableIfStatement
  */
 public class XFormsUploadControl extends XFormsValueControl {
 
@@ -68,6 +67,16 @@ public class XFormsUploadControl extends XFormsValueControl {
     protected void markDirtyImpl(XPathDependencies xpathDependencies) {
         super.markDirtyImpl(xpathDependencies);
         fileInfo.markDirty();
+    }
+
+    @Override
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+        if (XFormsEvents.XXFORMS_PROCESS_UPLOAD.equals(event.getName())) {
+            // Process upload to this control
+            final XXFormsProcessUploadEvent uploadEvent = (XXFormsProcessUploadEvent) event;
+            handleUploadedFile(propertyContext, true, uploadEvent.getFile(), uploadEvent.getFilename(), uploadEvent.getMediatype(), uploadEvent.getSize(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+        } else
+            super.performDefaultAction(propertyContext, event);
     }
 
     /**
@@ -124,18 +133,22 @@ public class XFormsUploadControl extends XFormsValueControl {
                     // No file was selected in the UI
                 } else {
                     // A file was selected in the UI (note that the file may be empty)
-                    // TODO: should pass true?
-                    final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));
-
-                    // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
-                    uploadControl.setExternalValue(propertyContext, value, paramValueType, handleTemporaryFiles);
-
-                    // Handle filename, mediatype and size if necessary
-                    uploadControl.setFilename(propertyContext, filename);
-                    uploadControl.setMediatype(propertyContext, mediatype);
-                    uploadControl.setSize(propertyContext, size);
+                    final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));// TODO: should pass true?
+                    uploadControl.handleUploadedFile(propertyContext, handleTemporaryFiles, value, filename, mediatype, size, paramValueType);
                 }
             }
+        }
+    }
+
+    private void handleUploadedFile(PropertyContext propertyContext, boolean handleTemporaryFiles, String value, String filename, String mediatype, String size, String paramValueType) {
+        if (!size.equals("0") || !filename.equals("")) {
+            // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
+            setExternalValue(propertyContext, value, paramValueType, handleTemporaryFiles);
+
+            // Handle filename, mediatype and size if necessary
+            setFilename(propertyContext, filename);
+            setMediatype(propertyContext, mediatype);
+            setSize(propertyContext, size);
         }
     }
 
@@ -186,6 +199,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
+            // Q: Should this event occur during refresh?
             getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(containingDocument, this));
         }
 
@@ -208,43 +222,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                 }
 
                 if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(type) && value != null && NetUtils.urlHasProtocol(value)) {
-                    // If we upload a new URI in the background, then don't delete the temporary file
-                    final String newPath;
-                    {
-                        final File newFile = File.createTempFile("xforms_upload_", null);
-                        newPath = newFile.getCanonicalPath();
-                        newFile.delete();
-                    }
-                    final File oldFile = new File(new URI(value));
-                    final File newFile = new File(newPath);
-                    final boolean success = oldFile.renameTo(newFile);
-                    try {
-                        final String message = success ? "renamed temporary file upon upload" : "could not rename temporary file upon upload";
-                        indentedLogger.logDebug("xforms:upload", message, "from", oldFile.getCanonicalPath(), "to", newFile.getCanonicalPath());
-                    } catch (IOException e) {
-                        // NOP
-                    }
-                    // Try to delete the file on exit and on session termination
-                    {
-                        newFile.deleteOnExit();
-                        final ExternalContext.Session session = XFormsUtils.getExternalContext(propertyContext).getSession(false);
-                        if (session != null) {
-                            session.addListener(new ExternalContext.Session.SessionListener() {
-                                public void sessionDestroyed() {
-                                    final boolean success = newFile.delete();
-                                    try {
-                                        final String message = success ? "deleted temporary file upon session destruction" : "could not delete temporary file upon session destruction";
-                                        indentedLogger.logDebug("xforms:upload", message, "file", newFile.getCanonicalPath());
-                                    } catch (IOException e) {
-                                        // NOP
-                                    }
-                                }
-                            });
-                        } else {
-                            indentedLogger.logDebug("xforms:upload", "no existing session found so cannot register temporary file deletion upon session destruction",
-                                    "file", newFile.getCanonicalPath());
-                        }
-                    }
+                    final File newFile = NetUtils.renameAndExpireWithSession(propertyContext, value, indentedLogger.getLogger());
                     newValue = newFile.toURI().toString();
                 } else {
                     newValue = value;

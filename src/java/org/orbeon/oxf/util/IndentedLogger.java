@@ -66,6 +66,10 @@ public class IndentedLogger {
         this(indentedLogger.logger, isDebugEnabled, indentation, indentedLogger.prefix);
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     public Indentation getIndentation() {
         return indentation;
     }

@@ -74,7 +74,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     }
 
     private void addUUIDToSession(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
@@ -97,7 +97,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      */
     public void onAdd(PropertyContext propertyContext, final XFormsContainingDocument containingDocument) {
 
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
@@ -135,7 +135,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      */
     public void onRemove(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
 
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
         // Tricky: if onRemove() is called upon session expiration, there might not be an ExternalContext. But it's fine,
         // because the session goes away -> all of its attributes go away so we don't have to remove them below.
         if (externalContext != null) {
@@ -213,7 +213,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         assert containingDocument.getStaticState().isServerStateHandling();
 
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
         final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
 
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
@@ -342,7 +342,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         final XFormsState xformsState;
         if (isServerState) {
             // State must be found by UUID in the store
-            final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
             final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
 
             if (indentedLogger.isDebugEnabled())

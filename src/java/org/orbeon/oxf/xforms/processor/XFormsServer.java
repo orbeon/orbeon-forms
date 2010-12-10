@@ -91,18 +91,17 @@ public class XFormsServer extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
         final ExternalContext.Request request = externalContext.getRequest();
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
 
         // Request retry details
-        final boolean isRetries = true;// TODO: property?
+        final boolean isRetries = true;
         final long requestSequenceNumber = !isRetries ? 0 : XFormsStateManager.getRequestSequence(requestDocument);
 
         final boolean isAjaxRequest = request.getMethod().equalsIgnoreCase("post") && XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(request.getContentType()));
-        final boolean isPseudoAjaxRequest = request.getMethod().equalsIgnoreCase("post") && request.getContentType().startsWith("multipart/form-data");
 
         final boolean isIgnoreSequenceNumber = !isRetries || !isAjaxRequest;
 
@@ -138,7 +137,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Gather client events if any
-        if (actionElement != null && !isPseudoAjaxRequest) {// ignore client events in pseudo-Ajax: only files and server events are considered
+        if (actionElement != null) {
             eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
@@ -221,10 +220,11 @@ public class XFormsServer extends ProcessorImpl {
 
                     final boolean hasEvents = eventElements.size() > 0;
                     // Whether there are uploaded files to handle
-                    // NOTE: In script mode, if we do get files, the only events we can get are server events. In noscript mode, we
-                    // can get files and other events. See xforms-server-submit.xpl. But in noscript mode, we are never doing two-
-                    // pass submissions.
                     final boolean hasFiles = XFormsUploadControl.hasUploadedFiles(filesElement);
+
+                    // NOTE: As of 2010-12, background uploads in script mode are handled in xforms-server.xpl. In
+                    // most cases should get files here only in noscript mode, but there is a chance in script mode in
+                    // a 2-pass submission that some files could make it here as well.
 
                     final boolean allEvents;
                     final Set<String> valueChangeControlIds = new HashSet<String>();
@@ -239,13 +239,13 @@ public class XFormsServer extends ProcessorImpl {
                             // Start external events
                             containingDocument.beforeExternalEvents(pipelineContext, response);
 
-                            // Handle uploaded files if any
+                            // Handle uploaded files for noscript if any
                             if (hasFiles) {
                                 eventsIndentedLogger.logDebug("", "handling uploaded files");
                                 XFormsUploadControl.handleUploadedFiles(pipelineContext, containingDocument, filesElement, true);
                             }
 
-                            // Dispatch everything
+                            // Dispatch the events
                             allEvents = hasEvents && createAndDispatchEvents(pipelineContext, containingDocument, eventElements,
                                     serverEventsCount, valueChangeControlIds);
 
@@ -390,7 +390,8 @@ public class XFormsServer extends ProcessorImpl {
         XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
     }
 
-    private static String[] EVENT_PARAMETERS = new String[] { "dnd-start", "dnd-end", "modifiers", "text" };
+    // All supported event parameters
+    private static String[] EVENT_PARAMETERS = new String[] { "dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length" };
 
     private boolean createAndDispatchEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
                                             List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds) {
@@ -431,6 +432,7 @@ public class XFormsServer extends ProcessorImpl {
                     parameters.put(attributeName, attributeValue);
             }
 
+            // Content of the element (the value of a control)
             final String value = eventElement.getText();
 
             if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {

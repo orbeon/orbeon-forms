@@ -215,7 +215,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     private void initializeRequestInformation(PipelineContext pipelineContext) {
-        final ExternalContext.Request request = XFormsUtils.getExternalContext(pipelineContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext(pipelineContext).getRequest();
 
         // Remember if filter provided separate deployment information
         final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
@@ -1195,7 +1195,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
             // Internal load event
             final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;
-            final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
             try {
                 final String resource = xxformsLoadEvent.getResource();
 

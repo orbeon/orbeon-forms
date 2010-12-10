@@ -22,7 +22,8 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -47,7 +48,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
     @Override
     public void start(PipelineContext pipelineContext) {
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
         final ExternalContext.Request request = externalContext.getRequest();
         final ExternalContext.Response response = externalContext.getResponse();
 
@@ -341,7 +342,7 @@ public class XFormsResourceServer extends ProcessorImpl {
         if (isCSS) {
             // CSS: rewrite url() in content
 
-            final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
             final ExternalContext.Response response = externalContext.getResponse();
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");

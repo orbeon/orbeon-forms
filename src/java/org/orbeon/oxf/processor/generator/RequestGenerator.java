@@ -20,9 +20,7 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
@@ -31,22 +29,13 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 /**
  * The Request generator works like this:
@@ -136,7 +125,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
                                             useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                     super.startElement("", "value", "value", newAttributes);
-                                    writeFileItem(pipelineContext, fileItem, getXMLReceiver());
+                                    writeFileItem(pipelineContext, fileItem, state.isSessionScope, getXMLReceiver());
                                     super.endElement("", "value", "value");
                                     super.endPrefixMapping(XMLConstants.XSD_PREFIX);
                                     super.endPrefixMapping(XMLConstants.XSI_PREFIX);
@@ -172,7 +161,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
                                             useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                     super.startElement(uri, localname, qName, newAttributes);
-                                    writeFileItem(pipelineContext, context.bodyFileItem, getXMLReceiver());
+                                    writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, getXMLReceiver());
                                     super.endElement(uri, localname, qName);
                                     super.endPrefixMapping(XMLConstants.XSD_PREFIX);
                                     super.endPrefixMapping(XMLConstants.XSI_PREFIX);
@@ -206,6 +195,7 @@ public class RequestGenerator extends ProcessorImpl {
                     if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME)))
                         throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.getQualifiedName());
                     state.requestedStreamType = streamTypeQName;
+                    state.isSessionScope = "session".equals(config.getRootElement().attributeValue("stream-scope"));
 
                     // Read and store request
                     state.requestDocument = readRequestAsDOM4J(pipelineContext, config);
@@ -236,7 +226,7 @@ public class RequestGenerator extends ProcessorImpl {
                 || (state.requestedStreamType != null && state.requestedStreamType.equals(XMLConstants.XS_BASE64BINARY_QNAME));
     }
 
-    private void writeFileItem(PipelineContext pipelineContext, FileItem fileItem, ContentHandler contentHandler) throws SAXException {
+    private void writeFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
         if (!isFileItemEmpty(fileItem)) {
             if (useBase64(pipelineContext, fileItem)) {
                 // The content of the file is streamed to the output (xs:base64Binary)
@@ -258,20 +248,34 @@ public class RequestGenerator extends ProcessorImpl {
             } else {
                 // Only a reference to the file is output (xs:anyURI)
                 final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
-                final String uri;
+                final String uriExpiringWithRequest;
                 if (!fileItem.isInMemory()) {
                     // File must exist on disk since isInMemory() returns false
                     final File file = diskFileItem.getStoreLocation();
-                    uri = file.toURI().toString();
+                    uriExpiringWithRequest = file.toURI().toString();
                 } else {
                     // File does not exist on disk, must convert
+                    // NOTE: Conversion occurs every time this method is called. Not optimal.
                     try {
-                        uri = NetUtils.inputStreamToAnyURI(pipelineContext, fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
+                        uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(pipelineContext, fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
                     } catch (IOException e) {
                         throw new OXFException(e);
                     }
                 }
-                final char[] chars = uri.toCharArray();
+
+                // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
+                final String uriExpiringWithScope;
+                if (isSessionScope) {
+                    final String tempSessionURI = getContext(pipelineContext).getSessionURIForRequestURI(uriExpiringWithRequest);
+                    if (tempSessionURI == null) {
+                        uriExpiringWithScope = NetUtils.renameAndExpireWithSession(pipelineContext, uriExpiringWithRequest, logger).toURI().toString();
+                        getContext(pipelineContext).putSessionURIForRequestURI(uriExpiringWithRequest, uriExpiringWithScope);
+                    } else
+                        uriExpiringWithScope = tempSessionURI;
+                } else
+                    uriExpiringWithScope = uriExpiringWithRequest;
+
+                final char[] chars = uriExpiringWithScope.toCharArray();
                 contentHandler.characters(chars, 0, chars.length);
             }
         }
@@ -530,6 +534,7 @@ public class RequestGenerator extends ProcessorImpl {
         public QName requestedStreamType;
         public boolean bodyRequested;
         public Document requestDocument;
+        public boolean isSessionScope;
     }
 
     private static Context getContext(PipelineContext pipelineContext) {
@@ -549,6 +554,20 @@ public class RequestGenerator extends ProcessorImpl {
         public Document wholeRequest;
         public boolean hasUpload;
         public FileItem bodyFileItem;
+
+        // Hold mapping from URI expiring w/ request (provided by Request object) to URI expiring w/ session (created here)
+        private Map<String, String> uriMap;
+
+        public String getSessionURIForRequestURI(String requestURI) {
+            return (uriMap == null) ? null : uriMap.get(requestURI);
+        }
+
+        public void putSessionURIForRequestURI(String requestURI, String sessionURI) {
+            if (uriMap == null)
+                uriMap = new HashMap<String, String>();
+
+            uriMap.put(requestURI, sessionURI);
+        }
     }
 
     public static int getMaxSizeProperty() {

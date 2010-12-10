@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -71,7 +69,7 @@ public class AsynchronousSubmissionManager {
     }
 
     private static AsynchronousSubmissions getAsynchronousSubmissions(PropertyContext propertyContext, boolean create, String sessionKey) {
-        final Map<String, Object> sessionMap = XFormsUtils.getExternalContext(propertyContext).getSession(true).getAttributesMap();
+        final Map<String, Object> sessionMap = NetUtils.getExternalContext(propertyContext).getSession(true).getAttributesMap();
         final AsynchronousSubmissions existingAsynchronousSubmissions = (AsynchronousSubmissions) sessionMap.get(sessionKey);
         if (existingAsynchronousSubmissions != null) {
             return existingAsynchronousSubmissions;

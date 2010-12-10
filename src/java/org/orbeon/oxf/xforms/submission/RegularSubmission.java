@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -92,7 +91,7 @@ public class RegularSubmission extends BaseSubmission {
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = new Connection().open(XFormsUtils.getExternalContext(propertyContext), detailsLogger, isLogBody(),
+                    connectionResult = new Connection().open(NetUtils.getExternalContext(propertyContext), detailsLogger, isLogBody(),
                         p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
                         sp.actualRequestMediatype, sp.messageBody,
                         customHeaderNameValues, newForwardSubmissionHeaders);

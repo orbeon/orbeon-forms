@@ -712,7 +712,7 @@ public class NetUtils {
      */
     public static void deleteFileOnSessionTermination(PipelineContext pipelineContext, final FileItem fileItem) {
         // Try to delete the file on exit and on session termination
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = getExternalContext(pipelineContext);
         final ExternalContext.Session session = externalContext.getSession(false);
         if (session != null) {
             session.addListener(new ExternalContext.Session.SessionListener() {
@@ -733,7 +733,7 @@ public class NetUtils {
      */
     public static void deleteFileOnContextDestroyed(PipelineContext pipelineContext, final FileItem fileItem) {
         // Try to delete the file on exit and on session termination
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = getExternalContext(pipelineContext);
         ExternalContext.Application application = externalContext.getApplication();
         if (application != null) {
             application.addListener(new ExternalContext.Application.ApplicationListener() {
@@ -890,7 +890,7 @@ public class NetUtils {
         final String digest = SecureUtils.digestString(uri, "MD5", "hex");
 
         // Get session
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = getExternalContext(propertyContext);
         final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
 
         if (session != null) {
@@ -904,7 +904,7 @@ public class NetUtils {
     }
 
     /**
-     * Utility method to decode a multipart/fomr-data stream and return a Map of parameters of type Object[], each of
+     * Utility method to decode a multipart/form-data stream and return a Map of parameters of type Object[], each of
      * which can be a String or FileData.
      */
     public static Map<String, Object[]> getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
@@ -1076,6 +1076,16 @@ public class NetUtils {
         return sb.toString();
     }
 
+    /**
+     * Get the external context from the property context.
+     *
+     * @param propertyContext   current context
+     * @return                  external context if found, null otherwise
+     */
+    public static ExternalContext getExternalContext(PropertyContext propertyContext) {
+        return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    }
+
     public static class DynamicResource {
         private String uri;
         private String filename;
@@ -1109,6 +1119,52 @@ public class NetUtils {
 
         public long getLastModified() {
             return lastModified;
+        }
+    }
+
+    public static File renameAndExpireWithSession(PropertyContext propertyContext, String existingFileURI, final Logger logger) {
+
+        try {
+            // Assume the file will be deleted with the request so rename it first
+            final String newPath;
+            {
+                final File newFile = File.createTempFile("xforms_upload_", null);
+                newPath = newFile.getCanonicalPath();
+                newFile.delete();
+            }
+            final File oldFile = new File(new URI(existingFileURI));
+            final File newFile = new File(newPath);
+            final boolean success = oldFile.renameTo(newFile);
+            try {
+                final String message = success ? "renamed temporary file" : "could not rename temporary file";
+                logger.debug(message + " from " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+            } catch (IOException e) {
+                // NOP
+            }
+
+            // Mark deletion of the file on exit and on session termination
+            {
+                newFile.deleteOnExit();
+                final ExternalContext.Session session = getExternalContext(propertyContext).getSession(false);
+                if (session != null) {
+                    session.addListener(new ExternalContext.Session.SessionListener() {
+                        public void sessionDestroyed() {
+                            final boolean success = newFile.delete();
+                            try {
+                                final String message = success ? "deleted temporary file upon session destruction: " : "could not delete temporary file upon session destruction: ";
+                                logger.debug(message + newFile.getCanonicalPath());
+                            } catch (IOException e) {
+                                // NOP
+                            }
+                        }
+                    });
+                } else {
+                    logger.debug("no existing session found so cannot register temporary file deletion upon session destruction: " + newFile.getCanonicalPath());
+                }
+            }
+            return newFile;
+        } catch (Exception e) {
+            throw new OXFException(e);
         }
     }
 }

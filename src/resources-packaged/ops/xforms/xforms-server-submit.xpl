@@ -98,16 +98,6 @@
                             </xxforms:files>
                         </xsl:if>
                         <xxforms:action>
-                            <!-- Create events for uploaded files if any -->
-                            <xsl:if test="$files">
-                                <xsl:for-each select="$files">
-                                    <!-- Generate value change events -->
-                                    <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="{name}">
-                                        <xsl:value-of select="normalize-space(value)"/>
-                                    </xxforms:event>
-                                </xsl:for-each>
-                            </xsl:if>
-
                             <!-- Create list of events based on parameters -->
                             <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or ends-with(name, '.y') or exists(filename))]">
                                 <!-- Here we don't know the type of the control so can't create the proper type of event -->

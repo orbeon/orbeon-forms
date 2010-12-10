@@ -48,7 +48,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = XFormsUtils.getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext(propertyContext).getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
@@ -165,7 +165,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openRequestDispatcherConnection(propertyContext, XFormsUtils.getExternalContext(propertyContext),
+                    connectionResult = openRequestDispatcherConnection(propertyContext, NetUtils.getExternalContext(propertyContext),
                         containingDocument, detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                         p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);

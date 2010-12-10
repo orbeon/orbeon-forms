@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest;
@@ -64,7 +65,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Create document
         final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
 
-        final ExternalContext.Session session = XFormsUtils.getExternalContext(pipelineContext).getSession(true);
+        final ExternalContext.Session session = NetUtils.getExternalContext(pipelineContext).getSession(true);
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml");
         final XFormsContainingDocument document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null);
 
@@ -202,7 +203,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state1 = new State();
         {
             final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-            session = XFormsUtils.getExternalContext(pipelineContext).getSession(true);
+            session = NetUtils.getExternalContext(pipelineContext).getSession(true);
             state1.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null);
 
             state1.uuid = state1.document.getUUID();
@@ -272,7 +273,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
         // Find document
         final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-        ((TestExternalContext) XFormsUtils.getExternalContext(pipelineContext)).setSession(session);
+        ((TestExternalContext) NetUtils.getExternalContext(pipelineContext)).setSession(session);
 
         state2.document = XFormsStateManager.instance()
                 .findOrRestoreDocument(pipelineContext, state1.uuid, state1.staticStateString, state1.dynamicStateString, false);

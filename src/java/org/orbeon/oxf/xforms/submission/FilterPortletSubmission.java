@@ -18,7 +18,6 @@ import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class FilterPortletSubmission extends BaseSubmission {
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = XFormsUtils.getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext(propertyContext).getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
@@ -94,7 +93,7 @@ public class FilterPortletSubmission extends BaseSubmission {
 //        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
 
         // Store stuff useful for portlet filter
-        final Map<String, Object> attributes = XFormsUtils.getExternalContext(propertyContext).getRequest().getAttributesMap();
+        final Map<String, Object> attributes = NetUtils.getExternalContext(propertyContext).getRequest().getAttributesMap();
         attributes.put(OrbeonPortletXFormsFilter.PORTLET_SUBMISSION_METHOD_ATTRIBUTE, p.actualHttpMethod);
         attributes.put(OrbeonPortletXFormsFilter.PORTLET_SUBMISSION_BODY_ATTRIBUTE, sp.messageBody);
         attributes.put(OrbeonPortletXFormsFilter.PORTLET_SUBMISSION_PATH_ATTRIBUTE, p2.actionOrResource

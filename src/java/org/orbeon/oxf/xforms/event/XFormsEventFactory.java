@@ -115,14 +115,9 @@ public class XFormsEventFactory {
                 return new XXFormsLoadEvent(containingDocument, targetObject, contextString);
             }
         });
-        nameToClassMap.put(XFormsEvents.XXFORMS_ONLINE, new Factory() {
+        nameToClassMap.put(XFormsEvents.XXFORMS_PROCESS_UPLOAD, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XXFormsOnlineEvent(containingDocument, targetObject);
-            }
-        });
-        nameToClassMap.put(XFormsEvents.XXFORMS_OFFLINE, new Factory() {
-            public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XXFormsOfflineEvent(containingDocument, targetObject);
+                return new XXFormsProcessUploadEvent(containingDocument, targetObject, parameters);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_MODEL_CONSTRUCT, new Factory() {

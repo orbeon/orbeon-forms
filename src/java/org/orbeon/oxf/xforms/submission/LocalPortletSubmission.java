@@ -44,7 +44,7 @@ public class LocalPortletSubmission extends BaseSubmission {
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = XFormsUtils.getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext(propertyContext).getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
@@ -118,7 +118,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                 final boolean[] status = { false , false };
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openLocalConnection(propertyContext, XFormsUtils.getExternalContext(propertyContext),
+                    connectionResult = openLocalConnection(propertyContext, NetUtils.getExternalContext(propertyContext),
                         detailsLogger, containingDocument.getResponse(), p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                         p.actualHttpMethod, resolvedURI.toString(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {

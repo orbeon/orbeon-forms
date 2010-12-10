@@ -29,10 +29,8 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -321,7 +319,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
                     pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
                     // Get ExternalContext
-                    final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+                    final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
 
                     StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
                     pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);

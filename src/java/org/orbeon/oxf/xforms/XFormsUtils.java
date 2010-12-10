@@ -832,16 +832,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Get the external context from the property context.
-     *
-     * @param propertyContext   current context
-     * @return                  external context if found, null otherwise
-     */
-    public static ExternalContext getExternalContext(PropertyContext propertyContext) {
-        return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-    }
-
-    /**
      * Resolve a render URL including xml:base resolution.
      *
      * @param propertyContext       current context
@@ -861,7 +851,7 @@ public class XFormsUtils {
         // TODO: is this the case with JSR-268? Don't/can't we run xforms-server in the portlet?
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            externalURL = XFormsUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIString, null, null);
+            externalURL = NetUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIString, null, null);
         } else {
             // XForms page was loaded from a portlet
             if (resolvedURI.getFragment() != null) {
@@ -893,7 +883,7 @@ public class XFormsUtils {
 
         final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
-        return XFormsUtils.getExternalContext(propertyContext).getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
+        return NetUtils.getExternalContext(propertyContext).getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
     }
 
     /**
@@ -910,7 +900,7 @@ public class XFormsUtils {
 
         final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
-        return XFormsUtils.getExternalContext(propertyContext).rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+        return NetUtils.getExternalContext(propertyContext).rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
     }
 
     /**

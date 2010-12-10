@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.ContentHandlerWriter;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -328,7 +329,7 @@ public class ControlsComparator {
             //
             // So for now, perform simple steps here, and later this can be revisited.
             //
-            final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
             controller.setOutput(new DeferredXMLReceiverImpl(new XHTMLRewrite().getRewriteXMLReceiver(externalContext,
                     new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getXmlReceiver()), true), true)));// NOTE: skip the root element
 

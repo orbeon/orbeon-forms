@@ -136,7 +136,7 @@
             <!-- Extract parameters -->
             <p:processor name="oxf:request">
                 <p:input name="config">
-                    <config stream-type="xs:anyURI">
+                    <config stream-type="xs:anyURI" stream-scope="session">
                         <include>/request/parameters</include>
                     </config>
                 </p:input>
@@ -144,51 +144,48 @@
                 <p:output name="data" id="request-params"/>
             </p:processor>  
 
-            <!-- Create XForms Server request -->
-            <p:processor name="oxf:xslt">
+            <!-- Create XForms Server response -->
+            <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
-                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                        <xxforms:uuid>
-                            <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
-                        </xxforms:uuid>
-                        <!-- Omit sequence number -->
-                        <xxforms:sequence/>
-                        <xxforms:static-state>
-                            <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
-                        </xxforms:static-state>
-                        <xxforms:dynamic-state>
-                            <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
-                        </xxforms:dynamic-state>
+                    <xxforms:event-response xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <!-- Only include files and omit all other parameters -->
                         <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
-                        <xsl:if test="$files">
-                            <xxforms:files>
-                                <xsl:copy-of select="$files"/>
-                            </xxforms:files>
-                        </xsl:if>
-                        <xxforms:action/>
-                        <!-- Server events -->
-                        <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
-                        <xsl:if test="not($server-events = '')">
-                            <xxforms:server-events>
-                                <xsl:value-of select="$server-events"/>
+
+                        <!--
+                            Example layout of file parameters:
+
+                            <parameter>
+                              <name>xforms-element-27</name>
+                              <filename>my-filename.jpg</filename>
+                              <content-type>image/jpeg</content-type>
+                              <content-length>33204</content-length>
+                              <value xmlns:request="http://orbeon.org/oxf/xml/request-private" xsi:type="xs:anyURI">file:/temp/upload_432dfead_11f1a983612__8000_00000107.tmp</value>
+                             </parameter>
+                        -->
+
+                        <!-- Create server events -->
+                        <xsl:variable name="events">
+                            <xxforms:events>
+                                <xsl:for-each select="$files">
+                                    <xxforms:event name="xxforms-process-upload" source-control-id="{name}" file="{value}" filename="{filename}" content-type="{content-type}" content-length="{content-length}"/>
+                                </xsl:for-each>
+                            </xxforms:events>
+                        </xsl:variable>
+
+                        <!-- Encode them -->
+                        <xxforms:action>
+                            <xxforms:server-events delay="0">
+                                <xsl:value-of select="context:encodeXML($events)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
                             </xxforms:server-events>
-                        </xsl:if>
-                    </xxforms:event-request>
+                        </xxforms:action>
+
+                    </xxforms:event-response>
                 </p:input>
-                <p:output name="data" id="xforms-request"/>
+                <p:output name="data" id="xforms-response"/>
             </p:processor>
 
-            <!-- Run XForms Server -->
-            <p:processor name="oxf:xforms-server">
-                <p:input name="request" href="#xforms-request" schema-href="xforms-server-request.rng"/>
-                <p:output name="response" id="xforms-response" schema-href="xforms-server-response.rng"/>
-                <!--<p:input name="request" href="#xforms-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>-->
-                <!--<p:output name="response" id="xforms-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>-->
-            </p:processor>
-
-            <!-- Create XForms Server response: XML is embedded within an HTML envelope -->
+            <!-- Embed XForms Server response within an HTML envelope -->
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#xforms-response"/>
                 <p:input name="config">
@@ -208,7 +205,7 @@
                 <!--<p:output name="data" id="html-response" debug="xxxhtml-response"/>-->
             </p:processor>
 
-            <!-- Generate response -->
+            <!-- Send HTML response -->
             <p:processor name="oxf:html-converter">
                 <p:input name="config">
                     <config>

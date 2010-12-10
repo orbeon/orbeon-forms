@@ -13,17 +13,15 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.util.*;
 
@@ -42,7 +40,7 @@ public class XFormsPersistentApplicationStateStoreTest extends ResourceManagerTe
     public void beforeTest() {
 
         pipelineContext = createPipelineContextWithExternalContext();
-        externalContext = (ExtendedTestExternalContext) XFormsUtils.getExternalContext(pipelineContext);
+        externalContext = (ExtendedTestExternalContext) NetUtils.getExternalContext(pipelineContext);
 
         stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
 

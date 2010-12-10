@@ -28,6 +28,11 @@
                     </choice>
                 </attribute>
             </optional>
+            <optional>
+                <attribute name="stream-scope">
+                    <value>session</value>
+                </attribute>
+            </optional>
             <interleave>
                 <zeroOrMore>
                     <choice>

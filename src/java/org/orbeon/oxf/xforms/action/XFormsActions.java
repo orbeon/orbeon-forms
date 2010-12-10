@@ -59,9 +59,6 @@ public class XFormsActions {
     public static final String XXFORMS_HIDE_ACTION = "hide";
     public static final String XXFORMS_INVALIDATE_INSTANCE_ACTION = "invalidate-instance";
     public static final String XXFORMS_INVALIDATE_INSTANCES_ACTION = "invalidate-instances";
-    public static final String XXFORMS_ONLINE_ACTION = "online";
-    public static final String XXFORMS_OFFLINE_ACTION = "offline";
-    public static final String XXFORMS_OFFLINE_SAVE_ACTION = "offline-save";
     public static final String XXFORMS_JOIN_SUBMISSIONS_ACTION = "join-submissions";
 
     private static final Map<String, XFormsAction> ACTIONS = new HashMap<String, XFormsAction>();
@@ -89,9 +86,6 @@ public class XFormsActions {
         ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_HIDE_ACTION), new XXFormsHideAction());
         ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCE_ACTION), new XXFormsInvalidateInstanceAction());
         ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_INVALIDATE_INSTANCES_ACTION), new XXFormsInvalidateInstancesAction());
-        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ONLINE_ACTION), new XXFormsOnlineAction());
-        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_ACTION), new XXFormsOfflineAction());
-        ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_OFFLINE_SAVE_ACTION), new XXFormsOfflineSaveAction());
         ACTIONS.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_JOIN_SUBMISSIONS_ACTION), new XXFormsJoinSubmissions());
 
         // Also support xbl:handler

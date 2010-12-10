@@ -79,16 +79,29 @@ public class XFormsUploadControl extends XFormsValueControl {
     @Override
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_UPLOAD_START.equals(event.getName())) {
-            containingDocument.startUpload();
+            containingDocument.startUpload(getUploadUniqueId());
         } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
-            containingDocument.endUpload();
+            containingDocument.endUpload(getUploadUniqueId());
         } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
             // Process upload to this control
-            containingDocument.endUpload();
+            containingDocument.endUpload(getUploadUniqueId());
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
             handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
         } else
             super.performDefaultAction(propertyContext, event);
+    }
+
+    @Override
+    protected void onDestroy(PropertyContext propertyContext) {
+        super.onDestroy(propertyContext);
+        // Make sure to consider any upload associated with this control as ended
+        containingDocument.endUpload(getUploadUniqueId());
+    }
+
+    private String getUploadUniqueId() {
+        // TODO: Need to move to using actual unique ids here, see:
+        // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
+        return getEffectiveId();
     }
 
     /**

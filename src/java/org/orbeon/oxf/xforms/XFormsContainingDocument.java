@@ -132,7 +132,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
 
     // Other state
-    private int pendingUploads;
+    private Set<String> pendingUploads;
 
     // Client state
     private XFormsModelSubmission activeSubmissionFirstPass;
@@ -1272,7 +1272,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
 
             // Add upload information
-            dynamicStateElement.addAttribute("pending-uploads", Integer.toString(pendingUploads));
+            dynamicStateElement.addAttribute("pending-uploads", StringUtils.join(pendingUploads, ' '));
 
             // Serialize instances
             {
@@ -1355,7 +1355,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
 
         // Restore upload information
-        this.pendingUploads = Integer.parseInt(dynamicStateElement.attributeValue("pending-uploads"));
+        this.pendingUploads = new HashSet<String>(Arrays.asList(StringUtils.split(dynamicStateElement.attributeValue("pending-uploads"), ' ')));
 
         // Restore annotated page template if present
         {
@@ -1578,23 +1578,22 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Register that an upload has started.
      */
-    public void startUpload() {
-        pendingUploads++;
+    public void startUpload(String uploadId) {
+        pendingUploads.add(uploadId);
     }
 
     /**
      * Register that an upload has ended.
      */
-    public void endUpload() {
-        pendingUploads--;
-        assert pendingUploads >= 0;
+    public void endUpload(String uploadId) {
+        assert pendingUploads.remove(uploadId);
     }
 
     /**
      * Return the number of pending uploads.
      */
-    public int getPendingUploads() {
-        return pendingUploads;
+    public int countPendingUploads() {
+        return pendingUploads.size();
     }
 
     /**

@@ -90,7 +90,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             YAHOO.util.Assert.isTrue(inputField.disabled, "input field initially disabled because bound to a readonly node");
             ORBEON.xforms.Document.setValue("relevant", "false");
         }, function() {
-            YAHOO.util.Assert.isTrue(inputField.disabled, "input field still disabled when non-relevant");
+            // When non-relevant, we don't care whether the field is actually disabled or not as it won't accessible by users
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 ORBEON.xforms.Document.setValue("relevant", "true");
             }, function() {

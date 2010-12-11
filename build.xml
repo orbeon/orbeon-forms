@@ -41,7 +41,6 @@
 
         <include name="xerces-resolver-2_9_orbeon_20070711.jar"/>
         <include name="xerces-serializer-2_9_orbeon_20070711.jar"/>
-        <include name="xerces-xml-apis-2_9_orbeon_20070711.jar"/>
         <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
 
         <include name="commons-collections-3_1.jar"/>

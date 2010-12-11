@@ -1272,7 +1272,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
 
             // Add upload information
-            dynamicStateElement.addAttribute("pending-uploads", StringUtils.join(pendingUploads, ' '));
+            if (pendingUploads != null && pendingUploads.size() > 0)
+                dynamicStateElement.addAttribute("pending-uploads", StringUtils.join(pendingUploads, ' '));
 
             // Serialize instances
             {
@@ -1355,7 +1356,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
 
         // Restore upload information
-        this.pendingUploads = new HashSet<String>(Arrays.asList(StringUtils.split(dynamicStateElement.attributeValue("pending-uploads"), ' ')));
+        {
+            final String pendingUploads = dynamicStateElement.attributeValue("pending-uploads");
+            this.pendingUploads = (pendingUploads == null) ? Collections.<String>emptySet() : new HashSet<String>(Arrays.asList(StringUtils.split(pendingUploads, ' ')));
+        }
 
         // Restore annotated page template if present
         {

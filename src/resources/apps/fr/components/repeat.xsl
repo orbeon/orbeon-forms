@@ -40,11 +40,13 @@
         <!--<xsl:variable name="is-table-appearance" as="xs:boolean" select="@appearance = 'xxforms:table'"/>-->
         <xsl:variable name="is-table-appearance" as="xs:boolean" select="true()"/>
 
+        <xsl:variable name="repeat-expression" select="if (@nodeset) then @nodeset else if (@ref) then @ref else concat('xxforms:bind(''', @bind, ''')')" as="xs:string"/>
+
         <xhtml:link rel="stylesheet" href="/ops/yui/datatable/assets/skins/sam/datatable.css" type="text/css" media="all"/>
 
         <xhtml:div class="yui-dt">
             <xhtml:div class="yui-dt-hd">
-                <xxforms:variable name="fr-repeat-sequence" select="{if (@nodeset) then @nodeset else if (@ref) then @ref else concat('xxforms:bind(''', @bind, ''')')}"/>
+                <xxforms:variable name="fr-repeat-sequence" select="{$repeat-expression}"/>
                 <xhtml:table class="yui-dt-table fr-repeat {if ($is-table-appearance) then 'fr-repeat-table' else 'fr-repeat-sections'} fr-grid {if (@columns) then concat('fr-grid-', @columns, '-columns') else ()}">
                     <xhtml:thead class="yui-dt-hd">
                         <!-- Row with column headers -->
@@ -98,7 +100,11 @@
                     <xhtml:tbody class="yui-dt-data">
                         <!-- Repeated rows -->
                         <xsl:for-each select="fr:body | xhtml:body">
-                            <xforms:repeat id="{$fr-repeat/@id}" ref="$fr-repeat-sequence">
+                            <!-- NOTE: Duplicate $repeat-expression here because if we use the XForms variable $fr-repeat-sequence,
+                                 upon inserting a new iteration, currently the variable does not re-evaluated and therefore
+                                 the repeat binding does not re-evaluate either. -->
+                            <!--<xforms:repeat id="{$fr-repeat/@id}" ref="$fr-repeat-sequence">-->
+                            <xforms:repeat id="{$fr-repeat/@id}" ref="{$repeat-expression}">
                                 <xxforms:variable name="repeat-position" select="position()" as="xs:integer"/>
                                 <!-- First line with data -->
                                 <xhtml:tr class="{{string-join((if ($repeat-position mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if ($repeat-position = 1) then 'yui-dt-first' else ()), ' ')}}">

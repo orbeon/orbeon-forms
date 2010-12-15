@@ -18,7 +18,8 @@
             var dialog = OD.get("xforms-message-dialog");
             Assert.areEqual("visible", dialog.parentNode.style.visibility, "dialog is visible");
             var body = YD.getElementsByClassName("bd", null, dialog)[0];
-            Assert.areEqual(text, OD.getStringValue(body), "unexpected message in dialog");
+            var span = OD.getChildElementByIndex(body, 0);
+            Assert.areEqual(text, OD.getStringValue(span), "unexpected message in dialog");
             dialog.getElementsByTagName("button")[0].click();
         },
 

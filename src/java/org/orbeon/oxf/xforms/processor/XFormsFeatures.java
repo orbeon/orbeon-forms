@@ -349,10 +349,13 @@ public class XFormsFeatures {
             // Underscore library
             new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             // XForms client
-            new ResourceConfig("/ops/javascript/xforms.js", "/ops/javascript/xforms-min.js"),
+            new ResourceConfig("/ops/javascript/xforms.js",                             "/ops/javascript/xforms-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/util/ExecutionQueue.js",         "/ops/javascript/orbeon/util/ExecutionQueue-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/Server.js",               "/ops/javascript/orbeon/xforms/Server-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/Form.js",                 "/ops/javascript/orbeon/xforms/Form-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/Page.js",                 "/ops/javascript/orbeon/xforms/Page-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Control.js",      "/ops/javascript/orbeon/xforms/control/Control-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Upload.js",       "/ops/javascript/orbeon/xforms/control/Upload-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js",         "/ops/javascript/orbeon/xforms/control/Tree-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",       "/ops/javascript/orbeon/xforms/action/Message-min.js")
     };

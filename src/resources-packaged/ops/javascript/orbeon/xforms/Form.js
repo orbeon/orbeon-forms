@@ -16,21 +16,5 @@
     ORBEON.xforms.Form = function() {};
     var Form = ORBEON.xforms.Form;
 
-    Form.prototype.idToControl = {};
 
-    /**
-     * Creates or returns a control object corresponding to the provided container.
-     *
-     * @param   container
-     * @return  {ORBEON.xforms.control.Control}
-     */
-    Form.prototype.getControl = function(container) {
-        var control = this.idToControl[container.id];
-        if (control == null || control.container != container) {
-            control = new (ORBEON.xforms.Page.getControlConstructor(container));
-            control.init(container);
-            this.idToControl[container.id] = control;
-        }
-        return control;
-    };
 })();

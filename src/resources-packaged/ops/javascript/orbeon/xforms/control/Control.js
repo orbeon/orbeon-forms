@@ -23,6 +23,18 @@
 
     /** @type {HTMLElement} */
     Control.prototype.container = null;
+    /** @type {HTMLFormElement} */
+    Control.prototype.form = null;
+
+    Control.prototype.getForm = function() {
+        if (this.form == null) {
+            /** @type {Node} */ var candidateForm = this.container;
+            while (candidateForm.tagName.toLowerCase() != "form")
+                candidateForm = candidateForm.parentNode;
+            this.form = candidateForm;
+        }
+        return this.form;
+    };
 
     /**
      * Creates a new instance of this control based on the container element.
@@ -31,6 +43,8 @@
      * @void
      */
     Control.prototype.init = function(container) { this.container = container; };
+
+    Control.prototype.change = function() {};
 
     /**
      * Provides a new itemset for a control, if the control supports this.

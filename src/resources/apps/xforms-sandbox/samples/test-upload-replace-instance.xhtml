@@ -82,9 +82,7 @@
         <xhtml:pre><xforms:output ref="text" id="text-output"/></xhtml:pre>
         <xforms:trigger id="upload-trigger">
             <xforms:label>Upload</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:send submission="submission" />
-            </xforms:action>
+            <xforms:send ev:event="DOMActivate" submission="submission"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

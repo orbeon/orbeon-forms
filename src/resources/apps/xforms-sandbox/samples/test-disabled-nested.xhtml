@@ -41,8 +41,8 @@
                             // Set focus on the button at the top of the page
                             visibleButton.focus();
                             testCase.wait(function() {
-                                // Try setting the focus on the input field
-                                var formElement = control.getElementsByTagName(tagName)[0];
+                                // Try setting the focus on the input or button
+                                var formElement = control.tagName.toLowerCase() == tagName ? control : control.getElementsByTagName(tagName)[0];
                                 formElement.focus();
                                 testCase.wait(function() {
                                     // Check if the input got the focus

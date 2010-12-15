@@ -1237,111 +1237,9 @@
                 <section>
                     <title>Upload</title>
                     <p>
-                        XForms allows you to upload files with the XForms Upload control:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:upload ref="files/file[1]">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </xml-source>
-                    <p>
-                        The related section of the XForms model can look like this:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:instance id="my-instance">
-                            <files>
-                                <file filename="" mediatype="" size=""/>
-                            </files>
-                        </xforms:instance>
-                        <xforms:bind nodeset="file" type="xs:anyURI"/>
-                    </xml-source>
-                    <p>
-                        The <code>file</code> element is the element storing the result of the file
-                        upload. The result can be stored in two ways:
-                    </p>
-                    <ul>
-                        <li>As a URL, by specifying the type <code>xs:anyURI</code>.</li> <li>As
-                        Base64-encoded text, by specifying the type <code>xs:base64Binary</code>.
-                        Base64 is a mechanism to encode any binary data using a 65-character subset
-                        of US-ASCII. Using this mechanism allows embedding binary data into XML
-                        documents, at the typical cost of taking 50% more space than the original
-                        binary data. For more information, please refer to the <a
-                        href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
-                    </ul>
-                    <p>
-                        The optional <code>xforms:filename</code>, <code>xforms:mediatype</code>, and
-                        <code>xxforms:size</code> (the latter being an extension) allow storing metadata
-                        about an uploaded file:
-                    </p>
-                    <ul>
-                        <li>
-                            <code>xforms:filename</code>: stores the file name sent by the user agent</li>
-                        <li>
-                            <code>xforms:mediatype</code>: store the media type sent by the user agent</li>
-                        <li>
-                            <code>xxforms:size</code>: stores the actual size in bytes of the uploaded data</li>
-                    </ul>
-                    <p>
-                        Note that the file name and the media type are provided by the user agent
-                        (typically a web browser) and are not guaranteed to be correct.
-                    </p>
-                    <p>
-                        The result of a file upload can look as follows when using
-                        <code>xs:anyURI</code>:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <file filename="photo.jpg" mediatype="image/jpeg" size="2345">file:/C:/Tomcat/temp/upload_00000005.tmp</file>
-                    </xml-source>
-                    <note>
-                        <p>
-                            The URL stored as the value of the upload is temporary and only valid until either:
-                        </p>
-                        <ul>
-                            <li>
-                                the session expires,
-                            </li>
-                            <li>
-                                the Java VM quits,
-                            </li>
-                            <li>
-                                or a new file upload replaces the existing URI in the XForms instance.
-                            </li>
-                        </ul>
-                        <p>
-                            The URL is only accessible from the server side, and will not be accessible from a client
-                            such as a web browser. It is not guaranteed to be a <code>file:</code> URL, only that it can
-                            be read with Orbeon Forms's <a href="processors-generators-url">URL generator</a>.
-                        </p>
-                    </note>
-                    <p>
-                        The contents of the file can be retrieved using the URL Generator. The result
-                        will be an XML document containing a single root element containing the uploaded
-                        file in Base64-encoded text.
-                    </p>
-                    <note>
-                        <p>
-                            Using the <code>xs:anyURI</code> type allows Orbeon Forms to make sure the uploaded file
-                            does not have to reside entirely in memory. This is the preferred method for uploading large
-                            files.
-                        </p>
-                    </note>
-                    <p>
-                        The result of a file upload can look as follows when using
-                        <code>xs:base64Binary</code>:
-                    </p>
-                    <xml-source>
-                        <file filename="photo.jpg" mediatype="image/jpeg" size="2345">
-                            /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4RERAO
-                            EA8SFBoWEhMYEw8QFh8XGBsbHR0dERYgIh8cIhocHRz/2wBDAQUFBQcGBw0HBw0cEhASHBwcHBwc
-                            ...
-                        </file>
-                    </xml-source>
-                    <p>
-                        In this case, the uploaded file is encoded an directly embedded into the XML
-                        instance. This is a good method to handle small files only, because the entire
-                        file is converted and stored in memory.
+                        This section has <a
+                        href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls#TOC-Upload-control">migrated
+                        to the wiki</a>.
                     </p>
                 </section>
             </section>
@@ -1350,7 +1248,7 @@
                 <title>Repeating with <code>&lt;xforms:repeat></code></title>
                 <p>
                     This section has <a
-                    href="http://wiki.orbeon.com/forms/doc/xforms-repeat">migrated
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-repeat">migrated
                     to the wiki</a>.
                 </p>
             </section>

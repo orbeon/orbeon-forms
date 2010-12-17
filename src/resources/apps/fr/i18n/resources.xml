@@ -494,4 +494,169 @@
             <link>Guardar</link>
         </import-export>
     </resource>
+    <resource xml:lang="no">
+        <components>
+            <labels>
+                <open-section>Åpne seksjon</open-section>
+                <close-section>Lukk seksjon</close-section>
+                <section-name>Seksjonsnavn</section-name>
+            </labels>
+        </components>
+        <errors>
+            <summary-title>Skjemaet inneholder følgende feil</summary-title>
+            <some>ugyldige eller manglende svar i skjema</some>
+            <none>Ingen feil i skjema</none>
+            <unsaved>Ulagrede endringer</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon Forms: Bekreftelse</subject>
+            <body>Vedlagt er skjema i PDF- og XML-format.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D] [MNn], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <titles>
+                <summary-title>Oppsummering</summary-title>
+                <row-number>Nr.</row-number>
+                <created>Opprettet</created>
+                <last-modified>Sist endret</last-modified>
+                <selected>Valgt</selected>
+                <refresh>Denne operasjonen vil laste siden på nytt</refresh>
+                <toc>Innholdsfortegnelse</toc>
+                <help>Hjelp</help>
+                <error-count>ugyldig eller manglende svar i skjema</error-count>
+                <errors-count>ugyldige eller manglende svar i skjema</errors-count>
+            </titles>
+            <search>
+                <search>Søk</search>
+                <search-forms>Søk etter skjema</search-forms>
+                <show-options>Vis alternativer for søk</show-options>
+                <close-options>Lukk alternativer for søk</close-options>
+                <returned-1>Søk fant</returned-1>
+                <returned-2>skjema.</returned-2>
+            </search>
+            <paging>
+                <to>til</to>
+                <of>av</of>
+            </paging>
+            <messages>
+                <no-form-found><i>Ingen skjema funnet.</i></no-form-found>
+                <delete-confirmation>Vil du slette markerte skjema?</delete-confirmation>
+            </messages>
+            <labels>
+                <new-form>Nytt skjema</new-form>
+                <import-forms>Importer skjema</import-forms>
+                <edit-form>Rediger</edit-form>
+                <delete-form>Slett</delete-form>
+                <view-readonly>Vis HTML</view-readonly>
+                <view-xml>Vis XML</view-xml>
+                <view-pdf>Vis PDF</view-pdf>
+                <language-choice>Velg språk</language-choice>
+                <form-choice>Velg et skjema</form-choice>
+                <free-search>Fritekstsøk</free-search>
+                <any>[Vilkårlig]</any>
+                <previous>Tilbake</previous>
+                <next>Neste</next>
+                <script>Full versjon</script>
+                <noscript>Tilgjengelig versjon</noscript>
+                <refresh>Oppdater</refresh>
+                <close-box>[lukk]</close-box>
+                <help-back>Tilbake</help-back>
+                <goto-content>Gå til innhold</goto-content>
+            </labels>
+            <formats>
+                <date>[D] [MNn], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[D] [MNn], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Skjemaet er lagret!</save-success>
+                <form-validation-error>Skjemaet er ikke innsendt: Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
+                <database-error>Feil i kommunikasjon med tjener: Vennligst kontakt din systemadministrator.</database-error>
+                <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
+                <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
+                <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
+                <buttons-placeholder>Knappene i skjemaet vil bli vist her</buttons-placeholder>
+            </messages>
+            <labels>
+                <save-document>Lagre</save-document>
+                <publish>Publiser...</publish>
+                <test>Test</test>
+                <save-locally>Lagre lokalt</save-locally>
+                <save-offline>Lagre offline</save-offline>
+                <submit-document>Send inn</submit-document>
+                <workflow-review>Vis</workflow-review>
+                <workflow-edit>Rediger</workflow-edit>
+                <workflow-send>Send</workflow-send>
+                <return>Tilbake til skjema</return>
+                <discard>Forkast endringer</discard>
+                <language-choice>Språk</language-choice>
+                <errors>Oppsummering av feil</errors>
+                <check-errors-in-form>Skjemaet inneholder feil</check-errors-in-form>
+                <error-details>Vis feilmeldingsdetaljer</error-details>
+                <language-choice>Språk</language-choice>
+                <close>Lukk</close>
+                <!--<cancel-link>Avbryt</cancel-link>-->
+                <!--<callme-link>Ring meg</callme-link>-->
+                <!--<leave-form>Forlat</leave-form>-->
+                <!--<go-back-to-form>Gå tilbake til skjemaet</go-back-to-form>-->
+                <home>Hjem</home>
+                <review>Vis</review>
+                <print>Skriv ut</print>
+                <print-pdf>PDF</print-pdf>
+                <print-pdf-template>PDF (Template)</print-pdf-template>
+                <clear>Tøm innhold</clear>
+                <confirm>Bekreft</confirm>
+                <cancel>Angre</cancel>
+                <offline>Gå offline</offline>
+                <online>Gå online</online>
+                <alert>Manglende eller ugyldig svar</alert>
+                <email>Epost</email>
+                <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
+                <submit-dialog-keep>Behold innhold og lukk</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
+                <collapse-all>Lukk alle seksjoner</collapse-all>
+                <expand-all>Åpne alle seksjoner</expand-all>
+                <show-content>Vis innhold</show-content>
+                <hide-content>Skjul innhold</hide-content>
+                <!--<select>Velg</select>-->
+            </labels>
+            <view>
+                <explanation>
+                    Dette er en skrivebeskyttet versjon av dine data.
+                </explanation>
+            </view>
+        </detail>
+        <import-export>
+            <dialog-title>Lagre</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        For å lagre dine data, klikk på lenken under og lagre dokumentet på din maskin.
+                    </p>
+                    <p>
+                        For å hente tilbake informasjonen, dobbeltklikk på filen du lagret på maskinen din og
+                        verktøyet vil automatisk hente informasjonen du skrev inn i skjemaet.
+                    </p>
+                    <p>
+                        <b>Merk:</b> Informasjonen er ikke lagret på serveren så hvis du sletter filen så vil informasjonen du skrev inn gå tapt.
+                    </p>
+                </div>
+            </dialog-body>
+            <link>Lagre</link>
+        </import-export>
+
+    </resource>
 </resources>

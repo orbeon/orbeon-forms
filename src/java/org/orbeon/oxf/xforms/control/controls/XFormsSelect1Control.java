@@ -415,48 +415,4 @@ public class XFormsSelect1Control extends XFormsValueControl {
 ////        }
 ////        return false;
 //    }
-
-//    /**
-//     * Represents xforms:itemset information.
-//     *
-//     * TODO: Work in progress for dependencies?
-//     */
-//    public static class ItemsetInfo {
-//        private String id;
-//        private String label;
-//        private String value;
-//
-//        private NodeInfo nodeInfo;
-//
-//        public ItemsetInfo(String id, String label, String value, NodeInfo nodeInfo) {
-//            this.id = id;
-//            this.label = label;
-//            this.value = value;
-//            this.nodeInfo = nodeInfo;
-//        }
-//
-//        public String getId() {
-//            return id;
-//        }
-//
-//        public String getLabel() {
-//            return label;
-//        }
-//
-//        public String getValue() {
-//            return value;
-//        }
-//
-//        public NodeInfo getNodeInfo() {
-//            return nodeInfo;
-//        }
-//
-//        public boolean equals(Object obj) {
-//            if (obj == null || !(obj instanceof ItemsetInfo))
-//                return false;
-//
-//            final ItemsetInfo other = (ItemsetInfo) obj;
-//            return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
-//        }
-//    }
 }

@@ -14,6 +14,7 @@
 package org.orbeon.saxon.dom4j;
 
 import org.dom4j.Node;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.saxon.om.*;
@@ -124,23 +125,14 @@ public class TypedNodeWrapper extends NodeWrapper {
     @Override
     public int getTypeAnnotation() {
 
-        final String nodeType = InstanceData.getType((Node) node);
+        final QName nodeType = InstanceData.getType((Node) node);
         if (nodeType == null) {
             return getUntypedType();
         } else {
             // Extract QName
-            final String uri;
-            final String localname;
-            {
-                int openIndex = nodeType.indexOf("{");
-                if (openIndex == -1) {
-                    uri = "";
-                    localname = nodeType;
-                } else {
-                    uri = nodeType.substring(openIndex + 1, nodeType.indexOf("}"));
-                    localname = nodeType.substring(nodeType.indexOf("}") + 1);
-                }
-            }
+            final String uri = nodeType.getNamespaceURI();
+            final String localname = nodeType.getName();
+
             final int requestedTypeFingerprint = StandardNames.getFingerprint(uri, localname);
             if (requestedTypeFingerprint == -1) {
                 // Back to default case

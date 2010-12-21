@@ -68,7 +68,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // Schema validation
     private XFormsModelSchemaValidator schemaValidator;
-    private boolean mustSchemaValidate;
+    private boolean hasSchema;
 
     // Container
     private final XBLContainer container;
@@ -176,10 +176,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public Model getStaticModel() {
         return staticModel;
-    }
-
-    public boolean isMustSchemaValidate() {
-        return mustSchemaValidate;
     }
 
     /**
@@ -350,22 +346,26 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return binds;
     }
 
-    public XFormsModelSchemaValidator getSchemaValidator() {
-        return schemaValidator;
-    }
-
     private void loadSchemasIfNeeded(PropertyContext propertyContext) {
         if (schemaValidator == null) {
             final Element modelElement = staticModel.element();
             schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
             schemaValidator.loadSchemas(propertyContext, containingDocument);
 
-            mustSchemaValidate = schemaValidator.hasSchema();
+            hasSchema = schemaValidator.hasSchema();
         }
     }
 
+    public boolean hasSchema() {
+        return hasSchema;
+    }
+
+    public XFormsModelSchemaValidator getSchemaValidator() {
+        return schemaValidator;
+    }
+
     public String[] getSchemaURIs() {
-        if (schemaValidator != null) {
+        if (hasSchema) {
             return schemaValidator.getSchemaURIs();
         } else {
             return null;
@@ -875,12 +875,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void doRebuild(PropertyContext propertyContext) {
 
-        // Rebuild bind tree only if needed.
-        if (binds != null && deferredActionContext.rebuild) {
+        // Rebuild bind tree only if needed
+        final boolean mustRebuild = binds != null && deferredActionContext.rebuild;
+        if (mustRebuild) {
             binds.rebuild(propertyContext);
-            // TODO: rebuild computational dependency data structures
 
             // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+            // TODO: Handle XPathDependencies
             getXBLContainer().requireRefresh();
         }
 
@@ -889,13 +890,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.rebuild = false;
 
         // Notify dependencies
-        containingDocument.getXPathDependencies().rebuildDone(staticModel);
+        if (mustRebuild)
+            containingDocument.getXPathDependencies().rebuildDone(staticModel);
     }
 
     public void doRecalculate(PropertyContext propertyContext, boolean applyInitialValues) {
 
         // Recalculate only if needed
-        if (instances.size() > 0 && binds != null && deferredActionContext.recalculate) {
+        final boolean mustRecalculate = instances.size() > 0 && binds != null && deferredActionContext.recalculate;
+        if (mustRecalculate) {
             // Apply calculate binds
             binds.applyCalculateBinds(propertyContext, applyInitialValues);
         }
@@ -905,7 +908,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.recalculate = false;
 
         // Notify dependencies
-        containingDocument.getXPathDependencies().recalculateDone(staticModel);
+        if (mustRecalculate)
+            containingDocument.getXPathDependencies().recalculateDone(staticModel);
     }
 
 
@@ -913,20 +917,21 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Validate only if needed, including checking the flags, because if validation state is clean, validation
         // being idempotent, revalidating is not needed.
-        if (instances.size() > 0 && (mustBindValidate || mustSchemaValidate) && deferredActionContext.revalidate) {
+        final boolean mustRevalidate = instances.size() > 0 && (mustBindValidate || hasSchema) && deferredActionContext.revalidate;
+        if (mustRevalidate) {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
 
-            // Clear validation state
+            // Clear schema validation state
             // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
             for (final XFormsInstance instance: instances) {
                 // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
                 // The reason is that clearing this state can take quite some time
-                final boolean mustSchemaValidateInstance = mustSchemaValidate && instance.isSchemaValidation();
-                if (mustSchemaValidateInstance || containingDocument.getXPathDependencies().hasAnyValidationBind(staticModel, instance.getPrefixedId())) {
+                final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
+                if (instanceMightBeSchemaValidated) {
                     XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
                         public void walk(NodeInfo nodeInfo) {
-                            InstanceData.clearValidationState(nodeInfo);
+                            InstanceData.clearSchemaState(nodeInfo);
                         }
                     }, true);
                 }
@@ -936,9 +941,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             final Set<String> invalidInstances = new LinkedHashSet<String>();
 
             // Validate using schemas if needed
-            if (mustSchemaValidate) {
+            if (hasSchema) {
                 // Apply schemas to all instances
-                for (final XFormsInstance instance: instances) {
+                for (final XFormsInstance instance : instances) {
                     // Currently we don't support validating read-only instances
                     if (instance.isSchemaValidation()) {
                         if (!schemaValidator.validateInstance(instance)) {
@@ -957,7 +962,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
             // algorithm below.
             // TODO: Must dispatch validity changes, not validity status
-            // TODO: Mus dispatch after marking revalidate = false, right?
+            // TODO: Must dispatch after marking revalidate = false, right?
             for (final XFormsInstance instance: instances) {
                 if (invalidInstances.contains(instance.getEffectiveId())) {
                     container.dispatchEvent(propertyContext, new XXFormsInvalidEvent(containingDocument, instance));
@@ -975,7 +980,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.revalidate = false;
 
         // Notify dependencies
-        containingDocument.getXPathDependencies().revalidateDone(staticModel);
+        if (mustRevalidate)
+            containingDocument.getXPathDependencies().revalidateDone(staticModel);
     }
 
     private void doRefresh(PropertyContext propertyContext) {

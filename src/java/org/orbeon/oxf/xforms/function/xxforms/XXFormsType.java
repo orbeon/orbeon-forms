@@ -13,14 +13,19 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.StandardNames;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.QNameValue;
+import org.orbeon.saxon.value.Value;
 
 public class XXFormsType extends XXFormsMIPFunction {
 
@@ -50,25 +55,12 @@ public class XXFormsType extends XXFormsMIPFunction {
             }
         } else if (item instanceof NodeInfo) {
             // Get type from node
-            final String typeExplodedQName = InstanceData.getType((NodeInfo) item);
-            if (typeExplodedQName == null)
+            final QName typeQName = InstanceData.getType((NodeInfo) item);
+            if (typeQName == null)
                 return null;
 
             // Create Saxon QName
-            final String uri;
-            final String localname;
-            {
-                int openIndex = typeExplodedQName.indexOf("{");
-                if (openIndex == -1) {
-                    uri = "";
-                    localname = typeExplodedQName;
-                } else {
-                    uri = typeExplodedQName.substring(openIndex + 1, typeExplodedQName.indexOf("}"));
-                    localname = typeExplodedQName.substring(typeExplodedQName.indexOf("}") + 1);
-                }
-            }
-
-            return new QNameValue("", uri, localname, null);
+            return new QNameValue("", typeQName.getNamespaceURI(), typeQName.getName(), null);
         } else {
             // Return () if we can't access the node or if it is not an atomic value or a node
             return null;

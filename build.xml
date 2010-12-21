@@ -33,6 +33,20 @@
 
     <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20101011.jar"/>
 
+    <taskdef resource="scala/tools/ant/antlib.xml">
+        <classpath>
+            <pathelement location="${lib.dir}/scala-compiler.jar"/>
+            <pathelement location="${lib.dir}/scala-library.jar"/>
+        </classpath>
+    </taskdef>
+
+    <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+        <classpath>
+            <pathelement location="${lib.dir}/junit-4.8.2.jar"/>
+            <pathelement location="${lib.dir}/ant-junit-1.7.1.jar"/>
+        </classpath>
+    </taskdef>
+
     <fileset id="war.libs" dir="${lib.dir}">
         <include name="dom4j-1_6_1.jar"/>
         <include name="log4j-1_2_15.jar"/>
@@ -252,13 +266,6 @@
     <!-- Compile source -->
     <target name="classes" depends="classpath" unless="skip.compilation">
 
-        <taskdef resource="scala/tools/ant/antlib.xml">
-            <classpath>
-                <pathelement location="${lib.dir}/scala-compiler.jar"/>
-                <pathelement location="${lib.dir}/scala-library.jar"/>
-            </classpath>
-        </taskdef>
-
         <mkdir dir="${build.dir}/src"/>
         <copy todir="${build.dir}/src" file="${java-src.dir}/org/orbeon/oxf/common/Version.java" overwrite="true">
             <filterset>
@@ -268,8 +275,8 @@
         </copy>
 
         <scalac destdir="${build.classes.dir}"
-            classpathref="class.path"
-            fork="true" encoding="utf-8" jvmargs="-Xmx300m">
+                classpathref="class.path"
+                fork="true" encoding="utf-8" jvmargs="-Xmx300m">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <src path="${scala-src.dir}"/>
@@ -277,9 +284,9 @@
         </scalac>
 
         <javac destdir="${build.classes.dir}"
-            classpathref="class.path"
-            debug="${build.debug}" optimize="off" target="1.5" source="1.5"
-            fork="true" memoryInitialSize="128m" memoryMaximumSize="300m" encoding="utf-8">
+                classpathref="class.path"
+                debug="${build.debug}" optimize="off" target="1.5" source="1.5"
+                fork="true" memoryInitialSize="128m" memoryMaximumSize="300m" encoding="utf-8">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
@@ -290,9 +297,16 @@
     <!-- Compile test source -->
     <target name="test-classes" depends="classes, test-classpath">
         <mkdir dir="${build.test-classes.dir}"/>
+
+        <scalac destdir="${build.test-classes.dir}"
+                classpathref="test.class.path"
+                fork="true" encoding="utf-8" jvmargs="-Xmx300m">
+            <src path="${test-src.dir}"/>
+        </scalac>
+
         <javac srcdir="${test-src.dir}" destdir="${build.test-classes.dir}"
-            classpathref="test.class.path" debug="on" optimize="off" target="1.5" source="1.5"
-            includes="**/*.java" encoding="utf-8">
+                classpathref="test.class.path" debug="on" optimize="off" target="1.5" source="1.5"
+                includes="**/*.java" encoding="utf-8">
         </javac>
     </target>
 
@@ -671,21 +685,14 @@
 	    <delete dir="${test.exist-db.dir}"/>
     	<mkdir dir="${test.exist-db.dir}"/>
 
-        <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
-            <classpath>
-                <pathelement location="${lib.dir}/junit-4.8.2.jar"/>
-                <pathelement location="${lib.dir}/ant-junit-1.7.1.jar"/>
-            </classpath>
-        </taskdef>
-
         <junit fork="true" haltonerror="yes" haltonfailure="yes">
             <!-- Enable assertions -->
             <jvmarg value="-ea"/>
 
             <batchtest>
-                <fileset dir="${test-src.dir}">
-                    <include name="org/orbeon/oxf/**/*Test.java"/>
-                    <include name="org/orbeon/oxf/**/Test*.java"/>
+                <fileset dir="${build.test-classes.dir}">
+                    <include name="org/orbeon/oxf/**/*Test.class"/>
+                    <include name="org/orbeon/oxf/**/Test*.class"/>
                 </fileset>
             </batchtest>
 

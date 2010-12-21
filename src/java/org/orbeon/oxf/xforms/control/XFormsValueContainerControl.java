@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -81,7 +82,7 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
-    public String getType() {
+    public QName getType() {
         return null;
     }
 }

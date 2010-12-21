@@ -22,24 +22,35 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -995,14 +1006,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 } else if (requestedSerialization.equals("application/octet-stream")) {
                     // Binary serialization
-                    final String nodeType = InstanceData.getType(documentToSubmit.getRootElement());
+                    final QName nodeType = InstanceData.getType(documentToSubmit.getRootElement());
 
-                    if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(nodeType)) {
+                    if (XMLConstants.XS_ANYURI_QNAME.equals(nodeType)) {
                         // Interpret node as anyURI
                         // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
                         final String uri = documentToSubmit.getRootElement().getStringValue();
                         messageBody = NetUtils.uriToByteArray(uri);
-                    } else if (XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME.equals(nodeType)) {
+                    } else if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
                         // TODO
                         throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: binary serialization with base64Binary type is not yet implemented.", "serializing instance");
                     } else {

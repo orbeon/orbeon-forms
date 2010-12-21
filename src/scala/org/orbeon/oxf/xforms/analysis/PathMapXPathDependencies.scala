@@ -13,82 +13,134 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.{SelectionControl, LHHATrait}
 import model.Model
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.om.NodeInfo
-import collection.mutable.{HashSet, HashMap, Set}
+import collection.mutable.{HashSet, HashMap}
 import org.orbeon.saxon.dom4j.NodeWrapper
 import org.orbeon.oxf.xforms._
+import analysis.controls._
 import org.w3c.dom.Node._
 import org.orbeon.oxf.common.OXFException
 import java.util.{Map => JMap}
 import java.lang.String
+import collection.immutable.Nil
 
-class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsStaticState)// Constructor for unit tests
+class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsStaticState) // Constructor for unit tests
         extends XPathDependencies {
 
     private var containingDocument: XFormsContainingDocument = _
 
-    // Represent the state of a model between refreshes
-    private class ModelState {
+    // Represent the state of a model
+    private class ModelState(private val modelPrefixedId: String) {
 
-        var structuralChanges = false
-        var calculateClean = false   // start dirty
-        var validateClean = false    // start dirty
+        var hasStructuralChanges = false
+
+        var useCalculateChangeset = false   // start dirty
+        var useValidateChangeset = false    // start dirty
+
+        var recalculateChangeset = new MapSet[String, String]
+        var revalidateChangeset = recalculateChangeset
 
         def markValueChanged(node: NodeInfo) {
-            val instance = containingDocument.getInstanceForNode(node)
-            RefreshState.modifiedPaths.put(instance.getPrefixedId, PathMapXPathDependencies.createFingerprintedPath(node))
+            // Only care about path changes if there is no structural change for this model, since structural changes
+            // for now disable any more subtle path-based check.
+            if (!hasStructuralChanges) {
+
+                // Create instance/path combo
+                val instance = containingDocument.getInstanceForNode(node)
+
+                val instancePrefixedId = instance.getPrefixedId
+                val path = PathMapXPathDependencies.createFingerprintedPath(node)
+
+                val instancePath = (instancePrefixedId -> path)
+
+                // Update model and view changesets
+                recalculateChangeset += instancePath
+                if (revalidateChangeset ne recalculateChangeset)
+                    revalidateChangeset += instancePath // also add to revalidate changeset
+                
+                RefreshState.changeset += instancePath
+            }
         }
 
         def markStructuralChange() {
-            structuralChanges = true
 
-            calculateClean = false
-            validateClean = false
+            // Update model and view information
+            hasStructuralChanges = true
+            RefreshState.structuralChangeModels += modelPrefixedId
+
+            markBindsDirty()
         }
 
         def rebuildDone() {
-            calculateClean = false
-            validateClean = false
+            hasStructuralChanges = false
+
+            markBindsDirty()
         }
+
+        private def markBindsDirty() {
+            useCalculateChangeset = false
+            useValidateChangeset = false
+
+            // Changesets won't be used
+            recalculateChangeset.clear()
+            revalidateChangeset = recalculateChangeset
+        }
+
+        // Say that for this model, calculate binds are clean and can be checked for modifications based on value changes
+        def recalculateDone(): Unit = {
+            useCalculateChangeset = true
+            recalculateChangeset = clearChangeset(recalculateChangeset, revalidateChangeset)
+        }
+        // Say that for this model, validate binds are clean and can be checked for modifications based on value changes
+        def revalidateDone(): Unit = {
+            useValidateChangeset = true
+            revalidateChangeset = clearChangeset(revalidateChangeset, recalculateChangeset)
+        }
+
+        private def clearChangeset(left: MapSet[String, String], right: MapSet[String, String]) = {
+            // Try to make both changesets point to the same object, but never clear the right changeset if not empty
+            if (right isEmpty) right
+            else if (left ne right) { left.clear(); left }
+            else new MapSet[String, String]
+        }
+
+        def refreshDone(): Unit = {}
+
+        def outOfDateChangesetForMip(mip: Model#Bind#MIP) = mip.isValidateMIP && !useValidateChangeset || !mip.isValidateMIP && !useCalculateChangeset
 
         // TODO: Scenario that can break this:
         // recalculate -> value change -> xxf-value-changed -> insert -> calculateClean = false -> recalculateDone -> calculateClean = true
         // although following rebuild will set calculateClean = false, this is not right and might still lead to issues
-
-        // Say that for this model, calculate binds are clean and can be checked for modifications based on value changes
-        def recalculateDone(): Unit = calculateClean = true
-        // Say that for this model, validate binds are clean and can be checked for modifications based on value changes
-        def revalidateDone(): Unit = validateClean = true
-
-        def refreshDone() {
-            structuralChanges = false
-        }
-
-        def mipDirty(mip: Model#Bind#MIP): Boolean = mip.isValidateMIP && !validateClean || !calculateClean
     }
 
-    // Set of models
+    // State of models
     private val modelStates = new HashMap[String, ModelState]
 
-    private def getModelState(modelPrefixedId: String): ModelState = {
+    private def getModelState(modelPrefixedId: String): ModelState =
         modelStates.get(modelPrefixedId) match {
             case Some(modelState) => modelState
             case None =>
-                val modelState = new ModelState
-                modelStates.put(modelPrefixedId, modelState)
+                val modelState = new ModelState(modelPrefixedId)
+                modelStates += (modelPrefixedId -> modelState)
                 modelState
         }
-    }
 
     // Used between refresh start and refresh done
     private var inRefresh = false
 
+    // Keep state related to the view
     private object RefreshState {
-        var structuralChangesModelsCached = false
-        val structuralChangeModelsCache = new HashSet[String]
+        // Structural changes
+//        private var structuralChangesModelsCached = false
+//        private val structuralChangeModelsCache = new HashSet[String]
+        val structuralChangeModels = new HashSet[String]
+
+        // Modified paths by instance
+//        private val modifiedPathsCached = false
+//        private val modifiedPathsCache = new MapSet[String, String]
+        val changeset = new MapSet[String, String]
 
         // Caches to speedup checks on repeated items
         val modifiedBindingCache = new HashMap[String, UpdateResult]
@@ -100,26 +152,24 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         var bindingUpdateCount: Int = 0
         var valueUpdateCount: Int = 0
 
-
         var bindingXPathOptimizedCount: Int = 0
         var valueXPathOptimizedCount: Int = 0
 
-        // Modified paths by instance
-        val modifiedPaths = new MapSet[String, String]
+        def getStructuralChangeModels = structuralChangeModels
+//        def getStructuralChangeModels: Set[String] = {
+//            if (!structuralChangesModelsCached) {
+//                // Add all model ids that have structuralChanges set to true
+//                structuralChangeModelsCache ++= modelStates filter (_._2.structuralChanges) map (_._1)
+//                structuralChangesModelsCached = true
+//            }
+//            structuralChangeModelsCache
+//        }
 
-        def getStructuralChangeModels: Set[String] = {
-            if (!structuralChangesModelsCached) {
-                // Add all model ids that have structuralChanges set to true
-                structuralChangeModelsCache ++= modelStates filter (_._2.structuralChanges) map (_._1)
-                structuralChangesModelsCached = true;
-            }
-            structuralChangeModelsCache
-        }
-
-        def clear() {
-            structuralChangesModelsCached = false
-            modifiedPaths.clear()
-            structuralChangeModelsCache.clear()
+        def refreshDone() {
+//            structuralChangesModelsCached = false
+//            structuralChangeModelsCache.clear()
+            structuralChangeModels.clear()
+            changeset.clear()
 
             modifiedBindingCache.clear()
             modifiedValueCache.clear()
@@ -135,7 +185,6 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         }
     }
 
-    private val modifiedMIPCache = new HashMap[String, UpdateResult]
     private var mipUpdateCount: Int = 0
     private var mipXPathOptimizedCount: Int = 0
 
@@ -169,19 +218,15 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         require(nodeInfo.isInstanceOf[NodeWrapper])
         require(model.getInstanceForNode(nodeInfo).getModel(containingDocument) == model)
 
-        if (!getModelState(model.getPrefixedId).structuralChanges) {
-            // Only care about path changes if there is no structural change for this model, since structural changes
-            // for now disable any more subtle path-based check.
-            getModelState(model.getPrefixedId).markValueChanged(nodeInfo)
-        }
+        getModelState(model.getPrefixedId).markValueChanged(nodeInfo)
     }
 
     def markStructuralChange(model: XFormsModel, instance: XFormsInstance): Unit =
         getModelState(model.getPrefixedId).markStructuralChange()
 
-    def rebuildDone(model: Model): Unit =  getModelState(model.prefixedId).rebuildDone()
-    def recalculateDone(model: Model): Unit = getModelState(model.prefixedId).recalculateDone()
-    def revalidateDone(model: Model): Unit = getModelState(model.prefixedId).revalidateDone()
+    def rebuildDone(model: Model) =  getModelState(model.prefixedId).rebuildDone()
+    def recalculateDone(model: Model) = getModelState(model.prefixedId).recalculateDone()
+    def revalidateDone(model: Model) = getModelState(model.prefixedId).revalidateDone()
 
     def refreshStart() {
         inRefresh = true
@@ -213,9 +258,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         for (modelState <- modelStates.values)
             modelState.refreshDone()
 
-        RefreshState.clear()
+        RefreshState.refreshDone()
 
-        modifiedMIPCache.clear()
         mipUpdateCount = 0
         mipXPathOptimizedCount = 0
 
@@ -272,9 +316,9 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
 
     // For unit tests
     def setModifiedPathTest(instance: String, namespaces: JMap[String, String], path: String) {
-        assert(RefreshState.modifiedPaths.isEmpty)
+        assert(RefreshState.changeset.isEmpty)
 
-        RefreshState.modifiedPaths.put(instance, PathMapXPathAnalysis.getInternalPath(namespaces, path))
+        RefreshState.changeset += (instance -> PathMapXPathAnalysis.getInternalPath(namespaces, path))
     }
 
     private class UpdateResult(val requireUpdate: Boolean, val savedEvaluations: Int)
@@ -299,7 +343,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                         case Some(analysis) =>
                             // Binding dependencies are known
                             new UpdateResult(
-                                analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsBinding(RefreshState.modifiedPaths)
+                                analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsBinding(RefreshState.changeset)
                                 , control.bindingXPathEvaluations)
                     }
 
@@ -308,17 +352,17 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedBindingCache.put(controlPrefixedId, tempResult)
+                        RefreshState.modifiedBindingCache += (controlPrefixedId -> tempResult)
                     tempResult
                 }
             }
 
-        if (updateResult.requireUpdate) {
+        if (updateResult.requireUpdate)
             RefreshState.bindingUpdateCount += 1
-        } else {
+        else
             // Update not required
             RefreshState.bindingXPathOptimizedCount += updateResult.savedEvaluations
-        }
+
         updateResult.requireUpdate
     }
 
@@ -342,7 +386,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                             new UpdateResult(true, 0)// savedEvaluations is N/A
                         case Some(analysis) =>
                             // Value dependencies are known
-                            new UpdateResult(analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.modifiedPaths)
+                            new UpdateResult(analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 , if (control.value.isDefined) 1 else 0)
                     }
                     if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && getLogger.isDebugEnabled)
@@ -350,17 +394,17 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedValueCache.put(controlPrefixedId, tempUpdateResult)
+                        RefreshState.modifiedValueCache += (controlPrefixedId -> tempUpdateResult)
                     (tempUpdateResult, tempValueAnalysis)
                 }
             }
 
-        if (updateResult.requireUpdate && valueAnalysis.isDefined) {// TODO: see above, check on valueAnalysis only because non-value controls still call this method
+        if (updateResult.requireUpdate && valueAnalysis.isDefined) // TODO: see above, check on valueAnalysis only because non-value controls still call this method
             RefreshState.valueUpdateCount += 1
-        } else {
+        else
             // Update not required
             RefreshState.valueXPathOptimizedCount += updateResult.savedEvaluations
-        }
+
         updateResult.requireUpdate
     }
 
@@ -378,13 +422,13 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 lhhaUnknownDependencies += 1
                                 true
                             case Some(analysis) => // dependencies are known
-                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.modifiedPaths)
+                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 if (result) lhhaHitCount += 1 else lhhaMissCount += 1
                                 result
                             case None => throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhhaName)
                         }
                         if (control.isWithinRepeat)
-                            RefreshState.modifiedLHHACache.put(controlPrefixedId, result)
+                            RefreshState.modifiedLHHACache += (controlPrefixedId -> result)
                         result
                     case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
                 }
@@ -406,68 +450,74 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 itemsetUnknownDependencies += 1
                                 true
                             case Some(analysis) => // dependencies are known
-                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.modifiedPaths)
+                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 if (result) itemsetHitCount += 1 else itemsetMissCount += 1
                                 result
                             case None => throw new IllegalStateException("Itemset not analyzed")
                         }
                         if (control.isWithinRepeat)
-                            RefreshState.modifiedItemsetCache.put(controlPrefixedId, result)
+                            RefreshState.modifiedItemsetCache += (controlPrefixedId -> result)
                         result
                     case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
                 }
         }
     }
 
-    def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = {
+    def hasAnyCalculationBind(model: Model, instancePrefixedId: String) =
         !model.figuredAllBindRefAnalysis || model.computedBindExpressionsInstances.contains(instancePrefixedId)
-    }
 
-    def hasAnyValidationBind(model: Model, instancePrefixedId: String) = {
+    def hasAnyValidationBind(model: Model, instancePrefixedId: String) =
         !model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
-    }
 
 //    public void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo) {
 //        if (!touchedMIPNodes.contains(nodeInfo)) {
 //            // First time this is called for a NodeInfo: keep old MIP values and remember NodeInfo
 //            InstanceData.saveMIPs(nodeInfo)
-//            touchedMIPNodes.add(nodeInfo)
+//            touchedMIPNodes += nodeInfo
 //        }
 //    }
 
-    def hasAnyCalculationBind(model: Model) = model.hasCalculateComputedCustomBind
-    def hasAnyValidationBind(model: Model) = model.hasValidateBind
+    def requireModelMIPUpdate(model: Model, bind: Model#Bind, mipName: String): Boolean = {
 
-    def requireModelMIPUpdate(model: Model, bindId: String, mipName: String): Boolean = {
-        val bind = model.bindsById.get(bindId)
+        // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
+
         bind.getMIP(mipName) match {
             case Some(mip) =>
-                val cached = modifiedMIPCache.get(bind.prefixedId)
+
+                val modelState = getModelState(model.prefixedId)
                 val updateResult =
-                    cached match {
-                        case Some(result) => result
-                        case None =>
-                            val mipAnalysis = mip.analysis
-                            val tempUpdateResult =
-                                if (!mipAnalysis.figuredOutDependencies)
-                                    // Value dependencies are unknown
-                                    new UpdateResult(true, 0)// savedEvaluations is N/A
-                                else if (getModelState(model.prefixedId).mipDirty(mip))
-                                    // Value dependencies are known but the MIP is dirty because validation or calculation binds are dirty
-                                    new UpdateResult(true, 0)// savedEvaluations is N/A
-                                else
-                                    // Value dependencies are known
-                                    new UpdateResult(
-                                        mipAnalysis.intersectsModels(RefreshState.getStructuralChangeModels) || mipAnalysis.intersectsValue(RefreshState.modifiedPaths)
-                                        , 1)
+                    if (modelState.outOfDateChangesetForMip(mip)) {
+                        // Can't check dependencies because the changeset is out of date
+                        new UpdateResult(true, 0)// savedEvaluations is N/A
+                    } else {
+                        // XPath MIPs
 
-                            if (tempUpdateResult.requireUpdate && mipAnalysis != null && getLogger.isDebugEnabled)
-                                getLogger.logDebug("dependencies", "MIP requires update",
-                                    Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", mipAnalysis.xpathString): _*)
-
-                            modifiedMIPCache.put(bind.prefixedId, tempUpdateResult)
-                            tempUpdateResult
+                        // Special case for type which is not an XPath expression
+                        // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
+                        // the value to type check has changed.
+                        val valueAnalysis = mip match {
+                            case xpathMIP: bind.XPathMIP => Some(xpathMIP.analysis)
+                            case typeMIP: bind.TypeMIP => bind.getValueAnalysis
+                            case _ => throw new IllegalStateException("Expecting XPath MIP or type MIP")
                         }
+
+                        val tempUpdateResult = valueAnalysis match {
+                            case Some(analysis) if !analysis.figuredOutDependencies =>
+                                // Value dependencies are unknown
+                                new UpdateResult(true, 0)// savedEvaluations is N/A
+                            case Some(analysis) =>
+                                // Value dependencies are known
+                                // NOTE: Assume bind/@ref or MIP points to/depends only on the containing model
+                                new UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
+                            case _ => throw new IllegalStateException("No value analysis found for xf:bind with " + mipName)
+                        }
+
+                        if (tempUpdateResult.requireUpdate && getLogger.isDebugEnabled)
+                            getLogger.logDebug("dependencies", "MIP requires update",
+                                Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
+
+                        tempUpdateResult
+                    }
 
                 if (updateResult.requireUpdate)
                     mipUpdateCount += 1
@@ -476,8 +526,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                     mipXPathOptimizedCount += updateResult.savedEvaluations
 
                 updateResult.requireUpdate
-            case None =>
-                false // no such MIP
+
+            case None => throw new IllegalArgumentException("No MIP found for name: " + mipName)
         }
     }
 }

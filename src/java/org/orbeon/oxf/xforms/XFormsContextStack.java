@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
@@ -24,8 +26,12 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
-import org.orbeon.oxf.xml.dom4j.*;
-import org.orbeon.saxon.om.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.ValueRepresentation;
 
 import java.util.*;
 
@@ -347,7 +353,7 @@ public class XFormsContextStack {
                             isPushModelVariables = false;
                             variableInfo = null;
                         } else {
-                            newNodeset = ((XFormsModelBinds.Bind) o).getNodeset();
+                            newNodeset = ((XFormsModelBinds.Bind) o).nodeset;
                             hasOverriddenContext = false;
                             contextItem = baseBindingContext.getSingleItem();
                             isNewBind = true;

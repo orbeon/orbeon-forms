@@ -21,19 +21,31 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.dom4j.*;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.dom4j.TypedDocumentWrapper;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 
 import javax.xml.transform.stream.StreamResult;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represent an XForms instance.
@@ -378,7 +390,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
         // Convert value based on types if possible
         if (type != null) {
-            final String nodeType = InstanceData.getType(node);
+            final QName nodeTypeQName = InstanceData.getType(node);
+            final String nodeType = (nodeTypeQName == null) ? null : Dom4jUtils.qNameToExplodedQName(nodeTypeQName);
 
             if (nodeType != null && !nodeType.equals(type)) {
                 // There is a different type already, do a conversion
@@ -490,8 +503,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 parentInfoElement.addAttribute("relevant", Boolean.toString(InstanceData.getInheritedRelevant(node)));
                 parentInfoElement.addAttribute("required", Boolean.toString(InstanceData.getRequired(node)));
                 parentInfoElement.addAttribute("valid", Boolean.toString(InstanceData.getValid(node)));
-                final String type = InstanceData.getType(node);
-                parentInfoElement.addAttribute("type", (type == null) ? "" : type);
+                final QName type = InstanceData.getType(node);
+                parentInfoElement.addAttribute("type", (type == null) ? "" : type.getQualifiedName());
 //                parentInfoElement.addAttribute("schema-error-messages", instanceData.getSchemaErrorsMsgs());
             }
         });

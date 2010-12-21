@@ -16,18 +16,27 @@ package org.orbeon.oxf.xforms;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.*;
-import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsVariableControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
@@ -442,32 +451,10 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Handle XForms grouping controls
                 listener.pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
                 listener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
-                final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
-                    // Recurse into grouping control and components if we don't optimize relevance, OR if we do
-                    // optimize and we are not bound to a node OR we are bound to a relevant node
-
-                    // NOTE: Simply excluding non-selected cases with the expression below doesn't work. So for
-                    // now, we don't consider hidden cases as non-relevant. In the future, we might want to improve
-                    // this.
-                    // && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))
-
-//                    if (ControlTree.TESTING_DIALOG_OPTIMIZATION && newContainerControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
-//                        // Visit dialog children only if dialog is visible
-//                        if (((XXFormsDialogControl) newContainerControl).isVisible()) {
-//                            visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-//                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
-//                        }
-//                    } else {
-                        // TODO: relevance logic here is wrong, see correct logic in XFormsSingleNodeControl
-                        if (!isOptimizeRelevance
-                                || (!currentBindingContext.isNewBind()
-                                || (currentBindingContext.getSingleItem() != null && InstanceData.getInheritedRelevant((NodeInfo) currentBindingContext.getSingleItem())))) {
-
-                            visitControlElementsHandleRepeat(propertyContext, listener, isOptimizeRelevance,
-                                    staticState, currentXBLContainer, currentControlElement, idPrefix, idPostfix);
-                        }
-//                    }
+                    // Recurse into grouping control
+                    visitControlElementsHandleRepeat(propertyContext, listener, isOptimizeRelevance,
+                            staticState, currentXBLContainer, currentControlElement, idPrefix, idPostfix);
                 }
                 listener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();

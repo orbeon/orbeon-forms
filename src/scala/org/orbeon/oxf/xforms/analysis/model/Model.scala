@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
 import org.orbeon.oxf.util.PropertyContext
-import java.util.{Map => JMap, HashMap => JHashMap, Collections => JCollections, LinkedHashMap => JLinkedHashMap, LinkedHashSet => JLinkedHashSet, Set => JSet}
+import java.util.{Map => JMap, HashMap => JHashMap, LinkedHashMap => JLinkedHashMap, Set => JSet, List => JList }
 import org.orbeon.oxf.xforms._
 
 
@@ -98,19 +98,21 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     val jVariablesMap: JMap[String, VariableAnalysisTrait] = variablesMap
 
     // Handle binds
-    val bindElements = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) // JAVA COLLECTION
     val bindIds = new LinkedHashSet[String]
-    val customMIPs = new JLinkedHashMap[String, JMap[String, Bind#MIP]] // bind static id => MIP mapping JAVA COLLECTION
     val bindInstances = new LinkedHashSet[String]                       // instances to which binds apply (i.e. bind/@ref point to them)
     val computedBindExpressionsInstances = new LinkedHashSet[String]    // instances to which computed binds apply
     val validationBindInstances = new LinkedHashSet[String]             // instances to which validation binds apply
 
     // TODO: use and produce variables introduced with xf:bind/@name
 
-    var figuredAllBindRefAnalysis = !hasBinds // default value sets to true if no binds
-
     // All binds by static id
     val bindsById = new JLinkedHashMap[String, Bind]// JAVA COLLECTION
+
+    var hasInitialValueBind = false
+    var hasCalculateBind = false
+    var hasTypeBind = false
+    var hasRequiredBind = false
+    var hasConstraintBind = false
 
     var hasCalculateComputedCustomBind = false // default
     var hasValidateBind = false // default
@@ -126,17 +128,28 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             yield new Bind(bindElement, this, preceding)
     }
 
+    val topLevelBindsJava: JList[Bind] = topLevelBinds
+
+    var figuredAllBindRefAnalysis = !hasBinds // default value sets to true if no binds
+    
+    def hasBinds = topLevelBinds.nonEmpty
+    def containsBind(bindId: String) = bindIds.contains(bindId)
+
+    def getDefaultInstance = if (instances.nonEmpty) instances.head._2 else null
+
     // Represent a static <xf:bind> element
     class Bind(element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis])
             extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope)
             with ContainerTrait {
 
         // Represent an individual MIP on an <xf:bind> element
-        class MIP(val name: String, val expression: String) {
-
+        class MIP(val name: String) {
             val isCalculateComputedMIP = Model.CALCULATE_MIP_NAMES.contains(name)
             val isValidateMIP = Model.VALIDATE_MIP_NAMES.contains(name)
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
+        }
+
+        class XPathMIP(name: String, val expression: String) extends MIP(name) {
 
             var analysis: XPathAnalysis = NegativeAnalysis(expression) // default to negative, analyzeXPath() can change that
 
@@ -153,6 +166,8 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             }
         }
 
+        class TypeMIP(name: String, val datatype: String) extends MIP(name)
+
         // Globally remember binds ids
         Model.this.bindIds.add(staticId)
         Model.this.bindsById.put(staticId, Bind.this)
@@ -165,10 +180,13 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         // Built-in XPath MIPs
         val mipNameToXPathMIP =
             for ((qName, name) <- Model.QNAME_TO_XPATH_MIP_NAME; attributeValue = element.attributeValue(qName); if attributeValue ne null)
-                yield (name -> new MIP(name, attributeValue))
+                yield (name -> new XPathMIP(name, attributeValue))
 
         // Type MIP is special as it is not an XPath expression
-        val typeMIP = Option(element.attributeValue(TYPE_QNAME))
+        val typeMIP = element.attributeValue(TYPE_QNAME) match {
+            case value if value ne null => Some(new TypeMIP(Model.TYPE, value))
+            case _ => None
+        }
 
         // Custom MIPs
         val customMIPNameToXPathMIP = Predef.Map((
@@ -186,42 +204,57 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                     (attributeURI != XXFORMS_NAMESPACE_URI || attributeQName == XXFORMS_EVENT_MODE_QNAME)
 
                 customMIPName = Model.buildCustomMIPName(attribute.getQualifiedName)
-            } yield (customMIPName -> new MIP(customMIPName, attribute.getValue))): _*)
+            } yield (customMIPName -> new XPathMIP(customMIPName, attribute.getValue))): _*)
 
-        // Globally remember custom MIPs
-        if (customMIPNameToXPathMIP.nonEmpty)
-            Model.this.customMIPs.put(staticId, customMIPNameToXPathMIP)
+        val customMIPs: JMap[String, Bind#XPathMIP] = customMIPNameToXPathMIP
 
         // All XPath MIPs
         val allMIPNameToXPathMIP = mipNameToXPathMIP ++ customMIPNameToXPathMIP
 
         // Create children binds
         val children: Seq[Bind] = Dom4jUtils.elements(element, XFORMS_BIND_QNAME) map (new Bind(_, Bind.this, preceding))
+        val childrenJava: JList[Bind] = children
 
-        def getMIP(mipName: String) = allMIPNameToXPathMIP.get(mipName)
+        def getMIP(mipName: String) = if (mipName == Model.TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
 
         // For Java callers (can return null)
-        def getRelevant = getMIPExpression(Model.RELEVANT)
-        def getReadonly = getMIPExpression(Model.READONLY)
-        def getRequired = getMIPExpression(Model.REQUIRED)
-        def getConstraint = getMIPExpression(Model.CONSTRAINT)
-        def getCalculate = getMIPExpression(Model.CALCULATE)
-        def getInitialValue = getMIPExpression(Model.INITIAL_VALUE)
-        def getType = typeMIP.orNull
-        def getCustom(mipName: String) = getMIPExpression(mipName)  
+        def getInitialValue = getMIPExpressionOrNull(Model.INITIAL_VALUE)
+        def getCalculate = getMIPExpressionOrNull(Model.CALCULATE)
+        def getRelevant = getMIPExpressionOrNull(Model.RELEVANT)
+        def getReadonly = getMIPExpressionOrNull(Model.READONLY)
+        def getRequired = getMIPExpressionOrNull(Model.REQUIRED)
+        def getConstraint = getMIPExpressionOrNull(Model.CONSTRAINT)
+        def getType = typeMIP match {
+            case Some(mip) => mip.datatype
+            case None => null
+        }
+        def getCustom(mipName: String) = getMIPExpressionOrNull(mipName)
 
-        def getMIPExpression(mipName: String) = getMIP(mipName) match {
+        def getMIPExpressionOrNull(mipName: String) = allMIPNameToXPathMIP.get(mipName) match {
             case Some(mip) => mip.expression
             case None => null
         }
 
-        def hasCalculateComputedBind = mipNameToXPathMIP exists (_._2 isCalculateComputedMIP)
-        def hasValidateBind = typeMIP.isDefined || (mipNameToXPathMIP exists (_._2 isValidateMIP))
-        def hasCustomMip = customMIPNameToXPathMIP.nonEmpty
+        def hasCalculateComputedMIPs = mipNameToXPathMIP exists (_._2 isCalculateComputedMIP)
+        def hasValidateMIPs = typeMIP.isDefined || (mipNameToXPathMIP exists (_._2 isValidateMIP))
+        def hasCustomMIPs = customMIPNameToXPathMIP.nonEmpty
+        def hasMIPs = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs
 
         // Globally remember if we have seen these categories of binds
-        Model.this.hasCalculateComputedCustomBind ||= hasCalculateComputedBind || hasCustomMip
-        Model.this.hasValidateBind ||= hasValidateBind
+        Model.this.hasInitialValueBind ||= getInitialValue ne null
+        Model.this.hasCalculateBind ||= getCalculate ne null
+        Model.this.hasTypeBind ||= getType ne null
+        Model.this.hasRequiredBind ||= getRequired ne null
+        Model.this.hasConstraintBind ||= getConstraint ne null
+
+        Model.this.hasCalculateComputedCustomBind ||= hasCalculateComputedMIPs || hasCustomMIPs
+        Model.this.hasValidateBind ||= hasValidateMIPs
+
+        // Compute value analysis if we have a type bound, otherwise don't bother
+        override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIP match {
+            case Some(_) if hasNodeBinding => Some(analyzeXPath(getChildrenContext, "xs:string(.[1])"))
+            case _ => None
+        }
 
         // Return true if analysis succeeded
         def analyzeXPathGather(): Boolean = {
@@ -239,10 +272,10 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                             // Remember dependent instances
                             val returnableInstances = bindingAnalysis.returnableInstances
                             bindInstances.addAll(returnableInstances)
-                            if (hasCalculateComputedBind || hasCustomMip)
+                            if (hasCalculateComputedMIPs || hasCustomMIPs)
                                 computedBindExpressionsInstances.addAll(returnableInstances)
 
-                            if (hasValidateBind)
+                            if (hasValidateMIPs)
                                 validationBindInstances.addAll(returnableInstances)
 
                         case _ => // analysis failed
@@ -308,11 +341,6 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         }
     }
 
-    def hasBinds = (bindElements ne null) && bindElements.nonEmpty
-    def containsBind(bindId: String) = bindIds.contains(bindId)
-
-    def getDefaultInstance = if (instances.nonEmpty) instances.head._2 else null
-
     override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
 
         super.toXML(propertyContext, helper, List(
@@ -363,14 +391,31 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
 object Model {
 
-    // Built-in MIP names
-    val RELEVANT = "relevant"
-    val READONLY = "readonly"
-    val REQUIRED = "required"
-    val CONSTRAINT = "constraint"
-    val CALCULATE = "calculate"
-    val INITIAL_VALUE = "initial-value"
-    val TYPE = "type"
+    // MIP enumeration
+    object MIP extends Enumeration {
+        val Relevant = Value("relevant")
+        val Readonly = Value("readonly")
+        val Required = Value("required")
+        val Constraint = Value("constraint")
+        val Calculate = Value("calculate")
+        val InitialValue = Value("initial-value")
+        val Type = Value("type")
+    }
+
+    // Constants for Java callers
+    val RELEVANT = MIP.Relevant.toString
+    val READONLY = MIP.Readonly.toString
+    val REQUIRED = MIP.Required.toString
+    val CONSTRAINT = MIP.Constraint.toString
+    val CALCULATE = MIP.Calculate.toString
+    val INITIAL_VALUE = MIP.InitialValue.toString
+    val TYPE = MIP.Type.toString
+
+    // MIP default values
+    val DEFAULT_RELEVANT = true
+    val DEFAULT_READONLY = false
+    val DEFAULT_REQUIRED = false
+    val DEFAULT_VALID = true
 
     // NOTE: "required" is special: it is evaluated during recalculate, but used during revalidate. In effect both
     // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the

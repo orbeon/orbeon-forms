@@ -108,17 +108,7 @@ public class DumbXPathDependencies implements XPathDependencies {
         return true;
     }
 
-    public boolean hasAnyCalculationBind(Model model) {
-        // Always update
-        return true;
-    }
-
-    public boolean hasAnyValidationBind(Model model) {
-        // Always update
-        return true;
-    }
-
-    public boolean requireModelMIPUpdate(Model model, String bindId, String mipName) {
+    public boolean requireModelMIPUpdate(Model model, Model.Bind bind, String mipName) {
         // Always update
         return true;
     }

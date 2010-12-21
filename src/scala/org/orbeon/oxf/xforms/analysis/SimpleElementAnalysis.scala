@@ -27,6 +27,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val scopeModel = new ScopeModel(scope, findContainingModel)
+    lazy val namespaceMapping = staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId)
 
     lazy val inScopeVariables: Map[String, VariableAnalysisTrait] = getRootVariables ++ treeInScopeVariables
 

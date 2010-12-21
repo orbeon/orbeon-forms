@@ -47,11 +47,8 @@ public interface XPathDependencies {
     boolean requireLHHAUpdate(String lhhaName, String controlPrefixedId);
     boolean requireItemsetUpdate(String controlPrefixedId);
 
-    boolean hasAnyCalculationBind(Model model);
-    boolean hasAnyValidationBind(Model model);
-
     boolean hasAnyCalculationBind(Model model, String instancePrefixedId);
     boolean hasAnyValidationBind(Model model, String instancePrefixedId);
 
-    boolean requireModelMIPUpdate(Model model, String bindId, String mipName);
+    boolean requireModelMIPUpdate(Model model, Model.Bind bind, String mipName);
 }

@@ -19,7 +19,10 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.Item;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Constants useful for the XForms engine.
@@ -321,6 +324,8 @@ public class XFormsConstants {
     public static final String XFORMS_INCREMENTAL_UPDATE = "incremental";
 
     public static final QName XXFORMS_XFORMS11_SWITCH_QNAME = new QName("xforms11-switch", XXFORMS_NAMESPACE);
+
+    public static final QName XFORMS_INTEGER_QNAME = new QName("integer", XFORMS_NAMESPACE);
 
     public static final String XFORMS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "string");
     public static final String XFORMS_BOOLEAN_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "boolean");

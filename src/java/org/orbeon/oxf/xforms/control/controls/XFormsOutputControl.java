@@ -216,7 +216,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    public String getType() {
+    public QName getType() {
         // No type information is returned when there is a value attribute
 
         // Question: what if we have both @ref and @value? Should a type still be provided? This is not supported in

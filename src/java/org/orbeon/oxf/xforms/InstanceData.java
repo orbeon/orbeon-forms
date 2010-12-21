@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
@@ -31,129 +31,203 @@ import java.util.*;
  * Annotations are now done lazily when needed in order to reduce the number of objects created. This has a positive
  * impact on memory usage and garbage collection. This is also why most methods in this class are static.
  *
- * @noinspection PointlessBooleanExpression
+ * Since 2010-12, this now points back to bind nodes, which store bind MIPs directly.
  */
-public class InstanceData {
+public class InstanceData {// rename to DataNodeProperties once done
 
     private LocationData locationData;
 
-    // All MIP default values
-    private static final boolean DEFAULT_RELEVANT = true;
-    private static final boolean DEFAULT_READONLY = false;
-    private static final boolean DEFAULT_REQUIRED = false;
-    private static final boolean DEFAULT_VALID = true;
-    
-    private static final String DEFAULT_CUSTOM = null;
+    // Point back to binds that impacted this node
+    private List<XFormsModelBinds.Bind.BindNode> bindNodes;
 
-    // All MIPs with their default values
-    private boolean relevant = DEFAULT_RELEVANT;
-    protected boolean readonly = DEFAULT_READONLY;
-    private boolean required = DEFAULT_REQUIRED;
+    // Types set by schema or binds
+    private QName bindType;
+    private QName schemaType;
 
-    private String type;
-    private boolean valueValid = DEFAULT_VALID;
+    // Schema validity: only set by schema
+    private boolean schemaInvalid;
 
-    private String invalidBindIds;
-    private List<String> schemaErrors;
+    // Annotations (used only for multipart submission as of 2010-12)
+    private Map<String, String> transientAnnotations;
 
-    // Custom MIPs
-    private Map<String, String> customMips = null;
+    public static void addBindNode(NodeInfo nodeInfo, XFormsModelBinds.Bind.BindNode bindNode) {
+        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo);
+        if (instanceData.bindNodes == null)
+            instanceData.bindNodes = Collections.singletonList(bindNode);
+        else if (instanceData.bindNodes.size() == 1) {
+            final XFormsModelBinds.Bind.BindNode oldBindNode = instanceData.bindNodes.get(0);
+            instanceData.bindNodes = new ArrayList<XFormsModelBinds.Bind.BindNode>(4); // hoping that situations where many binds point to same node are rare
+            instanceData.bindNodes.add(oldBindNode);
+            instanceData.bindNodes.add(bindNode);
+        }
+    }
 
     private static final InstanceData READONLY_LOCAL_INSTANCE_DATA = new InstanceData() {
-        {
-            // Default for non-mutable nodes is to be read-only
-            this.readonly = true;
+        @Override
+        public boolean getLocalRelevant() {
+            return Model.DEFAULT_RELEVANT();
+        }
+
+        @Override
+        public boolean getLocalReadonly() {
+            return true;
+        }
+
+        @Override
+        public boolean getRequired() {
+            return Model.DEFAULT_REQUIRED();
+        }
+
+        @Override
+        public boolean getValid() {
+            return Model.DEFAULT_VALID();
+        }
+
+        @Override
+        public QName getSchemaOrBindType() {
+            return null;
+        }
+
+        @Override
+        public String getInvalidBindIds() {
+            return null;
+        }
+
+        @Override
+        public LocationData getLocationData() {
+            return null;
         }
     };
 
-//    // Previous values for dependencies
-//    private boolean previousRelevant = DEFAULT_RELEVANT;
-//    private boolean previousReadonly = DEFAULT_READONLY;
-//    private boolean previousRequired = DEFAULT_REQUIRED;
-//    private boolean previousValueValid = DEFAULT_VALID;
-//
-//    public static void saveMIPs(NodeInfo nodeInfo) {
-//        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-//        if (existingInstanceData != null) {
-//            existingInstanceData.previousRelevant = existingInstanceData.relevant;
-//            existingInstanceData.previousReadonly = existingInstanceData.readonly;
-//            existingInstanceData.previousRequired = existingInstanceData.required;
-//            existingInstanceData.previousValueValid = existingInstanceData.valueValid;
-//            // TODO: custom MIPs
-//        }
-//    }
+    public boolean getLocalRelevant() {
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.isRelevant() != Model.DEFAULT_RELEVANT())
+                    return !Model.DEFAULT_RELEVANT();
 
-    private InstanceData() {
+        return Model.DEFAULT_RELEVANT();
     }
 
-    private InstanceData(LocationData locationData) {
-        this.locationData = locationData;
+    public boolean getLocalReadonly() {
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.isReadonly() != Model.DEFAULT_READONLY())
+                    return !Model.DEFAULT_READONLY();
+
+        return Model.DEFAULT_READONLY();
     }
 
-    public LocationData getLocationData() {
-        return locationData;
+    public boolean getRequired() {
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.isRequired() != Model.DEFAULT_REQUIRED())
+                    return !Model.DEFAULT_REQUIRED();
+
+        return Model.DEFAULT_REQUIRED();
     }
 
-    public static void setCustom(NodeInfo nodeInfo, String name, String value) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (value == DEFAULT_CUSTOM) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                if (newInstanceData.customMips == null)
-                    newInstanceData.customMips = new HashMap<String, String>();
-                newInstanceData.customMips.put(name, value);
-            }
-        } else {
-            if (existingInstanceData.customMips == null)
-                existingInstanceData.customMips = new HashMap<String, String>();
-            existingInstanceData.customMips.put(name, value);
-        }
+    public boolean getValid() {
+
+        if (schemaInvalid)
+            return false;
+
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.isValid() != Model.DEFAULT_VALID())
+                    return !Model.DEFAULT_VALID();
+
+        return Model.DEFAULT_VALID();
+    }
+
+    public boolean getTypeValid() {
+
+        if (schemaInvalid)
+            return false;
+
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.isTypeValid() != Model.DEFAULT_VALID())
+                    return !Model.DEFAULT_VALID();
+
+        return Model.DEFAULT_VALID();
+    }
+
+    public Map<String, String> getAllCustom() {
+
+        Map<String, String> result = null;
+        boolean doCopy = false;
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.getCustomMips() != null) {
+                    if (result == null) {
+                        // Just reference first Map (it is unmodifiable) as it's the common case
+                        result = bindNode.getCustomMips();
+                        doCopy = true;
+                    } else {
+                        if (doCopy) {
+                            result = new HashMap<String, String>(result);
+                            doCopy = false;
+                        }
+                        result.putAll(bindNode.getCustomMips());
+                    }
+                }
+
+        return result;
+    }
+    
+    public QName getSchemaOrBindType() {
+
+        if (schemaType != null)
+            return schemaType;
+
+        return bindType;
+    }
+
+    public String getInvalidBindIds() {
+        StringBuffer sb = null;
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+                if (bindNode.isValid() != Model.DEFAULT_VALID()) {
+                    if (sb == null)
+                        sb = new StringBuffer();
+                    else if (sb.length() > 0)
+                        sb.append(' ');
+
+                    sb.append(bindNode.getBindStaticId());
+                }
+        return sb == null ? null : sb.toString();
+    }
+
+    public void setTransientAnnotation(String name, String value) {
+        if (transientAnnotations == null)
+            transientAnnotations = new HashMap<String, String>();
+        transientAnnotations.put(name, value);
+    }
+
+    public String getTransientAnnotation(String name) {
+        return (transientAnnotations == null) ? null : transientAnnotations.get(name);
+    }
+
+    public static void setTransientAnnotation(NodeInfo nodeInfo, String name, String value) {
+        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo);
+        instanceData.setTransientAnnotation(name,value);
+    }
+
+    public static String getTransientAnnotation(Node node, String name) {
+        final InstanceData existingInstanceData = getLocalInstanceData(node);
+        return (existingInstanceData == null) ? null : existingInstanceData.getTransientAnnotation(name);
     }
 
     public static Map<String, String> getAllCustom(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? null : existingInstanceData.customMips;
-    }
-
-    public static String getCustom(NodeInfo nodeInfo, String name) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null)
-                ? DEFAULT_CUSTOM
-                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name);
-    }
-
-    public static String getCustom(Node node, String name) {
-        final InstanceData existingInstanceData = getLocalInstanceData(node, false);
-        return (existingInstanceData == null)
-                ? DEFAULT_CUSTOM
-                : (existingInstanceData.customMips == null) ? null : existingInstanceData.customMips.get(name);
-    }
-
-    public static void setRelevant(NodeInfo nodeInfo, boolean relevant) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (relevant == DEFAULT_RELEVANT) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.relevant = relevant;
-            }
-        } else {
-            existingInstanceData.relevant = relevant;
-        }
+        return (existingInstanceData == null) ? null : existingInstanceData.getAllCustom();
     }
 
     public static boolean getInheritedRelevant(NodeInfo nodeInfo) {
         if (nodeInfo instanceof NodeWrapper) {
             return getInheritedRelevant(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else if (nodeInfo != null) {
-            return DEFAULT_RELEVANT;
+            return Model.DEFAULT_RELEVANT();
         } else {
             throw new OXFException("Cannot get relevant Model Item Property on null object.");
         }
@@ -163,101 +237,22 @@ public class InstanceData {
         // Iterate this node and its parents. The node is non-relevant if it or any ancestor is non-relevant.
         for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
             final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
-            final boolean currentRelevant = (currentInstanceData == null) ? DEFAULT_RELEVANT : currentInstanceData.relevant;
+            final boolean currentRelevant = (currentInstanceData == null) ? Model.DEFAULT_RELEVANT() : currentInstanceData.getLocalRelevant();
             if (!currentRelevant)
                 return false;
         }
         return true;
     }
 
-//    public static boolean getPreviousInheritedRelevant(NodeInfo nodeInfo) {
-//        if (nodeInfo instanceof NodeWrapper) {
-//            return getPreviousInheritedRelevant(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
-//        } else if (nodeInfo != null) {
-//            return DEFAULT_RELEVANT;
-//        } else {
-//            throw new OXFException("Cannot get relevant Model Item Property on null object.");
-//        }
-//    }
-//
-//    public static boolean getPreviousInheritedRelevant(Node node) {
-//        // Iterate this node and its parents. The node is non-relevant if it or any ancestor is non-relevant.
-//        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
-//            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
-//            final boolean currentRelevant = (currentInstanceData == null) ? DEFAULT_RELEVANT : currentInstanceData.previousRelevant;
-//            if (!currentRelevant)
-//                return false;
-//        }
-//        return true;
-//    }
-
-    public static void setRequired(NodeInfo nodeInfo, boolean required) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (required == DEFAULT_REQUIRED) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.required = required;
-            }
-        } else {
-            existingInstanceData.required = required;
-        }
-    }
-
-//    public static boolean getPreviousRequired(NodeInfo nodeInfo) {
-//        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-//        return (existingInstanceData == null) ? DEFAULT_REQUIRED : existingInstanceData.previousRequired;
-//    }
-
     public static boolean getRequired(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_REQUIRED : existingInstanceData.required;
+        return (existingInstanceData == null) ? Model.DEFAULT_REQUIRED() : existingInstanceData.getRequired();
     }
 
     public static boolean getRequired(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
-        return (existingInstanceData == null) ? DEFAULT_REQUIRED : existingInstanceData.required;
+        return (existingInstanceData == null) ? Model.DEFAULT_REQUIRED() : existingInstanceData.getRequired();
     }
-
-    public static void setReadonly(NodeInfo nodeInfo, boolean readonly) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (readonly == DEFAULT_READONLY) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.readonly = readonly;
-            }
-        } else {
-            existingInstanceData.readonly = readonly;
-        }
-    }
-
-//    public static boolean getPreviousInheritedReadonly(NodeInfo nodeInfo) {
-//        if (nodeInfo instanceof NodeWrapper) {
-//            return getPreviousInheritedReadonly(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
-//        } else if (nodeInfo != null) {
-//            return true;// Default for non-mutable nodes is to be read-only
-//        } else {
-//            throw new OXFException("Cannot get readonly Model Item Property on null object.");
-//        }
-//    }
-//
-//    public static boolean getPreviousInheritedReadonly(Node node) {
-//        // Iterate this node and its parents. The node is readonly if it or any ancestor is readonly.
-//        for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
-//            final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
-//            final boolean currentReadonly = (currentInstanceData == null) ? DEFAULT_READONLY : currentInstanceData.previousReadonly;
-//            if (currentReadonly)
-//                return true;
-//        }
-//        return false;
-//    }
 
     public static boolean getInheritedReadonly(NodeInfo nodeInfo) {
         if (nodeInfo instanceof NodeWrapper) {
@@ -273,195 +268,132 @@ public class InstanceData {
         // Iterate this node and its parents. The node is readonly if it or any ancestor is readonly.
         for (Node currentNode = node; currentNode != null; currentNode = currentNode.getParent()) {
             final InstanceData currentInstanceData = getLocalInstanceData(currentNode);
-            final boolean currentReadonly = (currentInstanceData == null) ? DEFAULT_READONLY : currentInstanceData.readonly;
+            final boolean currentReadonly = (currentInstanceData == null) ? Model.DEFAULT_READONLY() : currentInstanceData.getLocalReadonly();
             if (currentReadonly)
                 return true;
         }
         return false;
     }
 
-    public static boolean getLocalReadonly(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_READONLY : existingInstanceData.readonly;
-    }
-
-//    public static boolean getPreviousValid(NodeInfo nodeInfo) {
-//        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-//        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.previousValueValid;
-//    }
-
     public static boolean getValid(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.valueValid;
+        return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getValid();
     }
 
     public static boolean getValid(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
-        return (existingInstanceData == null) ? DEFAULT_VALID : existingInstanceData.valueValid;
+        return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getValid();
     }
 
-    public static void setType(NodeInfo nodeInfo, String type) {
-        getOrCreateInstanceData(nodeInfo).type = type;
-    }
-
-    public static void setType(Node node, String type) {
-        getOrCreateInstanceData(node).type = type;
-    }
-
-    public static String getType(NodeInfo nodeInfo) {
+    public static boolean getTypeValid(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        if (existingInstanceData == null || existingInstanceData.type == null) {
-            // No type was assigned by schema or MIP
-            if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-                // Check for xsi:type attribute
-                // NOTE: Saxon 9 has new code to resolve such QNames
-                final String typeQName = nodeInfo.getAttributeValue(StandardNames.XSI_TYPE);
-                if (typeQName != null) {
-                    try {
-                        final NameChecker checker = nodeInfo.getConfiguration().getNameChecker();
-                        final String[] parts = checker.getQNameParts(typeQName);
+        return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getTypeValid();
+    }
 
-                        // No prefix
-                        if (parts[0].equals("")) {
-                            return parts[1];
-                        }
+    public static void setBindType(NodeInfo nodeInfo, QName type) {
+        getOrCreateInstanceData(nodeInfo).bindType = type;
+    }
 
-                        // There is a prefix, resolve it
-                        final SequenceIterator namespaceNodes = nodeInfo.iterateAxis(Axis.NAMESPACE);
-                        while (true) {
-                            final NodeInfo currentNamespaceNode = (NodeInfo) namespaceNodes.next();
-                            if (currentNamespaceNode == null) {
-                                break;
-                            }
-                            final String prefix = currentNamespaceNode.getLocalPart();
-                            if (prefix.equals(parts[0])) {
-                                return XMLUtils.buildExplodedQName(currentNamespaceNode.getStringValue(), parts[1]);
-                            }
-                        }
-                    } catch (Exception e) {
-                        throw new OXFException(e);
+    public static void setSchemaType(Node node, QName type) {
+        getOrCreateInstanceData(node).schemaType = type;
+    }
+
+    public static QName getType(NodeInfo nodeInfo) {
+
+        // Try schema or bind type
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        if (existingInstanceData != null) {
+            final QName schemaOrBindType = existingInstanceData.getSchemaOrBindType();
+            if (schemaOrBindType != null)
+                return schemaOrBindType;
+        }
+
+        // No type was assigned by schema or MIP, try xsi:type
+        if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+            // Check for xsi:type attribute
+            // NOTE: Saxon 9 has new code to resolve such QNames
+            final String typeQName = nodeInfo.getAttributeValue(StandardNames.XSI_TYPE);
+            if (typeQName != null) {
+                try {
+                    final NameChecker checker = nodeInfo.getConfiguration().getNameChecker();
+                    final String[] parts = checker.getQNameParts(typeQName);
+
+                    // No prefix
+                    if (parts[0].equals("")) {
+                        return QName.get(parts[1]);
                     }
+
+                    // There is a prefix, resolve it
+                    final SequenceIterator namespaceNodes = nodeInfo.iterateAxis(Axis.NAMESPACE);
+                    while (true) {
+                        final NodeInfo currentNamespaceNode = (NodeInfo) namespaceNodes.next();
+                        if (currentNamespaceNode == null) {
+                            break;
+                        }
+                        final String prefix = currentNamespaceNode.getLocalPart();
+                        if (prefix.equals(parts[0])) {
+                            return QName.get(parts[1], "", currentNamespaceNode.getStringValue());
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new OXFException(e);
                 }
             }
-            return null;
-        } else {
-            // Return type assigned by schema or MIP
-            return existingInstanceData.type;
         }
+
+        return null;
     }
 
-    public static String getType(Node node) {
+    public static QName getType(Node node) {
+
+        // Try schema or bind type
         final InstanceData existingInstanceData = getLocalInstanceData(node);
-        if (existingInstanceData == null || existingInstanceData.type == null) {
-            // No type was assigned by schema or MIP
-            if (node instanceof Element) {
-                // Check for xsi:type attribute
-                final Element element = (Element) node;
-                // TODO: should pass true?
-                final QName typeQName = Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false);
-                if (typeQName != null)
-                    return Dom4jUtils.qNameToExplodedQName(typeQName);
-            }
-            return null;
-        } else {
-            // Return type assigned by schema or MIP
-            return existingInstanceData.type;
+        if (existingInstanceData != null) {
+            final QName schemaOrBindType = existingInstanceData.getSchemaOrBindType();
+            if (schemaOrBindType != null)
+                return schemaOrBindType;
         }
+
+        // No type was assigned by schema or MIP, try xsi:type
+        if (node instanceof Element) {
+            // Check for xsi:type attribute
+            final Element element = (Element) node;
+            return Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME, false); // TODO: should pass true?
+        }
+
+        return null;
     }
 
     public static String getInvalidBindIds(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? null : existingInstanceData.invalidBindIds;
+        return (existingInstanceData == null) ? null : existingInstanceData.getInvalidBindIds();
     }
 
-    public static void addSchemaError(NodeInfo nodeInfo, final String schemaError, final String stringValue, String modelBindId) {
-        if (nodeInfo instanceof NodeWrapper) {
-            addSchemaError(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""), schemaError, stringValue, modelBindId);
-        } else {
-            throw new OXFException("Cannot add schema to non-NodeWrapper NodeInfo.");
-        }
-    }
-
-    public static void addSchemaError(Node node, final String schemaError, final String stringValue, String modelBindId) {
+    public static void addSchemaError(Node node) {
 
         // Get or create InstanceData
         final InstanceData instanceData = getOrCreateInstanceData(node);
 
         // Remember that the value is invalid
-        instanceData.valueValid = false;
-
-        // Add schema errors if provided
-        if (schemaError != null) {
-            if (instanceData.schemaErrors == null)
-                instanceData.schemaErrors = new ArrayList<String>(1);
-            instanceData.schemaErrors.add(schemaError);
-        }
-
-        // Add bind id if provided
-        if (modelBindId != null) {
-            instanceData.invalidBindIds = (instanceData.invalidBindIds == null) ? modelBindId : instanceData.invalidBindIds + " " + modelBindId;
-        }
+        instanceData.schemaInvalid = true;
     }
 
-    public static Iterator getSchemaErrors(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        final Collection result;
-        if (existingInstanceData != null) {
-            if (existingInstanceData.schemaErrors == null) {
-                result = Collections.EMPTY_LIST;
-            } else {
-                result = Collections.unmodifiableCollection(existingInstanceData.schemaErrors);
-            }
-        } else {
-            result = Collections.EMPTY_LIST;
-        }
-        return result.iterator();
-    }
-
-    public static void updateValueValid(NodeInfo nodeInfo, boolean valueValid, String modelBindId) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
-        if (existingInstanceData == null) {
-            if (valueValid == DEFAULT_VALID) {
-                // Not changing from the default so don't even create object
-                return;
-            } else {
-                // Changing from the default
-                final InstanceData newInstanceData = createNewInstanceData(nodeInfo);
-                newInstanceData.valueValid = valueValid;
-
-                if (modelBindId != null)
-                    newInstanceData.invalidBindIds = (newInstanceData.invalidBindIds == null) ? modelBindId : newInstanceData.invalidBindIds + " " + modelBindId;
-            }
-        } else {
-            // Never go back from default
-            if (valueValid != DEFAULT_VALID) {
-                existingInstanceData.valueValid = valueValid;
-
-                if (modelBindId != null)
-                    existingInstanceData.invalidBindIds = (existingInstanceData.invalidBindIds == null) ? modelBindId : existingInstanceData.invalidBindIds + " " + modelBindId;
-            }
-        }
-    }
-
-    public static void clearValidationState(NodeInfo nodeInfo) {
+    public static void clearState(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
         if (existingInstanceData != null) {
-            // Clear everything related to validity (except required)
-            existingInstanceData.valueValid = DEFAULT_VALID;
-            existingInstanceData.type = null;
-            existingInstanceData.invalidBindIds = null;
-            if (existingInstanceData.schemaErrors != null)
-                existingInstanceData.schemaErrors.clear();
+            existingInstanceData.bindNodes = null;
+            existingInstanceData.bindType = null;
+            existingInstanceData.schemaType = null;
+            existingInstanceData.schemaInvalid = false;
+            existingInstanceData.transientAnnotations = null;
         }
     }
 
-    public static void clearOtherState(NodeInfo nodeInfo) {
+    public static void clearSchemaState(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);// not really an update since for read-only nothing changes
         if (existingInstanceData != null) {
-
-            existingInstanceData.relevant = DEFAULT_RELEVANT;
-            existingInstanceData.readonly = DEFAULT_READONLY;
-            existingInstanceData.required = DEFAULT_REQUIRED;
+            existingInstanceData.schemaType = null;
+            existingInstanceData.schemaInvalid = false;
         }
     }
 
@@ -473,10 +405,6 @@ public class InstanceData {
     private static InstanceData getOrCreateInstanceData(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
         return (existingInstanceData != null) ? existingInstanceData : createNewInstanceData(node);
-    }
-
-    private static InstanceData getLocalInstanceData(Node node, boolean forUpdate) {
-        return getLocalInstanceData(node);
     }
 
     private static InstanceData getLocalInstanceData(NodeInfo nodeInfo, boolean forUpdate) {
@@ -556,25 +484,25 @@ public class InstanceData {
         final InstanceData instanceData;
         if (node instanceof Element) {
             final Element element = (Element) node;
-            instanceData = InstanceData.newInstanceData(element.getData());
+            instanceData = InstanceData.createNewInstanceData(element.getData());
             element.setData(instanceData);
         } else if (node instanceof Attribute) {
             final Attribute attribute = (Attribute) node;
-            instanceData = InstanceData.newInstanceData(attribute.getData());
+            instanceData = InstanceData.createNewInstanceData(attribute.getData());
             attribute.setData(instanceData);
         } else if (node instanceof Document) {
             // We can't store data on the Document object. Use root element instead.
             final Element element = ((Document) node).getRootElement();
-            instanceData = InstanceData.newInstanceData(element.getData());
+            instanceData = InstanceData.createNewInstanceData(element.getData());
             element.setData(instanceData);
         } else {
-            // TODO: other node types once we update to handling text nodes correctly. But it looks like Text does not support data.
+            // No other node type is supported
             throw new OXFException("Cannot create InstanceData on node type: " + node.getNodeTypeName());
         }
         return instanceData;
     }
 
-    private static InstanceData newInstanceData(Object existingData) {
+    private static InstanceData createNewInstanceData(Object existingData) {
         if (existingData instanceof LocationData) {
             return new InstanceData((LocationData) existingData);
         } else if (existingData instanceof InstanceData) {
@@ -583,5 +511,14 @@ public class InstanceData {
             return new InstanceData(null);
         }
     }
-}
 
+    private InstanceData() {}
+
+    private InstanceData(LocationData locationData) {
+        this.locationData = locationData;
+    }
+
+    public LocationData getLocationData() {
+        return locationData;
+    }
+}

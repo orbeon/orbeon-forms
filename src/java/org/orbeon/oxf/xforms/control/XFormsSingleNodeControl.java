@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
@@ -21,6 +22,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.value.AtomicValue;
@@ -51,7 +53,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     private boolean wasValid = true;
 
     // Type
-    private String type;
+    private QName type;
 
     // Custom MIPs
     private Map<String, String> customMIPs;
@@ -194,8 +196,12 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return false;
     }
 
-    public String getType() {
+    public QName getType() {
         return type;
+    }
+
+    public String getTypeExplodedQName() {
+        return Dom4jUtils.qNameToExplodedQName(type);
     }
 
     public Map<String, String> getCustomMIPs() {
@@ -243,14 +249,14 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
      * @return the local name of the built-in type, or null if not found
      */
     public String getBuiltinTypeName() {
-        final String type = getType();
+        final QName type = getType();
 
         if (type != null) {
-            final boolean isBuiltInSchemaType = type.startsWith(XFormsConstants.XSD_EXPLODED_TYPE_PREFIX);
-            final boolean isBuiltInXFormsType = type.startsWith(XFormsConstants.XFORMS_EXPLODED_TYPE_PREFIX);
+            final boolean isBuiltInSchemaType = type.getNamespaceURI().equals(XMLConstants.XSD_URI);
+            final boolean isBuiltInXFormsType = type.getNamespaceURI().equals(XFormsConstants.XFORMS_NAMESPACE_URI);
 
             if (isBuiltInSchemaType || isBuiltInXFormsType) {
-                return type.substring(type.indexOf('}') + 1);
+                return type.getName();
             } else {
                 return null;
             }
@@ -265,10 +271,10 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
      * @return the local name of the type, or null if not found
      */
     public String getTypeLocalName() {
-        final String type = getType();
+        final QName type = getType();
 
         if (type != null) {
-            return type.substring(type.indexOf('}') + 1);
+            return type.getName();
         } else {
             return null;
         }
@@ -448,8 +454,8 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
         // Type attribute
         {
-            final String typeValue1 = isNewlyVisibleSubtree ? null : control1.getType();
-            final String typeValue2 = control2.getType();
+            final String typeValue1 = isNewlyVisibleSubtree ? null : control1.getTypeExplodedQName();
+            final String typeValue2 = control2.getTypeExplodedQName();
 
             if (isNewlyVisibleSubtree || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
                 final String attributeValue = typeValue2 != null ? typeValue2 : "";

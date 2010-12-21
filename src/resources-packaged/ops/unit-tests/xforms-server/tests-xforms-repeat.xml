@@ -1059,7 +1059,7 @@
                                     </tea>
                                 </xforms:instance>
 
-                                <xforms:bind nodeset="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
+                                <xforms:bind id="bind1" nodeset="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
 
                             </xforms:model>
                         </models>

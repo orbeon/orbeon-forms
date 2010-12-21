@@ -54,7 +54,7 @@
 
     <!-- Choose which epilogue to call depending on container type -->
     <!-- If you don't use portlets at all, you can bypass this -->
-    <p:choose  href="#request">
+    <p:choose href="#request">
         <!-- If the container is a servlet, call the servlet epilogue pipeline -->
         <p:when test="/request/container-type = 'servlet'">
             <p:processor name="oxf:pipeline">

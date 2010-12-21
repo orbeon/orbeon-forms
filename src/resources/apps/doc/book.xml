@@ -68,7 +68,7 @@
             <menu-item label="XUpdate" href="processors-xupdate"/>
         </menu>
         <menu label="Querying Data">
-            <menu-item label="REST" href="processors-submission"/>
+            <menu-item label="REST" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xforms-submission"/>
             <menu-item label="SQL Databases" href="processors-sql"/>
             <menu-item label="XML Databases" href="processors-xmldb"/>
             <menu-item label="LDAP Directories" href="processors-ldap"/>

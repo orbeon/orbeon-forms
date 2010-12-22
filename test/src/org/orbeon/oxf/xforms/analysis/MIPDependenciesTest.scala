@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -22,28 +21,45 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent
 import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.junit._
+;
 
 class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    @Test
-    def testMIPChanges {
+    private var pipelineContext: PipelineContext = _
+    private var document: XFormsContainingDocument = _
+
+    @Before def setupDocument()  {
+        this.pipelineContext = createPipelineContextWithExternalContext()
+
+        val staticState= XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/mips.xml")
+        this.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null)
+
+        document.afterInitialResponse()
+        document.beforeExternalEvents(pipelineContext, null)
+    }
+
+    @After def disposeDocument() {
+        document.afterExternalEvents(pipelineContext)
+        document.afterUpdateResponse()
+
+        document = null
+        pipelineContext = null
+    }
+
+
+    @Test def testTypeInvalid {
         if (Version.isPE) { // only test this feature if we are the PE version
-            // Create document
-            val pipelineContext = createPipelineContextWithExternalContext()
 
-            val staticState= XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/mips.xml")
-            val document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null)
-            document.afterInitialResponse()
-
+            // Initial state
             assert("150" === getControlValue("line-total·1"))
             assert("2150" === getControlValue("subtotal"))
 
-            // Test updates on document
-            document.beforeExternalEvents(pipelineContext, null)
-
             // Change first item price to foo
             setControlValue("price·1", "foo")
+
             assert(!isValid("price·1"))
             assert(!isValid("line-total·1"))
             assert("-" === getControlValue("line-total·1"))
@@ -51,35 +67,105 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
 
             // Change first item price to 100
             setControlValue("price·1", "100")
+
             assert(isValid("price·1"))
             assert(isValid("line-total·1"))
             assert("300" === getControlValue("line-total·1"))
             assert("2300" === getControlValue("subtotal"))
-
-            document.afterExternalEvents(pipelineContext)
-
-            document.afterUpdateResponse()
-
-            def setControlValue(controlId: String, value: String): Unit =
-                document.handleExternalEvent(pipelineContext, new XXFormsValueChangeWithFocusChangeEvent(document, document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsEventTarget], null, value))
-
-            def isRequired(controlId: String) =
-                (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isRequired
-
-            def getType(controlId: String) =
-                (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).getType
-
-            def isValid(controlId: String) =
-                (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isValid
-
-            def isRelevant(controlId: String) =
-                (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsControl]).isRelevant
-
-            def getControlValue(controlId: String) =
-                (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsValueControl]).getValue(pipelineContext)
-
-            def isReadonly(controlId: String) =
-                (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isReadonly
         }
     }
+
+    @Test def testRelevance {
+        if (Version.isPE) { // only test this feature if we are the PE version
+
+            val units = getControlValue("units·1")
+
+            // Change first item units to foo
+            setControlValue("units·1", "foo")
+
+            assert(!isValid("units·1"))
+            assert(!isRelevant("line-total·1"))
+            assert("2000" === getControlValue("subtotal"))
+
+            // Change back item  units
+            setControlValue("units·1", units)
+
+            assert(isValid("units·1"))
+            assert(isRelevant("line-total·1"))
+            assert(isValid("line-total·1"))
+            assert("150" === getControlValue("line-total·1"))
+            assert("2150" === getControlValue("subtotal"))
+        }
+    }
+
+    @Test def testTypeConstraintInvalid {
+        if (Version.isPE) { // only test this feature if we are the PE version
+
+            val units = getControlValue("units·1")
+
+            // Change first item units to a constraint-invalid value
+            setControlValue("units·1", "0")
+
+            assert(!isValid("units·1"))
+            assert(!isRelevant("line-total·1"))
+            assert("2000" === getControlValue("subtotal"))
+
+            // Then change to type-invalid too
+            setControlValue("units·1", "foo")
+
+            assert(!isValid("units·1"))
+            assert(!isRelevant("line-total·1"))
+            assert("2000" === getControlValue("subtotal"))
+
+            // Change back item  units
+            setControlValue("units·1", units)
+
+            assert(isValid("units·1"))
+            assert(isRelevant("line-total·1"))
+            assert(isValid("line-total·1"))
+            assert("150" === getControlValue("line-total·1"))
+            assert("2150" === getControlValue("subtotal"))
+        }
+    }
+
+    @Test def testSimpleRequired {
+        if (Version.isPE) { // only test this feature if we are the PE version
+
+            // NOTE: The value of @required has no dependencies in this sample, so this is a weak test 
+
+            assert(isRequired("name·1"))
+            assert(isValid("name·1"))
+
+            setControlValue("name·1", "")
+            assert(isRequired("name·1"))
+            assert(!isValid("name·1"))
+
+            setControlValue("name·1", "100")
+            assert(isRequired("name·1"))
+            assert(isValid("name·1"))
+        }
+    }
+
+    // TODO: more tests
+
+    def setControlValue(controlId: String, value: String): Unit =
+        document.handleExternalEvent(pipelineContext, new XXFormsValueChangeWithFocusChangeEvent(document, document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsEventTarget], null, value))
+
+    def isRequired(controlId: String) =
+        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isRequired
+
+    def getType(controlId: String) =
+        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).getType
+
+    def isValid(controlId: String) =
+        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isValid
+
+    def isRelevant(controlId: String) =
+        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsControl]).isRelevant
+
+    def getControlValue(controlId: String) =
+        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsValueControl]).getValue(pipelineContext)
+
+    def isReadonly(controlId: String) =
+        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isReadonly
 }

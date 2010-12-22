@@ -37,7 +37,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     private ExternalContext.Request filterRequest;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
 
         {
             final PipelineContext pipelineContext = new PipelineContext();

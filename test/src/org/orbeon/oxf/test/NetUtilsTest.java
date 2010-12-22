@@ -23,13 +23,14 @@ import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.util.HttpServletRequestStub;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class NetUtilsTest extends ResourceManagerTestBase {
 
@@ -39,7 +40,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
     private ExternalContext.Response response;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
 
         pipelineContext = new PipelineContext();
 

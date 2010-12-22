@@ -1358,7 +1358,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Restore upload information
         {
             final String pendingUploads = dynamicStateElement.attributeValue("pending-uploads");
-            this.pendingUploads = (pendingUploads == null) ? Collections.<String>emptySet() : new HashSet<String>(Arrays.asList(StringUtils.split(pendingUploads, ' ')));
+            this.pendingUploads = (pendingUploads == null) ? null : new HashSet<String>(Arrays.asList(StringUtils.split(pendingUploads, ' ')));
         }
 
         // Restore annotated page template if present
@@ -1583,6 +1583,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Register that an upload has started.
      */
     public void startUpload(String uploadId) {
+        if (pendingUploads == null)
+            pendingUploads = new HashSet<String>();
         pendingUploads.add(uploadId);
     }
 
@@ -1590,14 +1592,16 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Register that an upload has ended.
      */
     public void endUpload(String uploadId) {
-        assert pendingUploads.remove(uploadId);
+        assert pendingUploads != null;
+        boolean found = pendingUploads.remove(uploadId);
+        assert found;
     }
 
     /**
      * Return the number of pending uploads.
      */
     public int countPendingUploads() {
-        return pendingUploads.size();
+        return (pendingUploads == null) ? 0 : pendingUploads.size();
     }
 
     /**

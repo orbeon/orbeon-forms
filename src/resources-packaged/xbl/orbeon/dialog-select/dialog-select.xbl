@@ -96,6 +96,8 @@
                         <xforms:choices xxbl:scope="outer">
                             <xbl:content includes="fr|dialog-select > xforms|itemset, fr|dialog-select > xforms|item, fr|dialog-select > xforms|choices"/>
                         </xforms:choices>
+                        <!-- Redirect focus to button -->
+                        <xforms:setfocus ev:event="xforms-focus" control="select"/>
                     </xforms:select>
 
                     <!-- Stuff within this group doesn't contribute events to the outside -->

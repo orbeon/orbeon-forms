@@ -148,24 +148,18 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
 
     // TODO: more tests
 
-    def setControlValue(controlId: String, value: String): Unit =
-        document.handleExternalEvent(pipelineContext, new XXFormsValueChangeWithFocusChangeEvent(document, document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsEventTarget], null, value))
-
-    def isRequired(controlId: String) =
-        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isRequired
-
-    def getType(controlId: String) =
-        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).getType
-
-    def isValid(controlId: String) =
-        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isValid
-
-    def isRelevant(controlId: String) =
-        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsControl]).isRelevant
-
     def getControlValue(controlId: String) =
-        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsValueControl]).getValue(pipelineContext)
+        getObject(controlId).asInstanceOf[XFormsValueControl].getValue(pipelineContext)
 
-    def isReadonly(controlId: String) =
-        (document.getObjectByEffectiveId(controlId).asInstanceOf[XFormsSingleNodeControl]).isReadonly
+    def setControlValue(controlId: String, value: String): Unit =
+        document.handleExternalEvent(pipelineContext, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
+
+    def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
+    def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
+    def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
+    def isValid(controlId: String) = getSingleNodeControl(controlId).isValid
+    def getType(controlId: String) = getSingleNodeControl(controlId).getType
+
+    private def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
+    private def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)
 }

@@ -53,7 +53,7 @@
             </xf:instance>
 
             <xf:bind id="item-bind" ref="items/item">
-                <xf:bind id="name-bind" ref="name" required="true()"/>
+                <xf:bind id="name-bind" ref="name" required="true()" constraint="normalize-space()"/>
                 <xf:bind id="units-bind" ref="units" type="xs:integer" constraint=". > 0"/>
                 <xf:bind id="price-bind" ref="price" type="xs:decimal" constraint=". > 0"/>
                 <xf:bind id="line-total-bind" ref="total"

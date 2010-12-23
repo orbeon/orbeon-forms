@@ -146,6 +146,21 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
         }
     }
 
+    @Test def testNormalizeSpaceContextConstraint {
+        if (Version.isPE) { // only test this feature if we are the PE version
+
+            // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
+
+            assert(isValid("name·1"))
+
+            setControlValue("name·1", "    ") // series of spaces
+            assert(!isValid("name·1"))
+
+            setControlValue("name·1", "100")
+            assert(isValid("name·1"))
+        }
+    }
+
     // TODO: more tests
 
     def getControlValue(controlId: String) =

@@ -31,7 +31,7 @@
 
     <property name="src.dir" location="src"/>
 
-    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20101011.jar"/>
+    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20101223.jar"/>
 
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>

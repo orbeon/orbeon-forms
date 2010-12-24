@@ -2176,4 +2176,122 @@
         </output>
     </test>
 
+    <test description="xf:select1 initial output with values and items containing spaces" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315711&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+                <xh:head>
+                    <xf:model xxforms:xhtml-layout="span" xxforms:encrypt-item-values="false">
+                        <xf:instance xmlns="">
+                            <Testcase>
+                                <myvalue/>
+                                <myvalue2>one</myvalue2>
+                                <myvalue3> </myvalue3>
+                                <myvalue4>  </myvalue4>
+                                <myvalue5>
+                                one
+                                </myvalue5>
+                            </Testcase>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="*">
+                        <xf:select1 ref="." id="my-select1">
+                            <xf:item>
+                                <xf:label>default label</xf:label>
+                                <xf:value>default</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>empty</xf:label>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>one label</xf:label>
+                                <xf:value>one</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>two label</xf:label>
+                                <xf:value>two</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>one space in value</xf:label>
+                                <xf:value> </xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>two spaces in value</xf:label>
+                                <xf:value>  </xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1">
+                    <xh:select id="my-select1$$c·1" name="my-select1·1">
+                        <xh:option value="default">default label</xh:option>
+                        <xh:option value="" selected="selected">empty</xh:option>
+                        <xh:option value="one">one label</xh:option>
+                        <xh:option value="two">two label</xh:option>
+                        <xh:option value=" ">one space in value</xh:option>
+                        <xh:option value="  ">two spaces in value</xh:option>
+                    </xh:select>
+                </xh:span>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-select1·2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xh:select id="my-select1$$c·2" name="my-select1·2">
+                        <xh:option value="default">default label</xh:option>
+                        <xh:option value="">empty</xh:option>
+                        <xh:option value="one" selected="selected">one label</xh:option>
+                        <xh:option value="two">two label</xh:option>
+                        <xh:option value=" ">one space in value</xh:option>
+                        <xh:option value="  ">two spaces in value</xh:option>
+                    </xh:select>
+                </xh:span>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-select1·3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xh:select id="my-select1$$c·3" name="my-select1·3">
+                        <xh:option value="default">default label</xh:option>
+                        <xh:option value="">empty</xh:option>
+                        <xh:option value="one">one label</xh:option>
+                        <xh:option value="two">two label</xh:option>
+                        <xh:option value=" " selected="selected">one space in value</xh:option>
+                        <xh:option value="  ">two spaces in value</xh:option>
+                    </xh:select>
+                </xh:span>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-select1·4" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xh:select id="my-select1$$c·4" name="my-select1·4">
+                        <xh:option value="default">default label</xh:option>
+                        <xh:option value="">empty</xh:option>
+                        <xh:option value="one">one label</xh:option>
+                        <xh:option value="two">two label</xh:option>
+                        <xh:option value=" ">one space in value</xh:option>
+                        <xh:option value="  " selected="selected">two spaces in value</xh:option>
+                    </xh:select>
+                </xh:span>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-select1·5" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xh:select id="my-select1$$c·5" name="my-select1·5">
+                        <xh:option value="default">default label</xh:option>
+                        <xh:option value="">empty</xh:option>
+                        <xh:option value="one">one label</xh:option>
+                        <xh:option value="two">two label</xh:option>
+                        <xh:option value=" ">one space in value</xh:option>
+                        <xh:option value="  ">two spaces in value</xh:option>
+                    </xh:select>
+                </xh:span>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
+                    <xh:select id="my-select1$$c" name="my-select1">
+                        <xh:option value="default">default label</xh:option>
+                        <xh:option value="">empty</xh:option>
+                        <xh:option value="one">one label</xh:option>
+                        <xh:option value="two">two label</xh:option>
+                        <xh:option value=" ">one space in value</xh:option>
+                        <xh:option value="  ">two spaces in value</xh:option>
+                    </xh:select>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

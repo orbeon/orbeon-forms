@@ -14,9 +14,13 @@
 package org.orbeon.oxf.xforms.itemset;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.*;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -55,6 +59,9 @@ public class XFormsItemUtils {
         boolean selected = false;
         if (controlValue != null) {
             if (isMultiple) {
+                // Trim for select only
+                controlValue = controlValue.trim();
+                itemValue = itemValue.trim();// TODO: maybe this should be trimmed in the itemset in the first place
                 if ("".equals(controlValue)) {
                     // Special case of empty string: check the item that has empty string if any
                     if ("".equals(itemValue)) {
@@ -71,6 +78,7 @@ public class XFormsItemUtils {
                     }
                 }
             } else {
+                // Do exact string comparison for select1
                 selected = controlValue.equals(itemValue);
             }
         }

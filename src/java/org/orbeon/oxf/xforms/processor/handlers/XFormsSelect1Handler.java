@@ -17,14 +17,23 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
-import org.orbeon.oxf.xforms.itemset.*;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xforms.itemset.Item;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.itemset.ItemsetListener;
+import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Iterator;
@@ -569,8 +578,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private static boolean isSelected(PipelineContext pipelineContext, HandlerContext handlerContext, XFormsValueControl xformsControl, boolean isMultiple, Item item) {
         boolean isSelected;
         if (!handlerContext.isTemplate() && xformsControl != null) {
-            final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
-            final String controlValue = ((xformsControl.getValue(pipelineContext) == null) ? "" : xformsControl.getValue(pipelineContext)).trim();
+            final String itemValue = (item.getValue() == null) ? "" : item.getValue();
+            final String controlValue = (xformsControl.getValue(pipelineContext) == null) ? "" : xformsControl.getValue(pipelineContext);
             isSelected = XFormsItemUtils.isSelected(isMultiple, controlValue, itemValue);
         } else {
             isSelected = false;

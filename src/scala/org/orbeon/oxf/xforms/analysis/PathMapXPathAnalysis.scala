@@ -1,4 +1,4 @@
-    /**
+/**
  *  Copyright (C) 2010 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -16,17 +16,21 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.saxon.expr._
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.dom4j.Element
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
-import org.orbeon.saxon.expr.PathMap.PathMapArc
 import java.util.{Map => JMap, HashMap => JHashMap}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import collection.mutable.{LinkedHashSet, Stack}
 import org.orbeon.oxf.xforms.{MapSet, XFormsConstants, XFormsContainingDocument, XFormsStaticState}
+import org.orbeon.saxon.trace.ExpressionPresenter
+import java.io.ByteArrayOutputStream
+import org.orbeon.saxon.expr.PathMap.{PathMapNode, PathMapArc}
+import xml._
+import org.orbeon.oxf.xml.dom4j._
+import org.orbeon.saxon.Configuration
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -157,16 +161,11 @@ object PathMapXPathAnalysis {
             pathmap match {
                 case Some(pathmap) if !pathmap.isInvalidated =>
 
-                    //            println("Expression:")
-                    //            println(expression.toString())
-                    //            println("PathMap before")
-                    //            pathmap.diagnosticDump(System.out)
-
                     // Try to reduce ancestor axis before anything else
                     reduceAncestorAxis(pathmap)
 
-                    //            println("PathMap after")
-                    //            pathmap.diagnosticDump(System.out)
+                    // DEBUG
+//                    dumpPathMap(staticState.getXPathConfiguration, xpathString, pathmap)
 
                     // We use LinkedHashMap/LinkedHashSet in part to keep unit tests reproducible
                     val valueDependentPaths = new MapSet[String, String]
@@ -531,6 +530,40 @@ object PathMapXPathAnalysis {
     }
 
     def buildInstanceString(instanceId: String) = "instance('" + instanceId.replaceAll("'", "''") + "')"
+
+    /**
+     * Output the structure of the given pathmap to the standard output.
+     */
+    def dumpPathMap(configuration: Configuration, xpathString: String, pathmap: PathMap) {
+
+        def getStep(step: Expression, targetNode: PathMapNode): Node =
+            <step atomized={targetNode.isAtomized.toString}
+                  returnable={targetNode.isReturnable.toString}
+                  unknown-dependencies={targetNode.hasUnknownDependencies.toString}>{step.toString}</step>
+
+        def getArcs(node: PathMapNode): Node =
+            <arcs>{ Seq(node.getArcs: _*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
+
+        def explainAsXML(expression: Expression) = {
+            val out = new ByteArrayOutputStream
+            val presenter = new ExpressionPresenter(configuration, out)
+            expression.explain(presenter)
+            presenter.close()
+            XML.loadString(out.toString("utf-8"))
+        }
+
+        val result =
+            <pathmap>
+                <xpath>{xpathString}</xpath>
+                {
+                    for { root <- pathmap.getPathMapRoots } yield
+                        <root>{ Seq(explainAsXML(root.getRootExpression), getStep(root.getRootExpression, root), getArcs(root)) }</root>
+                }
+            </pathmap>
+
+        // Pretty print
+        println(Dom4jUtils.prettyfy(result.toString))
+    }
 
 //    def externalAnalysisExperiment(expression: Expression, pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
 //

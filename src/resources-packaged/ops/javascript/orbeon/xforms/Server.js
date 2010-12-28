@@ -1007,7 +1007,7 @@
 
                                     } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-tree")) {
-                                        ORBEON.xforms.Page.getForm(formID).getControl(documentElement).setItemset(itemsetTree);
+                                        ORBEON.xforms.Page.getControl(documentElement).setItemset(itemsetTree);
                                     } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {

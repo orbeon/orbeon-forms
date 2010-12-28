@@ -1788,7 +1788,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
                 || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
             // Select/Select tree
-            return ORBEON.xforms.Page.getForm(formElement.id).getControl(control).getValue();
+            return ORBEON.xforms.Page.getControl(control).getValue();
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-range")) {
             return ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
         }
@@ -1998,7 +1998,7 @@ ORBEON.xforms.Controls = {
             }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
                 || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
-            return ORBEON.xforms.Page.getForm(formElement.id).getControl(control).setValue(newControlValue);
+            return ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload
 

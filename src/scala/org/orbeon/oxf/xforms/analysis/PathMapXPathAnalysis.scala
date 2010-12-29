@@ -536,27 +536,28 @@ object PathMapXPathAnalysis {
      */
     def dumpPathMap(configuration: Configuration, xpathString: String, pathmap: PathMap) {
 
-        def getStep(step: Expression, targetNode: PathMapNode): Node =
-            <step atomized={targetNode.isAtomized.toString}
-                  returnable={targetNode.isReturnable.toString}
-                  unknown-dependencies={targetNode.hasUnknownDependencies.toString}>{step.toString}</step>
-
-        def getArcs(node: PathMapNode): Node =
-            <arcs>{ Seq(node.getArcs: _*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
-
-        def explainAsXML(expression: Expression) = {
-            val out = new ByteArrayOutputStream
-            val presenter = new ExpressionPresenter(configuration, out)
-            expression.explain(presenter)
-            presenter.close()
-            XML.loadString(out.toString("utf-8"))
-        }
-
         val result =
             <pathmap>
                 <xpath>{xpathString}</xpath>
                 {
-                    for { root <- pathmap.getPathMapRoots } yield
+                    def explainAsXML(expression: Expression) = {
+                        // Use Saxon explain() and convert back to native XML
+                        val out = new ByteArrayOutputStream
+                        val presenter = new ExpressionPresenter(configuration, out)
+                        expression.explain(presenter)
+                        presenter.close()
+                        XML.loadString(out.toString("utf-8"))
+                    }
+
+                    def getStep(step: Expression, targetNode: PathMapNode) =
+                        <step atomized={targetNode.isAtomized.toString}
+                              returnable={targetNode.isReturnable.toString}
+                              unknown-dependencies={targetNode.hasUnknownDependencies.toString}>{step.toString}</step>
+
+                    def getArcs(node: PathMapNode): Node =
+                        <arcs>{ Seq(node.getArcs: _*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
+
+                    for (root <- pathmap.getPathMapRoots) yield
                         <root>{ Seq(explainAsXML(root.getRootExpression), getStep(root.getRootExpression, root), getArcs(root)) }</root>
                 }
             </pathmap>

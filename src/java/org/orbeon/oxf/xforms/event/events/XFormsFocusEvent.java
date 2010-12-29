@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
@@ -23,8 +22,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: form control / Bubbles: No / Cancelable: Yes / Context Info: None
  */
-public class XFormsFocusEvent extends XFormsEvent {
-    public XFormsFocusEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+public class XFormsFocusEvent extends XFormsUIEvent {
+    public XFormsFocusEvent(XFormsContainingDocument containingDocument, XFormsControl targetObject) {
         super(containingDocument, XFormsEvents.XFORMS_FOCUS, targetObject, false, true);
     }
 }

@@ -65,7 +65,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         }
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
-            containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, (XFormsEventTarget) controlObject));
+            containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, (XFormsControl) controlObject));
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

@@ -232,7 +232,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_FOCUS, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XFormsFocusEvent(containingDocument, targetObject);
+                return new XFormsFocusEvent(containingDocument, (XFormsControl) targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_HELP, new Factory() {

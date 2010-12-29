@@ -876,7 +876,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public void doRebuild(PropertyContext propertyContext) {
 
         // Rebuild bind tree only if needed
-        final boolean mustRebuild = binds != null && deferredActionContext.rebuild;
+        final boolean mustRebuild = instances.size() > 0 && binds != null && deferredActionContext.rebuild;
         if (mustRebuild) {
             binds.rebuild(propertyContext);
 
@@ -890,8 +890,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.rebuild = false;
 
         // Notify dependencies
-        if (mustRebuild)
-            containingDocument.getXPathDependencies().rebuildDone(staticModel);
+        containingDocument.getXPathDependencies().rebuildDone(staticModel);
     }
 
     public void doRecalculate(PropertyContext propertyContext, boolean applyInitialValues) {
@@ -908,8 +907,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.recalculate = false;
 
         // Notify dependencies
-        if (mustRecalculate)
-            containingDocument.getXPathDependencies().recalculateDone(staticModel);
+        containingDocument.getXPathDependencies().recalculateDone(staticModel);
     }
 
 
@@ -980,8 +978,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.revalidate = false;
 
         // Notify dependencies
-        if (mustRevalidate)
-            containingDocument.getXPathDependencies().revalidateDone(staticModel);
+        containingDocument.getXPathDependencies().revalidateDone(staticModel);
     }
 
     private void doRefresh(PropertyContext propertyContext) {

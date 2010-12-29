@@ -133,13 +133,9 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     // Keep state related to the view
     private object RefreshState {
         // Structural changes
-//        private var structuralChangesModelsCached = false
-//        private val structuralChangeModelsCache = new HashSet[String]
         val structuralChangeModels = new HashSet[String]
 
         // Modified paths by instance
-//        private val modifiedPathsCached = false
-//        private val modifiedPathsCache = new MapSet[String, String]
         val changeset = new MapSet[String, String]
 
         // Caches to speedup checks on repeated items
@@ -156,18 +152,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         var valueXPathOptimizedCount: Int = 0
 
         def getStructuralChangeModels = structuralChangeModels
-//        def getStructuralChangeModels: Set[String] = {
-//            if (!structuralChangesModelsCached) {
-//                // Add all model ids that have structuralChanges set to true
-//                structuralChangeModelsCache ++= modelStates filter (_._2.structuralChanges) map (_._1)
-//                structuralChangesModelsCached = true
-//            }
-//            structuralChangeModelsCache
-//        }
 
         def refreshDone() {
-//            structuralChangesModelsCached = false
-//            structuralChangeModelsCache.clear()
             structuralChangeModels.clear()
             changeset.clear()
 

@@ -17,28 +17,40 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
-import org.orbeon.oxf.common.*;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.*;
 import org.orbeon.oxf.xforms.analysis.controls.*;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEventHandler;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.script.ServerScript;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.SAXException;
 
@@ -78,7 +90,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     private Map<String, Model> modelsByPrefixedId = new LinkedHashMap<String, Model>();
     private Map<String, Model> modelByInstancePrefixedId = new LinkedHashMap<String, Model>();
 
-    private Map<String, String> xxformsScripts;                             // Map of id to script content
+    private Map<String, Script> scripts;
 
     private final Map<String, Object> nonDefaultProperties = new HashMap<String, Object>(); // Map of property name to property value (String, Integer, Boolean)
     private final Set<String> allowedExternalEvents = new HashSet<String>();        // Set<String eventName>
@@ -297,8 +309,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         for (final ExternalLHHAAnalysis entry : externalLHHA)
             entry.attachToControl();
 
-        if (xxformsScripts != null && xxformsScripts.size() > 0)
-            indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
+        if (scripts != null && scripts.size() > 0)
+            indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(scripts.size()));
 
         // Finalize repeat hierarchy
         if (controlTypes.get("repeat") != null) {
@@ -577,18 +589,23 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance) and exists(@id)]";
 
-        final List scripts = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
+        final List scriptNodeInfos = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
                 BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
-        if (scripts.size() > 0) {
-            if (xxformsScripts == null)
-                xxformsScripts = new HashMap<String, String>();
-            for (Object script: scripts) {
-                final NodeInfo currentNodeInfo = (NodeInfo) script;
+        if (scriptNodeInfos.size() > 0) {
+            if (this.scripts == null)
+                this.scripts = new HashMap<String, Script>();
+            for (Object scriptNodeInfo : scriptNodeInfos) {
+                final NodeInfo currentNodeInfo = (NodeInfo) scriptNodeInfo;
                 final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                // Remember script content
-                xxformsScripts.put(prefix + XFormsUtils.getElementStaticId(scriptElement), scriptElement.getStringValue());
+                // Remember script
+                final String prefixedId = prefix + XFormsUtils.getElementStaticId(scriptElement);
+                final boolean isClient = !"server".equals(scriptElement.attributeValue("runat"));
+                final Script script = isClient
+                        ? new Script(prefixedId, isClient, scriptElement.attributeValue("type"), scriptElement.getStringValue())
+                        : new ServerScript(prefixedId, isClient, scriptElement.attributeValue("type"), scriptElement.getStringValue());
+                this.scripts.put(prefixedId, script);
             }
         }
     }
@@ -706,8 +723,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         return null;
     }
 
-    public Map<String, String> getScripts() {
-        return xxformsScripts;
+    public Map<String, Script> getScripts() {
+        return scripts;
     }
 
     public Set<String> getAllowedExternalEvents() {

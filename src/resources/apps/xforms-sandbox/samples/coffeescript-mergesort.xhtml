@@ -1,0 +1,51 @@
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
+    <xh:head>
+        <xf:model>
+            <xf:instance id="instance">
+                <values>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                    <value></value>
+                </values>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+
+        <xf:repeat ref="value">
+            <xf:input ref="."/>
+        </xf:repeat>
+
+        <xf:trigger>
+            <xf:label>Run CoffeeScript</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xxf:script runat="server" type="text/coffeescript">
+                    <![CDATA[
+                    index = (list, target) ->
+                      [low, high] = [0, list.length]
+                      while low < high
+                        mid = (low + high) >> 1
+                        val = list[mid]
+                        return mid if val is target
+                        if val < target then low = mid + 1 else high = mid
+                      return -1
+
+                    ORBEON.controls.setValue "input2", index [10, 20, 30, 40, 50], Number(ORBEON.controls.getValue "input1")
+                    ]]>
+                </xxf:script>
+            </xf:action>
+        </xf:trigger>
+
+    </xh:body>
+</xh:html>

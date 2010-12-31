@@ -27,9 +27,13 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.Serializable;
@@ -106,7 +110,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             outputConfigurationProperties(helper, xhtmlPrefix, isVersionedResources);
 
             // User-defined (with xxforms:script) and XForms scripts
-            final Map<String, String> scriptsToDeclare = containingDocument.getScripts();
+            final Map<String, Script> scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
             final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
             final List<XXFormsDialogControl> dialogsToOpen = new ArrayList<XXFormsDialogControl>(); {
@@ -374,16 +378,19 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         }
     }
 
-    private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, Map<String, String> scriptsToDeclare, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
+    private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, Map<String, Script> scriptsToDeclare, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
         if (scriptsToDeclare != null || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript"});
 
             if (scriptsToDeclare != null) {
-                for (final Map.Entry<String, String> currentEntry: scriptsToDeclare.entrySet()) {
-                    helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey()) + "(event) {\n");
-                    helper.text(currentEntry.getValue());
-                    helper.text("}\n");
+                for (final Script script: scriptsToDeclare.values()) {
+                    // Only output client scripts
+                    if (script.isClient) {
+                        helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(script.prefixedId) + "(event) {\n");
+                        helper.text(script.body);
+                        helper.text("}\n");
+                    }
                 }
             }
 

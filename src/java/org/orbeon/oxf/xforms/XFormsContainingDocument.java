@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
+import org.orbeon.oxf.xforms.script.ScriptInterpreter;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
@@ -118,6 +119,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     // Asynchronous submission manager
     private AsynchronousSubmissionManager asynchronousSubmissionManager;
+
+    // Interpreter for JavaScript, etc.
+    private ScriptInterpreter scriptInterpreter;
 
     // A document refers to the static state and controls
     private XFormsStaticState xformsStaticState;
@@ -428,9 +432,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     /**
-     * Return a map of script id -> script text.
+     * Return a map of script prefixed id -> script information.
      */
-    public Map<String, String> getScripts() {
+    public Map<String, org.orbeon.oxf.xforms.Script> getScripts() {
         return xformsStaticState.getScripts();
     }
 
@@ -1463,6 +1467,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             if (addPollEvent)
                 manager.addClientDelayEventIfNeeded(propertyContext);
         }
+    }
+
+    public ScriptInterpreter getScriptInterpreter() {
+        if (scriptInterpreter == null)
+            scriptInterpreter = new ScriptInterpreter(this);
+        return scriptInterpreter;
     }
 
     private void createControlsAndModels() {

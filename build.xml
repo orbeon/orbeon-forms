@@ -122,6 +122,7 @@
         <include name="exist-xmlrpc-server-3_1_1.jar"/>
 
         <include name="scala-library.jar"/>
+        <include name="rhino-1.7R2.jar"/>
 
         <include name="flyingsaucer-core-renderer_orbeon_20100512.jar"/>
         <include name="flyingsaucer-20100212-itext-2_1_7.jar"/>
@@ -326,6 +327,9 @@
               <include name="**/*.css"/>
               <include name="**/*.xsd"/>
               <include name="**/*.properties"/>
+          </fileset>
+          <fileset dir="${scala-src.dir}">
+              <include name="**/*.js"/>
           </fileset>
           <fileset dir="${build.classes.dir}">
               <include name="**/*.class"/>

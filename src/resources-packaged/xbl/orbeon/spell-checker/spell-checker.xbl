@@ -53,9 +53,8 @@
                         <unknown-word/>     <!-- The current word we're looking at and trying to fix -->
                         <correction/>       <!-- The current correction being considered -->
                         <context/>          <!-- Text around the word to fix (HTML) -->
+                        <text/>             <!-- The text being corrected, annotated with corrections -->
                         <is-change-all/>    <!-- Temporarily set to true|false to know the button pressed -->
-                        <ignore-all/>       <!-- List of words the user decided to ignore -->
-                        <replacements/>     <!-- List of words the user decided to change -->
                     </internal>
                 </xforms:instance>
 
@@ -65,50 +64,58 @@
                 <xforms:submission method="post" resource="{xxforms:property('oxf.xforms.xbl.fr.spell-checker.service')}"
                         id="spell-check-submission" ref="instance('request')" replace="instance" instance="result">
                     <xforms:action ev:event="xforms-submit-done">
+                        <!-- Iterate over the correction and insert <t> elements between <c> elements to represent the normal text (non-corrections) -->
+                        <xforms:action xxforms:iterate="instance('result')/c">
+                            <xxforms:variable name="current-c" select="."/>
+                            <xxforms:variable name="position" select="position()"/>
+                            <xxforms:variable name="following-c" select="$current-c/following-sibling::c[1]"/>
+                            <xxforms:variable name="offset-after-current-c" select="$current-c/@o + $current-c/@l"/>
+                            <!-- If this is the first <c>, consider inserting a <t> before -->
+                            <xforms:action if="$position = 1">
+                                <xforms:insert if="$current-c/@o > 0" nodeset="." position="before" origin="xxforms:element('t', (xxforms:attribute('o', '0'), xxforms:attribute('l', $current-c/@o)))"/>
+                            </xforms:action>
+                            <!-- If we are between two <c>, consider inserting a <t> in between -->
+                            <xforms:action if="exists($following-c)">
+                                <xforms:insert if="$following-c/@o > $offset-after-current-c" nodeset="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
+                            </xforms:action>
+                            <!-- If this is the last <c>, consider insert a <t> after -->
+                            <xforms:action if="empty($following-c)">
+                                <xxforms:variable name="text-length" select="string-length(instance('request')/text)"/>
+                                <xforms:insert if="$text-length > $offset-after-current-c" nodeset="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $text-length - $offset-after-current-c)))"/>
+                            </xforms:action>
+                        </xforms:action>
+                        <!-- Populate the original value of the words -->
+                        <xforms:action xxforms:iterate="instance('result')/*">
+                            <xforms:insert context="." origin="xxforms:attribute('current', substring(instance('request')/text, context()/@o + 1, context()/@l))"/>
+                        </xforms:action>
                         <xxforms:show dialog="spell-checking-dialog"/>
+                        <xforms:setvalue ref="instance('internal')/current-c-index">1</xforms:setvalue>
                         <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
                     </xforms:action>
                 </xforms:submission>
 
+                <!-- Prepare UI for the next correction -->
                 <xforms:action ev:event="prepare-next-correction">
-                    <xxforms:variable name="correction" select="instance('result')/c[1]"/>
-                    <xforms:action if="exists($correction)">
-                        <xforms:setvalue ref="instance('internal')/unknown-word" value="substring(instance('request')/text, $correction/@o + 1, $correction/@l)"/>
-                        <xforms:setvalue ref="instance('internal')/correction" value="tokenize(instance('result')/c[1], '\s')[1]"/>
-                        <xxforms:variable name="words-before" select="if ($correction/@o = 0) then () else
-                            tokenize(substring(instance('request')/text, 1, $correction/@o), '\s+')"/>
-                        <xxforms:variable name="words-after" select="if ($correction/@o + $correction/@l = string-length(instance('request')/text)) then () else
-                            tokenize(substring(instance('request')/text, $correction/@o + $correction/@l + 1), '\s+')"/>
+                    <xxforms:variable name="current-c" select="(instance('result')/c[empty(@handled)])[1]"/>
+                    <xforms:action if="exists($current-c)">
+                        <xforms:setvalue ref="instance('internal')/unknown-word" value="$current-c/@current"/>
+                        <xforms:setvalue ref="instance('internal')/correction" value="tokenize($current-c, '\s')[1]"/>
                         <xforms:setvalue ref="instance('internal')/context" value="concat(
-                            substring(instance('request')/text, 1, $correction/@o),
+                            string-join($current-c/preceding-sibling::*/@current, ''),
                             '&lt;span id=''fr-spell-checker-unknown-word'' class=''unknown-word''&gt;',
                             ../unknown-word,
                             '&lt;/span&gt;',
-                            substring(instance('request')/text,  $correction/@o + $correction/@l + 1))"/>
+                            string-join($current-c/following-sibling::*/@current, ''))"/>
                         <xxforms:script>
+                            var YD = YAHOO.util.Dom;
+                            // Get the word we want to make visible
                             var unknownWord = document.getElementById("fr-spell-checker-unknown-word");
+                            // Get scrollable container accounting for span/nospan
                             var notInDictionaryDiv = unknownWord.parentNode;
+                            if (! YD.hasClass(notInDictionaryDiv, "xforms-output")) notInDictionaryDiv = notInDictionaryDiv.parentNode;
+                            // Set scrollTop on container so the word is visible
                             notInDictionaryDiv.scrollTop = Math.max(0, unknownWord.offsetTop - unknownWord.offsetHeight);
                         </xxforms:script>
-                        <xforms:action if="instance('internal')/unknown-word = instance('internal')/ignore-all/word">
-                            <!-- If current word is in the ignore list, go to the next one -->
-                            <xforms:delete nodeset="$correction"/>
-                            <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
-                        </xforms:action>
-                        <xxforms:variable name="change-all" select="instance('internal')/replacements/word[@change-all = 'true' and . = instance('internal')/unknown-word]"/>
-                        <xforms:action if="exists($change-all)">
-                            <!-- If the current word is one for which the user did a change all, add a change for this -->
-                            <xforms:insert context="instance('internal')/replacements"
-                                origin="xxforms:element('word', (
-                                    xxforms:attribute('by', $change-all/@by),
-                                    xxforms:attribute('o', $correction/@o),
-                                    xxforms:attribute('l', $correction/@l),
-                                    xxforms:attribute('change-all', 'false'),
-                                    ../unknown-word/text()
-                                ))"/>
-                            <xforms:delete nodeset="$correction"/>
-                            <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
-                        </xforms:action>
                     </xforms:action>
                 </xforms:action>
 
@@ -128,6 +135,8 @@
 
                     <!-- Shortcut to internal internal instance -->
                     <xxforms:variable name="internal" as="element()" select="instance('internal')"/>
+                    <!-- The currently considered correction -->
+                    <xxforms:variable name="current-c" select="(instance('result')/c[empty(@handled)])[1]"/>
 
                     <!-- Keep track of readonlyness of bound node -->
                     <xxforms:variable name="readonly" select="exforms:readonly($external)">
@@ -147,7 +156,7 @@
                     <xxforms:dialog id="spell-checking-dialog" class="fr-spell-checker-dialog" xbl:attr="close">
                         <xforms:setfocus ev:event="xxforms-dialog-open" control="ignore"/>
                         <xforms:label>Spelling</xforms:label>
-                        <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>
+                        <xxforms:variable name="has-corrections" select="exists(instance('result')/c[empty(@handled)])"/>
 
                         <!-- On open, set focus -->
                         <xforms:action ev:event="xxforms-dialog-open">
@@ -157,14 +166,6 @@
 
                         <!-- On close, apply replacements and do cleanup -->
                         <xforms:action ev:event="xxforms-dialog-close">
-                            <xforms:action xxforms:iterate="$internal/replacements/word">
-                                <xxforms:variable name="replacement" select="."/>
-                                <xforms:setvalue ref="$external" value="concat(
-                                    substring(., 1, $replacement/@o),
-                                    $replacement/@by,
-                                    substring(., $replacement/@o + $replacement/@l + 1))"/>
-                            </xforms:action>
-                            <xforms:delete nodeset="$internal/(ignore-all | replacements)/word"/>
                             <xforms:setvalue xxforms:iterate="$internal/*" ref="."/>
                         </xforms:action>
 
@@ -183,7 +184,9 @@
                                                 Ignore
                                             </xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:delete nodeset="instance('result')/c[1]"/>
+                                                <!-- Mark this correction as handled -->
+                                                <xforms:insert context="$current-c" origin="xxforms:attribute('handled', 'true')"/>
+                                                <!-- Move to the next correction -->
                                                 <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
                                             </xforms:action>
                                         </fr:button>
@@ -194,31 +197,29 @@
                                                 Ignore All
                                             </xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="$internal/ignore-all" origin="xxforms:element('word', ../unknown-word/text())"/>
-                                                <xforms:delete nodeset="instance('result')/c[1]"/>
+                                                <!-- Mark all the correction with the same word as handled -->
+                                                <xforms:action xxforms:iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
+                                                    <xforms:insert context="." origin="xxforms:attribute('handled', 'true')"/>
+                                                </xforms:action>
+                                                <!-- Move to the next correction -->
                                                 <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
                                             </xforms:action>
                                         </fr:button>
                                         <xforms:group appearance="xxforms:internal">
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert context="$internal/replacements"
-                                                    origin="xxforms:element('word', (
-                                                        xxforms:attribute('by', ../correction),
-                                                        xxforms:attribute('o', instance('result')/c[1]/@o),
-                                                        xxforms:attribute('l', instance('result')/c[1]/@l),
-                                                        xxforms:attribute('change-all', $internal/is-change-all),
-                                                        ../unknown-word/text()
-                                                    ))"/>
-                                                <xforms:delete nodeset="instance('result')/c[1]"/>
-                                                <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
-                                            </xforms:action>
                                             <!-- Change -->
                                             <fr:button id="change-this">
                                                 <xforms:label>
                                                     <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
                                                     Change
                                                 </xforms:label>
-                                                <xforms:setvalue ev:event="DOMActivate" ref="$internal/is-change-all">false</xforms:setvalue>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Apply replacement -->
+                                                    <xforms:setvalue ref="$current-c/@current" value="$internal/correction"/>
+                                                    <!-- Mark correction as handled -->
+                                                    <xforms:insert context="$current-c" origin="xxforms:attribute('handled', 'true')"/>
+                                                    <!-- Move to the next correction -->
+                                                    <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                                                </xforms:action>
                                             </fr:button>
                                             <!-- Change all -->
                                             <fr:button id="change-all">
@@ -226,16 +227,29 @@
                                                     <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
                                                     Change All
                                                 </xforms:label>
-                                                <xforms:setvalue ev:event="DOMActivate" ref="$internal/is-change-all">true</xforms:setvalue>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- For the upcoming correction with the same word -->
+                                                    <xforms:action xxforms:iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
+                                                        <!-- Apply replacement -->
+                                                        <xforms:setvalue ref="@current" value="$internal/correction"/>
+                                                        <!-- Mark correction as handled -->
+                                                        <xforms:insert context="." origin="xxforms:attribute('handled', 'true')"/>
+                                                    </xforms:action>
+                                                    <!-- Move to the next correction -->
+                                                    <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                                                </xforms:action>
                                             </fr:button>
                                         </xforms:group>
-                                        <!-- Close -->
+                                        <!-- Done -->
                                         <fr:button>
                                             <xforms:label>
                                                 <xhtml:img alt="" src="/apps/fr/style/images/silk/cross.png"/>
-                                                Close
+                                                Done
                                             </xforms:label>
-                                            <xxforms:hide ev:event="DOMActivate" dialog="spell-checking-dialog"/>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue if="exists(instance('result')/*)" ref="$external" value="string-join(instance('result')/*/@current, '')"/>
+                                                <xxforms:hide  dialog="spell-checking-dialog"/>
+                                            </xforms:action>
                                         </fr:button>
                                     </xhtml:td>
                                 </xhtml:tr>
@@ -266,8 +280,11 @@
                             <xforms:setfocus ev:event="xforms-enabled" control="close"/>
                             Done spell checking.
                             <fr:button id="close">
-                                <xforms:label>Close</xforms:label>
-                                <xxforms:hide ev:event="DOMActivate" dialog="spell-checking-dialog"/>
+                                <xforms:label>Done</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue if="exists(instance('result')/*)" ref="$external" value="string-join(instance('result')/*/@current, '')"/>
+                                    <xxforms:hide  dialog="spell-checking-dialog"/>
+                                </xforms:action>
                             </fr:button>
                         </xforms:group>
                     </xxforms:dialog>

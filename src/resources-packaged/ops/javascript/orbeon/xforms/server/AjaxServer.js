@@ -16,13 +16,12 @@
     /**
      * Server is a singleton.
      */
-    ORBEON.xforms.Server = {};
+    ORBEON.xforms.server.AjaxServer = {};
 
-    var Server = ORBEON.xforms.Server;
-    var ExecutionQueue = ORBEON.util.ExecutionQueue;
+    var AjaxServer = ORBEON.xforms.server.AjaxServer;
     var Properties = ORBEON.util.Properties;
 
-    Server.Event = function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
+    AjaxServer.Event = function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
         // If no form is provided, infer the form based on that targetId, if one is provided
         this.form = YAHOO.lang.isObject(form) ? form
             : YAHOO.lang.isString(targetId) ? ORBEON.xforms.Controls.getForm(ORBEON.util.Dom.get(targetId)) : null;
@@ -42,7 +41,7 @@
      * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
      * This is to prevent the UI from becoming totally unusable after an error.
      */
-    Server.exceptionWhenTalkingToServer = function(e, formID) {
+    AjaxServer.exceptionWhenTalkingToServer = function(e, formID) {
         ORBEON.util.Utils.logMessage("JavaScript error");
         ORBEON.util.Utils.logMessage(e);
         var details = "Exception in client-side code.";
@@ -51,13 +50,13 @@
         if (e.fileName != null) details += "<li>File: " + e.fileName + "</li>";
         if (e.lineNumber != null) details += "<li>Line number: " + e.lineNumber + "</li>";
         details += "</ul>";
-        ORBEON.xforms.Server.showError("Exception in client-side code", details, formID);
+        AjaxServer.showError("Exception in client-side code", details, formID);
     };
 
     /**
      * Display the error panel and shows the specified detailed message in the detail section of the panel.
      */
-    Server.showError = function(title, details, formID) {
+    AjaxServer.showError = function(title, details, formID) {
         ORBEON.xforms.Events.errorEvent.fire({title: title, details: details });
         if (!ORBEON.xforms.Globals.requestIgnoreErrors && ORBEON.util.Properties.showErrorDialog.get()) {
             var formErrorPanel = ORBEON.xforms.Globals.formErrorPanel[formID];
@@ -72,7 +71,7 @@
         }
     };
 
-    Server.fireEvents = function(events, incremental) {
+    AjaxServer.fireEvents = function(events, incremental) {
         if (!ORBEON.xforms.Offline.isOnline) {
             // Go through all events
             var valueChangeEvents = [];
@@ -125,7 +124,7 @@
                 // if there are no other executeNextRequest() that have been added to the queue after this
                 // request.
                 window.setTimeout(
-                    function() { ORBEON.xforms.Server.executeNextRequest(false); },
+                    function() { AjaxServer.executeNextRequest(false); },
                     ORBEON.util.Properties.delayBeforeIncrementalRequest.get()
                 );
             } else {
@@ -134,7 +133,7 @@
                 // The small delay is here so we don't send multiple requests to the server when the
                 // browser gives us a sequence of events (e.g. focus out, change, focus in).
                 window.setTimeout(
-                    function() { ORBEON.xforms.Server.executeNextRequest(true); },
+                    function() { AjaxServer.executeNextRequest(true); },
                     ORBEON.util.Properties.internalShortDelay.get()
                 );
             }
@@ -145,11 +144,11 @@
     /**
      * Create a timer which after the specified delay will fire a server event.
      */
-    Server.createDelayedServerEvent = function(serverEvents, delay, showProgress, progressMessage, discardable, formID) {
+    AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, progressMessage, discardable, formID) {
         var timerId = window.setTimeout(function () {
-            var event = new ORBEON.xforms.Server.Event(ORBEON.util.Dom.get(formID), null, null,
+            var event = new AjaxServer.Event(ORBEON.util.Dom.get(formID), null, null,
                     serverEvents, "server-events", null, null, null, showProgress, progressMessage);
-            ORBEON.xforms.Server.fireEvents([event]);
+            AjaxServer.fireEvents([event]);
         }, delay);
         // Save timer id for this discardable timer
         if (discardable) {
@@ -159,7 +158,7 @@
         }
     };
 
-    Server._debugEventQueue = function() {
+    AjaxServer._debugEventQueue = function() {
         ORBEON.util.Utils.logMessage("Event queue:");
         for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
             var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
@@ -167,7 +166,7 @@
         }
     };
 
-    Server.executeNextRequest = function(bypassRequestQueue) {
+    AjaxServer.executeNextRequest = function(bypassRequestQueue) {
         bypassRequestQueue = typeof(bypassRequestQueue) == "boolean" && bypassRequestQueue == true;
 
         ORBEON.xforms.Globals.executeEventFunctionQueued--;
@@ -502,7 +501,7 @@
                     // Send request
                     ORBEON.xforms.Globals.requestTryCount = 0;
                     ORBEON.xforms.Globals.requestDocument = requestDocumentString.join("");
-                    ORBEON.xforms.Server.asyncAjaxRequest();
+                    AjaxServer.asyncAjaxRequest();
                 }
             }
         }
@@ -515,70 +514,35 @@
         }
     };
 
-    Server.setTimeoutOnCallback = function(callback) {
+    AjaxServer.setTimeoutOnCallback = function(callback) {
         var ajaxTimeout = ORBEON.util.Properties.delayBeforeAjaxTimeout.get();
         if (ajaxTimeout != -1)
             callback.timeout = ajaxTimeout;
     };
 
-    Server.asyncAjaxRequest = function() {
+    AjaxServer.asyncAjaxRequest = function() {
         var formID = ORBEON.xforms.Globals.requestForm.id;
         try {
             ORBEON.xforms.Globals.requestTryCount++;
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
             var callback = {
-                success: ORBEON.xforms.Server.handleResponseAjax,
-                failure: ORBEON.xforms.Server.handleFailureAjax
+                success: AjaxServer.handleResponseAjax,
+                failure: AjaxServer.handleFailureAjax
             };
-            ORBEON.xforms.Server.setTimeoutOnCallback(callback);
+            AjaxServer.setTimeoutOnCallback(callback);
             YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
-            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+            AjaxServer.exceptionWhenTalkingToServer(e, formID);
         }
-    };
-
-    /**
-     * Run background form post (upload)
-     */
-    Server.asyncUploadRequest = function(events, done) {
-
-        // Potentially, if multiple forms are on the same page, and users simultaneously select a file in both forms,
-        // then we could have a problem here, as we'll only upload the first form. But we'll be optimistic and
-        // pretend this doesn't happen.
-        var form = events[0].form;
-
-        // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-        _.each(events, function(event) { event.upload.setState("progress"); });
-        // Tell server we're starting uploads
-        var uploadStartEvents = _.map(events, function(event) { return new ORBEON.xforms.Server.Event(null, event.upload.container.id, null, null, "xxforms-upload-start"); });
-        //ORBEON.xforms.Server.fireEvents(uploadStartEvents, false);
-
-        // Trigger actual upload through a form POST
-        YAHOO.util.Connect.setForm(form, true, true);
-        YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[form.id], {
-            upload: function(o) {
-                // Clear server events that were sent to the server (why? is this still needed?)
-                ORBEON.xforms.Globals.formServerEvents[form.id].value = "";
-                // Clear upload fields we just uploaded, otherwise subsequent uploads will upload the same data again
-                _.each(events, function(event) { event.upload.clear(); });
-                Server.handleResponseAjax(o);
-                // Call back to execution queue, which might have more files upload
-                done();
-            },
-            failure: function() {
-                console.log("Upload failure");
-                Server.retryRequestAfterDelay(_.bind(Server.asyncUploadRequest, Server, events, done));
-            }
-        });
     };
 
     /**
      * Retry after a certain delay which increases with the number of consecutive failed request, but which
      * never exceeds a maximum delay.
      */
-    Server.retryRequestAfterDelay = function(requestFunction) {
+    AjaxServer.retryRequestAfterDelay = function(requestFunction) {
         var delay = Math.min(ORBEON.util.Properties.retryDelayIncrement.get() * (ORBEON.xforms.Globals.requestTryCount - 1),
                 ORBEON.util.Properties.retryMaxDelay.get());
         if (delay == 0) requestFunction();
@@ -587,14 +551,14 @@
 
     /**
      * Unless we get a clear indication from the server that an error occurred, we retry to send the request to
-     * the server.
+     * the AjaxServer.
      *
      * Browsers behaviors:
      *
      *      On Safari, when o.status == 0, it might not be an error. Instead, it can be happen when users click on a
      *      link to download a file, and Safari stops the current Ajax request before it knows that new page is loaded
      *      (vs. a file being downloaded). With the current core, we assimilate this to a communication error, and
-     *      we'll retry to send the Ajax request to the server.
+     *      we'll retry to send the Ajax request to the AjaxServer.
      *
      *      On Firefox, when users navigate to another page while an Ajax request is in progress,
      *      we receive an error here, which we don't want to display. We don't have a good way of knowing if we get
@@ -603,7 +567,7 @@
      *      This  doesn't hurt as the server knows that it must not execute the request more than once.
      *
      */
-    Server.handleFailureAjax = function(o) {
+    AjaxServer.handleFailureAjax = function(o) {
 
         if (o.responseXML && o.responseXML.documentElement && o.responseXML.documentElement.tagName.indexOf("error") != -1) {
             // If we get an error document as follows, we consider this to be a permanent error, we don't retry, and
@@ -617,13 +581,13 @@
             var formID = ORBEON.xforms.Globals.requestForm.id;
             var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
             var detailsFromBody = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]);
-            ORBEON.xforms.Server.showError(title, detailsFromBody, formID);
+            AjaxServer.showError(title, detailsFromBody, formID);
         } else {
-            ORBEON.xforms.Server.retryRequestAfterDelay(ORBEON.xforms.Server.asyncAjaxRequest);
+            AjaxServer.retryRequestAfterDelay(AjaxServer.asyncAjaxRequest);
         }
     };
 
-    Server.handleResponseAjax = function(o) {
+    AjaxServer.handleResponseAjax = function(o) {
 
         var responseXML = o.responseXML;
         if (!YAHOO.lang.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
@@ -705,13 +669,13 @@
                 // We remove the modal progress panel before handling DOM response, as xxf:script may dispatch
                 // events and we don't want them to be filtered. If there are server events, we don't remove the
                 // panel until they have been processed, i.e. the request sending the server events returns.
-                if (! (ORBEON.xforms.Server.keepModelProgressPanelDisplayed(responseXML)
+                if (! (AjaxServer.keepModelProgressPanelDisplayed(responseXML)
                         || ORBEON.xforms.Globals.eventQueue.length > 0)) {
                     ORBEON.util.Utils.hideModalProgressPanel();
                 }
 
                 var formID = ORBEON.xforms.Globals.requestForm.id;
-                ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
+                AjaxServer.handleResponseDom(responseXML, formID);
                 // Reset changes, as changes are included in this bach of events
                 ORBEON.xforms.Globals.changedIdsRequest = {};
                 // Notify listeners that we are done processing this request
@@ -719,11 +683,11 @@
                 // Go ahead with next request, if any
                 ORBEON.xforms.Globals.requestDocument = "";
                 ORBEON.xforms.Globals.executeEventFunctionQueued++;
-                ORBEON.xforms.Server.executeNextRequest(false);
+                AjaxServer.executeNextRequest(false);
 
             } else {
                 // Consider this a failure
-                ORBEON.xforms.Server.handleFailureAjax(o);
+                AjaxServer.handleFailureAjax(o);
             }
         }
     };
@@ -735,7 +699,7 @@
      * The logic here corresponds to the following XPath:
      * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
      */
-    Server.keepModelProgressPanelDisplayed = function(responseXML) {
+    AjaxServer.keepModelProgressPanelDisplayed = function(responseXML) {
         if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
             var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
@@ -757,15 +721,13 @@
      *
      * @param responseXML       DOM containing events to process
      */
-    Server.handleResponseDom = function(responseXML, formID) {
+    AjaxServer.handleResponseDom = function(responseXML, formID) {
 
         try {
             var responseRoot = responseXML.documentElement;
 
             // Whether this response has triggered a load which will replace the current page.
             var newDynamicStateTriggersReplace = false;
-            // Whether we should run a background form submission once we are done with all the Ajax events
-            var doBackgroundFormSubmission = false;
 
             var xmlNamespace = null; // xforms namespace
             // Getting xforms namespace
@@ -798,7 +760,7 @@
 
                 // Store new dynamic and static state as soon as we find it. This is because the server only keeps the last
                 // dynamic state. So if a JavaScript error happens later on while processing the response,
-                // the next request we do we still want to send the latest dynamic state known to the server.
+                // the next request we do we still want to send the latest dynamic state known to the AjaxServer.
                 if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "dynamic-state") {
                     var newDynamicState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
                     ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
@@ -1500,7 +1462,7 @@
                                                     //
                                                     // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
                                                     // value for the field, since the current value is different from the server value, we will incorrectly think that the
-                                                    // user modified the field, and won't update the field with the value provided by the server.
+                                                    // user modified the field, and won't update the field with the value provided by the AjaxServer.
                                                     ORBEON.xforms.ServerValueStore.set(documentElement.id, ORBEON.xforms.Controls.getCurrentValue(documentElement));
                                                 }
                                             }
@@ -1876,7 +1838,7 @@
                                     // Case where we need to send those events to the server with a regular Ajax request
                                     // after the given delay.
                                     var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                    ORBEON.xforms.Server.createDelayedServerEvent(serverEvents, delay, showProgress, progressMessage, discardable, formID);
+                                    AjaxServer.createDelayedServerEvent(serverEvents, delay, showProgress, progressMessage, discardable, formID);
                                 }
                                 break;
                             }
@@ -1969,7 +1931,7 @@
                                 var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
                                 var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
                                 var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
-                                ORBEON.xforms.Server.callUserScript(functionName, targetId, observerId);
+                                ORBEON.xforms.server.Server.callUserScript(functionName, targetId, observerId);
                                 break;
                             }
 
@@ -2005,52 +1967,14 @@
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
 
-            if (doBackgroundFormSubmission) {
-                ORBEON.xforms.Server.asyncUploadRequest();
-            } else {
-                // Only say we have no request in process if are not right away running an form POST.
-                // If there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
-                ORBEON.xforms.Globals.requestInProgress = false;
-            }
+            // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
+            ORBEON.xforms.Globals.requestInProgress = false;
         } catch (e) {
             // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+            AjaxServer.exceptionWhenTalkingToServer(e, formID);
             // Rethrow, so the exception isn't lost (can be shown by Firebug, or a with little icon on the bottom left of the IE window)
             throw e;
         }
     };
-
-    Server.callUserScript = function(functionName, targetId, observerId) {
-
-        function getElement(id) {
-            var element = ORBEON.util.Dom.get(id);
-            if (element == null) {
-                // Try to find repeat (some events xxforms-nodeset-changed can target the repeat)
-                element = ORBEON.util.Dom.get("repeat-begin-" + id);
-                if (element == null) {
-                    // Try getting repeat delimiter
-                    var separatorPosition = Math.max(id.lastIndexOf(XFORMS_SEPARATOR_1), id.lastIndexOf(XFORMS_SEPARATOR_2));
-                    if (separatorPosition != -1) {
-                        var repeatID = id.substring(0, separatorPosition);
-                        var iteration = id.substring(separatorPosition + 1);
-                        element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
-                        if (element == null) {
-                            // If everything else has failed, the id might be an xforms:repeat id!
-                            element = ORBEON.util.Dom.get("repeat-begin-" + id);
-                        }
-                    }
-                }
-            }
-            return element;
-        }
-
-        var targetElement = getElement(targetId);
-        var observer = getElement(observerId);
-        var event = { "target" : targetElement };
-        var theFunction = eval(functionName);
-        theFunction.call(observer, event);
-    };
-
-    Server.uploadEventQueue = new ExecutionQueue(Server.asyncUploadRequest);
 
 })();

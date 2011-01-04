@@ -22,7 +22,7 @@
     var OD = ORBEON.util.Dom;
     var ExecutionQueue = ORBEON.util.ExecutionQueue;
     var Properties = ORBEON.util.Properties;
-    var Server = ORBEON.xforms.Server;
+    var UploadServer = ORBEON.xforms.server.UploadServer;
     var Control = ORBEON.xforms.control.Control;
     var Upload = ORBEON.xforms.control.Upload;
     var Page = ORBEON.xforms.Page;
@@ -45,7 +45,7 @@
 
     Upload.prototype.change = function() {
         // Queue event to submit this file in the background  as soon as possible (pseudo-Ajax request)
-        Server.uploadEventQueue.add({form: this.getForm(), upload: this}, Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
+        UploadServer.uploadEventQueue.add({form: this.getForm(), upload: this}, Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
     };
 
     /**

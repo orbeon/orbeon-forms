@@ -1377,6 +1377,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 ORBEON.xforms = {};
 ORBEON.xforms.action = {};
 ORBEON.xforms.control = {};
+ORBEON.xforms.server = {};
 ORBEON.widgets = ORBEON.widgets || {};  // Legacy name used by non-XBL components
 ORBEON.widget = ORBEON.widget || {};    // New name to follow the same convention used by YUI
 ORBEON.xforms.Globals = ORBEON.xforms.Globals || {};
@@ -1404,8 +1405,8 @@ ORBEON.xforms.Document = {
         }
 
         // Create event and fire
-        var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, eventName, bubbles, cancelable, ignoreErrors);
-        ORBEON.xforms.Server.fireEvents([event], incremental == undefined ? false : incremental);
+        var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, null, eventName, bubbles, cancelable, ignoreErrors);
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], incremental == undefined ? false : incremental);
     },
 
     /**
@@ -1435,8 +1436,8 @@ ORBEON.xforms.Document = {
             // Directly change the value of the control in the UI without waiting for a response from the server
             ORBEON.xforms.Controls.setCurrentValue(control, stringValue);
             // And also fire server event
-            var event = new ORBEON.xforms.Server.Event(null, control.id, null, stringValue, "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, stringValue, "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         } else {
             throw "ORBEON.xforms.Document.setValue: can't setvalue on output or upload control '" + controlId + "'";
         }
@@ -3064,18 +3065,18 @@ ORBEON.xforms.Events = {
                     // Handle DOMFocusOut
                     // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
                     // DOMFocusOut, but it is hard to detect correctly
-                    events.push(new ORBEON.xforms.Server.Event(null, currentFocusControlElement.id, null, null, "DOMFocusOut"));
+                    events.push(new ORBEON.xforms.server.AjaxServer.Event(null, currentFocusControlElement.id, null, null, "DOMFocusOut"));
                 }
 
                 // Handle DOMFocusIn
-                events.push(new ORBEON.xforms.Server.Event(null, targetControlElement.id, null, null, "DOMFocusIn"));
+                events.push(new ORBEON.xforms.server.AjaxServer.Event(null, targetControlElement.id, null, null, "DOMFocusIn"));
 
                 // Keep track of the id of the last known control which has focus
                 ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
                 ORBEON.xforms.Globals.currentFocusControlElement = targetControlElement;
 
                 // Fire events
-                ORBEON.xforms.Server.fireEvents(events, true);
+                ORBEON.xforms.server.AjaxServer.fireEvents(events, true);
             }
 
         } else {
@@ -3164,8 +3165,8 @@ ORBEON.xforms.Events = {
 
                 // Fire change event
                 var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null, controlCurrentValue, "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], false);
+                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, controlCurrentValue, "xxforms-value-change-with-focus-change");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
             }
         }
     },
@@ -3217,10 +3218,10 @@ ORBEON.xforms.Events = {
                     YAHOO.util.Event.preventDefault(event);
                     // Send a value change and DOM activate
                     var events = [
-                        new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change"),
-                        new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate")
+                        new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change"),
+                        new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, null, "DOMActivate")
                     ];
-                    ORBEON.xforms.Server.fireEvents(events, false);
+                    ORBEON.xforms.server.AjaxServer.fireEvents(events, false);
                 }
             }
         }
@@ -3237,8 +3238,8 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
             // Incremental control: treat keypress as a value change event
             if (YAHOO.util.Dom.hasClass(target, "xforms-incremental")) {
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
-                ORBEON.xforms.Server.fireEvents([event], true);
+                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event], true);
             }
 
             // Resize wide text area
@@ -3417,8 +3418,8 @@ ORBEON.xforms.Events = {
                 // focus event on those, and for buttons on Safari which does not dispatch the focus
                 // event for buttons.
                 ORBEON.xforms.Events.focus(event);
-                var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
-                ORBEON.xforms.Server.fireEvents([event], false);
+                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, null, "DOMActivate");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
                 if (YAHOO.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
                     // If click on a modal trigger, we want to prevent any further interaction with the form until
@@ -3438,8 +3439,8 @@ ORBEON.xforms.Events = {
 
             // Update classes right away to give user visual feedback
             ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
-            var event = new ORBEON.xforms.Server.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
         } else if (target != null && YAHOO.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
             // Click on calendar inside input field
@@ -3450,8 +3451,8 @@ ORBEON.xforms.Events = {
             }
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-upload") && YAHOO.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
             // Click on remove icon in upload control
-            var event = new ORBEON.xforms.Server.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
             // Click on menu item
 
@@ -3488,8 +3489,8 @@ ORBEON.xforms.Events = {
 
             // Send value change to server
             var itemValue = currentLevel[1];
-            var event = new ORBEON.xforms.Server.Event(null, target.id, null, itemValue, "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, itemValue, "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
             // Close the menu
             ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help-image")) {
@@ -3499,8 +3500,8 @@ ORBEON.xforms.Events = {
             var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help-image");
             if (ORBEON.util.Properties.helpHandler.get()) {
                 // We are sending the xforms-help event to the server and the server will tell us what do to
-                var event = new ORBEON.xforms.Server.Event(null, control.id, null, null, "xforms-help");
-                ORBEON.xforms.Server.fireEvents([event], false);
+                var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, null, "xforms-help");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
             } else {
                 // If the servers tells us there are no event handlers for xforms-help in the page,
@@ -3527,8 +3528,8 @@ ORBEON.xforms.Events = {
                             var targetId = sibling.id.substring("repeat-begin-".length);
                             targetId += targetId.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
                             targetId += delimiterCount;
-                            var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, "DOMFocusIn");
-                            ORBEON.xforms.Server.fireEvents([event]);
+                            var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, null, "DOMFocusIn");
+                            ORBEON.xforms.server.AjaxServer.fireEvents([event]);
                             foundRepeatBegin = true;
                             break;
                         } else if (YAHOO.util.Dom.hasClass(sibling, "xforms-repeat-delimiter")) {
@@ -3594,8 +3595,8 @@ ORBEON.xforms.Events = {
             rangeControl = rangeControl.parentNode;
 
         var value = offset / 200;
-        var event = new ORBEON.xforms.Server.Event(null, rangeControl.id, null, String(value), "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], false);
+        var event = new ORBEON.xforms.server.AjaxServer.Event(null, rangeControl.id, null, String(value), "xxforms-value-change-with-focus-change");
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
     },
 
     /**
@@ -3604,8 +3605,8 @@ ORBEON.xforms.Events = {
     menuClick: function (eventType, arguments, userObject) {
         var menu = userObject["menu"];
         var value = userObject["value"];
-        var event = new ORBEON.xforms.Server.Event(null, menu.id, null, value, "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], false);
+        var event = new ORBEON.xforms.server.AjaxServer.Event(null, menu.id, null, value, "xxforms-value-change-with-focus-change");
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
     },
 
     /**
@@ -3616,8 +3617,8 @@ ORBEON.xforms.Events = {
         if (! ORBEON.xforms.Globals.maskDialogCloseEvents) {
             var dialogId = me;
             var dialog = ORBEON.util.Dom.get(dialogId);
-            var event = new ORBEON.xforms.Server.Event(null, dialog.id, null, null, "xxforms-dialog-close");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, dialog.id, null, null, "xxforms-dialog-close");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         }
     },
 
@@ -3672,8 +3673,8 @@ ORBEON.xforms.Events = {
     treeClickValueUpdated: function(control) {
         // If we are in incremental mode, send value to the server on every click
         if (YAHOO.util.Dom.hasClass(control, "xforms-incremental")) {
-            var event = new ORBEON.xforms.Server.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         }
     },
 
@@ -3797,8 +3798,8 @@ ORBEON.xforms.Events = {
                 current = current.parentNode;
             }
             if (!foundDropDownParent) {
-                var event = new ORBEON.xforms.Server.Event(null, yuiDialog.id, null, null, "xxforms-dialog-close");
-                ORBEON.xforms.Server.fireEvents([event], false);
+                var event = new ORBEON.xforms.server.AjaxServer.Event(null, yuiDialog.id, null, null, "xxforms-dialog-close");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
             }
         }
     },
@@ -3812,8 +3813,8 @@ ORBEON.xforms.Events = {
         if (yuiDialog.element.style.display == "block"
                 && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
                 && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= ORBEON.util.Properties.delayBeforeCloseMinimalDialog.get()) {
-            var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         }
     },
 
@@ -3839,8 +3840,8 @@ ORBEON.xforms.Events = {
                 heartBeatDiv.id = "xforms-heartbeat";
                 form.appendChild(heartBeatDiv);
             }
-            var event = new ORBEON.xforms.Server.Event(null, heartBeatDiv.id, null, null, "xxforms-session-heartbeat");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, heartBeatDiv.id, null, null, "xxforms-session-heartbeat");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         }
     },
 
@@ -4062,8 +4063,8 @@ ORBEON.widgets.JSCalendar = function() {
 				imageField.alt = ORBEON.util.DateTime.jsDateToformatDisplayDate(calendar.date);
                 element = imageField.parentNode;
 			}
-            var event = new ORBEON.xforms.Server.Event(null, element.id, null, ORBEON.xforms.Controls.getCurrentValue(element), "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.Server.fireEvents([event], false);
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, element.id, null, ORBEON.xforms.Controls.getCurrentValue(element), "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         }
     }
 
@@ -4247,8 +4248,8 @@ ORBEON.widgets.YUICalendar = function() {
         inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
 		if(YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal"))
 			inputField.alt = inputField.value;
-        var event = new ORBEON.xforms.Server.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], false);
+        var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         closeCalendar();
     }
 
@@ -4461,9 +4462,9 @@ ORBEON.widgets.RTE = function() {
     renderedCustomEvents = {};
 
     function sendChangeToServer(controlID) {
-        var event = new ORBEON.xforms.Server.Event(null, controlID, null,
+        var event = new ORBEON.xforms.server.AjaxServer.Event(null, controlID, null,
                 ORBEON.widgets.RTE.getValue(ORBEON.util.Dom.get(controlID)), "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], true);
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], true);
     }
 
     /**
@@ -4810,7 +4811,7 @@ ORBEON.xforms.Init = {
             requestInProgress: false,            // Indicates whether an Ajax request is currently in process
             requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
             requestTryCount: 0,                  // How many attempts to run the current Ajax request we have done so far
-            executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
+            executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.server.AjaxServer.executeNextRequest waiting to be executed
             maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
             maskDialogCloseEvents: false,        // Avoid catching a dialog close event received from the server, so we don't sent it back to the server
             currentFocusControlId: null,         // Id of the control that got the focus last
@@ -5046,8 +5047,8 @@ ORBEON.xforms.Init = {
                         window.location.reload(true);
                         //NOTE: You would think that if reload is canceled, you would reset this to false, but somehow this fails with IE
                     } else {
-                        var event = new ORBEON.xforms.Server.Event(formElement, null, null, null, "xxforms-all-events-required");
-                        ORBEON.xforms.Server.fireEvents([event], false);
+                        var event = new ORBEON.xforms.server.AjaxServer.Event(formElement, null, null, null, "xxforms-all-events-required");
+                        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
                     }
                 }
 
@@ -5123,9 +5124,9 @@ ORBEON.xforms.Init = {
                                         additionalAttributes.push("modifiers");
                                         additionalAttributes.push(keyListener.modifier);
                                     }
-                                    var event = new ORBEON.xforms.Server.Event(keyListener.form, targetId, null, null, "keypress",
+                                    var event = new ORBEON.xforms.server.AjaxServer.Event(keyListener.form, targetId, null, null, "keypress",
                                         null, null, null, null, null, additionalAttributes);
-                                    ORBEON.xforms.Server.fireEvents([event], false);
+                                    ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
                                 }
                             });
 
@@ -5149,7 +5150,7 @@ ORBEON.xforms.Init = {
                         for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
                             var serverEvent = serverEvents[serverEventIndex];
                             var discardable = ! YAHOO.lang.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
-                            ORBEON.xforms.Server.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
+                            ORBEON.xforms.server.AjaxServer.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
                                 serverEvent["show-progress"], serverEvent["progress-message"], discardable, formElement.id);
                         }
                     }
@@ -5768,10 +5769,10 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         var endPosition = this._getPosition(srcElement);
         if (endPosition != this._startPosition) {
             var form = ORBEON.xforms.Controls.getForm(srcElement);
-            var event = new ORBEON.xforms.Server.Event(form, this.sourceControlID, null, null, "xxforms-dnd", null, null, null, null, null,
+            var event = new ORBEON.xforms.server.AjaxServer.Event(form, this.sourceControlID, null, null, "xxforms-dnd", null, null, null, null, null,
                     ["dnd-start", this._startPosition, "dnd-end", endPosition]);
             this._renumberIDs(this.sourceControlID);
-            ORBEON.xforms.Server.fireEvents([event], false);
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         }
     }
 
@@ -5935,7 +5936,7 @@ ORBEON.xforms.Offline = {
                 // Replay initial events
                 var initialEventsXML = ORBEON.util.Dom.stringToDom(initialEvents);
                 ORBEON.xforms.Globals.requestForm = ORBEON.util.Dom.get(formID);
-                ORBEON.xforms.Server.handleResponseDom(initialEventsXML, formID);
+                ORBEON.xforms.server.AjaxServer.handleResponseDom(initialEventsXML, formID);
                 // Set control values
                 controlValues = ORBEON.xforms.Offline._deserializerControlValues(controlValues);
                 for (var controlID in controlValues) {
@@ -6117,7 +6118,7 @@ ORBEON.xforms.Offline = {
                 for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++)
                     eventArray[eventComponentIndex] = unescape(eventArray[eventComponentIndex]);
                 // Create event object
-                events.push(new ORBEON.xforms.Server.Event(
+                events.push(new ORBEON.xforms.server.AjaxServer.Event(
                     ORBEON.util.Dom.get(eventArray[0]),
                     eventArray[1],
                     eventArray[2],
@@ -6128,7 +6129,7 @@ ORBEON.xforms.Offline = {
                     eventArray[7] == "1"));
             }
             // Send all the events back to the server
-            ORBEON.xforms.Server.fireEvents(events, false);
+            ORBEON.xforms.server.AjaxServer.fireEvents(events, false);
         }
 
         // Tell the server we are going online
@@ -6564,8 +6565,8 @@ function xformsValueChanged(target, other) {
         target.previousValue = newValue;
         var incremental = other == null && YAHOO.util.Dom.hasClass(target, "xforms-incremental");
         var otherID = YAHOO.lang.isObject(other) ? other.id : null;
-        var event = new ORBEON.xforms.Server.Event(null, target.id, otherID, newValue, "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.Server.fireEvents([event], incremental);
+        var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, otherID, newValue, "xxforms-value-change-with-focus-change");
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], incremental);
     }
     return valueChanged;
 }
@@ -6576,8 +6577,8 @@ function xformsHandleClick(event) {
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
     if ((YAHOO.util.Dom.hasClass(target, "xforms-trigger") || YAHOO.util.Dom.hasClass(target, "xforms-trigger"))
             && !YAHOO.util.Dom.hasClass(target, "xforms-readonly")) {
-        var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
-        ORBEON.xforms.Server.fireEvents([event], false);
+        var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, null, "DOMActivate");
+        ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
     }
     return false;
 }

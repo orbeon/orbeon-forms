@@ -402,7 +402,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 // Initial xxforms:script executions if present
                 if (scriptsToRun != null) {
                     for (final XFormsContainingDocument.Script script: scriptsToRun) {
-                        sb.append("ORBEON.xforms.Server.callUserScript(\"");
+                        sb.append("ORBEON.xforms.server.Server.callUserScript(\"");
                         sb.append(script.getFunctionName());
                         sb.append("\",\"");
                         sb.append(XFormsUtils.namespaceId(containingDocument, script.getEvent().getTargetObject().getEffectiveId()));

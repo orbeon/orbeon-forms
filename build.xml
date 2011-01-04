@@ -593,6 +593,7 @@
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/util"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/action"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/control"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/server"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/button"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
         <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
@@ -609,7 +610,8 @@
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Control"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Upload"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Tree"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Server"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/server/AjaxServer"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/server/UploadServer"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Form"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Page"/></antcall>
 

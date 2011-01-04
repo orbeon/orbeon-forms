@@ -86,9 +86,13 @@
                 </xsl:template>
                 <!-- Dynamically build where clause -->
                 <xsl:template match="where">
-                    <xsl:text>($query = '' or text:match-any($resource, $query))</xsl:text>
+                    <!-- Old fulltext index -->
+                    <!--<xsl:text>($query = '' or text:match-any($resource, $query))</xsl:text>-->
+                    <!-- New lucene index -->
+                    <xsl:text>($query = '' or ft:query($resource, $query))</xsl:text>
                     <xsl:for-each select="$instance/query[@path and normalize-space() != '']">
                         <xsl:variable name="position" select="position()" as="xs:integer"/>
+                        <!-- NOTE: We should probably use ft:query() below as well -->
                         <xsl:choose>
                             <xsl:when test="@match = 'exact'">
                                 <!-- Exact match -->

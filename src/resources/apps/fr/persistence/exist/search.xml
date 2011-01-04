@@ -30,7 +30,11 @@
         (: Get URL parameters :)
         let $page-size := request:get-parameter('page-size', '')
         let $page-number := request:get-parameter('page-number', '')
-        let $query := request:get-parameter('query', '')
+        (: If query is a single word without Lucene special characters, append a '*', else keep query as is :)
+        let $query-parameter := request:get-parameter('query', '')
+        let $query := if (count(tokenize($query-parameter, '\s+')) = 1 and not(string-to-codepoints($query-parameter) = string-to-codepoints('+-&amp;|!(){}[]^"~*?:\\')))
+                      then concat($query-parameter, '*')
+                      else $query-parameter
         let $path := request:get-parameter('path', '')
         let $value := request:get-parameter('value', '')
         (: Special language variable used for now by Form Builder :)

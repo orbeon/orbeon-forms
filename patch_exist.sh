@@ -34,10 +34,11 @@ done
 rm "$ORBEON_HOME"/lib/*exist*
 
 # Copy eXist JARs
-cp exist.jar "$ORBEON_HOME"/lib/exist-$FULL_VERSION.jar
-cp exist-optional.jar "$ORBEON_HOME"/lib/exist-optional-$FULL_VERSION.jar
-cp lib/extensions/exist-modules.jar "$ORBEON_HOME"/lib/exist-modules-$FULL_VERSION.jar
-cp lib/extensions/exist-ngram-module.jar "$ORBEON_HOME"/lib/exist-ngram-module-$FULL_VERSION.jar
+cp exist.jar                              "$ORBEON_HOME"/lib/exist-$FULL_VERSION.jar
+cp exist-optional.jar                     "$ORBEON_HOME"/lib/exist-optional-$FULL_VERSION.jar
+cp lib/extensions/exist-modules.jar       "$ORBEON_HOME"/lib/exist-modules-$FULL_VERSION.jar
+cp lib/extensions/exist-ngram-module.jar  "$ORBEON_HOME"/lib/exist-ngram-module-$FULL_VERSION.jar
+cp lib/extensions/exist-lucene-module.jar "$ORBEON_HOME"/lib/exist-lucene-module-$FULL_VERSION.jar
 
 # Copy eXist dependencies JARs
 cp lib/core/antlr-2.7.7.jar           "$ORBEON_HOME"/lib/exist-dependency-antlr-2.7.7.jar
@@ -50,6 +51,8 @@ cp lib/core/xmldb.jar                 "$ORBEON_HOME"/lib/exist-xmldb.jar
 cp lib/core/xmlrpc-client-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-client-3.1.2.jar
 cp lib/core/xmlrpc-common-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-common-3.1.2.jar
 cp lib/core/xmlrpc-server-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-server-3.1.2.jar
+cp extensions/indexes/lucene/lib/lucene-core-2.9.2.jar  "$ORBEON_HOME"/lib/exist-dependency-lucene-core-2.9.2.jar
+cp extensions/indexes/lucene/lib/lucene-regex-2.9.2.jar "$ORBEON_HOME"/lib/exist-dependency-lucene-regex-2.9.2
 cp lib/endorsed/resolver-1.2.jar      "$ORBEON_HOME"/lib/exist-dependency-resolver-1.2.jar
 
 

@@ -106,9 +106,10 @@
         <include name="antlr-2_7_4_orbeon.jar"/>
 
         <include name="exist-1_4_1_dev_orbeon_20110104.jar"/>
+        <include name="exist-optional-1_4_1_dev_orbeon_20110104.jar"/>
         <include name="exist-modules-1_4_1_dev_orbeon_20110104.jar"/>
         <include name="exist-ngram-module-1_4_1_dev_orbeon_20110104.jar"/>
-        <include name="exist-optional-1_4_1_dev_orbeon_20110104.jar"/>
+        <include name="exist-lucene-module-1_4_1_dev_orbeon_20110104.jar"/>
 
         <include name="exist-dependency-antlr-2.7.7.jar"/>
         <include name="exist-dependency-jgroups-all-2.2.6.jar"/>
@@ -120,6 +121,8 @@
         <include name="exist-dependency-xmlrpc-client-3.1.2.jar"/>
         <include name="exist-dependency-xmlrpc-common-3.1.2.jar"/>
         <include name="exist-dependency-xmlrpc-server-3.1.2.jar"/>
+        <include name="exist-dependency-lucene-core-2.9.2.jar"/>
+        <include name="exist-dependency-lucene-regex-2.9.2.jar"/>
         <include name="exist-dependency-resolver-1.2.jar"/>
 
         <include name="scala-library.jar"/>

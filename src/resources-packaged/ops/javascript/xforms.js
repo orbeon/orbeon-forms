@@ -2003,22 +2003,12 @@ ORBEON.xforms.Controls = {
             // Upload
 
             // Get elements we want to modify from the DOM
-            var fileInfoSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-info", null, control)[0];
             var fileNameSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, control)[0];
             var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, control)[0];
             var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
             // Set values in DOM
-            if (attribute1 == "empty") {
-                YAHOO.util.Dom.removeClass(control, "xforms-upload-state-file");
-                YAHOO.util.Dom.addClass(control, "xforms-upload-state-empty");
-            }
-            if (attribute1 == "file") {
-                YAHOO.util.Dom.removeClass(control, "xforms-upload-state-empty");
-                YAHOO.util.Dom.addClass(control, "xforms-upload-state-file");
-
-                // Clear upload input by replacing the control
-                ORBEON.util.Dom.clearUploadControl(control);
-            }
+            var upload = ORBEON.xforms.Page.getControl(control);
+            upload.setState(attribute1);
             if (attribute2 != null)
                 ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
             if (attribute3 != null)

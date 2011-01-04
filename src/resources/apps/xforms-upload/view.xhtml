@@ -29,6 +29,7 @@
                     <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                     <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                     <my-element>my-content</my-element>
+                    <counter>1</counter>
                 </files>
             </xforms:instance>
             <xforms:instance id="selected">
@@ -72,6 +73,11 @@
             This sample application shows how you can use the XForms upload control, and how file uploads take place in
             the background.
         </p>
+        <fr:button>
+            <xforms:label>Increment</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="counter" value=". + 1"/>
+        </fr:button>
+        <xforms:output value="counter"/>
         <p>
             Please select the files to upload:
         </p>
@@ -135,17 +141,5 @@
                 </tr>
             </xforms:repeat>
         </table>
-        <p>
-            <xforms:output ref="instance('selected')"/>
-        </p>
-        <p>
-            <xforms:submit ref="instance('control-instance')/simple-upload-trigger" submission="background-submission">
-                <xforms:label>Upload Selected Files</xforms:label>
-            </xforms:submit>
-
-            <xforms:submit ref="instance('control-instance')/simple-upload-trigger" submission="all-submission">
-                <xforms:label>Send Selected Files</xforms:label>
-            </xforms:submit>
-        </p>
     </body>
 </html>

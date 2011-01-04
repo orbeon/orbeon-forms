@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -19,6 +19,7 @@
      */
     ORBEON.xforms.control.Upload = function() {};
 
+    var OD = ORBEON.util.Dom;
     var ExecutionQueue = ORBEON.util.ExecutionQueue;
     var Properties = ORBEON.util.Properties;
     var Server = ORBEON.xforms.Server;
@@ -29,11 +30,53 @@
 
     Upload.prototype = new Control();
 
-    Upload.prototype.change = function() {
+    Upload.prototype.init = function(container) {
+        // Call super-class init
+        Control.prototype.init.call(this, container);
 
-        // Submit form in the background (pseudo-Ajax request)
-        YAHOO.util.Connect.setForm(this.getForm(), true, true);
-        Server.uploadEventQueue.add({}, Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
+        // Create loading progress indicator element, if we don't already have one
+        if (! this.getElementByClassName("xforms-upload-progress")) {
+            var uploadProgressSpan = document.createElement("span");
+            OD.setAttribute(uploadProgressSpan, "class", "xforms-upload-progress");
+            var inputSelect = this.getElementByClassName("xforms-upload-select");
+            YD.insertAfter(uploadProgressSpan, inputSelect);
+        }
+    };
+
+    Upload.prototype.change = function() {
+        // Queue event to submit this file in the background  as soon as possible (pseudo-Ajax request)
+        Server.uploadEventQueue.add({form: this.getForm(), upload: this}, Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
+    };
+
+    /**
+     * Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"
+     * (file is being uploaded), or "file" (a file has been uploaded).
+     *
+     * @param {String} state
+     */
+    Upload.prototype.setState = function(state) {
+        var STATES = ["empty", "progress", "file"];
+        // Check the state we got is one of the recognized states
+        if (! _.contains(STATES, state)) throw "Invalid state " + state;
+        // Remove any existing state class
+        _.each(STATES, _.bind(function(state) { YD.removeClass(this.container, "xforms-upload-state-" + state); }, this));
+        // Add the relevant state class
+        YD.addClass(this.container, "xforms-upload-state-" + state);
+    };
+
+    /**
+     * Clears the upload field by recreating it.
+     */
+    Upload.prototype.clear = function() {
+        var inputElement = YD.getElementsByClassName("xforms-upload-select", null, this.container)[0];
+        var parentElement = inputElement.parentNode;
+        var newInputElement = document.createElement("input");
+        YAHOO.util.Dom.addClass(newInputElement, inputElement.className);
+        newInputElement.setAttribute("type", inputElement.type);
+        newInputElement.setAttribute("name", inputElement.name);
+        newInputElement.setAttribute("size", inputElement.size);
+        newInputElement.setAttribute("unselectable", "on");// the server sets this, so we have to set it again
+        parentElement.replaceChild(newInputElement, inputElement);
     };
 
     Page.registerControlConstructor(Upload,  function(container) {

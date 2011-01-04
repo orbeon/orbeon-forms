@@ -20,6 +20,7 @@
      */
     ORBEON.xforms.control.Control = function() {};
     var Control = ORBEON.xforms.control.Control;
+    var YD = YAHOO.util.Dom;
 
     /** @type {HTMLElement} */
     Control.prototype.container = null;
@@ -45,6 +46,28 @@
     Control.prototype.init = function(container) { this.container = container; };
 
     Control.prototype.change = function() {};
+
+    /**
+     * Returns an array of the elements with the given class name that are inside this control. If there are no
+     * such elements, an empty array is returned.
+     *
+     * @param   {String}            className
+     * @return  {Array.<Element>}   Elements with the given class name
+     */
+    Control.prototype.getElementsByClassName = function(className) {
+        return YD.getElementsByClassName(className, null, this.container);
+    };
+
+    /**
+     * Returns the first element with the given class name that are inside this control. If there are no
+     * such elements, undefined is returned.
+     *
+     * @param   {String}            className
+     * @return  {?Element}   Elements with the given class name
+     */
+    Control.prototype.getElementByClassName = function(className) {
+        return _.first(this.getElementsByClassName(className));
+    };
 
     /**
      * Provides a new itemset for a control, if the control supports this.

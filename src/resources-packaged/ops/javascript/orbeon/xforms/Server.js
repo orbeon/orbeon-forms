@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,6 +20,7 @@
 
     var Server = ORBEON.xforms.Server;
     var ExecutionQueue = ORBEON.util.ExecutionQueue;
+    var Properties = ORBEON.util.Properties;
 
     Server.Event = function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
         // If no form is provided, infer the form based on that targetId, if one is provided
@@ -542,27 +543,35 @@
      * Run background form post (upload)
      */
     Server.asyncUploadRequest = function(events, done) {
-        var formID = ORBEON.xforms.Globals.requestForm.id;
-        var callback = {
+
+        // Potentially, if multiple forms are on the same page, and users simultaneously select a file in both forms,
+        // then we could have a problem here, as we'll only upload the first form. But we'll be optimistic and
+        // pretend this doesn't happen.
+        var form = events[0].form;
+
+        // Switch the upload to progress state, so users can't change the file and know the upload is in progress
+        _.each(events, function(event) { event.upload.setState("progress"); });
+        // Tell server we're starting uploads
+        var uploadStartEvents = _.map(events, function(event) { return new ORBEON.xforms.Server.Event(null, event.upload.container.id, null, null, "xxforms-upload-start"); });
+        //ORBEON.xforms.Server.fireEvents(uploadStartEvents, false);
+
+        // Trigger actual upload through a form POST
+        YAHOO.util.Connect.setForm(form, true, true);
+        YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[form.id], {
             upload: function(o) {
-                // Clear server events that were sent to the server
-                var formID = ORBEON.xforms.Globals.requestForm.id;
-                ORBEON.xforms.Globals.formServerEvents[formID].value = "";
-                // Clear all the upload fields (currently we submit all of them, but in the future, should clear only the ones that have been submitted)
-                var uploadElements = YAHOO.util.Dom.getElementsByClassName("xforms-upload", "span");
-                for (var uploadIndex = 0; uploadIndex < uploadElements.length; uploadIndex++) {
-                    var uploadElement = uploadElements[uploadIndex];
-                    if (YAHOO.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty")) // This also excludes templates
-                        ORBEON.util.Dom.clearUploadControl(uploadElement);
-                }
+                // Clear server events that were sent to the server (why? is this still needed?)
+                ORBEON.xforms.Globals.formServerEvents[form.id].value = "";
+                // Clear upload fields we just uploaded, otherwise subsequent uploads will upload the same data again
+                _.each(events, function(event) { event.upload.clear(); });
                 Server.handleResponseAjax(o);
+                // Call back to execution queue, which might have more files upload
                 done();
             },
             failure: function() {
+                console.log("Upload failure");
                 Server.retryRequestAfterDelay(_.bind(Server.asyncUploadRequest, Server, events, done));
             }
-        };
-        YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback);
+        });
     };
 
     /**

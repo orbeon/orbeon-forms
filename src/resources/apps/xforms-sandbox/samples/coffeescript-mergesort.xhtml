@@ -1,22 +1,24 @@
 <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xh:head>
+        <xh:title>Merge sort of XForms values in CoffeeScript</xh:title>
         <xf:model>
-            <xf:instance id="instance">
+            <xf:instance>
                 <values>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
-                    <value></value>
+                    <value>23</value>
+                    <value>99</value>
+                    <value>13</value>
+                    <value>15</value>
+                    <value>9</value>
+                    <value>46</value>
+                    <value>35</value>
+                    <value>12</value>
+                    <value>87</value>
+                    <value>40</value>
                 </values>
             </xf:instance>
         </xf:model>
@@ -24,28 +26,44 @@
     <xh:body>
 
         <xf:repeat ref="value">
-            <xf:input ref="."/>
+            <xf:output id="my-output" ref="."/>
+            <xh:br/>
         </xf:repeat>
 
-        <xf:trigger>
-            <xf:label>Run CoffeeScript</xf:label>
-            <xf:action ev:event="DOMActivate">
-                <xxf:script runat="server" type="text/coffeescript">
-                    <![CDATA[
-                    index = (list, target) ->
-                      [low, high] = [0, list.length]
-                      while low < high
-                        mid = (low + high) >> 1
-                        val = list[mid]
-                        return mid if val is target
-                        if val < target then low = mid + 1 else high = mid
-                      return -1
+        <fr:button>
+            <xf:label>Sort them!</xf:label>
+            <xxf:script ev:event="DOMActivate" runat="server" type="text/coffeescript">
+                <![CDATA[
 
-                    ORBEON.controls.setValue "input2", index [10, 20, 30, 40, 50], Number(ORBEON.controls.getValue "input1")
-                    ]]>
-                </xxf:script>
-            </xf:action>
-        </xf:trigger>
+                # Merge sort function from the CoffeeScript examples
+                mergeSort = (list) ->
+
+                  return list if list.length is 1
+
+                  result  = []
+                  pivot   = Math.floor list.length / 2
+                  left    = mergeSort list.slice 0, pivot
+                  right   = mergeSort list.slice pivot
+
+                  while left.length and right.length
+                    result.push(if left[0] < right[0] then left.shift() else right.shift())
+
+                  result.concat(left).concat(right)
+
+                # Read values of all 10 controls as numbers
+                unsortedValues = for index in [1..10]
+                  Number ORBEON.controls.getValue "my-output·" + index
+
+                # Sort values
+                sortedValues = mergeSort unsortedValues
+
+                # Sort and write back sorted values
+                for index in [1..10]
+                  ORBEON.controls.setValue "my-output·" + index, sortedValues[index - 1]
+
+                ]]>
+            </xxf:script>
+        </fr:button>
 
     </xh:body>
 </xh:html>

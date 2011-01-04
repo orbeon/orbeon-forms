@@ -18,7 +18,7 @@
     <!-- Form Runner properties -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
 
-    <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db/orbeon/fr"/>
     <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"               value="oracle"/>
     <property as="xs:anyURI " name="oxf.fr.persistence.service.mysql.datasource"                value="mysql"/>
 

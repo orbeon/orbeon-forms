@@ -1,31 +1,50 @@
-Index: src/org/exist/stax/EmbeddedXMLStreamReader.java
+Index: src/org/exist/http/urlrewrite/URLRewrite.java
 ===================================================================
---- src/org/exist/stax/EmbeddedXMLStreamReader.java	(revision 9256)
-+++ src/org/exist/stax/EmbeddedXMLStreamReader.java	(working copy)
-@@ -590,4 +590,4 @@
-             currentChild++;
+--- src/org/exist/http/urlrewrite/URLRewrite.java	(revision 13502)
++++ src/org/exist/http/urlrewrite/URLRewrite.java	(working copy)
+@@ -207,4 +207,4 @@
          }
+         return sb.toString();
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/http/urlrewrite/RewriteConfig.java
+===================================================================
+--- src/org/exist/http/urlrewrite/RewriteConfig.java	(revision 13502)
++++ src/org/exist/http/urlrewrite/RewriteConfig.java	(working copy)
+@@ -250,7 +250,7 @@
+     }
+ 
+     private Document parseConfig(File file) throws ParserConfigurationException, SAXException, IOException {
+-        SAXParserFactory factory = SAXParserFactory.newInstance();
++        SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+         factory.setNamespaceAware(true);
+         InputSource src = new InputSource(new FileInputStream(file));
+         SAXParser parser = factory.newSAXParser();
+@@ -262,4 +262,4 @@
+ 
+         return adapter.getDocument();
      }
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/http/RESTServer.java
 ===================================================================
---- src/org/exist/http/RESTServer.java	(revision 9256)
+--- src/org/exist/http/RESTServer.java	(revision 13502)
 +++ src/org/exist/http/RESTServer.java	(working copy)
-@@ -471,6 +471,9 @@
-             throw new PermissionDeniedException("Not allowed to read resource");
-         }
+@@ -805,7 +805,7 @@
  
-+        // ORBEON START: 2009-07-02 backported from trunk
-+        response.addDateHeader("Last-Modified", resource.getMetadata().getLastModified());
-+        // ORBEON END
-         if (resource.getResourceType() == DocumentImpl.BINARY_FILE) {
-             // binary resource
-             if(asMimeType != null)  { //was a mime-type specified?
+ 	private ElementImpl parseXML(String content, NamespaceExtractor nsExtractor) throws ParserConfigurationException, SAXException, IOException
+ 	{
+-		SAXParserFactory factory = SAXParserFactory.newInstance();
++		SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+ 		factory.setNamespaceAware(true);
+ 		InputSource src = new InputSource(new StringReader(content));
+ 		SAXParser parser = factory.newSAXParser();
 Index: src/org/exist/http/servlets/RedirectorServlet.java
 ===================================================================
---- src/org/exist/http/servlets/RedirectorServlet.java	(revision 9256)
+--- src/org/exist/http/servlets/RedirectorServlet.java	(revision 13502)
 +++ src/org/exist/http/servlets/RedirectorServlet.java	(working copy)
 @@ -311,4 +311,4 @@
              return null;
@@ -36,7 +55,7 @@ Index: src/org/exist/http/servlets/RedirectorServlet.java
 +}
 Index: src/org/exist/http/servlets/Authenticator.java
 ===================================================================
---- src/org/exist/http/servlets/Authenticator.java	(revision 9256)
+--- src/org/exist/http/servlets/Authenticator.java	(revision 13502)
 +++ src/org/exist/http/servlets/Authenticator.java	(working copy)
 @@ -55,4 +55,4 @@
  	 */
@@ -47,7 +66,7 @@ Index: src/org/exist/http/servlets/Authenticator.java
 +}
 Index: src/org/exist/http/servlets/SessionWrapper.java
 ===================================================================
---- src/org/exist/http/servlets/SessionWrapper.java	(revision 9256)
+--- src/org/exist/http/servlets/SessionWrapper.java	(revision 13502)
 +++ src/org/exist/http/servlets/SessionWrapper.java	(working copy)
 @@ -50,4 +50,4 @@
  	public void setAttribute(String arg0, Object arg1);
@@ -56,22 +75,11 @@ Index: src/org/exist/http/servlets/SessionWrapper.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/http/servlets/RequestWrapper.java
-===================================================================
---- src/org/exist/http/servlets/RequestWrapper.java	(revision 9256)
-+++ src/org/exist/http/servlets/RequestWrapper.java	(working copy)
-@@ -117,4 +117,4 @@
- 	public void setAttribute(String arg0, Object arg1);
- 	
- 	public void setCharacterEncoding(String arg0) throws UnsupportedEncodingException;
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/http/SOAPServer.java
 ===================================================================
---- src/org/exist/http/SOAPServer.java	(revision 9256)
+--- src/org/exist/http/SOAPServer.java	(revision 13502)
 +++ src/org/exist/http/SOAPServer.java	(working copy)
-@@ -714,7 +714,7 @@
+@@ -725,7 +725,7 @@
  	private Document BuildXMLDocument(byte[] buf) throws SAXException, ParserConfigurationException, IOException
  	{
  		//try and construct xml document from input stream, we use eXist's in-memory DOM implementation
@@ -82,9 +90,9 @@ Index: src/org/exist/http/SOAPServer.java
  		InputSource src = new InputSource(new ByteArrayInputStream(buf));
 Index: src/org/exist/http/Descriptor.java
 ===================================================================
---- src/org/exist/http/Descriptor.java	(revision 9256)
+--- src/org/exist/http/Descriptor.java	(revision 13502)
 +++ src/org/exist/http/Descriptor.java	(working copy)
-@@ -120,7 +120,7 @@
+@@ -121,7 +121,7 @@
              // initialize xml parser
              // we use eXist's in-memory DOM implementation to work
              // around a bug in Xerces
@@ -95,7 +103,7 @@ Index: src/org/exist/http/Descriptor.java
              InputSource src = new InputSource(is);
 Index: src/org/exist/http/Response.java
 ===================================================================
---- src/org/exist/http/Response.java	(revision 9256)
+--- src/org/exist/http/Response.java	(revision 13502)
 +++ src/org/exist/http/Response.java	(working copy)
 @@ -123,4 +123,4 @@
  		os.flush();
@@ -106,7 +114,7 @@ Index: src/org/exist/http/Response.java
 +}
 Index: src/org/exist/http/SessionManager.java
 ===================================================================
---- src/org/exist/http/SessionManager.java	(revision 9256)
+--- src/org/exist/http/SessionManager.java	(revision 13502)
 +++ src/org/exist/http/SessionManager.java	(working copy)
 @@ -124,4 +124,4 @@
              }
@@ -115,9 +123,20 @@ Index: src/org/exist/http/SessionManager.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/stax/EmbeddedXMLStreamReader.java
+===================================================================
+--- src/org/exist/stax/EmbeddedXMLStreamReader.java	(revision 13502)
++++ src/org/exist/stax/EmbeddedXMLStreamReader.java	(working copy)
+@@ -682,4 +682,4 @@
+             currentChild++;
+         }
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/validation/GrammarPool.java
 ===================================================================
---- src/org/exist/validation/GrammarPool.java	(revision 9256)
+--- src/org/exist/validation/GrammarPool.java	(revision 13502)
 +++ src/org/exist/validation/GrammarPool.java	(working copy)
 @@ -22,10 +22,10 @@
  package org.exist.validation;
@@ -149,7 +168,7 @@ Index: src/org/exist/validation/GrammarPool.java
   */
  public class GrammarPool implements XMLGrammarPool {
      
-@@ -65,10 +65,10 @@
+@@ -70,10 +70,10 @@
       * by a validator before the validation starts. the application can provide 
       * an initial set of grammars available to the current validation attempt.
       *
@@ -162,7 +181,7 @@ Index: src/org/exist/validation/GrammarPool.java
       * @return  The set of grammars the validator may put in its "bucket"
       */
      public Grammar[] retrieveInitialGrammarSet(String type) {
-@@ -84,7 +84,7 @@
+@@ -89,7 +89,7 @@
      /**
       *  Return the final set of grammars that the validator ended up with.
       *
@@ -171,7 +190,7 @@ Index: src/org/exist/validation/GrammarPool.java
       * 
       * @param type      The type of the grammars being returned
       * @param grammar   an array containing the set of grammars being 
-@@ -101,7 +101,7 @@
+@@ -106,7 +106,7 @@
       * cacheGrammars(String, Grammar[]) method is called. This is the default 
       * state of the object.
       *
@@ -180,7 +199,7 @@ Index: src/org/exist/validation/GrammarPool.java
       */
      public void unlockPool() {
          if (logger.isDebugEnabled())
-@@ -116,7 +116,7 @@
+@@ -121,7 +121,7 @@
       * EntityResolver. An application must not call its EntityResolver itself 
       * from this method; this may result in infinite recursions.
       *
@@ -189,7 +208,7 @@ Index: src/org/exist/validation/GrammarPool.java
       *
       * @param xgd    The description of the Grammar being requested.
       * @return       the Grammar corresponding to this description or null 
-@@ -147,7 +147,7 @@
+@@ -152,7 +152,7 @@
       *  Causes the XMLGrammarPool not to store any grammars when the 
       * cacheGrammars(String, Grammar[[]) method is called.
       *
@@ -198,7 +217,7 @@ Index: src/org/exist/validation/GrammarPool.java
       */
      public void lockPool() {
          if (logger.isDebugEnabled())
-@@ -158,7 +158,7 @@
+@@ -163,7 +163,7 @@
      /**
       *  Removes all grammars from the pool.
       *
@@ -207,7 +226,7 @@ Index: src/org/exist/validation/GrammarPool.java
       */
      public void clear() {
          if (logger.isDebugEnabled())
-@@ -169,7 +169,7 @@
+@@ -174,7 +174,7 @@
      /**
       *  Removes all DTD grammars from the pool. Workaround for Xerces bug.
       *
@@ -218,7 +237,7 @@ Index: src/org/exist/validation/GrammarPool.java
          //if (logger.isDebugEnabled())
 Index: src/org/exist/validation/resolver/SearchResourceResolver.java
 ===================================================================
---- src/org/exist/validation/resolver/SearchResourceResolver.java	(revision 9256)
+--- src/org/exist/validation/resolver/SearchResourceResolver.java	(revision 13502)
 +++ src/org/exist/validation/resolver/SearchResourceResolver.java	(working copy)
 @@ -27,10 +27,10 @@
  import java.net.URL;
@@ -237,7 +256,7 @@ Index: src/org/exist/validation/resolver/SearchResourceResolver.java
  import org.exist.storage.BrokerPool;
 Index: src/org/exist/validation/resolver/AnyUriResolver.java
 ===================================================================
---- src/org/exist/validation/resolver/AnyUriResolver.java	(revision 9256)
+--- src/org/exist/validation/resolver/AnyUriResolver.java	(revision 13502)
 +++ src/org/exist/validation/resolver/AnyUriResolver.java	(working copy)
 @@ -28,10 +28,10 @@
  
@@ -256,7 +275,7 @@ Index: src/org/exist/validation/resolver/AnyUriResolver.java
  import org.exist.protocolhandler.xmldb.XmldbURL;
 Index: src/org/exist/validation/resolver/eXistXMLCatalogResolver.java
 ===================================================================
---- src/org/exist/validation/resolver/eXistXMLCatalogResolver.java	(revision 9256)
+--- src/org/exist/validation/resolver/eXistXMLCatalogResolver.java	(revision 13502)
 +++ src/org/exist/validation/resolver/eXistXMLCatalogResolver.java	(working copy)
 @@ -29,17 +29,17 @@
  import java.util.List;
@@ -337,9 +356,9 @@ Index: src/org/exist/validation/resolver/eXistXMLCatalogResolver.java
          LOG.debug("name='"+name+"' baseURI='"+baseURI+"'");
 Index: src/org/exist/validation/ValidationContentHandler.java
 ===================================================================
---- src/org/exist/validation/ValidationContentHandler.java	(revision 9256)
+--- src/org/exist/validation/ValidationContentHandler.java	(revision 13502)
 +++ src/org/exist/validation/ValidationContentHandler.java	(working copy)
-@@ -53,4 +53,4 @@
+@@ -59,4 +59,4 @@
      public String getNamespaceUri(){
          return namespaceUri;
      }
@@ -348,11 +367,11 @@ Index: src/org/exist/validation/ValidationContentHandler.java
 +}
 Index: src/org/exist/validation/Validator.java
 ===================================================================
---- src/org/exist/validation/Validator.java	(revision 9256)
+--- src/org/exist/validation/Validator.java	(revision 13502)
 +++ src/org/exist/validation/Validator.java	(working copy)
-@@ -142,7 +142,7 @@
-         ValidationContentHandler handler = new ValidationContentHandler();
-         
+@@ -265,7 +265,7 @@
+             ErrorHandler errorHandler) throws ParserConfigurationException, SAXException {
+ 
          // setup sax factory ; be sure just one instance!
 -        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
 +        SAXParserFactory saxFactory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
@@ -361,53 +380,31 @@ Index: src/org/exist/validation/Validator.java
          saxFactory.setValidating(true);
 Index: src/org/exist/validation/XmlLibraryChecker.java
 ===================================================================
---- src/org/exist/validation/XmlLibraryChecker.java	(revision 9256)
+--- src/org/exist/validation/XmlLibraryChecker.java	(revision 13502)
 +++ src/org/exist/validation/XmlLibraryChecker.java	(working copy)
-@@ -43,18 +43,26 @@
+@@ -44,8 +44,8 @@
       * Possible XML Parsers, at least one must be valid
       */
      private final static ClassVersion[] validParsers = {
 -        new ClassVersion("Xerces", "Xerces-J 2.9.1", 
 -                "org.apache.xerces.impl.Version.getVersion()")
-+        // ORBEON START
 +        new ClassVersion("Xerces", "Xerces-J 2.9.0",
 +                "orbeon.apache.xerces.impl.Version.getVersion()")
-+//        new ClassVersion("Xerces", "Xerces-J 2.9.1",
-+//                "orbeon.apache.xerces.impl.Version.getVersion()")
-+        // ORBEON END
      };
      
      /**
-      * Possible XML Transformers, at least one must be valid
+@@ -53,7 +53,7 @@
       */
      private final static ClassVersion[] validTransformers = {
--        new ClassVersion("Saxon", "8.9.0", 
+         new ClassVersion("Saxon", "8.9.0", 
 -                "net.sf.saxon.Version.getProductVersion()"),
--        new ClassVersion("Xalan", "Xalan Java 2.7.1", 
--                "org.apache.xalan.Version.getVersion()"),
-+        // ORBEON START
-+        new ClassVersion("Saxon", "8.8",
-+            "org.orbeon.saxon.Version.getProductVersion()"),
-+//        new ClassVersion("Saxon", "8.9.0",
-+//                "org.orbeon.saxon.Version.getProductVersion()"),
-+//        new ClassVersion("Xalan", "Xalan Java 2.7.1",
-+//                "orbeon.apache.xalan.Version.getVersion()"),
-+        // ORBEON END
++                "org.orbeon.saxon.Version.getProductVersion()"),
+         new ClassVersion("Xalan", "Xalan Java 2.7.1", 
+                 "org.apache.xalan.Version.getVersion()"),
      };
-     
-     /**
-@@ -93,7 +101,7 @@
- 
-         String parserClass = "Unable to determine parser class";
-         try {
--            SAXParserFactory factory = SAXParserFactory.newInstance();
-+            SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
-             XMLReader xmlReader = factory.newSAXParser().getXMLReader();
-             String classId = xmlReader.toString();
-             parserClass = getClassName(classId);
 Index: src/org/exist/webstart/JnlpServlet.java
 ===================================================================
---- src/org/exist/webstart/JnlpServlet.java	(revision 9256)
+--- src/org/exist/webstart/JnlpServlet.java	(revision 13502)
 +++ src/org/exist/webstart/JnlpServlet.java	(working copy)
 @@ -113,4 +113,4 @@
          }
@@ -416,23 +413,23 @@ Index: src/org/exist/webstart/JnlpServlet.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/xquery/Optimize.java
+Index: src/org/exist/xquery/XPathException.java
 ===================================================================
---- src/org/exist/xquery/Optimize.java	(revision 9256)
-+++ src/org/exist/xquery/Optimize.java	(working copy)
-@@ -290,4 +290,4 @@
+--- src/org/exist/xquery/XPathException.java	(revision 13502)
++++ src/org/exist/xquery/XPathException.java	(working copy)
+@@ -184,4 +184,4 @@
+             return buf.toString();
          }
-         return indexType;
      }
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/xquery/XPathException.java
+Index: src/org/exist/xquery/LocationStep.java
 ===================================================================
---- src/org/exist/xquery/XPathException.java	(revision 9256)
-+++ src/org/exist/xquery/XPathException.java	(working copy)
-@@ -168,4 +168,4 @@
-             return buf.toString();
+--- src/org/exist/xquery/LocationStep.java	(revision 13502)
++++ src/org/exist/xquery/LocationStep.java	(working copy)
+@@ -1433,4 +1433,4 @@
+             return true;
          }
      }
 -}
@@ -440,7 +437,7 @@ Index: src/org/exist/xquery/XPathException.java
 +}
 Index: src/org/exist/xquery/DescendantOrSelfSelector.java
 ===================================================================
---- src/org/exist/xquery/DescendantOrSelfSelector.java	(revision 9256)
+--- src/org/exist/xquery/DescendantOrSelfSelector.java	(revision 13502)
 +++ src/org/exist/xquery/DescendantOrSelfSelector.java	(working copy)
 @@ -47,4 +47,4 @@
              p.copyContext(contextNode);
@@ -451,10 +448,10 @@ Index: src/org/exist/xquery/DescendantOrSelfSelector.java
 +}
 Index: src/org/exist/xquery/DynamicTypeCheck.java
 ===================================================================
---- src/org/exist/xquery/DynamicTypeCheck.java	(revision 9256)
+--- src/org/exist/xquery/DynamicTypeCheck.java	(revision 13502)
 +++ src/org/exist/xquery/DynamicTypeCheck.java	(working copy)
-@@ -203,4 +203,4 @@
- 	public void accept(ExpressionVisitor visitor) {
+@@ -209,4 +209,4 @@
+     public void accept(ExpressionVisitor visitor) {
  		expression.accept(visitor);
  	}
 -}
@@ -462,7 +459,7 @@ Index: src/org/exist/xquery/DynamicTypeCheck.java
 +}
 Index: src/org/exist/xquery/value/BinaryValue.java
 ===================================================================
---- src/org/exist/xquery/value/BinaryValue.java	(revision 9256)
+--- src/org/exist/xquery/value/BinaryValue.java	(revision 13502)
 +++ src/org/exist/xquery/value/BinaryValue.java	(working copy)
 @@ -108,4 +108,4 @@
          }
@@ -471,11 +468,22 @@ Index: src/org/exist/xquery/value/BinaryValue.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xquery/value/MixedNodeValueComparator.java
+===================================================================
+--- src/org/exist/xquery/value/MixedNodeValueComparator.java	(revision 13502)
++++ src/org/exist/xquery/value/MixedNodeValueComparator.java	(working copy)
+@@ -49,4 +49,4 @@
+                 return 1;
+         }
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/xquery/value/Base64Binary.java
 ===================================================================
---- src/org/exist/xquery/value/Base64Binary.java	(revision 9256)
+--- src/org/exist/xquery/value/Base64Binary.java	(revision 13502)
 +++ src/org/exist/xquery/value/Base64Binary.java	(working copy)
-@@ -92,4 +92,4 @@
+@@ -94,4 +94,4 @@
          throw new XPathException("FORG0006: value of type " + Type.getTypeName(getType()) +
              " has no boolean value.");
      }
@@ -484,7 +492,7 @@ Index: src/org/exist/xquery/value/Base64Binary.java
 +}
 Index: src/org/exist/xquery/Pragma.java
 ===================================================================
---- src/org/exist/xquery/Pragma.java	(revision 9256)
+--- src/org/exist/xquery/Pragma.java	(revision 13502)
 +++ src/org/exist/xquery/Pragma.java	(working copy)
 @@ -61,4 +61,4 @@
      public String toString() {
@@ -493,20 +501,31 @@ Index: src/org/exist/xquery/Pragma.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xquery/pragmas/Optimize.java
+===================================================================
+--- src/org/exist/xquery/pragmas/Optimize.java	(revision 13502)
++++ src/org/exist/xquery/pragmas/Optimize.java	(working copy)
+@@ -296,4 +296,4 @@
+         }
+         return indexType;
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/xquery/CompiledXQuery.java
 ===================================================================
---- src/org/exist/xquery/CompiledXQuery.java	(revision 9256)
+--- src/org/exist/xquery/CompiledXQuery.java	(revision 13502)
 +++ src/org/exist/xquery/CompiledXQuery.java	(working copy)
-@@ -80,4 +80,4 @@
-      * @param source This query's source
+@@ -74,4 +74,4 @@
+      * @return This query's source
       */
-     public void setSource(XACMLSource source);
+     public XACMLSource getSource();
 -} 
 \ No newline at end of file
 +} 
 Index: src/org/exist/xquery/TreatAsExpression.java
 ===================================================================
---- src/org/exist/xquery/TreatAsExpression.java	(revision 9256)
+--- src/org/exist/xquery/TreatAsExpression.java	(revision 13502)
 +++ src/org/exist/xquery/TreatAsExpression.java	(working copy)
 @@ -80,4 +80,4 @@
          super.setContextDocSet(contextSet);
@@ -517,18 +536,18 @@ Index: src/org/exist/xquery/TreatAsExpression.java
 +}
 Index: src/org/exist/xquery/StaticXQueryException.java
 ===================================================================
---- src/org/exist/xquery/StaticXQueryException.java	(revision 9256)
+--- src/org/exist/xquery/StaticXQueryException.java	(revision 13502)
 +++ src/org/exist/xquery/StaticXQueryException.java	(working copy)
-@@ -27,4 +27,4 @@
- 	public StaticXQueryException(XQueryAST ast, String message, Throwable cause) {
- 		super(ast, message, cause);
+@@ -23,4 +23,4 @@
+ 	public StaticXQueryException(int line, int column, String message, Throwable cause) {
+ 		super(line, column, message, cause);
  	}
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/xquery/util/RegexTranslator.java
 ===================================================================
---- src/org/exist/xquery/util/RegexTranslator.java	(revision 9256)
+--- src/org/exist/xquery/util/RegexTranslator.java	(revision 13502)
 +++ src/org/exist/xquery/util/RegexTranslator.java	(working copy)
 @@ -11,7 +11,7 @@
  
@@ -546,22 +565,9 @@ Index: src/org/exist/xquery/util/RegexTranslator.java
 -//
 \ No newline at end of file
 +//
-Index: src/org/exist/xquery/util/DocUtils.java
-===================================================================
---- src/org/exist/xquery/util/DocUtils.java	(revision 9256)
-+++ src/org/exist/xquery/util/DocUtils.java	(working copy)
-@@ -105,7 +105,7 @@
- 				//TODO : process pseudo-protocols URLs more efficiently.
- 				org.exist.memtree.DocumentImpl memtreeDoc = null;
- 				// we use eXist's in-memory DOM implementation
--				SAXParserFactory factory = SAXParserFactory.newInstance();
-+				SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
- 				factory.setNamespaceAware(true);				
- 				//TODO : we should be able to cope with context.getBaseURI()				
- 				InputSource src = new InputSource(con.getInputStream());
 Index: src/org/exist/xquery/util/Error.java
 ===================================================================
---- src/org/exist/xquery/util/Error.java	(revision 9256)
+--- src/org/exist/xquery/util/Error.java	(revision 13502)
 +++ src/org/exist/xquery/util/Error.java	(working copy)
 @@ -136,4 +136,4 @@
      public Object[] getArgs() {
@@ -572,9 +578,9 @@ Index: src/org/exist/xquery/util/Error.java
 +}
 Index: src/org/exist/xquery/GeneralComparison.java
 ===================================================================
---- src/org/exist/xquery/GeneralComparison.java	(revision 9256)
+--- src/org/exist/xquery/GeneralComparison.java	(revision 13502)
 +++ src/org/exist/xquery/GeneralComparison.java	(working copy)
-@@ -949,4 +949,4 @@
+@@ -1006,4 +1006,4 @@
              this.hasIndexOnQNames = false;
          }
      }
@@ -583,7 +589,7 @@ Index: src/org/exist/xquery/GeneralComparison.java
 +}
 Index: src/org/exist/xquery/Constants.java
 ===================================================================
---- src/org/exist/xquery/Constants.java	(revision 9256)
+--- src/org/exist/xquery/Constants.java	(revision 13502)
 +++ src/org/exist/xquery/Constants.java	(working copy)
 @@ -173,4 +173,4 @@
      //
@@ -592,11 +598,22 @@ Index: src/org/exist/xquery/Constants.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xquery/PerformanceStats.java
+===================================================================
+--- src/org/exist/xquery/PerformanceStats.java	(revision 13502)
++++ src/org/exist/xquery/PerformanceStats.java	(working copy)
+@@ -305,4 +305,4 @@
+         functions.clear();
+         indexStats.clear();
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/xquery/LetExpr.java
 ===================================================================
---- src/org/exist/xquery/LetExpr.java	(revision 9256)
+--- src/org/exist/xquery/LetExpr.java	(revision 13502)
 +++ src/org/exist/xquery/LetExpr.java	(working copy)
-@@ -408,4 +408,4 @@
+@@ -414,4 +414,4 @@
      public void accept(ExpressionVisitor visitor) {
          visitor.visitLetExpression(this);
      }
@@ -605,9 +622,9 @@ Index: src/org/exist/xquery/LetExpr.java
 +}
 Index: src/org/exist/xquery/TypeswitchExpression.java
 ===================================================================
---- src/org/exist/xquery/TypeswitchExpression.java	(revision 9256)
+--- src/org/exist/xquery/TypeswitchExpression.java	(revision 13502)
 +++ src/org/exist/xquery/TypeswitchExpression.java	(working copy)
-@@ -217,4 +217,4 @@
+@@ -224,4 +224,4 @@
              caseClause.returnClause.resetState(postOptimization);
          }
      }
@@ -616,31 +633,20 @@ Index: src/org/exist/xquery/TypeswitchExpression.java
 +}
 Index: src/org/exist/xquery/ForExpr.java
 ===================================================================
---- src/org/exist/xquery/ForExpr.java	(revision 9256)
+--- src/org/exist/xquery/ForExpr.java	(revision 13502)
 +++ src/org/exist/xquery/ForExpr.java	(working copy)
-@@ -502,4 +502,4 @@
+@@ -522,4 +522,4 @@
      public void accept(ExpressionVisitor visitor) {
          visitor.visitForExpression(this);
      }
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/xquery/RootNode.java
-===================================================================
---- src/org/exist/xquery/RootNode.java	(revision 9256)
-+++ src/org/exist/xquery/RootNode.java	(working copy)
-@@ -167,4 +167,4 @@
-         cached = null;
-         cachedDocs = null;
-     }
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/xquery/PathExpr.java
 ===================================================================
---- src/org/exist/xquery/PathExpr.java	(revision 9256)
+--- src/org/exist/xquery/PathExpr.java	(revision 13502)
 +++ src/org/exist/xquery/PathExpr.java	(working copy)
-@@ -457,4 +457,4 @@
+@@ -473,4 +473,4 @@
  	public void setContext(XQueryContext context) {
  		this.context = context;
  	}
@@ -649,7 +655,7 @@ Index: src/org/exist/xquery/PathExpr.java
 +}
 Index: src/org/exist/xquery/LocalVariable.java
 ===================================================================
---- src/org/exist/xquery/LocalVariable.java	(revision 9256)
+--- src/org/exist/xquery/LocalVariable.java	(revision 13502)
 +++ src/org/exist/xquery/LocalVariable.java	(working copy)
 @@ -43,4 +43,4 @@
  		this.after = var;
@@ -660,9 +666,9 @@ Index: src/org/exist/xquery/LocalVariable.java
 +}
 Index: src/org/exist/xquery/Step.java
 ===================================================================
---- src/org/exist/xquery/Step.java	(revision 9256)
+--- src/org/exist/xquery/Step.java	(revision 13502)
 +++ src/org/exist/xquery/Step.java	(working copy)
-@@ -202,4 +202,4 @@
+@@ -215,4 +215,4 @@
  			pred.resetState(postOptimization);
  		}
  	}
@@ -671,9 +677,9 @@ Index: src/org/exist/xquery/Step.java
 +}
 Index: src/org/exist/xquery/InternalFunctionCall.java
 ===================================================================
---- src/org/exist/xquery/InternalFunctionCall.java	(revision 9256)
+--- src/org/exist/xquery/InternalFunctionCall.java	(revision 13502)
 +++ src/org/exist/xquery/InternalFunctionCall.java	(working copy)
-@@ -207,4 +207,4 @@
+@@ -225,4 +225,4 @@
      public void accept(ExpressionVisitor visitor) {
          function.accept(visitor);
      }
@@ -682,7 +688,7 @@ Index: src/org/exist/xquery/InternalFunctionCall.java
 +}
 Index: src/org/exist/xquery/InternalModule.java
 ===================================================================
---- src/org/exist/xquery/InternalModule.java	(revision 9256)
+--- src/org/exist/xquery/InternalModule.java	(revision 13502)
 +++ src/org/exist/xquery/InternalModule.java	(working copy)
 @@ -54,4 +54,4 @@
  	 * @return all functions defined in this module
@@ -691,24 +697,11 @@ Index: src/org/exist/xquery/InternalModule.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/xquery/functions/text/MatchRegexp.java
-===================================================================
---- src/org/exist/xquery/functions/text/MatchRegexp.java	(revision 9256)
-+++ src/org/exist/xquery/functions/text/MatchRegexp.java	(working copy)
-@@ -263,7 +263,7 @@
- 
-                 result = path.eval(contextSequence).toNodeSet();
-             }
--            if(canCache && contextSequence.isCacheable())
-+            if(canCache && contextSequence != null && contextSequence.isCacheable())
- 				cached = new CachedResult(contextSequence, contextItem, result);
- 
- 		// otherwise we have to walk through each item in the context
 Index: src/org/exist/xquery/functions/text/HighlightMatches.java
 ===================================================================
---- src/org/exist/xquery/functions/text/HighlightMatches.java	(revision 9256)
+--- src/org/exist/xquery/functions/text/HighlightMatches.java	(revision 13502)
 +++ src/org/exist/xquery/functions/text/HighlightMatches.java	(working copy)
-@@ -158,4 +158,4 @@
+@@ -160,4 +160,4 @@
              }
          }
      }
@@ -717,9 +710,9 @@ Index: src/org/exist/xquery/functions/text/HighlightMatches.java
 +}
 Index: src/org/exist/xquery/functions/text/FilterNested.java
 ===================================================================
---- src/org/exist/xquery/functions/text/FilterNested.java	(revision 9256)
+--- src/org/exist/xquery/functions/text/FilterNested.java	(revision 13502)
 +++ src/org/exist/xquery/functions/text/FilterNested.java	(working copy)
-@@ -64,4 +64,4 @@
+@@ -66,4 +66,4 @@
          }
          return filtered;
      }
@@ -728,7 +721,7 @@ Index: src/org/exist/xquery/functions/text/FilterNested.java
 +}
 Index: src/org/exist/xquery/functions/text/FuzzyMatcher.java
 ===================================================================
---- src/org/exist/xquery/functions/text/FuzzyMatcher.java	(revision 9256)
+--- src/org/exist/xquery/functions/text/FuzzyMatcher.java	(revision 13502)
 +++ src/org/exist/xquery/functions/text/FuzzyMatcher.java	(working copy)
 @@ -106,4 +106,4 @@
          // we got the result!
@@ -739,29 +732,18 @@ Index: src/org/exist/xquery/functions/text/FuzzyMatcher.java
 +}
 Index: src/org/exist/xquery/functions/FunRemove.java
 ===================================================================
---- src/org/exist/xquery/functions/FunRemove.java	(revision 9256)
+--- src/org/exist/xquery/functions/FunRemove.java	(revision 13502)
 +++ src/org/exist/xquery/functions/FunRemove.java	(working copy)
-@@ -85,4 +85,4 @@
+@@ -113,4 +113,4 @@
  		return Dependency.NO_DEPENDENCY;
  	}
  
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/xquery/functions/ExtCollection.java
-===================================================================
---- src/org/exist/xquery/functions/ExtCollection.java	(revision 9256)
-+++ src/org/exist/xquery/functions/ExtCollection.java	(working copy)
-@@ -239,4 +239,4 @@
-         cached = null;
-         cachedArgs = null;
-     }
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/xquery/functions/FunSum.java
 ===================================================================
---- src/org/exist/xquery/functions/FunSum.java	(revision 9256)
+--- src/org/exist/xquery/functions/FunSum.java	(revision 13502)
 +++ src/org/exist/xquery/functions/FunSum.java	(working copy)
 @@ -141,4 +141,4 @@
  
@@ -772,67 +754,80 @@ Index: src/org/exist/xquery/functions/FunSum.java
 +}
 Index: src/org/exist/xquery/functions/request/GetData.java
 ===================================================================
---- src/org/exist/xquery/functions/request/GetData.java	(revision 9256)
+--- src/org/exist/xquery/functions/request/GetData.java	(revision 13502)
 +++ src/org/exist/xquery/functions/request/GetData.java	(working copy)
-@@ -161,7 +161,7 @@
+@@ -165,7 +165,7 @@
  				try
  				{ 
  					//try and construct xml document from input stream, we use eXist's in-memory DOM implementation
 -					SAXParserFactory factory = SAXParserFactory.newInstance();
 +					SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
- 					factory.setNamespaceAware(true);	
+ 					factory.setNamespaceAware(true);
  					//TODO : we should be able to cope with context.getBaseURI()				
  					InputSource src = new InputSource(new ByteArrayInputStream(bufRequestData));
 Index: src/org/exist/xquery/functions/request/GetMethod.java
 ===================================================================
---- src/org/exist/xquery/functions/request/GetMethod.java	(revision 9256)
+--- src/org/exist/xquery/functions/request/GetMethod.java	(revision 13502)
 +++ src/org/exist/xquery/functions/request/GetMethod.java	(working copy)
-@@ -75,4 +75,4 @@
- 		else
- 			throw new XPathException(getASTNode(), "Variable $request is not bound to a Request object.");
+@@ -79,4 +79,4 @@
+ 		} else
+ 			throw new XPathException(this, "Variable $request is not bound to a Request object.");
  	}
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/xquery/functions/request/GetHeader.java
 ===================================================================
---- src/org/exist/xquery/functions/request/GetHeader.java	(revision 9256)
+--- src/org/exist/xquery/functions/request/GetHeader.java	(revision 13502)
 +++ src/org/exist/xquery/functions/request/GetHeader.java	(working copy)
-@@ -85,4 +85,4 @@
-                 } else
-                         throw new XPathException(getASTNode(), "Variable $request is not bound to a Request object.");
-         }
+@@ -99,4 +99,4 @@
+ 			throw new XPathException(
+ 					"Variable $request is not bound to a Request object.");
+ 	}
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/xquery/functions/FunInScopePrefixes.java
 ===================================================================
---- src/org/exist/xquery/functions/FunInScopePrefixes.java	(revision 9256)
+--- src/org/exist/xquery/functions/FunInScopePrefixes.java	(revision 13502)
 +++ src/org/exist/xquery/functions/FunInScopePrefixes.java	(working copy)
-@@ -135,4 +135,4 @@
-             prefixes.putAll(element.getNamespaceMap());
-         } 
+@@ -180,4 +180,4 @@
+ 		}
      }
+ 
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/xquery/functions/ExtFulltext.java
 ===================================================================
---- src/org/exist/xquery/functions/ExtFulltext.java	(revision 9256)
+--- src/org/exist/xquery/functions/ExtFulltext.java	(revision 13502)
 +++ src/org/exist/xquery/functions/ExtFulltext.java	(working copy)
-@@ -395,4 +395,4 @@
+@@ -402,4 +402,4 @@
      public void accept(ExpressionVisitor visitor) {
          visitor.visitFtExpression(this);
      }
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xquery/functions/util/Eval.java
+===================================================================
+--- src/org/exist/xquery/functions/util/Eval.java	(revision 13502)
++++ src/org/exist/xquery/functions/util/Eval.java	(working copy)
+@@ -476,7 +476,7 @@
+ 		try {
+ 			URL url = new URL(uri);
+ 			InputStreamReader isr = new InputStreamReader(url.openStream(), "UTF-8");
+-            SAXParserFactory factory = SAXParserFactory.newInstance();
++            SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+             factory.setNamespaceAware(true);
+             InputSource src = new InputSource(isr);
+             SAXParser parser = factory.newSAXParser();
 Index: src/org/exist/xquery/functions/util/Parse.java
 ===================================================================
---- src/org/exist/xquery/functions/util/Parse.java	(revision 9256)
+--- src/org/exist/xquery/functions/util/Parse.java	(revision 13502)
 +++ src/org/exist/xquery/functions/util/Parse.java	(working copy)
-@@ -57,7 +57,7 @@
-             return Sequence.EMPTY_SEQUENCE;
+@@ -85,7 +85,7 @@
+         }
          StringReader reader = new StringReader(xmlContent);
          try {
 -            SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -840,55 +835,114 @@ Index: src/org/exist/xquery/functions/util/Parse.java
              factory.setNamespaceAware(true);
              InputSource src = new InputSource(reader);
  
+Index: src/org/exist/xquery/functions/FunIdRef.java
+===================================================================
+--- src/org/exist/xquery/functions/FunIdRef.java	(revision 13502)
++++ src/org/exist/xquery/functions/FunIdRef.java	(working copy)
+@@ -202,4 +202,4 @@
+             }
+         }
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/xquery/functions/system/FunctionAvailable.java
+===================================================================
+--- src/org/exist/xquery/functions/system/FunctionAvailable.java	(revision 13502)
++++ src/org/exist/xquery/functions/system/FunctionAvailable.java	(working copy)
+@@ -87,4 +87,4 @@
+         
+         return BooleanValue.valueOf(found);
+     }    
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/xquery/functions/validation/GrammarTooling.java
 ===================================================================
---- src/org/exist/xquery/functions/validation/GrammarTooling.java	(revision 9256)
+--- src/org/exist/xquery/functions/validation/GrammarTooling.java	(revision 13502)
 +++ src/org/exist/xquery/functions/validation/GrammarTooling.java	(working copy)
-@@ -22,8 +22,8 @@
+@@ -27,10 +27,10 @@
+ import java.util.ArrayList;
+ import java.util.List;
  
- package org.exist.xquery.functions.validation;
- 
+-import org.apache.xerces.parsers.XMLGrammarPreparser;
 -import org.apache.xerces.xni.grammars.Grammar;
 -import org.apache.xerces.xni.grammars.XMLGrammarDescription;
+-import org.apache.xerces.xni.parser.XMLInputSource;
++import orbeon.apache.xerces.parsers.XMLGrammarPreparser;
 +import orbeon.apache.xerces.xni.grammars.Grammar;
 +import orbeon.apache.xerces.xni.grammars.XMLGrammarDescription;
++import orbeon.apache.xerces.xni.parser.XMLInputSource;
+ 
  import org.exist.Namespaces;
  import org.exist.dom.QName;
- import org.exist.memtree.DocumentImpl;
-@@ -208,4 +208,4 @@
+@@ -315,4 +315,4 @@
              builder.endElement();
              attribs.clear();
      }
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xquery/functions/validation/Jaxp.java
+===================================================================
+--- src/org/exist/xquery/functions/validation/Jaxp.java	(revision 13502)
++++ src/org/exist/xquery/functions/validation/Jaxp.java	(working copy)
+@@ -37,7 +37,7 @@
+ import javax.xml.transform.stream.StreamResult;
+ import javax.xml.transform.stream.StreamSource;
+ 
+-import org.apache.xerces.xni.parser.XMLEntityResolver;
++import orbeon.apache.xerces.xni.parser.XMLEntityResolver;
+ 
+ import org.exist.Namespaces;
+ import org.exist.dom.QName;
+@@ -304,7 +304,7 @@
+     private XMLReader getXMLReader() throws ParserConfigurationException, SAXException {
+ 
+         // setup sax factory ; be sure just one instance!
+-        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
++        SAXParserFactory saxFactory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+ 
+         // Enable validation stuff
+         saxFactory.setValidating(true);
 Index: src/org/exist/xquery/functions/FunCeiling.java
 ===================================================================
---- src/org/exist/xquery/functions/FunCeiling.java	(revision 9256)
+--- src/org/exist/xquery/functions/FunCeiling.java	(revision 13502)
 +++ src/org/exist/xquery/functions/FunCeiling.java	(working copy)
-@@ -80,4 +80,4 @@
+@@ -83,4 +83,4 @@
          
          return result;        
  	}
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xquery/functions/transform/Transform.java
+===================================================================
+--- src/org/exist/xquery/functions/transform/Transform.java	(revision 13502)
++++ src/org/exist/xquery/functions/transform/Transform.java	(working copy)
+@@ -722,4 +722,4 @@
+             throw except;
+         }
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/xquery/functions/xmldb/XMLDBLoadFromPattern.java
 ===================================================================
---- src/org/exist/xquery/functions/xmldb/XMLDBLoadFromPattern.java	(revision 9256)
+--- src/org/exist/xquery/functions/xmldb/XMLDBLoadFromPattern.java	(revision 13502)
 +++ src/org/exist/xquery/functions/xmldb/XMLDBLoadFromPattern.java	(working copy)
-@@ -204,4 +204,4 @@
-         return current;
+@@ -172,4 +172,4 @@
+         }
+         return stored;
      }
- 
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/StandaloneServer.java
 ===================================================================
---- src/org/exist/StandaloneServer.java	(revision 9256)
+--- src/org/exist/StandaloneServer.java	(revision 13502)
 +++ src/org/exist/StandaloneServer.java	(working copy)
-@@ -412,7 +412,7 @@
+@@ -420,7 +420,7 @@
          }
          
          // initialize xml parser
@@ -899,9 +953,9 @@ Index: src/org/exist/StandaloneServer.java
          InputSource src = new InputSource(is);
 Index: src/org/exist/storage/lock/MultiReadReentrantLock.java
 ===================================================================
---- src/org/exist/storage/lock/MultiReadReentrantLock.java	(revision 9256)
+--- src/org/exist/storage/lock/MultiReadReentrantLock.java	(revision 13502)
 +++ src/org/exist/storage/lock/MultiReadReentrantLock.java	(working copy)
-@@ -598,4 +598,4 @@
+@@ -611,4 +611,4 @@
          }
          return buf.toString();
      }
@@ -910,7 +964,7 @@ Index: src/org/exist/storage/lock/MultiReadReentrantLock.java
 +}
 Index: src/org/exist/storage/lock/LockOwner.java
 ===================================================================
---- src/org/exist/storage/lock/LockOwner.java	(revision 9256)
+--- src/org/exist/storage/lock/LockOwner.java	(revision 13502)
 +++ src/org/exist/storage/lock/LockOwner.java	(working copy)
 @@ -49,4 +49,4 @@
      public final Throwable getStack() {
@@ -921,7 +975,7 @@ Index: src/org/exist/storage/lock/LockOwner.java
 +}
 Index: src/org/exist/storage/lock/DeadlockDetection.java
 ===================================================================
---- src/org/exist/storage/lock/DeadlockDetection.java	(revision 9256)
+--- src/org/exist/storage/lock/DeadlockDetection.java	(revision 13502)
 +++ src/org/exist/storage/lock/DeadlockDetection.java	(working copy)
 @@ -275,4 +275,4 @@
          buf.append("]");
@@ -932,7 +986,7 @@ Index: src/org/exist/storage/lock/DeadlockDetection.java
 +}
 Index: src/org/exist/storage/lock/FileLock.java
 ===================================================================
---- src/org/exist/storage/lock/FileLock.java	(revision 9256)
+--- src/org/exist/storage/lock/FileLock.java	(revision 13502)
 +++ src/org/exist/storage/lock/FileLock.java	(working copy)
 @@ -277,4 +277,4 @@
  	System.err.println(message);
@@ -943,7 +997,7 @@ Index: src/org/exist/storage/lock/FileLock.java
 +}
 Index: src/org/exist/storage/lock/LockListener.java
 ===================================================================
---- src/org/exist/storage/lock/LockListener.java	(revision 9256)
+--- src/org/exist/storage/lock/LockListener.java	(revision 13502)
 +++ src/org/exist/storage/lock/LockListener.java	(working copy)
 @@ -6,4 +6,4 @@
  public interface LockListener {
@@ -952,11 +1006,33 @@ Index: src/org/exist/storage/lock/LockListener.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/storage/statistics/DataGuide.java
+===================================================================
+--- src/org/exist/storage/statistics/DataGuide.java	(revision 13502)
++++ src/org/exist/storage/statistics/DataGuide.java	(working copy)
+@@ -158,4 +158,4 @@
+             handler.endElement(Namespaces.EXIST_NS, "distribution", "distribution");
+         }
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/storage/statistics/IndexStatisticsWorker.java
+===================================================================
+--- src/org/exist/storage/statistics/IndexStatisticsWorker.java	(revision 13502)
++++ src/org/exist/storage/statistics/IndexStatisticsWorker.java	(working copy)
+@@ -218,4 +218,4 @@
+             return true;
+         }
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/storage/IndexSpec.java
 ===================================================================
---- src/org/exist/storage/IndexSpec.java	(revision 9256)
+--- src/org/exist/storage/IndexSpec.java	(revision 13502)
 +++ src/org/exist/storage/IndexSpec.java	(working copy)
-@@ -235,4 +235,4 @@
+@@ -233,4 +233,4 @@
  		return result.toString();
      }
      
@@ -965,7 +1041,7 @@ Index: src/org/exist/storage/IndexSpec.java
 +}
 Index: src/org/exist/storage/cache/Cache.java
 ===================================================================
---- src/org/exist/storage/cache/Cache.java	(revision 9256)
+--- src/org/exist/storage/cache/Cache.java	(revision 13502)
 +++ src/org/exist/storage/cache/Cache.java	(working copy)
 @@ -162,4 +162,4 @@
      public String getFileName();
@@ -976,7 +1052,7 @@ Index: src/org/exist/storage/cache/Cache.java
 +}
 Index: src/org/exist/storage/cache/Accounting.java
 ===================================================================
---- src/org/exist/storage/cache/Accounting.java	(revision 9256)
+--- src/org/exist/storage/cache/Accounting.java	(revision 13502)
 +++ src/org/exist/storage/cache/Accounting.java	(working copy)
 @@ -172,4 +172,4 @@
                  + "; thrashing: " + getThrashing() 
@@ -987,7 +1063,7 @@ Index: src/org/exist/storage/cache/Accounting.java
 +}
 Index: src/org/exist/storage/UpdateListener.java
 ===================================================================
---- src/org/exist/storage/UpdateListener.java	(revision 9256)
+--- src/org/exist/storage/UpdateListener.java	(revision 13502)
 +++ src/org/exist/storage/UpdateListener.java	(working copy)
 @@ -43,4 +43,4 @@
      public void unsubscribe();
@@ -996,12 +1072,23 @@ Index: src/org/exist/storage/UpdateListener.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/storage/NativeElementIndex.java
+===================================================================
+--- src/org/exist/storage/NativeElementIndex.java	(revision 13502)
++++ src/org/exist/storage/NativeElementIndex.java	(working copy)
+@@ -1022,4 +1022,4 @@
+         " owned by " + broker.toString();
+     }
+ 
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/storage/txn/TransactionManager.java
 ===================================================================
---- src/org/exist/storage/txn/TransactionManager.java	(revision 9256)
+--- src/org/exist/storage/txn/TransactionManager.java	(revision 13502)
 +++ src/org/exist/storage/txn/TransactionManager.java	(working copy)
-@@ -194,4 +194,4 @@
-             journal.shutdown(txnId, checkpoint);
+@@ -260,4 +260,4 @@
+             lock.unlock();
          }
      }
 -}
@@ -1009,7 +1096,7 @@ Index: src/org/exist/storage/txn/TransactionManager.java
 +}
 Index: src/org/exist/storage/txn/Txn.java
 ===================================================================
---- src/org/exist/storage/txn/Txn.java	(revision 9256)
+--- src/org/exist/storage/txn/Txn.java	(revision 13502)
 +++ src/org/exist/storage/txn/Txn.java	(working copy)
 @@ -71,4 +71,4 @@
              this.lockMode = lockMode;
@@ -1020,7 +1107,7 @@ Index: src/org/exist/storage/txn/Txn.java
 +}
 Index: src/org/exist/storage/GeneralRangeIndexSpec.java
 ===================================================================
---- src/org/exist/storage/GeneralRangeIndexSpec.java	(revision 9256)
+--- src/org/exist/storage/GeneralRangeIndexSpec.java	(revision 13502)
 +++ src/org/exist/storage/GeneralRangeIndexSpec.java	(working copy)
 @@ -79,4 +79,4 @@
  		result.append("\thas range index : ").append(hasRangeIndex(this.type)).append('\n');			
@@ -1031,7 +1118,7 @@ Index: src/org/exist/storage/GeneralRangeIndexSpec.java
 +}
 Index: src/org/exist/storage/dom/NodeIterator.java
 ===================================================================
---- src/org/exist/storage/dom/NodeIterator.java	(revision 9256)
+--- src/org/exist/storage/dom/NodeIterator.java	(revision 13502)
 +++ src/org/exist/storage/dom/NodeIterator.java	(working copy)
 @@ -281,4 +281,4 @@
  	public void setTo(long address) {
@@ -1042,7 +1129,7 @@ Index: src/org/exist/storage/dom/NodeIterator.java
 +}
 Index: src/org/exist/storage/dom/RecordPos.java
 ===================================================================
---- src/org/exist/storage/dom/RecordPos.java	(revision 9256)
+--- src/org/exist/storage/dom/RecordPos.java	(revision 13502)
 +++ src/org/exist/storage/dom/RecordPos.java	(working copy)
 @@ -62,4 +62,4 @@
  	public boolean isLink() {
@@ -1053,7 +1140,7 @@ Index: src/org/exist/storage/dom/RecordPos.java
 +}
 Index: src/org/exist/storage/dom/WriteOverflowPageLoggable.java
 ===================================================================
---- src/org/exist/storage/dom/WriteOverflowPageLoggable.java	(revision 9256)
+--- src/org/exist/storage/dom/WriteOverflowPageLoggable.java	(revision 13502)
 +++ src/org/exist/storage/dom/WriteOverflowPageLoggable.java	(working copy)
 @@ -102,4 +102,4 @@
  	public String dump() {
@@ -1064,7 +1151,7 @@ Index: src/org/exist/storage/dom/WriteOverflowPageLoggable.java
 +}
 Index: src/org/exist/storage/dom/ItemId.java
 ===================================================================
---- src/org/exist/storage/dom/ItemId.java	(revision 9256)
+--- src/org/exist/storage/dom/ItemId.java	(revision 13502)
 +++ src/org/exist/storage/dom/ItemId.java	(working copy)
 @@ -78,4 +78,4 @@
  	public final static boolean isOrdinaryRecord(short id) {
@@ -1075,7 +1162,7 @@ Index: src/org/exist/storage/dom/ItemId.java
 +}
 Index: src/org/exist/storage/dom/CreatePageLoggable.java
 ===================================================================
---- src/org/exist/storage/dom/CreatePageLoggable.java	(revision 9256)
+--- src/org/exist/storage/dom/CreatePageLoggable.java	(revision 13502)
 +++ src/org/exist/storage/dom/CreatePageLoggable.java	(working copy)
 @@ -96,4 +96,4 @@
  		return super.dump() + " - new page created: " + newPage + "; prev. page: " + prevPage + "; next page: " +
@@ -1084,9 +1171,20 @@ Index: src/org/exist/storage/dom/CreatePageLoggable.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/storage/SystemTaskManager.java
+===================================================================
+--- src/org/exist/storage/SystemTaskManager.java	(revision 13502)
++++ src/org/exist/storage/SystemTaskManager.java	(working copy)
+@@ -72,4 +72,4 @@
+             waitingSystemTasks.clear();
+         }
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/storage/DefaultCacheManager.java
 ===================================================================
---- src/org/exist/storage/DefaultCacheManager.java	(revision 9256)
+--- src/org/exist/storage/DefaultCacheManager.java	(revision 13502)
 +++ src/org/exist/storage/DefaultCacheManager.java	(working copy)
 @@ -303,4 +303,4 @@
              LOG.warn("Exception while registering cache mbean.", e);
@@ -1097,44 +1195,53 @@ Index: src/org/exist/storage/DefaultCacheManager.java
 +}
 Index: src/org/exist/storage/SystemTask.java
 ===================================================================
---- src/org/exist/storage/SystemTask.java	(revision 9256)
+--- src/org/exist/storage/SystemTask.java	(revision 13502)
 +++ src/org/exist/storage/SystemTask.java	(working copy)
-@@ -52,4 +52,4 @@
+@@ -57,4 +57,4 @@
  	 * @throws EXistException
  	 */
  	void execute(DBBroker broker) throws EXistException;
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/storage/serializers/Serializer.java
+Index: src/org/exist/storage/serializers/XIncludeFilter.java
 ===================================================================
---- src/org/exist/storage/serializers/Serializer.java	(revision 9256)
-+++ src/org/exist/storage/serializers/Serializer.java	(working copy)
-@@ -24,6 +24,7 @@
+--- src/org/exist/storage/serializers/XIncludeFilter.java	(revision 13502)
++++ src/org/exist/storage/serializers/XIncludeFilter.java	(working copy)
+@@ -505,7 +505,7 @@
+         }
  
- import org.apache.log4j.Logger;
- import org.exist.Namespaces;
-+import org.exist.xslt.TransformerFactoryAllocator;
- import org.exist.dom.DocumentImpl;
- import org.exist.dom.NodeProxy;
- import org.exist.dom.QName;
-@@ -170,7 +171,12 @@
- 
-     public Serializer(DBBroker broker, Configuration config) {
- 		this.broker = broker;
--		factory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-+
-+        // ORBEON START: don't use
-+        factory = TransformerFactoryAllocator.getTransformerFactory(broker);
-+		//factory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-+        // ORBEON END
-+
- 		xinclude = new XIncludeFilter(this);
- 		receiver = xinclude;
- 		
+         // we use eXist's in-memory DOM implementation
+-        SAXParserFactory factory = SAXParserFactory.newInstance();
++        SAXParserFactory factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+         factory.setNamespaceAware(true);
+         InputSource src = new InputSource(con.getInputStream());
+         SAXParser parser = factory.newSAXParser();
+Index: src/org/exist/storage/serializers/CustomMatchListenerFactory.java
+===================================================================
+--- src/org/exist/storage/serializers/CustomMatchListenerFactory.java	(revision 13502)
++++ src/org/exist/storage/serializers/CustomMatchListenerFactory.java	(working copy)
+@@ -60,4 +60,4 @@
+     public MatchListener getLast() {
+         return last;
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/storage/serializers/CustomMatchListener.java
+===================================================================
+--- src/org/exist/storage/serializers/CustomMatchListener.java	(revision 13502)
++++ src/org/exist/storage/serializers/CustomMatchListener.java	(working copy)
+@@ -26,4 +26,4 @@
+     protected DBBroker getBroker() {
+         return broker;
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/storage/RegexMatcher.java
 ===================================================================
---- src/org/exist/storage/RegexMatcher.java	(revision 9256)
+--- src/org/exist/storage/RegexMatcher.java	(revision 13502)
 +++ src/org/exist/storage/RegexMatcher.java	(working copy)
 @@ -71,4 +71,4 @@
          matcher.reset(term);
@@ -1145,7 +1252,7 @@ Index: src/org/exist/storage/RegexMatcher.java
 +}
 Index: src/org/exist/storage/index/OverflowAppendLoggable.java
 ===================================================================
---- src/org/exist/storage/index/OverflowAppendLoggable.java	(revision 9256)
+--- src/org/exist/storage/index/OverflowAppendLoggable.java	(revision 13502)
 +++ src/org/exist/storage/index/OverflowAppendLoggable.java	(working copy)
 @@ -98,4 +98,4 @@
  	public String dump() {
@@ -1156,7 +1263,7 @@ Index: src/org/exist/storage/index/OverflowAppendLoggable.java
 +}
 Index: src/org/exist/storage/io/VariableByteArrayInput.java
 ===================================================================
---- src/org/exist/storage/io/VariableByteArrayInput.java	(revision 9256)
+--- src/org/exist/storage/io/VariableByteArrayInput.java	(revision 13502)
 +++ src/org/exist/storage/io/VariableByteArrayInput.java	(working copy)
 @@ -186,4 +186,4 @@
      	buf.append("]");
@@ -1167,7 +1274,7 @@ Index: src/org/exist/storage/io/VariableByteArrayInput.java
 +}
 Index: src/org/exist/storage/io/VariableByteInput.java
 ===================================================================
---- src/org/exist/storage/io/VariableByteInput.java	(revision 9256)
+--- src/org/exist/storage/io/VariableByteInput.java	(revision 13502)
 +++ src/org/exist/storage/io/VariableByteInput.java	(working copy)
 @@ -128,4 +128,4 @@
      
@@ -1178,7 +1285,7 @@ Index: src/org/exist/storage/io/VariableByteInput.java
 +}
 Index: src/org/exist/storage/io/AbstractVariableByteInput.java
 ===================================================================
---- src/org/exist/storage/io/AbstractVariableByteInput.java	(revision 9256)
+--- src/org/exist/storage/io/AbstractVariableByteInput.java	(revision 13502)
 +++ src/org/exist/storage/io/AbstractVariableByteInput.java	(working copy)
 @@ -175,4 +175,4 @@
       */
@@ -1189,7 +1296,7 @@ Index: src/org/exist/storage/io/AbstractVariableByteInput.java
 +}
 Index: src/org/exist/storage/CacheManager.java
 ===================================================================
---- src/org/exist/storage/CacheManager.java	(revision 9256)
+--- src/org/exist/storage/CacheManager.java	(revision 13502)
 +++ src/org/exist/storage/CacheManager.java	(working copy)
 @@ -72,4 +72,4 @@
      long getMaxSingle();
@@ -1200,7 +1307,7 @@ Index: src/org/exist/storage/CacheManager.java
 +}
 Index: src/org/exist/xupdate/Update.java
 ===================================================================
---- src/org/exist/xupdate/Update.java	(revision 9256)
+--- src/org/exist/xupdate/Update.java	(revision 13502)
 +++ src/org/exist/xupdate/Update.java	(working copy)
 @@ -138,4 +138,4 @@
          return XUpdateProcessor.UPDATE;
@@ -1211,7 +1318,7 @@ Index: src/org/exist/xupdate/Update.java
 +}
 Index: src/org/exist/xupdate/Insert.java
 ===================================================================
---- src/org/exist/xupdate/Insert.java	(revision 9256)
+--- src/org/exist/xupdate/Insert.java	(revision 13502)
 +++ src/org/exist/xupdate/Insert.java	(working copy)
 @@ -123,4 +123,4 @@
          return (mode == INSERT_BEFORE ? "insert-before" : "insert-after");
@@ -1222,7 +1329,7 @@ Index: src/org/exist/xupdate/Insert.java
 +}
 Index: src/org/exist/xupdate/Rename.java
 ===================================================================
---- src/org/exist/xupdate/Rename.java	(revision 9256)
+--- src/org/exist/xupdate/Rename.java	(revision 13502)
 +++ src/org/exist/xupdate/Rename.java	(working copy)
 @@ -124,4 +124,4 @@
          return "rename";
@@ -1233,7 +1340,7 @@ Index: src/org/exist/xupdate/Rename.java
 +}
 Index: src/org/exist/xupdate/Remove.java
 ===================================================================
---- src/org/exist/xupdate/Remove.java	(revision 9256)
+--- src/org/exist/xupdate/Remove.java	(revision 13502)
 +++ src/org/exist/xupdate/Remove.java	(working copy)
 @@ -105,4 +105,4 @@
  		return "remove";
@@ -1242,23 +1349,34 @@ Index: src/org/exist/xupdate/Remove.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/dom/NodeHandle.java
+===================================================================
+--- src/org/exist/dom/NodeHandle.java	(revision 13502)
++++ src/org/exist/dom/NodeHandle.java	(working copy)
+@@ -19,4 +19,4 @@
+ 
+ 	public DocumentImpl getDocument();
+ 
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/dom/CharacterDataImpl.java
 ===================================================================
---- src/org/exist/dom/CharacterDataImpl.java	(revision 9256)
+--- src/org/exist/dom/CharacterDataImpl.java	(revision 13502)
 +++ src/org/exist/dom/CharacterDataImpl.java	(working copy)
-@@ -164,4 +164,4 @@
-         UTF8.decode(value.data(), value.start() + 3 + nodeIdLen, value.getLength() - 3 - nodeIdLen, string);
-         return string;
+@@ -169,4 +169,4 @@
+         final int nodeIdLen = nodeId.size();
+         return value.getLength() - 3 - nodeIdLen;
      }
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/dom/Visitable.java
 ===================================================================
---- src/org/exist/dom/Visitable.java	(revision 9256)
+--- src/org/exist/dom/Visitable.java	(revision 13502)
 +++ src/org/exist/dom/Visitable.java	(working copy)
-@@ -39,4 +39,4 @@
-      * @return the value returned by the NodeVisitor.visit method.
+@@ -40,4 +40,4 @@
+      * @deprecated
       */
      public boolean accept(Iterator iterator, NodeVisitor visitor);  
 -}
@@ -1266,7 +1384,7 @@ Index: src/org/exist/dom/Visitable.java
 +}
 Index: src/org/exist/numbering/NodeIdFactory.java
 ===================================================================
---- src/org/exist/numbering/NodeIdFactory.java	(revision 9256)
+--- src/org/exist/numbering/NodeIdFactory.java	(revision 13502)
 +++ src/org/exist/numbering/NodeIdFactory.java	(working copy)
 @@ -122,4 +122,4 @@
      NodeId documentNodeId();
@@ -1275,9 +1393,31 @@ Index: src/org/exist/numbering/NodeIdFactory.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/source/BinarySource.java
+===================================================================
+--- src/org/exist/source/BinarySource.java	(revision 13502)
++++ src/org/exist/source/BinarySource.java	(working copy)
+@@ -54,4 +54,4 @@
+             }
+         }
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/source/StringSourceWithMapKey.java
+===================================================================
+--- src/org/exist/source/StringSourceWithMapKey.java	(revision 13502)
++++ src/org/exist/source/StringSourceWithMapKey.java	(working copy)
+@@ -39,4 +39,4 @@
+     }
+ 
+     public String getContent() throws IOException {return map.get("<query>");}
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/source/ClassLoaderSource.java
 ===================================================================
---- src/org/exist/source/ClassLoaderSource.java	(revision 9256)
+--- src/org/exist/source/ClassLoaderSource.java	(revision 13502)
 +++ src/org/exist/source/ClassLoaderSource.java	(working copy)
 @@ -50,4 +50,4 @@
              throw new IOException("Source not found: " + source);
@@ -1288,7 +1428,7 @@ Index: src/org/exist/source/ClassLoaderSource.java
 +}
 Index: src/org/exist/backup/ZipWriter.java
 ===================================================================
---- src/org/exist/backup/ZipWriter.java	(revision 9256)
+--- src/org/exist/backup/ZipWriter.java	(revision 13502)
 +++ src/org/exist/backup/ZipWriter.java	(working copy)
 @@ -84,4 +84,4 @@
      		return path.substring(1);
@@ -1297,20 +1437,9 @@ Index: src/org/exist/backup/ZipWriter.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/backup/ConsistencyCheck.java
-===================================================================
---- src/org/exist/backup/ConsistencyCheck.java	(revision 9256)
-+++ src/org/exist/backup/ConsistencyCheck.java	(working copy)
-@@ -359,4 +359,4 @@
-         
-         public void error(org.exist.backup.ErrorReport error);
-     }
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/backup/BackupWriter.java
 ===================================================================
---- src/org/exist/backup/BackupWriter.java	(revision 9256)
+--- src/org/exist/backup/BackupWriter.java	(revision 13502)
 +++ src/org/exist/backup/BackupWriter.java	(working copy)
 @@ -26,4 +26,4 @@
      void close() throws IOException;
@@ -1321,7 +1450,7 @@ Index: src/org/exist/backup/BackupWriter.java
 +}
 Index: src/org/exist/backup/RawDataBackup.java
 ===================================================================
---- src/org/exist/backup/RawDataBackup.java	(revision 9256)
+--- src/org/exist/backup/RawDataBackup.java	(revision 13502)
 +++ src/org/exist/backup/RawDataBackup.java	(working copy)
 @@ -19,4 +19,4 @@
      public OutputStream newEntry(String name) throws IOException;
@@ -1332,9 +1461,9 @@ Index: src/org/exist/backup/RawDataBackup.java
 +}
 Index: src/org/exist/backup/xquery/ListBackups.java
 ===================================================================
---- src/org/exist/backup/xquery/ListBackups.java	(revision 9256)
+--- src/org/exist/backup/xquery/ListBackups.java	(revision 13502)
 +++ src/org/exist/backup/xquery/ListBackups.java	(working copy)
-@@ -112,4 +112,4 @@
+@@ -127,4 +127,4 @@
              context.popDocumentContext();
          }
      }
@@ -1343,9 +1472,9 @@ Index: src/org/exist/backup/xquery/ListBackups.java
 +}
 Index: src/org/exist/backup/Restore.java
 ===================================================================
---- src/org/exist/backup/Restore.java	(revision 9256)
+--- src/org/exist/backup/Restore.java	(revision 13502)
 +++ src/org/exist/backup/Restore.java	(working copy)
-@@ -75,7 +75,7 @@
+@@ -79,7 +79,7 @@
  		if (newAdminPass != null)
  			setAdminCredentials(newAdminPass);
  		
@@ -1356,7 +1485,7 @@ Index: src/org/exist/backup/Restore.java
  		SAXParser sax = saxFactory.newSAXParser();
 Index: src/org/exist/backup/ErrorReport.java
 ===================================================================
---- src/org/exist/backup/ErrorReport.java	(revision 9256)
+--- src/org/exist/backup/ErrorReport.java	(revision 13502)
 +++ src/org/exist/backup/ErrorReport.java	(working copy)
 @@ -169,4 +169,4 @@
              return super.toString() + "\nDocument ID: " + documentId;
@@ -1365,20 +1494,9 @@ Index: src/org/exist/backup/ErrorReport.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/backup/SystemExport.java
-===================================================================
---- src/org/exist/backup/SystemExport.java	(revision 9256)
-+++ src/org/exist/backup/SystemExport.java	(working copy)
-@@ -708,4 +708,4 @@
-             }
-         }
-     }
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/backup/AbstractBackupDescriptor.java
 ===================================================================
---- src/org/exist/backup/AbstractBackupDescriptor.java	(revision 9256)
+--- src/org/exist/backup/AbstractBackupDescriptor.java	(revision 13502)
 +++ src/org/exist/backup/AbstractBackupDescriptor.java	(working copy)
 @@ -62,7 +62,7 @@
      }
@@ -1391,7 +1509,7 @@ Index: src/org/exist/backup/AbstractBackupDescriptor.java
          SAXParser sax = saxFactory.newSAXParser();
 Index: src/org/exist/indexing/IndexWorker.java
 ===================================================================
---- src/org/exist/indexing/IndexWorker.java	(revision 9256)
+--- src/org/exist/indexing/IndexWorker.java	(revision 13502)
 +++ src/org/exist/indexing/IndexWorker.java	(working copy)
 @@ -204,4 +204,4 @@
      
@@ -1402,9 +1520,9 @@ Index: src/org/exist/indexing/IndexWorker.java
 +}
 Index: src/org/exist/indexing/StreamListener.java
 ===================================================================
---- src/org/exist/indexing/StreamListener.java	(revision 9256)
+--- src/org/exist/indexing/StreamListener.java	(revision 13502)
 +++ src/org/exist/indexing/StreamListener.java	(working copy)
-@@ -111,4 +111,4 @@
+@@ -112,4 +112,4 @@
       */
      void endElement(Txn transaction, ElementImpl element, NodePath path);    
      
@@ -1413,7 +1531,7 @@ Index: src/org/exist/indexing/StreamListener.java
 +}
 Index: src/org/exist/indexing/IndexManager.java
 ===================================================================
---- src/org/exist/indexing/IndexManager.java	(revision 9256)
+--- src/org/exist/indexing/IndexManager.java	(revision 13502)
 +++ src/org/exist/indexing/IndexManager.java	(working copy)
 @@ -221,4 +221,4 @@
                  ((RawBackupSupport)index).backupToArchive(backup);
@@ -1424,9 +1542,9 @@ Index: src/org/exist/indexing/IndexManager.java
 +}
 Index: src/org/exist/indexing/MatchListener.java
 ===================================================================
---- src/org/exist/indexing/MatchListener.java	(revision 9256)
+--- src/org/exist/indexing/MatchListener.java	(revision 13502)
 +++ src/org/exist/indexing/MatchListener.java	(working copy)
-@@ -35,4 +35,4 @@
+@@ -34,4 +34,4 @@
       * @return the last receiver in the chain
       */
      Receiver getLastInChain();
@@ -1435,9 +1553,9 @@ Index: src/org/exist/indexing/MatchListener.java
 +}
 Index: src/org/exist/indexing/Index.java
 ===================================================================
---- src/org/exist/indexing/Index.java	(revision 9256)
+--- src/org/exist/indexing/Index.java	(revision 13502)
 +++ src/org/exist/indexing/Index.java	(working copy)
-@@ -121,4 +121,4 @@
+@@ -120,4 +120,4 @@
       * The definition of "consistency" is left to the user.
       */
      boolean checkIndex(DBBroker broker);
@@ -1446,7 +1564,7 @@ Index: src/org/exist/indexing/Index.java
 +}
 Index: src/org/exist/indexing/IndexController.java
 ===================================================================
---- src/org/exist/indexing/IndexController.java	(revision 9256)
+--- src/org/exist/indexing/IndexController.java	(revision 13502)
 +++ src/org/exist/indexing/IndexController.java	(working copy)
 @@ -412,4 +412,4 @@
          return first;
@@ -1455,20 +1573,9 @@ Index: src/org/exist/indexing/IndexController.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/xmldb/CollectionImpl.java
-===================================================================
---- src/org/exist/xmldb/CollectionImpl.java	(revision 9256)
-+++ src/org/exist/xmldb/CollectionImpl.java	(working copy)
-@@ -49,4 +49,4 @@
- 	public XmldbURI getPathURI();
- 	
- 	
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/xmldb/XPathQueryServiceImpl.java
 ===================================================================
---- src/org/exist/xmldb/XPathQueryServiceImpl.java	(revision 9256)
+--- src/org/exist/xmldb/XPathQueryServiceImpl.java	(revision 13502)
 +++ src/org/exist/xmldb/XPathQueryServiceImpl.java	(working copy)
 @@ -107,4 +107,4 @@
       * locks may not be released properly.
@@ -1477,22 +1584,33 @@ Index: src/org/exist/xmldb/XPathQueryServiceImpl.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/xmldb/CollectionImpl.java
+===================================================================
+--- src/org/exist/xmldb/CollectionImpl.java	(revision 13502)
++++ src/org/exist/xmldb/CollectionImpl.java	(working copy)
+@@ -49,4 +49,4 @@
+ 	public XmldbURI getPathURI();
+ 	
+ 	
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/xmldb/RemoteXMLResource.java
 ===================================================================
---- src/org/exist/xmldb/RemoteXMLResource.java	(revision 9256)
+--- src/org/exist/xmldb/RemoteXMLResource.java	(revision 13502)
 +++ src/org/exist/xmldb/RemoteXMLResource.java	(working copy)
-@@ -226,7 +226,7 @@
-         
-         XMLReader reader = null;
- 	if (xmlReader == null) {
--	    SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-+	    SAXParserFactory saxFactory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
- 	    saxFactory.setNamespaceAware(true);
- 	    saxFactory.setValidating(false);
+@@ -201,7 +201,7 @@
+     	
+         XMLReader reader = xmlReader;
+ 		if (reader == null) {
+-		    SAXParserFactory saxFactory = SAXParserFactory.newInstance();
++		    SAXParserFactory saxFactory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+ 		    saxFactory.setNamespaceAware(true);
+ 		    saxFactory.setValidating(false);
              try {
 Index: src/org/exist/xmldb/DatabaseInstanceManager.java
 ===================================================================
---- src/org/exist/xmldb/DatabaseInstanceManager.java	(revision 9256)
+--- src/org/exist/xmldb/DatabaseInstanceManager.java	(revision 13502)
 +++ src/org/exist/xmldb/DatabaseInstanceManager.java	(working copy)
 @@ -50,4 +50,4 @@
  	 * @return True if XACML is enabled
@@ -1501,11 +1619,22 @@ Index: src/org/exist/xmldb/DatabaseInstanceManager.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/debuggee/CommandContinuation.java
+===================================================================
+--- src/org/exist/debuggee/CommandContinuation.java	(revision 13502)
++++ src/org/exist/debuggee/CommandContinuation.java	(working copy)
+@@ -56,4 +56,4 @@
+ 
+ 	//close session
+ 	public void disconnect();
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/fulltext/FTIndex.java
 ===================================================================
---- src/org/exist/fulltext/FTIndex.java	(revision 9256)
+--- src/org/exist/fulltext/FTIndex.java	(revision 13502)
 +++ src/org/exist/fulltext/FTIndex.java	(working copy)
-@@ -119,4 +119,4 @@
+@@ -118,4 +118,4 @@
          db.backupToStream(os);
          backup.closeEntry();
      }
@@ -1514,7 +1643,7 @@ Index: src/org/exist/fulltext/FTIndex.java
 +}
 Index: src/org/exist/fulltext/FTMatch.java
 ===================================================================
---- src/org/exist/fulltext/FTMatch.java	(revision 9256)
+--- src/org/exist/fulltext/FTMatch.java	(revision 13502)
 +++ src/org/exist/fulltext/FTMatch.java	(working copy)
 @@ -49,4 +49,4 @@
      public String getIndexId() {
@@ -1525,9 +1654,9 @@ Index: src/org/exist/fulltext/FTMatch.java
 +}
 Index: src/org/exist/fulltext/FTIndexWorker.java
 ===================================================================
---- src/org/exist/fulltext/FTIndexWorker.java	(revision 9256)
+--- src/org/exist/fulltext/FTIndexWorker.java	(revision 13502)
 +++ src/org/exist/fulltext/FTIndexWorker.java	(working copy)
-@@ -262,4 +262,4 @@
+@@ -273,4 +273,4 @@
              return FTIndexWorker.this;
          }
      }
@@ -1536,7 +1665,7 @@ Index: src/org/exist/fulltext/FTIndexWorker.java
 +}
 Index: src/org/exist/security/XmldbPrincipal.java
 ===================================================================
---- src/org/exist/security/XmldbPrincipal.java	(revision 9256)
+--- src/org/exist/security/XmldbPrincipal.java	(revision 13502)
 +++ src/org/exist/security/XmldbPrincipal.java	(working copy)
 @@ -13,4 +13,4 @@
  	
@@ -1547,18 +1676,18 @@ Index: src/org/exist/security/XmldbPrincipal.java
 +}
 Index: src/org/exist/security/xacml/XACMLConstants.java
 ===================================================================
---- src/org/exist/security/xacml/XACMLConstants.java	(revision 9256)
+--- src/org/exist/security/xacml/XACMLConstants.java	(revision 13502)
 +++ src/org/exist/security/xacml/XACMLConstants.java	(working copy)
-@@ -254,4 +254,4 @@
- 	public static final String COCOON_SOURCE_TYPE = "Cocoon";
+@@ -256,4 +256,4 @@
  	
- 	private XACMLConstants() {}
+ 	private XACMLConstants() {}	
+ 
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/security/xacml/ExistPolicyModule.java
 ===================================================================
---- src/org/exist/security/xacml/ExistPolicyModule.java	(revision 9256)
+--- src/org/exist/security/xacml/ExistPolicyModule.java	(revision 13502)
 +++ src/org/exist/security/xacml/ExistPolicyModule.java	(working copy)
 @@ -140,4 +140,4 @@
  			pool.release(broker);
@@ -1569,9 +1698,9 @@ Index: src/org/exist/security/xacml/ExistPolicyModule.java
 +}
 Index: src/org/exist/security/xacml/XACMLUtil.java
 ===================================================================
---- src/org/exist/security/xacml/XACMLUtil.java	(revision 9256)
+--- src/org/exist/security/xacml/XACMLUtil.java	(revision 13502)
 +++ src/org/exist/security/xacml/XACMLUtil.java	(working copy)
-@@ -622,4 +622,4 @@
+@@ -631,4 +631,4 @@
      public void debug() {
          // left empty
      }
@@ -1580,7 +1709,7 @@ Index: src/org/exist/security/xacml/XACMLUtil.java
 +}
 Index: src/org/exist/security/xacml/RequestHelper.java
 ===================================================================
---- src/org/exist/security/xacml/RequestHelper.java	(revision 9256)
+--- src/org/exist/security/xacml/RequestHelper.java	(revision 13502)
 +++ src/org/exist/security/xacml/RequestHelper.java	(working copy)
 @@ -488,4 +488,4 @@
  	}
@@ -1589,9 +1718,42 @@ Index: src/org/exist/security/xacml/RequestHelper.java
 -}
 \ No newline at end of file
 +}
+Index: src/org/exist/management/impl/LockManager.java
+===================================================================
+--- src/org/exist/management/impl/LockManager.java	(revision 13502)
++++ src/org/exist/management/impl/LockManager.java	(working copy)
+@@ -76,4 +76,4 @@
+         }
+         return data;
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/management/impl/DatabaseMBean.java
+===================================================================
+--- src/org/exist/management/impl/DatabaseMBean.java	(revision 13502)
++++ src/org/exist/management/impl/DatabaseMBean.java	(working copy)
+@@ -41,4 +41,4 @@
+ 
+     TabularData getActiveBrokersMap();
+ 
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/management/impl/ProcessReport.java
+===================================================================
+--- src/org/exist/management/impl/ProcessReport.java	(revision 13502)
++++ src/org/exist/management/impl/ProcessReport.java	(working copy)
+@@ -130,4 +130,4 @@
+         }
+         return null;
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/management/CacheMBean.java
 ===================================================================
---- src/org/exist/management/CacheMBean.java	(revision 9256)
+--- src/org/exist/management/CacheMBean.java	(revision 13502)
 +++ src/org/exist/management/CacheMBean.java	(working copy)
 @@ -38,4 +38,4 @@
      public int getFails();
@@ -1600,24 +1762,11 @@ Index: src/org/exist/management/CacheMBean.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/util/XMLReaderObjectFactory.java
-===================================================================
---- src/org/exist/util/XMLReaderObjectFactory.java	(revision 9256)
-+++ src/org/exist/util/XMLReaderObjectFactory.java	(working copy)
-@@ -112,7 +112,7 @@
-             eXistXMLCatalogResolver resolver) throws ParserConfigurationException, SAXException{
-         
-         // Create a xmlreader
--        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-+        SAXParserFactory saxFactory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
-         if (validation == VALIDATION_AUTO || validation == VALIDATION_ENABLED){
-             saxFactory.setValidating(true);
-         } else {
 Index: src/org/exist/util/Configuration.java
 ===================================================================
---- src/org/exist/util/Configuration.java	(revision 9256)
+--- src/org/exist/util/Configuration.java	(revision 13502)
 +++ src/org/exist/util/Configuration.java	(working copy)
-@@ -267,7 +267,7 @@
+@@ -270,7 +270,7 @@
              // initialize xml parser
              // we use eXist's in-memory DOM implementation to work
              // around a bug in Xerces
@@ -1628,7 +1777,7 @@ Index: src/org/exist/util/Configuration.java
  //            factory.setFeature("http://apache.org/xml/features/validation/dynamic", true);
 Index: src/org/exist/util/FastByteBuffer.java
 ===================================================================
---- src/org/exist/util/FastByteBuffer.java	(revision 9256)
+--- src/org/exist/util/FastByteBuffer.java	(revision 13502)
 +++ src/org/exist/util/FastByteBuffer.java	(working copy)
 @@ -754,4 +754,4 @@
      public final int size() {
@@ -1637,22 +1786,11 @@ Index: src/org/exist/util/FastByteBuffer.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/util/Base64Encoder.java
-===================================================================
---- src/org/exist/util/Base64Encoder.java	(revision 9256)
-+++ src/org/exist/util/Base64Encoder.java	(working copy)
-@@ -147,4 +147,4 @@
-     public void reset() {
-     	out.setLength(0);
-     }
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/util/MimeTable.java
 ===================================================================
---- src/org/exist/util/MimeTable.java	(revision 9256)
+--- src/org/exist/util/MimeTable.java	(revision 13502)
 +++ src/org/exist/util/MimeTable.java	(working copy)
-@@ -206,7 +206,7 @@
+@@ -270,7 +270,7 @@
       * @throws IOException 
       */
      private void loadMimeTypes(InputStream stream) throws ParserConfigurationException, SAXException, IOException {
@@ -1663,7 +1801,7 @@ Index: src/org/exist/util/MimeTable.java
          InputSource src = new InputSource(stream);
 Index: src/org/exist/util/hashtable/SequencedLongHashMap.java
 ===================================================================
---- src/org/exist/util/hashtable/SequencedLongHashMap.java	(revision 9256)
+--- src/org/exist/util/hashtable/SequencedLongHashMap.java	(revision 13502)
 +++ src/org/exist/util/hashtable/SequencedLongHashMap.java	(working copy)
 @@ -326,4 +326,4 @@
  				return new Long(next.key);
@@ -1672,20 +1810,22 @@ Index: src/org/exist/util/hashtable/SequencedLongHashMap.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/util/sanity/SanityCheck.java
+Index: src/org/exist/util/ExistSAXParserFactory.java
 ===================================================================
---- src/org/exist/util/sanity/SanityCheck.java	(revision 9256)
-+++ src/org/exist/util/sanity/SanityCheck.java	(working copy)
-@@ -92,4 +92,4 @@
-         failure.printStackTrace(out);
-         LOG.warn(sout.toString());
-     }
--}
-\ No newline at end of file
-+}
+--- src/org/exist/util/ExistSAXParserFactory.java	(revision 13502)
++++ src/org/exist/util/ExistSAXParserFactory.java	(working copy)
+@@ -106,7 +106,7 @@
+ 
+         // If no factory could be retrieved, create system default property.
+         if (factory == null) {
+-            factory = SAXParserFactory.newInstance();
++            factory = new org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl();
+         }
+ 
+         return factory;
 Index: src/org/exist/util/serializer/Receiver.java
 ===================================================================
---- src/org/exist/util/serializer/Receiver.java	(revision 9256)
+--- src/org/exist/util/serializer/Receiver.java	(revision 13502)
 +++ src/org/exist/util/serializer/Receiver.java	(working copy)
 @@ -71,4 +71,4 @@
      public void setCurrentNode(StoredNode node);
@@ -1696,7 +1836,7 @@ Index: src/org/exist/util/serializer/Receiver.java
 +}
 Index: src/org/exist/util/serializer/DOMStreamer.java
 ===================================================================
---- src/org/exist/util/serializer/DOMStreamer.java	(revision 9256)
+--- src/org/exist/util/serializer/DOMStreamer.java	(revision 13502)
 +++ src/org/exist/util/serializer/DOMStreamer.java	(working copy)
 @@ -276,4 +276,4 @@
              this.element = element;
@@ -1705,20 +1845,9 @@ Index: src/org/exist/util/serializer/DOMStreamer.java
 -}
 \ No newline at end of file
 +}
-Index: src/org/exist/util/MimeType.java
-===================================================================
---- src/org/exist/util/MimeType.java	(revision 9256)
-+++ src/org/exist/util/MimeType.java	(working copy)
-@@ -82,4 +82,4 @@
-     public String toString() {
-         return name + ": " + description;
-     }
--}
-\ No newline at end of file
-+}
 Index: src/org/exist/util/XMLChar.java
 ===================================================================
---- src/org/exist/util/XMLChar.java	(revision 9256)
+--- src/org/exist/util/XMLChar.java	(revision 13502)
 +++ src/org/exist/util/XMLChar.java	(working copy)
 @@ -1,6 +1,6 @@
  package org.exist.util;
@@ -1728,9 +1857,42 @@ Index: src/org/exist/util/XMLChar.java
  
  /*
   * The Apache Software License, Version 1.1
+Index: src/org/exist/util/Base64Encoder.java
+===================================================================
+--- src/org/exist/util/Base64Encoder.java	(revision 13502)
++++ src/org/exist/util/Base64Encoder.java	(working copy)
+@@ -147,4 +147,4 @@
+     public void reset() {
+     	out.setLength(0);
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/util/sanity/SanityCheck.java
+===================================================================
+--- src/org/exist/util/sanity/SanityCheck.java	(revision 13502)
++++ src/org/exist/util/sanity/SanityCheck.java	(working copy)
+@@ -92,4 +92,4 @@
+         failure.printStackTrace(out);
+         LOG.warn(sout.toString());
+     }
+-}
+\ No newline at end of file
++}
+Index: src/org/exist/util/MimeType.java
+===================================================================
+--- src/org/exist/util/MimeType.java	(revision 13502)
++++ src/org/exist/util/MimeType.java	(working copy)
+@@ -84,4 +84,4 @@
+     public String toString() {
+         return name + ": " + description;
+     }
+-}
+\ No newline at end of file
++}
 Index: src/org/exist/client/MimeTypeFileFilter.java
 ===================================================================
---- src/org/exist/client/MimeTypeFileFilter.java	(revision 9256)
+--- src/org/exist/client/MimeTypeFileFilter.java	(revision 13502)
 +++ src/org/exist/client/MimeTypeFileFilter.java	(working copy)
 @@ -64,4 +64,4 @@
  		
@@ -1741,7 +1903,7 @@ Index: src/org/exist/client/MimeTypeFileFilter.java
 +}
 Index: src/org/exist/client/xacml/ResizingTable.java
 ===================================================================
---- src/org/exist/client/xacml/ResizingTable.java	(revision 9256)
+--- src/org/exist/client/xacml/ResizingTable.java	(revision 13502)
 +++ src/org/exist/client/xacml/ResizingTable.java	(working copy)
 @@ -125,4 +125,4 @@
  	{
@@ -1752,7 +1914,7 @@ Index: src/org/exist/client/xacml/ResizingTable.java
 +}
 Index: src/org/exist/client/ResourceDescriptor.java
 ===================================================================
---- src/org/exist/client/ResourceDescriptor.java	(revision 9256)
+--- src/org/exist/client/ResourceDescriptor.java	(revision 13502)
 +++ src/org/exist/client/ResourceDescriptor.java	(working copy)
 @@ -94,4 +94,4 @@
          }
@@ -1763,18 +1925,18 @@ Index: src/org/exist/client/ResourceDescriptor.java
 +}
 Index: src/org/exist/collections/triggers/HistoryTrigger.java
 ===================================================================
---- src/org/exist/collections/triggers/HistoryTrigger.java	(revision 9256)
+--- src/org/exist/collections/triggers/HistoryTrigger.java	(revision 13502)
 +++ src/org/exist/collections/triggers/HistoryTrigger.java	(working copy)
-@@ -114,4 +114,4 @@
+@@ -110,4 +110,4 @@
+     public void finish(int event, DBBroker broker, Txn transaction, XmldbURI documentPath, DocumentImpl document)
      {
-     	super.finish(event, broker, transaction, documentPath, document);
      }
 -}
 \ No newline at end of file
 +}
 Index: src/org/exist/collections/CollectionURI.java
 ===================================================================
---- src/org/exist/collections/CollectionURI.java	(revision 9256)
+--- src/org/exist/collections/CollectionURI.java	(revision 13502)
 +++ src/org/exist/collections/CollectionURI.java	(working copy)
 @@ -125,4 +125,4 @@
  		
@@ -1785,7 +1947,7 @@ Index: src/org/exist/collections/CollectionURI.java
 +}
 Index: src/org/exist/collections/CollectionConfigurationManager.java
 ===================================================================
---- src/org/exist/collections/CollectionConfigurationManager.java	(revision 9256)
+--- src/org/exist/collections/CollectionConfigurationManager.java	(revision 13502)
 +++ src/org/exist/collections/CollectionConfigurationManager.java	(working copy)
 @@ -146,7 +146,7 @@
       */
@@ -1803,15 +1965,28 @@ Index: src/org/exist/collections/CollectionConfigurationManager.java
 -}
 \ No newline at end of file
 +}
+Index: build.properties
+===================================================================
+--- build.properties	(revision 13502)
++++ build.properties	(working copy)
+@@ -18,7 +18,7 @@
+ # output dir for junit reports
+ junit.reports = test
+ junit.output = true
+-junit.forked.VM.maxmemory = 300m
++junit.forked.VM.maxmemory = 1024m
+ proxy.nonproxyhosts = 
+ proxy.host =
+ proxy.port = 0
 Index: eXist.iml
 ===================================================================
---- eXist.iml	(revision 9256)
+--- eXist.iml	(revision 13502)
 +++ eXist.iml	(working copy)
-@@ -1,196 +1,5 @@
+@@ -1,152 +1,39 @@
  <?xml version="1.0" encoding="UTF-8"?>
- <module relativePaths="true" type="JAVA_MODULE" version="4">
+-<module relativePaths="true" type="JAVA_MODULE" version="4">
 -  <component name="FacetManager">
--    <facet type="web" name="Web">
+-    <facet type="web" name="Web3">
 -      <configuration>
 -        <descriptors>
 -          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/webapp/WEB-INF/web.xml" optional="false" version="2.5" />
@@ -1824,52 +1999,12 @@ Index: eXist.iml
 -          <setting name="EXPLODED_ENABLED" value="false" />
 -          <setting name="JAR_URL" value="file://" />
 -          <setting name="JAR_ENABLED" value="false" />
--          <setting name="BUILD_MODULE_ON_FRAME_DEACTIVATION" value="false" />
--          <setting name="BUILD_EXTERNAL_DEPENDENCIES" value="false" />
 -          <setting name="EXCLUDE_EXPLODED_DIRECTORY" value="true" />
--          <setting name="RUN_JASPER_VALIDATION" value="true" />
--          <setting name="BUILD_ONLY_WEB_RESOURCES" value="false" />
 -        </building>
 -        <packaging>
 -          <containerElement type="module" name="eXist">
 -            <attribute name="method" value="1" />
 -            <attribute name="URI" value="/WEB-INF/classes" />
--          </containerElement>
--          <containerElement type="library" name="ant" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="cocoon" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="core" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="&lt;N/A&gt;" />
--          </containerElement>
--          <containerElement type="library" name="endorsed" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="extensions" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="optional" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="test" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/classes" />
--          </containerElement>
--          <containerElement type="library" name="tools" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="user" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
 -          </containerElement>
 -        </packaging>
 -      </configuration>
@@ -1887,57 +2022,17 @@ Index: eXist.iml
 -          <setting name="EXPLODED_ENABLED" value="false" />
 -          <setting name="JAR_URL" value="file://" />
 -          <setting name="JAR_ENABLED" value="false" />
--          <setting name="BUILD_MODULE_ON_FRAME_DEACTIVATION" value="false" />
--          <setting name="BUILD_EXTERNAL_DEPENDENCIES" value="false" />
 -          <setting name="EXCLUDE_EXPLODED_DIRECTORY" value="true" />
--          <setting name="RUN_JASPER_VALIDATION" value="true" />
--          <setting name="BUILD_ONLY_WEB_RESOURCES" value="false" />
 -        </building>
 -        <packaging>
 -          <containerElement type="module" name="eXist">
 -            <attribute name="method" value="1" />
 -            <attribute name="URI" value="/WEB-INF/classes" />
 -          </containerElement>
--          <containerElement type="library" name="ant" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="cocoon" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="core" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="&lt;N/A&gt;" />
--          </containerElement>
--          <containerElement type="library" name="endorsed" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="extensions" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="optional" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="test" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/classes" />
--          </containerElement>
--          <containerElement type="library" name="tools" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="user" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
 -        </packaging>
 -      </configuration>
 -    </facet>
--    <facet type="web" name="Web3">
+-    <facet type="web" name="Web">
 -      <configuration>
 -        <descriptors>
 -          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/tools/ircbot/webapp/WEB-INF/web.xml" optional="false" version="2.5" />
@@ -1950,94 +2045,113 @@ Index: eXist.iml
 -          <setting name="EXPLODED_ENABLED" value="false" />
 -          <setting name="JAR_URL" value="file://" />
 -          <setting name="JAR_ENABLED" value="false" />
--          <setting name="BUILD_MODULE_ON_FRAME_DEACTIVATION" value="false" />
--          <setting name="BUILD_EXTERNAL_DEPENDENCIES" value="false" />
 -          <setting name="EXCLUDE_EXPLODED_DIRECTORY" value="true" />
--          <setting name="RUN_JASPER_VALIDATION" value="true" />
--          <setting name="BUILD_ONLY_WEB_RESOURCES" value="false" />
 -        </building>
 -        <packaging>
 -          <containerElement type="module" name="eXist">
 -            <attribute name="method" value="1" />
 -            <attribute name="URI" value="/WEB-INF/classes" />
 -          </containerElement>
--          <containerElement type="library" name="ant" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="cocoon" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="core" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="&lt;N/A&gt;" />
--          </containerElement>
--          <containerElement type="library" name="endorsed" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="extensions" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="optional" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="test" level="project">
--            <attribute name="method" value="0" />
+-        </packaging>
+-      </configuration>
+-    </facet>
+-    <facet type="web" name="Web4">
+-      <configuration>
+-        <descriptors>
+-          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/build/docs/source/WEB-INF/web.xml" optional="false" version="2.5" />
+-        </descriptors>
+-        <webroots>
+-          <root url="file://$MODULE_DIR$/build/docs/source" relative="/" />
+-        </webroots>
+-        <building>
+-          <setting name="EXPLODED_URL" value="file://" />
+-          <setting name="EXPLODED_ENABLED" value="false" />
+-          <setting name="JAR_URL" value="file://" />
+-          <setting name="JAR_ENABLED" value="false" />
+-          <setting name="EXCLUDE_EXPLODED_DIRECTORY" value="true" />
+-        </building>
+-        <packaging>
+-          <containerElement type="module" name="eXist">
+-            <attribute name="method" value="1" />
 -            <attribute name="URI" value="/WEB-INF/classes" />
--          </containerElement>
--          <containerElement type="library" name="tools" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
--          </containerElement>
--          <containerElement type="library" name="user" level="project">
--            <attribute name="method" value="0" />
--            <attribute name="URI" value="/WEB-INF/lib" />
 -          </containerElement>
 -        </packaging>
 -      </configuration>
 -    </facet>
 -  </component>
++<module type="JAVA_MODULE" version="4">
    <component name="NewModuleRootManager" inherit-compiler-output="true">
      <exclude-output />
      <content url="file://$MODULE_DIR$">
-@@ -202,6 +11,7 @@
-       <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/spatial/test/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/debuggee/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/debuggee/test" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/extensions/fluent/src" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/extensions/fluent/test/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/fluent/test/src" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/lucene/src" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/lucene/test/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/lucene/test/src" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/ngram/src" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/ngram/test/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/ngram/test/src" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/spatial/src" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/spatial/test/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/indexes/spatial/test/src" isTestSource="false" />
        <sourceFolder url="file://$MODULE_DIR$/extensions/modules/src" isTestSource="false" />
-       <sourceFolder url="file://$MODULE_DIR$/samples" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/svn/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/svn/test" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/extensions/versioning/src" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/samples" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/xprocxq/main/src/java" isTestSource="false" packagePrefix="org.exist.xquery.functions.util" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/xqdoc/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/xqdoc/test/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/xslt/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/extensions/xslt/test" isTestSource="false" />
 +      <sourceFolder url="file://$MODULE_DIR$/samples/src" isTestSource="false" />
        <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-       <sourceFolder url="file://$MODULE_DIR$/test/src" isTestSource="true" />
-       <sourceFolder url="file://$MODULE_DIR$/tools/XFormsFilter/src" isTestSource="false" />
-@@ -210,6 +20,20 @@
-       <sourceFolder url="file://$MODULE_DIR$/tools/jmx/src" isTestSource="false" />
-       <sourceFolder url="file://$MODULE_DIR$/tools/requestlog/src" isTestSource="true" />
+-      <sourceFolder url="file://$MODULE_DIR$/test/src" isTestSource="true" />
+-      <sourceFolder url="file://$MODULE_DIR$/tools/XFormsFilter/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/test/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/thirdparty/jboss/src" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/tools/ircbot/src" isTestSource="false" />
+       <sourceFolder url="file://$MODULE_DIR$/tools/izpack/src" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/tools/requestlog/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/tools/requestlog/src" isTestSource="false" />
        <sourceFolder url="file://$MODULE_DIR$/tools/wrapper/src" isTestSource="false" />
-+      <excludeFolder url="file://$MODULE_DIR$/bin" />
-+      <excludeFolder url="file://$MODULE_DIR$/build" />
-+      <excludeFolder url="file://$MODULE_DIR$/extensions" />
-+      <excludeFolder url="file://$MODULE_DIR$/installer" />
-+      <excludeFolder url="file://$MODULE_DIR$/jdee-project" />
-+      <excludeFolder url="file://$MODULE_DIR$/lib" />
-+      <excludeFolder url="file://$MODULE_DIR$/nbproject" />
-+      <excludeFolder url="file://$MODULE_DIR$/roadmap" />
-+      <excludeFolder url="file://$MODULE_DIR$/samples" />
-+      <excludeFolder url="file://$MODULE_DIR$/schema" />
-+      <excludeFolder url="file://$MODULE_DIR$/test" />
-+      <excludeFolder url="file://$MODULE_DIR$/thirdparty" />
-+      <excludeFolder url="file://$MODULE_DIR$/tools" />
-+      <excludeFolder url="file://$MODULE_DIR$/webapp" />
+-      <excludeFolder url="file://$MODULE_DIR$/test/benchmark" />
+-      <excludeFolder url="file://$MODULE_DIR$/test/junit" />
+-      <excludeFolder url="file://$MODULE_DIR$/test/temp" />
+-      <excludeFolder url="file://$MODULE_DIR$/tools/jetty/logs" />
+-      <excludeFolder url="file://$MODULE_DIR$/tools/jetty/work" />
+-      <excludeFolder url="file://$MODULE_DIR$/webapp/WEB-INF/data" />
+-      <excludeFolder url="file://$MODULE_DIR$/webapp/WEB-INF/logs" />
++      <sourceFolder url="file://$MODULE_DIR$/tools/XFormsFilter/src" isTestSource="false" />
      </content>
-     <orderEntry type="inheritedJdk" />
+-    <orderEntry type="jdk" jdkName="1.5" jdkType="JavaSDK" />
++    <orderEntry type="inheritedJdk" />
      <orderEntry type="sourceFolder" forTests="false" />
-@@ -225,7 +49,6 @@
-     <orderEntry type="library" name="ant" level="project" />
-     <orderEntry type="library" name="test" level="project" />
-     <orderEntry type="library" name="extensions" level="project" />
--    <orderEntryProperties />
+-    <orderEntry type="library" exported="" name="optional libs" level="project" />
+-    <orderEntry type="library" exported="" name="core libs" level="project" />
+-    <orderEntry type="library" exported="" name="tools" level="project" />
+-    <orderEntry type="library" exported="" name="core" level="project" />
+-    <orderEntry type="library" name="xmlrpc-1.2-patched" level="project" />
+-    <orderEntry type="library" exported="" name="optional" level="project" />
+-    <orderEntry type="library" exported="" name="user" level="project" />
+-    <orderEntry type="library" exported="" name="endorsed" level="project" />
+-    <orderEntry type="library" exported="" name="cocoon" level="project" />
+-    <orderEntry type="library" exported="" name="ant" level="project" />
+-    <orderEntry type="library" exported="" name="test" level="project" />
+-    <orderEntry type="library" exported="" name="extensions" level="project" />
+-    <orderEntry type="module-library" exported="">
+-      <library>
+-        <CLASSES>
+-          <root url="jar://$APPLICATION_HOME_DIR$/lib/javaee.jar!/" />
+-        </CLASSES>
+-        <JAVADOC />
+-        <SOURCES />
+-      </library>
+-    </orderEntry>
+-    <orderEntry type="library" exported="" name="main" level="project" />
    </component>
  </module>
  

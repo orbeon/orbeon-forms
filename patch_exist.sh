@@ -10,15 +10,14 @@
 # 3) Run this script from the eXist root directory
 
 ORBEON_HOME=../orbeon
-VERSION=1_2_6
+VERSION=1_4_1_dev
 TODAY_DATE=`date +%Y%m%d`
 FULL_VERSION=$VERSION\_orbeon_$TODAY_DATE
 
 export ANT_OPTS=-Xmx256m
-rm lib/endorsed/xercesImpl-2.9.1.jar
-cp $ORBEON_HOME/lib/xerces-xercesImpl-2_9_orbeon_20070711.jar lib/endorsed/
-cp $ORBEON_HOME/lib/saxon-8_8_orbeon_20090617.jar lib/endorsed/
-cp $ORBEON_HOME/build/lib/orbeon.jar lib/endorsed/
+cp "$ORBEON_HOME"/lib/xerces-xercesImpl-2_9_orbeon_20070711.jar lib/endorsed/
+cp "$ORBEON_HOME"/lib/saxon-9-1-0-8_orbeon_20101223.jar lib/endorsed/
+cp "$ORBEON_HOME"/build/lib/orbeon.jar lib/endorsed/
 for F in $(find src -name *.java)
 do
     sed -i -e 's/org.apache.xerces/orbeon.apache.xerces/g' $F
@@ -28,28 +27,31 @@ do
 done
 
 # Build
-ant clean
-ant
+./build.sh clean
+./build.sh
 
 # Remove existing JARs
-rm $ORBEON_HOME/lib/*exist*
+rm "$ORBEON_HOME"/lib/*exist*
 
 # Copy eXist JARs
-cp exist.jar $ORBEON_HOME/lib/exist-$FULL_VERSION.jar
-cp exist-optional.jar $ORBEON_HOME/lib/exist-optional-$FULL_VERSION.jar
-cp lib/extensions/exist-modules.jar $ORBEON_HOME/lib/exist-modules-$FULL_VERSION.jar
-cp lib/extensions/exist-ngram-module.jar $ORBEON_HOME/lib/exist-ngram-module-$FULL_VERSION.jar
+cp exist.jar "$ORBEON_HOME"/lib/exist-$FULL_VERSION.jar
+cp exist-optional.jar "$ORBEON_HOME"/lib/exist-optional-$FULL_VERSION.jar
+cp lib/extensions/exist-modules.jar "$ORBEON_HOME"/lib/exist-modules-$FULL_VERSION.jar
+cp lib/extensions/exist-ngram-module.jar "$ORBEON_HOME"/lib/exist-ngram-module-$FULL_VERSION.jar
 
 # Copy eXist dependencies JARs
-cp lib/core/antlr-2.7.6.jar $ORBEON_HOME/lib/exist-antlr-2_7_6.jar
-cp lib/core/jgroups-all.jar $ORBEON_HOME/lib/exist-jgroups-all-exist.jar
-cp lib/core/xmldb.jar $ORBEON_HOME/lib/exist-xmldb.jar
-cp lib/core/xmlrpc-client-3.1.1.jar $ORBEON_HOME/lib/exist-xmlrpc-client-3_1_1.jar
-cp lib/core/xmlrpc-common-3.1.1.jar $ORBEON_HOME/lib/exist-xmlrpc-common-3_1_1.jar
-cp lib/core/xmlrpc-server-3.1.1.jar $ORBEON_HOME/lib/exist-xmlrpc-server-3_1_1.jar
-cp lib/core/quartz-1.6.0.jar $ORBEON_HOME/lib/exist-quartz-1_6_0.jar 
-cp lib/core/jta.jar $ORBEON_HOME/lib/exist-jta.jar
-cp lib/core/stax-api-1.0.1.jar $ORBEON_HOME/lib/exist-stax-api-1_0_1.jar
+cp lib/core/antlr-2.7.7.jar           "$ORBEON_HOME"/lib/exist-dependency-antlr-2.7.7.jar
+cp lib/core/jgroups-all-2.2.6.jar     "$ORBEON_HOME"/lib/exist-dependency-jgroups-all-2.2.6.jar
+cp lib/core/jta-1.1.jar               "$ORBEON_HOME"/lib/exist-dependency-jta-1.1.jar
+cp lib/core/quartz-1.6.6.jar          "$ORBEON_HOME"/lib/exist-dependency-quartz-1.6.6.jar
+cp lib/core/stax-api-1.0.1.jar        "$ORBEON_HOME"/lib/exist-dependency-stax-api-1.0.1.jar
+cp lib/core/ws-commons-util-1.0.2.jar "$ORBEON_HOME"/lib/exist-dependency-ws-commons-util-1.0.2.jar
+cp lib/core/xmldb.jar                 "$ORBEON_HOME"/lib/exist-xmldb.jar
+cp lib/core/xmlrpc-client-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-client-3.1.2.jar
+cp lib/core/xmlrpc-common-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-common-3.1.2.jar
+cp lib/core/xmlrpc-server-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-server-3.1.2.jar
+cp lib/endorsed/resolver-1.2.jar      "$ORBEON_HOME"/lib/exist-dependency-resolver-1.2.jar
+
 
 # Create patch file
-svn diff > $ORBEON_HOME/tools/eXist-$VERSION-$TODAY_DATE.patch
+svn diff > "$ORBEON_HOME"/tools/eXist-$VERSION-$TODAY_DATE.patch

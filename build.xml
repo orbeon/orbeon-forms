@@ -105,21 +105,22 @@
         <include name="castor-0_9_4_3-xml.jar"/>
         <include name="antlr-2_7_4_orbeon.jar"/>
 
-        <include name="exist-1_2_6_orbeon_20090702.jar"/>
-        <include name="exist-modules-1_2_6_orbeon_20090702.jar"/>
-        <include name="exist-optional-1_2_6_orbeon_20090702.jar"/>
-        <include name="exist-ngram-module-1_2_6_orbeon_20090702.jar"/>
+        <include name="exist-1_4_1_dev_orbeon_20110104.jar"/>
+        <include name="exist-modules-1_4_1_dev_orbeon_20110104.jar"/>
+        <include name="exist-ngram-module-1_4_1_dev_orbeon_20110104.jar"/>
+        <include name="exist-optional-1_4_1_dev_orbeon_20110104.jar"/>
 
-        <include name="exist-antlr-2_7_6.jar"/>
-        <include name="exist-jgroups-all-exist.jar"/>
-        <include name="exist-jta.jar"/>
-        <include name="exist-quartz-1_6_0.jar"/>
-        <include name="exist-stax-api-1_0_1.jar"/>
-        <include name="exist-ws-commons-util-1.0.2.jar"/>
-        <include name="exist-xmldb.jar"/>
-        <include name="exist-xmlrpc-client-3_1_1.jar"/>
-        <include name="exist-xmlrpc-common-3_1_1.jar"/>
-        <include name="exist-xmlrpc-server-3_1_1.jar"/>
+        <include name="exist-dependency-antlr-2.7.7.jar"/>
+        <include name="exist-dependency-jgroups-all-2.2.6.jar"/>
+        <include name="exist-dependency-jta-1.1.jar"/>
+        <include name="exist-dependency-quartz-1.6.6.jar"/>
+        <include name="exist-dependency-stax-api-1.0.1.jar"/>
+        <include name="exist-dependency-ws-commons-util-1.0.2.jar"/>
+        <include name="exist-dependency-xmldb.jar"/>
+        <include name="exist-dependency-xmlrpc-client-3.1.2.jar"/>
+        <include name="exist-dependency-xmlrpc-common-3.1.2.jar"/>
+        <include name="exist-dependency-xmlrpc-server-3.1.2.jar"/>
+        <include name="exist-dependency-resolver-1.2.jar"/>
 
         <include name="scala-library.jar"/>
         <include name="rhino-1.7R2.jar"/>

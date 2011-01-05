@@ -26,6 +26,7 @@
     var Control = ORBEON.xforms.control.Control;
     var Upload = ORBEON.xforms.control.Upload;
     var Page = ORBEON.xforms.Page;
+    var Event = YAHOO.util.Event;
     var YD = YAHOO.util.Dom;
 
     Upload.prototype = new Control();
@@ -36,16 +37,32 @@
 
         // Create loading progress indicator element, if we don't already have one
         if (! this.getElementByClassName("xforms-upload-progress")) {
+
+            // Add markup to the DOM
             var uploadProgressSpan = document.createElement("span");
+            uploadProgressSpan.innerHTML = '<span class="xforms-upload-spinner"></span>'
+                + '<a href="#" class="xforms-upload-cancel">Cancel</a>';
             OD.setAttribute(uploadProgressSpan, "class", "xforms-upload-progress");
             var inputSelect = this.getElementByClassName("xforms-upload-select");
             YD.insertAfter(uploadProgressSpan, inputSelect);
+
+            // Register listener on the cancel link
+            var cancelAnchor = this.getElementByClassName("xforms-upload-cancel");
+            Event.addListener(cancelAnchor, "click", this.cancel);
         }
     };
 
+    /**
+     * The change event corresponds to a file being selected.
+     */
     Upload.prototype.change = function() {
         // Queue event to submit this file in the background  as soon as possible (pseudo-Ajax request)
         UploadServer.uploadEventQueue.add({form: this.getForm(), upload: this}, Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
+    };
+
+    Upload.prototype.cancel = function() {
+        console.log("Aborting", UploadServer.yuiConnection);
+        YAHOO.util.Connect.abort(UploadServer.yuiConnection);
     };
 
     /**

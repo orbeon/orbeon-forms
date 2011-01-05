@@ -21,34 +21,43 @@
     var ExecutionQueue = ORBEON.util.ExecutionQueue;
     var UploadServer = ORBEON.xforms.server.UploadServer;
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
+    var Connect = YAHOO.util.Connect;
+
+    /**
+     * Object
+     * @private
+     */
+    UploadServer.yuiConnection = null;
 
     /**
      * Run background form post (upload)
      */
     UploadServer.asyncUploadRequest = function(events, done) {
 
-        // Potentially, if multiple forms are on the same page, and users simultaneously select a file in both forms,
-        // then we could have a problem here, as we'll only upload the first form. But we'll be optimistic and
-        // pretend this doesn't happen.
+        // Upload is done by form, so we pick the form of the first event as the one for which we handle the events
         var form = events[0].form;
+        var thisFormEvents = _.filter(events, function(event) { return event.form = form; });
+        var otherFormsEvents = _.filter(events, function(event) { return event.form != form; });
 
         // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-        _.each(events, function(event) { event.upload.setState("progress"); });
+        _.each(thisFormEvents, function(event) { event.upload.setState("progress"); });
         // Tell server we're starting uploads
-        var uploadStartEvents = _.map(events, function(event) { return new ORBEON.xforms.server.AjaxServer.Event(null, event.upload.container.id, null, null, "xxforms-upload-start"); });
-        ORBEON.xforms.server.AjaxServer.fireEvents(uploadStartEvents, false);
+        var uploadStartEvents = _.map(thisFormEvents, function(event) {
+            return new AjaxServer.Event(null, event.upload.container.id, null, null, "xxforms-upload-start"); });
+        AjaxServer.fireEvents(uploadStartEvents, false);
 
         // Trigger actual upload through a form POST
-        YAHOO.util.Connect.setForm(form, true, true);
-        YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[form.id], {
+        Connect.setForm(form, true, true);
+        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[form.id], {
             upload: function(o) {
                 // Clear server events that were sent to the server (why? is this still needed?)
                 ORBEON.xforms.Globals.formServerEvents[form.id].value = "";
                 // Clear upload fields we just uploaded, otherwise subsequent uploads will upload the same data again
-                _.each(events, function(event) { event.upload.clear(); });
+                _.each(thisFormEvents, function(event) { event.upload.clear(); });
                 AjaxServer.handleResponseAjax(o);
-                // Call back to execution queue, which might have more files upload
-                done();
+                // Are we done, or do we still need to handle events for other forms?
+                if (otherFormsEvents.length == 0) done();
+                else UploadServer.asyncUploadRequest(otherFormsEvents, done);
             },
             failure: function() {
                 console.log("Upload failure");
@@ -57,6 +66,9 @@
         });
     };
 
-    UploadServer.uploadEventQueue = new ExecutionQueue(UploadServer.asyncUploadRequest);
-
+    /**
+     * Queue for upload events.
+     * @private
+     */
+    UploadServer.uploadEventQueue = new ExecutionQueue(_.bind(UploadServer.asyncUploadRequest, UploadServer));
 })();

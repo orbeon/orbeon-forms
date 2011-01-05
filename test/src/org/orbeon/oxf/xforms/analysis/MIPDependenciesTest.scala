@@ -24,6 +24,11 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.junit._
 import org.scalatest.junit._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import xml.Elem
+import org.dom4j.{Document => JDocument}
+import org.orbeon.oxf.processor.ProcessorUtils
+
 //import runner.RunWith
 //import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
@@ -41,13 +46,15 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
 
     @Before def setupDocument(): Unit = setupDocument("oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml")
 
-    def setupDocument(documentURL: String)  {
+    def setupDocument(documentURL: String): Unit = setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
+    def setupDocument(xhtml: Elem): Unit = setupDocument(Dom4jUtils.readDom4j(xhtml.toString))
 
+    def setupDocument(xhtml: JDocument) {
         ResourceManagerTestBase.staticSetup()
 
         this.pipelineContext = createPipelineContextWithExternalContext()
 
-        val staticState= XFormsStaticStateTest.getStaticState(documentURL)
+        val staticState = XFormsStaticStateTest.getStaticState(xhtml)
         this.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null)
 
         document.afterInitialResponse()
@@ -61,7 +68,6 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
         document = null
         pipelineContext = null
     }
-
 
     @Test def testTypeInvalid {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
@@ -174,7 +180,24 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
     @Test def testMultipleBindsOnSameNode {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
-        setupDocument("oxf:/org/orbeon/oxf/xforms/analysis/mips-multiple.xhtml")
+        this setupDocument
+            <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true">
+                        <xf:instance id="instance">
+                            <value>0</value>
+                        </xf:instance>
+                        <xf:bind ref="instance()" readonly=". mod 2 = 1"/>
+                        <xf:bind ref="instance()" constraint=". idiv 10 mod 2 = 1"/>
+                        <xf:bind ref="instance()" required=". idiv 100 mod 2 = 1"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="input" ref="instance()"/>
+                </xh:body>
+            </xh:html>
 
         // Test all combinations of MIPs
         for {

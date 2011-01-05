@@ -268,6 +268,10 @@ public class Dom4jUtils {
         return saxReader.read(stringReader);
     }
 
+    public static Document readDom4j(String xmlString) throws SAXException, DocumentException {
+        return readDom4j(xmlString, false, false);
+    }
+
     public static Document readDom4j(InputStream inputStream, String uri, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader(validating, handleXInclude);
         return saxReader.read(inputStream, uri);

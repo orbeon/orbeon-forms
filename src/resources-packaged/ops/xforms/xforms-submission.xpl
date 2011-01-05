@@ -163,7 +163,7 @@
 
                     <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association.
                          Remove it here so as to not grow the session each time a submission is called. -->
-                    <xsl:value-of select="context:removeFromSession(concat('oxf.xforms.state.manager.uuid-key.', $dynamic-state/@uuid))"/>
+                    <xsl:value-of select="context:removeFromSession(concat('oxf.xforms.state.manager.uuid-key.', $dynamic-state/*/@uuid))"/>
                     
                     <!-- Copy out the last instance from the dynamic state -->
                     <xsl:copy-of select="saxon:parse($dynamic-state/dynamic-state/instances/instance[last()])"/>

@@ -36,12 +36,11 @@ class XXFormsScriptAction extends XFormsAction {
         // Get prefixed id of the xxforms:script element based on its location
         val actionPrefixedId = actionInterpreter.getXBLContainer.getFullPrefix + actionElement.attributeValue(XFormsConstants.ID_QNAME)
 
-        if ("server" == actionElement.attributeValue("runat")) {
-            // Run on server
-            containingDocument.getScriptInterpreter.runScript(propertyContext, actionPrefixedId)
-        } else {
-            // Run on client
-            containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver)
+        actionElement.attributeValue("runat") match {
+            case "server" => // run on server
+                containingDocument.getScriptInterpreter.runScript(propertyContext, actionPrefixedId)
+            case _ => // run on client
+                containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver)
         }
     }
 }

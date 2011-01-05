@@ -187,9 +187,9 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
             setControlValue("input", value)
 
             // Check all MIPs
-            assert(isReadonly("input") == readonly)
-            assert(isValid("input") == valid)
-            assert(isRequired("input") == required)
+            assert(isReadonly("input") === readonly)
+            assert(isValid("input") === valid)
+            assert(isRequired("input") === required)
         }
     }
 

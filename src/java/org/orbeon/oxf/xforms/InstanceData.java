@@ -59,6 +59,8 @@ public class InstanceData {// rename to DataNodeProperties once done
             instanceData.bindNodes = new ArrayList<XFormsModelBinds.Bind.BindNode>(4); // hoping that situations where many binds point to same node are rare
             instanceData.bindNodes.add(oldBindNode);
             instanceData.bindNodes.add(bindNode);
+        } else {
+            instanceData.bindNodes.add(bindNode);
         }
     }
 

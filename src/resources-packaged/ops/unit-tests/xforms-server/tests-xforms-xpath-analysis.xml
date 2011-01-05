@@ -1274,7 +1274,7 @@
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
-        <input name="form" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xml"/>
+        <input name="form" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml"/>
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <output scope="" prefixed-id="output1" model-prefixed-id="model1" binding="false" value="true">

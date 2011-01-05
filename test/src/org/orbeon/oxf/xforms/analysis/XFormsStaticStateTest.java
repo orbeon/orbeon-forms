@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.Document;
+import org.junit.Assume;
 import org.junit.Test;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -23,7 +24,10 @@ import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TeeXMLReceiver;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
 import java.util.HashMap;
@@ -37,7 +41,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
     @Test
     public void testLHHAAnalysis() {
 //        if (Version.instance().isPE()) { // only test this feature if we are the PE version
-//            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xml");
+//            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xhtml");
 //            final Map<String, String> namespaces = new HashMap<String, String>();
 //            namespaces.put("", "");
 //
@@ -57,364 +61,364 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
     @Test
     public void testBindAnalysis() {
-        if (Version.isPE()) { // only test this feature if we are the PE version
-            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xml");
+        Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
+
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xhtml");
 
 //            final PipelineContext pipelineContext = new PipelineContext();
 //            staticState.dumpAnalysis(pipelineContext);
 
-            // TODO: test computedBindExpressionsInstances and validationBindInstances
-            {
-                final Model model1 = staticState.getModel("model1");
-                assertTrue(model1.figuredAllBindRefAnalysis());
+        // TODO: test computedBindExpressionsInstances and validationBindInstances
+        {
+            final Model model1 = staticState.getModel("model1");
+            assertTrue(model1.figuredAllBindRefAnalysis());
 
-                assertTrue(model1.bindInstances().contains("instance11"));
-                assertTrue(model1.bindInstances().contains("instance12"));
-                assertTrue(model1.bindInstances().contains("instance13"));
-            }
-            {
-                final Model model2 = staticState.getModel("model2");
-                assertTrue(model2.figuredAllBindRefAnalysis());
+            assertTrue(model1.bindInstances().contains("instance11"));
+            assertTrue(model1.bindInstances().contains("instance12"));
+            assertTrue(model1.bindInstances().contains("instance13"));
+        }
+        {
+            final Model model2 = staticState.getModel("model2");
+            assertTrue(model2.figuredAllBindRefAnalysis());
 
-                assertFalse(model2.bindInstances().contains("instance21"));
-            }
-            {
-                final Model model3 = staticState.getModel("model3");
-                assertTrue(model3.figuredAllBindRefAnalysis());
+            assertFalse(model2.bindInstances().contains("instance21"));
+        }
+        {
+            final Model model3 = staticState.getModel("model3");
+            assertTrue(model3.figuredAllBindRefAnalysis());
 
-                assertFalse(model3.bindInstances().contains("instance31"));
-                assertTrue(model3.bindInstances().contains("instance32"));
-            }
-            {
-                final Model model4 = staticState.getModel("model4");
-                assertTrue(model4.figuredAllBindRefAnalysis());
+            assertFalse(model3.bindInstances().contains("instance31"));
+            assertTrue(model3.bindInstances().contains("instance32"));
+        }
+        {
+            final Model model4 = staticState.getModel("model4");
+            assertTrue(model4.figuredAllBindRefAnalysis());
 
-                assertTrue(model4.bindInstances().contains("instance41"));
-                assertFalse(model4.bindInstances().contains("instance42"));
-            }
-            {
-                final Model model5 = staticState.getModel("model5");
-                assertTrue(model5.figuredAllBindRefAnalysis());
+            assertTrue(model4.bindInstances().contains("instance41"));
+            assertFalse(model4.bindInstances().contains("instance42"));
+        }
+        {
+            final Model model5 = staticState.getModel("model5");
+            assertTrue(model5.figuredAllBindRefAnalysis());
 
-                assertTrue(model5.validationBindInstances().contains("instance51"));
-                assertFalse(model5.computedBindExpressionsInstances().contains("instance51"));
+            assertTrue(model5.validationBindInstances().contains("instance51"));
+            assertFalse(model5.computedBindExpressionsInstances().contains("instance51"));
 
-                assertFalse(model5.validationBindInstances().contains("instance52"));
-                assertTrue(model5.computedBindExpressionsInstances().contains("instance52"));
-            }
+            assertFalse(model5.validationBindInstances().contains("instance52"));
+            assertTrue(model5.computedBindExpressionsInstances().contains("instance52"));
         }
     }
 
     @Test
     public void testXPathAnalysis() {
-        if (Version.isPE()) { // only test this feature if we are the PE version
-            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xml");
-            final Map<String, String> namespaces = new HashMap<String, String>();
-            namespaces.put("", "");
+        Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
 
-            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xhtml");
+        final Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("", "");
 
-            final PipelineContext pipelineContext = new PipelineContext();
-            staticState.dumpAnalysis(pipelineContext);
+        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
-            // == Value change to default ==================================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("default", namespaces, "a");
+        final PipelineContext pipelineContext = new PipelineContext();
+        staticState.dumpAnalysis(pipelineContext);
 
-            assertFalse(dependencies.requireBindingUpdate("trigger1"));
-            assertFalse(dependencies.requireBindingUpdate("trigger2"));
+        // == Value change to default ==================================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("default", namespaces, "a");
 
-            assertFalse(dependencies.requireBindingUpdate("select1"));
-            assertTrue(dependencies.requireValueUpdate("select1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
-            assertTrue(dependencies.requireBindingUpdate("group2"));
-    //        assertTrue(dependencies.requireValueUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("select1"));
+        assertTrue(dependencies.requireValueUpdate("select1"));
 
-            assertTrue(dependencies.requireBindingUpdate("select2"));
-            assertTrue(dependencies.requireValueUpdate("select2"));
+        assertTrue(dependencies.requireBindingUpdate("group2"));
+//        assertTrue(dependencies.requireValueUpdate("group2"));
 
+        assertTrue(dependencies.requireBindingUpdate("select2"));
+        assertTrue(dependencies.requireValueUpdate("select2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-    //        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select3"));
-            assertFalse(dependencies.requireValueUpdate("select3"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+//        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("group4"));
-    //        assertFalse(dependencies.requireValueUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("select3"));
+        assertFalse(dependencies.requireValueUpdate("select3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select4"));
-            assertFalse(dependencies.requireValueUpdate("select4"));
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+//        assertFalse(dependencies.requireValueUpdate("group4"));
 
-            dependencies.refreshDone();
+        assertFalse(dependencies.requireBindingUpdate("select4"));
+        assertFalse(dependencies.requireValueUpdate("select4"));
 
-            // == Value change to default ==================================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("default", namespaces, "b");
+        dependencies.refreshDone();
 
-            assertFalse(dependencies.requireBindingUpdate("trigger1"));
-            assertFalse(dependencies.requireBindingUpdate("trigger2"));
+        // == Value change to default ==================================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("default", namespaces, "b");
 
-            assertFalse(dependencies.requireBindingUpdate("select1"));
-            assertFalse(dependencies.requireValueUpdate("select1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group2"));
-    //        assertFalse(dependencies.requireValueUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("select1"));
+        assertFalse(dependencies.requireValueUpdate("select1"));
 
-            assertFalse(dependencies.requireBindingUpdate("select2"));
-            assertTrue(dependencies.requireValueUpdate("select2"));
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+//        assertFalse(dependencies.requireValueUpdate("group2"));
 
+        assertFalse(dependencies.requireBindingUpdate("select2"));
+        assertTrue(dependencies.requireValueUpdate("select2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-    //        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select3"));
-            assertFalse(dependencies.requireValueUpdate("select3"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+//        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("group4"));
-    //        assertFalse(dependencies.requireValueUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("select3"));
+        assertFalse(dependencies.requireValueUpdate("select3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select4"));
-            assertFalse(dependencies.requireValueUpdate("select4"));
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+//        assertFalse(dependencies.requireValueUpdate("group4"));
 
-            dependencies.refreshDone();
+        assertFalse(dependencies.requireBindingUpdate("select4"));
+        assertFalse(dependencies.requireValueUpdate("select4"));
 
-            // == Value change to instance2 ================================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("instance2", namespaces, "a");
+        dependencies.refreshDone();
 
-            assertFalse(dependencies.requireBindingUpdate("trigger1"));
-            assertFalse(dependencies.requireBindingUpdate("trigger2"));
+        // == Value change to instance2 ================================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("instance2", namespaces, "a");
 
-            assertFalse(dependencies.requireBindingUpdate("select1"));
-            assertFalse(dependencies.requireValueUpdate("select1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group2"));
-    //        assertFalse(dependencies.requireValueUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("select1"));
+        assertFalse(dependencies.requireValueUpdate("select1"));
 
-            assertFalse(dependencies.requireBindingUpdate("select2"));
-            assertFalse(dependencies.requireValueUpdate("select2"));
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+//        assertFalse(dependencies.requireValueUpdate("group2"));
 
+        assertFalse(dependencies.requireBindingUpdate("select2"));
+        assertFalse(dependencies.requireValueUpdate("select2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-    //        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select3"));
-            assertTrue(dependencies.requireValueUpdate("select3"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+//        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertTrue(dependencies.requireBindingUpdate("group4"));
-    //        assertFalse(dependencies.requireValueUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("select3"));
+        assertTrue(dependencies.requireValueUpdate("select3"));
 
-            assertTrue(dependencies.requireBindingUpdate("select4"));
-            assertTrue(dependencies.requireValueUpdate("select4"));
+        assertTrue(dependencies.requireBindingUpdate("group4"));
+//        assertFalse(dependencies.requireValueUpdate("group4"));
 
-            dependencies.refreshDone();
+        assertTrue(dependencies.requireBindingUpdate("select4"));
+        assertTrue(dependencies.requireValueUpdate("select4"));
 
-            // == Value change to instance2 ================================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("instance2", namespaces, "b");
+        dependencies.refreshDone();
 
-            assertFalse(dependencies.requireBindingUpdate("trigger1"));
-            assertFalse(dependencies.requireBindingUpdate("trigger2"));
+        // == Value change to instance2 ================================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("instance2", namespaces, "b");
 
-            assertFalse(dependencies.requireBindingUpdate("select1"));
-            assertFalse(dependencies.requireValueUpdate("select1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group2"));
-    //        assertFalse(dependencies.requireValueUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("select1"));
+        assertFalse(dependencies.requireValueUpdate("select1"));
 
-            assertFalse(dependencies.requireBindingUpdate("select2"));
-            assertFalse(dependencies.requireValueUpdate("select2"));
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+//        assertFalse(dependencies.requireValueUpdate("group2"));
 
+        assertFalse(dependencies.requireBindingUpdate("select2"));
+        assertFalse(dependencies.requireValueUpdate("select2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-    //        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select3"));
-            assertFalse(dependencies.requireValueUpdate("select3"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+//        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("group4"));
-    //        assertFalse(dependencies.requireValueUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("select3"));
+        assertFalse(dependencies.requireValueUpdate("select3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select4"));
-            assertTrue(dependencies.requireValueUpdate("select4"));
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+//        assertFalse(dependencies.requireValueUpdate("group4"));
 
-            dependencies.refreshDone();
+        assertFalse(dependencies.requireBindingUpdate("select4"));
+        assertTrue(dependencies.requireValueUpdate("select4"));
 
-            // == Structural change to model1 ==============================================================================
-            dependencies.refreshStart();
-            dependencies.markStructuralChangeTest("model1");
+        dependencies.refreshDone();
 
-            assertTrue(dependencies.requireBindingUpdate("trigger1"));
-            assertFalse(dependencies.requireBindingUpdate("trigger2"));
+        // == Structural change to model1 ==============================================================================
+        dependencies.refreshStart();
+        dependencies.markStructuralChangeTest("model1");
 
-            assertTrue(dependencies.requireBindingUpdate("select1"));
-            assertTrue(dependencies.requireValueUpdate("select1"));
+        assertTrue(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
-            assertTrue(dependencies.requireBindingUpdate("group2"));
-    //        assertTrue(dependencies.requireValueUpdate("group2"));
+        assertTrue(dependencies.requireBindingUpdate("select1"));
+        assertTrue(dependencies.requireValueUpdate("select1"));
 
-            assertTrue(dependencies.requireBindingUpdate("select2"));
-            assertTrue(dependencies.requireValueUpdate("select2"));
+        assertTrue(dependencies.requireBindingUpdate("group2"));
+//        assertTrue(dependencies.requireValueUpdate("group2"));
 
+        assertTrue(dependencies.requireBindingUpdate("select2"));
+        assertTrue(dependencies.requireValueUpdate("select2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-    //        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select3"));
-            assertFalse(dependencies.requireValueUpdate("select3"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+//        assertFalse(dependencies.requireValueUpdate("group3"));
 
-            assertFalse(dependencies.requireBindingUpdate("group4"));
-    //        assertFalse(dependencies.requireValueUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("select3"));
+        assertFalse(dependencies.requireValueUpdate("select3"));
 
-            assertFalse(dependencies.requireBindingUpdate("select4"));
-            assertFalse(dependencies.requireValueUpdate("select4"));
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+//        assertFalse(dependencies.requireValueUpdate("group4"));
 
-            dependencies.refreshDone();
+        assertFalse(dependencies.requireBindingUpdate("select4"));
+        assertFalse(dependencies.requireValueUpdate("select4"));
 
-            // == Structural change to model2 ==============================================================================
-            dependencies.refreshStart();
-            dependencies.markStructuralChangeTest("model2");
+        dependencies.refreshDone();
 
-            assertFalse(dependencies.requireBindingUpdate("trigger1"));
-            assertTrue(dependencies.requireBindingUpdate("trigger2"));
+        // == Structural change to model2 ==============================================================================
+        dependencies.refreshStart();
+        dependencies.markStructuralChangeTest("model2");
 
-            assertFalse(dependencies.requireBindingUpdate("select1"));
-            assertFalse(dependencies.requireValueUpdate("select1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertTrue(dependencies.requireBindingUpdate("trigger2"));
 
-            assertFalse(dependencies.requireBindingUpdate("group2"));
-    //        assertFalse(dependencies.requireValueUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("select1"));
+        assertFalse(dependencies.requireValueUpdate("select1"));
 
-            assertFalse(dependencies.requireBindingUpdate("select2"));
-            assertFalse(dependencies.requireValueUpdate("select2"));
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+//        assertFalse(dependencies.requireValueUpdate("group2"));
 
+        assertFalse(dependencies.requireBindingUpdate("select2"));
+        assertFalse(dependencies.requireValueUpdate("select2"));
 
-            assertTrue(dependencies.requireBindingUpdate("group3"));
-    //        assertTrue(dependencies.requireValueUpdate("group3"));
 
-            assertTrue(dependencies.requireBindingUpdate("select3"));
-            assertTrue(dependencies.requireValueUpdate("select3"));
+        assertTrue(dependencies.requireBindingUpdate("group3"));
+//        assertTrue(dependencies.requireValueUpdate("group3"));
 
-            assertTrue(dependencies.requireBindingUpdate("group4"));
-    //        assertTrue(dependencies.requireValueUpdate("group4"));
+        assertTrue(dependencies.requireBindingUpdate("select3"));
+        assertTrue(dependencies.requireValueUpdate("select3"));
 
-            assertTrue(dependencies.requireBindingUpdate("select4"));
-            assertTrue(dependencies.requireValueUpdate("select4"));
+        assertTrue(dependencies.requireBindingUpdate("group4"));
+//        assertTrue(dependencies.requireValueUpdate("group4"));
 
-            dependencies.refreshDone();
-        }
+        assertTrue(dependencies.requireBindingUpdate("select4"));
+        assertTrue(dependencies.requireValueUpdate("select4"));
+
+        dependencies.refreshDone();
     }
 
     @Test
     public void testVariables() {
-        if (Version.isPE()) { // only test this feature if we are the PE version
-            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xml");
-            final Map<String, String> namespaces = new HashMap<String, String>();
-            namespaces.put("", "");
+        Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
 
-            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xhtml");
+        final Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("", "");
+
+        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
 //            final PipelineContext pipelineContext = new PipelineContext();
 //            staticState.dumpAnalysis(pipelineContext);
 
-            // == Value change to default ==================================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("default", namespaces, "value");
+        // == Value change to default ==================================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("default", namespaces, "value");
 
-            assertFalse(dependencies.requireBindingUpdate("values"));
-            assertTrue(dependencies.requireValueUpdate("values"));
+        assertFalse(dependencies.requireBindingUpdate("values"));
+        assertTrue(dependencies.requireValueUpdate("values"));
 
-            assertFalse(dependencies.requireBindingUpdate("repeat"));
+        assertFalse(dependencies.requireBindingUpdate("repeat"));
 
-            assertFalse(dependencies.requireBindingUpdate("value"));
-            assertTrue(dependencies.requireValueUpdate("value"));
+        assertFalse(dependencies.requireBindingUpdate("value"));
+        assertTrue(dependencies.requireValueUpdate("value"));
 
-            assertFalse(dependencies.requireBindingUpdate("input"));
-            assertTrue(dependencies.requireValueUpdate("input"));
-            dependencies.refreshDone();
-        }
+        assertFalse(dependencies.requireBindingUpdate("input"));
+        assertTrue(dependencies.requireValueUpdate("input"));
+        dependencies.refreshDone();
     }
     
     @Test
     public void testModelVariables() {
-        if (Version.isPE()) { // only test this feature if we are the PE version
-            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xml");
-            final Map<String, String> namespaces = new HashMap<String, String>();
-            namespaces.put("", "");
-            
-            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
+        Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
+
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml");
+        final Map<String, String> namespaces = new HashMap<String, String>();
+        namespaces.put("", "");
+
+        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
 //            final PipelineContext pipelineContext = new PipelineContext();
 //            staticState.dumpAnalysis(pipelineContext);
 
-            // == Value change to instance1 ============================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("instance1", namespaces, "");
+        // == Value change to instance1 ============================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("instance1", namespaces, "");
 
-            // No binding update
-            assertFalse(dependencies.requireBindingUpdate("output1"));
-            assertFalse(dependencies.requireBindingUpdate("group2"));
-            assertFalse(dependencies.requireBindingUpdate("output2a"));
-            assertFalse(dependencies.requireBindingUpdate("output2b"));
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-            assertFalse(dependencies.requireBindingUpdate("output3a"));
-            assertFalse(dependencies.requireBindingUpdate("output3b"));
-            // TODO: group4 has @context attribute so not analyzed
+        // No binding update
+        assertFalse(dependencies.requireBindingUpdate("output1"));
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("output2a"));
+        assertFalse(dependencies.requireBindingUpdate("output2b"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+        assertFalse(dependencies.requireBindingUpdate("output3a"));
+        assertFalse(dependencies.requireBindingUpdate("output3b"));
+        // TODO: group4 has @context attribute so not analyzed
 //            assertFalse(dependencies.requireBindingUpdate("group4"));
 //            assertFalse(dependencies.requireBindingUpdate("output4a"));
 //            assertFalse(dependencies.requireBindingUpdate("output4b"));
 
-            // $mv pointing to model1 must update their value
-            assertTrue(dependencies.requireValueUpdate("output1"));
-            assertTrue(dependencies.requireValueUpdate("output2b"));
-            assertTrue(dependencies.requireValueUpdate("output3a"));
-            assertTrue(dependencies.requireValueUpdate("output3b"));
-            assertTrue(dependencies.requireValueUpdate("output4a"));
-            assertTrue(dependencies.requireValueUpdate("output4b"));
-            assertTrue(dependencies.requireValueUpdate("output5a"));
+        // $mv pointing to model1 must update their value
+        assertTrue(dependencies.requireValueUpdate("output1"));
+        assertTrue(dependencies.requireValueUpdate("output2b"));
+        assertTrue(dependencies.requireValueUpdate("output3a"));
+        assertTrue(dependencies.requireValueUpdate("output3b"));
+        assertTrue(dependencies.requireValueUpdate("output4a"));
+        assertTrue(dependencies.requireValueUpdate("output4b"));
+        assertTrue(dependencies.requireValueUpdate("output5a"));
 
-            // $mv pointing to model2 must not update
-            assertFalse(dependencies.requireValueUpdate("output2a"));
-            assertFalse(dependencies.requireValueUpdate("output3c"));
-            assertFalse(dependencies.requireValueUpdate("output4c"));
-            assertFalse(dependencies.requireValueUpdate("output5b"));
+        // $mv pointing to model2 must not update
+        assertFalse(dependencies.requireValueUpdate("output2a"));
+        assertFalse(dependencies.requireValueUpdate("output3c"));
+        assertFalse(dependencies.requireValueUpdate("output4c"));
+        assertFalse(dependencies.requireValueUpdate("output5b"));
 
-            dependencies.refreshDone();
-            
-            // == Value change to instance2 ============================================================================
-            dependencies.refreshStart();
-            dependencies.setModifiedPathTest("instance2", namespaces, "");
+        dependencies.refreshDone();
 
-            // No binding update
-            assertFalse(dependencies.requireBindingUpdate("output1"));
-            assertFalse(dependencies.requireBindingUpdate("group2"));
-            assertFalse(dependencies.requireBindingUpdate("output2a"));
-            assertFalse(dependencies.requireBindingUpdate("output2b"));
-            assertFalse(dependencies.requireBindingUpdate("group3"));
-            assertFalse(dependencies.requireBindingUpdate("output3a"));
-            assertFalse(dependencies.requireBindingUpdate("output3b"));
-            // TODO: group4 has @context attribute so not analyzed
+        // == Value change to instance2 ============================================================================
+        dependencies.refreshStart();
+        dependencies.setModifiedPathTest("instance2", namespaces, "");
+
+        // No binding update
+        assertFalse(dependencies.requireBindingUpdate("output1"));
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+        assertFalse(dependencies.requireBindingUpdate("output2a"));
+        assertFalse(dependencies.requireBindingUpdate("output2b"));
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+        assertFalse(dependencies.requireBindingUpdate("output3a"));
+        assertFalse(dependencies.requireBindingUpdate("output3b"));
+        // TODO: group4 has @context attribute so not analyzed
 //            assertFalse(dependencies.requireBindingUpdate("group4"));
 //            assertFalse(dependencies.requireBindingUpdate("output4a"));
 //            assertFalse(dependencies.requireBindingUpdate("output4b"));
 
-            // $mv pointing to model1 must not update their value
-            assertFalse(dependencies.requireValueUpdate("output1"));
-            assertFalse(dependencies.requireValueUpdate("output2b"));
-            assertFalse(dependencies.requireValueUpdate("output3a"));
-            assertFalse(dependencies.requireValueUpdate("output3b"));
-            assertFalse(dependencies.requireValueUpdate("output4a"));
-            assertFalse(dependencies.requireValueUpdate("output4b"));
-            assertFalse(dependencies.requireValueUpdate("output5a"));
+        // $mv pointing to model1 must not update their value
+        assertFalse(dependencies.requireValueUpdate("output1"));
+        assertFalse(dependencies.requireValueUpdate("output2b"));
+        assertFalse(dependencies.requireValueUpdate("output3a"));
+        assertFalse(dependencies.requireValueUpdate("output3b"));
+        assertFalse(dependencies.requireValueUpdate("output4a"));
+        assertFalse(dependencies.requireValueUpdate("output4b"));
+        assertFalse(dependencies.requireValueUpdate("output5a"));
 
-            // $mv pointing to model2 must update
-            assertTrue(dependencies.requireValueUpdate("output2a"));
-            assertTrue(dependencies.requireValueUpdate("output3c"));
-            assertTrue(dependencies.requireValueUpdate("output4c"));
-            assertTrue(dependencies.requireValueUpdate("output5b"));
+        // $mv pointing to model2 must update
+        assertTrue(dependencies.requireValueUpdate("output2a"));
+        assertTrue(dependencies.requireValueUpdate("output3c"));
+        assertTrue(dependencies.requireValueUpdate("output4c"));
+        assertTrue(dependencies.requireValueUpdate("output5b"));
 
-            dependencies.refreshDone();
-        }
+        dependencies.refreshDone();
     }
 
     /**

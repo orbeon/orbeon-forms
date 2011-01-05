@@ -597,7 +597,7 @@
     <test description="Model switching and model variables" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <!-- Reuse document used by other tests -->
-        <input name="document" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xml"/>
+        <input name="document" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml"/>
         <!-- FIXME: output2b should be 42. See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315410&group_id=168&atid=350207 -->
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">

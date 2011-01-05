@@ -2009,7 +2009,7 @@ ORBEON.xforms.Controls = {
             var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
             // Set values in DOM
             var upload = ORBEON.xforms.Page.getControl(control);
-            upload.setState(attribute1);
+            if (attribute1) upload.setState(attribute1);
             if (attribute2 != null)
                 ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
             if (attribute3 != null)

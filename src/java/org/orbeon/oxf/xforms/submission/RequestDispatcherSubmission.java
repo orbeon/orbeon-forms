@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,8 +15,14 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -246,7 +252,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
             effectiveResource = resource;
         }
 
-        final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(resource, isContextRelative);
+        final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(effectiveResource, isContextRelative);
         final boolean isDefaultContext = requestDispatcher.isDefaultContext();
 
         return openLocalConnection(propertyContext, externalContext, indentedLogger, containingDocument.getResponse(),

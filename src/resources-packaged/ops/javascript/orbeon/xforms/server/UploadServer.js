@@ -22,11 +22,12 @@
     var UploadServer = ORBEON.xforms.server.UploadServer;
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
     var Connect = YAHOO.util.Connect;
+    var YD = YAHOO.util.Dom;
 
     // While an upload is in progress, the YUI object for that connection
     UploadServer.yuiConnection = null;
-    // While an upload is in progress, the events for the fields being uploaded
-    UploadServer.processingEvents = [];
+    // While an upload is in progress, the event for the field being uploaded
+    UploadServer.processingEvent = null;
     // While an upload is in progress, the events for the fields that are left to be uploaded
     UploadServer.remainingEvents = [];
     // While an upload is in progress, call-back function when we are done processing all the events
@@ -38,10 +39,8 @@
      * @private
      */
     UploadServer.uploadSuccess = function(o) {
-        // Clear server events that were sent to the server (why? is this still needed?)
-        ORBEON.xforms.Globals.formServerEvents[form.id].value = "";
-        // Clear upload fields we just uploaded, otherwise subsequent uploads will upload the same data again
-        _.each(this.processingEvents, function(event) { event.upload.clear(); });
+        // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+        this.processingEvent.upload.clear();
         // The Ajax response typically contains information about each file (name, size, etc)
         AjaxServer.handleResponseAjax(o);
         // Are we done, or do we still need to handle events for other forms?
@@ -50,7 +49,7 @@
 
     /**
      * Once we are done processing the events (either because the uploads have been completed or canceled), handle the
-     * remaining events (which were for other forms).
+     * remaining events.
      */
     UploadServer.continueWithRemainingEvents = function() {
         if (this.remainingEvents.length == 0) this.executionQueueDone();
@@ -65,22 +64,29 @@
      */
     UploadServer.asyncUploadRequest = function(events, done) {
         this.executionQueueDone = done;
-        // Upload is done by form, so we pick the form of the first event as the one for which we handle the events
-        var form = events[0].form;
-        this.processingEvents = _.filter(events, function(event) { return event.form = form; });
-        this.remainingEvents = _.filter(events, function(event) { return event.form != form; });
+        this.processingEvent = events[0];
+        this.remainingEvents = _.tail(events);
         // Switch the upload to progress state, so users can't change the file and know the upload is in progress
-        _.each(this.processingEvents, function(event) { event.upload.setState("progress"); });
+        this.processingEvent.upload.setState("progress");
         // Tell server we're starting uploads
-        var uploadStartEvents = _.map(this.processingEvents, function(event) {
-            return new AjaxServer.Event(null, event.upload.container.id, null, null, "xxforms-upload-start"); });
-        AjaxServer.fireEvents(uploadStartEvents, false);
+        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, null, "xxforms-upload-start")], false);
+        // Disabling fields other than the one we want to upload
+        var disabledElements = _.filter(this.processingEvent.form.elements, function(element) {
+            // Keep in form post the $uuid element and input for this upload
+            var keep = element.name == "$uuid" || (YD.hasClass(element, "xforms-upload-select")
+                    && element.name == this.processingEvent.upload.container.id);
+            // Disable elements we don't keep and that are not disabled already
+            if (! keep && ! element.disabled) { element.disabled = true; return true; }
+            else return false;
+        }, this);
         // Trigger actual upload through a form POST
-        Connect.setForm(form, true, true);
-        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[form.id], {
+        Connect.setForm(this.processingEvent.form, true, true);
+        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id], {
             upload: _.bind(this.uploadSuccess, this),
             failure: _.bind(AjaxServer.retryRequestAfterDelay, AjaxServer, _.bind(UploadServer.asyncUploadRequest, UploadServer, events, done))
         });
+        // Enable the controls we previously disabled
+        _.each(disabledElements, function(element) { element.disabled = false; });
     };
 
     /**
@@ -91,12 +97,9 @@
      */
     UploadServer.cancel = function() {
         Connect.abort(UploadServer.yuiConnection);
-        var uploadCancelEvents =_.map(this.processingEvents, function(event) {
-            event.upload.clear();
-            event.upload.setState("empty");
-            return new AjaxServer.Event(null, event.upload.container.id, null, null, "xxforms-upload-cancel");
-        });
-        AjaxServer.fireEvents(uploadCancelEvents, false);
+        this.processingEvent.upload.clear();
+        this.processingEvent.upload.setState("empty");
+        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, null, "xxforms-upload-cancel")], false);
         this.continueWithRemainingEvents();
     };
 

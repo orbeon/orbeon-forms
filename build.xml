@@ -35,8 +35,8 @@
 
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
-            <pathelement location="${lib.dir}/scala-compiler.jar"/>
-            <pathelement location="${lib.dir}/scala-library.jar"/>
+            <pathelement location="${lib.dir}/scala-compiler-2.8.1.jar"/>
+            <pathelement location="${lib.dir}/scala-library-2.8.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -125,7 +125,7 @@
         <include name="exist-dependency-lucene-regex-2.9.2.jar"/>
         <include name="exist-dependency-resolver-1.2.jar"/>
 
-        <include name="scala-library.jar"/>
+        <include name="scala-library-2.8.1.jar"/>
         <include name="rhino-1.7R2.jar"/>
 
         <include name="flyingsaucer-core-renderer_orbeon_20100512.jar"/>

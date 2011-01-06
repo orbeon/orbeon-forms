@@ -4,7 +4,7 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="scala-2.8.0" />
+        <option name="compilerLibraryName" value="Scala 2.8.1" />
       </configuration>
     </facet>
   </component>
@@ -22,10 +22,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Orbeon Forms" level="project" />
-    <orderEntry type="library" name="scala-2.8.0" level="project" />
+    <orderEntry type="library" name="Scala 2.8.1" level="project" />
     <orderEntry type="library" name="Saxon" level="application" />
-    <orderEntry type="library" name="eXist" level="application" />
-    <orderEntry type="library" name="HttpClient" level="application" />
+    <orderEntry type="library" name="ScalaTest" level="application" />
+    <orderEntry type="library" name="Rhino" level="application" />
   </component>
 </module>
 

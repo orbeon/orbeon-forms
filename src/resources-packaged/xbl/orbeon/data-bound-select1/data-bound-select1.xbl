@@ -34,27 +34,37 @@
                 div.xbl-fr-data-bound-select1 { display: inline; }
             </xbl:style>
         </xbl:resources>
+        <xbl:implementation>
+            <xforms:model id="xbl-model">
+                <!-- Contains the data from which the itemset is populated -->
+                <xforms:instance id="itemset"><dummy/></xforms:instance>
+                <xforms:instance id="resource"><resource/></xforms:instance>
+                <!-- What do when doing a refresh -->
+                <xforms:submission id="get-itemset" method="get" resource="{instance('resource')}" replace="instance" serialization="none">
+                    <xforms:action ev:event="xforms-submit-error">
+                        <xforms:insert nodeset="instance('itemset')" origin="xxforms:element('dummy')"/>
+                    </xforms:action>
+                </xforms:submission>
+            </xforms:model>
+        </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxforms:internal" xsl:version="2.0">
 
                 <xxforms:variable name="result" as="node()?" select="."/>
 
-                <!-- Local model -->
-                <xforms:model id="xbl-model" xxbl:scope="inner">
-                    <!-- Contains the data from which the itemset is populated -->
-                    <xforms:instance id="itemset"><dummy/></xforms:instance>
-                    <!-- What do when doing a refresh -->
-                    <xxforms:variable name="resource" xbl:attr="xbl:text=resource"/>
-                    <xforms:submission id="get-itemset" method="get" resource="{{xxforms:component-context()/xxforms:evaluate-avt($resource)}}" replace="instance" serialization="none">
-                        <xforms:action ev:event="xforms-submit-error">
-                            <xforms:insert nodeset="instance('itemset')" origin="xxforms:element('dummy')"/>
-                        </xforms:action>
-                    </xforms:submission>
-                    <!-- Refresh itemset when initialized -->
-                    <xforms:send ev:event="xforms-model-construct-done" submission="get-itemset"/>
-                </xforms:model>
-
                 <xforms:group appearance="xxforms:internal">
+
+                    <!-- Save resource in model -->
+                    <xxforms:variable name="resource-avt" xbl:attr="xbl:text=resource"/>
+                    <xxforms:variable name="resource" xbl:attr="xbl:text=resource" xxbl:scope="inner">
+                        <xxforms:sequence select="xxforms:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+                        <xforms:action ev:event="xforms-enabled xforms-value-changed">
+                            <xforms:message level="modal" value="$resource-avt"/>
+                            <xforms:setvalue ref="instance('resource')" value="$resource"/>
+                            <xforms:send submission="get-itemset"/>
+                        </xforms:action>
+                    </xxforms:variable>
+
                     <!--  Create one xforms:output per dependency so we can detect the changes -->
                     <xsl:for-each select="/*/fr:dependency">
                         <xforms:output style="display: none">

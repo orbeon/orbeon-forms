@@ -271,7 +271,7 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
 .xforms-upload-size { padding-left: .5em; }
 .xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
 .xforms-upload-progress .xforms-upload-spinner, .xforms-upload-progress .xforms-upload-cancel { vertical-align: middle }
-.xforms-upload-progress .xforms-upload-cancel { padding-left: .5em; display: none }
+.xforms-upload-progress .xforms-upload-cancel { padding-left: .5em }
 .xforms-upload-progress .xforms-upload-spinner { background-image: url(../../ops/images/yui/loading.gif); width: 16px; height: 16px; display: inline-block }
 .xforms-readonly .xforms-upload-remove { display: none }
 

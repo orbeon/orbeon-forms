@@ -431,6 +431,7 @@
 
                         // Keep track of the events we have handled, so we can later remove them from the queue
                         var handledEvents = [];
+                        var remainingEvents = ORBEON.xforms.Globals.eventQueue;
 
                         // Add server-events, if any. Server excepts server-events in a separate elements before the
                         // <xxforms:action> which contains all the <xxforms:event>.
@@ -443,7 +444,7 @@
                                     requestDocumentString.push('<xxforms:server-events>');
                                     requestDocumentString.push(event.value);
                                     requestDocumentString.push('</xxforms:server-events>');
-                                    handledEvents.unshift(i);
+                                    remainingEvents = _.without(remainingEvents, event);
                                 }
                             }
                         }
@@ -482,7 +483,7 @@
                                     requestDocumentString.push(event.value);
                                 }
                                 requestDocumentString.push('</xxforms:event>\n');
-                                handledEvents.unshift(i);
+                                remainingEvents = _.without(remainingEvents, event);
                             }
                         }
 
@@ -493,9 +494,8 @@
                         // End request
                         requestDocumentString.push('</xxforms:event-request>');
 
-                        // Remove events we have handled from event queue
-                        for (var i = 0; i < handledEvents.length; i++)
-                            ORBEON.xforms.Globals.eventQueue.splice(handledEvents[i], 1);
+                        // New event queue now formed of the events we haven't just handled
+                        ORBEON.xforms.Globals.eventQueue = remainingEvents;
                     }
 
                     // Send request

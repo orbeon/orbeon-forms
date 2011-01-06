@@ -48,21 +48,25 @@
 
             // Register listener on the cancel link
             var cancelAnchor = this.getElementByClassName("xforms-upload-cancel");
-            Event.addListener(cancelAnchor, "click", this.cancel);
+            Event.addListener(cancelAnchor, "click", this.cancel, this, true);
         }
     };
 
     /**
-     * The change event corresponds to a file being selected.
+     * The change event corresponds to a file being selected. This will queue an event to submit this file in the
+     * background  as soon as possible (pseudo-Ajax request).
      */
     Upload.prototype.change = function() {
-        // Queue event to submit this file in the background  as soon as possible (pseudo-Ajax request)
-        UploadServer.uploadEventQueue.add({form: this.getForm(), upload: this}, Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
+        UploadServer.uploadEventQueue.add({form: this.getForm(), upload: this},
+                Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
     };
 
-    Upload.prototype.cancel = function() {
-        console.log("Aborting", UploadServer.yuiConnection);
-        YAHOO.util.Connect.abort(UploadServer.yuiConnection);
+    /**
+     * When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
+     */
+    Upload.prototype.cancel = function(event) {
+        Event.preventDefault(event);
+        UploadServer.cancel();
     };
 
     /**

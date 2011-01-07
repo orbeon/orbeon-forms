@@ -5505,7 +5505,7 @@ ORBEON.xforms.Init = {
                 constraintoviewport: true,
                 underlay: "none",
                 usearia: true,
-                role: "alertdialog"
+                role: "" // See bug 315634 http://goo.gl/54vzd
             });
             // Close the dialog when users click on document
             YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);
@@ -5520,12 +5520,16 @@ ORBEON.xforms.Init = {
                 constraintoviewport: true,
                 underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
                 usearia: true,
-                role: "alertdialog"
+                role: "" // See bug 315634 http://goo.gl/54vzd
             });
 			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);
             // Register listener for when the dialog is closed by a click on the "x"
             yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         }
+
+        // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
+        var dialogDiv = YAHOO.util.Dom.getElementsByClassName("xforms-dialog", "div", yuiDialog.element)[0];
+        dialogDiv.setAttribute("aria-live", "polite");
 
         // Move the dialog under the form element, as if the dialog is inside another absolute block it can be cropped
         // (can't escape that block), and in some cases the mask can show on top of the dialog (even if the z-index
@@ -5536,8 +5540,7 @@ ORBEON.xforms.Init = {
             form.appendChild(yuiDialog.element);
 
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
-        if (isVisible)
-            ORBEON.xforms.Controls.showDialog(dialog.id, null);
+        if (isVisible) ORBEON.xforms.Controls.showDialog(dialog.id, null);
     }
 };
 

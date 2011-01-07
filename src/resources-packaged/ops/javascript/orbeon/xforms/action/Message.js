@@ -48,13 +48,12 @@
                         isDefault: false
                     }],
                     usearia: true,
-                    role: "alertdialog"
+                    role: "" // See bug 315634 http://goo.gl/54vzd
                 });
                 this._messageDialog.setHeader("Message");
                 this._messageDialog.render(document.body);
 
-                // This is done for JAWS - Without this, on IE 7, JAWS only reads the "close button" when the dialog
-                // opens (it doesn't tell users that the dialog opened, and doesn't read the message).
+                // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
                 var dialogDiv = OD.get("xforms-message-dialog");
                 dialogDiv.setAttribute("aria-live", "polite");
             }, this, true);

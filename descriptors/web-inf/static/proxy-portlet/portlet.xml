@@ -1,4 +1,3 @@
-<?xml version="1.0" ?>
 <portlet-app>
 
     <!-- Orbeon Forms proxy portlet (to access a remote Form Runner instance) -->
@@ -34,7 +33,7 @@
         </init-param>
 
         <portlet-info>
-            <title>Orbeon Forms Form Runner Proxy Portlet</title>
+            <title>Orbeon Forms - Form Runner Proxy Portlet</title>
         </portlet-info>
     </portlet>
 

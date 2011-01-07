@@ -538,15 +538,17 @@
         </antcall>
     </target>
 
-    <target name="proxy-portlet-war" depends="classes" description="Create exploded proxy portlet WAR file">
-
-        <!--xxx-->
-        <!---->
-        <!--<antcall target="war"/>-->
-        <!--<antcall target="war-copy-descriptors">-->
-            <!--<param name="target" value="devel"/>-->
-            <!--<param name="build.root" value="${build.root}"/>-->
-        <!--</antcall>-->
+    <target name="proxy-portlet-war" depends="jars" description="Create proxy portlet WAR file">
+        <war destfile="${build.distrib.dir}/orbeon-proxy-portlet.war">
+            <webinf dir="descriptors/web-inf/static/proxy-portlet"/>
+            <lib dir="${build.lib.dir}">
+                <include name="orbeon.jar"/>
+                <include name="orbeon-xforms-filter.jar"/>
+            </lib>
+            <lib dir="${lib.dir}">
+                <include name="scala-library-2.8.1.jar"/>
+            </lib>
+        </war>
     </target>
 
     <!-- Zip sources file -->
@@ -752,35 +754,6 @@
         </junit>
     </target>
 
-    <target name="orbeon-doc" depends="jars,orbeon-css-templates">
-        <mkdir dir="${build.doc.dir}/reference"/>
-        <mkdir dir="${build.doc.dir}/reference/theme"/>
-        <java classname="org.orbeon.oxf.main.OPS" fork="false" failonerror="true">
-            <classpath>
-                <path refid="class.path"/>
-                <pathelement location="${resources-private.jar.file}"/>
-            </classpath>
-            <arg value="-r"/>
-            <arg value="${resources.dir}"/>
-            <arg value="oxf:/apps/doc/generate-static-html.xpl"/>
-        </java>
-        <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${resources-packaged.dir}/config">
-                <include name="theme/images/**"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${resources.dir}/apps/doc">
-                <include name="images/**/*.*"/>
-            </fileset>
-        </copy>
-        <copy toDir="${build.doc.dir}/reference/theme">
-            <fileset dir="${build.temp.dir}/theme">
-                <include name="*.css"/>
-            </fileset>
-        </copy>
-    </target>
-
     <target name="orbeon-dist-war" depends="jars">
         <mkdir dir="${build.distrib.dir}"/>
 
@@ -813,7 +786,7 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-javadoc, orbeon-src">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, orbeon-javadoc, orbeon-src">
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/${full.release.name}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
@@ -900,11 +873,13 @@
         <move file="${rsync.dir}/${full.release.name}.tgz" tofile="${rsync.dir}/${artifact.name}.tgz"/>
         <move file="${rsync.dir}/${full.release.name}.war" tofile="${rsync.dir}/${artifact.name}.war"/>
         <move file="${rsync.dir}/${full.release.name}-src.zip" tofile="${rsync.dir}/${artifact.name}-src.zip"/>
+        <move file="${rsync.dir}/orbeon-proxy-portlet.war" tofile="${rsync.dir}/${artifact.name}-proxy-portlet.war"/>
 
         <move file="${rsync.dir}/${full.release.name}.zip.MD5" tofile="${rsync.dir}/${artifact.name}.zip.MD5"/>
         <move file="${rsync.dir}/${full.release.name}.tgz.MD5" tofile="${rsync.dir}/${artifact.name}.tgz.MD5"/>
         <move file="${rsync.dir}/${full.release.name}.war.MD5" tofile="${rsync.dir}/${artifact.name}.war.MD5"/>
         <move file="${rsync.dir}/${full.release.name}-src.zip.MD5" tofile="${rsync.dir}/${artifact.name}-src.zip.MD5"/>
+        <move file="${rsync.dir}/orbeon-proxy-portlet.war.MD5" tofile="${rsync.dir}/${artifact.name}-proxy-portlet.war.MD5"/>
 
         <!-- Post the unstable build -->
         <exec executable="rsync" failonerror="true" dir="${rsync.dir}">
@@ -918,8 +893,10 @@
             <arg value="${artifact.name}.war.MD5"/>
             <arg value="${artifact.name}.zip"/>
             <arg value="${artifact.name}.zip.MD5"/>
-            <arg value="${artifact.name}-src.zip"/>
-            <arg value="${artifact.name}-src.zip.MD5"/>
+            <arg value="${artifact.name}-proxy-portlet.war"/>
+            <arg value="${artifact.name}-proxy-portlet.war.MD5"/>
+            <!--<arg value="${artifact.name}-src.zip"/>-->
+            <!--<arg value="${artifact.name}-src.zip.MD5"/>-->
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 

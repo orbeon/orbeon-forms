@@ -1,0 +1,6 @@
+<liferay-portlet-app>
+    <portlet>
+        <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
+        <instanceable>true</instanceable>
+    </portlet>
+</liferay-portlet-app>

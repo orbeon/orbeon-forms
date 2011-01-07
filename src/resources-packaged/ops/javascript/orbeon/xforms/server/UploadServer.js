@@ -48,6 +48,18 @@
     };
 
     /**
+     * In case of failure, after a delay call this.asyncUploadRequest() as it was called originally by the
+     * execution queue.
+     */
+    UploadServer.uploadFailure = function() {
+        console.log("Failure");
+        AjaxServer.retryRequestAfterDelay(_.bind(function() {
+            this.remainingEvents.unshift(this.processingEvent);
+            this.asyncUploadRequest(this.remainingEvents, this.executionQueueDone);
+        }, this));
+    };
+
+    /**
      * Once we are done processing the events (either because the uploads have been completed or canceled), handle the
      * remaining events.
      */
@@ -81,10 +93,8 @@
         }, this);
         // Trigger actual upload through a form POST
         Connect.setForm(this.processingEvent.form, true, true);
-        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id], {
-            upload: _.bind(this.uploadSuccess, this),
-            failure: _.bind(AjaxServer.retryRequestAfterDelay, AjaxServer, _.bind(UploadServer.asyncUploadRequest, UploadServer, events, done))
-        });
+        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id],
+            { upload: _.bind(this.uploadSuccess, this), failure: _.bind(this.uploadFailure, this) });
         // Enable the controls we previously disabled
         _.each(disabledElements, function(element) { element.disabled = false; });
     };

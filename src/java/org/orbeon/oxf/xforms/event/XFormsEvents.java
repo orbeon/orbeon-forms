@@ -30,6 +30,7 @@ public class XFormsEvents {
 
     // Other custom events
     public static final String XXFORMS_SESSION_HEARTBEAT = "xxforms-session-heartbeat";
+    public static final String XXFORMS_SERVER_EVENTS = "xxforms-server-events";
     public static final String XXFORMS_POLL = "xxforms-poll";
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
     public static final String XXFORMS_SUBMIT_REPLACE = "xxforms-submit-replace";

@@ -414,4 +414,107 @@
         </output>
     </test>
 
+    <test description="xxforms-server-events Ajax event" name="oxf:pipeline"
+          request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <value>0</value>
+                                            <values/>
+                                        </instance>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:input id="my-input" ref="value">
+                                    <xforms:setvalue ev:event="xforms-value-changed" ref="instance()/values" value="string-join((., instance()/value), ' ')"/>
+                                </xforms:input>
+                                <xforms:output id="my-output" ref="values"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" id="xhtml"/>
+                </p:processor>
+
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="config">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                            <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                            <xxforms:sequence>1</xxforms:sequence>
+                            <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                            <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+
+                            <xxforms:action>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">1</xxforms:event>
+                                <xxforms:event name="xxforms-server-events">
+                                    <xsl:variable name="server-events" as="document-node()">
+                                        <xsl:document>
+                                            <xxforms:server-events xmlns="">
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">2</xxforms:event>
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">3</xxforms:event>
+                                            </xxforms:server-events>
+                                        </xsl:document>
+                                    </xsl:variable>
+                                    <xsl:value-of select="context:encodeXML($server-events)"/>
+                                </xxforms:event>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">4</xxforms:event>
+                                <xxforms:event name="xxforms-server-events">
+                                    <xsl:variable name="server-events" as="document-node()">
+                                        <xsl:document>
+                                            <xxforms:server-events xmlns="">
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">5</xxforms:event>
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">6</xxforms:event>
+                                            </xxforms:server-events>
+                                        </xsl:document>
+                                    </xsl:variable>
+                                    <xsl:value-of select="context:encodeXML($server-events)"/>
+                                </xxforms:event>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">7</xxforms:event>
+                            </xxforms:action>
+                        </xxforms:event-request>
+                    </p:input>
+                    <p:input name="data" href="#xhtml"/>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+
+                <!-- Run request -->
+                <p:processor name="oxf:xforms-server">
+                    <p:input name="request" href="#request"/>
+                    <p:output name="response" id="response" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                </p:processor>
+
+                <!-- Filter response -->
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="#response" transform="oxf:unsafe-xslt">
+                        <xsl:transform version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                            <xsl:template match="/">
+                                <xsl:copy-of select="//xxforms:control-values"/>
+                            </xsl:template>
+                        </xsl:transform>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <!-- NOTE: Values 1-4-7, 2-3 and 5-6 are collapsed due to the way the code is written now. This is probably not
+             desirable, but in practice xxforms:server-events is unlikely to contain value change events. -->
+        <output name="response">
+            <xxf:control-values xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:control id="my-input">7</xxf:control>
+                <xxf:control id="my-output">3 6 7</xxf:control>
+            </xxf:control-values>
+        </output>
+    </test>
+
 </group>

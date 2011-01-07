@@ -17,18 +17,33 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.*;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.*;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventFactory;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TeeXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
@@ -124,21 +139,14 @@ public class XFormsServer extends ProcessorImpl {
 
         // Get events requested by the client
         final List<Element> eventElements = new ArrayList<Element>();
+        final int serverEventsCount;
+        {
+            // Gather server events first if any
+            serverEventsCount = addServerEvents(pipelineContext, serverEventsElements, eventElements);
 
-        // Gather server events first if any
-        int serverEventsCount = 0;
-        if (serverEventsElements != null && serverEventsElements.size() > 0) {
-            for (final Element element: serverEventsElements) {
-                final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
-                final List<Element> xxformsEventElements = Dom4jUtils.elements(serverEventsDocument.getRootElement(), XFormsConstants.XXFORMS_EVENT_QNAME);
-                serverEventsCount += xxformsEventElements.size();
-                eventElements.addAll(xxformsEventElements);
-            }
-        }
-
-        // Gather client events if any
-        if (actionElement != null) {
-            eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
+            // Gather client events if any
+            if (actionElement != null)
+                eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
         // Hit session if it exists (it's probably not even necessary to do so)
@@ -390,6 +398,19 @@ public class XFormsServer extends ProcessorImpl {
         XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
     }
 
+    private int addServerEvents(PipelineContext pipelineContext, List<Element> serverEventsElements, List<Element> eventElements) {
+        int serverEventsCount = 0;
+        if (serverEventsElements != null && serverEventsElements.size() > 0) {
+            for (final Element element : serverEventsElements) {
+                final Document serverEventsDocument = XFormsUtils.decodeXML(pipelineContext, element.getStringValue());
+                final List<Element> xxformsEventElements = Dom4jUtils.elements(serverEventsDocument.getRootElement(), XFormsConstants.XXFORMS_EVENT_QNAME);
+                serverEventsCount += xxformsEventElements.size();
+                eventElements.addAll(xxformsEventElements);
+            }
+        }
+        return serverEventsCount;
+    }
+
     // All supported event parameters
     private static String[] EVENT_PARAMETERS = new String[] { "dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length" };
 
@@ -410,12 +431,11 @@ public class XFormsServer extends ProcessorImpl {
         // Iterate through all events to dispatch them
         final Map<String, String> parameters = new HashMap<String, String>();
         int eventElementIndex = 0;
-        for (Iterator i = eventElements.iterator(); i.hasNext(); eventElementIndex++) {
-            final Element eventElement = (Element) i.next();
+        for (final Element eventElement : eventElements) {
 
             // Whether this event is trusted, that is whether this event was a server event. Server events
             // are processed first, so are at the beginning of eventElements.
-            boolean isTrustedEvent = eventElementIndex < serverEventsCount;
+            final boolean isTrustedEvent = eventElementIndex < serverEventsCount;
 
             final String eventName = eventElement.attributeValue("name");
             final String sourceTargetId = eventElement.attributeValue("source-control-id");
@@ -440,6 +460,15 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Remember that we got this event
                 hasAllEvents = true;
+
+            } else if (XFormsEvents.XXFORMS_SERVER_EVENTS.equals(eventName)) {
+                // Special event containing server-encrypted events to dispatch
+
+                final List<Element> serverEvents = new ArrayList<Element>();
+                addServerEvents(pipelineContext, Collections.singletonList(eventElement), serverEvents);
+
+                // Recursively create and dispatch events
+                createAndDispatchEvents(pipelineContext, containingDocument, serverEvents, serverEvents.size(), valueChangeControlIds);
 
             } else if (sourceTargetId != null && eventName != null) {
                 // A normal event is passed
@@ -478,26 +507,24 @@ public class XFormsServer extends ProcessorImpl {
                             otherControlId, value, events, parameters);
                 }
 
-                if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-                    // Remember id of controls for which value changed
+                // Remember id of controls for which value changed
+                if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE))
                     valueChangeControlIds.add(sourceTargetId);
-                }
             } else if (!(sourceTargetId == null && eventName == null)) {
                 // Error case
                 throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
             }
+
+            eventElementIndex++;
         }
         // Flush stored event if needed
-        if (lastSourceControlId != null) {
-            // Send old event
+        if (lastSourceControlId != null)
             createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
                     lastSourceControlId, true, true, null, lastValueChangeEventValue, events, null);
-        }
 
         // Iterate and dispatch the events
-        for (final XFormsEvent event: events) {
+        for (final XFormsEvent event : events)
             containingDocument.handleExternalEvent(pipelineContext, event);
-        }
 
         return hasAllEvents;
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,15 +15,38 @@ package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.portlet.*;
+import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Map;
 
 
 public class WSRPURLRewriter implements URLRewriter {
+
+    public static final int URL_TYPE_BLOCKING_ACTION = 1;
+    public static final int URL_TYPE_RENDER = 2;
+    public static final int URL_TYPE_RESOURCE = 3;
+    public static final String BASE_TAG = "wsrp_rewrite";
+    public static final String START_TAG = BASE_TAG + "?";
+    public static final String END_TAG = "/" + BASE_TAG;
+    public static final String PREFIX_TAG = BASE_TAG + "_";
+    public static final String URL_TYPE_PARAM = "wsrp-urlType";
+    public static final String MODE_PARAM = "wsrp-mode";
+    public static final String WINDOW_STATE_PARAM = "wsrp-windowState";
+    public static final String NAVIGATIONAL_STATE_PARAM = "wsrp-navigationalState";
+    public static final String URL_TYPE_BLOCKING_ACTION_STRING = "blockingAction";
+    public static final String URL_TYPE_RENDER_STRING = "render";
+    public static final String URL_TYPE_RESOURCE_STRING = "resource";
+    public static final int BASE_TAG_LENGTH = BASE_TAG.length();
+    public static final int START_TAG_LENGTH = START_TAG.length();
+    public static final int END_TAG_LENGTH = END_TAG.length();
+    public static final int PREFIX_TAG_LENGTH = PREFIX_TAG.length();
+//    public static final String URL_PARAM = "wsrp-url";
+//    public static final String REQUIRES_REWRITE_PARAM = "wsrp-requiresRewrite";
 
     private final ExternalContext.Request request;
 
@@ -32,19 +55,19 @@ public class WSRPURLRewriter implements URLRewriter {
     }
 
     public String rewriteRenderURL(String urlString) {
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_RENDER, null, null);
+        return rewritePortletURL(urlString, URL_TYPE_RENDER, null, null);
     }
 
     public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_RENDER, portletMode, windowState);
+        return rewritePortletURL(urlString, URL_TYPE_RENDER, portletMode, windowState);
     }
 
     public String rewriteActionURL(String urlString) {
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_BLOCKING_ACTION, null, null);
+        return rewritePortletURL(urlString, URL_TYPE_BLOCKING_ACTION, null, null);
     }
 
     public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_BLOCKING_ACTION, portletMode, windowState);
+        return rewritePortletURL(urlString, URL_TYPE_BLOCKING_ACTION, portletMode, windowState);
     }
 
     private String rewritePortletURL(String urlString, int urlType, String portletMode, String windowState) {
@@ -76,7 +99,7 @@ public class WSRPURLRewriter implements URLRewriter {
             final String navigationalState = NetUtils.encodeQueryString(parameters);
 
             // Encode the URL a la WSRP
-            return WSRP2Utils.encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef(), false);
+            return encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef(), false);
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -84,6 +107,70 @@ public class WSRPURLRewriter implements URLRewriter {
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {
         // JSR-268 supports portlet resources
-        return rewritePortletURL(urlString, WSRP2Utils.URL_TYPE_RESOURCE, null, null);
+        return rewritePortletURL(urlString, URL_TYPE_RESOURCE, null, null);
+    }
+
+    /**
+     * Encode an URL into a WSRP pattern including the string "wsrp_rewrite".
+     *
+     * This does not call the portlet API. Used by Portlet2URLRewriter.
+     *
+     * @param urlType
+     * @param navigationalState
+     * @param mode
+     * @param windowState
+     * @param fragmentId
+     * @param secure
+     * @return
+     */
+    public static String encodePortletURL(int urlType, String navigationalState, String mode, String windowState, String fragmentId, boolean secure) {
+
+        final StringBuffer sb = new StringBuffer(START_TAG);
+        sb.append(URL_TYPE_PARAM);
+        sb.append('=');
+
+        final String urlTypeString;
+        if (urlType == URL_TYPE_BLOCKING_ACTION)
+            urlTypeString = URL_TYPE_BLOCKING_ACTION_STRING;
+        else if (urlType == URL_TYPE_RENDER)
+            urlTypeString = URL_TYPE_RENDER_STRING;
+        else if (urlType == URL_TYPE_RESOURCE)
+            urlTypeString = URL_TYPE_RESOURCE_STRING;
+        else
+            throw new IllegalArgumentException();
+
+        sb.append(urlTypeString);
+
+        // Encode mode
+        if (mode != null) {
+            sb.append('&');
+            sb.append(MODE_PARAM);
+            sb.append('=');
+            sb.append(mode);
+        }
+
+        // Encode window state
+        if (windowState != null) {
+            sb.append('&');
+            sb.append(WINDOW_STATE_PARAM);
+            sb.append('=');
+            sb.append(windowState);
+        }
+
+        // Encode navigational state
+        if (navigationalState != null) {
+            try {
+                sb.append('&');
+                sb.append(NAVIGATIONAL_STATE_PARAM);
+                sb.append('=');
+                sb.append(URLEncoder.encode(navigationalState, "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new OXFException(e);
+            }
+        }
+
+        sb.append(END_TAG);
+
+        return sb.toString();
     }
 }

@@ -196,6 +196,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
     background-image: url(field.png);
     background-repeat: repeat-x;
     border: 1px solid #ccc;
+    padding: 0
 }
 
 /* Colored border for invalid fields */

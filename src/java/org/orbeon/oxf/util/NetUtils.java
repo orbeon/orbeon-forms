@@ -47,7 +47,6 @@ public class NetUtils {
 
     private static final Pattern PATTERN_NO_AMP;
     private static final Pattern PATTERN_AMP;
-//    private static final Pattern PATTERN_AMP_AMP;
 
     public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
 
@@ -79,7 +78,6 @@ public class NetUtils {
         final String token = notEqNorAmpChar+ "+";
         PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&|(?<!&)\\z)" );
         PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;|&|(?<!&amp;|&)\\z)" );
-//        PATTERN_AMP_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;amp;|&|(?<!&amp;amp;|&)\\z)" );
     }
 
     public static long getDateHeader(String stringValue) throws ParseException {

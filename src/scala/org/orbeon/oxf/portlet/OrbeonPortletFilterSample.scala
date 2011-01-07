@@ -22,29 +22,28 @@ import javax.portlet._
  */
 class OrbeonPortletFilterSample extends GenericPortlet {
     override def render(request: RenderRequest, response: RenderResponse) {
-        val writer = response.getWriter
-
-        writer.write(<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
-            <xh:head>
-                <xh:title>XForms Hello</xh:title>
-                <xf:model>
-                    <xf:instance>
-                        <first-name/>
-                    </xf:instance>
-                    <xf:bind ref="instance()" required="true()"/>
-                </xf:model>
-            </xh:head>
-            <xh:body>
-                <xh:p>
-                    <xf:input ref="instance()" incremental="true">
-                        <xf:label>Please enter your first name:</xf:label>
-                        <xf:alert>First name is required</xf:alert>
-                    </xf:input>
-                </xh:p>
-                <xh:p>
-                    <xf:output value="if (normalize-space(instance()) = '') then '' else concat('Hello, ', instance(), '!')"/>
-                </xh:p>
-            </xh:body>
-        </xh:html>.toString)
+        response.getWriter write
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+                <xh:head>
+                    <xh:title>XForms Hello</xh:title>
+                    <xf:model>
+                        <xf:instance>
+                            <first-name/>
+                        </xf:instance>
+                        <xf:bind ref="instance()" required="true()"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xh:p>
+                        <xf:input ref="instance()" incremental="true">
+                            <xf:label>Please enter your first name:</xf:label>
+                            <xf:alert>First name is required</xf:alert>
+                        </xf:input>
+                    </xh:p>
+                    <xh:p>
+                        <xf:output value="if (normalize-space(instance()) = '') then '' else concat('Hello, ', instance(), '!')"/>
+                    </xh:p>
+                </xh:body>
+            </xh:html>.toString
     }
 }

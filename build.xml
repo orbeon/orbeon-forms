@@ -343,6 +343,7 @@
               <exclude name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
               <exclude name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
               <exclude name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
+              <exclude name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
           </fileset>
           <fileset dir="${resources-packaged.dir}">
               <include name="config/*-processors.xml"/>
@@ -356,6 +357,7 @@
               <include name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
               <include name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
               <include name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
+              <include name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
           </fileset>
         </jar>
 
@@ -534,6 +536,17 @@
             <param name="target" value="devel"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
+    </target>
+
+    <target name="proxy-portlet-war" depends="classes" description="Create exploded proxy portlet WAR file">
+
+        <!--xxx-->
+        <!---->
+        <!--<antcall target="war"/>-->
+        <!--<antcall target="war-copy-descriptors">-->
+            <!--<param name="target" value="devel"/>-->
+            <!--<param name="build.root" value="${build.root}"/>-->
+        <!--</antcall>-->
     </target>
 
     <!-- Zip sources file -->

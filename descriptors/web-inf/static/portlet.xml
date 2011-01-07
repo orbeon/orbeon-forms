@@ -63,7 +63,7 @@
         </init-param>
 
         <portlet-info>
-            <title>Orbeon Forms - Form Runner</title>
+            <title>Form Runner</title>
         </portlet-info>
     </portlet>
 

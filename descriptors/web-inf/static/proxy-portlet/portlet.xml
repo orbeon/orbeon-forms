@@ -33,7 +33,7 @@
         </init-param>
 
         <portlet-info>
-            <title>Orbeon Forms - Form Runner Proxy Portlet</title>
+            <title>Form Runner</title>
         </portlet-info>
     </portlet>
 

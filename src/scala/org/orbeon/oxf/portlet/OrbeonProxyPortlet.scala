@@ -32,7 +32,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
         val ReadOnly = Value("read-only")
     }
 
-    private val actions = Set("new", "summary")
+//    private val actions = Set("new", "summary")
 
     private val preferences = Map(
         (PreferenceName.FormRunnerURL -> "Form Runner URL"),
@@ -95,13 +95,17 @@ class OrbeonProxyPortlet extends GenericPortlet {
     // Very simple preferences editor
     override def doEdit(request: RenderRequest, response: RenderResponse) = {
 
-        response setTitle "Orbeon Forms Proxy Portlet Preferences"
+        response setTitle "Orbeon Forms Preferences"
         response.getWriter write
             <div>
-                <form action={val url = response.createActionURL; url.toString} method="post">
+                <style>
+                    .orbeon-pref-form label {{display: block; font-weight: bold}}
+                    .orbeon-pref-form input {{display: block; width: 20em }}
+                </style>
+                <form action={response.createActionURL.toString} method="post" class="orbeon-pref-form">
                     {
                         for ((pref, label) <- preferences) yield
-                            <p><label>{label}: <input name={pref.toString} value={getPreference(request, pref)}/></label><br/></p>
+                            <label>{label}: <input name={pref.toString} value={getPreference(request, pref)}/></label>
                     }
                     <hr/>
                     <p>
@@ -204,15 +208,10 @@ class OrbeonProxyPortlet extends GenericPortlet {
             Net.copyStream(connection.getInputStream, response.getPortletOutputStream)
         }
 
-    val REMOTE_SESSION_ID_KEY = "org.orbeon.oxf.xforms.portlet.remote-session-id"
+    private val REMOTE_SESSION_ID_KEY = "org.orbeon.oxf.xforms.portlet.remote-session-id"
 
     // Propagate useful headers from Form Runner server to client
     private def propagateHeaders(response: ResourceResponse, connection: HttpURLConnection): Unit =
-
-//        // Handle Content-Type differently (could maybe use setProperty() too?)
-//        val contentType = connection.getHeaderField("Content-Type")
-//        if (contentType ne null)
-//            response.setContentType(contentType)
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
             (name => (name, connection.getHeaderField(name))) filter
                 (_._2 ne null) foreach

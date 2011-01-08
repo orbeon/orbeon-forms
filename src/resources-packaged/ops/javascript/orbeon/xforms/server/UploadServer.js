@@ -52,7 +52,6 @@
      * execution queue.
      */
     UploadServer.uploadFailure = function() {
-        console.log("Failure");
         AjaxServer.retryRequestAfterDelay(_.bind(function() {
             this.remainingEvents.unshift(this.processingEvent);
             this.asyncUploadRequest(this.remainingEvents, this.executionQueueDone);

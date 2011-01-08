@@ -147,7 +147,7 @@
     AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, progressMessage, discardable, formID) {
         var timerId = window.setTimeout(function () {
             var event = new AjaxServer.Event(ORBEON.util.Dom.get(formID), null, null,
-                    serverEvents, "server-events", null, null, null, showProgress, progressMessage);
+                    serverEvents, "xxforms-server-events", null, null, null, showProgress, progressMessage);
             AjaxServer.fireEvents([event]);
         }, delay);
         // Save timer id for this discardable timer
@@ -433,22 +433,6 @@
                         var handledEvents = [];
                         var remainingEvents = ORBEON.xforms.Globals.eventQueue;
 
-                        // Add server-events, if any. Server excepts server-events in a separate elements before the
-                        // <xxforms:action> which contains all the <xxforms:event>.
-                        for (var i = 0; i < ORBEON.xforms.Globals.eventQueue.length; i++) {
-                            var event = ORBEON.xforms.Globals.eventQueue[i];
-                            // Only handle this event if it is for the form we chose, and if
-                            if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) {
-                                if (event.eventName == "server-events") {
-                                    requestDocumentString.push(indent);
-                                    requestDocumentString.push('<xxforms:server-events>');
-                                    requestDocumentString.push(event.value);
-                                    requestDocumentString.push('</xxforms:server-events>');
-                                    remainingEvents = _.without(remainingEvents, event);
-                                }
-                            }
-                        }
-
                         // Start action
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxforms:action>\n');
@@ -459,8 +443,7 @@
 
                             // Only handle this event if it is for the form we chose, and if
                             // And if this is not an xforms-events (which is sent separately, not as an action).
-                            if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm
-                                    && event.eventName != "server-events") {
+                            if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) {
                                 // Create <xxforms:event> element
                                 requestDocumentString.push(indent + indent);
                                 requestDocumentString.push('<xxforms:event');

@@ -82,14 +82,22 @@ public class XFormsUploadControl extends XFormsValueControl {
     @Override
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_UPLOAD_START.equals(event.getName())) {
+            // Upload started
             containingDocument.startUpload(getUploadUniqueId());
         } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
+            // Upload canceled
             containingDocument.endUpload(getUploadUniqueId());
+            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), containingDocument.getUUID());
         } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
-            // Process upload to this control
+            // Upload done: process upload to this control
+
+            // Notify that the upload has ended
             containingDocument.endUpload(getUploadUniqueId());
+            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), containingDocument.getUUID());
+
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
             handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+            
         } else if (XFormsEvents.XXFORMS_UPLOAD_PROGRESS.equals(event.getName())) {
             // NOP: upload progress information will be sent through the diff process
         } else

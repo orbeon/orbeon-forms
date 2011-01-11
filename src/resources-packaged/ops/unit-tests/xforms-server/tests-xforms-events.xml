@@ -997,7 +997,7 @@
                      -->
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="plate·3">7FOOBAR</xxforms:event>
+                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="plate·3">777</xxforms:event>
                             <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="leased·3">leased</xxforms:event>
                         </xxforms:action>
                     </p:input>
@@ -1032,15 +1032,15 @@
                             <instance id="instance" model-id="model">
                                 <vehicles>
                                     <vehicle>
-                                        <plate-number>1CCD412</plate-number>
+                                        <plate-number>111</plate-number>
                                         <leased/>
                                     </vehicle>
                                     <vehicle>
-                                        <plate-number>3TRE787</plate-number>
+                                        <plate-number>333</plate-number>
                                         <leased/>
                                     </vehicle>
                                     <vehicle>
-                                        <plate-number>6QWA76</plate-number>
+                                        <plate-number>666</plate-number>
                                         <leased/>
                                     </vehicle>
                                 </vehicles>
@@ -1059,15 +1059,15 @@
                             <instance id="instance" model-id="model">
                                 <vehicles>
                                     <vehicle>
-                                        <plate-number>7FOOBAR</plate-number>
+                                        <plate-number>777</plate-number>
                                         <leased>leased</leased>
                                     </vehicle>
                                     <vehicle>
-                                        <plate-number>3TRE787</plate-number>
+                                        <plate-number>333</plate-number>
                                         <leased/>
                                     </vehicle>
                                     <vehicle>
-                                        <plate-number>6QWA76</plate-number>
+                                        <plate-number>666</plate-number>
                                         <leased/>
                                     </vehicle>
                                 </vehicles>
@@ -1080,10 +1080,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="plate·1">7FOOBAR</xxf:control>
+                        <xxf:control id="plate·1">777</xxf:control>
                         <xxf:control id="leased·1">leased</xxf:control>
-                        <xxf:control id="plate·2">6QWA76</xxf:control>
-                        <xxf:control id="plate·3">3TRE787</xxf:control>
+                        <xxf:control id="plate·2">666</xxf:control>
+                        <xxf:control id="plate·3">333</xxf:control>
                         <xxf:control id="leased·3"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>

@@ -431,15 +431,26 @@
                                         <instance>
                                             <value>0</value>
                                             <values/>
+                                            <triggers/>
                                         </instance>
                                     </xforms:instance>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-                                <xforms:input id="my-input" ref="value">
+                                <xforms:input id="input" ref="value">
                                     <xforms:setvalue ev:event="xforms-value-changed" ref="instance()/values" value="string-join((., instance()/value), ' ')"/>
                                 </xforms:input>
-                                <xforms:output id="my-output" ref="values"/>
+                                <xforms:output id="output1" ref="values"/>
+
+                                <xforms:setvalue ev:event="DOMActivate" ref="instance()/triggers" value="string-join((., event('xxforms:target')), ' ')"/>
+
+                                <xforms:trigger id="trigger1"><xforms:label/></xforms:trigger>
+                                <xforms:trigger id="trigger2"><xforms:label/></xforms:trigger>
+                                <xforms:trigger id="trigger3"><xforms:label/></xforms:trigger>
+                                <xforms:trigger id="trigger4"><xforms:label/></xforms:trigger>
+                                <xforms:trigger id="trigger5"><xforms:label/></xforms:trigger>
+
+                                <xforms:output id="output2" ref="triggers"/>
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>
@@ -455,31 +466,36 @@
                             <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
 
                             <xxforms:action>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">1</xxforms:event>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">1</xxforms:event>
+                                <xxforms:event name="DOMActivate" source-control-id="trigger1"/>
                                 <xxforms:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
                                             <xxforms:server-events xmlns="">
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">2</xxforms:event>
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">3</xxforms:event>
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">2</xxforms:event>
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">3</xxforms:event>
+                                                <xxforms:event name="DOMActivate" source-control-id="trigger2"/>
                                             </xxforms:server-events>
                                         </xsl:document>
                                     </xsl:variable>
                                     <xsl:value-of select="context:encodeXML($server-events)"/>
                                 </xxforms:event>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">4</xxforms:event>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">4</xxforms:event>
+                                <xxforms:event name="DOMActivate" source-control-id="trigger3"/>
                                 <xxforms:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
                                             <xxforms:server-events xmlns="">
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">5</xxforms:event>
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">6</xxforms:event>
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">5</xxforms:event>
+                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">6</xxforms:event>
+                                                <xxforms:event name="DOMActivate" source-control-id="trigger4"/>
                                             </xxforms:server-events>
                                         </xsl:document>
                                     </xsl:variable>
                                     <xsl:value-of select="context:encodeXML($server-events)"/>
                                 </xxforms:event>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">7</xxforms:event>
+                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">7</xxforms:event>
+                                <xxforms:event name="DOMActivate" source-control-id="trigger5"/>
                             </xxforms:action>
                         </xxforms:event-request>
                     </p:input>
@@ -507,12 +523,12 @@
 
             </p:config>
         </input>
-        <!-- NOTE: Values 1-4-7, 2-3 and 5-6 are collapsed due to the way the code is written now. This is probably not
-             desirable, but in practice xxforms:server-events is unlikely to contain value change events. -->
         <output name="response">
+            <!-- NOTE: Values 2-3 and 5-6 are compacted, which is what we expect -->
             <xxf:control-values xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:control id="my-input">7</xxf:control>
-                <xxf:control id="my-output">3 6 7</xxf:control>
+                <xxf:control id="input">7</xxf:control>
+                <xxf:control id="output1">1 3 4 6 7</xxf:control>
+                <xxf:control id="output2">trigger1 trigger2 trigger3 trigger4 trigger5</xxf:control>
             </xxf:control-values>
         </output>
     </test>

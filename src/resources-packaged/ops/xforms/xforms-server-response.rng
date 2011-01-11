@@ -96,6 +96,12 @@
                                                 <optional>
                                                     <attribute name="filename"/>
                                                 </optional>
+                                                <optional>
+                                                    <attribute name="progress-received"/>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="progress-expected"/>
+                                                </optional>
                                             </group>
                                             <!-- Optional attributes for xforms:input -->
                                             <group>

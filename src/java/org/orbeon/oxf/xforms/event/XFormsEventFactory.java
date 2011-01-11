@@ -130,6 +130,11 @@ public class XFormsEventFactory {
                 return new XXFormsUploadDoneEvent(containingDocument, targetObject, parameters);
             }
         });
+        nameToClassMap.put(XFormsEvents.XXFORMS_UPLOAD_PROGRESS, new Factory() {
+            public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
+                return new XXFormsUploadProgressEvent(containingDocument, targetObject, parameters);
+            }
+        });
         nameToClassMap.put(XFormsEvents.XFORMS_MODEL_CONSTRUCT, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
                 return new XFormsModelConstructEvent(containingDocument, targetObject);

@@ -25,10 +25,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
@@ -152,7 +149,7 @@ public class XFormsServer extends ProcessorImpl {
         // Hit session if it exists (it's probably not even necessary to do so)
         final ExternalContext.Session session = externalContext.getSession(false);
 
-        // Check for message where there is only the heartbeat event
+        // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
         if (eventElements.size() == 1) {
             final Element eventElement = eventElements.get(0);
             final String eventName = eventElement.attributeValue("name");
@@ -171,6 +168,40 @@ public class XFormsServer extends ProcessorImpl {
                     helper.startDocument();
                     xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                     helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+                    helper.endElement();
+                    xmlReceiver.endPrefixMapping("xxf");
+                    helper.endDocument();
+                } catch (SAXException e) {
+                    throw new OXFException(e);
+                }
+
+                // Don't do anything else
+                return;
+            } else if (eventName.equals(XFormsEvents.XXFORMS_UPLOAD_PROGRESS)) {
+
+                // Output simple resulting document
+                try {
+                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                    helper.startDocument();
+                    xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+
+                    final Multipart.UploadProgress progress = Multipart.getUploadProgressJava(request, XFormsStateManager.getRequestUUID(requestDocument));
+                    if (progress != null) {
+
+                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
+                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
+
+                        helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {
+                                "id", eventElement.attributeValue("source-control-id"),
+                                "progress-received", Long.toString(progress.receivedSize()),
+                                "progress-expected", progress.expectedSize().isDefined() ? ((Long) progress.expectedSize().get()).toString() : null
+                        });
+
+                        helper.endElement();
+                        helper.endElement();
+                    }
+
                     helper.endElement();
                     xmlReceiver.endPrefixMapping("xxf");
                     helper.endDocument();
@@ -913,17 +944,17 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output focus instruction
                 {
-                    final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId();
-                    if (focusEffectiveControlId != null) {
-                        outputFocusInfo(ch, containingDocument, focusEffectiveControlId);
+                    final String focusControlEffectiveId = containingDocument.getClientFocusControlEffectiveId();
+                    if (focusControlEffectiveId != null) {
+                        outputFocusInfo(ch, containingDocument, focusControlEffectiveId);
                     }
                 }
 
                 // Output help instruction
                 {
-                    final String helpEffectiveControlId = containingDocument.getClientHelpEffectiveControlId();
-                    if (helpEffectiveControlId != null) {
-                        outputHelpInfo(ch, containingDocument, helpEffectiveControlId);
+                    final String helpControlEffectiveId = containingDocument.getClientHelpControlEffectiveId();
+                    if (helpControlEffectiveId != null) {
+                        outputHelpInfo(ch, containingDocument, helpControlEffectiveId);
                     }
                 }
 
@@ -1037,13 +1068,13 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void outputFocusInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String focusEffectiveControlId) {
+    private static void outputFocusInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String focusControlEffectiveId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "setfocus",
-                new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, focusEffectiveControlId)});
+                new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId)});
     }
 
-    private static void outputHelpInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String helpEffectiveControlId) {
+    private static void outputHelpInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String helpControlEffectiveId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "help",
-                new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, helpEffectiveControlId)});
+                new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId)});
     }
 }

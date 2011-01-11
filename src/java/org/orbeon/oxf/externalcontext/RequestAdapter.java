@@ -116,6 +116,10 @@ public class RequestAdapter implements ExternalContext.Request {
         return 0;
     }
 
+    public ExternalContext.Session getSession(boolean create) {
+        return null;
+    }
+
     public void sessionInvalidate() {
     }
 

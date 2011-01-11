@@ -40,6 +40,7 @@ public class XFormsEvents {
     public static final String XXFORMS_UPLOAD_START = "xxforms-upload-start";
     public static final String XXFORMS_UPLOAD_CANCEL = "xxforms-upload-cancel";
     public static final String XXFORMS_UPLOAD_DONE = "xxforms-upload-done";
+    public static final String XXFORMS_UPLOAD_PROGRESS = "xxforms-upload-progress";
 
     public static final String XXFORMS_DIALOG_CLOSE = "xxforms-dialog-close";
     public static final String XXFORMS_DIALOG_OPEN = "xxforms-dialog-open";

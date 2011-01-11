@@ -131,6 +131,10 @@ public class RequestWrapper implements ExternalContext.Request {
         return _request.getRemoteUser();
     }
 
+    public ExternalContext.Session getSession(boolean create) {
+        return _request.getSession(create);
+    }
+
     public String getRequestedSessionId() {
         return _request.getRequestedSessionId();
     }

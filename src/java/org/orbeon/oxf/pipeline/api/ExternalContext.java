@@ -15,7 +15,9 @@ package org.orbeon.oxf.pipeline.api;
 
 import java.io.*;
 import java.security.Principal;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * ExternalContext abstracts context, request and response information so that compile-time dependencies on the
@@ -60,6 +62,7 @@ public interface ExternalContext extends WebAppExternalContext {
         String getServerName();
         int getServerPort();
 
+        Session getSession(boolean create);
         void sessionInvalidate();
         boolean isRequestedSessionIdValid();
         String getRequestedSessionId();

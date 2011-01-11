@@ -14,7 +14,9 @@
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.*;
+import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.externalcontext.URLRewriter;
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
@@ -112,6 +114,10 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return headerValuesMap;
         }
 
+        public ExternalContext.Session getSession(boolean create) {
+            return Portlet2ExternalContext.this.getSession(create);
+        }
+
         public void sessionInvalidate() {
             PortletSession session = portletRequest.getPortletSession(false);
             if (session != null)
@@ -157,7 +163,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                     // Special handling for multipart/form-data
 
                     // Decode the multipart data
-                    parameterMap = NetUtils.getParameterMapMultipart(pipelineContext, request, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
+                    parameterMap = Multipart.getParameterMapMultipart(pipelineContext, request, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
 
                 } else {
                     // Just use native request parameters
@@ -274,10 +280,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
         public Principal getUserPrincipal() {
             return portletRequest.getUserPrincipal();
-        }
-
-        public Portlet2ExternalContext getServletExternalContext() {
-            return Portlet2ExternalContext.this;
         }
 
         public Object getNativeRequest() {
@@ -457,10 +459,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
         public String getNamespacePrefix() {
             return WSRP2Utils.encodeNamespacePrefix();
-        }
-
-        public Portlet2ExternalContext getServletExternalContext() {
-            return Portlet2ExternalContext.this;
         }
 
         public Object getNativeResponse() {

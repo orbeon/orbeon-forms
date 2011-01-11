@@ -17,6 +17,7 @@ import javax.portlet._
 import java.net.{HttpURLConnection, URL}
 import org.orbeon.oxf.util.StringBuilderWriter
 import java.io._
+
 /**
  * Orbeon Forms Form Runner proxy portlet.
  *
@@ -252,16 +253,18 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
     private object Net {
 
+        private val COPY_BUFFER_SIZE = 8192
+
         def copyStream(is: InputStream, os: OutputStream) {
             var count = -1
-            val buffer: Array[Byte] = new Array[Byte](1024)
+            val buffer: Array[Byte] = new Array[Byte](COPY_BUFFER_SIZE)
             while ({count = is.read(buffer); count} > 0)
                 os.write(buffer, 0, count)
         }
 
         def copyStream(reader: Reader, writer: Writer) {
             var count = -1
-            val buffer: Array[Char] = new Array[Char](1024)
+            val buffer: Array[Char] = new Array[Char](COPY_BUFFER_SIZE)
             while ({count = reader.read(buffer); count} > 0)
                 writer.write(buffer, 0, count)
         }

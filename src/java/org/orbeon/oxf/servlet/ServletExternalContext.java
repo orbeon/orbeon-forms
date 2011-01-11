@@ -26,7 +26,9 @@ import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
@@ -42,7 +44,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String DEFAULT_FORM_CHARSET_DEFAULT = "utf-8";
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
 
-    public static final String EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY = "oxf.servlet.externalize-form-values-prefix";
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
     public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
 
@@ -65,7 +66,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         private Map<String, Object> attributesMap;
         private Map<String, String> headerMap;
         private Map<String, String[]> headerValuesMap;
-        private Map<String, Object> sessionMap;
         private Map<String, Object[]> parameterMap;
 
         private boolean getParameterMapMultipartFormDataCalled;
@@ -154,6 +154,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public synchronized Map<String, Object[]> getParameterMap() {
             if (parameterMap == null) {
                 // Two conditions: file upload ("multipart/form-data") or not
+                // NOTE: Regular form POST uses application/x-www-form-urlencoded. In this case, the servlet container
+                // exposes parameters with getParameter*() methods (see SRV.4.1.1).
                 if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
                     // Special handling for multipart/form-data
 
@@ -161,7 +163,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                         throw new OXFException("Cannot call getParameterMap() after getInputStream() when a form was posted with multipart/form-data");
 
                     // Decode the multipart data
-                    parameterMap = NetUtils.getParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
+                    parameterMap = Multipart.getParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
 
                     // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
                     getParameterMapMultipartFormDataCalled = true;
@@ -199,19 +201,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return nativeRequest.isUserInRole(role);
         }
 
+        public ExternalContext.Session getSession(boolean create) {
+            return ServletExternalContext.this.getSession(create);
+        }
+
         public void sessionInvalidate() {
             HttpSession session = nativeRequest.getSession(false);
             if (session != null)
                 session.invalidate();
-        }
-
-        public synchronized Map<String, Object> getSessionMap() {
-            if (sessionMap == null) {
-                HttpSession session = nativeRequest.getSession(false);
-                if (session != null)
-                    sessionMap = new InitUtils.SessionMap(session);
-            }
-            return sessionMap;
         }
 
         public String getCharacterEncoding() {
@@ -348,10 +345,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public Principal getUserPrincipal() {
             return nativeRequest.getUserPrincipal();
-        }
-
-        public ServletExternalContext getServletExternalContext() {
-            return ServletExternalContext.this;
         }
 
         public String getPortletMode() {
@@ -568,10 +561,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public void setTitle(String title) {
             // Nothing to do
-        }
-
-        public ServletExternalContext getServletExternalContext() {
-            return ServletExternalContext.this;
         }
 
         public Object getNativeResponse() {

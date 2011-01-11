@@ -828,7 +828,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Return the effective control id of the control to set the focus to, or null.
      */
-    public String getClientFocusEffectiveControlId() {
+    public String getClientFocusControlEffectiveId() {
 
         if (focusEffectiveControlId == null)
             return null;
@@ -860,7 +860,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Return the effective control id of the control to help for, or null.
      */
-    public String getClientHelpEffectiveControlId() {
+    public String getClientHelpControlEffectiveId() {
 
         if (helpEffectiveControlId == null)
             return null;

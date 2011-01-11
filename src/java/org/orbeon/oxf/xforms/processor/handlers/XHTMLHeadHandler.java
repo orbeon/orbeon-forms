@@ -111,7 +111,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
             // User-defined (with xxforms:script) and XForms scripts
             final Map<String, Script> scriptsToDeclare = containingDocument.getScripts();
-            final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
+            final String focusElementId = containingDocument.getClientFocusControlEffectiveId();
             final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
             final List<XXFormsDialogControl> dialogsToOpen = new ArrayList<XXFormsDialogControl>(); {
                 final Map<String, XFormsControl> dialogsMap = containingDocument.getControls().getCurrentControlTree().getDialogControls();

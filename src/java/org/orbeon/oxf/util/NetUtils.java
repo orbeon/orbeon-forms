@@ -13,18 +13,16 @@
  */
 package org.orbeon.oxf.util;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -42,12 +40,14 @@ public class NetUtils {
     private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
 
     public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.resources.dynamic.";
+
     // Resources are served by the XForms server. It is not ideal to refer to XForms-related functionality from here.
     public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
 
     private static final Pattern PATTERN_NO_AMP;
     private static final Pattern PATTERN_AMP;
 
+    public static final int COPY_BUFFER_SIZE = 8192;
     public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
 
     private static final SimpleDateFormat dateHeaderFormats[] = {
@@ -265,14 +265,14 @@ public class NetUtils {
 
     public static void copyStream(InputStream is, OutputStream os) throws IOException {
         int count;
-        byte[] buffer = new byte[1024];
+        final byte[] buffer = new byte[COPY_BUFFER_SIZE];
         while ((count = is.read(buffer)) > 0)
             os.write(buffer, 0, count);
     }
 
     public static void copyStream(Reader reader, Writer writer) throws IOException {
         int count;
-        char[] buffer = new char[1024];
+        final char[] buffer = new char[COPY_BUFFER_SIZE / 2];
         while ((count = reader.read(buffer)) > 0)
             writer.write(buffer, 0, count);
     }
@@ -899,134 +899,6 @@ public class NetUtils {
 
         // Rewrite new URI to absolute path without the context
         return DYNAMIC_RESOURCES_PATH + digest;
-    }
-
-    /**
-     * Utility method to decode a multipart/form-data stream and return a Map of parameters of type Object[], each of
-     * which can be a String or FileData.
-     */
-    public static Map<String, Object[]> getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, String headerEncoding) {
-
-        final Map<String, Object[]> uploadParameterMap = new HashMap<String, Object[]>();
-        try {
-            // Setup commons upload
-
-            // Read properties
-            // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-            int maxSize = RequestGenerator.getMaxSizeProperty();
-            int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
-
-            final DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory(maxMemorySize, SystemUtils.getTemporaryDirectory());
-
-            final ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory) {
-                protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
-                    if (isFormField) {
-                        // Handle externalized values
-                        final String externalizeFormValuesPrefix = org.orbeon.oxf.properties.Properties.instance().getPropertySet().getString(ServletExternalContext.EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
-                        final String fieldName = getFieldName(headers);
-                        if (externalizeFormValuesPrefix != null && fieldName.startsWith(externalizeFormValuesPrefix)) {
-                            // In this case, we do as if the value content is an uploaded file so that it can be externalized
-                            return super.createItem(headers, false);
-                        } else {
-                            // Just create the FileItem using the default way
-                            return super.createItem(headers, isFormField);
-                        }
-                    } else {
-                        // Just create the FileItem using the default way
-                        return super.createItem(headers, isFormField);
-                    }
-                }
-            };
-            upload.setHeaderEncoding(headerEncoding);
-            upload.setSizeMax(maxSize);
-
-            // Add a listener to destroy file items when the pipeline context is destroyed
-            pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-                public void contextDestroyed(boolean success) {
-                    for (final String name: uploadParameterMap.keySet()) {
-                        final Object values[] = uploadParameterMap.get(name);
-                        for (final Object currentValue: values) {
-                            if (currentValue instanceof FileItem) {
-                                final FileItem fileItem = (FileItem) currentValue;
-                                fileItem.delete();
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Wrap and implement just the required methods for the upload code
-            final InputStream inputStream;
-            try {
-                inputStream = request.getInputStream();
-            } catch (IOException e) {
-                throw new OXFException(e);
-            }
-
-            final RequestContext requestContext = new RequestContext() {
-
-                public int getContentLength() {
-                    return request.getContentLength();
-                }
-
-                public InputStream getInputStream() {
-                    // NOTE: The upload code does not actually check that it doesn't read more than the content-length
-                    // sent by the client! Maybe here would be a good place to put an interceptor and make sure we
-                    // don't read too much.
-                    return new InputStream() {
-                        public int read() throws IOException {
-                            return inputStream.read();
-                        }
-                    };
-                }
-
-                public String getContentType() {
-                    return request.getContentType();
-                }
-
-                public String getCharacterEncoding() {
-                    return request.getCharacterEncoding();
-                }
-            };
-
-            // Parse the request and add file information
-            try {
-                for (Object o: upload.parseRequest(requestContext)) {
-                    final FileItem fileItem = (FileItem) o;
-                    // Add value to existing values if any
-                    if (fileItem.isFormField()) {
-                        // Simple form field
-                        // Assume that form fields are in UTF-8. Can they have another encoding? If so, how is it specified?
-                        StringConversions.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString(STANDARD_PARAMETER_ENCODING));
-                    } else {
-                        // File
-                        StringConversions.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
-                    }
-                }
-            } catch (FileUploadBase.SizeLimitExceededException e) {
-                // Should we do something smart so we can use the Presentation
-                // Server error page anyway? Right now, this is going to fail
-                // miserably with an error.
-                throw e;
-            } catch (UnsupportedEncodingException e) {
-                // Should not happen
-                throw new OXFException(e);
-            } finally {
-                // Close the input stream; if we don't nobody does, and if this stream is
-                // associated with a temporary file, that file may resist deletion
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
-            }
-
-            return uploadParameterMap;
-        } catch (FileUploadException e) {
-            throw new OXFException(e);
-        }
     }
 
     /**

@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.Multipart;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -68,6 +69,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         getFileMediatype(propertyContext);
         getFileName(propertyContext);
         getFileSize(propertyContext);
+        getProgressReceived(propertyContext);
+        getProgressExpected(propertyContext);
     }
 
     @Override
@@ -87,6 +90,8 @@ public class XFormsUploadControl extends XFormsValueControl {
             containingDocument.endUpload(getUploadUniqueId());
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
             handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+        } else if (XFormsEvents.XXFORMS_UPLOAD_PROGRESS.equals(event.getName())) {
+            // NOP: upload progress information will be sent through the diff process
         } else
             super.performDefaultAction(propertyContext, event);
     }
@@ -284,6 +289,14 @@ public class XFormsUploadControl extends XFormsValueControl {
         return fileInfo.getFileSize(propertyContext);
     }
 
+    public String getProgressReceived(PropertyContext propertyContext) {
+        return fileInfo.getProgressCurrent(propertyContext);
+    }
+
+    public String getProgressExpected(PropertyContext propertyContext) {
+        return fileInfo.getProgressExpected(propertyContext);
+    }
+
     private void setMediatype(PropertyContext propertyContext, String mediatype) {
         fileInfo.setMediatype(propertyContext, mediatype);
     }
@@ -314,6 +327,11 @@ public class XFormsUploadControl extends XFormsValueControl {
         if (!XFormsUtils.compareStrings(getFileSize(propertyContext), otherUploadControl.getFileSize(propertyContext)))
             return false;
         if (!XFormsUtils.compareStrings(getFileName(propertyContext), otherUploadControl.getFileName(propertyContext)))
+            return false;
+
+        if (!XFormsUtils.compareStrings(getProgressReceived(propertyContext), otherUploadControl.getProgressReceived(propertyContext)))
+            return false;
+        if (!XFormsUtils.compareStrings(getProgressExpected(propertyContext), otherUploadControl.getProgressExpected(propertyContext)))
             return false;
 
         return super.equalsExternal(propertyContext, other);
@@ -366,6 +384,26 @@ public class XFormsUploadControl extends XFormsValueControl {
                 added |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
+        {
+            // Progress current
+            final String progressReceivedValue1 = (uploadControl1 == null) ? null : uploadControl1.getProgressReceived(pipelineContext);
+            final String progressReceivedValue2 = uploadControl2.getProgressReceived(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(progressReceivedValue1, progressReceivedValue2)) {
+                final String attributeValue = progressReceivedValue2 != null ? progressReceivedValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "progress-received", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // Progress total
+            final String progressExpectedValue1 = (uploadControl1 == null) ? null : uploadControl1.getProgressExpected(pipelineContext);
+            final String progressExpectedValue2 = uploadControl2.getProgressExpected(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(progressExpectedValue1, progressExpectedValue2)) {
+                final String attributeValue = progressExpectedValue2 != null ? progressExpectedValue2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "progress-expected", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
 
         return added;
     }
@@ -389,6 +427,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_START);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_CANCEL);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_PROGRESS);
     }
 
     @Override
@@ -418,6 +457,11 @@ class FileInfo implements ExternalCopyable {
     private boolean isFilenameEvaluated;
     private String filename;
 
+    private boolean isProgressReceivedEvaluated;
+    private String progressReceived;
+    private boolean isProgressExpectedEvaluated;
+    private String progressExpected;
+
     FileInfo(XFormsValueControl control, XFormsContextStack contextStack, Element element) {
         this.control = control;
         this.contextStack =  contextStack;
@@ -432,6 +476,9 @@ class FileInfo implements ExternalCopyable {
         isMediatypeEvaluated = false;
         isSizeEvaluated = false;
         isFilenameEvaluated = false;
+
+        isProgressReceivedEvaluated = false;
+        isProgressExpectedEvaluated = false;
     }
 
     public String getState(PropertyContext propertyContext) {
@@ -465,6 +512,44 @@ class FileInfo implements ExternalCopyable {
             isSizeEvaluated = true;
         }
         return size;
+    }
+
+    public String getProgressCurrent(PropertyContext propertyContext) {
+        if (!isProgressReceivedEvaluated) {
+
+            final Multipart.UploadProgress progress = getProgress(propertyContext);
+            if (progress != null)
+                progressReceived = Long.toString(progress.receivedSize());
+            else
+                progressReceived = null;
+
+            isProgressReceivedEvaluated = true;
+        }
+        return progressReceived;
+    }
+
+    public String getProgressExpected(PropertyContext propertyContext) {
+        if (!isProgressExpectedEvaluated) {
+
+            final Multipart.UploadProgress progress = getProgress(propertyContext);
+            if (progress != null)
+                progressExpected = progress.expectedSize().isDefined() ? ((Long) progress.expectedSize().get()).toString() : null;
+            else
+                progressExpected = null;
+
+            isProgressExpectedEvaluated = true;
+        }
+        return progressExpected;
+    }
+
+    private Multipart.UploadProgress getProgress(PropertyContext propertyContext) {
+        final Multipart.UploadProgress progress
+            = Multipart.getUploadProgressJava(NetUtils.getExternalContext(propertyContext).getRequest(), control.getContainingDocument().getUUID());
+
+        if (progress != null && control.getEffectiveId().equals(progress.fieldName()))
+            return progress;
+        else
+            return null;
     }
 
     private String getInfoValue(PropertyContext propertyContext, Element element) {
@@ -524,6 +609,9 @@ class FileInfo implements ExternalCopyable {
             cloned.isMediatypeEvaluated = true;
             cloned.isSizeEvaluated = true;
             cloned.isFilenameEvaluated = true;
+
+            cloned.isProgressReceivedEvaluated = true;
+            cloned.isProgressExpectedEvaluated = true;
 
             return cloned;
         } catch (CloneNotSupportedException e) {

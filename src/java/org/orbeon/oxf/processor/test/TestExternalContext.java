@@ -298,6 +298,10 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/remote-user");
         }
 
+        public Session getSession(boolean create) {
+            return TestExternalContext.this.getSession(create);
+        }
+
         public String getRequestedSessionId() {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/requested-session-id");
         }

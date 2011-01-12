@@ -28,7 +28,6 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -257,10 +256,6 @@ public class XFormsServer extends ProcessorImpl {
                     final Set<String> valueChangeControlIds = new HashSet<String>();
                     if (hasEvents || hasFiles) {
 
-                        // Reorder events in noscript mode
-                        if (hasEvents && isNoscript)
-                            processEventsForNoscript(clientEvents, containingDocument);
-
                         eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
                         {
                             // Start external events
@@ -401,7 +396,6 @@ public class XFormsServer extends ProcessorImpl {
                     indentedLogger.endHandleOperation("success", Boolean.toString(success));
                 }
 
-
                 // We are done here
                 return;
 
@@ -415,67 +409,6 @@ public class XFormsServer extends ProcessorImpl {
         // NOTE: Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         // hit the document
         XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
-    }
-
-    private void processEventsForNoscript(List<Element> eventElements, XFormsContainingDocument containingDocument) {
-
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-
-        List<Element> noscriptActivateEvents = null;
-        Map<String, String> noscriptValueIds = null;
-
-        for (Iterator i = eventElements.iterator(); i.hasNext();) {
-            final Element eventElement = (Element) i.next();
-            final String eventName = eventElement.attributeValue("name");
-
-            if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
-                // Special event for noscript mode
-                final String sourceControlId = eventElement.attributeValue("source-control-id");
-                if (!staticState.isValueControl(sourceControlId)) {
-                    // This is most likely a trigger or submit which will translate into a DOMActivate,
-                    // so we move it to the end so that value change events are committed to the
-                    // instance before that.
-                    i.remove();
-                    if (noscriptActivateEvents == null)
-                        noscriptActivateEvents = new ArrayList<Element>();
-                    noscriptActivateEvents.add(eventElement);
-                } else {
-                    // This is a value event, just remember the id
-                    if (noscriptValueIds == null)
-                        noscriptValueIds = new HashMap<String, String>();
-                    noscriptValueIds.put(sourceControlId, "");
-                }
-            }
-        }
-
-        // Special handling of checkboxes blanking in noscript mode
-        final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
-
-        if (selectFullControls != null) {
-
-            for (Map.Entry<String, XFormsControl> currentEntry: selectFullControls.entrySet()) {
-                final String currentEffectiveId = currentEntry.getKey();
-                final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
-
-                if (currentControl != null
-                        && (noscriptValueIds == null || noscriptValueIds.get(currentEffectiveId) == null) // control did not have a value set by other events
-                        && currentControl.isRelevant() && !currentControl.isReadonly()) {                 // control is relevant and not readonly
-
-                    // <xxforms:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
-                    final Element newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME.getQualifiedName(), XFormsConstants.XXFORMS_EVENT_QNAME.getNamespaceURI());
-                    newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
-                    newEventElement.addAttribute("source-control-id", currentEffectiveId);
-
-                    // Append the blanking event
-                    eventElements.add(newEventElement);
-                }
-            }
-        }
-
-        // Append all noscript activation events
-        if (noscriptActivateEvents != null) {
-            eventElements.addAll(noscriptActivateEvents);
-        }
     }
 
     /**

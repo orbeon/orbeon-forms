@@ -18,12 +18,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 import scala.collection.JavaConversions._
-import java.util.{List => JList, Set => JSet}
 import org.orbeon.oxf.common.OXFException
+import java.util.{List => JList, Set => JSet}
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsSelectControl, XFormsTriggerControl}
 
 object ClientEvents {
 
@@ -44,6 +45,13 @@ object ClientEvents {
                                 clientEvents: JList[Element], serverEvents: JList[Element],
                                 valueChangeControlIds: JSet[String]) = {
 
+        // Process events for noscript mode if needed
+        val clientEventsAfterNoscript =
+            if (containingDocument.getStaticState.isNoscript)
+                reorderNoscriptEvents(clientEvents, containingDocument)
+            else
+                clientEvents.toSeq
+
         // Decode encrypted server events
         def decodeServerEvents(element: Element) = {
             val document = XFormsUtils.decodeXML(pipelineContext, element.getStringValue)
@@ -62,7 +70,7 @@ object ClientEvents {
         // Gather all events including decoding action server events
         val allClientAndServerEvents: Seq[LocalEvent] =
             globalServerEvents ++
-                (clientEvents flatMap (_ match {
+                (clientEventsAfterNoscript flatMap (_ match {
                     case element if element.attributeValue("name") == XFormsEvents.XXFORMS_SERVER_EVENTS =>
                         decodeServerEvents(element) map (LocalEvent(_, true))
                     case element => List(LocalEvent(element, false))
@@ -87,7 +95,7 @@ object ClientEvents {
             case Seq(a, b) if new EventGroupingKey(a) != new EventGroupingKey(b) =>
                 // Only process last value change event received
                 assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
-                valueChangeControlIds.add(a.targetEffectiveId)
+                valueChangeControlIds += a.targetEffectiveId
                 safelyCreateEvent(containingDocument, a)
             case Seq(a, b) =>
                 // Nothing to do here: we are compressing value change events
@@ -171,5 +179,61 @@ object ClientEvents {
         // Create event
         Some(XFormsEventFactory.createEvent(containingDocument, newEventName, eventTarget, otherEventTarget, true,
             event.bubbles, event.cancelable, event.value, gatherParameters(event)))
+    }
+
+    private def reorderNoscriptEvents(eventElements: JList[Element], containingDocument: XFormsContainingDocument): Seq[Element] = {
+
+        // Event categories, in the order we will want them
+        object Category extends Enumeration {
+            val Other = Value
+            val ValueChange = Value
+            val SelectBlank = Value
+            val Activation = Value
+        }
+
+        // Group events in 3 categories
+        def getEventCategory(element: Element) = element match {
+            // Special event for noscript mode
+            case element if element.attributeValue("name") == XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE =>
+                val sourceControlId = element.attributeValue("source-control-id")
+                element match {
+                    // This is a value event
+                    case element if containingDocument.getStaticState.isValueControl(sourceControlId) => Category.ValueChange
+                    // This is most likely a trigger or submit which will translate into a DOMActivate. We will move it
+                    // to the end so that value change events are committed to instance data before that.
+                    case _ => Category.Activation
+                }
+            case _ => Category.Other
+        }
+
+        // NOTE: map keys are not in predictable order, but map values preserve the order
+        val groups = eventElements groupBy (getEventCategory(_))
+
+        // Special handling of checkboxes blanking in noscript mode
+        val blankEvents = {
+
+            // Get set of all value change events effective ids
+            def getValueChangeIds = groups.get(Category.ValueChange).flatten map (_.attributeValue("source-control-id")) toSet
+
+            // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
+            def createBlankingEvent(control: XFormsControl) = {
+                val newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME)
+                newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE)
+                newEventElement.addAttribute("source-control-id", control.getEffectiveId)
+                newEventElement
+            }
+
+            val selectFullControls = containingDocument.getControls.getCurrentControlTree.getSelectFullControls
+
+            // Find all relevant and non-readonly select controls for which no value change event arrived. For each such
+            // control, create a new event that will blank its value.
+            selectFullControls.keySet -- getValueChangeIds map
+                (selectFullControls.get(_).asInstanceOf[XFormsSelectControl]) filter
+                    (control => control.isRelevant && !control.isReadonly) map
+                        (createBlankingEvent(_)) toSeq
+        }
+
+        // Return all events by category in the order we defined the categories
+        Category.values.toSeq flatMap ((groups ++ Map(Category.SelectBlank -> blankEvents)).get(_)) flatten
     }
 }

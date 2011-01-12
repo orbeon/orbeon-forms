@@ -16,7 +16,10 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 
 import java.util.*;
 
@@ -144,7 +147,8 @@ public class ControlIndex {
      * @return LinkedHashMap
      */
     public Map<String, XFormsControl> getSelectFullControls() {
-        return (controlTypes != null) ? controlTypes.get("select") : null;
+        final Map<String, XFormsControl> result = (controlTypes != null) ? controlTypes.get("select") : null;
+        return (result == null) ? Collections.<String, XFormsControl>emptyMap() : result;
     }
 
     public void clear() {

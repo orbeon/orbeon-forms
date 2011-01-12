@@ -607,6 +607,11 @@ public class Dom4jUtils {
         return factory.createElement(qualifiedName, namespaceURI);
     }
 
+    public static Element createElement(final QName qName) {
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        return factory.createElement(qName);
+    }
+
     public static Attribute createAttribute(final QName qName, final String value) {
         final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createAttribute(null, qName, value);

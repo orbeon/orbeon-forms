@@ -627,6 +627,8 @@
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/util/ExecutionQueue"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/action/Message"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Control"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/CalendarResources"/></antcall>
+        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Calendar"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Upload"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Tree"/></antcall>
         <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/server/Server"/></antcall>

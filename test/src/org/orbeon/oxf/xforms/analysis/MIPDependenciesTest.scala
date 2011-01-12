@@ -13,21 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
-import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.junit._
 import org.scalatest.junit._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import xml.Elem
-import org.dom4j.{Document => JDocument}
-import org.orbeon.oxf.processor.ProcessorUtils
+import org.orbeon.oxf.test.DocumentTestBase
 
 //import runner.RunWith
 //import org.scalatest.{BeforeAndAfterEach, FlatSpec}
@@ -35,39 +24,9 @@ import org.orbeon.oxf.processor.ProcessorUtils
 
 //@RunWith(classOf[JUnitRunner])
 //class MIPDependenciesTest extends ResourceManagerTestBase with FlatSpec with AssertionsForJUnit with BeforeAndAfterEach {
-class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUnit {
-
-
-    private var pipelineContext: PipelineContext = _
-    private var document: XFormsContainingDocument = _
-
-//    override protected def beforeEach() = setupDocument()
-//    override protected def afterEach() = disposeDocument()
+class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
     @Before def setupDocument(): Unit = setupDocument("oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml")
-
-    def setupDocument(documentURL: String): Unit = setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
-    def setupDocument(xhtml: Elem): Unit = setupDocument(Dom4jUtils.readDom4j(xhtml.toString))
-
-    def setupDocument(xhtml: JDocument) {
-        ResourceManagerTestBase.staticSetup()
-
-        this.pipelineContext = createPipelineContextWithExternalContext()
-
-        val staticState = XFormsStaticStateTest.getStaticState(xhtml)
-        this.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null)
-
-        document.afterInitialResponse()
-        document.beforeExternalEvents(pipelineContext, null)
-    }
-
-    @After def disposeDocument() {
-        document.afterExternalEvents(pipelineContext)
-        document.afterUpdateResponse()
-
-        document = null
-        pipelineContext = null
-    }
 
     @Test def testTypeInvalid {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
@@ -232,26 +191,4 @@ class MIPDependenciesTest extends ResourceManagerTestBase with AssertionsForJUni
 //    }
 
     // TODO: more tests
-
-    def getControlValue(controlId: String) =
-        getObject(controlId).asInstanceOf[XFormsValueControl].getValue(pipelineContext)
-
-    def setControlValue(controlId: String, value: String) {
-        // This stores the value without testing for readonly
-        document.startOutermostActionHandler()
-        getObject(controlId).asInstanceOf[XFormsValueControl].storeExternalValue(pipelineContext, value, null)
-        document.endOutermostActionHandler(pipelineContext)
-    }
-
-    def setControlValueWithEvent(controlId: String, value: String): Unit =
-        document.handleExternalEvent(pipelineContext, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
-
-    def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
-    def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
-    def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
-    def isValid(controlId: String) = getSingleNodeControl(controlId).isValid
-    def getType(controlId: String) = getSingleNodeControl(controlId).getType
-
-    private def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
-    private def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)
 }

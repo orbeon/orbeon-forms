@@ -61,13 +61,9 @@ object Multipart {
 
         // Add a listener to destroy file items when the pipeline context is destroyed
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter {
-            override def contextDestroyed(success: Boolean) {
-                for (name <- uploadParameterMap.keySet) {
-                    for (currentValue <- uploadParameterMap.get(name))
-                        if (currentValue.isInstanceOf[FileItem])
-                            runQuietly(currentValue.asInstanceOf[FileItem].delete())
-                }
-            }
+            override def contextDestroyed(success: Boolean) =
+                for ((name, value) <- uploadParameterMap if value.isInstanceOf[FileItem])
+                    runQuietly(value.asInstanceOf[FileItem].delete())
         })
 
         // Parse the request and add file information

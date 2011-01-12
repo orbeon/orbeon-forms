@@ -62,6 +62,17 @@
     };
 
     /**
+     * This method is called when we the server sends us a progress update for this upload control. Here we update
+     * the progress indicator to reflect the new value we got from the server.
+     *
+     * @param {number} received     Number of bytes the server received so far
+     * @param {number} expected     Total number of bytes the server expects
+     */
+    Upload.prototype.progress = function(received, expected) {
+        // TODO
+    };
+
+    /**
      * When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
      */
     Upload.prototype.cancel = function(event) {

@@ -19,6 +19,7 @@
     ORBEON.xforms.server.AjaxServer = {};
 
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
+    var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
 
     AjaxServer.Event = function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
@@ -354,6 +355,15 @@
                         }
                     }
 
+                    // Get events to send, filtering out those that are not for the form we chose
+                    var eventsToSend = [];
+                    var remainingEvents = [];
+                    _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
+                        ((Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) ? eventsToSend : remainingEvents)
+                            .push(event);
+                    });
+                    ORBEON.xforms.Globals.eventQueue = remainingEvents;
+
                     // Mark this as loading
                     ORBEON.xforms.Globals.requestInProgress = true;
 
@@ -397,11 +407,15 @@
 
                         // Add request sequence number
                         var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
-                        ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
+
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxforms:sequence>');
                         requestDocumentString.push(currentSequenceNumber);
                         requestDocumentString.push('</xxforms:sequence>\n');
+
+                        // Increment the sequence number if we have at least one event which is not a request for upload progress
+                        var nonProgressEvent = _.detect(eventsToSend, function(event) { return event.eventName != "xxforms-upload-progress"; });
+                        if (nonProgressEvent) ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
 
                         // Add static state
                         var staticState = ORBEON.xforms.Globals.formStaticState[formID].value;
@@ -430,45 +444,37 @@
                         }
 
                         // Keep track of the events we have handled, so we can later remove them from the queue
-                        var handledEvents = [];
-                        var remainingEvents = ORBEON.xforms.Globals.eventQueue;
 
                         // Start action
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxforms:action>\n');
 
                         // Add events
-                        for (var i = 0; i < ORBEON.xforms.Globals.eventQueue.length; i++) {
-                            var event = ORBEON.xforms.Globals.eventQueue[i];
-
-                            // Only handle this event if it is for the form we chose, and if
-                            // And if this is not an xforms-events (which is sent separately, not as an action).
-                            if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) {
-                                // Create <xxforms:event> element
-                                requestDocumentString.push(indent + indent);
-                                requestDocumentString.push('<xxforms:event');
-                                requestDocumentString.push(' name="' + event.eventName + '"');
-                                if (event.targetId != null)
-                                    requestDocumentString.push(' source-control-id="' + event.targetId + '"');
-                                if (event.otherId != null)
-                                    requestDocumentString.push(' other-control-id="' + event.otherId + '"');
-                                if (event.additionalAttribs != null) {
-                                    for(var attribIndex = 0; attribIndex < event.additionalAttribs.length - 1; attribIndex+=2)
-                                        requestDocumentString.push(' '+ event.additionalAttribs[attribIndex] +'="' + event.additionalAttribs[attribIndex+1] + '"');
-                                }
-                                requestDocumentString.push('>');
-                                if (event.value != null) {
-                                    // When the range is used we get an int here when the page is first loaded
-                                    if (typeof event.value == "string") {
-                                        event.value = event.value.replace(XFORMS_REGEXP_AMPERSAND, "&amp;");
-                                        event.value = event.value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
-                                    }
-                                    requestDocumentString.push(event.value);
-                                }
-                                requestDocumentString.push('</xxforms:event>\n');
-                                remainingEvents = _.without(remainingEvents, event);
+                        _.each(eventsToSend, function(event) {
+                            // Create <xxforms:event> element
+                            requestDocumentString.push(indent + indent);
+                            requestDocumentString.push('<xxforms:event');
+                            requestDocumentString.push(' name="' + event.eventName + '"');
+                            if (event.targetId != null)
+                                requestDocumentString.push(' source-control-id="' + event.targetId + '"');
+                            if (event.otherId != null)
+                                requestDocumentString.push(' other-control-id="' + event.otherId + '"');
+                            if (event.additionalAttribs != null) {
+                                for(var attribIndex = 0; attribIndex < event.additionalAttribs.length - 1; attribIndex+=2)
+                                    requestDocumentString.push(' '+ event.additionalAttribs[attribIndex] +'="' + event.additionalAttribs[attribIndex+1] + '"');
                             }
-                        }
+                            requestDocumentString.push('>');
+                            if (event.value != null) {
+                                // When the range is used we get an int here when the page is first loaded
+                                if (typeof event.value == "string") {
+                                    event.value = event.value.replace(XFORMS_REGEXP_AMPERSAND, "&amp;");
+                                    event.value = event.value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
+                                }
+                                requestDocumentString.push(event.value);
+                            }
+                            requestDocumentString.push('</xxforms:event>\n');
+                            remainingEvents = _.without(remainingEvents, event);
+                        });
 
                         // End action
                         requestDocumentString.push(indent);

@@ -49,7 +49,8 @@
 
     /**
      * In case of failure, after a delay call this.asyncUploadRequest() as it was called originally by the
-     * execution queue.
+     * execution queue. Currently, this method isn't called as it should when there is a connection failure.
+     * See: [ #315398 ] Retry mechanism is erratic with pseudo-Ajax submissions http://goo.gl/pPByq
      */
     UploadServer.uploadFailure = function() {
         AjaxServer.retryRequestAfterDelay(_.bind(function() {
@@ -63,6 +64,8 @@
      * remaining events.
      */
     UploadServer.continueWithRemainingEvents = function() {
+        this.yuiConnection = null;
+        this.processingEvent = null;
         if (this.remainingEvents.length == 0) this.executionQueueDone();
         else UploadServer.asyncUploadRequest(this.remainingEvents, this.executionQueueDone);
     };
@@ -90,12 +93,29 @@
             if (! keep && ! element.disabled) { element.disabled = true; return true; }
             else return false;
         }, this);
-        // Trigger actual upload through a form POST
+        // Trigger actual upload through a form POST and start asking server for progress
         Connect.setForm(this.processingEvent.form, true, true);
         this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id],
             { upload: _.bind(this.uploadSuccess, this), failure: _.bind(this.uploadFailure, this) });
+        this.askForProgressUpdate();
         // Enable the controls we previously disabled
         _.each(disabledElements, function(element) { element.disabled = false; });
+    };
+
+    /**
+     * While there is a file upload going, this method runs at a regular interval and keeps asking the server for
+     * the status of the upload.
+     *
+     * @private
+     */
+    UploadServer.askForProgressUpdate = function() {
+        if (this.processingEvent != null) {
+            _.delay(_.bind(function() {
+                if (this.processingEvent != null)
+                    AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id,
+                            null, null, "xxforms-upload-progress")], false);
+            }, this), 2000)
+        }
     };
 
     /**

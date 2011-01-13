@@ -130,6 +130,7 @@ public class XFormsFeatures {
     private static final ResourceConfig[] stylesheets = {
             // Standard CSS
             new ResourceConfig("/ops/yui/container/assets/skins/sam/container.css", null),
+            new ResourceConfig("/ops/yui/progressbar/assets/skins/sam/progressbar.css", null),
             // Calendar CSS
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null) {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
@@ -224,7 +225,9 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),
             new ResourceConfig("/ops/yui/dom/dom.js", "/ops/yui/dom/dom-min.js"),
             new ResourceConfig("/ops/yui/connection/connection.js", "/ops/yui/connection/connection-min.js"),
+            new ResourceConfig("/ops/yui/element/element.js", "/ops/yui/element/element-min.js"),
             new ResourceConfig("/ops/yui/animation/animation.js", "/ops/yui/animation/animation-min.js"),
+            new ResourceConfig("/ops/yui/progressbar/progressbar.js", "/ops/yui/progressbar/progressbar-min.js"),
             new ResourceConfig("/ops/yui/dragdrop/dragdrop.js", "/ops/yui/dragdrop/dragdrop-min.js"),
             new ResourceConfig("/ops/yui/container/container.js", "/ops/yui/container/container-min.js"),
             new ResourceConfig("/ops/yui/examples/container/assets/containerariaplugin.js", "/ops/yui/examples/container/assets/containerariaplugin-min.js"),
@@ -269,12 +272,6 @@ public class XFormsFeatures {
                     return isFCKEditorInUse(containingDocument, appearancesMap);
                 }
                 public String getFeatureName() { return "fckeditor"; }
-            },
-            new ResourceConfig("/ops/yui/element/element.js", "/ops/yui/element/element-min.js") {
-                public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {
-                    return isYUIRTEInUse(containingDocument, appearancesMap);
-                }
-                public String getFeatureName() { return "yuirte"; }
             },
             new ResourceConfig("/ops/yui/button/button.js", "/ops/yui/button/button-min.js") {
                 public boolean isInUse(XFormsContainingDocument containingDocument, Map appearancesMap) {

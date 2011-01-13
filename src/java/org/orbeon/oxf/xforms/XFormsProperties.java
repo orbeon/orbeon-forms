@@ -96,6 +96,7 @@ public class XFormsProperties {
     private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
     private static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
     private static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
+    private static final String DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY = "delay-before-upload-progress-refresh";
     private static final String DEBUG_WINDOW_HEIGHT_PROPERTY = "debug-window-height";
     private static final String DEBUG_WINDOW_WIDTH_PROPERTY = "debug-window-width";
     private static final String LOADING_MIN_TOP_PADDING_PROPERTY = "loading-min-top-padding";
@@ -230,6 +231,7 @@ public class XFormsProperties {
             new PropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, 30000, true),
             new PropertyDefinition(INTERNAL_SHORT_DELAY_PROPERTY, 10, true),
             new PropertyDefinition(DELAY_BEFORE_DISPLAY_LOADING_PROPERTY, 500, true),
+            new PropertyDefinition(DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY, 2000, true),
             new PropertyDefinition(DEBUG_WINDOW_HEIGHT_PROPERTY, 600, true),
             new PropertyDefinition(DEBUG_WINDOW_WIDTH_PROPERTY, 300, true),
             new PropertyDefinition(LOADING_MIN_TOP_PADDING_PROPERTY, 10, true),

@@ -19,6 +19,7 @@
     ORBEON.xforms.server.UploadServer = {};
 
     var ExecutionQueue = ORBEON.util.ExecutionQueue;
+    var Properties = ORBEON.util.Properties;
     var UploadServer = ORBEON.xforms.server.UploadServer;
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
     var Connect = YAHOO.util.Connect;
@@ -83,7 +84,8 @@
         // Switch the upload to progress state, so users can't change the file and know the upload is in progress
         this.processingEvent.upload.setState("progress");
         // Tell server we're starting uploads
-        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, null, "xxforms-upload-start")], false);
+        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, null,
+                "xxforms-upload-start", null, null, null, false)], false);
         // Disabling fields other than the one we want to upload
         var disabledElements = _.filter(this.processingEvent.form.elements, function(element) {
             // Keep in form post the $uuid element and input for this upload
@@ -104,18 +106,19 @@
 
     /**
      * While there is a file upload going, this method runs at a regular interval and keeps asking the server for
-     * the status of the upload.
-     *
-     * @private
+     * the status of the upload. Initially, it is called by the UploadServer when it sends the file. Then, it is called
+     * by the upload control, when it receives a progress update, as we only want to ask for an updated progress after
+     * we get an answer from the server.
      */
     UploadServer.askForProgressUpdate = function() {
-        if (this.processingEvent != null) {
-            _.delay(_.bind(function() {
-                if (this.processingEvent != null)
-                    AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id,
-                            null, null, "xxforms-upload-progress")], false);
-            }, this), 2000)
-        }
+        _.delay(_.bind(function() {
+            // Keep asking for progress update at regular interval until there is no upload in progress
+            if (this.processingEvent != null) {
+                AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id,
+                        null, null, "xxforms-upload-progress", null, null, null, false)], false);
+                this.askForProgressUpdate();
+            }
+        }, this), Properties.delayBeforeUploadProgressRefresh.get())
     };
 
     /**

@@ -264,6 +264,7 @@
                 {
                     var seenControlValue = {};
                     var newEvents = [];
+                    var firstUploadProgressEvent = null;
 
                     for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                         // Extract information from event array
@@ -292,6 +293,14 @@
                                     seenControlValue[event.targetId].value = event.value;
                                     // Update server value
                                     ORBEON.xforms.ServerValueStore.set(event.targetId, event.value);
+                                }
+                            } else if (event.eventName == "xxforms-upload-progress") {
+                                // Collapse multiple upload progress requests only sending the one for the latest control
+                                if (firstUploadProgressEvent == null) {
+                                    firstUploadProgressEvent = event;
+                                    newEvents.push(event);
+                                } else {
+                                    firstUploadProgressEvent.targetId = event.targetId;
                                 }
                             } else {
                                 // Any non-value change event is a boundary between event blocks
@@ -1138,6 +1147,8 @@
                                     var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                     var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
                                     var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
+                                    var progressReceived = ORBEON.util.Dom.getAttribute(controlElement, "progress-received");
+                                    var progressExpected = ORBEON.util.Dom.getAttribute(controlElement, "progress-expected");
 
                                     var newSchemaType = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                     var documentElement = ORBEON.util.Dom.get(controlId);
@@ -1510,6 +1521,10 @@
                                             && ORBEON.util.Properties.htmlEditor.get() == "fck") {
                                         ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
                                     }
+
+                                    // Handle progress for upload controls
+                                    if (progressReceived != null && progressExpected != null && progressReceived != "" && progressExpected != "")
+                                        ORBEON.xforms.Page.getControl(documentElement).progress(parseInt(progressReceived), parseInt(progressExpected));
                                 }
 
                                 // Handle innerHTML updates

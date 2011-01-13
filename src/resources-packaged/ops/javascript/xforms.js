@@ -928,6 +928,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 this.delayBeforeAjaxTimeout = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
                 this.internalShortDelay = new ORBEON.util.Property("internal-short-delay", 100);
                 this.delayBeforeDisplayLoading = new ORBEON.util.Property("delay-before-display-loading", 500);
+                this.delayBeforeUploadProgressRefresh= new ORBEON.util.Property("delay-before-upload-progress-refresh", 2000);
                 this.debugWindowHeight = new ORBEON.util.Property("debug-window-height", 600);
                 this.debugWindowWidth = new ORBEON.util.Property("debug-window-width", 300);
                 this.loadingMinTopPadding = new ORBEON.util.Property("loading-min-top-padding", 10);

@@ -28,8 +28,11 @@
     var Page = ORBEON.xforms.Page;
     var Event = YAHOO.util.Event;
     var YD = YAHOO.util.Dom;
+    var ProgressBar = YAHOO.widget.ProgressBar;
 
     Upload.prototype = new Control();
+
+    Upload.prototype.yuiProgressBar = null;
 
     Upload.prototype.init = function(container) {
         // Call super-class init
@@ -40,7 +43,7 @@
 
             // Add markup to the DOM
             var uploadProgressSpan = document.createElement("span");
-            uploadProgressSpan.innerHTML = '<span class="xforms-upload-spinner"></span>'
+            uploadProgressSpan.innerHTML = '<span class="xforms-upload-progress-bar"></span>'
                 + '<a href="#" class="xforms-upload-cancel">Cancel</a>';
             OD.setAttribute(uploadProgressSpan, "class", "xforms-upload-progress");
             var inputSelect = this.getElementByClassName("xforms-upload-select");
@@ -57,6 +60,7 @@
      * background  as soon as possible (pseudo-Ajax request).
      */
     Upload.prototype.change = function() {
+        // Start at 10, so the progress bar doesn't appear to be stuck at the beginning
         UploadServer.uploadEventQueue.add({form: this.getForm(), upload: this},
                 Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT);
     };
@@ -69,7 +73,8 @@
      * @param {number} expected     Total number of bytes the server expects
      */
     Upload.prototype.progress = function(received, expected) {
-        // TODO
+        this.yuiProgressBar.set("value", 10 + 100 * received / expected);
+        UploadServer.askForProgressUpdate();
     };
 
     /**
@@ -92,6 +97,14 @@
         if (! _.contains(STATES, state)) throw "Invalid state " + state;
         // Remove any existing state class
         _.each(STATES, _.bind(function(state) { YD.removeClass(this.container, "xforms-upload-state-" + state); }, this));
+        if (state == "progress") {
+            // Create or recreate progress bar
+            this.getElementByClassName("xforms-upload-progress-bar").innerHTML = "";
+            this.yuiProgressBar = new ProgressBar({ width: 100, height: 10, value: 0, minValue: 0, maxValue: 110, anim: true });
+            this.yuiProgressBar.get("anim").duration = Properties.delayBeforeUploadProgressRefresh.get() / 1000 * 1.5;
+            this.yuiProgressBar.render(this.getElementByClassName("xforms-upload-progress-bar"));
+            this.yuiProgressBar.set("value", 10);
+        }
         // Add the relevant state class
         YD.addClass(this.container, "xforms-upload-state-" + state);
     };

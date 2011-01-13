@@ -87,13 +87,11 @@ public class XFormsUploadControl extends XFormsValueControl {
         } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
             // Upload canceled
             containingDocument.endUpload(getUploadUniqueId());
-            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), containingDocument.getUUID());
         } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
             // Upload done: process upload to this control
 
             // Notify that the upload has ended
             containingDocument.endUpload(getUploadUniqueId());
-            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), containingDocument.getUUID());
 
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
             handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);

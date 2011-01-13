@@ -105,11 +105,19 @@ object Multipart {
             case _ => None
         }
 
+    /* NOTE: Don't remove the object from the session. This handles the following case:
+             o upload 2 starts and puts new UploadProgress into session
+             o upload 1 done event sent to server
+             o UploadProgress is removed from session
+             o upload 2 keeps updating UploadProgress but this is not put back into session
+             o so no progress updates are sent to the client
+
     def removeUploadProgress(request: ExternalContext.Request, uuid: String): Unit =
         request.getSession(false) match {
             case session: Session => session.getAttributesMap.remove(UPLOAD_PROGRESS_SESSION_KEY + uuid)
             case _ =>
         }
+    */
 
     class UploadProgress(val fieldName: String, val expectedSize: Option[Long]) {
         var receivedSize = 0L

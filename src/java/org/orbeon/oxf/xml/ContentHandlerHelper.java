@@ -197,6 +197,22 @@ public class ContentHandlerHelper {
         }
     }
 
+    public void startPrefixMapping (String prefix, String uri) {
+        try {
+            xmlReceiver.startPrefixMapping(prefix, uri);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public void endPrefixMapping (String prefix) {
+        try {
+            xmlReceiver.endPrefixMapping(prefix);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
+
     public static void populateAttributes(AttributesImpl attributesImpl, String[] attributes) {
         if (attributes != null) {
             for (int i = 0; i < attributes.length / 2; i++) {

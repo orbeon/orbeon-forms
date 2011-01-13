@@ -25,7 +25,10 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -135,67 +138,8 @@ public class XFormsServer extends ProcessorImpl {
 
         // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
         if (clientEvents.size() == 1) {
-            final Element eventElement = clientEvents.get(0);
-            final String eventName = eventElement.attributeValue("name");
-            if (eventName.equals(XFormsEvents.XXFORMS_SESSION_HEARTBEAT)) {
-
-                if (indentedLogger.isDebugEnabled()) {
-                    if (session != null)
-                        indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId());
-                    else
-                        indentedLogger.logDebug("heartbeat", "received heartbeat from client (no session available).");
-                }
-
-                // Output simple resulting document
-                try {
-                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
-                    helper.startDocument();
-                    xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                    helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
-                    helper.endElement();
-                    xmlReceiver.endPrefixMapping("xxf");
-                    helper.endDocument();
-                } catch (SAXException e) {
-                    throw new OXFException(e);
-                }
-
-                // Don't do anything else
+            if (ClientEvents.doQuickReturnEvents(xmlReceiver, request, requestDocument, indentedLogger, logRequestResponse, clientEvents, session))
                 return;
-            } else if (eventName.equals(XFormsEvents.XXFORMS_UPLOAD_PROGRESS)) {
-
-                // Output simple resulting document
-                try {
-                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
-                    helper.startDocument();
-                    xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                    helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
-
-                    final Multipart.UploadProgress progress = Multipart.getUploadProgressJava(request, XFormsStateManager.getRequestUUID(requestDocument));
-                    if (progress != null) {
-
-                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
-                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
-
-                        helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {
-                                "id", eventElement.attributeValue("source-control-id"),
-                                "progress-received", Long.toString(progress.receivedSize()),
-                                "progress-expected", progress.expectedSize().isDefined() ? ((Long) progress.expectedSize().get()).toString() : null
-                        });
-
-                        helper.endElement();
-                        helper.endElement();
-                    }
-
-                    helper.endElement();
-                    xmlReceiver.endPrefixMapping("xxf");
-                    helper.endDocument();
-                } catch (SAXException e) {
-                    throw new OXFException(e);
-                }
-
-                // Don't do anything else
-                return;
-            }
         }
 
         // Gather server events containers if any

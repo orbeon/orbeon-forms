@@ -13,18 +13,21 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.dom4j.Element
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
-import java.util.{List => JList, Set => JSet}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.{XFormsSelectControl, XFormsTriggerControl}
+import org.orbeon.oxf.xml._
+import org.orbeon.oxf.util.IndentedLogger
+import java.util.{ArrayList, List => JList, Set => JSet}
+import dom4j.{LocationSAXContentHandler, Dom4jUtils}
+import org.orbeon.oxf.pipeline.api._
+import org.orbeon.oxf.util.Multipart
+import org.dom4j.{Document, Element}
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 
 object ClientEvents {
 
@@ -181,7 +184,7 @@ object ClientEvents {
             event.bubbles, event.cancelable, event.value, gatherParameters(event)))
     }
 
-    private def reorderNoscriptEvents(eventElements: JList[Element], containingDocument: XFormsContainingDocument): Seq[Element] = {
+    def reorderNoscriptEvents(eventElements: JList[Element], containingDocument: XFormsContainingDocument): Seq[Element] = {
 
         // Event categories, in the order we will want them
         object Category extends Enumeration {
@@ -235,5 +238,79 @@ object ClientEvents {
 
         // Return all events by category in the order we defined the categories
         Category.values.toSeq flatMap ((groups ++ Map(Category.SelectBlank -> blankEvents)).get(_)) flatten
+    }
+
+    def doQuickReturnEvents(xmlReceiver: XMLReceiver, request: ExternalContext.Request, requestDocument: Document, indentedLogger: IndentedLogger,
+               logRequestResponse: Boolean, clientEvents: JList[Element], session: ExternalContext.Session): Boolean = {
+
+        val eventElement = clientEvents.get(0)
+
+        // Hook-up debug content handler if we must log the response document
+        def getReceiver =
+            if (logRequestResponse) {
+                val receivers = new ArrayList[XMLReceiver]
+                receivers.add(xmlReceiver)
+                val debugContentHandler = new LocationSAXContentHandler
+                receivers.add(debugContentHandler)
+
+                (new TeeXMLReceiver(receivers), debugContentHandler)
+            } else
+                (xmlReceiver, null)
+
+        // Helper to make it easier to output simple Ajax responses
+        def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper => Unit): Boolean = {
+            indentedLogger.startHandleOperation("ajax response", "handling regular Ajax response")
+
+            val (responseReceiver, debugContentHandler) = getReceiver
+
+            val helper = new ContentHandlerHelper(responseReceiver)
+            helper.startDocument()
+            helper.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI)
+            helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response")
+
+            block(helper)
+
+            helper.endElement()
+            helper.endPrefixMapping("xxf")
+            helper.endDocument()
+
+            indentedLogger.endHandleOperation("ajax response", if (debugContentHandler ne null) Dom4jUtils.domToPrettyString(debugContentHandler.getDocument) else null)
+
+            true
+        }
+
+        eventElement.attributeValue("name") match {
+            // Quick response for heartbeat
+            case XFormsEvents.XXFORMS_SESSION_HEARTBEAT =>
+
+                if (indentedLogger.isDebugEnabled) {
+                    if (session != null)
+                        indentedLogger.logDebug("heartbeat", "received heartbeat from client for session: " + session.getId)
+                    else
+                        indentedLogger.logDebug("heartbeat", "received heartbeat from client (no session available).")
+                }
+
+                // Output empty Ajax response
+                eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper => ())
+
+            // Quick response for upload progress
+            case XFormsEvents.XXFORMS_UPLOAD_PROGRESS =>
+
+                // Output simple resulting document
+                eventResponse("ajax response", "handling quick upload progress Ajax response") { helper =>
+                    val progress = Multipart.getUploadProgressJava(request, XFormsStateManager.getRequestUUID(requestDocument))
+                    if (progress != null) {
+                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action")
+                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values")
+                        helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control",
+                            Array[String]("id", eventElement.attributeValue("source-control-id"),
+                                "progress-received", progress.receivedSize.toString,
+                                "progress-expected", progress.expectedSize match {case Some(long) => long.toString; case _ => null}))
+                        helper.endElement()
+                        helper.endElement()
+                    }
+                }
+            case _ => false
+        }
     }
 }

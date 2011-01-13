@@ -245,23 +245,21 @@ object ClientEvents {
 
         val eventElement = clientEvents.get(0)
 
-        // Hook-up debug content handler if we must log the response document
-        def getReceiver =
-            if (logRequestResponse) {
-                val receivers = new ArrayList[XMLReceiver]
-                receivers.add(xmlReceiver)
-                val debugContentHandler = new LocationSAXContentHandler
-                receivers.add(debugContentHandler)
-
-                (new TeeXMLReceiver(receivers), debugContentHandler)
-            } else
-                (xmlReceiver, null)
-
         // Helper to make it easier to output simple Ajax responses
         def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper => Unit): Boolean = {
             indentedLogger.startHandleOperation("ajax response", "handling regular Ajax response")
 
-            val (responseReceiver, debugContentHandler) = getReceiver
+            // Hook-up debug content handler if we must log the response document
+            val (responseReceiver, debugContentHandler) =
+                if (logRequestResponse) {
+                    val receivers = new ArrayList[XMLReceiver]
+                    receivers.add(xmlReceiver)
+                    val debugContentHandler = new LocationSAXContentHandler
+                    receivers.add(debugContentHandler)
+
+                    (new TeeXMLReceiver(receivers), debugContentHandler)
+                } else
+                    (xmlReceiver, null)
 
             val helper = new ContentHandlerHelper(responseReceiver)
             helper.startDocument()

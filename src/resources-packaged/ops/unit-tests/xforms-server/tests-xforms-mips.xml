@@ -1477,4 +1477,40 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Don't throw exception with bind on non-NodeWrapper NodeInfo" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315728&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xf:model id="model">
+                        <!-- Mark instance as readonly -->
+                        <xf:instance id="instance" xxf:readonly="true">
+                            <instance>
+                                <value/>
+                            </instance>
+                        </xf:instance>
+                        <xf:bind ref="instance()">
+                            <!-- Use nested bind to trigger creation of BindNode object-->
+                            <xf:bind ref="."/>
+                        </xf:bind>
+                    </xf:model>
+                </xhtml:head>
+                <xhtml:body/>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

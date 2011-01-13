@@ -51,16 +51,19 @@ public class InstanceData {// rename to DataNodeProperties once done
     private Map<String, String> transientAnnotations;
 
     public static void addBindNode(NodeInfo nodeInfo, XFormsModelBinds.Bind.BindNode bindNode) {
-        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo);
-        if (instanceData.bindNodes == null)
-            instanceData.bindNodes = Collections.singletonList(bindNode);
-        else if (instanceData.bindNodes.size() == 1) {
-            final XFormsModelBinds.Bind.BindNode oldBindNode = instanceData.bindNodes.get(0);
-            instanceData.bindNodes = new ArrayList<XFormsModelBinds.Bind.BindNode>(4); // hoping that situations where many binds point to same node are rare
-            instanceData.bindNodes.add(oldBindNode);
-            instanceData.bindNodes.add(bindNode);
-        } else {
-            instanceData.bindNodes.add(bindNode);
+        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo, false);
+        if (instanceData != READONLY_LOCAL_INSTANCE_DATA) {
+            // only register ourselves if we are not a readonly node
+            if (instanceData.bindNodes == null)
+                instanceData.bindNodes = Collections.singletonList(bindNode);
+            else if (instanceData.bindNodes.size() == 1) {
+                final XFormsModelBinds.Bind.BindNode oldBindNode = instanceData.bindNodes.get(0);
+                instanceData.bindNodes = new ArrayList<XFormsModelBinds.Bind.BindNode>(4); // hoping that situations where many binds point to same node are rare
+                instanceData.bindNodes.add(oldBindNode);
+                instanceData.bindNodes.add(bindNode);
+            } else {
+                instanceData.bindNodes.add(bindNode);
+            }
         }
     }
 
@@ -211,7 +214,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static void setTransientAnnotation(NodeInfo nodeInfo, String name, String value) {
-        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo);
+        final InstanceData instanceData = getOrCreateInstanceData(nodeInfo, true);
         instanceData.setTransientAnnotation(name,value);
     }
 
@@ -293,7 +296,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static void setBindType(NodeInfo nodeInfo, QName type) {
-        getOrCreateInstanceData(nodeInfo).bindType = type;
+        getOrCreateInstanceData(nodeInfo, true).bindType = type;
     }
 
     public static void setSchemaType(Node node, QName type) {
@@ -399,8 +402,8 @@ public class InstanceData {// rename to DataNodeProperties once done
         }
     }
 
-    private static InstanceData getOrCreateInstanceData(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, true);
+    private static InstanceData getOrCreateInstanceData(NodeInfo nodeInfo, boolean forUpdate) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate);
         return (existingInstanceData != null) ? existingInstanceData : createNewInstanceData(nodeInfo);
     }
 

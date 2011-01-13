@@ -73,8 +73,10 @@
      * @param {number} expected     Total number of bytes the server expects
      */
     Upload.prototype.progress = function(received, expected) {
-        this.yuiProgressBar.set("value", 10 + 100 * received / expected);
-        UploadServer.askForProgressUpdate();
+        if (this.yuiProgressBar) {
+            this.yuiProgressBar.set("value", 10 + 100 * received / expected);
+            UploadServer.askForProgressUpdate();
+        }
     };
 
     /**

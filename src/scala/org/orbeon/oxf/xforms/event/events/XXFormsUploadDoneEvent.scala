@@ -18,7 +18,7 @@ import java.util.{Map => JMap}
 import org.orbeon.oxf.xforms.event._
 
 class XXFormsUploadDoneEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, parameters: JMap[String, String])
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_UPLOAD_DONE, targetObject, false, false) {
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_UPLOAD_DONE, targetObject, true, false) {
 
     val file = parameters.get("file")
     val filename = parameters.get("filename")

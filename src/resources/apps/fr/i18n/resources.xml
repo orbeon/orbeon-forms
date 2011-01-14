@@ -100,6 +100,7 @@
             <messages>
                 <save-success>Document saved successfully!</save-success>
                 <form-validation-error>Document not saved: please check for errors in your form before saving again.</form-validation-error>
+                <upload-in-progress>Please retry once the file upload has completed or has been canceled.</upload-in-progress>
                 <database-error>Error communicating with the database: please contact your system administrator.</database-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
@@ -259,6 +260,7 @@
             <messages>
                 <save-success>Document enregistré avec succès!</save-success>
                 <form-validation-error>Document non enregistré: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</form-validation-error>
+                <upload-in-progress>Veuillez ressayer une fois que le téléchargement du fichier est terminé ou a été annulé.</upload-in-progress>
                 <database-error>Erreur de base de données: veuillez contacter votre administrateur système.</database-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
@@ -420,6 +422,7 @@
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
                 <form-validation-error>Documento no guardado: por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
+                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <database-error>Documento no guardado: por favor, contacte al administrador del sistema.</database-error>
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
                 <submit-dialog-title>Su formulario ha sido enviado</submit-dialog-title>
@@ -581,6 +584,7 @@
             <messages>
                 <save-success>Skjemaet er lagret!</save-success>
                 <form-validation-error>Skjemaet er ikke innsendt: Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
+                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <database-error>Feil i kommunikasjon med tjener: Vennligst kontakt din systemadministrator.</database-error>
                 <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>

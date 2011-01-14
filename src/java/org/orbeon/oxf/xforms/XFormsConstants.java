@@ -292,7 +292,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_SEPARATOR_APPEARANCE_QNAME = new QName("separator", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_ENSURE_UPLOADS_QNAME = new QName("ensure-uploads", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_UPLOADS_QNAME = new QName("uploads", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_XINCLUDE = new QName("xinclude", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ORDER_QNAME = new QName("order", XXFORMS_NAMESPACE);

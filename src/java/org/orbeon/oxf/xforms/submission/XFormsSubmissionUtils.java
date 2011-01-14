@@ -317,23 +317,25 @@ public class XFormsSubmissionUtils {
     }
 
     /**
-     * Returns whether there are relevant upload controls bound to any node of the given instance.
+     * Returns whether there is at least one relevant upload control with pending upload bound to any node of the given instance.
      *
      * @param containingDocument    current XFormsContainingDocument
      * @param currentInstance       instance to check
-     * @return                      true iif there are relevant upload controls bound
+     * @return                      true iif condition is satisfied
      */
-    public static boolean hasBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
-        final XFormsControls xformsControls = containingDocument.getControls();
-        final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
-        if (uploadControls != null) {
-            for (Object o: uploadControls.values()) {
-                final XFormsUploadControl currentControl = (XFormsUploadControl) o;
-                if (currentControl.isRelevant()) {
-                    final Item controlBoundItem = currentControl.getBoundItem();
-                    if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode((NodeInfo) controlBoundItem)) {
-                        // Found one relevant upload control bound to the instance we are submitting
-                        return true;
+    public static boolean hasBoundRelevantPendingUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
+        if (containingDocument.countPendingUploads() > 0) { // don't bother if there is no pending upload
+            final XFormsControls xformsControls = containingDocument.getControls();
+            final Map uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
+            if (uploadControls != null) {
+                for (Object o: uploadControls.values()) {
+                    final XFormsUploadControl currentControl = (XFormsUploadControl) o;
+                    if (currentControl.isRelevant() && containingDocument.isUploadPendingFor(currentControl)) {
+                        final Item controlBoundItem = currentControl.getBoundItem();
+                        if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode((NodeInfo) controlBoundItem)) {
+                            // Found one relevant upload control with pending upload bound to the instance we are submitting
+                            return true;
+                        }
                     }
                 }
             }

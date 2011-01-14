@@ -109,7 +109,7 @@ public class XFormsUploadControl extends XFormsValueControl {
         containingDocument.endUpload(getUploadUniqueId());
     }
 
-    private String getUploadUniqueId() {
+    public String getUploadUniqueId() {
         // TODO: Need to move to using actual unique ids here, see:
         // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
         return getEffectiveId();

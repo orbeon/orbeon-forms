@@ -237,9 +237,10 @@
                  is invalid and 2) submission doesn't check validity anymore -->
             <!-- NOTE: We use instance('fr-error-summary-instance')/valid and not xxforms:valid() because the instance
                  validity may not be reflected with the use of XBL components. -->
-            <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:instance('fr-error-summary-instance')/valid = 'true'" as="xs:boolean"/>
+            <xxforms:variable name="save-validity-passed" select="not($check-data-valid) or
+                (xxforms:instance('fr-error-summary-instance')/valid = 'true')" as="xs:boolean"/>
 
-            <xforms:action if="not($continue-with-save)">
+            <xforms:action if="not($save-validity-passed)">
                 <!-- Data not valid: display error -->
                 <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
                                  model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
@@ -249,7 +250,12 @@
                 <!-- Open all sections -->
                 <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
             </xforms:action>
-            <xforms:action if="$continue-with-save">
+
+            <!-- Display message if there is at least one upload in progress -->
+            <xforms:message if="$save-validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+
+            <!-- Actually save if we passed validation and there is no upload in progress -->
+            <xforms:action if="$save-validity-passed and not(xxforms:pending-uploads() > 0)">
                 <!-- Data valid: proceed with saving attachments and data -->
 
                 <!-- Handle attachments -->
@@ -362,24 +368,22 @@
     </xforms:instance>
 
     <!-- Submission to create/update the XML form -->
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here (could be cause we assume that attachments have all been uploaded in the background?) -->
     <!-- Note about validate="false": In general, when the user saves data, the data needs to be valid. This will be
          enforced by the "Save" button being disabled. But there are other cases where we want to call this persistence
          code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
          form instance is created. -->
     <xforms:submission id="fr-create-update-submission"
             validate="false" relevant="false" method="put"
-            ref="event('holder')" xxforms:ensure-uploads="false"
+            ref="event('holder')"
             resource="{instance('fr-uris-instance')/data-collection}/crud/{$app}/{$form}/data/{$document}/{event('resource')}"
             replace="text" target="instance('fr-create-update-submission-response')">
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
 
     <!-- Submission to create/update an attachment -->
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here (could be cause we assume that attachments have all been uploaded in the background?) -->
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
-            ref="event('holder')" xxforms:ensure-uploads="false"
+            ref="event('holder')"
             resource="{event('resource')}"
             replace="none">
         <xi:include href="persistence-model-headers.xml"/>
@@ -483,13 +487,13 @@
 
         <!-- Condition for disabling strict Save button -->
         <xforms:bind nodeset="strict-save" readonly="not(property('xxforms:noscript'))
-            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-error-summary-instance')/valid = 'false')"/>
+            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0)"/>
         <!-- Condition for disabling strict Submit button -->
-        <xforms:bind nodeset="strict-submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-error-summary-instance')/valid = 'false'"/>
+        <xforms:bind nodeset="strict-submit" readonly="not(property('xxforms:noscript'))
+            and (xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0)"/>
 
         <!-- Condition for disabling Publish button -->
-        <xforms:bind nodeset="publish" readonly="not(property('xxforms:noscript'))
-            and not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-error-summary-instance')/valid = 'false'"/>
+        <xforms:bind nodeset="publish" readonly="not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0"/>
 
         <!-- Conditions for disabling workflow buttons -->
         <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>
@@ -589,34 +593,21 @@
     </xforms:action>
 
     <!-- Send to final confirmation page -->
-    <!--
-        NOTE: Use xxforms:ensure-uploads="false" here because we now all uploads have been processed at this point.
-    -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{xxforms:property(string-join(('oxf.fr.detail.send.uri', $app, $form), '.'))}"
         method="post" ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
-        replace="all" xxforms:ensure-uploads="false"/>
+        replace="all"/>
 
     <!-- Call email service -->
-    <!--
-        NOTE: Use xxforms:ensure-uploads="false" here because 1) when this is called, uploads have already been
-        processed because this reacts to a create/save submission and 2) not doing so will cause a failure when we call
-        the final submission/load.
-    -->
     <xforms:submission id="fr-email-service-submission"
         resource="/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="none" xxforms:ensure-uploads="false"/>
+        method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
 
     <!-- Call PDF service -->
-    <!--
-        NOTE: Use xxforms:ensure-uploads="false" here because 1) when this is called, uploads have already been
-        processed because this reacts to a create/save submission and 2) not doing so will cause a failure when we call
-        the final submission/load.
-    -->
     <xforms:submission id="fr-pdf-service-submission"
         resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         method="post" ref="xxforms:instance('fr-form-instance')"
-        replace="instance" instance="fr-workflow-confirmation-instance" xxforms:ensure-uploads="false"/>
+        replace="instance" instance="fr-workflow-confirmation-instance"/>
 
     <xforms:instance id="fr-workflow-confirmation-instance">
         <uri/>
@@ -661,7 +652,11 @@
             <!-- Open all sections -->
             <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
         </xforms:action>
-        <xforms:action if="event('error-type') != 'validation-error'">
+        <!-- If submission failed because there is a pending upload, display a message -->
+        <xforms:action if="event('error-type') = 'xxforms-pending-uploads'">
+            <xforms:message model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+        </xforms:action>
+        <xforms:action if="not(event('error-type') = ('validation-error', 'xxforms-pending-uploads')">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
@@ -681,19 +676,5 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
     </xforms:action>
-
-    <!-- Perform background submission upon xforms-select for xforms:upload -->
-    <!-- NOTE: We used to check on event('xxforms:binding')/root()/* is xxforms:instance('fr-form-instance'), but this
-         doesn't work with nested XBL components which handle their own local data. So now just rely on observers. -->
-    <xforms:action ev:observer="fr-form-group fb-logo-group fr-dialogs-group" ev:event="xforms-select"
-            if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">
-        <xforms:send submission="fr-upload-attachment-submission"/>
-    </xforms:action>
-
-    <xforms:submission id="fr-upload-attachment-submission"
-                       ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"
-                       method="post" replace="none" resource="test:">
-        <xi:include href="persistence-model-headers.xml"/>
-    </xforms:submission>
 
 </xforms:model>

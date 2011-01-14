@@ -313,13 +313,6 @@
                                 <attribute name="action"/>
                             </optional>
                             <attribute name="method"/>
-                            <attribute name="replace">
-                                <choice>
-                                    <value>all</value>
-                                    <value>instance</value>
-                                    <value>none</value>
-                                </choice>
-                            </attribute>
                             <optional>
                                 <attribute name="show-progress">
                                     <choice>

@@ -17,4 +17,4 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event._
 
 class XXFormsUploadStartEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_UPLOAD_START, targetObject, false, false)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_UPLOAD_START, targetObject, true, false)

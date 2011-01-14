@@ -76,6 +76,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String avtValidate;
     private String avtRelevant;
     private String avtXXFormsCalculate;
+    private String avtXXFormsUploads;
 
     private String avtSerialization;
     private boolean serialize = true;// computed from @serialization attribute or legacy @serialize attribute
@@ -106,8 +107,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String avtXXFormsTarget;
     private String resolvedXXFormsTarget;
     private String avtXXFormsHandleXInclude;
-
-    private boolean xxfFormsEnsureUploads;
 
     private boolean xxfShowProgress;
 
@@ -189,6 +188,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             avtValidate = submissionElement.attributeValue("validate");
             avtRelevant = submissionElement.attributeValue("relevant");
             avtXXFormsCalculate = submissionElement.attributeValue(XFormsConstants.XXFORMS_CALCULATE_QNAME);
+            avtXXFormsUploads = submissionElement.attributeValue(XFormsConstants.XXFORMS_UPLOADS_QNAME);
 
             avtSerialization = submissionElement.attributeValue("serialization");
             if (avtSerialization != null) {
@@ -239,7 +239,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             avtXXFormsCache = submissionElement.attributeValue(XFormsConstants.XXFORMS_CACHE_QNAME);
 
             avtXXFormsTarget = submissionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
-            xxfFormsEnsureUploads = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_ENSURE_UPLOADS_QNAME));
             avtXXFormsHandleXInclude = submissionElement.attributeValue(XFormsConstants.XXFORMS_XINCLUDE);
 
             // Whether we must show progress or not
@@ -340,6 +339,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                 "new submission", this.getEffectiveId());
                         return;
                     }
+                }
+
+                /* ***** Check for pending uploads ********************************************************************** */
+
+                // We can do this first, because the check just depends on the controls, instance to submit, and pending
+                // submissions if any. This does not depend on the actual state of the instance.
+                if (serialize && p.resolvedXXFormsUploads && XFormsSubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refInstance)) {
+                    throw new XFormsSubmissionException(this, "xforms:submission: instance to submit has at least one pending upload.",
+                        "checking pending uploads",
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_PENDING_UPLOADS, null));
                 }
 
                 /* ***** Update data model ****************************************************************************** */
@@ -699,8 +708,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         XFormsInstance refInstance;
         Item submissionElementContextItem;
 
-        final boolean hasBoundRelevantUploadControl;
-
         final String resolvedMethod;
         final String actualHttpMethod;
         final String resolvedMediatype;
@@ -708,6 +715,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean resolvedValidate;
         final boolean resolvedRelevant;
         final boolean resolvedXXFormsCalculate;
+        final boolean resolvedXXFormsUploads;
 
         final boolean isHandlingClientGetAll;
 
@@ -753,21 +761,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
             }
 
-            // Determine if the instance to submit has one or more bound and relevant upload controls
-            //
-            // o we don't check if we are currently initializing the document because at that point the
-            //   client cannot have any files to upload yet
-            //
-            // o we don't check if we have already processed the second pass of a submission during this
-            //   request, because it means that upload controls have been already committed
-            //
-            // o we don't check if we are requested not to with an attribute
-            //
-            // o we only check for replace="instance|none" and if serialization must take place
-            hasBoundRelevantUploadControl = refInstance != null && !containingDocument.isInitializing()
-                    && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll
-                    && serialize && XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
-
             {
                 // Resolved method AVT
                 final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtMethod);
@@ -790,6 +783,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtXXFormsCalculate);
                 resolvedXXFormsCalculate = serialize && !"false".equals(resolvedCalculateString);
+
+                final String resolvedUploadsString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtXXFormsUploads);
+                resolvedXXFormsUploads = serialize && !"false".equals(resolvedUploadsString);
             }
 
             isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
@@ -802,7 +798,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             isNoscript = containingDocument.getStaticState().isNoscript();
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
 
-            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll && !containingDocument.isInitializing()) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
+            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll && !containingDocument.isInitializing());
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
             isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
             isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT

@@ -215,6 +215,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     	public static final ErrorType RESOURCE_ERROR = new ErrorType("resource-error");
     	public static final ErrorType PARSE_ERROR = new ErrorType("parse-error");
         public static final ErrorType TARGET_ERROR = new ErrorType("target-error");
+        public static final ErrorType XXFORMS_PENDING_UPLOADS = new ErrorType("xxforms-pending-uploads");
         public static final ErrorType XXFORMS_INTERNAL_ERROR = new ErrorType("xxforms-internal-error");
 
         private final String errorType;

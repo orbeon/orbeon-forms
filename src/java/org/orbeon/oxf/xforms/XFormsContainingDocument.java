@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -1612,6 +1613,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public int countPendingUploads() {
         return (pendingUploads == null) ? 0 : pendingUploads.size();
+    }
+
+    /**
+     * Whether an upload is pending for the given upload control.
+     */
+    public boolean isUploadPendingFor(XFormsUploadControl uploadControl) {
+        return (pendingUploads != null) && pendingUploads.contains(uploadControl.getUploadUniqueId());
     }
 
     /**

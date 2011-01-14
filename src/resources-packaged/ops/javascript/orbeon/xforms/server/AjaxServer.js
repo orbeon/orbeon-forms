@@ -1853,35 +1853,33 @@
                                 var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
                                 var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                 var target = ORBEON.util.Dom.getAttribute(submissionElement, "target");
-                                if (replace == null) replace = "all";
-                                if (replace == "all") {
-                                    ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsIndex != -1
-                                        ? ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]) : "";
-                                    // Increment and send sequence number
-                                    var requestForm = ORBEON.util.Dom.get(formID);
-                                    // Go to another page
-                                    if (showProgress != "false") {
-                                        // Display loading indicator unless the server tells us not to display it
-                                        newDynamicStateTriggersReplace = true;
-                                    }
-                                    // Set the action to the URL of the current page, so the URL seen by the client is always the URL
-                                    // of a page to which we didn't do a submission replace="all"
-                                    if (requestForm.action.indexOf("xforms-server-submit") == -1)
-                                        requestForm.action = window.location.href;
-                                    if (target == null) {
-                                        // Reset as this may have been changed before by asyncAjaxRequest
-                                        requestForm.removeAttribute("target");
-                                    } else {
-                                        // Set the requested target
-                                        requestForm.target = target;
-                                    }
-                                    try {
-                                        requestForm.submit();
-                                    } catch (e) {
-                                        // NOP: This is to prevent the error "Unspecified error" in IE. This can
-                                        // happen when navigating away is cancelled by the user pressing cancel
-                                        // on a dialog displayed on unload.
-                                    }
+
+                                ORBEON.xforms.Globals.formServerEvents[formID].value = serverEventsIndex != -1
+                                    ? ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]) : "";
+                                // Increment and send sequence number
+                                var requestForm = ORBEON.util.Dom.get(formID);
+                                // Go to another page
+                                if (showProgress != "false") {
+                                    // Display loading indicator unless the server tells us not to display it
+                                    newDynamicStateTriggersReplace = true;
+                                }
+                                // Set the action to the URL of the current page, so the URL seen by the client is always the URL
+                                // of a page to which we didn't do a submission replace="all"
+                                if (requestForm.action.indexOf("xforms-server-submit") == -1)
+                                    requestForm.action = window.location.href;
+                                if (target == null) {
+                                    // Reset as this may have been changed before by asyncAjaxRequest
+                                    requestForm.removeAttribute("target");
+                                } else {
+                                    // Set the requested target
+                                    requestForm.target = target;
+                                }
+                                try {
+                                    requestForm.submit();
+                                } catch (e) {
+                                    // NOP: This is to prevent the error "Unspecified error" in IE. This can
+                                    // happen when navigating away is cancelled by the user pressing cancel
+                                    // on a dialog displayed on unload.
                                 }
                                 break;
                             }

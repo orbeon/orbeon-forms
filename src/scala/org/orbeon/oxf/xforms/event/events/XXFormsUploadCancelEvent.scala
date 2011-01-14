@@ -17,4 +17,4 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event._
 
 class XXFormsUploadCancelEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_UPLOAD_CANCEL, targetObject, false, false)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_UPLOAD_CANCEL, targetObject, true, false)

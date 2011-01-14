@@ -682,7 +682,6 @@ public class XFormsServer extends ProcessorImpl {
                 new String[]{
                         "method", "POST",
                         "show-progress", activeSubmissionShowProgress,
-                        "replace", activeSubmissionReplace,
                         (target != null) ? "target" : null, target
                 });
     }

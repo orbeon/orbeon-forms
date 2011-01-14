@@ -74,10 +74,9 @@
     </xforms:submission>
 
     <!-- Submission to preview the XML form -->
-    <!-- TODO: not sure why we use xxforms:ensure-uploads="false" here (could be cause we assume that attachments have all been uploaded in the background?) -->
     <xforms:submission id="fr-workflow-review-submission"
             validate="true" relevant="false" method="post"
-            ref="xxforms:instance('fr-form-instance')" xxforms:ensure-uploads="false"
+            ref="xxforms:instance('fr-form-instance')"
             resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all">
         <!-- Set data-safe-override -->

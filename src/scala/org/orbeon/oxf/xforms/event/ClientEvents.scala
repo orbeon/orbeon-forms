@@ -243,11 +243,11 @@ object ClientEvents {
     def doQuickReturnEvents(xmlReceiver: XMLReceiver, request: ExternalContext.Request, requestDocument: Document, indentedLogger: IndentedLogger,
                logRequestResponse: Boolean, clientEvents: JList[Element], session: ExternalContext.Session): Boolean = {
 
-        val eventElement = clientEvents.get(0)
+        val eventElement = clientEvents(0)
 
         // Helper to make it easier to output simple Ajax responses
         def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper => Unit): Boolean = {
-            indentedLogger.startHandleOperation("ajax response", "handling regular Ajax response")
+            indentedLogger.startHandleOperation(messageType, message)
 
             // Hook-up debug content handler if we must log the response document
             val (responseReceiver, debugContentHandler) =

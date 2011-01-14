@@ -173,10 +173,8 @@ object Multipart {
                         val uploadProgress = new UploadProgress(item.getFieldName, expectedLength)
                         session.getAttributesMap.put(UPLOAD_PROGRESS_SESSION_KEY + progressUUID, uploadProgress)
 
-                        copyStream(inputStream, fileItem.getOutputStream, true, (read: Long) => {
-                            // Update session value
-                            uploadProgress.receivedSize += read
-                        })
+                        // Copy stream and update progress information
+                        copyStream(inputStream, fileItem.getOutputStream, true, uploadProgress.receivedSize += _)
 
                         uploadProgress.completed = true
 
@@ -228,23 +226,21 @@ object Multipart {
     }
 
     // Use a closable item and make sure an attempt to close it is done after use
-    def useAndClose[T <: {def close() : Unit}](closable: T)(block: T => Unit) {
+    def useAndClose[T <: {def close() : Unit}](closable: T)(block: T => Unit) =
         try {
             block(closable)
         } finally {
             if (closable ne null)
                 runQuietly(closable.close())
         }
-    }
 
     // Run a block and swallow any exception. Use only for things like close().
-    def runQuietly(block: => Unit) {
+    def runQuietly(block: => Unit) =
         try {
             block
         } catch {
             case _ => // NOP
         }
-    }
 
     // Implicit conversion from FileItemIterator -> Iterator
     private implicit def asScalaIterator(i : FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {

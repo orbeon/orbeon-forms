@@ -519,17 +519,18 @@
     };
 
     AjaxServer.asyncAjaxRequest = function() {
-        var formID = ORBEON.xforms.Globals.requestForm.id;
         try {
             ORBEON.xforms.Globals.requestTryCount++;
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
+            var formId = ORBEON.xforms.Globals.requestForm.id;
             var callback = {
                 success: AjaxServer.handleResponseAjax,
-                failure: AjaxServer.handleFailureAjax
+                failure: AjaxServer.handleFailureAjax,
+                argument: { formId: formId }
             };
             AjaxServer.setTimeoutOnCallback(callback);
-            YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formID], callback, ORBEON.xforms.Globals.requestDocument);
+            YAHOO.util.Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[formId], callback, ORBEON.xforms.Globals.requestDocument);
         } catch (e) {
             ORBEON.xforms.Globals.requestInProgress = false;
             AjaxServer.exceptionWhenTalkingToServer(e, formID);
@@ -672,7 +673,7 @@
                     ORBEON.util.Utils.hideModalProgressPanel();
                 }
 
-                var formID = ORBEON.xforms.Globals.requestForm.id;
+                var formID = o.argument.formId;
                 AjaxServer.handleResponseDom(responseXML, formID);
                 // Reset changes, as changes are included in this bach of events
                 ORBEON.xforms.Globals.changedIdsRequest = {};

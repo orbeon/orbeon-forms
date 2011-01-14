@@ -97,8 +97,11 @@
         }, this);
         // Trigger actual upload through a form POST and start asking server for progress
         Connect.setForm(this.processingEvent.form, true, true);
-        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id],
-            { upload: _.bind(this.uploadSuccess, this), failure: _.bind(this.uploadFailure, this) });
+        this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id], {
+            upload: _.bind(this.uploadSuccess, this),
+            failure: _.bind(this.uploadFailure, this),
+            argument: { formId: this.processingEvent.form.id }
+        });
         this.askForProgressUpdate();
         // Enable the controls we previously disabled
         _.each(disabledElements, function(element) { element.disabled = false; });

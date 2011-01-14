@@ -184,7 +184,7 @@ object ClientEvents {
             event.bubbles, event.cancelable, event.value, gatherParameters(event)))
     }
 
-    def reorderNoscriptEvents(eventElements: JList[Element], containingDocument: XFormsContainingDocument): Seq[Element] = {
+    def reorderNoscriptEvents(eventElements: Seq[Element], containingDocument: XFormsContainingDocument): Seq[Element] = {
 
         // Event categories, in the order we will want them
         object Category extends Enumeration {

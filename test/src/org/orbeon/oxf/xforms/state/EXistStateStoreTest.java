@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -27,12 +29,12 @@ import java.util.*;
 
 import static junit.framework.Assert.*;
 
-public class XFormsPersistentApplicationStateStoreTest extends ResourceManagerTestBase {
+public class EXistStateStoreTest extends ResourceManagerTestBase {
 
     private PipelineContext pipelineContext;
 	private ExtendedTestExternalContext externalContext;
 
-    private XFormsStateStore stateStore;
+    private EXistStateStoreBase stateStore;
 
 	private static Map<String, TestExternalContext.TestSession> sessionMap = new HashMap<String, TestExternalContext.TestSession>();
 
@@ -42,7 +44,7 @@ public class XFormsPersistentApplicationStateStoreTest extends ResourceManagerTe
         pipelineContext = createPipelineContextWithExternalContext();
         externalContext = (ExtendedTestExternalContext) NetUtils.getExternalContext(pipelineContext);
 
-        stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
+        stateStore = EXistStateStore.instance(externalContext);
 
         stateStore.clear();
         sessionMap.clear();

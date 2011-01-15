@@ -120,20 +120,20 @@ public class XFormsUtils {
 
     public static String encodeXMLAsDOM(PipelineContext pipelineContext, org.w3c.dom.Node node) {
         try {
-            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), XFormsProperties.getXFormsPassword(), false);
+            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), false);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }
 
     public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, boolean encodeLocationData) {
-        return encodeXML(propertyContext, documentToEncode, XFormsProperties.getXFormsPassword(), encodeLocationData);
+        return encodeXML(propertyContext, documentToEncode, XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
     // Use a Deflater pool as creating deflaters is expensive
     private static final SoftReferenceObjectPool DEFLATER_POOL = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory());
 
-    public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
+    public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, boolean compress, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
         // Get SAXStore
@@ -155,15 +155,15 @@ public class XFormsUtils {
         }
 
         // Encode bytes
-        return encodeBytes(propertyContext, bytes, encryptionPassword);
+        return encodeBytes(propertyContext, bytes, compress, encryptionPassword);
     }
 
-    public static String encodeBytes(PropertyContext propertyContext, byte[] bytesToEncode, String encryptionPassword) {
+    public static String encodeBytes(PropertyContext propertyContext, byte[] bytesToEncode, boolean compress, String encryptionPassword) {
         Deflater deflater = null;
         try {
             // Compress if needed
             final byte[] gzipByteArray;
-            if (XFormsProperties.isGZIPState()) {
+            if (compress) {
                 deflater = (Deflater) DEFLATER_POOL.borrowObject();
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
@@ -218,26 +218,11 @@ public class XFormsUtils {
         if (encoded.startsWith("X3") || encoded.startsWith("X4")) {
             // Data is currently not encrypted, so encrypt it
             final byte[] decodedValue = XFormsUtils.decodeBytes(propertyContext, encoded, XFormsProperties.getXFormsPassword());
-            return XFormsUtils.encodeBytes(propertyContext, decodedValue, XFormsProperties.getXFormsPassword());
+            return XFormsUtils.encodeBytes(propertyContext, decodedValue, XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword());
         } else {
             // Data is already encrypted
             return encoded;
         }
-
-//        if (encoded.startsWith("X1") || encoded.startsWith("X2")) {
-//            // Case where data is already encrypted
-//            return encoded;
-//        } else if (encoded.startsWith("X3")) {
-//            // Uncompressed data to encrypt
-//            final byte[] decoded = Base64.decode(encoded.substring(2));
-//            return "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, decoded).replace((char) 0xa, ' ');
-//        } else if (encoded.startsWith("X4")) {
-//            // Compressed data to encrypt
-//            final byte[] decoded = Base64.decode(encoded.substring(2));
-//            return "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, decoded).replace((char) 0xa, ' ');
-//        } else {
-//            throw new OXFException("Invalid prefix for encoded data: " + encoded.substring(0, 2));
-//        }
     }
 
     public static org.w3c.dom.Document htmlStringToDocument(String value, LocationData locationData) {

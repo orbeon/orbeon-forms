@@ -625,7 +625,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         if (!encodedStaticStateAvailable) {
             // Remember encoded state and discard Document
-            encodedStaticState = XFormsUtils.encodeXML(propertyContext, staticStateDocument, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
+            // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state)
+            encodedStaticState = XFormsUtils.encodeXML(propertyContext, staticStateDocument, true, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
 
             staticStateDocument = null;
             encodedStaticStateAvailable = true;

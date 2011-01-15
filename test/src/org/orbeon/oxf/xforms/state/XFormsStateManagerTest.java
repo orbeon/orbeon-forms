@@ -24,7 +24,10 @@ import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -219,7 +222,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             state1.document.afterInitialResponse();
             stateManager.afterInitialResponse(pipelineContext, state1.document);
 
-            initialDynamicStateString = state1.document.createEncodedDynamicState(pipelineContext, false);
+            initialDynamicStateString = state1.document.createEncodedDynamicState(pipelineContext, XFormsProperties.isGZIPState(), false);
         }
 
         assertEquals(1, state1.document.getSequence());
@@ -264,7 +267,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Make sure we found the initial dynamic state
         {
             final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(state4.document.createEncodedDynamicState(pipelineContext, false)));
+            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(state4.document.createEncodedDynamicState(pipelineContext, XFormsProperties.isGZIPState(), false)));
         }
     }
 

@@ -19,15 +19,21 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base class for XForms state stores. This store deals with storing items in memory.
  */
-public abstract class XFormsStateStore {
+public abstract class EXistStateStoreBase implements XFormsStateStore {
 
     private static final String XFORMS_STATE_STORE_LISTENER_STATE_KEY = "oxf.xforms.state.store.has-session-listeners-key";
 
@@ -41,7 +47,7 @@ public abstract class XFormsStateStore {
     // Map session ids -> Map of keys
     private final Map<String, Set<String>> sessionToKeysMap = new HashMap<String, Set<String>>();
 
-    protected XFormsStateStore() {
+    protected EXistStateStoreBase() {
         debug("created new store.");
     }
 
@@ -60,15 +66,15 @@ public abstract class XFormsStateStore {
      *
      * @param propertyContext       current context
      * @param containingDocument    document
-     * @param sessionId             current session id
+     * @param session               current session
      * @param isInitialState        whether this is the document's initial state
      */
     public synchronized void storeDocumentState(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
-                                                String sessionId, boolean isInitialState) {
+                                                ExternalContext.Session session, boolean isInitialState) {
 
         assert containingDocument.getStaticState().isServerStateHandling();
 
-        assert sessionId != null;
+        assert session != null;
 
         if (isDebugEnabled()) {
             debug("store size before storing: " + currentSize + " bytes.");
@@ -80,13 +86,13 @@ public abstract class XFormsStateStore {
         final String dynamicStateKey = getDynamicStateKey(documentUUID, isInitialState);
 
         // Mapping (UUID -> static state key : dynamic state key)
-        addOrReplaceOne(documentUUID, staticStateUUID + ":" + dynamicStateKey, sessionId);
+        addOrReplaceOne(documentUUID, staticStateUUID + ":" + dynamicStateKey, session.getId());
 
         // Static state
-        addOrReplaceOne(staticStateUUID, containingDocument.getStaticState().getEncodedStaticState(propertyContext), sessionId);
+        addOrReplaceOne(staticStateUUID, containingDocument.getStaticState().getEncodedStaticState(propertyContext), session.getId());
 
         // Dynamic state
-        addOrReplaceOne(dynamicStateKey, containingDocument.createEncodedDynamicState(propertyContext, false), sessionId);
+        addOrReplaceOne(dynamicStateKey, containingDocument.createEncodedDynamicState(propertyContext, XFormsProperties.isGZIPState(), false), session.getId());
     }
 
     private String getDynamicStateKey(String documentUUID, boolean isInitialState) {
@@ -96,11 +102,12 @@ public abstract class XFormsStateStore {
     /**
      * Find the current state for the given document UUID.
      *
+     * @param session           current session
      * @param documentUUID      document UUID
      * @param isInitialState    whether this is the document's initial state
      * @return                  encoded static and dynamic state
      */
-    public synchronized XFormsState findState(String documentUUID, boolean isInitialState) {
+    public synchronized XFormsState findState(ExternalContext.Session session, String documentUUID, boolean isInitialState) {
 
         if (isDebugEnabled()) {
             debug("store size before finding: " + currentSize + " bytes.");
@@ -190,7 +197,7 @@ public abstract class XFormsStateStore {
      *
      * @param sessionId     session id
      */
-    protected synchronized void expireBySessionId(String sessionId) {
+    public synchronized void expireBySessionId(String sessionId) {
 
         assert sessionId != null;
 
@@ -348,7 +355,7 @@ public abstract class XFormsStateStore {
     }
 
     private String getStoreDebugName() {
-        return "state store";
+        return "eXist state store";
     }
 
     public int getCurrentSize() {

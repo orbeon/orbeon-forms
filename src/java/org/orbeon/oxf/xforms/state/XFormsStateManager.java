@@ -15,12 +15,19 @@ package org.orbeon.oxf.xforms.state;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.util.Map;
@@ -214,12 +221,11 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         assert containingDocument.getStaticState().isServerStateHandling();
 
         final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
-        final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
+        final XFormsStateStore stateStore = XFormsStateStoreFactory.instance(externalContext);
 
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
-        final String sessionId = session.getId();
 
-        stateStore.storeDocumentState(propertyContext, containingDocument, sessionId, isInitialState);
+        stateStore.storeDocumentState(propertyContext, containingDocument, session, isInitialState);
     }
 
     /**
@@ -343,7 +349,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         if (isServerState) {
             // State must be found by UUID in the store
             final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
-            final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
+            final XFormsStateStore stateStore = XFormsStateStoreFactory.instance(externalContext);
 
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug(LOG_TYPE, "Getting document state from store.",
@@ -352,7 +358,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                         "current store size", Integer.toString(stateStore.getCurrentSize()),
                         "max store size", Integer.toString(stateStore.getMaxSize())
                 );
-            xformsState = stateStore.findState(uuid, isInitialState);
+
+            final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
+
+            xformsState = stateStore.findState(session, uuid, isInitialState);
 
             if (xformsState == null) {
                 // Oops, we couldn't find the state in the store
@@ -422,7 +431,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 dynamicStateString = null;
             } else {
                 // Return full encoded state
-                dynamicStateString = containingDocument.createEncodedDynamicState(propertyContext, true);
+                dynamicStateString = containingDocument.createEncodedDynamicState(propertyContext, XFormsProperties.isGZIPState(), true);
             }
         }
         return dynamicStateString;

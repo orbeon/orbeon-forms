@@ -17,7 +17,10 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -26,10 +29,14 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.*;
+import org.xmldb.api.base.Resource;
+import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This store:
@@ -80,7 +87,7 @@ import java.util.*;
  * are still tagged with other sessions. For those, we just remove the SESSION1 tag. This would be a good thing to
  * test.
  */
-public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
+public class EXistStateStore extends EXistStateStoreBase {
 
     private static final boolean TEMP_PERF_TEST = false;
     private static final int TEMP_PERF_ITERATIONS = 100;
@@ -99,16 +106,16 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
      * @param externalContext   external context
      * @return                  state store
      */
-    public synchronized static XFormsStateStore instance(ExternalContext externalContext) {
+    public synchronized static EXistStateStoreBase instance(ExternalContext externalContext) {
         // Try to find existing store
-        final XFormsStateStore existingStateStore
-                = (XFormsStateStore) externalContext.getAttributesMap().get(PERSISTENT_STATE_STORE_APPLICATION_KEY);
+        final EXistStateStoreBase existingStateStore
+                = (EXistStateStoreBase) externalContext.getAttributesMap().get(PERSISTENT_STATE_STORE_APPLICATION_KEY);
 
         if (existingStateStore != null) {
             return existingStateStore;
         } else {
             // Create new store
-            final XFormsPersistentApplicationStateStore newStateStore = new XFormsPersistentApplicationStateStore();
+            final EXistStateStore newStateStore = new EXistStateStore();
 
             // Expire persistent entries
             // NOTE: Not sure why we used to remove only those with session information. For now we remove everything as
@@ -149,7 +156,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
      * @param sessionId     session id
      */
     @Override
-    protected void expireBySessionId(String sessionId) {
+    public void expireBySessionId(String sessionId) {
 
         // 1. Expire in memory
         super.expireBySessionId(sessionId);

@@ -136,6 +136,10 @@
         <include name="exist-dependency-lucene-regex-2.9.2.jar"/>
         <include name="exist-dependency-resolver-1.2.jar"/>
 
+        <include name="ehcache-core-2.3.1.jar"/>
+        <include name="ehcache-dependency-slf4j-api-1.6.1.jar"/>
+        <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
+
         <include name="scala-library-2.8.1.jar"/>
         <include name="rhino-1.7R2.jar"/>
 

@@ -998,11 +998,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.
      *
      * @param propertyContext       current context
+     * @param compress              whether to compress
      * @param isForceEncryption     whether to force encryption or not
      * @return                      encoded dynamic state
      */
-    public String createEncodedDynamicState(PropertyContext propertyContext, boolean isForceEncryption) {
-        return XFormsUtils.encodeXML(propertyContext, createDynamicStateDocument(),
+    public String createEncodedDynamicState(PropertyContext propertyContext, boolean compress, boolean isForceEncryption) {
+        return XFormsUtils.encodeXML(propertyContext, createDynamicStateDocument(), compress,
             (isForceEncryption || XFormsProperties.isClientStateHandling(this)) ? XFormsProperties.getXFormsPassword() : null, false);
     }
 

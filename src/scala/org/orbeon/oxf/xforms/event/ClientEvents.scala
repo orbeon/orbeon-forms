@@ -316,16 +316,20 @@ object ClientEvents {
 
                 // Output simple resulting document
                 eventResponse("ajax response", "handling quick upload progress Ajax response") { helper =>
-                    val progress = Multipart.getUploadProgressJava(request, XFormsStateManager.getRequestUUID(requestDocument))
-                    if (progress != null) {
-                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action")
-                        helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values")
-                        helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control",
-                            Array[String]("id", eventElement.attributeValue("source-control-id"),
-                                "progress-received", progress.receivedSize.toString,
-                                "progress-expected", progress.expectedSize match {case Some(long) => long.toString; case _ => null}))
-                        helper.endElement()
-                        helper.endElement()
+                    val sourceControlId = eventElement.attributeValue("source-control-id")
+                    Multipart.getUploadProgress(request, XFormsStateManager.getRequestUUID(requestDocument), sourceControlId) match {
+                        case Some(progress) =>
+
+                            helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action")
+                            helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values")
+                            helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control",
+                                Array[String]("id", sourceControlId,
+                                    "progress-received", progress.receivedSize.toString,
+                                    "progress-expected", progress.expectedSize match {case Some(long) => long.toString; case _ => null}))
+                            helper.endElement()
+                            helper.endElement()
+
+                        case _ =>
                     }
                 }
             case _ => false

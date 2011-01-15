@@ -41,6 +41,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Option;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,11 +88,13 @@ public class XFormsUploadControl extends XFormsValueControl {
         } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
             // Upload canceled
             containingDocument.endUpload(getUploadUniqueId());
+            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), this);
         } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
             // Upload done: process upload to this control
 
             // Notify that the upload has ended
             containingDocument.endUpload(getUploadUniqueId());
+            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), this);
 
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
             handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
@@ -549,8 +552,11 @@ class FileInfo implements ExternalCopyable {
     }
 
     private Multipart.UploadProgress getProgress(PropertyContext propertyContext) {
-        final Multipart.UploadProgress progress
-            = Multipart.getUploadProgressJava(NetUtils.getExternalContext(propertyContext).getRequest(), control.getContainingDocument().getUUID());
+        final Option option
+            = Multipart.getUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(),
+                control.getContainingDocument().getUUID(), control.getEffectiveId());
+
+        final Multipart.UploadProgress progress = option.isEmpty() ? null : (Multipart.UploadProgress) option.get();
 
         if (progress != null && control.getEffectiveId().equals(progress.fieldName()))
             return progress;

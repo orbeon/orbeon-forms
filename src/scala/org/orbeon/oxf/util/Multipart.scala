@@ -26,6 +26,7 @@ import java.util.{Map => JMap, HashMap => JHashMap}
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
 import util.Streams
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 
 /**
  * Multipart decoding with support for progress indicator.
@@ -86,34 +87,22 @@ object Multipart {
         uploadParameterMap
     }
 
-    def getUploadProgressJava(request: ExternalContext.Request, uuid: String) =
-        getUploadProgress(request, uuid) match {
-            case Some(progress) => progress
-            case _ => null
-        }
+    private def getProgressSessionKey(uuid: String, fieldName: String) = UPLOAD_PROGRESS_SESSION_KEY + uuid + "." + fieldName
 
-    def getUploadProgress(request: ExternalContext.Request, uuid: String): Option[UploadProgress] =
+    def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress] =
         request.getSession(false) match {
-            case session: Session => session.getAttributesMap.get(UPLOAD_PROGRESS_SESSION_KEY + uuid) match {
+            case session: Session => session.getAttributesMap.get(getProgressSessionKey(uuid, fieldName)) match {
                 case progress: UploadProgress => Some(progress)
                 case _ => None
             }
             case _ => None
         }
 
-    /* NOTE: Don't remove the object from the session. This handles the following case:
-             o upload 2 starts and puts new UploadProgress into session
-             o upload 1 done event sent to server
-             o UploadProgress is removed from session
-             o upload 2 keeps updating UploadProgress but this is not put back into session
-             o so no progress updates are sent to the client
-
-    def removeUploadProgress(request: ExternalContext.Request, uuid: String): Unit =
+    def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
         request.getSession(false) match {
-            case session: Session => session.getAttributesMap.remove(UPLOAD_PROGRESS_SESSION_KEY + uuid)
+            case session: Session => session.getAttributesMap.remove(getProgressSessionKey(control.getContainingDocument.getUUID, control.getEffectiveId))
             case _ =>
         }
-    */
 
     class UploadProgress(val fieldName: String, val expectedSize: Option[Long]) {
         var receivedSize = 0L
@@ -132,12 +121,14 @@ object Multipart {
         // Don't create session if missing
         val session = request.getSession(false)
 
-        var progressUUID: String = null
+        var sessionKeys: List[String] = Nil
 
         val items = collection.mutable.Seq[FileItem]()
         var successful = false
 
         try {
+            var progressUUID: String = null
+
             for (item <- upload.getItemIterator(requestContext)) {
                 val fileItem = factory.createItem(item.getFieldName, item.getContentType, item.isFormField, item.getName)
 
@@ -170,8 +161,11 @@ object Multipart {
                         }
 
                         // Store into session with start value
+                        val newSessionKey = getProgressSessionKey(progressUUID, item.getFieldName)
+                        sessionKeys = newSessionKey :: sessionKeys
+
                         val uploadProgress = new UploadProgress(item.getFieldName, expectedLength)
-                        session.getAttributesMap.put(UPLOAD_PROGRESS_SESSION_KEY + progressUUID, uploadProgress)
+                        session.getAttributesMap.put(newSessionKey, uploadProgress)
 
                         // Copy stream and update progress information
                         copyStream(inputStream, fileItem.getOutputStream, true, uploadProgress.receivedSize += _)
@@ -195,8 +189,8 @@ object Multipart {
         } finally {
             if (!successful) {
                 // Remove session value
-                if (progressUUID ne null)
-                    session.getAttributesMap.remove(UPLOAD_PROGRESS_SESSION_KEY + progressUUID)
+                for (sessionKey <- sessionKeys)
+                    runQuietly(session.getAttributesMap.remove(sessionKey))
 
                 // Free underlying storage for all (disk) items gathered so far
                 for (fileItem <- items)
@@ -205,7 +199,7 @@ object Multipart {
         }
     }
 
-    def copyStream(in: InputStream, out: OutputStream, closeOut: Boolean, progress: (Long) => Unit = null) = {
+    def copyStream(in: InputStream, out: OutputStream, closeOut: Boolean, progress: (Long) => Unit = _ => ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -215,9 +209,7 @@ object Multipart {
                 val buffer = new Array[Byte](COPY_BUFFER_SIZE)
                 Iterator continually (in read buffer) takeWhile (_ != -1) foreach { read =>
                     if (read > 0) {
-                        if (progress ne null)
-                            progress(read)
-
+                        progress(read)
                         out.write(buffer, 0, read)
                     }
                 }

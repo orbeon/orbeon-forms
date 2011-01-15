@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="ant2html.xsl"?>
 <!--
     Copyright (C) 2004-2009 Orbeon, Inc.
 
@@ -12,7 +13,6 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<?xml-stylesheet type="text/xsl" href="ant2html.xsl"?>
 <project name="orbeon" default="orbeon-war" basedir=".">
 
     <!--<echoproperties/>-->
@@ -36,7 +36,7 @@
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
             <pathelement location="${lib.dir}/scala-compiler-2.8.1.jar"/>
-            <pathelement location="${lib.dir}/scala-library-2.8.1.jar"/>
+            <pathelement location="${lib.dir}/scala1-library-2.8.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -44,6 +44,17 @@
         <classpath>
             <pathelement location="${lib.dir}/junit-4.8.2.jar"/>
             <pathelement location="${lib.dir}/ant-junit-1.7.1.jar"/>
+        </classpath>
+    </taskdef>
+
+
+    <!-- Ant task for the YUI Compressor -->
+    <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
+    <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
+        <classpath>
+            <pathelement location="${lib.dir}/yui-compressor-ant-task-0.5.jar"/>
+            <pathelement location="${lib.dir}/jargs-1.0.jar"/>
+            <pathelement location="${lib.dir}/yuicompressor-2.4.2.jar"/>
         </classpath>
     </taskdef>
 
@@ -606,82 +617,71 @@
         </copy>
     </target>
 
-    <target name="orbeon-minify-js" depends="init">
+    <target name="orbeon-minify-js" depends="init, classes">
         <!-- Store those under ${war.dir}/WEB-INF/resources so they can be used in dev mode -->
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/util"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/action"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/control"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/orbeon/xforms/server"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/button"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/container"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/treeview"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/yui/examples/treeview/assets/js"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/jscalendar/lang"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/ajaxxslt"/>
-        <mkdir dir="${war.dir}/WEB-INF/resources/ops/javascript/encryption"/>
+        <mkdir dir="${war.dir}/WEB-INF/resources/ops"/>
+        <mkdir dir="${build.dir}/js"/>
 
-        <!-- Orbeon Orbeon's own JavaScript -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/xforms"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/util/ExecutionQueue"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/action/Message"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Control"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/CalendarResources"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Calendar"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Upload"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/control/Tree"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/server/Server"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/server/AjaxServer"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/server/UploadServer"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Form"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/orbeon/xforms/Page"/></antcall>
+        <!-- Ant task to compile CoffeeScript -->
+        <!-- Defined here (instead of the beginning of this file) as CoffeeScriptTask needs to be compiled first -->
+        <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask" >
+            <classpath>
+                <pathelement location="build/classes"/>
+                <pathelement location="src/scala"/>
+                <pathelement location="lib/rhino-1.7R2.jar"/>
+                <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
+                <pathelement location="lib/log4j-1_2_15.jar"/>
+                <pathelement location="lib/scala-library-2.8.1.jar"/>
+            </classpath>
+        </taskdef>
 
-        <!-- YUI -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/button/button"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/container/container"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/treeview/treeview"/></antcall>
+        <!-- Compile CoffeeScript -->
+        <coffee-script fromdir="${resources-packaged.dir}/ops" todir="${build.dir}/js">
+            <include name="**/*.coffee"/>
+        </coffee-script>
 
-        <!-- From YUI examples -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/examples/treeview/assets/js/TaskNode"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="yui/examples/treeview/assets/js/CheckOnClickNode"/></antcall>
+        <!-- Minimize compiled CoffeeScript -->
+        <yui-compressor warn="false" charset="UTF-8" fromdir="${build.dir}/js" todir="${war.dir}/WEB-INF/resources/ops">
+            <include name="**/*.js"/>
+        </yui-compressor>
 
-        <!-- JSCalendar -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/jscalendar/calendar"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/jscalendar/lang/calendar-en"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/jscalendar/calendar-setup"/></antcall>
+        <!-- Minimize JavaScript-->
+        <yui-compressor warn="false" charset="UTF-8" fromdir="${resources-packaged.dir}/ops" todir="${war.dir}/WEB-INF/resources/ops">
 
-        <!-- Autocomplete -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/suggest-common"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/suggest-actb"/></antcall>
+            <!-- Orbeon JavaScript code -->
+            <include name="javascript/xforms.js"/>
+            <include name="javascript/orbeon/**/*.js"/>
 
-        <!-- AJAXXSLT -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/util"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/xmltoken"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/dom"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/ajaxxslt/xpath"/></antcall>
+            <!-- YUI file we changed -->
+            <include name="yui/button/button.js"/>
+            <include name="yui/container/container.js"/>
+            <include name="yui/treeview/treeview.js"/>
+            <include name="yui/examples/treeview/assets/js/TaskNode"/>
+            <include name="yui/examples/treeview/assets/js/CheckOnClickNode" />
 
-        <!-- Encryption -->
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/encryption/encryption"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/encryption/md5"/></antcall>
-        <antcall target="orbeon-minify-maybe-js"><param name="name" value="javascript/encryption/utf-8"/></antcall>
+            <!-- JSCalendar -->
+            <include name="javascript/jscalendar/calendar.js"/>
+            <include name="javascript/jscalendar/lang/calendar-en.js"/>
+            <include name="javascript/jscalendar/calendar-setup.js"/>
 
-    </target>
+            <!-- Autocomplete -->
+            <include name="javascript/suggest-common.js"/>
+            <include name="javascript/suggest-actb.js"/>
 
-    <target name="orbeon-minify-maybe-js">
-        <uptodate property="min.uptodate" srcfile="${resources-packaged.dir}/ops/${name}.js" targetfile="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
-        <antcall target="orbeon-minify-one-js">
-            <param name="name" value="${name}"/>
-        </antcall>
-    </target>
+            <!-- AJAXXSLT -->
+            <include name="javascript/ajaxxslt/util.js"/>
+            <include name="javascript/ajaxxslt/xmltoken.js"/>
+            <include name="javascript/ajaxxslt/dom.js"/>
+            <include name="javascript/ajaxxslt/xpath.js"/>
 
-    <target name="orbeon-minify-one-js" unless="min.uptodate">
-        <echo message="Minimizing ${resources-packaged.dir}/ops/${name}.js"/>
-        <java classname="com.yahoo.platform.yui.compressor.YUICompressor" classpath="${lib.dir}/yuicompressor-2.4.1.jar" fork="false" failonerror="true">
-            <arg value="${resources-packaged.dir}/ops/${name}.js"/>
-            <arg value="-o"/>
-            <arg value="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
-        </java>
+            <!-- Encryption -->
+            <include name="javascript/encryption/encryption.js"/>
+            <include name="javascript/encryption/md5.js"/>
+            <include name="javascript/encryption/utf-8.js"/>
+
+        </yui-compressor>
+
+
     </target>
 
     <target name="debug-enabled" if="is.debug">

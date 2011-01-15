@@ -13,23 +13,33 @@
  */
 package org.orbeon.oxf.processor;
 
+import com.sun.mail.iap.ByteArray;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UserAgent;
+import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,38 +96,61 @@ public class ResourceServer extends ProcessorImpl {
                     final URL newURL = URLFactory.createURL(urlString);
 
                     URLConnection urlConnection = null;
+                    int length = -1;
+                    long lastModified = -1;
                     {
-                        // IE 6 hack for PNG images
-                        final boolean isIE6 = UserAgent.isRenderingEngineIE6OrEarlier(externalContext.getRequest());
-                        if (isIE6 && newURL.getProtocol().equals("oxf")) {
-                            final String urlPath = newURL.getPath();
-                            if (urlPath.endsWith(".png")) {
-                                // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
-                                urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";
-                                final URL gifURL = URLFactory.createURL(urlString);
-                                try {
-                                    // Try to get InputStream
-                                    final URLConnection gifURLConnection = gifURL.openConnection();
-                                    urlConnectionInputStream = gifURLConnection.getInputStream();
-                                    // If we get to here, we were successful
-                                    urlConnection = gifURLConnection;
-                                } catch (ResourceNotFoundException e) {
-                                    // GIF doesn't exist
-                                    // NOTE: Exception throwing / catching is expensive so we hope this doesn't happen too often
+                        final String urlPath = newURL.getPath();
+                        if (newURL.getProtocol().equals("oxf")) {
+
+                            // IE 6 hack for PNG images
+                            final boolean isIE6 = UserAgent.isRenderingEngineIE6OrEarlier(externalContext.getRequest());
+                            if (isIE6) {
+                                if (urlPath.endsWith(".png")) {
+                                    // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
+                                    urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";
+                                    final URL gifURL = URLFactory.createURL(urlString);
+                                    try {
+                                        // Try to get InputStream
+                                        final URLConnection gifURLConnection = gifURL.openConnection();
+                                        urlConnectionInputStream = gifURLConnection.getInputStream();
+                                        // If we get to here, we were successful
+                                        urlConnection = gifURLConnection;
+                                    } catch (ResourceNotFoundException e) {
+                                        // GIF doesn't exist
+                                        // NOTE: Exception throwing / catching is expensive so we hope this doesn't happen too often
+                                    }
+                                }
+                            }
+
+                            // Compile CoffeeScript to JavaScript if we have a .coffee and no .js
+                            // TODO: only run when minimal resources are enabled
+                            if (urlPath.endsWith(".js") && ! ResourceManagerWrapper.instance().exists(urlPath)) {
+                                final String coffeePath = urlPath.substring(0, urlPath.length() - 2) + "coffee";
+                                if (ResourceManagerWrapper.instance().exists(coffeePath)) {
+                                    // Open URL for CoffeeScript file
+                                    final URL coffeeURL = URLFactory.createURL("oxf:" + coffeePath);
+                                    urlConnection = coffeeURL.openConnection();
+                                    length = 0; // Unknown length, as it is not just the length of the compiled code
+                                    lastModified = NetUtils.getLastModified(urlConnection);
+                                    // Read CoffeeScript as a string; CoffeeScript is always UTF-8
+                                    Reader coffeeReader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
+                                    final String coffeeString = NetUtils.readStreamAsString(coffeeReader);
+                                    // TODO: do we need to handle compilation errors?
+                                    String javascriptString = CoffeeScriptCompiler.compile(coffeeString, coffeePath, 0);
+                                    urlConnectionInputStream = new ByteArrayInputStream(javascriptString.getBytes(Charset.forName("UTF-8")));
                                 }
                             }
                         }
                     }
 
-                    // Open the connection
+                    // Open the connection, if not node already
                     if (urlConnection == null) {
                         urlConnection = newURL.openConnection();
-                        // Get InputStream
                         urlConnectionInputStream = urlConnection.getInputStream();
                     }
-
-                    // Get date of last modification of resource
-                    final long lastModified = NetUtils.getLastModified(urlConnection);
+                    // Get length and last modified, if not done already
+                    if (length == -1) length = urlConnection.getContentLength();
+                    if (lastModified == -1) lastModified = NetUtils.getLastModified(urlConnection);
 
                     // Set Last-Modified, required for caching and conditional get
                     response.setCaching(lastModified, false, false);
@@ -133,7 +166,6 @@ public class ResourceServer extends ProcessorImpl {
                     if (contentType != null)
                         response.setContentType(contentType);
 
-                    final int length = urlConnection.getContentLength();
                     if (length > 0)
                         response.setContentLength(length);
 

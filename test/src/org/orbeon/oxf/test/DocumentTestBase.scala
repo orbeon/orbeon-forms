@@ -21,9 +21,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.junit.After
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.dom4j.{Element, Document => JDocument}
 import xml.{XML, Elem}
+import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase {
 
@@ -68,7 +68,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     }
 
     def setControlValueWithEvent(controlId: String, value: String): Unit =
-        document.handleExternalEvent(pipelineContext, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
+        ClientEvents.processEvent(pipelineContext, document, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
 
     def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
@@ -77,13 +77,13 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def getType(controlId: String) = getSingleNodeControl(controlId).getType
 
     // Automatically convert between Scala Elem andDom4j Document/Element
-    implicit def scalaElemToDom4jDocument(element: Elem) = Dom4jUtils.readDom4j(element.toString)
-    implicit def scalaElemToDom4jElement(element: Elem) = Dom4jUtils.readDom4j(element.toString).getRootElement
-    implicit def dom4jElementToScalaElem(element: Element) = XML.loadString(Dom4jUtils.domToString(element))
+    implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)
+    implicit def elemToElement(e: Elem) = Dom4jUtils.readDom4j(e.toString).getRootElement
+    implicit def elementToElem(e: Element) = XML.loadString(Dom4jUtils.domToString(e))
 
-    // TODO: There is probably a better way to write these conversions
-    implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]) = seq map (scalaElemToDom4jElement(_)) toList
-    implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]) = seq map (dom4jElementToScalaElem(_)) toList
+//    // TODO: There is probably a better way to write these conversions
+    implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]) = seq map (elemToElement(_)) toList
+    implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]) = seq map (elementToElem(_)) toList
 
     private def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
     private def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)

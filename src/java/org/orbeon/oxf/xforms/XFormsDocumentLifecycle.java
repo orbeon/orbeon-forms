@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 
 /**
  * Represent the lifecycle of an XForms document from the point of view of requests/responses.
@@ -23,7 +22,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 public interface XFormsDocumentLifecycle {
     void afterInitialResponse();
     void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response);
-    void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event);
     void afterExternalEvents(PipelineContext pipelineContext);
     void afterUpdateResponse();
 }

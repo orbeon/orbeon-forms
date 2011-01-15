@@ -29,11 +29,11 @@ import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.script.ScriptInterpreter;
@@ -74,8 +74,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     private static final String LOGGING_CATEGORY = "document";
     private static final Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
-
-    public static final String EVENT_LOG_TYPE = "executeExternalEvent";
 
     private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
     {
@@ -437,23 +435,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public Map<String, org.orbeon.oxf.xforms.Script> getScripts() {
         return xformsStaticState.getScripts();
-    }
-
-    /**
-     * Return external-events configuration attribute.
-     */
-    private Set<String> getExternalEventsMap() {
-        return xformsStaticState.getAllowedExternalEvents();
-    }
-
-    /**
-     * Return whether an external event name is explicitly allowed by the configuration.
-     *
-     * @param eventName event name to check
-     * @return          true if allowed, false otherwise
-     */
-    private boolean isExplicitlyAllowedExternalEvent(String eventName) {
-        return !XFormsEventFactory.isBuiltInEvent(eventName) && getExternalEventsMap().contains(eventName);
     }
 
     /**
@@ -879,203 +860,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
 
-    /**
-     * Execute an external event and ensure deferred event handling.
-     *
-     * @param pipelineContext   current context
-     * @param event             event to dispatch
-     */
-    public void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event) {
-
-        final IndentedLogger indentedLogger = getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
-
-        final XFormsEventTarget eventTarget = event.getTargetObject();
-        final String eventTargetEffectiveId = eventTarget.getEffectiveId();
-        final String eventName = event.getName();
-
-        try {
-
-            indentedLogger.startHandleOperation(EVENT_LOG_TYPE, "handling external event", "target id", eventTargetEffectiveId, "event name", eventName);
-
-            // Each event is within its own start/end outermost action handler
-            startOutermostActionHandler();
-            {
-                // Check if the value to set will be different from the current value
-                if (eventTarget instanceof XFormsValueControl && event instanceof XXFormsValueChangeWithFocusChangeEvent) {
-                    final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) event;
-                    if (valueChangeWithFocusChangeEvent.getOtherTargetObject() == null) {
-                        // We only get a value change with this event
-                        final String currentExternalValue = ((XFormsValueControl) eventTarget).getExternalValue(pipelineContext);
-                        if (currentExternalValue != null) {
-                            // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
-                            final boolean isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue());
-                            if (isIgnoreValueChangeEvent) {
-                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring value change event as value is the same",
-                                        "control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue);
-
-                                // Ensure deferred event handling
-                                // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
-                                endOutermostActionHandler(pipelineContext);
-                                return;
-                            }
-                        } else {
-                            // shouldn't happen really, but just in case let's log this
-                            indentedLogger.logDebug(EVENT_LOG_TYPE, "got null currentExternalValue", "control id", eventTargetEffectiveId, "event name", eventName);
-                        }
-                    } else {
-                        // There will be a focus event too, so don't ignore the event!
-                    }
-                }
-
-                // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
-                if (eventTargetEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
-                        && !(event instanceof DOMFocusOutEvent)) {
-
-                    // The event target is in a repeated structure, so make sure it gets repeat focus
-                    dispatchEventCheckTarget(pipelineContext, new XXFormsRepeatFocusEvent(this, eventTarget));
-                }
-
-                // Interpret event
-                if (eventTarget instanceof XFormsOutputControl) {
-                    // Special xforms:output case
-
-                    final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
-                    if (event instanceof DOMFocusInEvent) {
-
-                        // First, dispatch DOMFocusIn
-                        dispatchEventCheckTarget(pipelineContext, event);
-
-                        // Then, dispatch DOMActivate unless the control is read-only
-                        if (!xformsOutputControl.isReadonly()) {
-                            dispatchEventCheckTarget(pipelineContext, new DOMActivateEvent(this, xformsOutputControl));
-                        }
-                    } else if (!xformsOutputControl.isIgnoredExternalEvent(eventName)) {
-                        // Dispatch other event
-                        dispatchEventCheckTarget(pipelineContext, event);
-                    }
-                } else if (event instanceof XXFormsValueChangeWithFocusChangeEvent) {
-                    // 4.6.7 Sequence: Value Change
-
-                    // TODO: Not sure if this comment makes sense anymore.
-                    // What we want to do here is set the value on the initial controls tree, as the value has already been
-                    // changed on the client. This means that this event(s) must be the first to come!
-
-                    final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) event;
-                    if (checkEventTarget(event)) {
-                        // Store value into instance data through the control
-                        final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
-                        valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null);
-                    }
-
-                    {
-                        // NOTE: Recalculate and revalidate are done with the automatic deferred updates
-
-                        // Handle focus change DOMFocusOut / DOMFocusIn
-                        if (valueChangeWithFocusChangeEvent.getOtherTargetObject() != null) {
-
-                            // We have a focus change (otherwise, the focus is assumed to remain the same)
-
-                            // Dispatch DOMFocusOut
-                            // NOTE: storeExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
-                            // dispatched, so we get the control again to have a fresh reference
-                            dispatchEventCheckTarget(pipelineContext, new DOMFocusOutEvent(this, eventTarget));
-
-                            // Dispatch DOMFocusIn
-                            dispatchEventCheckTarget(pipelineContext, new DOMFocusInEvent(this, valueChangeWithFocusChangeEvent.getOtherTargetObject()));
-                        }
-
-                        // NOTE: Refresh is done with the automatic deferred updates
-                    }
-
-                } else {
-                    // Dispatch any other allowed event
-                    dispatchEventCheckTarget(pipelineContext, event);
-                }
-            }
-            // Each event is within its own start/end outermost action handler
-            endOutermostActionHandler(pipelineContext);
-        } finally {
-            indentedLogger.endHandleOperation();
-        }
-    }
-
-    /**
-     * Dispatch the event and check its target first.
-     *
-     * @param pipelineContext   current context
-     * @param event             event to dispatch
-     */
-    private void dispatchEventCheckTarget(PipelineContext pipelineContext, XFormsEvent event) {
-        if (checkEventTarget(event)) {
-            dispatchEvent(pipelineContext, event);
-        }
-    }
-
-    /**
-     * Check whether an event can be be dispatched to the given object. This only checks:
-     *
-     * o the the target is still live
-     * o that the target is not a non-relevant or readonly control
-     *
-     * @param event         event
-     * @return              true iif the event target is allowed
-     */
-    private boolean checkEventTarget(XFormsEvent event) {
-        final XFormsEventTarget eventTarget = event.getTargetObject();
-        final Object newReference = getObjectByEffectiveId(eventTarget.getEffectiveId());
-        if (eventTarget != newReference) {
-
-            // Here, we check that the event's target is still a valid object. For example, a couple of events from the
-            // UI could target controls. The first event is processed, which causes a change in the controls tree. The
-            // second event would then refer to a control which no longer exist. In this case, we don't dispatch it.
-
-            // We used to check simply by effective id, but this is not enough in some cases. We want to handle
-            // controls that just "move" in a repeat. Scenario:
-            //
-            // o repeat with 2 iterations has xforms:input and xforms:trigger
-            // o assume repeat is sorted on input value
-            // o use changes value in input and clicks trigger
-            // o client sends 2 events to server
-            // o client processes value change and sets new value
-            // o refresh takes place and causes reordering of rows
-            // o client processes DOMActivate on trigger, which now has moved position, e.g. row 2 to row 1
-            // o DOMActivate is dispatched to proper control (i.e. same as input was on)
-            //
-            // On the other hand, if the repeat iteration has disappeared, or was removed and recreated, the event is
-            // not dispatched.
-
-            if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on ghost target",
-                        "control id", eventTarget.getEffectiveId(), "event name", event.getName());
-            }
-            return false;
-        }
-
-        if (eventTarget instanceof XFormsControl) {
-            final XFormsControl xformsControl = (XFormsControl) eventTarget;
-            if (!xformsControl.isRelevant()) {
-                // Controls accept event only if they are relevant
-                if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-relevant control",
-                            "control id", eventTarget.getEffectiveId(), "event name", event.getName());
-                }
-                return false;
-            }
-            if (eventTarget instanceof XFormsSingleNodeControl) {
-                final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) eventTarget;
-                if (xformsSingleNodeControl.isReadonly() && !(xformsSingleNodeControl instanceof XFormsOutputControl)) {
-                    // Controls accept event only if they are not readonly, except for xforms:output which may be readonly
-                    if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on read-only control",
-                                "control id", eventTarget.getEffectiveId(), "event name", event.getName());
-                    }
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     @Override
     public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
         if (targetStaticId.equals(CONTAINING_DOCUMENT_PSEUDO_ID)) {
@@ -1096,24 +880,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else {
             targetContainer.dispatchEvent(propertyContext, event);
         }
-    }
-
-    /**
-     * Check whether the external event is allowed on the given target.
-     *
-     * @param indentedLogger    logger
-     * @param eventName         event name
-     * @param eventTarget       event target
-     * @return                  true iif the event is allowed
-     */
-    public boolean checkAllowedExternalEvents(IndentedLogger indentedLogger, String eventName, XFormsEventTarget eventTarget) {
-        // This is also a security measure that also ensures that somebody is not able to change values in an instance
-        // by hacking external events.
-
-        if (!isExplicitlyAllowedExternalEvent(eventName) && !eventTarget.allowExternalEvent(indentedLogger, EVENT_LOG_TYPE, eventName))
-            return false;
-
-        return true;
     }
 
     /**

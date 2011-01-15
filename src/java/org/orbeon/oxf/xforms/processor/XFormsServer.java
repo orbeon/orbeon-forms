@@ -212,7 +212,7 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             // Dispatch the events
-                            allEvents = hasEvents && ClientEvents.createAndDispatchEvents(pipelineContext, containingDocument,
+                            allEvents = hasEvents && ClientEvents.processEvents(pipelineContext, containingDocument,
                                     clientEvents, serverEventsElements, valueChangeControlIds);
 
                             // End external events

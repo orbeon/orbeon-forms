@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest;
+import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
@@ -287,7 +288,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         state2.document.beforeExternalEvents(pipelineContext, null);
         if (callback != null) {
             for (final XFormsEvent event: callback.createEvents(state2.document)) {
-                state2.document.handleExternalEvent(pipelineContext, event);
+                ClientEvents.processEvent(pipelineContext, state2.document, event);
             }
         }
         state2.document.afterExternalEvents(pipelineContext);

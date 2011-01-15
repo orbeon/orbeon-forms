@@ -326,9 +326,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     indentedLogger.startHandleOperation("", message, "id", getEffectiveId());
                 }
 
-                if (p.isDeferredSubmissionSecondPass)
-                    containingDocument.setGotSubmissionSecondPass();
-
                 // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
                 // issue a warning
                 {

@@ -36,7 +36,7 @@
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
             <pathelement location="${lib.dir}/scala-compiler-2.8.1.jar"/>
-            <pathelement location="${lib.dir}/scala1-library-2.8.1.jar"/>
+            <pathelement location="${lib.dir}/scala-library-2.8.1.jar"/>
         </classpath>
     </taskdef>
 

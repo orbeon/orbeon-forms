@@ -19,9 +19,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.{Map => JMap, HashMap => JHashMap}
+import ScalaUtils._
 
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
@@ -35,7 +34,6 @@ object Multipart {
 
     private val UPLOAD_PROGRESS_SESSION_KEY = "orbeon.upload.progress."
     private val STANDARD_PARAMETER_ENCODING = "utf-8"
-    private val COPY_BUFFER_SIZE = 8192
 
     /**
      * Decode a multipart/form-data stream and return a Map of parameters of type Object[], each of
@@ -198,41 +196,6 @@ object Multipart {
             }
         }
     }
-
-    def copyStream(in: InputStream, out: OutputStream, closeOut: Boolean, progress: (Long) => Unit = _ => ()) = {
-
-        require(in ne null)
-        require(out ne null)
-
-        useAndClose(in) { in =>
-            useAndClose(out) { out =>
-                val buffer = new Array[Byte](COPY_BUFFER_SIZE)
-                Iterator continually (in read buffer) takeWhile (_ != -1) foreach { read =>
-                    if (read > 0) {
-                        progress(read)
-                        out.write(buffer, 0, read)
-                    }
-                }
-            }
-        }
-    }
-
-    // Use a closable item and make sure an attempt to close it is done after use
-    def useAndClose[T <: {def close() : Unit}](closable: T)(block: T => Unit) =
-        try {
-            block(closable)
-        } finally {
-            if (closable ne null)
-                runQuietly(closable.close())
-        }
-
-    // Run a block and swallow any exception. Use only for things like close().
-    def runQuietly(block: => Unit) =
-        try {
-            block
-        } catch {
-            case _ => // NOP
-        }
 
     // Implicit conversion from FileItemIterator -> Iterator
     private implicit def asScalaIterator(i : FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {

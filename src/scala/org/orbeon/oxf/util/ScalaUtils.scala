@@ -17,18 +17,19 @@ object ScalaUtils {
 
     private val COPY_BUFFER_SIZE = 8192
 
-    private type Readable[T] = {
+    type Readable[T] = {
         def close(): Unit
         def read(b: Array[T]): Int
     }
 
-    private type Writable[T] = {
+    type Writable[T] = {
         def close(): Unit
         def write(cbuf: Array[T], off: Int, len: Int): Unit
     }
 
     // Copy a stream, with optional progress callback
-    def copyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: (Long) => Unit = _ => ()) = {
+    // This fails at runtime due to: https://lampsvn.epfl.ch/trac/scala/ticket/2672
+    def genericCopyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: (Long) => Unit = _ => ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -36,6 +37,38 @@ object ScalaUtils {
         useAndClose(in) { in =>
             useAndClose(out) { out =>
                 val buffer = new Array[T](COPY_BUFFER_SIZE)
+                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
+                    progress(read)
+                    out.write(buffer, 0, read)
+                }
+            }
+        }
+    }
+
+    def copyStream(in: Readable[Byte], out: Writable[Byte], progress: (Long) => Unit = _ => ()) = {
+
+        require(in ne null)
+        require(out ne null)
+
+        useAndClose(in) { in =>
+            useAndClose(out) { out =>
+                val buffer = new Array[Byte](COPY_BUFFER_SIZE)
+                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
+                    progress(read)
+                    out.write(buffer, 0, read)
+                }
+            }
+        }
+    }
+
+    def copyReader(in: Readable[Char], out: Writable[Char], progress: (Long) => Unit = _ => ()) = {
+
+        require(in ne null)
+        require(out ne null)
+
+        useAndClose(in) { in =>
+            useAndClose(out) { out =>
+                val buffer = new Array[Char](COPY_BUFFER_SIZE)
                 Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
                     progress(read)
                     out.write(buffer, 0, read)

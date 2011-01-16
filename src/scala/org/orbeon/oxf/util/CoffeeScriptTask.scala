@@ -30,25 +30,29 @@ class CoffeeScriptTask extends MatchingTask {
 
         Seq(fromDir, toDir) find (!_.isDirectory) foreach (s => throw new BuildException(s + " is not a valid directory"))
 
-        for (fileName <- getDirectoryScanner(fromDir).getIncludedFiles) {
+        try {
+            for (fileName <- getDirectoryScanner(fromDir).getIncludedFiles) {
 
-            val iFile = new File(fromDir.getAbsolutePath, fileName)
-            val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init ++ Seq("js") mkString ".")
+                val iFile = new File(fromDir.getAbsolutePath, fileName)
+                val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init ++ Seq("js") mkString ".")
 
-            if (oFile.lastModified < iFile.lastModified) {
+                if (oFile.lastModified < iFile.lastModified) {
 
-                // Read CoffeeScript as a string; CoffeeScript is always UTF-8
-                val coffeeReader = new InputStreamReader(new FileInputStream(iFile), Charset.forName("UTF-8"))
-                val coffeeString = NetUtils.readStreamAsString(coffeeReader)
+                    // Read CoffeeScript as a string; CoffeeScript is always UTF-8
+                    val coffeeReader = new InputStreamReader(new FileInputStream(iFile), Charset.forName("UTF-8"))
+                    val coffeeString = NetUtils.readStreamAsString(coffeeReader)
 
-                // Compile
-                log("Compiling " + fileName)
-                val jsString = CoffeeScriptCompiler.compile(coffeeString, fileName, 0)
+                    // Compile
+                    log("Compiling " + fileName)
+                    val jsString = CoffeeScriptCompiler.compile(coffeeString, fileName, 0)
 
-                // Write result
-                oFile.getParentFile.mkdirs()
-                copyStream(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
+                    // Write result
+                    oFile.getParentFile.mkdirs()
+                    copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
+                }
             }
+        } catch {
+            case e => throw new BuildException(e);
         }
     }
 }

@@ -43,12 +43,11 @@ class CoffeeScriptTask extends MatchingTask {
 
                 // Compile
                 log("Compiling " + fileName)
-                val javascriptString = CoffeeScriptCompiler.compile(coffeeString, fileName, 0)
+                val jsString = CoffeeScriptCompiler.compile(coffeeString, fileName, 0)
 
                 // Write result
                 oFile.getParentFile.mkdirs()
-                val javascriptReader = new StringReader(javascriptString)
-                copyReader(javascriptReader, new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
+                copyStream(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
             }
         }
     }

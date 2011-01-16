@@ -13,38 +13,29 @@
  */
 package org.orbeon.oxf.util
 
-import java.io._
-
 object ScalaUtils {
 
     private val COPY_BUFFER_SIZE = 8192
 
-    // Copy an InputStream to an OutputStream, with optional progress information
-    def copyStream(in: InputStream, out: OutputStream, closeOut: Boolean = true, progress: (Long) => Unit = _ => ()) = {
-
-        require(in ne null)
-        require(out ne null)
-
-        useAndClose(in) { in =>
-            useAndClose(out) { out =>
-                val buffer = new Array[Byte](COPY_BUFFER_SIZE)
-                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
-                    progress(read)
-                    out.write(buffer, 0, read)
-                }
-            }
-        }
+    private type Readable[T] = {
+        def close(): Unit
+        def read(b: Array[T]): Int
     }
 
-    // Copy a Reader to a writer, with optional progress information
-    def copyReader(in: Reader, out: Writer, closeOut: Boolean = true, progress: (Long) => Unit = _ => ()) = {
+    private type Writable[T] = {
+        def close(): Unit
+        def write(cbuf: Array[T], off: Int, len: Int): Unit
+    }
+
+    // Copy a stream, with optional progress callback
+    def copyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: (Long) => Unit = _ => ()) = {
 
         require(in ne null)
         require(out ne null)
 
         useAndClose(in) { in =>
             useAndClose(out) { out =>
-                val buffer = new Array[Char](COPY_BUFFER_SIZE)
+                val buffer = new Array[T](COPY_BUFFER_SIZE)
                 Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
                     progress(read)
                     out.write(buffer, 0, read)

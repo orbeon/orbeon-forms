@@ -39,7 +39,7 @@ class Upload extends Control
 
             # Register listener on the cancel link
             cancelAnchor = this.getElementByClassName "xforms-upload-cancel"
-            Event.addListener(cancelAnchor, "click", this.cancel, this, true
+            Event.addListener cancelAnchor, "click", this.cancel, this, true
 
     # The change event corresponds to a file being selected. This will queue an event to submit this file in the
     # background  as soon as possible (pseudo-Ajax request).
@@ -58,7 +58,7 @@ class Upload extends Control
             this.yuiProgressBar.set "value", 10 + 100 * received / expected
 
     # When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
-    cancel: ->
+    cancel: (event) ->
         Event.preventDefault event
         UploadServer.cancel()
 

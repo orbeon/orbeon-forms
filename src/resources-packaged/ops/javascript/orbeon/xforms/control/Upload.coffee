@@ -56,7 +56,6 @@ class Upload extends Control
     progress: (received, expected) ->
         if this.yuiProgressBar
             this.yuiProgressBar.set "value", 10 + 100 * received / expected
-            UploadServer.askForProgressUpdate()
 
     # When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
     cancel: ->

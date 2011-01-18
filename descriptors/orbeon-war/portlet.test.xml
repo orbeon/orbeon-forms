@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<portlet-app>
+<portlet>
+    <portlet-name>orbeon-forms-portlet</portlet-name>
+    <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet2Delegate</portlet-class>
+    <supports>
+        <mime-type>text/html</mime-type>
+        <portlet-mode>edit</portlet-mode>
+    </supports>
+    <init-param>
+        <name>oxf.main-processor.name</name>
+        <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+    </init-param>
+    <init-param>
+        <name>oxf.main-processor.input.config</name>
+        <value>oxf:/config/prologue-portlet.xpl</value>
+    </init-param>
+    <init-param>
+        <name>oxf.error-processor.name</name>
+        <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+    </init-param>
+    <init-param>
+        <name>oxf.error-processor.input.config</name>
+        <value>oxf:/config/error.xpl</value>
+    </init-param>
+    <portlet-info>
+        <title>Orbeon Forms Portlet</title>
+    </portlet-info>
+    <portlet-preferences>
+        <preference>
+            <name>web-site</name>
+            <value>http://www.orbeon.com/</value>
+        </preference>
+        <preference>
+            <name>favorite-animals</name>
+            <value>cat, dog</value>
+        </preference>
+    </portlet-preferences>
+</portlet>
+
+<portlet>
+    <portlet-name>orbeon-forms-jsp-portlet</portlet-name>
+    <portlet-class>org.orbeon.oxf.portlet.OrbeonJSPPortlet</portlet-class>
+    <supports>
+        <mime-type>text/html</mime-type>
+        <portlet-mode>view</portlet-mode>
+    </supports>
+    <init-param>
+        <name>orbeon.portlet.jsp.path</name>
+        <value>/xforms-jsp/test.jsp</value>
+    </init-param>
+    <portlet-info>
+        <title>Orbeon Forms JSP Portlet</title>
+    </portlet-info>
+</portlet>
+
+<filter>
+    <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
+    <filter-class>org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter</filter-class>
+    <lifecycle>RENDER_PHASE</lifecycle>
+    <lifecycle>RESOURCE_PHASE</lifecycle>
+    <init-param>
+        <name>oxf.xforms.renderer.context</name>
+        <value>/orbeon</value>
+    </init-param>
+</filter>
+
+<filter-mapping>
+    <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
+    <portlet-name>orbeon-forms-jsp-portlet</portlet-name>
+</filter-mapping>
+
+
+</portlet-app>

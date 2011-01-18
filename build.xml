@@ -13,7 +13,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<project name="orbeon" default="orbeon-war" basedir=".">
+<project name="orbeon" default="orbeon-war" basedir="." xmlns:xdb="http://exist-db.org/ant">
 
     <!--<echoproperties/>-->
 
@@ -33,6 +33,8 @@
 
     <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20101223.jar"/>
 
+    <!-- Scala tasks -->
+    <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
             <pathelement location="${lib.dir}/scala-compiler-2.8.1.jar"/>
@@ -40,6 +42,7 @@
         </classpath>
     </taskdef>
 
+    <!-- JUnit tasks -->
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
         <classpath>
             <pathelement location="${lib.dir}/junit-4.8.2.jar"/>
@@ -47,6 +50,18 @@
         </classpath>
     </taskdef>
 
+    <!-- eXist tasks -->
+    <!-- http://exist-db.org/ant-tasks.html -->
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+        <classpath>
+            <fileset dir="${lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${build.dir}/lib">
+                <include name="orbeon.jar"/>
+            </fileset>
+        </classpath>
+    </typedef>
 
     <!-- Ant task for the YUI Compressor -->
     <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
@@ -532,10 +547,10 @@
 
     <target name="war-copy-descriptors" depends="prepare">
         <copy todir="${war.inf}">
-            <fileset dir="descriptors/web-inf/static"/>
+            <fileset dir="descriptors/orbeon-war"/>
         </copy>
         <echo message="Target: ${target}"/>
-        <xslt in="build.xml" style="descriptors/web-inf/dynamic/web.xsl" out="${war.inf}/web.xml" force="true">
+        <xslt in="build.xml" style="descriptors/orbeon-war-web.xsl" out="${war.inf}/web.xml" force="true">
             <param name="target" expression="${target}"/>
             <param name="build-root" expression="${build.root}"/>
             <param name="build-root" expression="${build.root}"/>
@@ -555,7 +570,7 @@
 
     <target name="proxy-portlet-war" depends="jars" description="Create proxy portlet WAR file">
         <war destfile="${build.distrib.dir}/orbeon-proxy-portlet.war">
-            <webinf dir="descriptors/web-inf/static/proxy-portlet"/>
+            <webinf dir="descriptors/proxy-portlet"/>
             <lib dir="${build.lib.dir}">
                 <include name="orbeon.jar"/>
                 <include name="orbeon-xforms-filter.jar"/>
@@ -760,7 +775,7 @@
         </junit>
     </target>
 
-    <target name="orbeon-dist-war" depends="jars">
+    <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war"/>
@@ -773,9 +788,8 @@
                 <!-- This is already added to orbeon-resources-public.jar -->
                 <exclude name="WEB-INF/resources/ops"/>
                 <exclude name="WEB-INF/resources/ops/**"/>
-                <!-- These shouldn't be there, but just in case filter them out -->
-                <exclude name="WEB-INF/exist-data/*.dbx"/>
-                <exclude name="WEB-INF/exist-data/*.log"/>
+                <!-- Filter eXist that that might be in there -->
+                <exclude name="WEB-INF/exist-data/**"/>
             </zipfileset>
             <zipfileset dir="${resources.dir}" prefix="WEB-INF/resources">
                 <exclude name="apps/doc/**/*.eps"/>
@@ -788,6 +802,10 @@
                 <!-- Form Builder is packaged as a JAR -->
                 <exclude name="forms/orbeon/builder"/>
                 <exclude name="forms/orbeon/builder/**"/>
+            </zipfileset>
+            <zipfileset dir="build/exist-data" prefix="WEB-INF/exist-data">
+                <exclude name="*.log"/>
+                <exclude name="*.lck"/>
             </zipfileset>
         </zip>
     </target>
@@ -906,6 +924,39 @@
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 
+    </target>
+
+    <target name="exist-export-from-web-inf">
+        <delete dir="build/exist-data-exported"/>
+        <mkdir dir="build/exist-data-exported"/>
+        <xdb:extract configuration="build/orbeon-war/WEB-INF/exist-conf.xml" uri="xmldb:exist:///db" initDb="true" destdir="build/exist-data-exported" subcollections="true" createdirectories="true"/>
+        <move todir="build/exist-data-exported" includeemptydirs="false">
+            <fileset dir="build/exist-data-exported">
+                <include name="**/*.xhtml.xml"/>
+            </fileset>
+            <globmapper from="*.xhtml.xml" to="*.xhtml"/>
+        </move>
+    </target>
+
+    <target name="exist-import-sample-data-to-build">
+        <delete dir="build/exist-data"/>
+        <mkdir dir="build/exist-data"/>
+        <!-- Store config first -->
+        <xdb:store configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="admin" password="">
+            <fileset dir="data">
+                <include name="system/**"/>
+            </fileset>
+        </xdb:store>
+        <!-- Store data -->
+        <xdb:store configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="guest" password="guest">
+            <fileset dir="data">
+                <include name="orbeon/**"/>
+                <!-- TODO: Some examples forms in the builder -->
+                <exclude name="orbeon/fr/orbeon/builder/**"/>
+            </fileset>
+        </xdb:store>
+        <!-- Make sure the database is shut down -->
+        <xdb:shutdown configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" user="admin" password=""/>
     </target>
 
 </project>

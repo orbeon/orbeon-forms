@@ -1,0 +1,33 @@
+<book xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:exforms="http://www.exforms.org/exf/1-0" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    <details>
+        <title>The Terror</title>
+        <author>Dan Simmons</author>
+        <language>en</language>
+        <link/>
+        <rating/>
+        <publication-year/>
+        <review>&lt;b&gt;From Publishers Weekly&lt;/b&gt;&lt;br clear="none"/&gt;
+  &lt;i&gt;Starred Review.&lt;/i&gt;  Hugo-winner Simmons (&lt;i&gt;Olympos&lt;/i&gt;)
+brings the horrific trials and tribulations of arctic exploration
+vividly to life in this beautifully written historical, which injects a
+note of supernatural horror into the 1840s Franklin expedition and its
+doomed search for the Northwest Passage. Sir John Franklin, the leader
+of the expedition and captain of the &lt;i&gt;Erebus&lt;/i&gt;, is an aging fool. Francis Crozier, his second in command and captain of the &lt;i&gt;Terror&lt;/i&gt;,
+is a competent sailor, but embittered after years of seeing lesser men
+with better connections given preferment over him. With their two ships
+quickly trapped in pack ice, their voyage is a disaster from start to
+finish. Some men perish from disease, others from the cold, still
+others from botulism traced to tinned food purchased from the lowest
+bidder. Madness, mutiny and cannibalism follow. And then there's the
+monstrous creature from the ice, the thing like a polar bear but many
+times larger, possessed of a dark and vicious intelligence. This
+complex tale should find many devoted readers and add significantly to
+Simmons's already considerable reputation. &lt;i&gt;(Jan.)&lt;/i&gt; &lt;br clear="none"/&gt;&lt;div style="text-align: left;"&gt;Copyright © Reed Business Information, a division of Reed Elsevier Inc. All rights reserved.
+  
+&lt;/div&gt;</review>
+        <image filename="The Terror.jpg" mediatype="image/jpeg" size="15773">http://localhost:8080/orbeon/fr/service/exist/crud/orbeon/bookshelf/data/e8bfd3ba63fa12a8b59cdd5c08369a35/e9f827e57410b51359a5d82351ab1b9b.jpg</image>
+    </details>
+    <notes>
+        <note/>
+    </notes>
+</book>

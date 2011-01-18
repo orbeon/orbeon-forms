@@ -116,7 +116,9 @@
         you have some more memory to waste. If you deal with lots of
         collections, you can also increase the collectionCacheSize value
     -->
-    <db-connection cacheSize="48M" collectionCache="24M" database="native" files="exist-data" pageSize="4096" nodesBuffer="-1">
+    <!--<db-connection cacheSize="48M" collectionCache="24M" database="native" files="exist-data" pageSize="4096" nodesBuffer="-1">-->
+    <!-- ORBEON: smaller caches for embedded use -->
+    <db-connection cacheSize="20M" collectionCache="10M" database="native" files="exist-data" pageSize="4096" nodesBuffer="-1">
 
         <!--
             Specifies the default permissions for all resources and collections

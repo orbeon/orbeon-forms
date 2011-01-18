@@ -103,9 +103,13 @@
                 <xs:simpleType name="language">
                     <xs:restriction base="xs:string">
                         <xs:enumeration value=""/>
+                        <xs:enumeration value="de"/>
                         <xs:enumeration value="en"/>
                         <xs:enumeration value="fr"/>
                         <xs:enumeration value="es"/>
+                        <xs:enumeration value="it"/>
+                        <xs:enumeration value="ru"/>
+                        <xs:enumeration value="zh"/>
                     </xs:restriction>
                 </xs:simpleType>
 
@@ -208,12 +212,28 @@
                             <help>This contains the book language. For example...</help>
                             <alert>The language selected is invalid</alert>
                             <item>
+                                <label>Chinese</label>
+                                <value>zh</value>
+                            </item>
+                            <item>
                                 <label>English</label>
                                 <value>en</value>
                             </item>
                             <item>
                                 <label>French</label>
                                 <value>fr</value>
+                            </item>
+                            <item>
+                                <label>German</label>
+                                <value>de</value>
+                            </item>
+                            <item>
+                                <label>Italian</label>
+                                <value>it</value>
+                            </item>
+                            <item>
+                                <label>Russian</label>
+                                <value>ru</value>
                             </item>
                             <item>
                                 <label>Spanish</label>
@@ -306,8 +326,16 @@
                             <help>Ce champ contient la langue du livre, par exemple...</help>
                             <alert>La langue sélectionnée est invalide</alert>
                             <item>
+                                <label>Allemand</label>
+                                <value>de</value>
+                            </item>
+                            <item>
                                 <label>Anglais</label>
                                 <value>en</value>
+                            </item>
+                            <item>
+                                <label>Chinois</label>
+                                <value>zh</value>
                             </item>
                             <item>
                                 <label>Français</label>
@@ -316,6 +344,14 @@
                             <item>
                                 <label>Espagnol</label>
                                 <value>es</value>
+                            </item>
+                            <item>
+                                <label>Italien</label>
+                                <value>it</value>
+                            </item>
+                            <item>
+                                <label>Russe</label>
+                                <value>ru</value>
                             </item>
                         </language>
                         <link>

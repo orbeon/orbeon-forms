@@ -116,16 +116,16 @@
         <include name="msv-relaxngDatatype-20070407.jar"/>
 
         <include name="hsqldb-1_8_0_7.jar"/>
-        <include name="jfreechart*"/>
-        <include name="jcommon*"/>
+        <include name="jfreechart-1.0.9.jar"/>
+        <include name="jfreechart-dependency-jcommon-1.0.12.jar"/>
         <include name="activation-1_0_2.jar"/>
         <include name="jtidy-8.0-20060801.131059-3.jar"/>
         <include name="tagsoup-1.2.jar"/>
         <include name="${saxon.jar}"/>
         <include name="batik-all-1_6.jar"/>
+        <include name="batic-dependency-xmlgraphics-commons-1.1.jar"/>
         <include name="avalon-framework-4_2_0.jar"/>
         <include name="fop-0_93.jar"/>
-        <include name="xmlgraphics-commons-1_1.jar"/>
         <include name="jakarta-poi*"/>
         <include name="metadata-extractor-2_1.jar"/>
         <include name="castor-0_9_4_3-xml.jar"/>
@@ -803,10 +803,13 @@
                 <exclude name="forms/orbeon/builder"/>
                 <exclude name="forms/orbeon/builder/**"/>
             </zipfileset>
+            <!-- eXist sample database -->
             <zipfileset dir="build/exist-data" prefix="WEB-INF/exist-data">
                 <exclude name="*.log"/>
                 <exclude name="*.lck"/>
             </zipfileset>
+            <!-- README.txt file -->
+            <zipfileset dir="descriptors/orbeon-war/exist-data" prefix="WEB-INF/exist-data"/>
         </zip>
     </target>
 

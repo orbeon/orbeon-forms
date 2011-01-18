@@ -820,9 +820,10 @@
             <zipfileset dir="${build.distrib.dir}" fullpath="${full.release.name}/${project.name}.war">
                 <include name="${full.release.name}.war"/>
             </zipfileset>
-            <zipfileset file="README.txt" prefix="${full.release.name}"/>
+            <zipfileset file="README.md" prefix="${full.release.name}"/>
+            <zipfileset file="LICENSE.txt" prefix="${full.release.name}"/>
             <zipfileset dir="${build.doc.dir}" prefix="${full.release.name}/doc"/>
-            <zipfileset dir="doc/dist" prefix="${full.release.name}"/>
+            <zipfileset dir="third-party-licenses" prefix="${full.release.name}/third-party-licenses"/>
             <zipfileset dir="${examples-cli-src.dir}" prefix="${full.release.name}/examples-cli"/>
         </zip>
         <!-- Fix EOL for Windows platform -->

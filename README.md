@@ -1,6 +1,5 @@
-
-About Orbeon Forms
-==================
+Orbeon Forms - Open source web forms done the right way
+=======================================================
 
 Last updated for Orbeon Forms 3.9, January 2011
 
@@ -19,13 +18,13 @@ includes:
 
 For more information about Orbeon Forms, please visit:
 
-- http://www.orbeon.com/
-- http://www.orbeon.com/orbeon/doc/
-- http://wiki.orbeon.com/forms/
+- <http://www.orbeon.com/>
+- <http://www.orbeon.com/orbeon/doc/>
+- <http://wiki.orbeon.com/forms/>
 
 Also check the Orbeon Forms Frequently Asked Questions (FAQ):
 
-- http://wiki.orbeon.com/forms/orbeon-forms-faq
+- <http://wiki.orbeon.com/forms/orbeon-forms-faq>
 
 
 2. Editions
@@ -38,26 +37,31 @@ Orbeon Forms comes in two editions:
 
 For more information:
 
-- http://www.orbeon.com/forms/compare
-- http://www.orbeon.com/support-services/professional
+- <http://www.orbeon.com/forms/compare>
+- <http://www.orbeon.com/support-services/professional>
 
 
 3. Community and support
 ------------------------
 
+See: http://www.orbeon.com/forms/community
 
-- If you have questions, comments, or difficulties with Orbeon
-  Forms, please subscribe to the ops-users mailing-list at:
+In a nutshell:
 
-  http://www.orbeon.com/forms/community
+- Technical questions: ask them on StackOverflow (don't forget the "orbeon"
+  tag):
 
-- For commercial support and licensing alternatives, please visit:
+  <http://stackoverflow.com/>
 
-  http://www.orbeon.com/support-services/overview
+- Discussions and feedback: please subscribe to the ops-users mailing-list.
+
+- Commercial support and licensing:
+
+  <http://www.orbeon.com/support-services/overview>
 
   or contact us at:
 
-  info@orbeon.com
+  <info@orbeon.com>
 
 
 4. What's new in the latest release
@@ -65,11 +69,11 @@ For more information:
 
 A complete list of changes can be found online at:
 
-> http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-39
+> <http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-39>
 
 Changes for the previous release:
 
-> http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38
+> <http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38>
 
 
 5. Documentation
@@ -77,12 +81,12 @@ Changes for the previous release:
 
 Most of the new documentation is available on the Orbreon Forms wiki:
 
-> http://wiki.orbeon.com/forms/
+> <http://wiki.orbeon.com/forms/>
 
 Older documentation, which is progressively being migrated to the wiki,
 is available at:
 
-> http://www.orbeon.com/orbeon/doc/
+> <http://www.orbeon.com/orbeon/doc/>
 
 
 6. System requirements and installation
@@ -90,11 +94,11 @@ is available at:
 
 The system requirements and installation procedure are detailed at:
 
-> http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing
+> <http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing>
 
 In addition, the Orbeon Forms tutorial also tackles installation:
 
-> http://www.orbeon.com/orbeon/doc/intro-tutorial
+> <http://www.orbeon.com/orbeon/doc/intro-tutorial>
 
 
 7. Compiling Orbeon Forms
@@ -103,7 +107,11 @@ In addition, the Orbeon Forms tutorial also tackles installation:
 You usually don't have to compile Orbeon Forms yourself, but for
 information about compiling Orbeon Forms from sources, please visit:
 
-> http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development
+> <http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development>
+
+The source code is on github:
+
+> <https://github.com/orbeon/orbeon-forms/>
 
 Orbeon Forms is written mainly using the following languages and technologies:
 
@@ -113,12 +121,12 @@ Orbeon Forms is written mainly using the following languages and technologies:
 - XForms, XSLT, and related XML technologies
 
 
-8. Known Issues
----------------
+8. Known bugs and requests for enhancements
+-------------------------------------------
 
-For a list of known issues, consult the OW2 issue tracking system:
+For a list of known issues and RFEs, consult the OW2 issue tracking system:
 
-> http://goo.gl/iSEyq
+> <http://goo.gl/iSEyq>
 
 
 9. Licenses
@@ -126,13 +134,13 @@ For a list of known issues, consult the OW2 issue tracking system:
 
 The source code is distributed under the terms of the GNU Lesser General
 Public License (LGPL). The full text of the license is available at
-http://www.gnu.org/copyleft/lesser.html. LGPL is a business-friendly
+<http://www.gnu.org/copyleft/lesser.html>. LGPL is a business-friendly
 license that allows you to use Orbeon Forms for open source and
 commercial applications.
 
 Some examples are distributed under the terms of the Apache License,
 Version 2.0. The full text of the license is available at:
-http://www.apache.org/licenses/LICENSE-2.0.
+<http://www.apache.org/licenses/LICENSE-2.0>.
 
 Please refer to file headers to identify which license governs the
 distribution of a particular file.
@@ -150,48 +158,48 @@ third-party software.
 This product includes software developed by the Apache Software Foundation
 (http://www.apache.org/):
 
-- Ant (http://ant.apache.org/)
-- Avalon (http://avalon.apache.org/closed.html)
-- Axis (http://axis.apache.org/)
-- Batik (http://xmlgraphics.apache.org/batik/)
-- Commons (http://commons.apache.org/)
-- FOP (http://xmlgraphics.apache.org/fop/)
-- Forrest (http://forrest.apache.org/)
-- HttpComponents (http://hc.apache.org/)
-- log4j (http://logging.apache.org/log4j/)
-- Mime4j (http://james.apache.org/mime4j/)
-- ORO (http://jakarta.apache.org/oro/)
-- POI (http://poi.apache.org/)
-- Xerces (http://xerces.apache.org/xerces-j/)
+- Ant (<http://ant.apache.org/>)
+- Avalon (<http://avalon.apache.org/closed.html>)
+- Axis (<http://axis.apache.org/>)
+- Batik (<http://xmlgraphics.apache.org/batik/>)
+- Commons (<http://commons.apache.org/>)
+- FOP (<http://xmlgraphics.apache.org/fop/>)
+- Forrest (<http://forrest.apache.org/>)
+- HttpComponents (<http://hc.apache.org/>)
+- log4j (<http://logging.apache.org/log4j/>)
+- Mime4j (<http://james.apache.org/mime4j/>)
+- ORO (<http://jakarta.apache.org/oro/>)
+- POI (<http://poi.apache.org/>)
+- Xerces (<http://xerces.apache.org/xerces-j/>)
 
 In addition, this product includes the following software:
 
-- antlr (http://www.antlr.org/)
-- Barcode4j (http://barcode4j.sourceforge.net/)
-- Castor (http://www.castor.org/)
+- antlr (<http://www.antlr.org/>)
+- Barcode4j (<http://barcode4j.sourceforge.net/>)
+- Castor (<http://www.castor.org/>)
 - CoffeeScript
-- dom4j (http://dom4j.org/)
-- Ehcache (http://ehcache.org/)
-- eXist (http://exist.sourceforge.net/)
-- Flying Saucer (http://code.google.com/p/flying-saucer/)
-- hsqldb (http://hsqldb.sourceforge.net/)
-- iText (http://itextpdf.com/)
-- Jaxen (http://jaxen.org/)
-- JCIFS (http://jcifs.samba.org/)
-- JCommon (http://www.jfree.org/jcommon/)
-- JFreeChart (http://www.jfree.org/jfreechart/)
-- JTidy (http://jtidy.sourceforge.net/)
-- JUnit (http://www.junit.org/)
-- PDFBox (http://pdfbox.apache.org/)
-- Rhino (http://www.mozilla.org/rhino/)
-- Saxon (http://saxon.sourceforge.net/)
-- SAXPath (http://sourceforge.net/projects/saxpath/)
-- Scala (http://www.scala-lang.org/)
-- ScalaTest (http://www.scalatest.org/)
-- TagSoup (http://home.ccil.org/~cowan/XML/tagsoup/)
-- Sun Multi-Schema XML Validator (https://msv.dev.java.net/)
-- YUI Compressor (http://developer.yahoo.com/yui/compressor/)
-- YUI Library (http://developer.yahoo.com/yui/)
+- dom4j (<http://dom4j.org/>)
+- Ehcache (<http://ehcache.org/>)
+- eXist (<http://exist.sourceforge.net/>)
+- Flying Saucer (<http://code.google.com/p/flying-saucer/>)
+- hsqldb (<http://hsqldb.sourceforge.net/>)
+- iText (<http://itextpdf.com/>)
+- Jaxen (<http://jaxen.org/>)
+- JCIFS (<http://jcifs.samba.org/>)
+- JCommon (<http://www.jfree.org/jcommon/>)
+- JFreeChart (<http://www.jfree.org/jfreechart/>)
+- JTidy (<http://jtidy.sourceforge.net/>)
+- JUnit (<http://www.junit.org/>)
+- PDFBox (<http://pdfbox.apache.org/>)
+- Rhino (<http://www.mozilla.org/rhino/>)
+- Saxon (<http://saxon.sourceforge.net/>)
+- SAXPath (<http://sourceforge.net/projects/saxpath/>)
+- Scala (<http://www.scala-lang.org/>)
+- ScalaTest (<http://www.scalatest.org/>)
+- TagSoup (<http://home.ccil.org/~cowan/XML/tagsoup/>)
+- Sun Multi-Schema XML Validator (<https://msv.dev.java.net/>)
+- YUI Compressor (<http://developer.yahoo.com/yui/compressor/>)
+- YUI Library (<http://developer.yahoo.com/yui/>)
 
 This product makes use of schemas for XSLT 2.0 and XForms 1.1 provided
 under W3C Software License. The schemas are available at the following

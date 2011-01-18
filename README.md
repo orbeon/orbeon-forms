@@ -44,7 +44,7 @@ For more information:
 3. Community and support
 ------------------------
 
-See: http://www.orbeon.com/forms/community
+See: <http://www.orbeon.com/forms/community>
 
 In a nutshell:
 

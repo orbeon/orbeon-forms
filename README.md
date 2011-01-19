@@ -101,7 +101,15 @@ In addition, the Orbeon Forms tutorial also tackles installation:
 > <http://www.orbeon.com/orbeon/doc/intro-tutorial>
 
 
-7. Compiling Orbeon Forms
+7. What's happening?
+--------------------
+
+- Follow Orbeon on Twitter: <http://twitter.com/orbeon>
+- Latest commits on github: <https://github.com/orbeon/orbeon-forms/commits/>
+- Mailing-list archive: <http://orbeon-forms-ops-users.24843.n4.nabble.com/>
+
+
+8. Compiling Orbeon Forms
 -------------------------
 
 You usually don't have to compile Orbeon Forms yourself, but for
@@ -121,7 +129,7 @@ Orbeon Forms is written mainly using the following languages and technologies:
 - XForms, XSLT, and related XML technologies
 
 
-8. Known bugs and requests for enhancements
+9. Known bugs and requests for enhancements
 -------------------------------------------
 
 For a list of known issues and RFEs, consult the OW2 issue tracking system:
@@ -129,7 +137,7 @@ For a list of known issues and RFEs, consult the OW2 issue tracking system:
 > <http://goo.gl/iSEyq>
 
 
-9. Licenses
+10. License
 -----------
 
 The source code is distributed under the terms of the GNU Lesser General
@@ -152,7 +160,7 @@ See the next section for more details about the licenses of included
 third-party software.
 
 
-10. Third-party software
+11. Third-party software
 ------------------------
 
 This product includes software developed by the Apache Software Foundation
@@ -177,7 +185,7 @@ In addition, this product includes the following software:
 - antlr (<http://www.antlr.org/>)
 - Barcode4j (<http://barcode4j.sourceforge.net/>)
 - Castor (<http://www.castor.org/>)
-- CoffeeScript
+- CoffeeScript (<http://jashkenas.github.com/coffee-script/>)
 - dom4j (<http://dom4j.org/>)
 - Ehcache (<http://ehcache.org/>)
 - eXist (<http://exist.sourceforge.net/>)

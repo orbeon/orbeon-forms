@@ -34,7 +34,7 @@ class CoffeeScriptTask extends MatchingTask {
             for (fileName <- getDirectoryScanner(fromDir).getIncludedFiles) {
 
                 val iFile = new File(fromDir.getAbsolutePath, fileName)
-                val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init ++ Seq("js") mkString ".")
+                val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init :+ "js" mkString ".")
 
                 if (oFile.lastModified < iFile.lastModified) {
 

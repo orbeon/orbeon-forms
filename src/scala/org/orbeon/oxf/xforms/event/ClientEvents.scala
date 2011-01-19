@@ -170,7 +170,7 @@ object ClientEvents {
         }
 
         // Return all events by category in the order we defined the categories
-        Category.values.toSeq flatMap ((groups ++ Map(Category.SelectBlank -> blankEvents)).get(_)) flatten
+        Category.values.toSeq flatMap ((groups + (Category.SelectBlank -> blankEvents)).get(_)) flatten
     }
 
     private def safelyCreateEvent(document: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {

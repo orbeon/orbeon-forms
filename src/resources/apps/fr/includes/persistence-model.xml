@@ -656,7 +656,7 @@
         <xforms:action if="event('error-type') = 'xxforms-pending-uploads'">
             <xforms:message model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
         </xforms:action>
-        <xforms:action if="not(event('error-type') = ('validation-error', 'xxforms-pending-uploads')">
+        <xforms:action if="not(event('error-type') = ('validation-error', 'xxforms-pending-uploads'))">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>

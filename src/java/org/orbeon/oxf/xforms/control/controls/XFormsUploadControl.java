@@ -70,6 +70,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         getFileMediatype(propertyContext);
         getFileName(propertyContext);
         getFileSize(propertyContext);
+
+        getProgressState(propertyContext);
         getProgressReceived(propertyContext);
         getProgressExpected(propertyContext);
     }
@@ -298,6 +300,10 @@ public class XFormsUploadControl extends XFormsValueControl {
         return fileInfo.getFileSize(propertyContext);
     }
 
+    public String getProgressState(PropertyContext propertyContext) {
+        return fileInfo.getProgressState(propertyContext);
+    }
+
     public String getProgressReceived(PropertyContext propertyContext) {
         return fileInfo.getProgressCurrent(propertyContext);
     }
@@ -338,6 +344,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         if (!XFormsUtils.compareStrings(getFileName(propertyContext), otherUploadControl.getFileName(propertyContext)))
             return false;
 
+        if (!XFormsUtils.compareStrings(getProgressState(propertyContext), otherUploadControl.getProgressState(propertyContext)))
+            return false;
         if (!XFormsUtils.compareStrings(getProgressReceived(propertyContext), otherUploadControl.getProgressReceived(propertyContext)))
             return false;
         if (!XFormsUtils.compareStrings(getProgressExpected(propertyContext), otherUploadControl.getProgressExpected(propertyContext)))
@@ -391,6 +399,16 @@ public class XFormsUploadControl extends XFormsValueControl {
             if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
                 final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
                 added |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+        {
+            // Progress state
+            final String value1 = (uploadControl1 == null) ? null : uploadControl1.getProgressState(pipelineContext);
+            final String value2 = uploadControl2.getProgressState(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(value1, value2)) {
+                final String attributeValue = value2 != null ? value2 : "";
+                added |= addAttributeIfNeeded(attributesImpl, "progress-state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -466,6 +484,8 @@ class FileInfo implements ExternalCopyable {
     private boolean isFilenameEvaluated;
     private String filename;
 
+    private boolean isProgressStateEvaluated;
+    private String progressState;
     private boolean isProgressReceivedEvaluated;
     private String progressReceived;
     private boolean isProgressExpectedEvaluated;
@@ -521,6 +541,20 @@ class FileInfo implements ExternalCopyable {
             isSizeEvaluated = true;
         }
         return size;
+    }
+
+    public String getProgressState(PropertyContext propertyContext) {
+        if (!isProgressStateEvaluated) {
+
+            final Multipart.UploadProgress progress = getProgress(propertyContext);
+            if (progress != null)
+                progressState = progress.state().toString().toLowerCase();
+            else
+                progressState = null;
+
+            isProgressStateEvaluated = true;
+        }
+        return progressState;
     }
 
     public String getProgressCurrent(PropertyContext propertyContext) {

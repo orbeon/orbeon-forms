@@ -324,6 +324,7 @@ object ClientEvents {
                             helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values")
                             helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control",
                                 Array[String]("id", sourceControlId,
+                                    "progress-state", progress.state.toString.toLowerCase,
                                     "progress-received", progress.receivedSize.toString,
                                     "progress-expected", progress.expectedSize match {case Some(long) => long.toString; case _ => null}))
                             helper.endElement()

@@ -86,14 +86,17 @@ object Multipart {
 
     private def getProgressSessionKey(uuid: String, fieldName: String) = UPLOAD_PROGRESS_SESSION_KEY + uuid + "." + fieldName
 
-    def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress] =
+    def getUploadProgress(request: ExternalContext.Request, sessionKey: String): Option[UploadProgress] =
         request.getSession(false) match {
-            case session: Session => session.getAttributesMap.get(getProgressSessionKey(uuid, fieldName)) match {
+            case session: Session => session.getAttributesMap.get(sessionKey) match {
                 case progress: UploadProgress => Some(progress)
                 case _ => None
             }
             case _ => None
         }
+
+    def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress] =
+        getUploadProgress(request, getProgressSessionKey(uuid, fieldName))
 
     def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
         request.getSession(false) match {
@@ -101,9 +104,15 @@ object Multipart {
             case _ =>
         }
 
+    object UploadState extends Enumeration {
+        val Started = Value
+        val Completed = Value
+        val Interrupted = Value
+    }
+
     class UploadProgress(val fieldName: String, val expectedSize: Option[Long]) {
         var receivedSize = 0L
-        var completed = false
+        var state = UploadState.Started
     }
 
     private def parseRequest(requestContext: RequestContext, factory: DiskFileItemFactory, upload: ServletFileUpload,
@@ -132,9 +141,13 @@ object Multipart {
                 // Make sure openStream is opened otherwise other methods fail later due to NPE
                 val inputStream = item.openStream
 
-                items :+ fileItem                
+                fileItem match {
+                    case headersSupport: FileItemHeadersSupport => headersSupport.setHeaders(item.getHeaders)
+                }
 
-                val fieldValue=
+                items :+ fileItem
+
+                val fieldValue = // either a String or a FileItem (we don't use Either as this is used from Java)
                     if (fileItem.isFormField) {
                         // Simple form field
                         // Assume that form fields are in UTF-8. Can they have another encoding? If so, how is it specified?
@@ -166,8 +179,7 @@ object Multipart {
 
                         // Copy stream and update progress information
                         copyStream(inputStream, fileItem.getOutputStream, uploadProgress.receivedSize += _)
-
-                        uploadProgress.completed = true
+                        uploadProgress.state = UploadState.Completed
 
                         fileItem
                     } else {
@@ -177,17 +189,22 @@ object Multipart {
                         fileItem
                     }
 
-                if (fileItem.isInstanceOf[FileItemHeadersSupport])
-                    (fileItem.asInstanceOf[FileItemHeadersSupport]).setHeaders(item.getHeaders)
-
                 StringConversions.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName, fieldValue)
             }
             successful = true
         } finally {
             if (!successful) {
-                // Remove session value
+                // In case of exception:
+                // o don't remove UploadProgress objects from the session
+                // o instead mark all entries added so far as being in state Interrupted
+                // o free underlying FileItem storage if any as those won't be used
                 for (sessionKey <- sessionKeys)
-                    runQuietly(session.getAttributesMap.remove(sessionKey))
+                    runQuietly {
+                        getUploadProgress(request, sessionKey) match {
+                            case Some(progress) => progress.state = UploadState.Interrupted
+                            case _ =>
+                        }
+                    }
 
                 // Free underlying storage for all (disk) items gathered so far
                 for (fileItem <- items)

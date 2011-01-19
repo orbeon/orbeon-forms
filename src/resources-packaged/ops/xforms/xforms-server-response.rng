@@ -102,6 +102,9 @@
                                                 <optional>
                                                     <attribute name="progress-expected"/>
                                                 </optional>
+                                                <optional>
+                                                    <attribute name="progress-state"/>
+                                                </optional>
                                             </group>
                                             <!-- Optional attributes for xforms:input -->
                                             <group>

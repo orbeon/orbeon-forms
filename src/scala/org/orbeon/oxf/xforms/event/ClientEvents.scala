@@ -76,11 +76,11 @@ object ClientEvents {
         // Gather all events including decoding action server events
         val allClientAndServerEvents: Seq[LocalEvent] =
             globalServerEvents ++
-                (clientEventsAfterNoscript flatMap (_ match {
+                (clientEventsAfterNoscript flatMap {
                     case element if element.attributeValue("name") == XFormsEvents.XXFORMS_SERVER_EVENTS =>
                         decodeServerEvents(element) map (LocalEvent(_, true))
                     case element => List(LocalEvent(element, false))
-                }))
+                })
 
         var hasAllEvents = false
 
@@ -88,7 +88,7 @@ object ClientEvents {
         // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
         // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
         // beforehand.
-        val filteredEvents: Seq[XFormsEvent] = (allClientAndServerEvents ++ DUMMY_EVENT).sliding(2).toList flatMap (_ match {
+        val filteredEvents: Seq[XFormsEvent] = (allClientAndServerEvents ++ DUMMY_EVENT).sliding(2).toList flatMap {
             case Seq(a, _) if a.name == XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED =>
                 // Just remember we got the "all events" event
                 hasAllEvents = true
@@ -108,7 +108,7 @@ object ClientEvents {
                 assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
                 assert(new EventGroupingKey(a) == new EventGroupingKey(b))
                 None
-        })
+        }
 
         // Process all filtered events
         for (event <- filteredEvents)

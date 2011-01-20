@@ -50,19 +50,6 @@
         </classpath>
     </taskdef>
 
-    <!-- eXist tasks -->
-    <!-- http://exist-db.org/ant-tasks.html -->
-    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
-        <classpath>
-            <fileset dir="${lib.dir}">
-                <include name="*.jar"/>
-            </fileset>
-            <fileset dir="${build.dir}/lib">
-                <include name="orbeon.jar"/>
-            </fileset>
-        </classpath>
-    </typedef>
-
     <!-- Ant task for the YUI Compressor -->
     <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
     <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
@@ -932,7 +919,22 @@
 
     </target>
 
-    <target name="exist-export-from-web-inf">
+    <target name="exist-task" depends="jars">
+        <!-- eXist tasks -->
+        <!-- http://exist-db.org/ant-tasks.html -->
+        <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+            <classpath>
+                <fileset dir="${lib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+                <fileset dir="${build.dir}/lib">
+                    <include name="orbeon.jar"/>
+                </fileset>
+            </classpath>
+        </typedef>
+    </target>
+
+    <target name="exist-export-from-web-inf" depends="exist-task">
         <delete dir="build/exist-data-exported"/>
         <mkdir dir="build/exist-data-exported"/>
         <xdb:extract configuration="build/orbeon-war/WEB-INF/exist-conf.xml" uri="xmldb:exist:///db" initDb="true" destdir="build/exist-data-exported" subcollections="true" createdirectories="true"/>
@@ -944,7 +946,7 @@
         </move>
     </target>
 
-    <target name="exist-import-sample-data-to-build">
+    <target name="exist-import-sample-data-to-build" depends="exist-task">
         <delete dir="build/exist-data"/>
         <mkdir dir="build/exist-data"/>
         <!-- Store config first -->

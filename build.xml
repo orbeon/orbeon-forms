@@ -592,8 +592,10 @@
                 <exclude name="build/**"/>
                 <exclude name="tools"/>
                 <exclude name="tools/**"/>
-                <exclude name="src/scala/"/>
-                <exclude name="src/scala/**"/>
+                <!-- Not sure why JUnit outputs those here -->
+                <exclude name="junit*.properties"/>
+                <!-- Don't include a license with the source -->
+                <exclude name="**/license.xml"/>
             </zipfileset>
         </zip>
     </target>

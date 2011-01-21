@@ -13,37 +13,58 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import net.sf.ehcache.store.MemoryStoreEvictionPolicy
-import net.sf.ehcache.config.CacheConfiguration
-import org.orbeon.oxf.xforms.{XFormsStaticState, XFormsContainingDocument}
 import net.sf.ehcache.{Element => EhElement, _ }
+import config._
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.PropertyContext
+import store.MemoryStoreEvictionPolicy
+import org.orbeon.oxf.xforms._
 
 /**
  * XForms state cache based on Ehcache.
  */
 class EhcacheStateStore extends XFormsStateStore {
 
-    private val manager = new CacheManager
-    private lazy val stateCache = {
+    private val ehcachePath = "oxf:/config/ehcache.xml"
+    private val cacheName = "xforms.state"
 
-        val cache = new Cache(
-             new CacheConfiguration("xforms.state", 50)
-               memoryStoreEvictionPolicy MemoryStoreEvictionPolicy.LFU
-               overflowToDisk true
-               diskSpoolBufferSizeMB 10
-               diskStorePath "java.io.tmpdir/orbeon/cache"
-               eternal false
-               timeToLiveSeconds 0
-               timeToIdleSeconds (30 * 60)
-               diskPersistent false
-               diskExpiryThreadIntervalSeconds 120)
+    private lazy val cacheManager =
+        try {
+            // Read configuration from XML file in resources
+            val manager = new CacheManager(URLFactory.createURL(ehcachePath))
+            debug("initialized cache manager from " + ehcachePath)
+            manager
+        } catch {
+            case _ =>
+                // Fallback configuration if not found
+                warn("unable to read cache manager configuration from " + ehcachePath)
+                new CacheManager
+        }
 
-        manager.addCache(cache)
-
-        cache
-    }
+    private lazy val stateCache =
+        cacheManager.getCache(cacheName) match {
+            // If manager already knows about our cache we are good to go
+            case cache: Cache =>
+                debug("found cache configuration for " + cacheName)
+                cache
+            // Otherwise use fallback configuration
+            case _ =>
+                val cache = new Cache(new CacheConfiguration(cacheName, 50)
+                        memoryStoreEvictionPolicy MemoryStoreEvictionPolicy.LFU
+                        overflowToDisk true
+                        diskSpoolBufferSizeMB 10
+                        diskStorePath "java.io.tmpdir/orbeon/cache"
+                        eternal false
+                        timeToLiveSeconds 0
+                        timeToIdleSeconds (30 * 60)
+                        diskPersistent false
+                        diskExpiryThreadIntervalSeconds 120)
+                
+                cacheManager.addCache(cache)
+                debug("used fallback cache configuration for " + cacheName)
+                cache
+        }
 
     def storeDocumentState(propertyContext: PropertyContext, document: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean) = {
 
@@ -64,7 +85,7 @@ class EhcacheStateStore extends XFormsStateStore {
 
         // Static and dynamic states
         addOrReplaceOne(staticStateDigest, document.getStaticState.getEncodedStaticState(propertyContext))
-        addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(propertyContext, false, false))
+        addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(propertyContext, XFormsProperties.isGZIPState, false))
     }
 
     def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState = {
@@ -113,7 +134,10 @@ class EhcacheStateStore extends XFormsStateStore {
     private def debug(message: String) =
         XFormsStateManager.getIndentedLogger.logDebug("", getStoreDebugName + " store: " + message)
 
-    private def getStoreDebugName = "Ehcache state store"
+    private def warn(message: String) =
+        XFormsStateManager.getIndentedLogger.logWarning("", getStoreDebugName + " store: " + message)
+
+    private def getStoreDebugName = "Ehcache"
 }
 
 object EhcacheStateStore {

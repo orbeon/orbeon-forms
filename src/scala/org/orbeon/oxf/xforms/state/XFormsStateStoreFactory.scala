@@ -17,9 +17,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 
 
 object XFormsStateStoreFactory {
+    // Use Ehcache state store
     def instance(externalContext: ExternalContext): XFormsStateStore =
-        EXistStateStore.instance(externalContext)
-
-//    def instance(externalContext: ExternalContext): XFormsStateStore =
-//        EhcacheStateStore.instance(externalContext)
+        EhcacheStateStore.instance(externalContext)
 }

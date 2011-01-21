@@ -35,6 +35,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dollars and Cents</display-name>
             <display-name lang="fr">Dollars et cents</display-name>
+            <display-name lang="ru">Доллары и центы</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>

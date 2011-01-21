@@ -33,4 +33,14 @@
         <add>Ajouter</add>
         <remove>Supprimer</remove>
     </resource>
+    <resource xml:lang="ru">
+        <select>...</select>
+        <title>Выбор</title>
+        <available>Доступно</available>
+        <selected>Выбрано</selected>
+        <confirm>Подтвердить</confirm>
+        <cancel>Отменить</cancel>
+        <add>Добавить</add>
+        <remove>Удалить</remove>
+    </resource>
 </resources>

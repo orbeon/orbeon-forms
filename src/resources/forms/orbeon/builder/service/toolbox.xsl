@@ -58,6 +58,7 @@
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                 <display-name lang="en">Custom Components</display-name>
                 <display-name lang="fr">Composants</display-name>
+                <display-name lang="ru">Собственные компоненты</display-name>
                 <icon lang="en">
                     <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                     <large-icon>/forms/orbeon/builder/images/input.png</large-icon>

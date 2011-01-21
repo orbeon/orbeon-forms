@@ -29,6 +29,7 @@
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Selection Controls</display-name>
         <display-name lang="fr">Contrôles de sélection</display-name>
+        <display-name lang="ru">Элементы выбора</display-name>
         <!--<icon lang="en">-->
             <!--<small-icon>/forms/orbeon/builder/images/input.png</small-icon>-->
             <!--<large-icon>/forms/orbeon/builder/images/input.png</large-icon>-->
@@ -39,6 +40,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dropdown</display-name>
             <display-name lang="fr">Menu déroulant</display-name>
+            <display-name lang="ru">Выпадающий список</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
@@ -67,6 +69,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons</display-name>
             <display-name lang="fr">Boutons radio</display-name>
+            <display-name lang="ru">Радио-кнопки</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
@@ -91,6 +94,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Checkboxes</display-name>
             <display-name lang="fr">Cases à cocher</display-name>
+            <display-name lang="ru">Галочки</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
@@ -115,6 +119,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single List Box</display-name>
             <display-name lang="fr">Liste simple</display-name>
+            <display-name lang="ru">Один из списка</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
@@ -139,6 +144,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Multi List Box</display-name>
             <display-name lang="fr">Liste multiple</display-name>
+            <display-name lang="ru">Несколько из списка</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
@@ -163,6 +169,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single Selection Tree</display-name>
             <display-name lang="fr">Arbre sél. simple</display-name>
+            <display-name lang="ru">Один из дерева</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
                 <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
@@ -187,6 +194,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Multi Selection Tree</display-name>
             <display-name lang="fr">Arbre sél. multiple</display-name>
+            <display-name lang="ru">Несколько из дерева</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
                 <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>

@@ -663,4 +663,163 @@
         </import-export>
 
     </resource>
+    <resource xml:lang="ru">
+        <components>
+            <labels>
+                <open-section>Показать раздел</open-section>
+                <close-section>Свернуть раздел</close-section>
+                <section-name>Название раздела</section-name>
+            </labels>
+        </components>
+        <errors>    
+            <summary-title>Форма содержит следующие ошибки</summary-title>
+            <some>Есть ошибки</some>
+            <none>Ошибок нет</none>
+            <unsaved>Несохраненные изменения</unsaved>
+        </errors>
+        <email>
+            <subject>Подтверждение формы</subject>
+            <body>Ваша форма в форматах PDF и XML во вложении.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D] [MNn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <titles>
+                <summary-title>Общая информация</summary-title>
+                <row-number>№.</row-number>
+                <created>Дата создания</created>
+                <last-modified>Дата последнего изменения</last-modified>
+                <selected>Выбрана</selected>
+                <refresh>Эта операция потребует перезагрузки страницы</refresh>
+                <toc>Оглавление</toc>
+                <help>Помощь</help>
+                <error-count>Есть ошибка</error-count>
+                <errors-count>Есть ошибки</errors-count>
+            </titles>
+            <search>
+                <search>Поиск</search>
+                <search-forms>Поиск формы</search-forms>
+                <show-options>Показать настройки поиска</show-options>
+                <close-options>Закрыть настройки поиска</close-options>
+                <returned-1>Найдено</returned-1>
+                <returned-2>документов.</returned-2>
+            </search>
+            <paging>
+                <to>до</to>
+                <of>из</of>
+            </paging>
+            <messages>
+                <no-form-found><i>Форм не найдено.</i></no-form-found>
+                <delete-confirmation>Вы уверены, что хотите удалить формы?</delete-confirmation>
+            </messages>
+            <labels>
+                <new-form>Новая</new-form>
+                <import-forms>Импорт форм</import-forms>
+                <edit-form>Редактировать</edit-form>
+                <delete-form>Удалить</delete-form>
+                <view-readonly>Просмотр HTML</view-readonly>
+                <view-xml>Просмотр XML</view-xml>
+                <view-pdf>Просмотр PDF</view-pdf>
+                <language-choice>Выберите язык</language-choice>
+                <form-choice>Выберите форму</form-choice>
+                <free-search>Поиск</free-search>
+                <any>[Что угодно]</any>
+                <previous>Назад</previous>
+                <next>Вперед</next>
+                <script>Полная версия</script>
+                <noscript>Упрощенная версия</noscript>
+                <refresh>Обновить</refresh>
+                <close-box>[закрыть]</close-box>
+                <help-back>Назад</help-back>
+                <goto-content>Перейти к материалам</goto-content>
+            </labels>
+            <formats>
+                <date>[D] [MNn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Документ сохранен успешно!</save-success>
+                <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
+                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
+                <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
+                <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
+                <submit-dialog-title>Форма отправлена</submit-dialog-title>
+                <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
+                <buttons-placeholder>Здесь будут размещены кнопки</buttons-placeholder>
+            </messages>
+            <labels>
+                <save-document>Сохранить</save-document>
+                <publish>Публиковать</publish>
+                <test>Тестировать</test>
+                <save-locally>Сохр.на диск</save-locally>
+                <save-offline>Сохр. офлайн</save-offline>
+                <submit-document>Отправить</submit-document>
+                <workflow-review>Просмотреть</workflow-review>
+                <workflow-edit>Править</workflow-edit>
+                <workflow-send>Отправить</workflow-send>
+                <return>К списку форм</return>
+                <discard>Отменить изменения</discard>
+                <language-choice>Язык</language-choice>
+                <errors>Ошибки</errors>
+                <check-errors-in-form>В форме есть ошибки</check-errors-in-form>
+                <error-details>Подробности об ошибках</error-details>
+                <language-choice>Язык</language-choice>
+                <close>Закрыть</close>
+                <home>На главную</home>
+                <review>Проверить</review>
+                <print>Печать</print>
+                <print-pdf>PDF</print-pdf>
+                <print-pdf-template>PDF (шаблон)</print-pdf-template>
+                <clear>Очистить</clear>
+                <confirm>Подтвердить</confirm>
+                <cancel>Отменить</cancel>
+                <offline>Офлайн</offline>
+                <online>Онлайн</online>
+                <alert>Значение неверное или отсутствует</alert>
+                <email>Email</email>
+                <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
+                <submit-dialog-keep>Сохранить значения и закрыть</submit-dialog-keep>
+                <submit-dialog-go>Ок</submit-dialog-go>
+                <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
+                <collapse-all>Свернуть все</collapse-all>
+                <expand-all>Развернуть все</expand-all>
+                <show-content>Показать</show-content>
+                <hide-content>Скрыть</hide-content>
+            </labels>
+            <view>
+                <explanation>
+                    Это версия только для чтения.
+                </explanation>
+            </view>
+        </detail>
+        <import-export>
+            <dialog-title>Сохранить</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Чтобы сохранить форму, нажмите на ссылку ниже и сохраните файл на свой компьютер.
+                    </p>
+                    <p>
+                        Чтобы вернуться к редактированию формы, откройте сохраненный файл. После этого вы автоматически вернетесь к редактированию формы.
+                    </p>
+                    <p>
+                        <b>Внимание:</b> данные не сохраняются на сервере, если вы удалите файл, восстановить данные будет невозможно.
+                    </p>
+                </div>
+            </dialog-body>
+            <link>Сохранить</link>
+        </import-export>
+    </resource>
 </resources>

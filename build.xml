@@ -634,6 +634,7 @@
         <taskdef name="coffee-script" classname="org.orbeon.oxf.util.CoffeeScriptTask" >
             <classpath>
                 <pathelement location="build/classes"/>
+                <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->
                 <pathelement location="src/scala"/>
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>

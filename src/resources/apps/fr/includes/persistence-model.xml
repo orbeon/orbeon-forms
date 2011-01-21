@@ -592,10 +592,31 @@
 
     </xforms:action>
 
-    <!-- Send to final confirmation page -->
+    <!-- Send to success page -->
+    <xxforms:variable name="workflow-success-uri" as="xs:anyURI"
+        select="normalize-space((xxforms:property(string-join(('oxf.fr.detail.send.uri', $app, $form), '.')),
+                                 xxforms:property(string-join(('oxf.fr.detail.send.success.uri', $app, $form), '.')))[normalize-space()][1])"/>
+    <xxforms:variable name="workflow-success-method" as="xs:string"
+        select="lower-case(xxforms:property(string-join(('oxf.fr.detail.send.success.method', $app, $form), '.')))"/>
+
     <xforms:submission id="fr-workflow-confirmation-submission"
-        resource="{xxforms:property(string-join(('oxf.fr.detail.send.uri', $app, $form), '.'))}"
-        method="post" ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
+        resource="{$workflow-success-uri}"
+        method="{$workflow-success-method}"
+        serialization="{if ($workflow-success-method = 'get') then 'none' else 'application/xml'}"
+        ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
+        replace="all"/>
+
+    <!-- Send to error page -->
+    <xxforms:variable name="workflow-error-uri" as="xs:anyURI"
+        select="normalize-space(xxforms:property(string-join(('oxf.fr.detail.send.error.uri', $app, $form), '.')))"/>
+    <xxforms:variable name="workflow-error-method" as="xs:string"
+        select="lower-case(xxforms:property(string-join(('oxf.fr.detail.send.error.method', $app, $form), '.')))"/>
+
+    <xforms:submission id="fr-workflow-error-submission"
+        resource="{$workflow-error-uri}"
+        method="{$workflow-error-method}"
+        serialization="{if ($workflow-error-method = 'get') then 'none' else 'application/xml'}"
+        ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
 
     <!-- Call email service -->
@@ -642,7 +663,8 @@
         <!-- Log error -->
         <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('submission-id')"/></xforms:message>
         <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-        <!-- Set error message and show error section in UI -->
+
+        <!-- case validation-error => set error message and show validation error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
@@ -652,14 +674,21 @@
             <!-- Open all sections -->
             <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
         </xforms:action>
-        <!-- If submission failed because there is a pending upload, display a message -->
+
+        <!-- case xxforms-pending-uploads => display a modal message -->
         <xforms:action if="event('error-type') = 'xxforms-pending-uploads'">
             <xforms:message model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
         </xforms:action>
+
+        <!-- case _ => set error message and show fatal error section in UI -->
         <xforms:action if="not(event('error-type') = ('validation-error', 'xxforms-pending-uploads'))">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
                              model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
+
+            <!-- Call error submission if defined -->
+            <xforms:send if="$workflow-error-uri != ''" submission="fr-workflow-error-submission"/>
+
         </xforms:action>
     </xforms:action>
 

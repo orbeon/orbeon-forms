@@ -79,7 +79,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String avtXXFormsUploads;
 
     private String avtSerialization;
-    private boolean serialize = true;// computed from @serialization attribute or legacy @serialize attribute
 
     private String targetref;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
     private String avtMode;
@@ -191,12 +190,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             avtXXFormsUploads = submissionElement.attributeValue(XFormsConstants.XXFORMS_UPLOADS_QNAME);
 
             avtSerialization = submissionElement.attributeValue("serialization");
-            if (avtSerialization != null) {
-                serialize = !avtSerialization.equals("none");
-            } else {
-                // For backward compatibility only, support @serialize if there is no @serialization attribute (was in early XForms 1.1 draft)
-                serialize = !"false".equals(submissionElement.attributeValue("serialize"));
-            }
 
             // @targetref is the new name as of May 2009, and @target is still supported for backward compatibility
             targetref = submissionElement.attributeValue("targetref");
@@ -342,7 +335,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
-                if (serialize && p.resolvedXXFormsUploads && XFormsSubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refInstance)) {
+                if (p.serialize && p.resolvedXXFormsUploads && XFormsSubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refInstance)) {
                     throw new XFormsSubmissionException(this, "xforms:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
                         new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_PENDING_UPLOADS, null));
@@ -385,7 +378,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 if (p.isDeferredSubmissionFirstPass) {
 
                     // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
-                    if (serialize) {
+                    if (p.serialize) {
                         createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
                     }
 
@@ -403,10 +396,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 /* ***** Serialization ********************************************************************************** */
 
                 // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerialization(p2.serialization, p.resolvedMethod);
+                final String requestedSerialization = getRequestedSerialization(p.serialization, p.resolvedMethod);
 
                 final Document documentToSubmit;
-                if (serialize) {
+                if (p.serialize) {
 
                     // Check if a submission requires file upload information
                     if (requestedSerialization.startsWith("multipart/")) {
@@ -423,7 +416,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 final String overriddenSerializedData;
-                if (serialize && !p.isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
+                if (p.serialize && !p.isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
                     // Fire xforms-submit-serialize
 
                     // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
@@ -708,6 +701,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final String resolvedMethod;
         final String actualHttpMethod;
         final String resolvedMediatype;
+        final String serialization;
+        final boolean serialize;
 
         final boolean resolvedValidate;
         final boolean resolvedRelevant;
@@ -769,6 +764,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // Get mediatype
                 resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtMediatype);
 
+                // Serialization
+                serialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo, avtSerialization);
+                if (serialization != null) {
+                    serialize = !serialization.equals("none");
+                } else {
+                    // For backward compatibility only, support @serialize if there is no @serialization attribute (was in early XForms 1.1 draft)
+                    serialize = !"false".equals(submissionElement.attributeValue("serialize"));
+                }
+
                 // Resolve validate and relevant AVTs
                 final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtValidate);
                 // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
@@ -809,7 +813,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         // This mostly consists of AVTs that can be evaluated only during the second pass of the submission
 
         final String actionOrResource;
-        final String serialization;
         final String mode;
         final String version;
         final String encoding;
@@ -840,7 +843,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 //                actionOrResource = XFormsUtils.resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString();
             }
 
-            serialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);
             mode = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtMode);
             version = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtVersion);
             encoding = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtEncoding);
@@ -908,7 +910,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         protected SecondPassParameters(SecondPassParameters other, boolean isAsynchronous, boolean isReadonly) {
             this.actionOrResource = other.actionOrResource;
-            this.serialization = other.serialization;
             this.version = other.version;
             this.encoding = other.encoding;
             this.separator = other.separator;
@@ -938,7 +939,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final String actualRequestMediatype;
 
         public SerializationParameters(SubmissionParameters p, SecondPassParameters p2, String requestedSerialization, Document documentToSubmit, String overriddenSerializedData) throws Exception {
-            if (serialize) {
+            if (p.serialize) {
                 final String defaultMediatypeForSerialization;
                 if (overriddenSerializedData != null && !overriddenSerializedData.equals("")) {
                     // Form author set data to serialize

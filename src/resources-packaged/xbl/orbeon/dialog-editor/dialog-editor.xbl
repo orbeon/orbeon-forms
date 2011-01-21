@@ -80,17 +80,17 @@
                     <xhtml:div class="fr-dialog-editor-buttons">
                         <xforms:group appearance="xxforms:internal">
                             <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
-                            <xforms:group ref=".[not($readonly)]">
-                                <fr:button class="fr-dialog-editor-positive">
+                            <xforms:group ref=".[not($readonly)]" id="readwrite-buttons">
+                                <fr:button class="fr-dialog-editor-positive" id="fr-dialog-editor-positive">
                                     <xforms:label>OK</xforms:label>
                                     <xforms:setvalue ev:event="DOMActivate" ref="$external" value="$internal"/>
                                 </fr:button>
-                                <fr:button class="fr-dialog-editor-negative">
+                                <fr:button class="fr-dialog-editor-negative" id="fr-dialog-editor-negative">
                                     <xforms:label>Cancel</xforms:label>
                                 </fr:button>
                             </xforms:group>
-                            <xforms:group ref=".[$readonly]">
-                                <fr:button class="fr-dialog-editor-close">
+                            <xforms:group ref=".[$readonly]" id="readonly-button">
+                                <fr:button class="fr-dialog-editor-close" id="fr-dialog-editor-close">
                                     <xforms:label>Close</xforms:label>
                                 </fr:button>
                             </xforms:group>

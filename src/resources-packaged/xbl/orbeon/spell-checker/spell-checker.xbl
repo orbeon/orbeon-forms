@@ -125,13 +125,14 @@
             <xbl:style src="/xbl/orbeon/spell-checker/spell-checker.css"/>
         </xbl:resources>
         <xbl:template>
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
+            <xforms:group appearance="xxforms:internal" xsl:version="2.0">
 
-                    <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="external" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
+                <!-- Variable pointing to external single-node binding -->
+                <xxforms:variable name="external" as="node()?">
+                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                </xxforms:variable>
+
+                <xforms:group ref="$external" xxbl:scope="inner" id="container">
 
                     <!-- Shortcut to internal internal instance -->
                     <xxforms:variable name="internal" as="element()" select="instance('internal')"/>
@@ -169,7 +170,7 @@
                             <xforms:setvalue xxforms:iterate="$internal/*" ref="."/>
                         </xforms:action>
 
-                        <xforms:group ref=".[$has-corrections]" class="xbl-fr-spell-checker-correcting">
+                        <xforms:group ref=".[$has-corrections]" class="xbl-fr-spell-checker-correcting" id="correcting">
                             <xhtml:table>
                                 <xhtml:tr>
                                     <xhtml:td class="label">Not in dictionary:</xhtml:td>
@@ -191,7 +192,7 @@
                                             </xforms:action>
                                         </fr:button>
                                         <!-- Ignore all -->
-                                        <fr:button>
+                                        <fr:button id="ignore-all">
                                             <xforms:label>
                                                 <xhtml:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
                                                 Ignore All
@@ -241,7 +242,7 @@
                                             </fr:button>
                                         </xforms:group>
                                         <!-- Done -->
-                                        <fr:button>
+                                        <fr:button id="done">
                                             <xforms:label>
                                                 <xhtml:img alt="" src="/apps/fr/style/images/silk/cross.png"/>
                                                 Done
@@ -276,10 +277,10 @@
                                 </xhtml:tr>
                             </xhtml:table>
                         </xforms:group>
-                        <xforms:group ref=".[not($has-corrections)]" class="xbl-fr-spell-checker-close">
+                        <xforms:group ref=".[not($has-corrections)]" class="xbl-fr-spell-checker-close" id="close">
                             <xforms:setfocus ev:event="xforms-enabled" control="close"/>
                             Done spell checking.
-                            <fr:button id="close">
+                            <fr:button id="close-dialog">
                                 <xforms:label>Done</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:setvalue if="exists(instance('result')/*)" ref="$external" value="string-join(instance('result')/*/@current, '')"/>

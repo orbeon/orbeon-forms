@@ -17,7 +17,8 @@
         OD = ORBEON.util.Dom,
         Test = ORBEON.util.Test,
         UserAction = YAHOO.util.UserAction,
-        YD = YAHOO.util.Dom;
+        YD = YAHOO.util.Dom,
+        Document = ORBEON.xforms.Document;
 
     var testCase = {
 
@@ -413,7 +414,8 @@
                 }, function() {
                     var testContainer = OD.get("my-accordion$goto-page-event");
                     var tbody = OD.getElementByTagName(testContainer, "tbody");
-                    var firstRowText = OD.getStringValue(OD.getElementByTagName(tbody, "span"));
+                    var outputSpan = OD.getElementByTagName(tbody, "span");
+                    var firstRowText = Document.getValue(outputSpan.id);
                     Assert.areEqual("Integer quis metus vitae elit lobortis egestas.", firstRowText);
                     this.closeAccordionCase(this, "goto-page-event");
                 });
@@ -429,32 +431,32 @@
                 var container = OD.get("my-accordion$internal-paging-external-sorting"),
                     table = YD.getElementsByClassName("yui-dt-table", "table", container)[0],
                     firstOutput  = YD.getElementsByClassName("xforms-output", "span", table)[0],
-                    sortPosition = YD.getElementsByClassName("yui-dt-label", "span", table)[0],
-                    sortTextAnchor = YD.getElementsByClassName("yui-dt-label", "span", table)[1],
-                    nextAnchor = YD.getElementsByClassName("yui-pg-next", "a", container)[0],
-                    firstAnchor = YD.getElementsByClassName("yui-pg-first", "a", container)[0];
-                Assert.areEqual("0", OD.getStringValue(firstOutput), "initially have 1");
+                    sortPosition = OD.getElementByTagName(YD.getElementsByClassName("yui-dt-label", "span", table)[0], "a"),
+                    sortTextAnchor = OD.getElementByTagName(YD.getElementsByClassName("yui-dt-label", "span", table)[1], "a"),
+                    nextAnchor = OD.getElementByTagName(YD.get("my-accordion$internal-paging-external-sorting-table$top-next-trigger"), "a"),
+                    firstAnchor = OD.getElementByTagName(YD.get("my-accordion$internal-paging-external-sorting-table$top-first-trigger"), "a");
+                Assert.areEqual("0", Document.getValue(firstOutput.id), "initially have 1");
                 Test.executeSequenceCausingAjaxRequest(this, [[
                     // Test internal paging
                     function() { UserAction.click(nextAnchor); },
-                    function() { Assert.areEqual("5", OD.getStringValue(firstOutput), "go to second page"); }
+                    function() { Assert.areEqual("5", Document.getValue(firstOutput.id), "go to second page"); }
                 ], [
                     // Back to first page
                     function() { UserAction.click(firstAnchor); },
-                    function() { Assert.areEqual("0", OD.getStringValue(firstOutput), "back on first page"); }
+                    function() { Assert.areEqual("0", Document.getValue(firstOutput.id), "back on first page"); }
                 ], [
                     // Test external sorting
                     function() { UserAction.click(sortTextAnchor); },
-                    function() { Assert.areEqual("33", OD.getStringValue(firstOutput), "sorting by text moved the row 33 to the beginning"); }
+                    function() { Assert.areEqual("33", Document.getValue(firstOutput.id), "sorting by text moved the row 33 to the beginning"); }
                 ], [
                     // Do internal paging after sort
                     function() { UserAction.click(nextAnchor); },
-                    function() { Assert.areEqual("7", OD.getStringValue(firstOutput), "second page sorted by text"); }
+                    function() { Assert.areEqual("7", Document.getValue(firstOutput.id), "second page sorted by text"); }
                 ], [
                     // Back to sorting by position to restore instance in its original state
                     function() { UserAction.click(sortPosition); UserAction.click(firstAnchor); },
                     function() {
-                        Assert.areEqual("0", OD.getStringValue(firstOutput), "back to initial state");
+                        Assert.areEqual("0", Document.getValue(firstOutput.id), "back to initial state");
                         this.closeAccordionCase(this, "internal-paging-external-sorting");
                     }
                 ]]);

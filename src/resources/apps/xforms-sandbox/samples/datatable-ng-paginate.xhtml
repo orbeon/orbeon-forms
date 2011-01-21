@@ -28,13 +28,13 @@
 
         <p>This sample demonstrates the pagination feature of the datatable widget.</p>
 
-        <fr:button>
+        <fr:button id="go-to-page-2">
             <xforms:label>Go to page 2</xforms:label>
             <xforms:dispatch ev:event="DOMActivate" target="my-datatable" name="fr-goto-page">
                 <xxforms:context name="fr-new-page" select="2"/>
             </xforms:dispatch>
         </fr:button>
-        
+
         <fr:datatable paginated="true" rowsPerPage="5" id="my-datatable">
             <xforms:action ev:event="fr-goto-page">
                 <xforms:message level="modal" value="concat('Arrived at page: ', event('fr-new-page'))"/>
@@ -47,17 +47,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr repeat-nodeset="/atom:feed/atom:entry">
+                <tr repeat-nodeset="/atom:feed/atom:entry" id="entries">
                     <td>
-                        <xforms:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
+                        <xforms:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')" id="date"/>
                     </td>
                     <td>
                         <a href="{atom:author/atom:uri}">
-                            <xforms:output value="atom:author/atom:name"/>
+                            <xforms:output value="atom:author/atom:name" id="name"/>
                         </a>
                     </td>
                     <td>
-                        <xforms:output value="atom:title"/>
+                        <xforms:output value="atom:title" id="title"/>
                     </td>
                 </tr>
             </tbody>

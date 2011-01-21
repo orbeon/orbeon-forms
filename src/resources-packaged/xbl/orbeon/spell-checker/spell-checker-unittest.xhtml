@@ -68,11 +68,11 @@
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <fr:button>
+        <fr:button id="add-line">
             <xforms:label>Add line</xforms:label>
             <xforms:insert nodeset="text" ev:event="DOMActivate"/>
         </fr:button>
-        <xforms:repeat nodeset="text">
+        <xforms:repeat nodeset="text" id="spell-checker-repeat">
             <xhtml:div class="block">
                 <xforms:textarea ref="." id="textarea"/>
                 <fr:spell-checker ref="." id="spell-checker"/>

@@ -81,14 +81,14 @@
 
         <xbl:template>
             <!-- Outer group -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxforms:internal">
                 <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
 
                 <!-- Stop all events dispatched to outer group -->
                 <xforms:action ev:event="#all" ev:propagate="stop" ev:target="#observer"/>
 
                 <!-- Inner group -->
-                <xforms:group xxbl:scope="inner">
+                <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
                     <!-- Stop events dispatched to group and variable from propagating outside the component -->
                     <xforms:action ev:event="#all" ev:propagate="stop" ev:target="#observer binding-var"/>
 
@@ -123,18 +123,18 @@
 
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
                         <xxforms:variable name="separator" xbl:attr="xbl:text=separator" as="xs:string">ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8</xxforms:variable>
-                        <xforms:group ref=".[$separator != 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']">
+                        <xforms:group ref=".[$separator != 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']" id="joined-group">
                             <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
                                  This isn't done by default, but can be done by the application, as is the case in the test-dialog-select.xthml -->
-                            <xforms:output value="string-join($items[value = $selected]/label, $separator)" tabindex="-1"/>
+                            <xforms:output value="string-join($items[value = $selected]/label, $separator)" tabindex="-1" id="joined"/>
                         </xforms:group>
-                        <xforms:group ref=".[$separator = 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']">
+                        <xforms:group ref=".[$separator = 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']" id="list-group">
                             <xhtml:ul>
                                 <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
                                      repeat nodeset recalculations -->
-                                <xforms:repeat nodeset="$items[value = $selected]/value/string()">
+                                <xforms:repeat nodeset="$items[value = $selected]/value/string()" id="list">
                                     <xhtml:li>
-                                        <xforms:output value="$items[value = context()]/label"/>
+                                        <xforms:output value="$items[value = context()]/label" id="item"/>
                                     </xhtml:li>
                                 </xforms:repeat>
                             </xhtml:ul>
@@ -178,7 +178,7 @@
                                         </xforms:select>
                                     </xhtml:td>
                                     <xhtml:td>
-                                        <fr:button ref="add-trigger" class="fr-add-button">
+                                        <fr:button ref="add-trigger" class="fr-add-button" id="add">
                                             <xforms:label>
                                                 <xforms:output value="$resources/add"/>
                                             </xforms:label>
@@ -193,7 +193,7 @@
                                             </xforms:action>
                                         </fr:button>
 
-                                        <fr:button ref="remove-trigger" class="fr-remove-button">
+                                        <fr:button ref="remove-trigger" class="fr-remove-button" id="remove">
                                             <xforms:label>
                                                 <xforms:output value="$resources/remove"/>
                                             </xforms:label>
@@ -223,7 +223,7 @@
 
                             <xhtml:div class="fr-dialog-buttons">
                                 <!-- Confirm button -->
-                                <fr:button>
+                                <fr:button id="confirm">
                                     <xforms:label>
                                         <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
                                         <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
@@ -237,7 +237,7 @@
                                     </xforms:action>
                                 </fr:button>
                                 <!-- Cancel button -->
-                                <fr:button>
+                                <fr:button id="cancel">
                                     <xforms:label>
                                         <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
                                         <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>

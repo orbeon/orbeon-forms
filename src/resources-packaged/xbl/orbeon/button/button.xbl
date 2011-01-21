@@ -51,27 +51,30 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <!-- Group has complete single-node binding -->
-            <xforms:group class="yui-button yui-push-button{if (/fr:button/@class) then concat(' ', /fr:button/@class) else ''}"
-                          xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
-                <xhtml:span class="first-child">
-                    <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
-                    <xsl:if test="/fr:button/@tabindex">
-                        <xhtml:span class="fr-button-tabindex" style="display: none">
-                            <xsl:value-of select="/fr:button/@tabindex"/>
-                        </xhtml:span>
-                    </xsl:if>
-                    <!-- Bind trigger so it can handle read-only -->
-                    <xforms:trigger xbl:attr="xxforms:modal">
-                        <xsl:if test="exists(/fr:button/(@ref, @bind))">
-                            <xsl:attribute name="ref">.</xsl:attribute>
+            <xforms:group appearance="xxforms:internal" xsl:version="2.0">
+                <xxforms:variable name="binding" as="node()?">
+                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                </xxforms:variable>
+                <xforms:group ref="$binding" class="yui-button yui-push-button{if (/fr:button/@class) then concat(' ', /fr:button/@class) else ''}" id="container">
+                    <xhtml:span class="first-child">
+                        <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
+                        <xsl:if test="/fr:button/@tabindex">
+                            <xhtml:span class="fr-button-tabindex" style="display: none">
+                                <xsl:value-of select="/fr:button/@tabindex"/>
+                            </xhtml:span>
                         </xsl:if>
-                        <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
-                        <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxforms:script>
-                        <xxforms:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxforms:script>
-                        <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxforms:script>
-                    </xforms:trigger>
-                </xhtml:span>
+                        <!-- Bind trigger so it can handle read-only -->
+                        <xforms:trigger xbl:attr="xxforms:modal" id="trigger">
+                            <xsl:if test="exists(/fr:button/(@ref, @bind))">
+                                <xsl:attribute name="ref">$binding</xsl:attribute>
+                            </xsl:if>
+                            <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                            <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxforms:script>
+                            <xxforms:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxforms:script>
+                            <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxforms:script>
+                        </xforms:trigger>
+                    </xhtml:span>
+                </xforms:group>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

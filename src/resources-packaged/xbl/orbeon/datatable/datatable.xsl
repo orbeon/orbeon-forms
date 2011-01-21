@@ -220,6 +220,7 @@
 
     <xsl:template match="/fr:datatable/xhtml:tbody/xhtml:tr[@repeat-nodeset]" mode="pass2">
         <xforms:repeat nodeset="{@repeat-nodeset}">
+            <xsl:copy-of select="@id"/>
             <xsl:copy>
                 <xsl:copy-of select="@*[name() != 'repeat-nodeset']|node()"/>
             </xsl:copy>
@@ -460,125 +461,6 @@
                 </xsl:when>
             </xsl:choose>
 
-            <xsl:variable name="pagination">
-                <!-- TODO: fix scopes -->
-                <xsl:if test="$paginated">
-                    <xhtml:div class="yui-dt-paginator yui-pg-container" style="">
-
-                        <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
-
-                            <xforms:group ref=".[$page = 1]">
-                                <xhtml:span class="yui-pg-first">&lt;&lt; first</xhtml:span>
-                            </xforms:group>
-                            <xforms:group ref=".[$page != 1]">
-                                <xforms:trigger class="yui-pg-first" appearance="minimal">
-                                    <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
-                                    <xforms:label>&lt;&lt; first </xforms:label>
-                                    <xsl:call-template name="fr-goto-page">
-                                        <xsl:with-param name="fr-new-page">1</xsl:with-param>
-                                    </xsl:call-template>
-                                </xforms:trigger>
-                            </xforms:group>
-
-                            <xforms:group ref=".[$page = 1]">
-                                <xhtml:span class="yui-pg-previous">&lt; prev</xhtml:span>
-                            </xforms:group>
-                            <xforms:group ref=".[$page != 1]">
-                                <xforms:trigger class="yui-pg-previous" appearance="minimal">
-                                    <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
-                                    <xforms:label>&lt; prev</xforms:label>
-                                    <xsl:call-template name="fr-goto-page">
-                                        <xsl:with-param name="fr-new-page">$page - 1</xsl:with-param>
-                                    </xsl:call-template>
-                                </xforms:trigger>
-                            </xforms:group>
-
-                            <xhtml:span class="yui-pg-pages">
-                                <xforms:repeat nodeset="$pages">
-                                    <xsl:choose>
-                                        <xsl:when test="$maxNbPagesToDisplay &lt; 0">
-                                            <xxforms:variable name="display">page</xxforms:variable>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xxforms:variable name="display"
-                                                select="
-                                            if ($page &lt; $maxNbPagesToDisplay -2)
-                                            then if (. &lt;= $maxNbPagesToDisplay - 2 or . = $nbPages)
-                                            then 'page'
-                                            else if (. = $nbPages - 1)
-                                            then 'ellipses'
-                                            else 'none'
-                                            else if ($page > $nbPages - $maxNbPagesToDisplay + 3)
-                                            then if (. >= $nbPages - $maxNbPagesToDisplay + 3 or . = 1)
-                                            then 'page'
-                                            else if (. = 2)
-                                            then 'ellipses'
-                                            else 'none'
-                                            else if (. = 1 or . = $nbPages or (. > $page - $radix and . &lt; $page + $radix))
-                                            then 'page'
-                                            else if (. = 2 or . = $nbPages -1)
-                                            then 'ellipses'
-                                            else 'none'
-                                            "
-                                            />
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                    <xforms:group ref=".[. = $page and $display = 'page']">
-                                        <xforms:output class="yui-pg-page" value="$page">
-                                            <!-- <xforms:hint>Current page (edit to move to another
-                                            page)</xforms:hint>-->
-                                        </xforms:output>
-                                    </xforms:group>
-                                    <xforms:group ref=".[. != $page and $display = 'page']">
-                                        <xxforms:variable name="targetPage" select="."/>
-                                        <xforms:trigger class="yui-pg-page" appearance="minimal">
-                                            <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
-                                            <xforms:label>
-                                                <xforms:output value="."/>
-                                            </xforms:label>
-                                            <xsl:call-template name="fr-goto-page">
-                                                <xsl:with-param name="fr-new-page">$targetPage</xsl:with-param>
-                                            </xsl:call-template>
-                                        </xforms:trigger>
-                                    </xforms:group>
-                                    <xforms:group ref=".[ $display = 'ellipses']">
-                                        <xhtml:span class="yui-pg-page">...</xhtml:span>
-                                    </xforms:group>
-                                </xforms:repeat>
-                            </xhtml:span>
-
-                            <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
-                                <xhtml:span class="yui-pg-next">next ></xhtml:span>
-                            </xforms:group>
-                            <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
-                                <xforms:trigger class="yui-pg-next" appearance="minimal" xxforms:modal="true">
-                                    <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
-                                    <xforms:label>next ></xforms:label>
-                                    <xsl:call-template name="fr-goto-page">
-                                        <xsl:with-param name="fr-new-page">$page + 1</xsl:with-param>
-                                    </xsl:call-template>
-                                </xforms:trigger>
-                            </xforms:group>
-
-                            <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
-                                <xhtml:span class="yui-pg-last">last >></xhtml:span>
-                            </xforms:group>
-                            <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
-                                <xforms:trigger class="yui-pg-last" appearance="minimal">
-                                    <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
-                                    <xforms:label>last >></xforms:label>
-                                    <xsl:call-template name="fr-goto-page">
-                                        <xsl:with-param name="fr-new-page">$nbPages</xsl:with-param>
-                                    </xsl:call-template>
-                                </xforms:trigger>
-                            </xforms:group>
-
-                        </xforms:group>
-                    </xhtml:div>
-
-                </xsl:if>
-            </xsl:variable>
-
             <xxforms:variable name="currentSortOrder" model="datatable-model" select="instance('datatable-instance')/@currentSortOrder"
                 xxbl:scope="inner"/>
             <xxforms:variable name="currentSortColumn" model="datatable-model" select="instance('datatable-instance')/@currentSortColumn"
@@ -629,7 +511,9 @@
             <xsl:if test="$hasLoadingFeature">
                 <xxforms:variable name="fr-dt-loading" xbl:attr="select=loading"/>
             </xsl:if>
-            <xsl:copy-of select="$pagination"/>
+            <xsl:call-template name="pagination">
+                <xsl:with-param name="prefix">top</xsl:with-param>
+            </xsl:call-template>
 
             <xxforms:variable name="group-ref" xxbl:scope="inner">
                 <xxforms:sequence select=".{if ($hasLoadingFeature) then '[not($fr-dt-loading = true())]' else ''}" xxbl:scope="outer"/>
@@ -651,8 +535,7 @@
                     <xsl:value-of select="$innerTableWidth"/>
                 </xhtml:span>
 
-                <!--  <xforms:group appearance="xxforms:internal" xxbl:scope="outer"> would be better but doesn't work! -->
-                <xforms:group xxbl:scope="outer">
+                <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
                     <xhtml:div class="yui-dt yui-dt-scrollable {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''}"
                         style="{$height} {$width}">
                         <xsl:variable name="table">
@@ -750,7 +633,9 @@
                 </xforms:group>
             </xsl:if>
 
-            <xsl:copy-of select="$pagination"/>
+            <xsl:call-template name="pagination">
+                <xsl:with-param name="prefix">bottom</xsl:with-param>
+            </xsl:call-template>
 
             <xsl:if test="$paginated and $is-internally-paginated">
                 <xforms:group model="datatable-model" ref="instance('page')" appearance="xxforms:internal" xxbl:scope="inner">
@@ -789,6 +674,7 @@
     </xsl:template>
 
     <xsl:template name="header-cell">
+        <xsl:param name="index"/>
 
         <!-- XXForms variable "columnDesc" is the current column description when we enter here -->
 
@@ -860,7 +746,8 @@
         <xsl:if test="$is-externally-sorted and @fr:sortable and not(@fr:sortMessage)">
             <xsl:message terminate="yes">In datatables with external sorting, sortable columns must have fr:sortMessage attributes.</xsl:message>
         </xsl:if>
-        <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}" xxbl:scope="inner"/>
+        <xsl:variable name="index" select="count(../../preceding-sibling::*) + 1" xxbl:scope="inner"/>
+        <xxforms:variable name="index" select="{$index}" xxbl:scope="inner"/>
         <xxforms:variable name="columnDesc" model="datatable-model" select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
         <xxforms:variable name="fr-dt-columnDesc">
             <xxforms:sequence select="$columnDesc" xxbl:scope="inner"/>
@@ -873,9 +760,11 @@
             else if ($fr-dt-columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
 
              {@class}
-            ">
+            " id="header-{$index}">
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
-            <xsl:call-template name="header-cell"/>
+            <xsl:call-template name="header-cell">
+                <xsl:with-param name="index" select="$index"/>
+            </xsl:call-template>
 
         </xhtml:th>
     </xsl:template>
@@ -1175,7 +1064,8 @@
     </xsl:template>
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td" mode="dynamic">
-        <xxforms:variable name="index" select="{count(preceding-sibling::*) + 1}" xxbl:scope="inner"/>
+        <xsl:variable name="index" select="count(preceding-sibling::*) + 1" xxbl:scope="inner"/>
+        <xxforms:variable name="index" select="{$index}" xxbl:scope="inner"/>
         <xxforms:variable name="fr-dt-columnDesc" xxbl:scope="outer">
             <xxforms:sequence model="datatable-model" select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
         </xxforms:variable>
@@ -1380,6 +1270,123 @@
     <!-- Body filtering mode: remove @id attributes in the table header -->
     <xsl:template match="xhtml:thead//@id" mode="bodyFiltering"/>
 
+    <xsl:template name="pagination">
+        <xsl:param name="prefix" as="xs:string"/>
+        <xsl:if test="$paginated">
+            <xhtml:div class="yui-dt-paginator yui-pg-container" style="">
 
+                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+
+                    <xforms:group ref=".[$page = 1]" id="{$prefix}-first-disabled">
+                        <xhtml:span class="yui-pg-first">&lt;&lt; first</xhtml:span>
+                    </xforms:group>
+                    <xforms:group ref=".[$page != 1]" id="{$prefix}-first-enabled">
+                        <xforms:trigger class="yui-pg-first" appearance="minimal" id="{$prefix}-first-trigger">
+                            <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
+                            <xforms:label>&lt;&lt; first </xforms:label>
+                            <xsl:call-template name="fr-goto-page">
+                                <xsl:with-param name="fr-new-page">1</xsl:with-param>
+                            </xsl:call-template>
+                        </xforms:trigger>
+                    </xforms:group>
+
+                    <xforms:group ref=".[$page = 1]" id="{$prefix}-prev-disabled">
+                        <xhtml:span class="yui-pg-previous">&lt; prev</xhtml:span>
+                    </xforms:group>
+                    <xforms:group ref=".[$page != 1]" id="{$prefix}-enabled">
+                        <xforms:trigger class="yui-pg-previous" appearance="minimal" id="{$prefix}-enabled-trigger">
+                            <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
+                            <xforms:label>&lt; prev</xforms:label>
+                            <xsl:call-template name="fr-goto-page">
+                                <xsl:with-param name="fr-new-page">$page - 1</xsl:with-param>
+                            </xsl:call-template>
+                        </xforms:trigger>
+                    </xforms:group>
+
+                    <xhtml:span class="yui-pg-pages">
+                        <xforms:repeat nodeset="$pages" id="{$prefix}-pages">
+                            <xsl:choose>
+                                <xsl:when test="$maxNbPagesToDisplay &lt; 0">
+                                    <xxforms:variable name="display">page</xxforms:variable>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xxforms:variable name="display"
+                                        select="
+                                    if ($page &lt; $maxNbPagesToDisplay -2)
+                                    then if (. &lt;= $maxNbPagesToDisplay - 2 or . = $nbPages)
+                                    then 'page'
+                                    else if (. = $nbPages - 1)
+                                    then 'ellipses'
+                                    else 'none'
+                                    else if ($page > $nbPages - $maxNbPagesToDisplay + 3)
+                                    then if (. >= $nbPages - $maxNbPagesToDisplay + 3 or . = 1)
+                                    then 'page'
+                                    else if (. = 2)
+                                    then 'ellipses'
+                                    else 'none'
+                                    else if (. = 1 or . = $nbPages or (. > $page - $radix and . &lt; $page + $radix))
+                                    then 'page'
+                                    else if (. = 2 or . = $nbPages -1)
+                                    then 'ellipses'
+                                    else 'none'
+                                    "
+                                    />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xforms:group ref=".[. = $page and $display = 'page']" id="{$prefix}-page-current">
+                                <xforms:output class="yui-pg-page" value="$page" id="{$prefix}-page-number">
+                                    <!-- <xforms:hint>Current page (edit to move to another
+                                    page)</xforms:hint>-->
+                                </xforms:output>
+                            </xforms:group>
+                            <xforms:group ref=".[. != $page and $display = 'page']" id="{$prefix}-page-goto">
+                                <xxforms:variable name="targetPage" select="."/>
+                                <xforms:trigger class="yui-pg-page" appearance="minimal" id="{$prefix}-page-goto-trigger">
+                                    <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
+                                    <xforms:label>
+                                        <xforms:output value="."/>
+                                    </xforms:label>
+                                    <xsl:call-template name="fr-goto-page">
+                                        <xsl:with-param name="fr-new-page">$targetPage</xsl:with-param>
+                                    </xsl:call-template>
+                                </xforms:trigger>
+                            </xforms:group>
+                            <xforms:group ref=".[ $display = 'ellipses']" id="{$prefix}-ellipses">
+                                <xhtml:span class="yui-pg-page">...</xhtml:span>
+                            </xforms:group>
+                        </xforms:repeat>
+                    </xhtml:span>
+
+                    <xforms:group ref=".[$page = $nbPages or $nbPages = 0]" id="{$prefix}-next-disabled">
+                        <xhtml:span class="yui-pg-next">next ></xhtml:span>
+                    </xforms:group>
+                    <xforms:group ref=".[$page != $nbPages and $nbPages != 0]" id="{$prefix}-next-enabled">
+                        <xforms:trigger class="yui-pg-next" appearance="minimal" xxforms:modal="true" id="{$prefix}-next-trigger">
+                            <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
+                            <xforms:label>next ></xforms:label>
+                            <xsl:call-template name="fr-goto-page">
+                                <xsl:with-param name="fr-new-page">$page + 1</xsl:with-param>
+                            </xsl:call-template>
+                        </xforms:trigger>
+                    </xforms:group>
+
+                    <xforms:group ref=".[$page = $nbPages or $nbPages = 0]" id="{$prefix}-last-disabled">
+                        <xhtml:span class="yui-pg-last">last >></xhtml:span>
+                    </xforms:group>
+                    <xforms:group ref=".[$page != $nbPages and $nbPages != 0]" id="{$prefix}-last-enabled">
+                        <xforms:trigger class="yui-pg-last" appearance="minimal" id="{$prefix}-last-trigger">
+                            <xsl:if test="$is-modal"><xsl:attribute name="xxforms:modal">true</xsl:attribute></xsl:if>
+                            <xforms:label>last >></xforms:label>
+                            <xsl:call-template name="fr-goto-page">
+                                <xsl:with-param name="fr-new-page">$nbPages</xsl:with-param>
+                            </xsl:call-template>
+                        </xforms:trigger>
+                    </xforms:group>
+
+                </xforms:group>
+            </xhtml:div>
+
+        </xsl:if>
+    </xsl:template>
 
 </xsl:transform>

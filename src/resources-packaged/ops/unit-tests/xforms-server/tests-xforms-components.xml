@@ -53,7 +53,7 @@
             </xhtml:html>
         </input>
         <output name="response">
-           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -80,11 +80,11 @@
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
                         <xxf:control id="my-inplace-input$xf-8" class="fr-inplace-hint">[Hint hint!]</xxf:control>
                         <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit"/>
-                        <xxf:control id="my-inplace-input$xf-15$xf-22" class="yui-button yui-push-button fr-inplace-rename"/>
-                        <xxf:control id="my-inplace-input$xf-15$xf-23" label="Apply"/>
+                        <xxf:control id="my-inplace-input$xf-15$container" class="yui-button yui-push-button fr-inplace-rename"/>
+                        <xxf:control id="my-inplace-input$xf-15$trigger" label="Apply"/>
                         <xxf:control id="my-inplace-input$xf-16" class="fr-inplace-cancel" label="Cancel"/>
                     </xxf:control-values>
-                    <xxf:script name="my_inplace_input_xf_15_xf_25_xforms_function" target-id="my-inplace-input$xf-15$xf-23" observer-id="my-inplace-input$xf-15$xf-23"/>
+                    <xxf:script name="my_inplace_input_xf_15_xf_26_xforms_function" target-id="my-inplace-input$xf-15$trigger" observer-id="my-inplace-input$xf-15$trigger"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -141,8 +141,8 @@
                         <xxf:control id="my-inplace-input$xf-8" readonly="true">42</xxf:control>
                         <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-15$xf-22" class="yui-button yui-push-button fr-inplace-rename" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-15$xf-23" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-15$container" class="yui-button yui-push-button fr-inplace-rename" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-15$trigger" relevant="false"/>
                         <xxf:control id="my-inplace-input$xf-16" class="fr-inplace-cancel" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -264,10 +264,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-tabview$xf-20" for="my-tabview$xf-19" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-21" for="my-tabview$xf-19" name="class">selected</xxf:attribute>
-                        <xxf:attribute id="my-tabview$xf-23" for="my-tabview$xf-22" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-24" for="my-tabview$xf-22" name="class"/>
+                        <xxf:attribute id="my-tabview$xf-19" for="my-tabview$nav-1" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-20" for="my-tabview$nav-1" name="class">selected</xxf:attribute>
+                        <xxf:attribute id="my-tabview$xf-21" for="my-tabview$nav-2" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-22" for="my-tabview$nav-2" name="class"/>
                         <xxf:control id="my-tabview$output1">42</xxf:control>
                         <xxf:control id="my-tabview$output2">42</xxf:control>
                         <xxf:attribute id="my-tabview$fr-tabview-select-1" for="my-tabview$fr-tabview-select-1" name="style">display: none</xxf:attribute>
@@ -365,25 +365,25 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-tabview$xf-34" for="my-tabview$xf-33" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-35" for="my-tabview$xf-33" name="class">selected</xxf:attribute>
-                        <xxf:attribute id="my-tabview$xf-37" for="my-tabview$xf-36" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-38" for="my-tabview$xf-36" name="class"/>
-                        <xxf:attribute id="my-tabview$xf-40" for="my-tabview$xf-39" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-41" for="my-tabview$xf-39" name="class"/>
-                        <xxf:control id="my-tabview$xf-42">My label 3</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-44" for="my-tabview$xf-43" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-45" for="my-tabview$xf-43" name="class"/>
-                        <xxf:control id="my-tabview$xf-46">My label 4</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-48" for="my-tabview$xf-47" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-49" for="my-tabview$xf-47" name="class"/>
-                        <xxf:control id="my-tabview$xf-50">My label 5</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-52" for="my-tabview$xf-51" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-53" for="my-tabview$xf-51" name="class"/>
-                        <xxf:control id="my-tabview$xf-54">My label 6</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-56" for="my-tabview$xf-55" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-57" for="my-tabview$xf-55" name="class"/>
-                        <xxf:control id="my-tabview$xf-58">My label 7</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-33" for="my-tabview$nav-1" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-34" for="my-tabview$nav-1" name="class">selected</xxf:attribute>
+                        <xxf:attribute id="my-tabview$xf-35" for="my-tabview$nav-2" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-36" for="my-tabview$nav-2" name="class"/>
+                        <xxf:attribute id="my-tabview$xf-37" for="my-tabview$nav-3" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-38" for="my-tabview$nav-3" name="class"/>
+                        <xxf:control id="my-tabview$xf-39">My label 3</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-40" for="my-tabview$nav-4" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-41" for="my-tabview$nav-4" name="class"/>
+                        <xxf:control id="my-tabview$xf-42">My label 4</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-43" for="my-tabview$nav-5" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-44" for="my-tabview$nav-5" name="class"/>
+                        <xxf:control id="my-tabview$xf-45">My label 5</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-46" for="my-tabview$nav-6" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-47" for="my-tabview$nav-6" name="class"/>
+                        <xxf:control id="my-tabview$xf-48">My label 6</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-49" for="my-tabview$nav-7" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-50" for="my-tabview$nav-7" name="class"/>
+                        <xxf:control id="my-tabview$xf-51">My label 7</xxf:control>
                         <xxf:attribute id="my-tabview$fr-tabview-select-1" for="my-tabview$fr-tabview-select-1" name="style">display: none</xxf:attribute>
                         <xxf:attribute id="my-tabview$fr-tabview-deselect-1" for="my-tabview$fr-tabview-deselect-1" name="style">display: none</xxf:attribute>
                         <xxf:attribute id="my-tabview$fr-tabview-select-2" for="my-tabview$fr-tabview-select-2" name="style">display: none</xxf:attribute>

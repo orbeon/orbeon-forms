@@ -1698,7 +1698,7 @@
                         <xxf:control id="my-foo$xf-5$xf-14" label="Life, etc.: ">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
-            </xxf:event-response>            
+            </xxf:event-response>
         </output>
     </test>
 
@@ -3457,8 +3457,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-group" relevant="false"/>
-                        <xxf:control id="my-button$xf-2" class="yui-button yui-push-button" relevant="false"/>
-                        <xxf:control id="my-button$xf-3" relevant="false"/>
+                        <xxf:control id="my-button$container" class="yui-button yui-push-button" relevant="false"/>
+                        <xxf:control id="my-button$trigger" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3579,7 +3579,7 @@
                     <xxf:message level="modal">instance, my-foo1$my-xbl-instance</xxf:message>
                     <xxf:message level="modal">instance, my-foo1$my-xbl-instance, my-foo3$my-xbl-instance</xxf:message>
                 </xxf:action>
-            </xxf:event-response>            
+            </xxf:event-response>
         </output>
     </test>
 

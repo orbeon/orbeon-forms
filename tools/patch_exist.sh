@@ -47,12 +47,12 @@ cp lib/core/jta-1.1.jar               "$ORBEON_HOME"/lib/exist-dependency-jta-1.
 cp lib/core/quartz-1.6.6.jar          "$ORBEON_HOME"/lib/exist-dependency-quartz-1.6.6.jar
 cp lib/core/stax-api-1.0.1.jar        "$ORBEON_HOME"/lib/exist-dependency-stax-api-1.0.1.jar
 cp lib/core/ws-commons-util-1.0.2.jar "$ORBEON_HOME"/lib/exist-dependency-ws-commons-util-1.0.2.jar
-cp lib/core/xmldb.jar                 "$ORBEON_HOME"/lib/exist-xmldb.jar
+cp lib/core/xmldb.jar                 "$ORBEON_HOME"/lib/exist-dependency-xmldb.jar
 cp lib/core/xmlrpc-client-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-client-3.1.2.jar
 cp lib/core/xmlrpc-common-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-common-3.1.2.jar
 cp lib/core/xmlrpc-server-3.1.2.jar   "$ORBEON_HOME"/lib/exist-dependency-xmlrpc-server-3.1.2.jar
 cp extensions/indexes/lucene/lib/lucene-core-2.9.2.jar  "$ORBEON_HOME"/lib/exist-dependency-lucene-core-2.9.2.jar
-cp extensions/indexes/lucene/lib/lucene-regex-2.9.2.jar "$ORBEON_HOME"/lib/exist-dependency-lucene-regex-2.9.2
+cp extensions/indexes/lucene/lib/lucene-regex-2.9.2.jar "$ORBEON_HOME"/lib/exist-dependency-lucene-regex-2.9.2.jar
 cp lib/endorsed/resolver-1.2.jar      "$ORBEON_HOME"/lib/exist-dependency-resolver-1.2.jar
 
 

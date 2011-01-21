@@ -72,7 +72,7 @@
         },
         "de": {
             properties: {
-                "MONTHS_LONG": [ "Januar", "Februar", "M�rz", "April", "Mai", "Juni", "July", "August",  "September",  "Oktober",  "November",  "Dezember" ],
+                "MONTHS_LONG": [ "Januar", "Februar", "M\u00E4rz", "April", "Mai", "Juni", "July", "August",  "September",  "Oktober",  "November",  "Dezember" ],
                 "WEEKDAYS_SHORT": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
                 "START_WEEKDAY": 0
             },

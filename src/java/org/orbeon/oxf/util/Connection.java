@@ -143,7 +143,24 @@ public class Connection {
         // Forward cookies for session handling
         if (username == null) {
 
-            // START NEW ALGORITHM
+            // NOTES 2011-01-22:
+            //
+            // If this is requested when a page is generated, it turns out we cannot rely on a JSESSIONID that makes
+            // sense right after authentication, even in the scenario where the JSESSIONID is clean, because Tomcat
+            // replays the initial request. In other words the JSESSIONID cookie can be stale.
+            //
+            // This means that the forwarding done below often doesn't make sense.
+            //
+            // We could possibly allow it only for XForms Ajax/page updates, where the probability that JSESSIONID is
+            // correct is greater.
+            //
+            // A stronger fix might be to simply disable JSESSIONID forwarding, or support a stronger SSO option.
+            //
+            // See: http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=315104&group_id=168
+            //      https://issues.apache.org/bugzilla/show_bug.cgi?id=50633
+            //
+
+            // START "NEW" 2009 ALGORITHM
 
             // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
             // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
@@ -248,7 +265,7 @@ public class Connection {
                 }
             }
 
-            // END NEW ALGORITHM
+            // END "NEW" 2009 ALGORITHM
         }
 
         // Forward headers if needed

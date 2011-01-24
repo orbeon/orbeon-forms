@@ -6,10 +6,10 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
 
     name: "HTML Area"
 
-    assertHTML: (htmlOut) ->
+    assertHTML: (htmlExpectedOut) ->
         htmlActualOut = Document.getValue "xhtml-textarea"
-        htmlNormalizedOut = YAHOO.lang.trim(htmlActualOut).replace(new RegExp("  +", "g"), " ")
-        Assert.areEqual htmlOut, htmlNormalizedOut
+        [htmlExpectedOut, htmlActualOut] = (YAHOO.lang.trim(s).replace(new RegExp("  +", "g"), " ") for s in [htmlExpectedOut, htmlActualOut])
+        Assert.areEqual htmlExpectedOut, htmlActualOut
 
     # Set the value of the RTE and checks that the textarea acquires a corresponding value
     settingValue: (htmlIn, htmlOut) ->
@@ -38,20 +38,20 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
 
     # Pasting Word HTML, which doesn't have quotes around some attributes, is parsed correctly on the server
     testWordHTML: () ->
-        this.settingValue '''
+        this.settingValue "
             <p class=MsoNormal align=center
             style='margin-bottom:0in;margin-bottom:.0001pt;text-align:center;line-height:normal'><b
             style='mso-bidi-font-weight:normal'><u><span
             style='font-size:14.0pt;mso-bidi-font-size:11.0pt;mso-fareast-font-family:&quot;Times New
             Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;color:#0070C0'>Project
             Description<o:p></o:p></span></u></b></p>
-            ''', '''
+            ", "
             <p align=\"center\" class=\"MsoNormal\" style=\"margin-bottom:0in;margin-bottom:.0001pt;text-align:center;line-height:normal\"><b
             style=\"mso-bidi-font-weight:normal\"><u><span
             style=\"font-size:14.0pt;mso-bidi-font-size:11.0pt;mso-fareast-font-family:&quot;Times New
             Roman&quot;;mso-bidi-font-family:&quot;Times New Roman&quot;;color:#0070C0\">Project
             Description</span></u></b></p>
-            '''
+            "
 
     # Check we send the value of an RTE to the server when another RTE gets the focus
     testFocus: () ->

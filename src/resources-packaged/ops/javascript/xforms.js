@@ -1310,7 +1310,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
                         testTuple[0].call(testCase);
                     }, function() {
-                        testTuple[1].call(testCase);
+                        if (testTuple[1]) testTuple[1].call(testCase);
                         ORBEON.util.Test.executeSequenceCausingAjaxRequest(testCase, tests);
                     });
                 }
@@ -3048,20 +3048,14 @@ ORBEON.xforms.Events = {
                 var changeValue = false;
                 if (currentFocusControlElement != null) { // Can be null on first focus
                     if (YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-textarea")
-                            && YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")
-                            && ORBEON.util.Properties.htmlEditor.get() == "fck") {
-                        // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't duplicate the code here
-                        var editorInstance = FCKeditorAPI.GetInstance(currentFocusControlElement.name);
-                        currentFocusControlElement.value = editorInstance.GetXHTML();
+                            && YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-mediatype-text-html")) {
                         changeValue = true;
                     } else if (YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-select1-appearance-xxforms-tree")
                             || YAHOO.util.Dom.hasClass(currentFocusControlElement, "xforms-select-appearance-xxforms-tree")) {
                         changeValue = true;
                     }
                     // Send value change if needed
-                    if (changeValue) {
-                        xformsValueChanged(currentFocusControlElement, null);
-                    }
+                    if (changeValue) xformsValueChanged(currentFocusControlElement, null);
 
                     // Handle DOMFocusOut
                     // Should send out DOMFocusOut only if no xxforms-value-change-with-focus-change was sent to avoid extra
@@ -4137,14 +4131,8 @@ ORBEON.widgets.RTE = function() {
      */
     renderedCustomEvents = {};
 
-    function sendChangeToServer(controlID) {
-        var event = new ORBEON.xforms.server.AjaxServer.Event(null, controlID, null,
-                ORBEON.widgets.RTE.getValue(ORBEON.util.Dom.get(controlID)), "xxforms-value-change-with-focus-change");
-        ORBEON.xforms.server.AjaxServer.fireEvents([event], true);
-    }
-
     /**
-     * Event handler called by the RTE every time there is an event which can could potentialy change the content
+     * Event handler called by the RTE every time there is an event which can could potentially change the content
      * of the editor.
      */
     function changeEvent(controlID) {
@@ -4169,6 +4157,7 @@ ORBEON.widgets.RTE = function() {
     var PUBLIC = {
 
         extending: ORBEON.widgets.Base,
+        rteEditors: rteEditors,
 
         /**
          * Initializes the RTE editor for a particular control.
@@ -4299,6 +4288,8 @@ ORBEON.widgets.RTE = function() {
             var registerChangeEvent = function() {
                 yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
                 yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
+                yuiRTE.on("editorWindowFocus", function() { ORBEON.xforms.Events.focus({ target: control }); });
+                yuiRTE.on("editorWindowBlur", function() { ORBEON.xforms.Events.blur({ target: control }); });
                 yuiRTE.removeListener("afterNodeChange", registerChangeEvent);
             };
             yuiRTE.on("afterNodeChange", registerChangeEvent);

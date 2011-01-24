@@ -10,7 +10,10 @@
         <xhtml:title>HTML Editor</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main">
             <xforms:instance>
-                <gaga>Some &lt;b>text&lt;/b> here</gaga>
+                <instance>
+                    <xhtml-editor-1>Some &lt;b>text&lt;/b> here</xhtml-editor-1>
+                    <xhtml-editor-2>Second</xhtml-editor-2>
+                </instance>
             </xforms:instance>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -26,10 +29,13 @@
         </xforms:trigger>
         <xhtml:h2>text/html texarea</xhtml:h2>
         <xhtml:div>
-            <xforms:textarea id="xhtml-editor" mediatype="text/html" ref="/gaga">
+            <xforms:textarea id="xhtml-editor-1" mediatype="text/html" ref="xhtml-editor-1">
                 <xforms:help>gaga</xforms:help>
             </xforms:textarea>
-            <xforms:textarea ref="/gaga" id="xhtml-textarea"/>
+            <xforms:textarea id="xhtml-editor-2" mediatype="text/html" ref="xhtml-editor-2">
+                <xforms:help>gaga</xforms:help>
+            </xforms:textarea>
+            <xforms:textarea ref="xhtml-editor-1" id="xhtml-textarea"/>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

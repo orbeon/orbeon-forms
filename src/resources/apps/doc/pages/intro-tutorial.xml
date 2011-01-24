@@ -781,14 +781,14 @@
                 <note>
                     <p>
                         If you get lost at some point in this tutorial, feel free to look at the reference
-                        source files for the bookcast application:
+                        source files for the Bookcast application:
                     </p>
                     <ul>
                         <li>
-                            <a href="/source-viewer/xforms-bookcast/view.xhtml">view.xhtml</a>
+                            <a href="https://github.com/orbeon/orbeon-forms/blob/master/src/resources/apps/xforms-bookcast/view.xhtml">view.xhtml</a>
                         </li>
                         <li>
-                            <a href="/source-viewer/xforms-bookcast/page-flow.xml">page-flow.xml</a>
+                            <a href="https://github.com/orbeon/orbeon-forms/blob/master/src/resources/apps/xforms-bookcast/page-flow.xml">page-flow.xml</a>
                         </li>
                     </ul>
                 </note>

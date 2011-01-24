@@ -28,11 +28,11 @@
 
     <!-- List of applications -->
     <xsl:variable name="applications" select="doc('../apps-list.xml')" as="document-node()"/>
-    <!-- Current application id -->
+    <!-- Current navigation -->
     <xsl:variable name="current-application-id" select="tokenize(doc('input:request')/*/request-path, '/')[2]" as="xs:string"/>
-    <!-- Source viewer application id if relevant -->
-    <xsl:variable name="is-source-viewer" select="$current-application-id = 'source-viewer'" as="xs:boolean"/>
-    <xsl:variable name="source-viewer-application-id" select="if ($is-source-viewer) then tokenize(doc('input:request')/*/request-path, '/')[3] else ()" as="xs:string?"/>
+    <xsl:variable name="current-application-remaining" select="tokenize(doc('input:request')/*/request-path, '/')[3]" as="xs:string?"/>
+    <xsl:variable name="is-form-runner-home" select="$current-application-id = 'home' and $current-application-remaining = ''" as="xs:boolean"/>
+
     <!-- Try to obtain a meaningful title for the example -->
     <xsl:variable name="title" select="if (/xhtml:html/xhtml:head/xhtml:title != '')
                                        then /xhtml:html/xhtml:head/xhtml:title
@@ -99,55 +99,51 @@
                         <xhtml:td colspan="2">
                             <xhtml:div class="tabs">
                                 <xsl:choose>
-                                    <xsl:when test="$is-source-viewer">
-                                        <xhtml:a class="tab" href="/{$source-viewer-application-id}/">Run Application</xhtml:a>
+                                    <xsl:when test="not($is-form-runner-home)">
+                                        <xhtml:a class="tab" href="/home/">Form Builder and Example Forms</xhtml:a>
                                         <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
-                                        <xhtml:span class="tab-selected">View Source Code</xhtml:span>
+                                        <xhtml:span class="tab-selected">XForms Examples and Apps</xhtml:span>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
-                                        <xhtml:span class="tab-selected">Run Application</xhtml:span>
-                                        <xhtml:a class="tab" href="/source-viewer/{$current-application-id}/">View Source Code</xhtml:a>
+                                        <xhtml:span class="tab-selected">Form Builder and Example Forms</xhtml:span>
+                                        <xhtml:a class="tab" href="/home/xforms">XForms Examples and Apps</xhtml:a>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xhtml:div>
                         </xhtml:td>
                     </xhtml:tr>
                     <xhtml:tr>
-                        <!-- List of examples -->
-                        <xhtml:td id="leftcontent" valign="top" width="1%">
-                            <h1>Orbeon Forms Apps</h1>
-                            <xhtml:ul class="tree-sections">
-                                <xsl:for-each select="$applications/*/section">
-                                    <xhtml:li class="tree-section">
-                                        <xsl:value-of select="@label"/>
-                                    </xhtml:li>
-                                    <xhtml:ul class="tree-items">
-                                        <xsl:for-each select="application">
-                                            <xsl:variable name="selected" as="xs:boolean" select="@id = $current-application-id"/>
-                                            <xhtml:li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
-                                                <xsl:choose>
-                                                    <xsl:when test="$selected">
-                                                        <xsl:value-of select="@label"/>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <xhtml:a href="/{@id}{if (tokenize(@id, '/')[1] != 'fr') then '/' else ''}">
+                        <!--List of examples -->
+                        <xsl:if test="not($is-form-runner-home)">
+                            <xhtml:td id="leftcontent" valign="top" width="1%">
+                                <h1>Orbeon Forms Apps</h1>
+                                <xhtml:ul class="tree-sections">
+                                    <xsl:for-each select="$applications/*/section">
+                                        <xhtml:li class="tree-section">
+                                            <xsl:value-of select="@label"/>
+                                        </xhtml:li>
+                                        <xhtml:ul class="tree-items">
+                                            <xsl:for-each select="application">
+                                                <xsl:variable name="selected" as="xs:boolean" select="@id = $current-application-id"/>
+                                                <xhtml:li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
+                                                    <xsl:choose>
+                                                        <xsl:when test="$selected">
                                                             <xsl:value-of select="@label"/>
-                                                        </xhtml:a>
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-                                                <!--<xsl:if test="@xforms-ng = 'true'">-->
-                                                    <!--&#160;-->
-                                                    <!--<xhtml:span style="font-size: 9px; color: #f90; font-weight: normal">-->
-                                                        <!--XForms NG-->
-                                                    <!--</xhtml:span>-->
-                                                <!--</xsl:if>-->
-                                            </xhtml:li>
-                                        </xsl:for-each>
-                                    </xhtml:ul>
-                                </xsl:for-each>
-                            </xhtml:ul>
-                        </xhtml:td>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xhtml:a href="/{@id}{if (tokenize(@id, '/')[1] != 'fr') then '/' else ''}">
+                                                                <xsl:value-of select="@label"/>
+                                                            </xhtml:a>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </xhtml:li>
+                                            </xsl:for-each>
+                                        </xhtml:ul>
+                                    </xsl:for-each>
+                                </xhtml:ul>
+                            </xhtml:td>
+                        </xsl:if>
                         <xhtml:td id="maincontent" valign="top" width="99%">
                             <xhtml:div class="maincontent">
                                 <!-- Title -->

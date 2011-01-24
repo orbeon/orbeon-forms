@@ -12,15 +12,13 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <applications>
-    <section label="Get Started">
-        <application id="home" label="Demo Forms &amp; Apps"/>
-    </section>
     <section label="Form Builder / Runner">
+        <application id="/home/" label="Home"/>
         <application id="fr/orbeon/builder/summary" label="Form Builder"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
-        <application id="fr/orbeon/contact/summary" label="Contact Form"/>
-        <application id="fr/orbeon/controls/new" label="Controls Form"/>
         <application id="fr/orbeon/dmv-14/new" label="DMV-14 Form"/>
+        <application id="fr/orbeon/controls/new" label="Controls Form"/>
+        <application id="fr/orbeon/contact/summary" label="Contact Form"/>
     </section>
     <section label="Essential XForms">
         <application id="xforms-controls" label="XForms Controls"/>
@@ -31,14 +29,14 @@
         <application id="xforms-bookcast" label="XForms Bookcast"/>
     </section>
     <section label="More XForms">
+        <application id="xforms-espresso" label="Espresso Order"/>
         <application id="xforms-todo" label="To-Do Lists"/>
         <application id="xforms-translate" label="Instant Translation"/>
         <application id="xforms-calculator" label="Calculator"/>
         <application id="xforms-flickr-resize" label="Flickr Resize"/>
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
     </section>
-    <section label="Sandboxes">
-        <application id="xforms-sandbox" label="XForms Sandbox"/>
+    <section label="XML Sandboxes">
         <application id="sandbox-exist" label="eXist Sandbox"/>
         <application id="sandbox-transformations/schema" label="XML Schema Sandbox"/>
         <application id="sandbox-transformations/xpath" label="XPath Sandbox"/>

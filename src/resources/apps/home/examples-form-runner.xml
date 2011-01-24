@@ -1,0 +1,39 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+  
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+  
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<examples title="Orbeon Forms - Form Builder and Demo Forms">
+    <example title="Form Builder" href="/fr/orbeon/builder/summary" img="/apps/home/images/form-builder-small.png">
+        <b>Orbeon Form Builder</b> is the Orbeon Forms visual form designer. It allows you to build and deploy forms in minutes right from your web browser.
+    </example>
+    <example title="Bookshelf Form" href="/fr/orbeon/bookshelf/summary" img="/apps/home/images/form-bookshelf-small.png">
+        The <b>Bookshelf</b> form is a simple form built on top of the the Form Runner environment. It shows
+        attaching images and repeating form fields, and Form Runner features such as on-the-fly validation,
+        error summary, localization,
+        automatic preview page, automatic PDF generation, and more!
+    </example>
+    <example title="DMV-14 Form" href="/fr/orbeon/dmv-14/new" img="/apps/home/images/form-dmv14-small.png">
+        The <b>DMV-14</b> form is based on a real-life form (a California Department of
+        Motor Vehicles form). It shows data capture and validation, repeating sections,
+        generating PDF using a template, and more!
+    </example>
+    <example title="Controls Form" href="/fr/orbeon/controls/new" img="/apps/home/images/form-controls-small.png">
+        View the Orbeon Forms <b>XForms and custom controls</b> in action within Form Runner.
+    </example>
+    <example title="Contact Form" href="/fr/orbeon/contact/summary" img="/apps/home/images/form-contact-small.png">
+        The <b>Contact</b> form is a simple form designed with Form Builder. It can be entirely created in about 10
+        minutes as shown in the <a href="http://www.orbeon.com/forms/screencast/form-builder">Form Builder screencast</a>.
+    </example>
+    <example href="/home/xforms" img="/apps/home/images/arrow_right.png">
+        Go to XForms Examples and Apps
+    </example>
+</examples>

@@ -20,7 +20,7 @@
         The <b>Espresso Order</b> demo shows powerful aspect of XForms in a compact example:
         declarative binds, repeats, dynamic sets of items and dynamic rules.
     </example>
-    <example title="XForms Bookcast App" href="/xforms-bookcast/" img="/apps/home/images/xforms-bookcast-small.png">
+    <example title="XForms Bookcast" href="/xforms-bookcast/" img="/apps/home/images/xforms-bookcast-small.png">
         The <b>XForms Bookcast</b> app is part of the Orbeon Forms tutorial. It shows simple XRX-style database access,
         repeats, and more!
     </example>

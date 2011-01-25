@@ -16,7 +16,7 @@
         <application id="/home/" label="Home"/>
         <application id="fr/orbeon/builder/summary" label="Form Builder"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
-        <application id="fr/orbeon/dmv-14/new" label="DMV-14 Form"/>
+        <application id="fr/orbeon/dmv-14/edit/6b01fa4cd1605b8f736fac09be6cf9b2" label="DMV-14 Form"/>
         <application id="fr/orbeon/controls/new" label="Controls Form"/>
         <application id="fr/orbeon/contact/summary" label="Contact Form"/>
     </section>

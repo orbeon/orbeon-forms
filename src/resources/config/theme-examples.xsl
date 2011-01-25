@@ -100,14 +100,14 @@
                             <xhtml:div class="tabs">
                                 <xsl:choose>
                                     <xsl:when test="not($is-form-runner-home)">
-                                        <xhtml:a class="tab" href="/home/">Form Builder and Example Forms</xhtml:a>
+                                        <xhtml:a class="tab" href="/home/">Form Builder &amp; Sample Forms</xhtml:a>
                                         <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
-                                        <xhtml:span class="tab-selected">XForms Examples and Apps</xhtml:span>
+                                        <xhtml:span class="tab-selected">XForms Controls &amp; Demo Apps</xhtml:span>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
-                                        <xhtml:span class="tab-selected">Form Builder and Example Forms</xhtml:span>
-                                        <xhtml:a class="tab" href="/home/xforms">XForms Examples and Apps</xhtml:a>
+                                        <xhtml:span class="tab-selected">Form Builder &amp; Sample Forms</xhtml:span>
+                                        <xhtml:a class="tab" href="/home/xforms">XForms Controls &amp; Demo Apps</xhtml:a>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xhtml:div>

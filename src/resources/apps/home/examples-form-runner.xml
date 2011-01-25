@@ -16,15 +16,13 @@
         <b>Orbeon Form Builder</b> is the Orbeon Forms visual form designer. It allows you to build and deploy forms in minutes right from your web browser.
     </example>
     <example title="Bookshelf Form" href="/fr/orbeon/bookshelf/summary" img="/apps/home/images/form-bookshelf-small.png">
-        The <b>Bookshelf</b> form is a simple form built on top of the the Form Runner environment. It shows
-        attaching images and repeating form fields, and Form Runner features such as on-the-fly validation,
-        error summary, localization,
-        automatic preview page, automatic PDF generation, and more!
+        The <b>Bookshelf</b> form shows image attachments, rich text, repeating form fields, and Form Runner features such as
+        as-you-type validation, error summary, localization, automatic preview page and automatic PDF generation.
     </example>
-    <example title="DMV-14 Form" href="/fr/orbeon/dmv-14/new" img="/apps/home/images/form-dmv14-small.png">
+    <example title="DMV-14 Form" href="/fr/orbeon/dmv-14/edit/6b01fa4cd1605b8f736fac09be6cf9b2" img="/apps/home/images/form-dmv14-small.png">
         The <b>DMV-14</b> form is based on a real-life form (a California Department of
         Motor Vehicles form). It shows data capture and validation, repeating sections,
-        generating PDF using a template, and more!
+        and generating great-looking PDF from templates.
     </example>
     <example title="Controls Form" href="/fr/orbeon/controls/new" img="/apps/home/images/form-controls-small.png">
         View the Orbeon Forms <b>XForms and custom controls</b> in action within Form Runner.

@@ -40,12 +40,17 @@
      * @private
      */
     UploadServer.uploadSuccess = function(o) {
-        // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
-        this.processingEvent.upload.clear();
-        // The Ajax response typically contains information about each file (name, size, etc)
-        AjaxServer.handleResponseAjax(o);
-        // Are we done, or do we still need to handle events for other forms?
-        this.continueWithRemainingEvents();
+        // On IE (confirmed with IE 7 and IE 8 in IE 7 mode), this also gets called when the upload is interrupted,
+        // maybe because of a connection issue. When this happens, we don't want to try to handle the Ajax response,
+        // as there is none.
+        if (o.responseText) {
+            // Clear upload field we just uploaded, otherwise subsequent uploads will upload the same data again
+            this.processingEvent.upload.clear();
+            // The Ajax response typically contains information about each file (name, size, etc)
+            AjaxServer.handleResponseAjax(o);
+            // Are we done, or do we still need to handle events for other forms?
+            this.continueWithRemainingEvents();
+        }
     };
 
     /**

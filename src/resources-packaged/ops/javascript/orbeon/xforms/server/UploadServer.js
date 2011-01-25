@@ -49,15 +49,13 @@
     };
 
     /**
-     * In case of failure, after a delay call this.asyncUploadRequest() as it was called originally by the
+     * In case of failure, call this.asyncUploadRequest() as it was called originally by the
      * execution queue. Currently, this method isn't called as it should when there is a connection failure.
      * See: [ #315398 ] Retry mechanism is erratic with pseudo-Ajax submissions http://goo.gl/pPByq
      */
     UploadServer.uploadFailure = function() {
-        AjaxServer.retryRequestAfterDelay(_.bind(function() {
-            this.remainingEvents.unshift(this.processingEvent);
-            this.asyncUploadRequest(this.remainingEvents, this.executionQueueDone);
-        }, this));
+        this.remainingEvents.unshift(this.processingEvent);
+        this.asyncUploadRequest(this.remainingEvents, this.executionQueueDone);
     };
 
     /**
@@ -99,7 +97,8 @@
         Connect.setForm(this.processingEvent.form, true, true);
         this.yuiConnection = Connect.asyncRequest("POST", ORBEON.xforms.Globals.xformsServerURL[this.processingEvent.form.id], {
             upload: _.bind(this.uploadSuccess, this),
-            failure: _.bind(this.uploadFailure, this),
+            // Failure isn't called; instead we detect if an upload is interrupted through the progress-state="interrupted" in the Ajax response
+            failure: _.identity,
             argument: { formId: this.processingEvent.form.id }
         });
         this.askForProgressUpdate();

@@ -48,14 +48,16 @@ class Upload extends Control
         UploadServer.uploadEventQueue.add {form: this.getForm(), upload: this},
             Properties.delayBeforeIncrementalRequest.get(), ExecutionQueue.MIN_WAIT
 
-    # This method is called when we the server sends us a progress update for this upload control. Here we update
-    # the progress indicator to reflect the new value we got from the server.
+    # This method is called when the server sends us a progress update for this upload control. If the upload was
+    # interrupted we resume it and otherwise update the progress indicator to reflect the new value we got from the
+    # server.
     #
     # @param {number} received     Number of bytes the server received so far
     # @param {number} expected     Total number of bytes the server expects
-    progress: (received, expected) ->
-        if this.yuiProgressBar
-            this.yuiProgressBar.set "value", 10 + 100 * received / expected
+    progress: (state, received, expected) ->
+        switch state
+            when "interrupted" then UploadServer.uploadFailure()
+            else this.yuiProgressBar.set "value", 10 + 100 * received / expected if this.yuiProgressBar
 
     # When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
     cancel: (event) ->

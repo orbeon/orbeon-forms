@@ -62,7 +62,7 @@
         var controlConstructor = _.detect(this.controlConstructors, function(controlConstructor) {
             return controlConstructor.predicate(container);
         });
-        if (! controlConstructor) throw "Can't find a relevant control for container" + container.id;
+        if (! controlConstructor) throw "Can't find a relevant control for container: " + container.id;
         return controlConstructor.controlConstructor;
     };
 

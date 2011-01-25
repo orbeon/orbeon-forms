@@ -649,7 +649,8 @@
                 ORBEON.xforms.Init.document();
             }
         } else {
-            if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
+            if (o.responseText &&
+                    (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html"))) {
                 // The XML document does not come in o.responseXML: parse o.responseText.
                 // This happens in particular when we get a response after a background upload.
                 var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
@@ -1148,6 +1149,7 @@
                                     var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
                                     var required = ORBEON.util.Dom.getAttribute(controlElement, "required");
                                     var classes = ORBEON.util.Dom.getAttribute(controlElement, "class");
+                                    var progressState = ORBEON.util.Dom.getAttribute(controlElement, "progress-state");
                                     var progressReceived = ORBEON.util.Dom.getAttribute(controlElement, "progress-received");
                                     var progressExpected = ORBEON.util.Dom.getAttribute(controlElement, "progress-expected");
 
@@ -1524,8 +1526,9 @@
                                     }
 
                                     // Handle progress for upload controls
-                                    if (progressReceived != null && progressExpected != null && progressReceived != "" && progressExpected != "")
-                                        ORBEON.xforms.Page.getControl(documentElement).progress(parseInt(progressReceived), parseInt(progressExpected));
+                                    if (progressState != null && progressReceived != null && progressExpected != null
+                                            && progressState != "" && progressReceived != "" && progressExpected != "")
+                                        ORBEON.xforms.Page.getControl(documentElement).progress(progressState, parseInt(progressReceived), parseInt(progressExpected));
                                 }
 
                                 // Handle innerHTML updates

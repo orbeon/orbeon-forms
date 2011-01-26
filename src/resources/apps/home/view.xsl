@@ -19,7 +19,7 @@
             .example .image { height: 310px; overflow-y: auto; overflow-x: hidden; padding: 1px 0 } <!-- padding 1px to make FF 3.6 happy -->
             .example img { border: none; display: block; margin: 0 auto; padding: 1px 0 1px }
             .example:hover { background-color: #FFCC66 }
-            .example h2 { color: #004B92; font-size: larger; margin-top: 0; margin-bottom: .3em }
+            .example h2 { color: #004B92; font-size: 14px; margin-top: 0; margin-bottom: .3em }
             .example .description { padding: .5em 1em; font-family: georgia,serif; font-size: 14px; line-height: 1.3 }
             .example.last .image { margin-top: 5em }
             .example.last .description {  text-align: center; font-style: italic }

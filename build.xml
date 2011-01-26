@@ -83,10 +83,12 @@
         <include name="commons-pool-1.5.4.jar"/>
         <include name="commons-validator-1_0_2.jar"/>
 
-        <include name="httpclient-4.0.3.jar"/>
-        <include name="httpcore-4.0.1.jar"/>
-        <include name="httpcore-nio-4.0.1.jar"/>
-        <include name="httpmime-4.0.3.jar"/>
+        <include name="httpclient-4.1.jar"/>
+        <!--<include name="httpclient-cache-4.1.jar"/>-->
+        <include name="httpcore-4.1.jar"/>
+        <include name="httpcore-nio-4.1.jar"/>
+        <include name="httpmime-4.1.jar"/>
+
         <include name="apache-mime4j-0.6.jar"/>
         <include name="jcifs-1.3.14.jar"/>
 

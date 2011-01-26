@@ -28,6 +28,7 @@ class EhcacheStateStore extends XFormsStateStore {
 
     private val ehcachePath = "oxf:/config/ehcache.xml"
     private val cacheName = "xforms.state"
+    private val storeDebugName = "Ehcache"
 
     private lazy val cacheManager =
         try {
@@ -127,26 +128,17 @@ class EhcacheStateStore extends XFormsStateStore {
     def addStateCombined(staticStateDigest: String, dynamicStateUUID: String, xformsState: XFormsState, sessionId: String) = ()
 
     private def getDynamicStateKey(documentUUID: String, isInitialState: Boolean) =
-        documentUUID + (if (isInitialState) "-I" else "-C")
+        documentUUID + (if (isInitialState) "-I" else "-C") // key is different for initial vs. subsequent state
 
     private def isDebugEnabled() = XFormsStateManager.getIndentedLogger.isDebugEnabled
 
     private def debug(message: String) =
-        XFormsStateManager.getIndentedLogger.logDebug("", getStoreDebugName + " store: " + message)
+        XFormsStateManager.getIndentedLogger.logDebug("", storeDebugName + " store: " + message)
 
     private def warn(message: String) =
-        XFormsStateManager.getIndentedLogger.logWarning("", getStoreDebugName + " store: " + message)
-
-    private def getStoreDebugName = "Ehcache"
+        XFormsStateManager.getIndentedLogger.logWarning("", storeDebugName + " store: " + message)
 }
 
 object EhcacheStateStore {
-
-    private var instance: XFormsStateStore = null
-
-    def instance(externalContext: ExternalContext): XFormsStateStore = synchronized {
-        if (instance eq null)
-            instance = new EhcacheStateStore
-        instance
-    }
+    lazy val instance = new EhcacheStateStore
 }

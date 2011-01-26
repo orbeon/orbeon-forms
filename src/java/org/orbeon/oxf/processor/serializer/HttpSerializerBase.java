@@ -89,7 +89,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 }
 
                 // Get last modification date and compute last modified if possible
-                // NOTE: It is not clear if this is right! We had a discussion top "remove serializer last modified,
+                // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
                 // and use oxf:request-generator default validity".
                 final long lastModified = findInputLastModified(pipelineContext, dataInput, true);
 

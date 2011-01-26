@@ -111,7 +111,7 @@ class EhcacheStateStore extends XFormsStateStore {
 
                 // Gather values from cache for both keys and return state only if both are non-null
                 Stream(parts(0), dynamicStateKey) map (findOne(_)) filter (_ ne null) match {
-                    case Stream(staticState: String, dynamicState: String) =>
+                    case Stream(staticState, dynamicState) =>
                         new XFormsState(parts(0), staticState, dynamicState)
                     case _ => null
                 }

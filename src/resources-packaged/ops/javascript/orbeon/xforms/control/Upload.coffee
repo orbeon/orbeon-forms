@@ -10,16 +10,16 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-OD = ORBEON.util.Dom;
-ExecutionQueue = ORBEON.util.ExecutionQueue;
-Properties = ORBEON.util.Properties;
-UploadServer = ORBEON.xforms.server.UploadServer;
-Control = ORBEON.xforms.control.Control;
-Upload = ORBEON.xforms.control.Upload;
-Page = ORBEON.xforms.Page;
-Event = YAHOO.util.Event;
-YD = YAHOO.util.Dom;
-ProgressBar = YAHOO.widget.ProgressBar;
+OD = ORBEON.util.Dom
+ExecutionQueue = ORBEON.util.ExecutionQueue
+Properties = ORBEON.util.Properties
+UploadServer = ORBEON.xforms.server.UploadServer
+Control = ORBEON.xforms.control.Control
+Upload = ORBEON.xforms.control.Upload
+Page = ORBEON.xforms.Page
+Event = YAHOO.util.Event
+YD = YAHOO.util.Dom
+ProgressBar = YAHOO.widget.ProgressBar
 
 class Upload extends Control
 

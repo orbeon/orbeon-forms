@@ -1413,25 +1413,25 @@ ORBEON.xforms.Document = {
     /**
      * Returns the value of an XForms control.
      *
-     * @param {String} controlId    Id of the control
+     * @param {String | HTMLElement} control    Either the id of the control or the element corresponding to that control
      */
-    getValue: function(controlId) {
-        var control = ORBEON.util.Dom.get(controlId);
+    getValue: function(control) {
+        control = _.isString(control) ? ORBEON.util.Dom.get(control) : control;
         return ORBEON.xforms.Controls.getCurrentValue(control);
     },
 
     /**
      * Set the value of an XForms control.
      *
-     * @param {String} controlId    Id of the control
-     * @param {String} newValue     New value for the control
+     * @param {String | HTMLElement} control    Either the id of the control or the element corresponding to that control
+     * @param {String} newValue                 New value for the control
      */
-    setValue: function(controlId, newValue) {
+    setValue: function(control, newValue) {
         // User might pass non-string values, so make sure the result is a string
         var stringValue = "" + newValue;
-        var control = ORBEON.util.Dom.get(controlId);
+        control = _.isString(control) ? ORBEON.util.Dom.get(control) : control;
         if (control == null || ORBEON.xforms.Controls.isInRepeatTemplate(control))
-            throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
+            throw "ORBEON.xforms.Document.setValue: can't find control id '" + control + "'";
 
         if (!YAHOO.util.Dom.hasClass(control, "xforms-output") && !YAHOO.util.Dom.hasClass(control, "xforms-upload")) {// ignore event on xforms:output and xforms:upload
             // Directly change the value of the control in the UI without waiting for a response from the server
@@ -1440,7 +1440,7 @@ ORBEON.xforms.Document = {
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, stringValue, "xxforms-value-change-with-focus-change");
             ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         } else {
-            throw "ORBEON.xforms.Document.setValue: can't setvalue on output or upload control '" + controlId + "'";
+            throw "ORBEON.xforms.Document.setValue: can't setvalue on output or upload control '" + control + "'";
         }
     },
 

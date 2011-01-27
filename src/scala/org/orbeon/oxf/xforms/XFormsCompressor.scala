@@ -25,12 +25,12 @@ import java.util.zip.GZIPOutputStream
 object XFormsCompressor {
 
     // Use a Deflater pool as creating deflaters is expensive
-    private val DEFLATER_POOL = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory)
+    private val deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory)
 
     private val BUFFER_SIZE = 1024 * 8
 
     def compressBytes(bytesToEncode: Array[Byte], level: Int) = {
-        val deflater = DEFLATER_POOL.borrowObject.asInstanceOf[Deflater]
+        val deflater = deflaterPool.borrowObject.asInstanceOf[Deflater]
         deflater.setLevel(level)
         try {
             val os = new ByteArrayOutputStream
@@ -41,15 +41,17 @@ object XFormsCompressor {
             os.toByteArray
         } finally {
             deflater.reset()
-            DEFLATER_POOL.returnObject(deflater)
+            deflaterPool.returnObject(deflater)
         }
     }
 
+    // Compress using BEST_SPEED as serializing state quickly has been determined to be more important than saving extra
+    // memory. Even this way compression typically is more than 10X.
     def compressBytes(bytesToEncode: Array[Byte]): Array[Byte] = compressBytes(bytesToEncode, Deflater.BEST_SPEED)
 
     // Example of effective compression ratios and speeds for XML inputs:
     //
-    // Sizes in bytes, times in ms per compression.
+    // Sizes in bytes:
     //
     // Input     | SPEED   | DEFAULT | COMPRESSION
     // ----------+---------+---------+------------
@@ -58,14 +60,16 @@ object XFormsCompressor {
     //   511,776 |  49,751 |  35,309 |      33,858
     //   178,796 |  17,321 |  12,234 |      11,973
     //
+    // Times in ms per compression:
+    //
     // Input     | SPEED   | DEFAULT | COMPRESSION
     // ----------+---------+---------+------------
-    // 1,485,020 |      31 |      41 |         133
-    //   955,373 |      18 |      37 |          98
-    //   511,776 |      16 |      14|           96
-    //   178,796 |       4 |       5 |          12
+    // 1,485,020 |      15 |      37 |         122
+    //   955,373 |      12 |      31 |         108
+    //   511,776 |       6 |      13 |          42
+    //   178,796 |       2 |       5 |          12
 
-    def testCompressionPerformance(bytesToEncode: Array[Byte]) = {
+    def compressBytesMeasurePerformance(bytesToEncode: Array[Byte]): Array[Byte] = {
 
         val settings = Map(
             (Deflater.BEST_SPEED -> "BEST_SPEED"),
@@ -79,6 +83,8 @@ object XFormsCompressor {
                 compressBytes(bytesToEncode, level)
             XFormsUtils.indentedLogger.endHandleOperation()
         }
+
+        compressBytes(bytesToEncode, Deflater.BEST_SPEED)
     }
 
     def uncompressBytes(bytesToDecode: Array[Byte]) = {

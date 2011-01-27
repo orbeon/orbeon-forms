@@ -159,6 +159,10 @@ public class IndentedLogger {
         log(Level.WARN, indentation.indentation, type, message, parameters);
     }
 
+    public void logInfo(String type, String message) {
+        log(Level.INFO, indentation.indentation, type, message, (String[]) null);
+    }
+
     public void logInfo(String type, String message, String... parameters) {
         log(Level.INFO, indentation.indentation, type, message, parameters);
     }

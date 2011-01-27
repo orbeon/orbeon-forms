@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.log4j.Logger;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.dom4j.*;
@@ -62,16 +61,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.zip.CRC32;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPInputStream;
 
 public class XFormsUtils {
 
     private static final String LOGGING_CATEGORY = "utils";
     private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
-    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+    public static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
     private static final int SRC_CONTENT_BUFFER_SIZE = NetUtils.COPY_BUFFER_SIZE / 2;
 
@@ -130,9 +125,6 @@ public class XFormsUtils {
         return encodeXML(propertyContext, documentToEncode, XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
-    // Use a Deflater pool as creating deflaters is expensive
-    private static final SoftReferenceObjectPool DEFLATER_POOL = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory());
-
     public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, boolean compress, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
@@ -159,57 +151,27 @@ public class XFormsUtils {
     }
 
     public static String encodeBytes(PropertyContext propertyContext, byte[] bytesToEncode, boolean compress, String encryptionPassword) {
-        Deflater deflater = null;
-        try {
-            // Compress if needed
-            final byte[] gzipByteArray;
-            if (compress) {
-                deflater = (Deflater) DEFLATER_POOL.borrowObject();
-                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
-                gzipOutputStream.write(bytesToEncode);
-                gzipOutputStream.close();
-                gzipByteArray = byteArrayOutputStream.toByteArray();
-            } else {
-                gzipByteArray = null;
-            }
+        // Compress if needed
+        final byte[] gzipByteArray = compress ? XFormsCompressor.compressBytes(bytesToEncode) : null;
 
-            // Encrypt if needed
-            if (encryptionPassword != null) {
-                // Perform encryption
-                if (gzipByteArray == null) {
-                    // The data was not compressed above
-                    return "X1" + SecureUtils.encrypt(propertyContext, encryptionPassword, bytesToEncode);
-                } else {
-                    // The data was compressed above
-                    return "X2" + SecureUtils.encrypt(propertyContext, encryptionPassword, gzipByteArray);
-                }
+        // Encrypt if needed
+        if (encryptionPassword != null) {
+            // Perform encryption
+            if (gzipByteArray == null) {
+                // The data was not compressed above
+                return "X1" + SecureUtils.encrypt(propertyContext, encryptionPassword, bytesToEncode);
             } else {
-                // No encryption
-                if (gzipByteArray == null) {
-                    // The data was not compressed above
-                    return "X3" + Base64.encode(bytesToEncode, false);
-                } else {
-                    // The data was compressed above
-                    return "X4" + Base64.encode(gzipByteArray, false);
-                }
+                // The data was compressed above
+                return "X2" + SecureUtils.encrypt(propertyContext, encryptionPassword, gzipByteArray);
             }
-        } catch (Throwable e) {
-            try {
-                if (deflater != null)
-                    DEFLATER_POOL.invalidateObject(deflater);
-            } catch (Exception e1) {
-                throw new OXFException(e1);
-            }
-            throw new OXFException(e);
-        } finally {
-            try {
-                if (deflater != null) {
-                    deflater.reset();
-                    DEFLATER_POOL.returnObject(deflater);
-                }
-            } catch (Exception e) {
-                throw new OXFException(e);
+        } else {
+            // No encryption
+            if (gzipByteArray == null) {
+                // The data was not compressed above
+                return "X3" + Base64.encode(bytesToEncode, false);
+            } else {
+                // The data was compressed above
+                return "X4" + Base64.encode(gzipByteArray, false);
             }
         }
     }
@@ -585,104 +547,6 @@ public class XFormsUtils {
         return valueRepresentation;
     }
 
-    private static class DeflaterPoolableObjectFactory implements PoolableObjectFactory {
-        public Object makeObject() throws Exception {
-            indentedLogger.logDebug("", "creating new Deflater");
-            return new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-        }
-
-        public void destroyObject(Object object) throws Exception {
-        }
-
-        public boolean validateObject(Object object) {
-            return true;
-        }
-
-        public void activateObject(Object object) throws Exception {
-        }
-
-        public void passivateObject(Object object) throws Exception {
-        }
-    }
-
-    private static class DeflaterGZIPOutputStream extends DeflaterOutputStream {
-        public DeflaterGZIPOutputStream(Deflater deflater, OutputStream out, int size) throws IOException {
-            super(out, deflater, size);
-            writeHeader();
-            crc.reset();
-        }
-
-        private boolean closed = false;
-        protected CRC32 crc = new CRC32();
-        private final static int GZIP_MAGIC = 0x8b1f;
-        private final static int TRAILER_SIZE = 8;
-
-        public synchronized void write(byte[] buf, int off, int len) throws IOException {
-            super.write(buf, off, len);
-            crc.update(buf, off, len);
-        }
-
-        public void finish() throws IOException {
-            if (!def.finished()) {
-                def.finish();
-                while (!def.finished()) {
-                    int len = def.deflate(buf, 0, buf.length);
-                    if (def.finished() && len <= buf.length - TRAILER_SIZE) {
-                        writeTrailer(buf, len);
-                        len = len + TRAILER_SIZE;
-                        out.write(buf, 0, len);
-                        return;
-                    }
-                    if (len > 0)
-                        out.write(buf, 0, len);
-                }
-                byte[] trailer = new byte[TRAILER_SIZE];
-                writeTrailer(trailer, 0);
-                out.write(trailer);
-            }
-        }
-
-        public void close() throws IOException {
-            if (!closed) {
-                finish();
-                out.close();
-                closed = true;
-            }
-        }
-
-        private final static byte[] header = {
-                (byte) GZIP_MAGIC,
-                (byte) (GZIP_MAGIC >> 8),
-                Deflater.DEFLATED,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-        };
-
-        private void writeHeader() throws IOException {
-            out.write(header);
-        }
-
-        private void writeTrailer(byte[] buf, int offset) {
-            writeInt((int) crc.getValue(), buf, offset);
-            writeInt(def.getTotalIn(), buf, offset + 4);
-        }
-
-        private void writeInt(int i, byte[] buf, int offset) {
-            writeShort(i & 0xffff, buf, offset);
-            writeShort((i >> 16) & 0xffff, buf, offset + 2);
-        }
-
-        private void writeShort(int s, byte[] buf, int offset) {
-            buf[offset] = (byte) (s & 0xff);
-            buf[offset + 1] = (byte) ((s >> 8) & 0xff);
-        }
-    }
-
     public static org.w3c.dom.Document decodeXMLAsDOM(PipelineContext pipelineContext, String encodedXML) {
         try {
             return TransformerUtils.dom4jToDomDocument(XFormsUtils.decodeXML(pipelineContext, encodedXML));
@@ -731,51 +595,42 @@ public class XFormsUtils {
 //    }
 
     public static byte[] decodeBytes(PropertyContext propertyContext, String encoded, String encryptionPassword) {
-        try {
-            // Get raw text
-            byte[] resultBytes;
-            {
-                final String prefix = encoded.substring(0, 2);
-                final String encodedString = encoded.substring(2);
+        // Get raw text
+        byte[] resultBytes;
+        {
+            final String prefix = encoded.substring(0, 2);
+            final String encodedString = encoded.substring(2);
 
-                final byte[] resultBytes1;
-                final byte[] gzipByteArray;
-                if (prefix.equals("X1")) {
-                    // Encryption + uncompressed
-                    resultBytes1 = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
-                    gzipByteArray = null;
-                } else if (prefix.equals("X2")) {
-                    // Encryption + compressed
-                    resultBytes1 = null;
-                    gzipByteArray = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
-                } else if (prefix.equals("X3")) {
-                    // No encryption + uncompressed
-                    resultBytes1 = Base64.decode(encodedString);
-                    gzipByteArray = null;
-                } else if (prefix.equals("X4")) {
-                    // No encryption + compressed
-                    resultBytes1 = null;
-                    gzipByteArray = Base64.decode(encodedString);
-                } else {
-                    throw new OXFException("Invalid prefix for encoded string: " + prefix);
-                }
-
-                // Decompress if needed
-                if (gzipByteArray != null) {
-                    final ByteArrayInputStream compressedData = new ByteArrayInputStream(gzipByteArray);
-                    final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
-                    final ByteArrayOutputStream binaryData = new ByteArrayOutputStream(1024);
-                    NetUtils.copyStream(gzipInputStream, binaryData);
-                    resultBytes = binaryData.toByteArray();
-                } else {
-                    resultBytes = resultBytes1;
-                }
+            final byte[] resultBytes1;
+            final byte[] gzipByteArray;
+            if (prefix.equals("X1")) {
+                // Encryption + uncompressed
+                resultBytes1 = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
+                gzipByteArray = null;
+            } else if (prefix.equals("X2")) {
+                // Encryption + compressed
+                resultBytes1 = null;
+                gzipByteArray = SecureUtils.decrypt(propertyContext, encryptionPassword, encodedString);
+            } else if (prefix.equals("X3")) {
+                // No encryption + uncompressed
+                resultBytes1 = Base64.decode(encodedString);
+                gzipByteArray = null;
+            } else if (prefix.equals("X4")) {
+                // No encryption + compressed
+                resultBytes1 = null;
+                gzipByteArray = Base64.decode(encodedString);
+            } else {
+                throw new OXFException("Invalid prefix for encoded string: " + prefix);
             }
-            return resultBytes;
 
-        } catch (IOException e) {
-            throw new OXFException(e);
+            // Decompress if needed
+            if (gzipByteArray != null) {
+                resultBytes = XFormsCompressor.uncompressBytes(gzipByteArray);
+            } else {
+                resultBytes = resultBytes1;
+            }
         }
+        return resultBytes;
     }
 
     public static String retrieveSrcValue(String src) throws IOException {

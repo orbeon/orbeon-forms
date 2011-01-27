@@ -207,7 +207,7 @@
 
     <!-- All form resources -->
     <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
-                     xxforms:readonly="true" xxforms:shared="application"/>
+                     xxforms:readonly="true" xxforms:cache="true"/>
     <!--<xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"-->
                      <!--xxforms:readonly="false"/>-->
 
@@ -675,7 +675,7 @@
     <xforms:submission id="fb-load-components" serialization="none"
                        method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application={xxforms:bind('application-name-bind')}"
                        replace="instance" instance="fb-components-instance"
-                       xxforms:readonly="true" xxforms:shared="document"/>
+                       xxforms:readonly="true" xxforms:cache="true"/>
 
     <xforms:instance id="fb-components-instance">
         <!-- This contains the components available for the currently edited form -->

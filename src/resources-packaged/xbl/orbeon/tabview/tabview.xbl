@@ -133,9 +133,9 @@
                                                     <xxforms:script ev:event="fr-toggle" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
                                                 </xsl:if>
                                                 <!-- Listen on xforms-readonly and xforms-readwrite for this fr:tab -->
-                                                <xxforms:script ev:event="xforms-readonly">YAHOO.xbl.fr.TabView.instance(this).readonly(this);</xxforms:script>
-                                                <xxforms:script ev:event="xforms-readwrite">YAHOO.xbl.fr.TabView.instance(this).readwrite(this);</xxforms:script>
-                                                <xxforms:script ev:event="xforms-focus"  ev:phase="capture">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
+                                                <xxforms:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).readonly(this);</xxforms:script>
+                                                <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).readwrite(this);</xxforms:script>
+                                                <xxforms:script ev:event="xforms-focus" ev:phase="capture">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
 
                                                 <xsl:apply-templates select="node() except fr:label"/>
 

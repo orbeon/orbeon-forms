@@ -142,8 +142,9 @@
                                     </xforms:dispatch>
 
                                     <!-- Open label editor for newly inserted section -->
-                                    <xforms:toggle case="fr-inplace-fb-top-level-section-input-open-edit"/>
-                                    <xforms:setfocus control="fr-inplace-fb-top-level-section-input-open-input"/>
+                                    <!-- TODO: these ids don't exist anymore; instead, dispatch to fr-inplace-fb-top-level-section-editable-title -->
+                                    <!--<xforms:toggle case="fr-inplace-fb-top-level-section-input-open-edit"/>-->
+                                    <!--<xforms:setfocus control="fr-inplace-fb-top-level-section-input-open-input"/>-->
 
                                 </xforms:action>
                             </fr:button>

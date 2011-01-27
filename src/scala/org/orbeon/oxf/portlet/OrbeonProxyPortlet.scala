@@ -175,9 +175,6 @@ class OrbeonProxyPortlet extends GenericPortlet {
                     // Write content
                     Net.copyStream(request.getPortletInputStream, connection.getOutputStream)
 
-                    val contentType = connection.getHeaderField("Content-Type")
-                    response.setContentType(contentType)
-
                     propagateHeaders(response, connection)
                     getRemoteSessionId(request, connection)
 
@@ -214,9 +211,8 @@ class OrbeonProxyPortlet extends GenericPortlet {
     // Propagate useful headers from Form Runner server to client
     private def propagateHeaders(response: ResourceResponse, connection: HttpURLConnection): Unit =
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
-            (name => (name, connection.getHeaderField(name))) filter
-                (_._2 ne null) foreach
-                    (header => response.setProperty(header._1, header._2))
+            (name => (name, connection.getHeaderField(name))) foreach
+                { case (name, value: String) => response.setProperty(name, value) }
 
     // If we know about the remote session id, set it on the connection to Form Runner
     private def setRemoteSessionId(request: PortletRequest, connection: HttpURLConnection): Unit =

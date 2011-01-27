@@ -911,6 +911,12 @@ public class URLGenerator extends ProcessorImpl {
         public List<URIReference> references = new ArrayList<URIReference>();
     }
 
+    // The idea of URLGeneratorState is that, during a pipeline execution with a given PipelineContext, there is typically:
+    //
+    // o a call to getValidity()
+    // o followed by a call to read()
+    //
+    // In order to avoid dereferencing the URL twice, the handler is stored in the state so it can be accessed by read().
     private class URLGeneratorState {
 
         private ResourceHandler mainResourceHandler;

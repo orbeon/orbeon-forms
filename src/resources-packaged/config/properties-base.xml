@@ -25,7 +25,7 @@
 
     <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$"/>
     <!-- TODO: Uncomment this properties once we are confident -->
-    <!--<property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms)/.*$"/>-->
+    <!--<property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms|ops|config)/.*$"/>-->
     <!--<property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>-->
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
     <!-- Support "servlet" or "wsrp" (or "portlet2" for backward compatibility") -->

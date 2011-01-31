@@ -28,6 +28,8 @@
 
       xxforms:external-events="show-fb-test-dialog"
       xxforms:noscript-support="false"
+      xxforms:xpath-analysis="true"
+
       id="fr-form-model">
 
     <!-- Variable pointing to the current language -->

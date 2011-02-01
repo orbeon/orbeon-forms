@@ -1076,8 +1076,9 @@
                                         template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
 
                                         // Get the span that contains the one span per checkbox/radio
+                                        // This is the first span that has no class on it (we don't want to get a span for label, hint, help, alert)
                                         var spanContainer = ORBEON.util.Utils.isNewXHTMLLayout()
-                                            ? documentElement.getElementsByTagName("span")[0]
+                                            ? _.detect(documentElement.getElementsByTagName("span"), function(span) { return span.className == ""; })
                                             : documentElement;
 
                                         // Remove spans and store current checked value

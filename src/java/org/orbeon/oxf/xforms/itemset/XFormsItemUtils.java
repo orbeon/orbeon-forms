@@ -90,10 +90,9 @@ public class XFormsItemUtils {
      *
      * @param propertyContext       current context
      * @param select1Control        control to evaluate
-     * @param setBinding            whether this method must set the evaluation binding (false if it is already set)
      * @return                      Itemset
      */
-    public static Itemset evaluateItemset(final PropertyContext propertyContext, final XFormsSelect1Control select1Control, boolean setBinding) {
+    public static Itemset evaluateItemset(final PropertyContext propertyContext, final XFormsSelect1Control select1Control) {
 
         final SelectionControl staticControl = (SelectionControl) select1Control.getElementAnalysis();
 
@@ -106,14 +105,11 @@ public class XFormsItemUtils {
 
         final Itemset result = new Itemset();
 
-        // Set binding on this control if required
+        // Set binding on this control, after saving the current context because the context stack must
+        // remain unmodified.
         final XFormsContextStack contextStack = container.getContextStack();
-        if (setBinding)
-            contextStack.setBinding(select1Control);
-
-        // TODO: Work on dependencies
-//        final List existingItems = containingDocument.getXFormsControls().getConstantItems(getOriginalId());
-//        final boolean[] mayReuse = new boolean[] { existingItems != null };
+        final XFormsContextStack.BindingContext savedBindingContext = contextStack.getCurrentBindingContext();
+        contextStack.setBinding(select1Control);
 
         final boolean isEncryptItemValues = select1Control.isEncryptItemValues();
         Dom4jUtils.visitSubtree(select1Control.getControlElement(), new Dom4jUtils.VisitorListener() {
@@ -363,6 +359,9 @@ public class XFormsItemUtils {
                 return false;
             }
         });
+
+        // Make sure to restore the stack
+        contextStack.setBinding(savedBindingContext);
 
         // Prune non-relevant children
         result.pruneNonRelevantChildren();

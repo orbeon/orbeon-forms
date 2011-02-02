@@ -58,7 +58,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         final String newValue;
         {
             // All items
-            final Itemset itemset = getItemset(propertyContext, true);
+            final Itemset itemset = getItemset(propertyContext);
             // Current values in the instance
             final Set<String> instanceValues = tokenize(propertyContext, controlValue, false);
 
@@ -133,7 +133,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             updatedValue = internalValue;
         } else {
             // Values in the itemset
-            final Itemset itemset = getItemset(propertyContext, true);
+            final Itemset itemset = getItemset(propertyContext);
             if (itemset != null) {
 
                 // Current values in the instance

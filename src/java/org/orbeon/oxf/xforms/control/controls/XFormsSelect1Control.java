@@ -70,7 +70,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
         @Override
         protected Itemset evaluateValue(PropertyContext propertyContext) {
-            return XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this, true);
+            return XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this);
         }
 
         @Override
@@ -89,7 +89,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         // Evaluate itemsets only if restoring dynamic state
         // NOTE: This doesn't sound like it is the right place to do this, does it?
         if (containingDocument.isRestoringDynamicState(propertyContext))
-            getItemset(propertyContext, false);
+            getItemset(propertyContext);
     }
 
     public SelectionControl getSelectionControl() {
@@ -149,7 +149,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
         if (control != null && control.isRelevant()) {
             // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
-            return control.getItemset(pipelineContext, true);
+            return control.getItemset(pipelineContext);
         } else if (isStaticItemset(containingDocument, prefixedId)) {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
@@ -164,10 +164,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * Get this control's itemset.
      *
      * @param propertyContext   current context
-     * @param setBinding        whether to set the current binding on the control first
      * @return                  itemset
      */
-    public Itemset getItemset(PropertyContext propertyContext, final boolean setBinding) {
+    public Itemset getItemset(PropertyContext propertyContext) {
         try {
             // Non-relevant control does not return an itemset
             if (!isRelevant())
@@ -178,7 +177,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
                 Itemset constantItemset =  containingDocument.getControls().getConstantItems(getPrefixedId());
                 if (constantItemset == null) {
-                    constantItemset = XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this, setBinding);
+                    constantItemset = XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this);
                     containingDocument.getControls().setConstantItems(getPrefixedId(), constantItemset);
                 }
                 return constantItemset;
@@ -257,7 +256,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             final String controlValue = getValue(propertyContext);
 
             // Iterate over all the items
-            final Itemset itemset = getItemset(propertyContext, true);
+            final Itemset itemset = getItemset(propertyContext);
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
             if (itemset != null) {
@@ -360,7 +359,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             } else {
                 // If the itemsets changed, then we need to send an update
                 // NOTE: This also covers the case where the control was and is non-relevant
-                return !Itemset.compareItemsets(otherSelect1Control.getItemset(propertyContext, true), getItemset(propertyContext, true));
+                return !Itemset.compareItemsets(otherSelect1Control.getItemset(propertyContext), getItemset(propertyContext));
             }
         }
     }
@@ -375,7 +374,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         if (mustSendItemsetUpdate(pipelineContext, (XFormsSelect1Control) other)) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", XFormsUtils.namespaceId(containingDocument, getEffectiveId())});
             {
-                final Itemset itemset = getItemset(pipelineContext, true);
+                final Itemset itemset = getItemset(pipelineContext);
                 if (itemset != null) {
                     final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, getLocationData());
                     if (result.length() > 0)

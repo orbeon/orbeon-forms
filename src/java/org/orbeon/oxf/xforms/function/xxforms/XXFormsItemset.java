@@ -18,7 +18,9 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ExpressionTool;
+import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
@@ -44,7 +46,7 @@ public class XXFormsItemset extends XFormsFunction {
 
             // Obtain itemset
             final PropertyContext pipelineContext = getOrCreatePipelineContext();
-            final Itemset itemset = select1Control.getItemset(pipelineContext, true);
+            final Itemset itemset = select1Control.getItemset(pipelineContext);
 
             final String controlValueForSelection = selected ? select1Control.getValue(pipelineContext) : null;
             final boolean isMultiple = select1Control instanceof XFormsSelectControl;

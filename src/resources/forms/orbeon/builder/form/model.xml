@@ -101,7 +101,7 @@
             <xxforms:variable name="msie" select="(for $t in tokenize(lower-case($user-agent), '[;\(\)]') return normalize-space($t))[starts-with(., 'msie')][1]"/>
             <xxforms:variable name="ie-version" select="xs:integer(substring-before(normalize-space(substring-after($msie, 'msie')), '.'))"/>
             <xforms:setvalue ref="instance('fb-user-agent-instance')/ie-version" value="$ie-version"/>
-            <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version = (7, 8)"/>
+            <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version gt 6"/>
         </xforms:action>
 
         <!--  I18n -->

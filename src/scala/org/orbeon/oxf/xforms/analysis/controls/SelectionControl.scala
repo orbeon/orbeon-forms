@@ -39,7 +39,6 @@ trait SelectionControl extends SimpleElementAnalysis {
     val isMultiple = element.getName == "select"
     val isOpenSelection = element.attributeValue("selection") == "open"
     val isNorefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME) == "false"
-    val isFull = element.attributeValue(XFormsConstants.APPEARANCE_QNAME) == "full"
 
     val isEncryptValues = {
         val localEncryptItemValues = element.attributeValue(XFormsConstants.ENCRYPT_ITEM_VALUES)
@@ -170,8 +169,7 @@ trait SelectionControl extends SimpleElementAnalysis {
                         val labelElement = element.element(XFormsConstants.LABEL_QNAME)
                         if (labelElement eq null)
                             throw new ValidationException("xforms:item must contain an xforms:label element.", ElementAnalysis.createLocationData(element))
-                        val containsHTML = Array(false)
-                        val label = XFormsUtils.getStaticChildElementValue(labelElement, isFull, containsHTML)
+                        val label = XFormsUtils.getStaticChildElementValue(labelElement, false, null)
 
                         val valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME)
                         if (valueElement eq null)
@@ -179,7 +177,7 @@ trait SelectionControl extends SimpleElementAnalysis {
                         val value = XFormsUtils.getStaticChildElementValue(valueElement, false, null)
 
                         val attributes = getAttributes(element)
-                        currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
+                        currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)))
 
                     case XFormsConstants.ITEMSET_QNAME => // xforms:itemset
 
@@ -194,7 +192,7 @@ trait SelectionControl extends SimpleElementAnalysis {
                             assert(label ne null)
 
                             val attributes = getAttributes(element)
-                            val newContainer = new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
+                            val newContainer = new Item(isMultiple, isEncryptValues, attributes, label, null)
                             currentContainer.addChildItem(newContainer);
                             currentContainer = newContainer
                         }

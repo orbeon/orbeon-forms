@@ -57,7 +57,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private boolean isTree;
     private boolean isMenu;
 
-    private static final Item EMPTY_TOP_LEVEL_ITEM = new Item(false, false, null, new Item.Label("", false), "");
+    private static final Item EMPTY_TOP_LEVEL_ITEM = new Item(false, false, null, "", "");
 
     public XFormsSelect1Handler() {
         super(false);
@@ -295,8 +295,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                     reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
 
-                                    assert !item.getLabel().isHTML();
-                                    final String text = item.getLabel().getLabel();
+                                    final String text = item.getLabel();
                                     contentHandler.characters(text.toCharArray(), 0, text.length());
 
                                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
@@ -369,8 +368,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                                 public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
 
-                                	assert !item.getLabel().isHTML();
-                                    final String label = item.getLabel().getLabel();
+                                    final String label = item.getLabel();
                                     final String value = item.getValue();
 
                                     if (value == null) {
@@ -497,7 +495,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             handleItemFull(pipelineContext, baseHandler, contentHandler, reusableAttributes, attributes,
                     xhtmlPrefix, spanQName, containingDocument, null, effectiveId, itemEffectiveId, isMultiple, fullItemType,
                     new Item(isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
-                            new Item.Label("$xforms-template-label$", false), "$xforms-template-value$"), true);
+                            "$xforms-template-label$", "$xforms-template-value$"), true);
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
@@ -531,8 +529,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
         {
-            final Item.Label itemLabel = item.getLabel();
-            if (itemLabel != null && !itemLabel.getLabel().isEmpty()) { // empty only for xforms|input:xxforms-type(xs:boolean)
+            final String itemLabel = item.getLabel();
+            if (itemLabel != null) { // null only for xforms|input:xxforms-type(xs:boolean)
                 reusableAttributes.clear();
                 outputLabelForStart(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", false);
             }
@@ -570,7 +568,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             }
 
             if (itemLabel != null) { // null only for xforms|input:xxforms-type(xs:boolean)
-                outputLabelForEnd(handlerContext, "label", itemLabel.getLabel(), itemLabel.isHTML());
+                outputLabelForEnd(handlerContext, "label", itemLabel, false);// TODO: may be HTML for full appearance
             }
         }
 
@@ -605,8 +603,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         // xhtml:option
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName, optionAttributes);
-        assert !item.getLabel().isHTML();
-        final String label = item.getLabel().getLabel();
+        final String label = item.getLabel();
         if (label != null)
             contentHandler.characters(label.toCharArray(), 0, label.length());
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName);

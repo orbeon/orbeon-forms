@@ -577,18 +577,21 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             jsDateToformatDisplayTime: function(jsDate) {
-                if (ORBEON.util.Properties.formatInputTime.get() == "[H]:[m]:[s]") {
+                var formatInputTime = ORBEON.util.Properties.formatInputTime.get();
+                if (formatInputTime == "[H]:[m]:[s]") {
                     // EU time
                     return jsDate.getHours() + ":"
                             + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
                             + ORBEON.util.DateTime._padAZero(jsDate.getSeconds());
                 } else {
-                    // Default: [h]:[m]:[s] [P]
-                    // US time
+                    // US time: [h]:[m]:[s] [P] or [h]:[m]:[s] [P,2-2]
+                    var amPm = ORBEON.util.String.endsWith(formatInputTime, "-2]")
+                        ? (jsDate.getHours() < 12 ? " am" : " pm")
+                        : (jsDate.getHours() < 12 ? " a.m." : " p.m.");
                     return (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12) + ":"
                             + ORBEON.util.DateTime._padAZero(jsDate.getMinutes()) + ":"
                             + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())
-                            + (jsDate.getHours() < 12 ? " a.m." : " p.m.");
+                            + amPm;
                 }
             },
 

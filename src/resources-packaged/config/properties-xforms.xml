@@ -66,7 +66,7 @@
 
 
     <property as="xs:string"  name="oxf.xforms.format.input.date"                       value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
-    <property as="xs:string"  name="oxf.xforms.format.input.time"                       value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [H]:[m]:[s] -->
+    <property as="xs:string"  name="oxf.xforms.format.input.time"                       value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
 
     <!-- XForms cache configuration -->
     <property as="xs:string"  name="oxf.xforms.state-handling"                          value="server"/>

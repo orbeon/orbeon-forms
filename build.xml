@@ -969,4 +969,15 @@
         <xdb:shutdown configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" user="admin" password=""/>
     </target>
 
+    <target name="exist-import-sample-data-to-www" depends="exist-task">
+        <!-- Store data -->
+        <xdb:store uri="xmldb:exist://www.orbeon.com/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="orbeon" password="secret">
+            <fileset dir="data">
+                <include name="orbeon/**"/>
+                <!-- TODO: Some examples forms in the builder -->
+                <exclude name="orbeon/fr/orbeon/builder/**"/>
+            </fileset>
+        </xdb:store>
+    </target>
+
 </project>

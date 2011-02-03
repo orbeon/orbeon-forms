@@ -704,7 +704,7 @@
     </xforms:action>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->
-    <xforms:action ev:observer="fr-view fb-editor-switch" ev:event="DOMFocusIn xforms-value-changed">
+    <xforms:action ev:observer="fr-view" ev:event="DOMFocusIn">
         <xforms:toggle case="fr-message-none"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>

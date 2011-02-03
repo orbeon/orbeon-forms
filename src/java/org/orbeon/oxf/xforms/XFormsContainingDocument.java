@@ -381,6 +381,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return containerType;
     }
 
+    public boolean isPortletContainer() {
+        return "portlet".equals(containerType);
+    }
+
     /**
      * Return the container namespace that generated the XForms page. Always "" for servlets.
      */
@@ -727,14 +731,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Add an XForms load to send to the client.
      */
-    public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad, boolean isShowProgress) {
+    public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isShowProgress) {
 
         if (activeSubmissionFirstPass != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", activeSubmissionFirstPass.getLocationData());
 
         if (loadsToRun == null)
             loadsToRun = new ArrayList<Load>();
-        loadsToRun.add(new Load(resource, target, urlType, isReplace, isPortletLoad, isShowProgress));
+        loadsToRun.add(new Load(resource, target, urlType, isReplace, isShowProgress));
     }
 
     /**
@@ -749,15 +753,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         private final String target;
         private final String urlType;
         private final boolean isReplace;
-        private final boolean isPortletLoad;
         private final boolean isShowProgress;
 
-        public Load(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad, boolean isShowProgress) {
+        public Load(String resource, String target, String urlType, boolean isReplace, boolean isShowProgress) {
             this.resource = resource;
             this.target = target;
             this.urlType = urlType;
             this.isReplace = isReplace;
-            this.isPortletLoad = isPortletLoad;
             this.isShowProgress = isShowProgress;
         }
 
@@ -775,10 +777,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
         public boolean isReplace() {
             return isReplace;
-        }
-
-        public boolean isPortletLoad() {
-            return isPortletLoad;
         }
 
         public boolean isShowProgress() {
@@ -982,7 +980,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                     pathInfo = resource;
                     parameters = null;
                 }
-                externalContext.getResponse().sendRedirect(externalContext.getResponse().rewriteRenderURL(pathInfo), parameters, false, false);
+                externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false);
             } catch (IOException e) {
                 throw new ValidationException(e, getLocationData());
             }

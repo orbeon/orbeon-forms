@@ -18,7 +18,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -90,7 +93,7 @@ public class XFormsLoadAction extends XFormsAction {
                                                Element currentElement, boolean doReplace, String value, String target,
                                                String urlType, boolean urlNorewrite, boolean isShowProgress) {
 
-        final boolean isPortlet = "portlet".equals(containingDocument.getContainerType());
+        final boolean isPortlet = containingDocument.isPortletContainer();
         final String externalURL;
         if (value.startsWith("#") || urlNorewrite) {
             // Keep value unchanged if it's just a fragment or if we are explicitly disabling rewriting
@@ -108,7 +111,7 @@ public class XFormsLoadAction extends XFormsAction {
                 externalURL = XFormsUtils.resolveRenderURL(propertyContext, containingDocument, isPortlet, currentElement, value);
             }
         }
-        containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortlet, isShowProgress);
+        containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isShowProgress);
         return externalURL;
     }
 }

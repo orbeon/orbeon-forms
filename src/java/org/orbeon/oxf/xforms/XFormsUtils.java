@@ -701,9 +701,6 @@ public class XFormsUtils {
         final String resolvedURIString = resolvedURI.toString();
 
         final String externalURL;
-        // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
-        // runs in a servlet when processing these events!
-        // TODO: is this the case with JSR-268? Don't/can't we run xforms-server in the portlet?
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
             externalURL = NetUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIString, null, null);
@@ -775,9 +772,7 @@ public class XFormsUtils {
         } else if ("href".equals(attributeName)) {
 
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
-
-            final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, isPortletLoad, element, attributeValue);
+            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, containingDocument.isPortletContainer(), element, attributeValue);
         } else {
             rewrittenValue = attributeValue;
         }

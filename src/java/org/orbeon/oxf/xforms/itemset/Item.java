@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -29,7 +31,7 @@ public class Item implements ItemContainer {
 
     private final boolean isEncryptValue; // whether this item is part of an open selection control
     private final Map<QName, String> attributes;
-    private final String label;
+    private final Label label;
     private final String value;
 
     private int level;
@@ -37,7 +39,7 @@ public class Item implements ItemContainer {
     private ItemContainer parent;
     private List<Item> children;
 
-    public Item(boolean isMultiple, boolean isEncryptValue, Map<QName, String> attributes, String label, String value) {
+    public Item(boolean isMultiple, boolean isEncryptValue, Map<QName, String> attributes, Label label, String value) {
 
         // NOTE: As of 2010-08-18, label can be null in these cases:
         //
@@ -102,7 +104,7 @@ public class Item implements ItemContainer {
         return attributes;
     }
 
-    public String getLabel() {
+    public Label getLabel() {
         return label;
     }
 
@@ -119,7 +121,7 @@ public class Item implements ItemContainer {
     }
 
     public String getExternalJSLabel() {
-        return label == null? "" : XFormsUtils.escapeJavaScript(label);
+        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? label.getLabel() : XMLUtils.escapeXMLMinimal(value)); //TODO check if we need to rewrite URLs?
     }
 
     /**
@@ -207,5 +209,24 @@ public class Item implements ItemContainer {
         sb.append(getValue());
 
         return sb.toString();
+    }
+    
+    public static class Label {
+    	
+    	private final String label;
+    	private final boolean isHTML;
+		
+		public Label(String label, boolean isHTML) {
+			this.label = label;
+			this.isHTML = isHTML;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public boolean isHTML() {
+			return isHTML;
+		}
     }
 }

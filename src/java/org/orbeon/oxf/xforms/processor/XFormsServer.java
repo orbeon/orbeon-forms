@@ -448,7 +448,7 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         if (loads != null && loads.size() > 0) {
                             for (XFormsContainingDocument.Load load: loads) {
-                                if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
+                                if (load.isReplace() && containingDocument.isPortletContainer() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
                                     // We need to submit the event so that the portlet can load the new path
                                     final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
                                     eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
@@ -578,7 +578,7 @@ public class XFormsServer extends ProcessorImpl {
                 {
                     final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
                     if (loads != null && loads.size() > 0) {
-                        outputLoadsInfo(ch, loads);
+                        outputLoadsInfo(ch, containingDocument, loads);
                     }
                 }
 
@@ -695,9 +695,9 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputLoadsInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Load> loads) {
+    public static void outputLoadsInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Load> loads) {
         for (XFormsContainingDocument.Load load: loads) {
-            if (!(load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType()))) {
+            if (!(load.isReplace() && containingDocument.isPortletContainer() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType()))) {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
                         new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new", "show-progress", load.isShowProgress() ? null : "false" });
             }

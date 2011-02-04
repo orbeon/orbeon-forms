@@ -80,7 +80,11 @@
                                       action="http://www.google.com/custom">
                                     <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
                                     |
-                                    <xhtml:a href="/doc/">Documentation</xhtml:a>
+                                    <xhtml:a href="http://wiki.orbeon.com/forms/">Orbeon Wiki</xhtml:a>
+                                    |
+                                    <xhtml:a href="/doc/">Local Documentation</xhtml:a>
+                                    |
+                                    Demo Forms &amp; Apps
                                     |
                                     <xhtml:span style="white-space: nowrap">
                                         Search:

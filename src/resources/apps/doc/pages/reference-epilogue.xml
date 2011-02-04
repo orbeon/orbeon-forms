@@ -584,8 +584,8 @@
         <section>
             <title>XForms Processing</title>
             <p>
-                The Orbeon Forms built-in <a href="reference-xforms-guide">XForms engine</a> allows you to write
-                not only raw XHTML, but also supports XForms 1.0. To achieve this, the XForms engine
+                The Orbeon Forms built-in XForms engine allows you to write
+                not only raw XHTML, but also supports XForms 1.1. To achieve this, the XForms engine
                 rewrites XHTML + XForms into XHTML + JavaScript + CSS. This transformation also
                 occurs in the epilogue, as mentioned <a href="#standard-epilogue">above</a>.
             </p>

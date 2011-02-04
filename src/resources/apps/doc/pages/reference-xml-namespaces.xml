@@ -82,7 +82,7 @@
                         <code>xxforms:appearance</code>
                     </td>
                     <td style="white-space: nowrap">
-                        <a href="/doc/reference-xforms-guide">Orbeon Forms XForms Reference</a>
+
                     </td>
                 </tr>
                 <tr>
@@ -394,9 +394,7 @@
                         <code>xforms:input</code>
                     </td>
                     <td style="white-space: nowrap">
-                        <a href="http://www.w3.org/TR/2003/REC-xforms-20031014/">XForms 1.0</a>
-                        <br/>
-                        <a href="/doc/reference-xforms-guide">Orbeon Forms XForms Reference</a>
+                        <a href="http://www.w3.org/TR/xforms11/">XForms 1.1</a>
                     </td>
                 </tr>
                 <tr>
@@ -409,7 +407,7 @@
                         <code>ev:event</code>
                     </td>
                     <td style="white-space: nowrap">
-                        <a href="/doc/reference-xforms-guide">Orbeon Forms XForms Reference</a>
+                        <a href="http://www.w3.org/TR/xforms11/">XForms 1.1</a>
                     </td>
                 </tr>
                 <tr>

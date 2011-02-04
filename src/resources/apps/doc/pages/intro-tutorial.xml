@@ -14,13 +14,14 @@
   -->
 <document>
     <header>
-        <title>Orbeon Forms Tutorial</title>
+        <title>Orbeon Forms XForms Tutorial</title>
     </header>
     <body>
         <section>
             <title>What is this?</title>
             <p>
-                This is the tutorial for Orbeon Forms version 3.6.
+                This is the tutorial for Orbeon Forms's XForms features. It is aimed at programmers who want to program
+                Orbeon Forms, as opposed to analysis who want to use <a href="http://www.orbeon.com/forms/orbeon-form-builder">Form Builder</a>.
             </p>
             <p>
                 If you have questions, issues or suggestions related to this tutorial, please send a message to the
@@ -52,12 +53,12 @@
                 <ul>
                     <li>
                         <p>
-                            Mozilla Firefox 1.5 or 2 or greater.
+                            Mozilla Firefox 3.6 or greater.
                         </p>
                     </li>
                     <li>
                         <p>
-                            Safari 2 or greater.
+                            Safari 4 or greater.
                         </p>
                     </li>
                     <li>
@@ -67,12 +68,12 @@
                     </li>
                     <li>
                         <p>
-                            Opera 9, 10 or greater.
+                            Opera 10 or greater.
                         </p>
                     </li>
                     <li>
                         <p>
-                            Internet Explorer 6, 7, 8 or greater.
+                            Internet Explorer 8 or greater.
                         </p>
                     </li>
                 </ul>
@@ -141,12 +142,14 @@
                     Java provides the cross-platform environment in which Orbeon Forms runs.
                 </p>
                 <p>
-                    If you don't have Java installed yet, download it from the Sun web site at <a
-                    href="http://java.sun.com/javase/downloads/index.jsp">http://java.sun.com/javase/downloads/index.jsp</a>.
-                    Sun provides Windows, Linux and Solaris versions. If you use a Mac with Mac OS X, you probably have
+                    If you don't have Java installed yet, download it from <a
+                    href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a>.
+                </p>
+                <p>
+                    <i>NOTE: If you use a Mac with Mac OS X, you probably have
                     Java already installed on your machine, but if not visit <a
                     href="http://www.apple.com/macosx/features/java/">http://www.apple.com/macosx/features/java/</a>.
-                    Then follow the instructions to install Java.
+                    Then follow the instructions to install Java.</i>
                 </p>
             </section>
             <a name="installing-tomcat"/>
@@ -159,8 +162,8 @@
                 <ol>
                     <li>
                         <p>
-                            Download Tomcat 5.5 from the Apache web site at <a
-                            href="http://tomcat.apache.org/download-55.cgi">http://tomcat.apache.org/download-55.cgi</a>.
+                            Download Tomcat 6 from the Apache web site at <a
+                            href="http://tomcat.apache.org/download-60.cgi">http://tomcat.apache.org/download-60.cgi</a>.
                         </p>
                     </li>
                     <li>
@@ -251,12 +254,6 @@
                     You should see the Orbeon Forms welcome page:
                 </p>
                 <figure src="../apps/doc/images/tutorial/02.png"/>
-                <p>
-                    You can now navigate the list of sample applications listed on the left side. You can see the source
-                    code of each application directly in your web browser by selecting the "View Source Code" tab at
-                    the top of the page to open up the Orbeon Forms Source Viewer:
-                </p>
-                <figure src="../apps/doc/images/tutorial/00.png"/>
             </section>
         </section>
         <a name="hello-application"/>
@@ -277,11 +274,6 @@
                     message underneath saying "Hello, Joe!".
                 </p>
                 <figure src="../apps/doc/images/tutorial/03.png"/>
-                <p>
-                    You can directly view the source code from your web browser by selecting the "View Source Code"
-                    tab. There you see:
-                </p>
-                <figure src="../apps/doc/images/tutorial/04.png"/>
                 <ul>
                     <li>
                         <p>
@@ -2593,8 +2585,8 @@
             </ul>
             <p>
                 You have now covered a good part of the basics of Orbeon Forms. You can now look at the <a
-                href="/">Orbeon Forms example applications</a> and the <a href="/doc/">rest of the Orbeon Forms
-                documentation</a>!
+                href="/">Orbeon Forms example applications</a> and the <a href="http://wiki.orbeon.com/forms/">rest of
+                the Orbeon Forms documentation</a>!
             </p>
 
         <!--

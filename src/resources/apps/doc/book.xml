@@ -14,6 +14,11 @@
 <book software="Orbeon Forms" title="Orbeon Forms User Guide" copyright="Orbeon, Inc">
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
+        <menu-item label="Installing" href="http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing"/>
+        <menu-item label="Orbeon XForms Tutorial" href="intro-tutorial"/>
+        <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
+        <menu-item label="Frequently Asked Questions" href="http://wiki.orbeon.com/forms/orbeon-forms-faq"/>
+
         <menu label="Changes">
             <menu-item label="Version 3.9" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-39"/>
             <menu-item label="Version 3.8" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38"/>
@@ -23,18 +28,12 @@
             <menu-item label="Version 3.5" href="home-changes-35" printed-book="false"/>
             <menu-item label="Version 3.0" href="home-changes-30" printed-book="false"/>
         </menu>
-        <menu-item label="Installing" href="http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing"/>
-        <menu-item label="Orbeon Forms Tutorial" href="intro-tutorial"/>
+    </menu>
+    <menu label="XForms Documentation">
         <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
-        <menu-item label="Frequently Asked Questions" href="http://wiki.orbeon.com/forms/orbeon-forms-faq"/>
+        <menu-item label="Orbeon XForms Tutorial" href="intro-tutorial"/>
     </menu>
     <menu label="Core Technologies Reference">
-        <menu label="XForms">
-            <menu-item label="XForms Guide" href="reference-xforms-guide"/>
-            <menu-item label="XForms Extensions" href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-extensions"/>
-            <menu-item label="XForms Engine Configuration" href="reference-xforms-configuration"/>
-            <menu-item label="XPath Functions" href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-xpath-functions"/>
-        </menu>
         <menu label="Page Flow">
             <menu-item label="Page Flow Controller" href="reference-page-flow"/>
             <menu-item label="Page Flow Epilogue" href="reference-epilogue"/>
@@ -43,8 +42,6 @@
             <menu-item label="Introduction to XPL" href="reference-xpl-pipelines"/>
             <menu-item label="XPL 1.0 W3C Submission" href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/"/>
         </menu>
-    </menu>
-    <menu label="Other Technologies Reference">
         <menu-item label="Resource Managers" href="http://wiki.orbeon.com/forms/doc/developer-guide/resource-managers"/>
         <menu-item label="Configuration Properties" href="reference-properties"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>
@@ -52,7 +49,7 @@
         <menu-item label="Listeners" href="reference-listeners"/>
         <menu-item label="XML Namespaces" href="reference-xml-namespaces"/>
     </menu>
-    <menu label="Processors Reference">
+    <menu label="XPL Processors Reference">
         <menu label="Producing XML">
             <menu-item label="URL Generator" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-url-generator"/>
             <menu-item label="Request Generator" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-request-generator"/>
@@ -94,7 +91,7 @@
         <menu-item label="Scheduler" href="processors-scheduler"/>
         <menu-item label="Other Processors" href="processors-other"/>
     </menu>
-    <menu label="API Reference">
+    <menu label="XPL API Reference">
         <menu-item label="Processor API" href="reference-processor-api"/>
         <menu-item label="Pipeline Engine API" href="reference-pipeline-api"/>
     </menu>

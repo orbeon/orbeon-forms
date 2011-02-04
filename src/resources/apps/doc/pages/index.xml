@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+<document>
     <header>
         <title>Welcome</title>
     </header>
@@ -32,60 +32,6 @@
                 <li>Is provided as open source under a business-friendly license</li>
             </ul>
         </section>
-        <!--
-        <section>
-            <title>Noteworthy Features</title>
-            <img src="/apps/doc/images/form-builder-400.png" class="ops-doc-image" alt="Screenshot of Orbeon Form Builder"/>
-            <ul>
-                <li>
-                    <p>Fully interactive forms</p>
-                    <ul>
-                        <li>As-you-type validation</li>
-                        <li>Optional sections</li>
-                        <li>Repeated sections</li>
-                        <li>Up-to-date error summary</li>
-                        <li>Based on Ajax technology</li>
-                    </ul>
-                </li>
-                <li>
-                    <p>Advanced form features</p>
-                    <ul>
-                        <li>Create PDF documents</li>
-                        <li>Full internationalization</li>
-                        <li>Accessible forms</li>
-                    </ul>
-                </li>
-            </ul>
-            <ul>
-                <li>
-                    <p>Advanced controls</p>
-                    <ul>
-                        <li>Auto-completion</li>
-                        <li>Tabview and accordion</li>
-                        <li>Dialog</li>
-                        <li>Tree and menu</li>
-                        <li>Programmable custom controls</li>
-                    </ul>
-                </li>
-                <li>
-                    <p>An open solution</p>
-                    <ul>
-                        <li>Open source (LGPL)</li>
-                        <li>Standards-based (XForms)</li>
-                        <li>Commercially supported</li>
-                    </ul>
-                </li>
-                <li>
-                    <p>A Solid technological foundation</p>
-                    <ul>
-                        <li>User-friendly Ajax-based XForms engine supporting <a href="http://www.w3.org/TR/xforms11/">XForms 1.1</a></li>
-                        <li>The <a href="reference-xpl-pipelines">XPL engine</a>, a mature, high-performance XML pipeline engine for processing XML data</li>
-                        <li>Form Runner, the Orbeon Forms runtime environment</li>
-                    </ul>
-                </li>
-            </ul>
-        </section>
-        -->
         <section>
             <title>Getting Started with Orbeon Forms</title>
             <p>
@@ -104,33 +50,28 @@
                 </li>
                 <li>
                     <p>
-                        <a href="intro-tutorial">Orbeon Forms Tutorial</a>
+                        <a href="intro-tutorial">Orbeon Forms XForms Tutorial</a>
                     </p>
                 </li>
             </ul>
             <p>
-                Important parts of the documentation include:
+                Also don't miss:
             </p>
             <ul>
                 <li>
                     <p>
-                        <a href="/doc/home-faq">Frequently Asked Questions (FAQ)</a>
+                        <a href="http://wiki.orbeon.com/forms/orbeon-forms-faq">Frequently Asked Questions (FAQ)</a>
                     </p>
                 </li>
                 <li>
                     <p>
-                        <a href="reference-xforms-guide">XForms Guide</a>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <a href="home-changes-372">List of changes since the previous version</a>
+                        <a href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-39">List of changes since the previous version</a>
                     </p>
                 </li>
             </ul>
             <p>
                 For any further questions, you are invited to join the Orbeon Forms community <a
-                href="home-faq#mailing-list">mailing-list</a>.
+                href="http://orbeon.com/forms/community">mailing-list</a>.
             </p>
         </section>
     </body>

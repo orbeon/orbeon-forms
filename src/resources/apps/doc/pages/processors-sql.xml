@@ -983,7 +983,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         </li>
                         <li>
                             <p>
-                                <a href="reference-xforms-guide#upload">XForms upload</a>: as the result
+                                <a href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-controls/upload-control">XForms upload</a>: as the result
                                 of a file upload, a Base64-encoded representation of the uploaded
                                 file may be stored into the XForms instance.
                             </p>

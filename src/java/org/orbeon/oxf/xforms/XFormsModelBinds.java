@@ -643,12 +643,14 @@ public class XFormsModelBinds {
         assert bind.staticBind.getType() != null || bind.staticBind.getRequired() != null;
 
         // Don't try to apply validity to a node if it has children nodes or if it's not a node
-        // Q: do we really want to bail here if hasChildrenElements, or just for validation of type and required?
         // "The type model item property is not applied to instance nodes that contain child elements"
         final Bind.BindNode bindNode = bind.getBindNode(position);
         final NodeInfo currentNodeInfo = bindNode.nodeInfo;
         if (currentNodeInfo == null || bindNode.hasChildrenElements)
             return;
+
+        // NOTE: 2011-02-03: Decided to also apply this to required validation.
+        // See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315821&group_id=168&atid=350207
 
         // Current required value (computed during previous recalculate)
         final boolean isRequired = InstanceData.getRequired(currentNodeInfo);
@@ -710,13 +712,15 @@ public class XFormsModelBinds {
 
         assert bind.staticBind.getConstraint() != null;
 
-        // Don't try to apply validity to a node if it has children nodes or if it's not a node
-        // Q: do we really want to bail here if hasChildrenElements, or just for validation of type and required?
-        // "The type model item property is not applied to instance nodes that contain child elements"
+        // Don't try to apply validity to a node if it's not a node
         final Bind.BindNode bindNode = bind.getBindNode(position);
         final NodeInfo currentNodeInfo = bindNode.nodeInfo;
-        if (currentNodeInfo == null || bindNode.hasChildrenElements)
+        if (currentNodeInfo == null)
             return;
+
+        // NOTE: 2011-02-03: Decided to allow setting a constraint on an element with children. Handles the case of
+        // assigning validity to an enclosing element.
+        // See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315821&group_id=168&atid=350207
 
         final boolean typeValidity = InstanceData.getTypeValid(currentNodeInfo); // all type validity has been computed now
         final boolean constraintValidity;

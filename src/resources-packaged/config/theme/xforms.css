@@ -424,3 +424,23 @@ a.ygtvlabel { cursor: pointer; }
 /* YUI sets this to a color, but it is hindering more than anything else */
 .ygtvfocus { background-color: transparent }
 .xforms-select-appearance-xxforms-tree table, xforms-select1-appearance-xxforms-tree table { margin: 0 }/* as table style can be globally changed */
+
+/* Custom control widths */
+#xforms-form .xforms-width-2em input.xforms-input-input,
+    #xforms-form input.xforms-width-2em,
+    #xforms-form select.xforms-width-2em, #xforms-form .xforms-width-2em select { width: 2em }
+#xforms-form .xforms-width-3em input.xforms-input-input,
+    #xforms-form input.xforms-width-3em,
+    #xforms-form select.xforms-width-3em, #xforms-form .xforms-width-3em select { width: 3em }
+#xforms-form .xforms-width-5em input.xforms-input-input,
+    #xforms-form input.xforms-width-5em,
+    #xforms-form select.xforms-width-5em, #xforms-form .xforms-width-5em select { width: 5em }
+#xforms-form .xforms-width-7em input.xforms-input-input,
+    #xforms-form input.xforms-width-7em,
+    #xforms-form select.xforms-width-7em, #xforms-form .xforms-width-7em select { width: 7em }
+#xforms-form .xforms-width-10em input.xforms-input-input,
+    #xforms-form input.xforms-width-10em,
+    #xforms-form select.xforms-width-10em, #xforms-form .xforms-width-10em select { width: 10em }
+#xforms-form .xforms-width-15em input.xforms-input-input,
+    #xforms-form input.xforms-width-15em,
+    #xforms-form select.xforms-width-15em, #xforms-form .xforms-width-15em select { width: 15em }

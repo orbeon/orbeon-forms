@@ -1,0 +1,8 @@
+<!--
+    This file is an empty template for your own processors-local.xml file.
+-->
+<processors xmlns:foo="http://example.org/orbeon/processors">
+    <processor name="foo:my-processor">
+        <class name="org.example.orbeon.MyCoolProcessor"/>
+    </processor>
+</processors>

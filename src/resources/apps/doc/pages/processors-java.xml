@@ -45,8 +45,8 @@
                         </li>
                         <li>
                             <p>
-                                Declare the new processor in <code>/config/custom-processors.xml</code> (i.e. mapping an
-                                URI to this new processor). The syntax of <code>/config/custom-processors.xml</code> is
+                                Declare the new processor in <code>/config/processors-local.xml</code> (i.e. mapping an
+                                URI to this new processor). The syntax of <code>/config/processors-local.xml</code> is
                                 as described <a href="reference-processor-api#custom-processors">here</a>.
                             </p>
                         </li>

@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,10 +14,13 @@
 <processors xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <!-- Include user definitions. The file must be present, even if almost empty -->
+    <!-- Include user definitions. By default an empty file is present in packaged resources, and can be overridden. -->
+    <xi:include href="oxf:/config/processors-local.xml"/>
+
+    <!-- For backward compatibility -->
     <xi:include href="oxf:/config/custom-processors.xml"/>
 
-    <!-- Include third-party definitions. The file must be present, even if almost empty -->
+    <!-- Include third-party definitions. The file must be present. -->
     <xi:include href="oxf:/config/third-party-processors.xml"/>
 
     <!-- These are the main processor declarations. They are defined globally for any pipeline
@@ -86,6 +89,7 @@
     </processor>
 
     <processor name="oxf:debug">
+        <!--<class name="org.orbeon.oxf.processor.SAXLoggerProcessor"/>-->
         <class name="org.orbeon.oxf.processor.DebugProcessor"/>
     </processor>
 

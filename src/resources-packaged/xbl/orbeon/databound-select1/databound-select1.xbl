@@ -28,10 +28,10 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          script-type="application/xhtml+xml">
 
-    <xbl:binding id="fr-data-bound-select1" element="fr|data-bound-select1">
+    <xbl:binding id="fr-databound-select1" element="fr|databound-select1">
         <xbl:resources>
             <xbl:style>
-                div.xbl-fr-data-bound-select1 { display: inline; }
+                div.xbl-fr-databound-select1 { display: inline; }
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>

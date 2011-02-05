@@ -4301,7 +4301,7 @@ ORBEON.widgets.RTE = function() {
             rteEditors[control.id] = yuiRTE;
             isIncremental[control.id] = YAHOO.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
-            yuiRTE.on("editorContentLoaded", function() {
+            yuiRTE.on("windowRender", function() {
                 if (!ORBEON.util.Utils.isNewXHTMLLayout()) {
                     var rteContainer = control.parentNode;
                     rteContainer.className += " " + control.className;

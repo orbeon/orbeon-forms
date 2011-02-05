@@ -27,7 +27,7 @@
         <xforms:model id="main-model">
             <xforms:instance id="main-instance">
                 <data-bound-select1>
-                    <state>ca</state>
+                    <state>CA</state>
                     <city/>
                     <zip/>
                 </data-bound-select1>
@@ -50,7 +50,6 @@
                     <xforms:label ref="@name"/>
                     <xforms:value ref="@name"/>
                 </xforms:itemset>
-                <fr:dependency ref="../state"/>
             </fr:data-bound-select1>
             <fr:data-bound-select1 ref="zip" appearance="minimal"
                                    resource="/xforms-sandbox/service/zip-zips?state-abbreviation={state}&amp;city={city}">
@@ -59,8 +58,6 @@
                     <xforms:label ref="@code"/>
                     <xforms:value ref="@code"/>
                 </xforms:itemset>
-                <fr:dependency ref="../state"/>
-                <fr:dependency ref="../city"/>
             </fr:data-bound-select1>
         </xhtml:p>
     </xhtml:body>

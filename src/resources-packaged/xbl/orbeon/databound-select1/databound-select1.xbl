@@ -48,51 +48,37 @@
             </xforms:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxforms:internal" xsl:version="2.0">
+            <xforms:group appearance="xxforms:internal" xsl:version="2.0">
 
-                <xxforms:variable name="result" as="node()?" select="."/>
+                <!-- Stop propagation of all UI events -->
+                <xforms:action ev:event="#all" ev:propagate="stop"/>
 
-                <xforms:group appearance="xxforms:internal">
+                <!-- Node to which users bound this component -->
+                <xxforms:variable name="binding" as="node()?">
+                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                </xxforms:variable>
 
-                    <!-- Save resource in model -->
-                    <xxforms:variable name="resource-avt" xbl:attr="xbl:text=resource"/>
-                    <xxforms:variable name="resource" xbl:attr="xbl:text=resource" xxbl:scope="inner">
-                        <xxforms:sequence select="xxforms:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
-                        <xforms:action ev:event="xforms-enabled xforms-value-changed">
-                            <xforms:message level="modal" value="$resource-avt"/>
-                            <xforms:setvalue ref="instance('resource')" value="$resource"/>
-                            <xforms:send submission="get-itemset"/>
-                        </xforms:action>
-                    </xxforms:variable>
-
-                    <!--  Create one xforms:output per dependency so we can detect the changes -->
-                    <xsl:for-each select="/*/fr:dependency">
-                        <xforms:output style="display: none">
-                            <xsl:copy-of select="@model | @context | @ref | @bind"/>
-                        </xforms:output>
-                    </xsl:for-each>
-
-                    <xforms:action ev:event="xforms-value-changed">
-                        <!-- Send submission -->
-                        <xforms:send model="xbl-model" submission="get-itemset" xxbl:scope="inner"/>
-
-                        <xxforms:variable name="nodeset" xxbl:scope="inner"><xsl:value-of select="/*/xforms:itemset/@nodeset"/></xxforms:variable>
-                        <xxforms:variable name="value" xxbl:scope="inner"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
-                        <xxforms:variable name="new-values">
-                            <xxforms:sequence select="instance('itemset')/saxon:evaluate($nodeset)/saxon:evaluate($value)" xxbl:scope="inner"/>
-                        </xxforms:variable>
-                        <!-- If the current value is not in the new itemset and not already blank, set it to blank -->
-                        <xforms:setvalue if="not($result = ($new-values, ''))" ref="$result"/>
-
+                <!-- When the component is initialized or when resources changes, update our internal itemset -->
+                <xxforms:variable name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
+                <xxforms:variable name="resource" xbl:attr="xbl:text=resource">
+                    <xxforms:sequence select="xxforms:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+                    <xforms:action ev:event="xforms-enabled xforms-value-changed">
+                        <!-- Save resource in model, as it is used as an AVT by the submission -->
+                        <xforms:setvalue ref="instance('resource')" value="$resource"/>
+                        <!-- Update itemset based on resource -->
+                        <xforms:send submission="get-itemset"/>
+                        <!-- Get sequence of values in the new itemset -->
+                        <xxforms:variable name="nodeset"><xsl:value-of select="/*/xforms:itemset/@nodeset"/></xxforms:variable>
+                        <xxforms:variable name="value"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
+                        <xxforms:variable name="new-values" select="instance('itemset')/saxon:evaluate($nodeset)/saxon:evaluate($value)"/>
+                        <!-- If the current value is not in the new itemset, set it to blank -->
+                        <xforms:setvalue if="not($binding = ($new-values, ''))" ref="$binding"/>
                     </xforms:action>
-
-                    <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
-                </xforms:group>
+                </xxforms:variable>
 
                 <!-- The concrete select1 -->
-                <xforms:select1 ref=".">
-                    <xforms:message ev:event="xforms-out-of-range" level="modal">Getting xforms-out-of-range</xforms:message>
+                <xxforms:variable name="binding" xxbl:scope="outer"><xxforms:sequence select="$binding" xxbl:scope="inner"/></xxforms:variable>
+                <xforms:select1 ref="$binding" xxbl:scope="outer">
                     <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
                     <!-- Blank item -->
                     <xforms:item>
@@ -101,8 +87,6 @@
                     </xforms:item>
                     <!-- Itemset unconventionally evaluates wrt inner scope -->
                     <xbl:content includes="xforms|itemset" xxbl:scope="inner"/>
-                    <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
                 </xforms:select1>
             </xforms:group>
         </xbl:template>

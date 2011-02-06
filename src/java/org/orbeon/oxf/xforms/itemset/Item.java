@@ -121,7 +121,7 @@ public class Item implements ItemContainer {
     }
 
     public String getExternalJSLabel() {
-        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? label.getLabel() : XMLUtils.escapeXMLMinimal(value)); //TODO check if we need to rewrite URLs?
+        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? label.getLabel() : XMLUtils.escapeXMLMinimal(label.getLabel())); //TODO check if we need to rewrite URLs?
     }
 
     /**

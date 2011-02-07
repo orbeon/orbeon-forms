@@ -127,18 +127,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return attributesMap;
         }
 
-        public synchronized Map<String, String> getHeaderMap() {
-            if (headerMap == null) {
-                headerMap = new HashMap<String, String>();
-                for (Enumeration e = nativeRequest.getHeaderNames(); e.hasMoreElements();) {
-                    String name = (String) e.nextElement();
-                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerMap.put(name.toLowerCase(), nativeRequest.getHeader(name));
-                }
-            }
-            return headerMap;
-        }
-
         public synchronized Map<String, String[]> getHeaderValuesMap() {
             if (headerValuesMap == null) {
                 headerValuesMap = new HashMap<String, String[]>();

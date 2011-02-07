@@ -60,10 +60,6 @@ public class SimpleExternalContext implements ExternalContext {
             return attributesMap;
         }
 
-        public Map<String, String> getHeaderMap() {
-            return Collections.emptyMap();
-        }
-
         public Map<String, String[]> getHeaderValuesMap() {
             return Collections.emptyMap();
         }

@@ -1285,8 +1285,12 @@
                                                 var newInputElement = document.createElement("input");
                                                 newInputElement.setAttribute("type", "text");
                                                 newInputElement.className = "xforms-input-input " + typeClassName;
-                                                newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
-                                                newInputElement.id = newInputElement.name;
+                                                newInputElement.id = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
+                                                // In portlet mode, name is not prefixed
+                                                if (newInputElement.id.indexOf(ORBEON.xforms.Globals.ns[formID]) == 0)
+                                                    newInputElement.name = newInputElement.id.substring(ORBEON.xforms.Globals.ns[formID].length);
+                                                else
+                                                    newInputElement.name = newInputElement.id; // should not happen as ns should be valid or ""
                                                 return newInputElement;
                                             }
 

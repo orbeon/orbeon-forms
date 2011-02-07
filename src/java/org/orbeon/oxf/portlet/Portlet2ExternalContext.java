@@ -88,27 +88,29 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return null;
         }
 
-        public synchronized Map<String, String> getHeaderMap() {
-            // NOTE: The container may or may not make HTTP headers available through the properties API
-            if (headerMap == null) {
-                headerMap = new HashMap<String, String>();
-                for (Enumeration<String> e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
-                    String name = e.nextElement();
-                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerMap.put(name.toLowerCase(), portletRequest.getProperty(name));
-                }
-            }
-            return headerMap;
-        }
-
         public synchronized Map<String, String[]> getHeaderValuesMap() {
             // NOTE: The container may or may not make HTTP headers available through the properties API
             if (headerValuesMap == null) {
                 headerValuesMap = new HashMap<String, String[]>();
+
+                // NOTE: Not sure we should even pass these properties as "headers"
+                // Example of property: javax.portlet.markup.head.element.support = true
                 for (Enumeration<String> e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
                     headerValuesMap.put(name.toLowerCase(), StringConversions.stringEnumerationToArray(portletRequest.getProperties(name)));
+                }
+
+                // PLT.11.1.5 Request Properties: "client request HTTP headers may not be always available. Portlets
+                // should not rely on the presence of headers to function properly. The PortletRequest interface
+                // provides specific methods to access information normally available as HTTP headers: content-length,
+                // content-type, accept-language."
+                if (portletRequest instanceof ClientDataRequest) {
+                    final ClientDataRequest clientDataRequest = (ClientDataRequest) portletRequest;
+                    if (clientDataRequest.getContentType() != null)
+                        headerValuesMap.put("content-type", new String[] { clientDataRequest.getContentType() });
+                    if (clientDataRequest.getContentLength() != -1)
+                        headerValuesMap.put("content-length", new String[] { Integer.toString(clientDataRequest.getContentLength()) });
                 }
             }
             return headerValuesMap;

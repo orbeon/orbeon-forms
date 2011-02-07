@@ -84,35 +84,37 @@ object ClientEvents {
 
         var hasAllEvents = false
 
-        // Slide over the events so we can filter and compress them
-        // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
-        // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
-        // beforehand.
-        val filteredEvents: Seq[XFormsEvent] = (allClientAndServerEvents ++ DUMMY_EVENT).sliding(2).toList flatMap {
-            case Seq(a, _) if a.name == XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED =>
-                // Just remember we got the "all events" event
-                hasAllEvents = true
-                None
-            case Seq(a, _) if (a.name eq null) && (a.targetEffectiveId eq null) =>
-                throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.")
-            case Seq(a, _) if a.name != XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE =>
-                // Non-value change event
-                safelyCreateEvent(document, a)
-            case Seq(a, b) if new EventGroupingKey(a) != new EventGroupingKey(b) =>
-                // Only process last value change event received
-                assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
-                valueChangeControlIds += a.targetEffectiveId
-                safelyCreateEvent(document, a)
-            case Seq(a, b) =>
-                // Nothing to do here: we are compressing value change events
-                assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
-                assert(new EventGroupingKey(a) == new EventGroupingKey(b))
-                None
-        }
+        if (allClientAndServerEvents.size > 0 ) {
+            // Slide over the events so we can filter and compress them
+            // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
+            // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
+            // beforehand.
+            val filteredEvents: Seq[XFormsEvent] = (allClientAndServerEvents ++ DUMMY_EVENT).sliding(2).toList flatMap {
+                case Seq(a, _) if a.name == XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED =>
+                    // Just remember we got the "all events" event
+                    hasAllEvents = true
+                    None
+                case Seq(a, _) if (a.name eq null) && (a.targetEffectiveId eq null) =>
+                    throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.")
+                case Seq(a, _) if a.name != XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE =>
+                    // Non-value change event
+                    safelyCreateEvent(document, a)
+                case Seq(a, b) if new EventGroupingKey(a) != new EventGroupingKey(b) =>
+                    // Only process last value change event received
+                    assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
+                    valueChangeControlIds += a.targetEffectiveId
+                    safelyCreateEvent(document, a)
+                case Seq(a, b) =>
+                    // Nothing to do here: we are compressing value change events
+                    assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
+                    assert(new EventGroupingKey(a) == new EventGroupingKey(b))
+                    None
+            }
 
-        // Process all filtered events
-        for (event <- filteredEvents)
-            processEvent(pipelineContext, document, event)
+            // Process all filtered events
+            for (event <- filteredEvents)
+                processEvent(pipelineContext, document, event)
+        }
 
         hasAllEvents
     }

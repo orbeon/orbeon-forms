@@ -67,10 +67,6 @@ public class RequestWrapper implements ExternalContext.Request {
         return _request.getContextPath();
     }
 
-    public Map<String, String> getHeaderMap() {
-        return _request.getHeaderMap();
-    }
-
     public Map<String, String[]> getHeaderValuesMap() {
         return _request.getHeaderValuesMap();
     }

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ *  Copyright (C) 2011 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -60,6 +60,8 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
         assert(getControlValue("output2") === "<div><p>This is <b>bold</b> content.</p></div>")
     }
 
+    // See: [ #315525 ] XPath analysis: bug with xf:output pointing to complex content
+    //      http://forge.ow2.org/tracker/index.php?func=detail&aid=315525&group_id=168&atid=350207
     @Test def testOutputComplexContent {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
@@ -79,7 +81,6 @@ class ComplexContentDependenciesTest extends DocumentTestBase with AssertionsFor
                     <xf:output id="output" value="instance()"/>
                 </xh:body>
             </xh:html>
-
 
         assert(getControlValue("input") === "Teddy")
         assert(getControlValue("output") === "TeddyBear")

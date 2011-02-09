@@ -89,7 +89,7 @@ public class XFormsLoadAction extends XFormsAction {
         }
     }
 
-    public static String resolveStoreLoadValue(XFormsContainingDocument containingDocument, PropertyContext propertyContext,
+    public static void resolveStoreLoadValue(XFormsContainingDocument containingDocument, PropertyContext propertyContext,
                                                Element currentElement, boolean doReplace, String value, String target,
                                                String urlType, boolean urlNorewrite, boolean isShowProgress) {
         final String externalURL;
@@ -108,7 +108,11 @@ public class XFormsLoadAction extends XFormsAction {
                 externalURL = XFormsUtils.resolveRenderURL(propertyContext, containingDocument, currentElement, value);
             }
         }
+
+        // Force no progress indication if this is a JavaScript URL
+        if (externalURL.startsWith("javascript:"))
+            isShowProgress = false;
+
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isShowProgress);
-        return externalURL;
     }
 }

@@ -83,7 +83,10 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+
+        // NOTE: Perform all actions at target, so that user event handlers are called after these operations.
+
         if (XFormsEvents.XXFORMS_UPLOAD_START.equals(event.getName())) {
             // Upload started
             containingDocument.startUpload(getUploadUniqueId());
@@ -100,11 +103,11 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
             handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
-            
+
         } else if (XFormsEvents.XXFORMS_UPLOAD_PROGRESS.equals(event.getName())) {
             // NOP: upload progress information will be sent through the diff process
         } else
-            super.performDefaultAction(propertyContext, event);
+            super.performTargetAction(propertyContext, container, event);
     }
 
     @Override

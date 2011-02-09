@@ -45,7 +45,7 @@
                 <xforms:bind nodeset="file[2]/@valid" calculate="../../action = 'upload' or
                         (../../action = 'download' and starts-with(normalize-space(..), 'http://'))"/>
                 <xforms:bind nodeset="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
-                
+
                 <xforms:bind nodeset="upload-trigger" readonly="not(property('xxforms:noscript')) and ../file[1]/@selected = 'false'"/>
                 <xforms:bind nodeset="download-trigger" readonly="not(property('xxforms:noscript')) and ../file[2]/@valid = 'false'"/>
                 <xforms:bind nodeset="sample-trigger" readonly="not(property('xxforms:noscript')) and ../sample = ''"/>
@@ -82,7 +82,7 @@
                         <xforms:filename ref="@filename"/>
                         <xforms:mediatype ref="@mediatype"/>
                         <xxforms:size ref="@size"/>
-                        <xforms:setvalue ev:event="xforms-select" ref="@selected">true</xforms:setvalue>
+                        <xforms:setvalue ev:event="xxforms-upload-done" ref="@selected">true</xforms:setvalue>
                     </xforms:upload>
                     <fr:button ref="upload-trigger">
                         <xforms:label>Run XForms</xforms:label>

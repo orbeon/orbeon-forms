@@ -393,7 +393,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
     public abstract class BaseResponse implements Response {
 
-        private URLRewriter urlRewriter = new WSRPURLRewriter(request);
+        private URLRewriter urlRewriter = new WSRPURLRewriter(pipelineContext, request);
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // NIY / FIXME

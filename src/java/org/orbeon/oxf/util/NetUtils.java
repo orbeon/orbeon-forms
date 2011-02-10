@@ -956,7 +956,7 @@ public class NetUtils {
         return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
     }
 
-    public static class DynamicResource {
+    public static class DynamicResource implements Serializable {
         private String uri;
         private String filename;
         private String contentType;

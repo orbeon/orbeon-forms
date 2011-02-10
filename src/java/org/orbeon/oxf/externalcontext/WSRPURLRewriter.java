@@ -16,12 +16,15 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 
@@ -48,10 +51,23 @@ public class WSRPURLRewriter implements URLRewriter {
 //    public static final String URL_PARAM = "wsrp-url";
 //    public static final String REQUIRES_REWRITE_PARAM = "wsrp-requiresRewrite";
 
+    private final PropertyContext propertyContext;
     private final ExternalContext.Request request;
+    private List<URLRewriterUtils.PathMatcher> pathMatchers;
 
-    public WSRPURLRewriter(ExternalContext.Request request) {
+    public WSRPURLRewriter(PropertyContext propertyContext, ExternalContext.Request request) {
+        this.propertyContext = propertyContext;
         this.request = request;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<URLRewriterUtils.PathMatcher> getPathMatchers() {
+        if (pathMatchers == null) {
+            pathMatchers = (List<URLRewriterUtils.PathMatcher>) propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+            if (pathMatchers == null)
+                pathMatchers = URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
+        }
+        return pathMatchers;
     }
 
     public String rewriteRenderURL(String urlString) {
@@ -107,7 +123,13 @@ public class WSRPURLRewriter implements URLRewriter {
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {
         // JSR-268 supports portlet resources
-        return rewritePortletURL(urlString, URL_TYPE_RESOURCE, null, null);
+
+        // First rewrite path to support versioned resources
+        final String rewrittenPath = URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(),
+                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+
+        // Then do the WSRP encoding
+        return rewritePortletURL(rewrittenPath, URL_TYPE_RESOURCE, null, null);
     }
 
     /**

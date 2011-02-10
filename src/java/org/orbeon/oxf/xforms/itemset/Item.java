@@ -18,7 +18,9 @@ import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -120,8 +122,8 @@ public class Item implements ItemContainer {
         return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(propertyContext, value) : XFormsUtils.escapeJavaScript(value);
     }
 
-    public String getExternalJSLabel() {
-        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? label.getLabel() : XMLUtils.escapeXMLMinimal(label.getLabel())); //TODO check if we need to rewrite URLs?
+    public String getExternalJSLabel(PropertyContext propertyContext, final LocationData locationData) {
+        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? XFormsCaseControl.getEscapedHTMLValue(propertyContext, locationData, label.getLabel()) : XMLUtils.escapeXMLMinimal(label.getLabel())); //TODO check if we need to rewrite URLs?
     }
 
     /**

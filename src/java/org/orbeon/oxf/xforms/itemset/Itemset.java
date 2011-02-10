@@ -116,7 +116,7 @@ public class Itemset implements ItemContainer {
 
                         // Item label and value
                         sb.append('"');
-                        sb.append(item.getExternalJSLabel());
+                        sb.append(item.getExternalJSLabel(context, locationData));
                         sb.append("\",\"");
                         sb.append(item.getExternalJSValue(context));
                         sb.append('\"');

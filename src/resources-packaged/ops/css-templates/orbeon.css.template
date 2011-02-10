@@ -71,7 +71,6 @@ fieldset {
     border-right: 1px solid &dark-color;;
     vertical-align: top;
     width: 99%;
-    line-height: 13pt;
 }
 
 .cleaner {

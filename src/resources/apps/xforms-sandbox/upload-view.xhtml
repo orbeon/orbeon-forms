@@ -24,7 +24,8 @@
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>Orbeon Forms XForms Sandbox - Run XForms Everywhere!</title>
-        <xforms:model xxforms:state-handling="client" xxforms:xhtml-layout="span">
+        <xforms:model xxforms:xhtml-layout="span">
+            <!--xxforms:state-handling="client" -->
 
             <xforms:action ev:event="xforms-ready">
                 <xforms:send submission="samples-submission"/>
@@ -65,6 +66,8 @@
             .xbl-fr-tabview .xforms-label { display: block; font-weight: bold; margin-bottom: .5em }
             .yui-skin-sam  .xbl-fr-tabview .yui-navset .yui-content { padding: 1em }
             .xbl-fr-tabview .html-note { color: orange; font-style: italic }
+            .xforms-hint { display: block; color: #333; font-size: 93%; padding-top: .5em }
+            .upload-trigger { padding-left: 1em }
         </xhtml:style>
     </head>
     <body>
@@ -74,27 +77,24 @@
                 own XForms documents, as well as XForms documents located anywhere on the web.
             </p>
             <fr:tabview>
-                <fr:tab id="upload-case">
+                <fr:tab id="upload-case" class="upload-case">
                     <fr:label>Upload Local File</fr:label>
                     <xforms:setvalue ev:event="xforms-select" ref="action">upload</xforms:setvalue>
                     <xforms:upload ref="file[1]" xxforms:size="45">
-                        <xforms:label>Please select the local XHTML + XForms file to run</xforms:label>
+                        <xforms:label>Select a local XHTML + XForms file</xforms:label>
                         <xforms:filename ref="@filename"/>
                         <xforms:mediatype ref="@mediatype"/>
                         <xxforms:size ref="@size"/>
-                        <xforms:setvalue ev:event="xxforms-upload-done" ref="@selected">true</xforms:setvalue>
+                        <xforms:action ev:event="xxforms-upload-done">
+                            <xforms:setvalue ref="@selected">true</xforms:setvalue>
+                            <xforms:setfocus control="upload-trigger"/>
+                        </xforms:action>
                     </xforms:upload>
-                    <fr:button ref="upload-trigger">
+                    <xforms:trigger ref="upload-trigger" class="upload-trigger" id="upload-trigger">
                         <xforms:label>Run XForms</xforms:label>
                         <xforms:send ev:event="DOMActivate" submission="upload-submission"/>
-                    </fr:button>
-                    <p>
-                        Point to an XHTML+XForms document, press the "Run XForms" button, and see how the Orbeon Forms
-                        XForms engine renders it!
-                    </p>
-                    <p class="html-note">
-                        NOTE: Your document has to be in the XHTML namespace. Plain HTML won't work.
-                    </p>
+                    </xforms:trigger>
+                    <p>Your document has to be in the XHTML namespace; plain HTML won't work.</p>
                 </fr:tab>
                 <fr:tab id="download-case">
                     <fr:label>Run From the Web</fr:label>
@@ -109,9 +109,7 @@
                             <xforms:label>Run XForms</xforms:label>
                         </fr:button>
                     </xforms:group>
-                    <p class="html-note">
-                        NOTE: Your document has to be in the XHTML namespace. Plain HTML won't work.
-                    </p>
+                    <p>Your document has to be in the XHTML namespace. Plain HTML won't work.</p>
                 </fr:tab>
                 <fr:tab id="samples-case">
                     <fr:label>Test Samples</fr:label>

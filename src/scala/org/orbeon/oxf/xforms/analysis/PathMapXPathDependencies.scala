@@ -120,7 +120,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             else new MapSet[String, String]
         }
 
-        def refreshDone(): Unit = {}
+        def refreshDone(): Unit = ()
 
         def outOfDateChangesetForMip(mip: Model#Bind#MIP) = mip.isValidateMIP && !useValidateChangeset || !mip.isValidateMIP && !useCalculateChangeset
 

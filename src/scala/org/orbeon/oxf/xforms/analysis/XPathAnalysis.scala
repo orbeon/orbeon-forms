@@ -50,7 +50,7 @@ abstract class XPathAnalysis {
 
     def toXML(propertyContext: PropertyContext , helper: ContentHandlerHelper)
 
-    def freeTransientState() {}
+    def freeTransientState() = ()
 }
 
 /**

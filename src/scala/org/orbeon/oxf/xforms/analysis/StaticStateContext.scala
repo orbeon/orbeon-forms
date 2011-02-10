@@ -22,6 +22,6 @@ class StaticStateContext(val staticState: XFormsStaticState, val controlsDocumen
     // this would just be used by the XPath cache for statistics, just don't care for now
     val propertyContext = new PropertyContext {
         def getAttribute(key: Any) = null
-        def setAttribute(key: Any, o: Any) = {}
+        def setAttribute(key: Any, o: Any) = ()
     }
 }

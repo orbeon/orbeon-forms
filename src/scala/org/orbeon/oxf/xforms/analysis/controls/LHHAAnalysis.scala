@@ -89,8 +89,8 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                         }
                     }
 
-                    def endElement(element: Element) {}
-                    def text(text: Text) {}
+                    def endElement(element: Element) = ()
+                    def text(text: Text) = ()
                 })
 
                 // Result of all combined analyses

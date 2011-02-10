@@ -108,7 +108,7 @@ trait SelectionControl extends SimpleElementAnalysis {
                 if (element == XFormsConstants.CHOICES_QNAME)
                     stack pop
 
-            def text(text: Text) = {}
+            def text(text: Text) = ()
         })
 
         Some(combinedAnalysis)
@@ -208,7 +208,7 @@ trait SelectionControl extends SimpleElementAnalysis {
                         currentContainer = currentContainer.getParent
                 }
 
-            def text(text: Text) = {}
+            def text(text: Text) = ()
         })
         result
     }

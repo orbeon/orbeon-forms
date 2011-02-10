@@ -15,8 +15,11 @@ package org.orbeon.oxf.processor.pdf;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ServletURLRewriter;
+import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
@@ -30,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,6 +66,10 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         final float DEFAULT_DOTS_PER_POINT = 20f * 4f / 3f;
         final int DEFAULT_DOTS_PER_PIXEL = 14;
 
+        // Use servlet URL rewriter for resources, even in portlet mode, so that resources are served over HTTP by
+        // the servlet and not looping back through the portal.
+        final URLRewriter servletRewriter = new ServletURLRewriter(pipelineContext, externalContext.getRequest());
+
         final ITextRenderer renderer = new ITextRenderer(DEFAULT_DOTS_PER_POINT, DEFAULT_DOTS_PER_PIXEL);
         try {
             final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
@@ -73,8 +82,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // requests from this processor should not go through it. So we rewrite as a service URL instead. But in
                     // addition to that, we must still rewrite the path as a resource, so that versioned resources are
                     // handled properly.
-
-                    final String path = externalContext.getResponse().rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    final String path = servletRewriter.rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
                     return externalContext.rewriteServiceURL(path, true);
                 }
 

@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.externalcontext.ServletURLRewriter;
+import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
@@ -30,6 +32,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -149,7 +152,10 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:anyURI type
                 if (!urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                    final String resolvedURI = XFormsUtils.resolveResourceURL(propertyContext, containingDocument, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    final URI rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, getControlElement(), internalValue);
+                    final URLRewriter servletRewriter = new ServletURLRewriter(propertyContext, NetUtils.getExternalContext(propertyContext).getRequest());
+                    final String resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
                     updatedValue = NetUtils.proxyURI(propertyContext, resolvedURI, fileInfo.getFileName(propertyContext), mediatype, lastModified);
                 } else {

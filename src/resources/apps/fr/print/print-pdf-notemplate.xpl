@@ -37,19 +37,36 @@
         <p:output name="xformed-data" id="xformed-data"/>
     </p:processor>
 
-    <!-- Remove XHTML prefixes because of a bug in Flying Saucer -->
-    <p:processor name="oxf:qname-converter">
+    <p:processor name="oxf:request">
         <p:input name="config">
-            <config>
-                <match>
-                    <uri>http://www.w3.org/1999/xhtml</uri>
-                </match>
-                <replace>
-                    <prefix/>
-                </replace>
-            </config>
+            <config><include>/request/container-namespace</include></config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
+    <!-- Prepare XHTML before conversion to PDF -->
+    <p:processor name="oxf:xslt">
+        <p:input name="config">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <!-- Remove portlet namespace from ids if present. Do this because in a portlet environment, the CSS
+                     retrieved by oxf:xhtml-to-pdf doesn't know about the namespace. Not doing so, the CSS won't apply
+                     and also this can cause a ClassCastException in Flying Saucer. -->
+                <xsl:template match="@id">
+                    <xsl:attribute name="id" select="substring-after(., doc('input:request')/*/container-namespace)"/>
+                </xsl:template>
+                <!-- While we are at it filter out scripts as they won't be used -->
+                <xsl:template match="*:script"/>
+                <!-- Remove all prefixes because Flying Saucer doesn't like them -->
+                <xsl:template match="*">
+                    <xsl:element name="{local-name()}">
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:element>
+                </xsl:template>
+            </xsl:transform>
         </p:input>
         <p:input name="data" href="#xformed-data"/>
+        <p:input name="request" href="#request"/>
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 

@@ -234,7 +234,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
         this.deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
                     : "integrated".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.integrated
-                    : XFormsConstants.DeploymentType.plain;
+                    : XFormsConstants.DeploymentType.standalone;
 
         // Try to get request context path
         this.requestContextPath = request.getClientContextPath("/");

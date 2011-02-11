@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
@@ -388,24 +389,45 @@ public class NetUtils {
     /**
      * Encode a query string. The input Map contains names indexing Object[].
      */
-    public static String encodeQueryString(Map parameters) {
+    public static String encodeQueryString(Map<String, Object[]> parameters) {
         final StringBuilder sb = new StringBuilder(100);
         boolean first = true;
         try {
-            for (Object o: parameters.keySet()) {
-                final String name = (String) o;
-                final Object[] values = (Object[]) parameters.get(name);
-                for (final Object currentValue: values) {
+            for (final Map.Entry<String, Object[]> entry : parameters.entrySet()) {
+                for (final Object currentValue : entry.getValue()) {
                     if (currentValue instanceof String) {
                         if (!first)
                             sb.append('&');
 
-                        sb.append(URLEncoder.encode(name, NetUtils.STANDARD_PARAMETER_ENCODING));
+                        sb.append(URLEncoder.encode(entry.getKey(), NetUtils.STANDARD_PARAMETER_ENCODING));
                         sb.append('=');
                         sb.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
 
                         first = false;
                     }
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            // Should not happen as we are using a required encoding
+            throw new OXFException(e);
+        }
+        return sb.toString();
+    }
+
+    public static String encodeQueryString2(Map<String, String[]> parameters) {
+        final StringBuilder sb = new StringBuilder(100);
+        boolean first = true;
+        try {
+            for (final Map.Entry<String, String[]> entry : parameters.entrySet()) {
+                for (final Object currentValue : entry.getValue()) {
+                    if (!first)
+                        sb.append('&');
+
+                    sb.append(URLEncoder.encode(entry.getKey(), NetUtils.STANDARD_PARAMETER_ENCODING));
+                    sb.append('=');
+                    sb.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
+
+                    first = false;
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -447,7 +469,7 @@ public class NetUtils {
      * @return              resulting URL
      */
     public static String appendQueryString(String urlString, String queryString) {
-        if (org.apache.commons.lang.StringUtils.isBlank(queryString)) {
+        if (StringUtils.isBlank(queryString)) {
             return urlString;
         } else {
             final StringBuilder updatedActionStringBuilder = new StringBuilder(urlString);
@@ -455,6 +477,22 @@ public class NetUtils {
             updatedActionStringBuilder.append(queryString);
             return updatedActionStringBuilder.toString();
         }
+    }
+
+    public static String removeQueryString(String urlString) {
+        final int questionIndex = urlString.indexOf('?');
+        if (questionIndex == -1)
+            return urlString;
+        else
+            return urlString.substring(0, questionIndex);
+    }
+
+    public static String getQueryString(String urlString) {
+        final int questionIndex = urlString.indexOf('?');
+        if (questionIndex == -1)
+            return null;
+        else
+            return urlString.substring(questionIndex + 1);
     }
 
     /**

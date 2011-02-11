@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StringConversions {
 
@@ -70,6 +67,19 @@ public class StringConversions {
         int size = 0;
         for (final Object currentValue: values) {
             result[size++] = currentValue;
+        }
+        return result;
+    }
+
+    public static Map<String, Object[]> stringArrayMapToObjectArrayMap(Map<String, String[]> in) {
+        if (in == null)
+            return null;
+
+        final Map<String, Object[]> result = new HashMap<String, Object[]>();
+        for (Map.Entry<String, String[]> entry : in.entrySet()) {
+            final Object[] values = stringArrayToObjectArray(entry.getValue());
+            if (values != null && values.length > 0)
+                result.put(entry.getKey(), values);
         }
         return result;
     }

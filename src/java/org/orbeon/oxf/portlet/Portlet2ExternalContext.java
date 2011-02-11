@@ -78,7 +78,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
         public String getPathInfo() {
             // Use the resource id if we are a ResourceRequest
-            String result = (portletRequest instanceof ResourceRequest) ? ((ResourceRequest) portletRequest).getResourceID() : portletRequest.getParameter(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
+            // In that case, remove the query string part of the resource id, that's handled by getParameterMap()
+            String result = (portletRequest instanceof ResourceRequest) ? NetUtils.removeQueryString(((ResourceRequest) portletRequest).getResourceID()) : portletRequest.getParameter(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
             if (result == null) result = "";
             return (result.startsWith("/")) ? result : "/" + result;
         }
@@ -166,9 +167,15 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
                     // Decode the multipart data
                     parameterMap = Multipart.getParameterMapMultipart(pipelineContext, request, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
-
+                } else if (portletRequest instanceof ResourceRequest) {
+                    // We encoded query parameters directly into the resource id in this case
+                    final String queryString = NetUtils.getQueryString(((ResourceRequest) portletRequest).getResourceID());
+                    if (queryString != null)
+                        parameterMap = Collections.unmodifiableMap(StringConversions.stringArrayMapToObjectArrayMap(NetUtils.decodeQueryString(queryString, false)));
+                    else
+                        parameterMap = Collections.emptyMap();
                 } else {
-                    // Just use native request parameters
+                    // Not a resource request, so just use native request parameters
                     parameterMap = new HashMap<String, Object[]>(portletRequest.getParameterMap());
                     parameterMap.remove(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
                     parameterMap = Collections.unmodifiableMap(parameterMap);

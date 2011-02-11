@@ -102,17 +102,18 @@ public class WSRPURLRewriter implements URLRewriter {
             // Decode query string
             final Map<String, String[]> parameters = NetUtils.decodeQueryString(u.getQuery(), true);
             // Add special path parameter
+            final String path;
             if (urlString.startsWith("?")) {
                 // This is a special case that appears to be implemented
                 // in Web browsers as a convenience. Users may use it.
-                parameters.put(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME, new String[]{request.getRequestPath()});
+                path = request.getRequestPath();
             } else {
                 // Regular case, use parsed path
-                final String path = URLRewriterUtils.getRewritingContext("wsrp", "") + u.getPath();
-                parameters.put(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME, new String[]{ path });
+                path = URLRewriterUtils.getRewritingContext("wsrp", "") + u.getPath();
             }
+            parameters.put(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME, new String[]{ path });
             // Encode as "navigational state"
-            final String navigationalState = NetUtils.encodeQueryString(parameters);
+            final String navigationalState = NetUtils.encodeQueryString2(parameters);
 
             // Encode the URL a la WSRP
             return encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef(), false);

@@ -68,6 +68,7 @@
      * remaining events.
      */
     UploadServer.continueWithRemainingEvents = function() {
+        this.processingEvent.upload.uploadDone();
         this.yuiConnection = null;
         this.processingEvent = null;
         if (this.remainingEvents.length == 0) this.executionQueueDone();

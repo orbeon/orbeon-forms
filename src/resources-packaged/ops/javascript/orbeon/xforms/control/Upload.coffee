@@ -59,11 +59,21 @@ class Upload extends Control
             when "interrupted" then UploadServer.uploadFailure()
             else this.yuiProgressBar.set "value", 10 + 100 * received / expected if this.yuiProgressBar
 
+    # Called by UploadServer when the upload for this control is finished.
+    uploadDone: () ->
+        ajaxResponseProcessed = () =>
+            ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe ajaxResponseProcessed
+            # However, if we don't (thus the progress indicator is still shown), this means some XForms reset the file name
+            if YD.hasClass this.container, "xforms-upload-state-progress"
+                # So switch back to the file selector, as we won't get a file name anymore
+                @setState "empty"
+        # After the file is uploaded, in general at the next Ajax response, we get the file name
+        ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe ajaxResponseProcessed
+
     # When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
     cancel: (event) ->
         Event.preventDefault event
         UploadServer.cancel()
-
 
     # Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"
     # (file is being uploaded), or "file" (a file has been uploaded).

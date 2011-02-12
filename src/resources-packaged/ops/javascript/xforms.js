@@ -4139,17 +4139,6 @@ ORBEON.widgets.RTE = function() {
      * of the editor.
      */
     function changeEvent(controlID) {
-        // Simulate blur on previous, focus on this
-        var currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId;
-        if (currentFocusControlId != controlID) {
-            // If previous control was an RTE, send blur to it
-            if (rteEditors[currentFocusControlId] != null) {
-                ORBEON.xforms.Events.blur({ target: ORBEON.util.Dom.get(currentFocusControlId) });
-            }
-            // Send focus to current control
-            ORBEON.xforms.Events.focus({ target: ORBEON.util.Dom.get(controlID) });
-        }
-
         // Simulate keyup
         ORBEON.xforms.Events.keydown({ target: ORBEON.util.Dom.get(currentFocusControlId) });
         ORBEON.xforms.Events.keyup({ target: ORBEON.util.Dom.get(currentFocusControlId) });
@@ -4277,8 +4266,7 @@ ORBEON.widgets.RTE = function() {
                 };
 
             // Create RTE object
-            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
-                ? control.getElementsByTagName("textarea")[0] : control;
+            var textarea = ORBEON.util.Utils.isNewXHTMLLayout() ? control.getElementsByTagName("textarea")[0] : control;
             // Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
             textarea.disabled = YAHOO.util.Dom.hasClass(control, "xforms-readonly");
             var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
@@ -4288,9 +4276,10 @@ ORBEON.widgets.RTE = function() {
             // in changeEvent being called onload, which has a side-effect of making Orbeon think the RTE
             // has focus. Avoid this by only registering the changeEvent listener when the first afterNodeChange
             // event is received.
+            var controlId = control.id;
             var registerChangeEvent = function() {
-                yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
-                yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
+                yuiRTE.on("editorKeyUp", function() { changeEvent(controlId); });
+                yuiRTE.on("afterNodeChange", function() { changeEvent(controlId); });
                 yuiRTE.on("editorWindowFocus", function() { ORBEON.xforms.Events.focus({ target: control }); });
                 yuiRTE.on("editorWindowBlur", function() { ORBEON.xforms.Events.blur({ target: control }); });
                 yuiRTE.removeListener("afterNodeChange", registerChangeEvent);
@@ -4302,10 +4291,6 @@ ORBEON.widgets.RTE = function() {
             isIncremental[control.id] = YAHOO.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
             yuiRTE.on("windowRender", function() {
-                if (!ORBEON.util.Utils.isNewXHTMLLayout()) {
-                    var rteContainer = control.parentNode;
-                    rteContainer.className += " " + control.className;
-                }
                 // Store initial server value
                 // If we don't and user's JS code calls ORBEON.xforms.Document.setValue(), the value of the RTE is changed, our RFE changeEvent() is called,
                 // it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
@@ -4317,6 +4302,16 @@ ORBEON.widgets.RTE = function() {
                     renderedCustomEvents[control.id].fire();
                 // Set to true, so future listeners are called back right away
                 renderedCustomEvents[control.id] = true;
+
+                if (! ORBEON.util.Utils.isNewXHTMLLayout()) {
+                    // Move classes on the container created by YUI
+                    var rteContainer = control.parentNode;
+                    rteContainer.className += " " + control.className;
+                    control.className = "";
+                    // If classes are later changed, they need to be changed on the container, so move the id on the container
+                    control.id = controlId + "-textarea";
+                    rteContainer.id = controlId;
+                }
             });
             yuiRTE.render();
         },

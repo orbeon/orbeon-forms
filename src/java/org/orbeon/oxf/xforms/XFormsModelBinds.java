@@ -178,9 +178,9 @@ public class XFormsModelBinds {
                     // Handle default values first
                     if (staticModel.hasInitialValueBind())
                         iterateBinds(propertyContext, new BindRunner() {
-                            public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                            public void applyBind(PropertyContext propertyContext, Bind bind, int position) {
                                 if (bind.staticBind.getInitialValue() != null &&  dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.INITIAL_VALUE()))
-                                    handleInitialValueDefaultBind(propertyContext, bind, nodeset, position);
+                                    handleInitialValueDefaultBind(propertyContext, bind, position);
                             }
                         });
                     // This will be false from now on as we have done our first handling of calculate binds
@@ -190,9 +190,9 @@ public class XFormsModelBinds {
                 // Handle calculations
                 if (staticModel.hasCalculateBind())
                     iterateBinds(propertyContext, new BindRunner() {
-                        public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                        public void applyBind(PropertyContext propertyContext, Bind bind, int position) {
                             if (bind.staticBind.getCalculate() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.CALCULATE()))
-                                handleCalculateBind(propertyContext, bind, nodeset, position);
+                                handleCalculateBind(propertyContext, bind, position);
                         }
                     });
 
@@ -217,9 +217,9 @@ public class XFormsModelBinds {
 
         // Apply
         iterateBinds(propertyContext, new BindRunner() {
-            public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+            public void applyBind(PropertyContext propertyContext, Bind bind, int position) {
                 if (bind.staticBind.hasCalculateComputedMIPs() || bind.staticBind.hasCustomMIPs()) // don't bother if not
-                    handleComputedExpressionBind(propertyContext, bind, nodeset, position);
+                    handleComputedExpressionBind(propertyContext, bind, position);
             }
         });
     }
@@ -245,7 +245,7 @@ public class XFormsModelBinds {
             // 1. Validate based on type and requiredness
             if (staticModel.hasTypeBind() || staticModel.hasRequiredBind())
                 iterateBinds(propertyContext, new BindRunner() {
-                    public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                    public void applyBind(PropertyContext propertyContext, Bind bind, int position) {
                         if (bind.staticBind.getType() != null || bind.staticBind.getRequired() != null) // don't bother if not
                             validateTypeAndRequired(propertyContext, bind, position, invalidInstances);
                     }
@@ -254,9 +254,9 @@ public class XFormsModelBinds {
             // 2. Validate constraints
             if (staticModel.hasConstraintBind())
                 iterateBinds(propertyContext, new BindRunner() {
-                    public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                    public void applyBind(PropertyContext propertyContext, Bind bind, int position) {
                         if (bind.staticBind.getConstraint() != null) // don't bother if not
-                            validateConstraint(propertyContext, bind, nodeset, position, invalidInstances);
+                            validateConstraint(propertyContext, bind, position, invalidInstances);
                     }
                 });
         }
@@ -307,22 +307,22 @@ public class XFormsModelBinds {
         return null;
     }
 
-    public Item evaluateBindByType(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, QName mipType) throws XPathException {
+    public Item evaluateBindByType(final PropertyContext propertyContext, Bind bind, int position, QName mipType) throws XPathException {
 
-        final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+        final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
         final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
 
         if (mipType.equals(XFormsConstants.RELEVANT_QNAME)) {
             // Relevant
-            final Boolean relevant = evaluateRelevantMIP(propertyContext, bind, nodeset, position, currentVariables);
+            final Boolean relevant = evaluateRelevantMIP(propertyContext, bind, position, currentVariables);
             return (relevant != null) ? BooleanValue.get(relevant) : null;
         } else if (mipType.equals(XFormsConstants.READONLY_QNAME)) {
             // Readonly
-            final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, nodeset, position, currentVariables);
+            final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, position, currentVariables);
             return (readonly != null) ? BooleanValue.get(readonly) : null;
         } else if (mipType.equals(XFormsConstants.REQUIRED_QNAME)) {
             // Required
-            final Boolean required = evaluateRequiredMIP(propertyContext, bind, nodeset, position, currentVariables);
+            final Boolean required = evaluateRequiredMIP(propertyContext, bind, position, currentVariables);
             return (required != null) ? BooleanValue.get(required) : null;
         } else if (mipType.equals(XFormsConstants.TYPE_QNAME)) {
             // Type
@@ -331,19 +331,19 @@ public class XFormsModelBinds {
             return (type != null) ? new QNameValue(type.getNamespacePrefix(), type.getNamespaceURI(), type.getName(), null) : null;
         } else if (mipType.equals(XFormsConstants.CONSTRAINT_QNAME)) {
             // Constraint
-            final Boolean constraint = evaluateConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
+            final Boolean constraint = evaluateConstraintMIP(propertyContext, bind, position, currentNodeInfo);
             return (constraint != null) ? BooleanValue.get(constraint) : null;
         } else if (mipType.equals(XFormsConstants.CALCULATE_QNAME)) {
             // Calculate
-            final String result = evaluateCalculateBind(propertyContext, bind, nodeset, position);
+            final String result = evaluateCalculateBind(propertyContext, bind, position);
             return (result != null) ? new StringValue(result) : null;
         } else if (mipType.equals(XFormsConstants.XXFORMS_DEFAULT_QNAME)) {
             // xxforms:default
-            final String result = evaluateXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+            final String result = evaluateXXFormsDefaultBind(propertyContext, bind, position);
             return (result != null) ? new StringValue(result) : null;
         } else {
             // Try custom MIPs
-            final String result = evaluateCustomMIP(propertyContext, bind, Model.buildCustomMIPName(mipType.getQualifiedName()), nodeset, position, currentVariables);
+            final String result = evaluateCustomMIP(propertyContext, bind, Model.buildCustomMIPName(mipType.getQualifiedName()), position, currentVariables);
             return (result != null) ? new StringValue(result) : null;
         }
     }
@@ -365,13 +365,13 @@ public class XFormsModelBinds {
         }
     }
 
-    private String evaluateXXFormsDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+    private String evaluateXXFormsDefaultBind(final PropertyContext propertyContext, Bind bind, int position) {
         // Handle xxforms:default MIP
         if (bind.staticBind.getInitialValue() != null) {
             // Compute default value
             try {
-                final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-                return evaluateStringExpression(propertyContext, nodeset, position, bind, bind.staticBind.getInitialValue(), getVariables(currentNodeInfo));
+                final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
+                return evaluateStringExpression(propertyContext, bind.nodeset, position, bind, bind.staticBind.getInitialValue(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms default bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getCalculate()));
@@ -384,34 +384,34 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleInitialValueDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+    private void handleInitialValueDefaultBind(final PropertyContext propertyContext, Bind bind, int position) {
 
-        final String stringResult = evaluateXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+        final String stringResult = evaluateXXFormsDefaultBind(propertyContext, bind, position);
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
-            final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+            final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
             XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
         }
     }
 
-    public void handleCalculateBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-        final String stringResult = evaluateCalculateBind(propertyContext, bind, nodeset, position);
+    public void handleCalculateBind(final PropertyContext propertyContext, Bind bind, int position) {
+        final String stringResult = evaluateCalculateBind(propertyContext, bind, position);
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
-            final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+            final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
             XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
         }
     }
 
-    public String evaluateCalculateBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+    public String evaluateCalculateBind(final PropertyContext propertyContext, Bind bind, int position) {
         // Handle calculate MIP
         if (bind.staticBind.getCalculate() != null) {
             // Compute calculated value
             try {
-                final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-                return evaluateStringExpression(propertyContext, nodeset, position, bind, bind.staticBind.getCalculate(), getVariables(currentNodeInfo));
+                final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
+                return evaluateStringExpression(propertyContext, bind.nodeset, position, bind, bind.staticBind.getCalculate(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms calculate bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getCalculate()));
@@ -446,40 +446,40 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleComputedExpressionBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+    private void handleComputedExpressionBind(PropertyContext propertyContext, Bind bind, int position) {
 
-        final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+        final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
         final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
 
         // Handle relevant, readonly, required, and custom MIPs
         if (bind.staticBind.getRelevant() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.RELEVANT()))
-            evaluateAndSetRelevantMIP(propertyContext, bind, nodeset, position, currentVariables);
+            evaluateAndSetRelevantMIP(propertyContext, bind, position, currentVariables);
         if (bind.staticBind.getReadonly() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.READONLY()) || bind.staticBind.getCalculate() != null)
-            evaluateAndSetReadonlyMIP(propertyContext, bind, nodeset, position, currentVariables);
+            evaluateAndSetReadonlyMIP(propertyContext, bind, position, currentVariables);
         if (bind.staticBind.getRequired() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.REQUIRED()))
-            evaluateAndSetRequiredMIP(propertyContext, bind, nodeset, position, currentVariables);
+            evaluateAndSetRequiredMIP(propertyContext, bind, position, currentVariables);
 
         // TODO: optimize those as well
-        evaluateAndSetCustomMIPs(propertyContext, bind, nodeset, position, currentVariables);
+        evaluateAndSetCustomMIPs(propertyContext, bind, position, currentVariables);
     }
 
-    private void evaluateAndSetCustomMIPs(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+    private void evaluateAndSetCustomMIPs(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
         final Map<String, Model.Bind.XPathMIP> customMips = bind.staticBind.customMIPs();
         if (customMips != null && customMips.size() > 0) {
             for (final String propertyName: customMips.keySet()) {
-                final String stringResult = evaluateCustomMIP(propertyContext, bind, propertyName, nodeset, position, currentVariables);
+                final String stringResult = evaluateCustomMIP(propertyContext, bind, propertyName, position, currentVariables);
                 bind.setCustom(position, propertyName, stringResult);
             }
         }
     }
 
-    private String evaluateCustomMIP(PropertyContext propertyContext, Bind bind, String propertyName, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+    private String evaluateCustomMIP(PropertyContext propertyContext, Bind bind, String propertyName, int position, Map<String, ValueRepresentation> currentVariables) {
         final Map<String, Model.Bind.XPathMIP> customMips = bind.staticBind.customMIPs();
         if (customMips != null && customMips.size() > 0) {
             final String expression = customMips.get(propertyName).expression();
             if (expression != null) {
                 try {
-                    return evaluateStringExpression(propertyContext, nodeset, position, bind, expression, currentVariables);
+                    return evaluateStringExpression(propertyContext, bind.nodeset, position, bind, expression, currentVariables);
                 } catch (Exception e) {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms custom bind",
                             bind.staticBind.element(), "name", propertyName, "expression", expression));
@@ -495,20 +495,20 @@ public class XFormsModelBinds {
         }
     }
 
-    private void evaluateAndSetRequiredMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
-        final Boolean required = evaluateRequiredMIP(propertyContext, bind, nodeset, position, currentVariables);
+    private void evaluateAndSetRequiredMIP(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
+        final Boolean required = evaluateRequiredMIP(propertyContext, bind, position, currentVariables);
         if (required != null) {
             // Update node with MIP value
             bind.setRequired(position, required);
         }
     }
 
-    private Boolean evaluateRequiredMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+    private Boolean evaluateRequiredMIP(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
         if (bind.staticBind.getRequired() != null) {
             // Evaluate "required" XPath expression on this node
             try {
                 // Get MIP value
-                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.staticBind.getRequired(), currentVariables);
+                return evaluateBooleanExpression1(propertyContext, bind.nodeset, position, bind, bind.staticBind.getRequired(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms required bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getRequired()));
@@ -521,8 +521,8 @@ public class XFormsModelBinds {
         }
     }
 
-    private void evaluateAndSetReadonlyMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
-        final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, nodeset, position, currentVariables);
+    private void evaluateAndSetReadonlyMIP(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
+        final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, position, currentVariables);
         if (readonly != null) {
             // Mark node
             bind.setReadonly(position, readonly);
@@ -552,12 +552,12 @@ public class XFormsModelBinds {
 //        }
     }
 
-    private Boolean evaluateReadonlyMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+    private Boolean evaluateReadonlyMIP(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
         if (bind.staticBind.getReadonly() != null) {
             // The bind has a readonly attribute
             // Evaluate "readonly" XPath expression on this node
             try {
-                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.staticBind.getReadonly(), currentVariables);
+                return evaluateBooleanExpression1(propertyContext, bind.nodeset, position, bind, bind.staticBind.getReadonly(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms readonly bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getReadonly()));
@@ -571,19 +571,19 @@ public class XFormsModelBinds {
         }
     }
 
-    private void evaluateAndSetRelevantMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
-        final Boolean relevant = evaluateRelevantMIP(propertyContext, bind, nodeset, position, currentVariables);
+    private void evaluateAndSetRelevantMIP(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
+        final Boolean relevant = evaluateRelevantMIP(propertyContext, bind, position, currentVariables);
         if (relevant != null) {
             // Mark node
             bind.setRelevant(position, relevant);
         }
     }
 
-    private Boolean evaluateRelevantMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+    private Boolean evaluateRelevantMIP(PropertyContext propertyContext, Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
         if (bind.staticBind.getRelevant() != null) {
             // Evaluate "relevant" XPath expression on this node
             try {
-                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.staticBind.getRelevant(), currentVariables);
+                return evaluateBooleanExpression1(propertyContext, bind.nodeset, position, bind, bind.staticBind.getRelevant(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms relevant bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getRelevant()));
@@ -708,7 +708,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void validateConstraint(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Set<String> invalidInstances) {
+    private void validateConstraint(PropertyContext propertyContext, Bind bind, int position, Set<String> invalidInstances) {
 
         assert bind.staticBind.getConstraint() != null;
 
@@ -728,7 +728,7 @@ public class XFormsModelBinds {
             // Then bother checking @constraint
             if (dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.CONSTRAINT())) {
                 // Re-evaluate and set
-                constraintValidity = evaluateConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
+                constraintValidity = evaluateConstraintMIP(propertyContext, bind, position, currentNodeInfo);
                 bind.setConstraintValidity(position, constraintValidity);
             } else
                 // Keep current value
@@ -862,12 +862,12 @@ public class XFormsModelBinds {
         return "".equals(value);
     }
 
-    private Boolean evaluateConstraintMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo) {
+    private Boolean evaluateConstraintMIP(PropertyContext propertyContext, Bind bind, int position, NodeInfo currentNodeInfo) {
         if (bind.staticBind.getConstraint() != null) {
             // Evaluate constraint
             try {
                 // Get MIP value
-                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.staticBind.getConstraint(), getVariables(currentNodeInfo));
+                return evaluateBooleanExpression1(propertyContext, bind.nodeset, position, bind, bind.staticBind.getConstraint(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms constraint bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getConstraint()));
@@ -881,7 +881,7 @@ public class XFormsModelBinds {
     }
 
     private static interface BindRunner {
-        public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position);
+        public void applyBind(PropertyContext propertyContext, Bind bind, int position);
     }
 
     public class Bind {
@@ -977,7 +977,7 @@ public class XFormsModelBinds {
                     final BindNode currentBindIteration = (j != null) ? j.next() : null;
 
                     // Handle current node
-                    bindRunner.applyBind(propertyContext, this, nodeset, index);
+                    bindRunner.applyBind(propertyContext, this, index);
 
                     // Handle children binds if any
                     if (currentBindIteration instanceof BindIteration)

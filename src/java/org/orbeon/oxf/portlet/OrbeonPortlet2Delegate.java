@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.Processor;
@@ -58,6 +59,10 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
 
     @Override
     public void init() throws PortletException {
+
+        // This is a PE feature
+        Version.instance().checkPEFeature("Orbeon Forms portlet");
+
         // NOTE: Here we assume that an Orbeon Forms WebAppContext context has already
         // been initialized. This can be done by another Servlet or Filter. The only reason we
         // cannot use the WebAppContext appears to be that it has to pass the ServletContext to

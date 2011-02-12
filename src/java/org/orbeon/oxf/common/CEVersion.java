@@ -24,6 +24,13 @@ public class CEVersion extends Version {
 
     private static final Set<String> WARNED_FEATURES = new HashSet<String>();
 
+    @Override
+    public void checkPEFeature(String featureName) {
+        // Feature is disallowed
+        throw new OXFException("Feature is not enabled in this version of the product: " + featureName);
+    }
+
+    @Override
     public boolean isPEFeatureEnabled(boolean featureRequested, String featureName) {
         if (featureRequested) {
             // Feature is requested but disallowed
@@ -35,6 +42,7 @@ public class CEVersion extends Version {
         return false;
     }
 
+    @Override
     public XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
         return new DumbXPathDependencies();
     }

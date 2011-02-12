@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
+import org.orbeon.oxf.common.Version
 import javax.portlet._
 import java.net.{HttpURLConnection, URL}
 import org.orbeon.oxf.util.StringBuilderWriter
@@ -48,7 +49,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
     private def getPreference(request: PortletRequest, pref: PreferenceName.Value) =
         request.getPreferences.getValue(pref.toString, getPortletConfig.getInitParameter(pref.toString))
 
-    override def init = {}
+    override def init = Version.instance().checkPEFeature("Form Runner proxy portlet")
 
     private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)""".r
     private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/]+)""".r

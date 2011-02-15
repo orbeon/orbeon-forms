@@ -357,6 +357,8 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/CalendarResources.js",    "/ops/javascript/orbeon/xforms/control/CalendarResources-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Calendar.js",             "/ops/javascript/orbeon/xforms/control/Calendar-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Upload.js",               "/ops/javascript/orbeon/xforms/control/Upload-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTEConfig.js",            "/ops/javascript/orbeon/xforms/control/RTEConfig-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTE.js",                  "/ops/javascript/orbeon/xforms/control/RTE-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js",                 "/ops/javascript/orbeon/xforms/control/Tree-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",               "/ops/javascript/orbeon/xforms/action/Message-min.js")
     };

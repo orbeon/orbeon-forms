@@ -138,7 +138,7 @@
             <responses>
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:dynamic-state>
-                        <dynamic-state sequence="2" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                        <dynamic-state sequence="2" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
                             <instances>
                                 <instance id="instance" model-id="model">
                                     <instance>new</instance>
@@ -152,7 +152,7 @@
                 </xxf:event-response>
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:dynamic-state>
-                        <dynamic-state sequence="3" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                        <dynamic-state sequence="3" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
                             <instances>
                                 <instance id="instance" model-id="model">
                                     <instance>new</instance>
@@ -161,7 +161,7 @@
                             <response>
                                 <xxf:event-response>
                                     <xxf:dynamic-state>
-                                        <dynamic-state sequence="2" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                                        <dynamic-state sequence="2" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
                                             <instances>
                                                 <instance id="instance" model-id="model">
                                                     <instance>new</instance>
@@ -182,7 +182,7 @@
                 </xxf:event-response>
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:dynamic-state>
-                        <dynamic-state sequence="3" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                        <dynamic-state sequence="3" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
                             <instances>
                                 <instance id="instance" model-id="model">
                                     <instance>new</instance>
@@ -191,7 +191,7 @@
                             <response>
                                 <xxf:event-response>
                                     <xxf:dynamic-state>
-                                        <dynamic-state sequence="2" deployment-type="plain" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
+                                        <dynamic-state sequence="2" deployment-type="standalone" request-context-path="/orbeon" request-path="/xforms-server" container-type="servlet" container-namespace="" uuid="4A00AF98-7464-2F85-9AF6-291447DCC6F8">
                                             <instances>
                                                 <instance id="instance" model-id="model">
                                                     <instance>new</instance>

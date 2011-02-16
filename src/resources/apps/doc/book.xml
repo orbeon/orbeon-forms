@@ -31,7 +31,7 @@
     </menu>
     <menu label="XForms Documentation">
         <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
-        <menu-item label="Orbeon XForms Tutorial" href="intro-tutorial"/>
+        <menu-item label="Orbeon XForms Tutorial" href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial"/>
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="Page Flow">
@@ -60,7 +60,7 @@
             <menu-item label="Other Serializers" href="processors-serializers"/>
         </menu>
         <menu label="Transforming XML">
-            <menu-item label="Converters" href="processors-converters"/>
+            <menu-item label="Converters" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-converters#TOC-Custom-serializer-classes"/>
             <menu-item label="XSLT and TrAX" href="http://wiki.orbeon.com/forms/doc/xslt-jaxp-processors"/>
             <menu-item label="XInclude" href="processors-xinclude"/>
             <menu-item label="XUpdate" href="processors-xupdate"/>

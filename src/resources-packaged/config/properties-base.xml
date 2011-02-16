@@ -62,6 +62,9 @@
     <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
     <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
 
+    <property as="xs:QName" processor-name="oxf:xml-converter"  name="default-method" value="xml"/>
+    <property as="xs:QName" processor-name="oxf:html-converter" name="default-method" value="html"/>
+
     <property as="xs:string"  processor-name="oxf:builtin-saxon"        name="location-mode" value="none"/>
     <property as="xs:string"  processor-name="oxf:unsafe-builtin-saxon" name="location-mode" value="none"/>
     <!-- This property was used prior to January 2010 builds -->

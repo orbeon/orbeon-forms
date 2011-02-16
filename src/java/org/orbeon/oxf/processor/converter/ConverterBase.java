@@ -14,11 +14,13 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 /**
  * Base class for converters.
@@ -57,7 +59,13 @@ public abstract class ConverterBase extends ProcessorImpl {
                     try {
                         final Config config = new Config();
 
-                        config.method = XPathUtils.selectStringValueNormalize(configElement, "/config/method");
+                        // Support a QName as method value
+                        final Element methodElement = (Element) XPathUtils.selectSingleNode(configElement, "/config/method");
+                        if (methodElement != null) {
+                            final QName methodQName = Dom4jUtils.extractTextValueQName(methodElement, true);
+                            config.method = Dom4jUtils.qNameToExplodedQName(methodQName);
+                        }
+
                         config.contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
                         config.encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
                         config.version = XPathUtils.selectStringValueNormalize(configElement, "/config/version");

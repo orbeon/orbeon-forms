@@ -306,6 +306,11 @@ public class PropertySet {
         return (QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
     }
 
+    public QName getQName(String name, QName defaultValue) {
+        final QName result = getQName(name);
+        return (result == null) ? defaultValue : result;
+    }
+
     public URI getURI(String name) {
         return (URI) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
     }

@@ -16,7 +16,9 @@ package org.orbeon.oxf.processor.converter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.util.ContentHandlerWriter;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -30,6 +32,8 @@ import java.io.Writer;
  * Base class for text converters.
  */
 public abstract class TextConverterBase extends ConverterBase {
+
+    public static final String DEFAULT_METHOD_PROPERTY_NAME = "default-method";
 
     /**
      * This must be overridden by subclasses.

@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.processor.converter;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -33,7 +35,7 @@ import java.io.Writer;
 public class HTMLConverter extends TextConverterBase {
 
     public static final String DEFAULT_CONTENT_TYPE = "text/html";
-    public static final String DEFAULT_METHOD = "html";
+    public static final QName DEFAULT_METHOD = QName.get("html");
 
     public static final String DEFAULT_PUBLIC_DOCTYPE = "-//W3C//DTD HTML 4.01 Transitional//EN";
     public static final String DEFAULT_SYSTEM_DOCTYPE = null;
@@ -51,7 +53,7 @@ public class HTMLConverter extends TextConverterBase {
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : DEFAULT_METHOD,
+                config.method != null ? config.method : Dom4jUtils.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
                 config.version != null ? config.version : null,
                 config.publicDoctype != null ? config.publicDoctype : null,
                 config.systemDoctype != null ? config.systemDoctype : null,

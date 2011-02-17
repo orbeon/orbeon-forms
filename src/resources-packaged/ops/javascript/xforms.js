@@ -3912,6 +3912,8 @@ ORBEON.xforms.Events = {
          * @param {!string} fullUpdateId    Id of the control that contains the section that was updated.
          */
         onFullUpdateDone: function(fullUpdateId) {
+
+            // Re-initialize all the existing XBL components inside the this container
             var me = this;
             var componentIds = this._fullUpdateToComponents[fullUpdateId];
             if (componentIds) {
@@ -3924,6 +3926,9 @@ ORBEON.xforms.Events = {
                     }
                 });
             }
+
+            // Re-initialize all the legacy/built-in controls
+            ORBEON.xforms.Init.insertedElement(YUD.get(fullUpdateId));
         }
     };
 
@@ -4876,6 +4881,8 @@ ORBEON.xforms.Init = {
      * Initialize dialogs
      */
     _dialog: function(dialog) {
+        console.log("Init dialog");
+        console.trace();
         var isModal = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
         var isDraggable = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");

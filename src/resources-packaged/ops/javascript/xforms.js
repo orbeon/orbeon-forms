@@ -4881,8 +4881,6 @@ ORBEON.xforms.Init = {
      * Initialize dialogs
      */
     _dialog: function(dialog) {
-        console.log("Init dialog");
-        console.trace();
         var isModal = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
         var isDraggable = YAHOO.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");

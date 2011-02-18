@@ -14,9 +14,9 @@
 
 /* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
 
-html body form.xforms-initially-hidden,
-    html body .xforms-form .xforms-initially-hidden,
-    html body .xforms-form .xforms-repeat-template,
+/* See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden  */
+
+html body .xforms-form .xforms-repeat-template,
     html body .xforms-form .xforms-template,
     html body .xforms-form .xforms-repeat-delimiter,
     html body .xforms-form .xforms-repeat-begin-end,
@@ -91,6 +91,11 @@ html body .xforms-form tr.xforms-disabled,
     border-style: none ! important;
 }
 
+/* Special text content that must remain hidden */
+#xforms-repeat-tree, #xforms-repeat-indexes {
+    display: none;
+}
+
 /**
  * XForms switch/case
  * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
@@ -102,10 +107,6 @@ html body .xforms-form tr.xforms-disabled,
 /* For animated toggle of switch/case */
 .xxforms-animate { overflow: hidden }
 
-/* Special text content that must remain hidden */
-#xforms-repeat-tree, #xforms-repeat-indexes {
-    display: none;
-}
 
 /* ***** Label, hint, help, alert *********************************************************************************** */
 

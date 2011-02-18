@@ -67,6 +67,9 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
         final boolean isMinimal = XFormsProperties.isMinimalResources();
         final boolean isVersionedResources = URLRewriterUtils.isResourcesVersioned();
 
+        // Include static XForms CSS. This makes sure that
+        final String requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
+        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", XHTMLBodyHandler.getIncludedResourcePath(requestPath, "static-xforms-css.xml") });
 
         // Stylesheets
         final AttributesImpl attributesImpl = new AttributesImpl();

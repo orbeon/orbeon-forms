@@ -37,7 +37,7 @@ public class URLRewriterUtils {
 
     // Versioned resources configuration
     public static final String RESOURCES_VERSIONED_PROPERTY = "oxf.resources.versioned";
-    public static final boolean RESOURCES_VERSIONED_DEFAULT = false;
+    public static final boolean RESOURCES_VERSIONED_DEFAULT = true;
 
     private static final String REWRITING_PLATFORM_PATHS_PROPERTY = "oxf.url-rewriting.platform-paths";
     private static final String REWRITING_APP_PATHS_PROPERTY = "oxf.url-rewriting.app-paths";

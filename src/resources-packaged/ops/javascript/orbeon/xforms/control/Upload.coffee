@@ -15,7 +15,6 @@ ExecutionQueue = ORBEON.util.ExecutionQueue
 Properties = ORBEON.util.Properties
 UploadServer = ORBEON.xforms.server.UploadServer
 Control = ORBEON.xforms.control.Control
-Upload = ORBEON.xforms.control.Upload
 Page = ORBEON.xforms.Page
 Event = YAHOO.util.Event
 YD = YAHOO.util.Dom

@@ -1769,7 +1769,7 @@ ORBEON.xforms.Controls = {
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML text area
             if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                return ORBEON.widgets.RTE.getValue(control);
+                return ORBEON.xforms.Page.getControl(control).getValue();
             } else {
                 var editorInstance = FCKeditorAPI.GetInstance(control.name);
                 return editorInstance.GetXHTML();
@@ -1991,7 +1991,7 @@ ORBEON.xforms.Controls = {
             // HTML area
             if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
                 // YUI RTE
-                ORBEON.widgets.RTE.setValue(control, newControlValue);
+                ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
             } else {
                 // FCK
                 var htmlEditor = FCKeditorAPI.GetInstance(control.name);
@@ -2347,7 +2347,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea") && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
             if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                ORBEON.widgets.RTE.setReadonly(control, isReadonly);
+                ORBEON.xforms.Page.getControl(control).setReadonly(isReadonly);
             } else {
                 var htmlEditor = FCKeditorAPI.GetInstance(control.name);
                 if (isReadonly) htmlEditor.ToolbarSet.Collapse();
@@ -2471,7 +2471,7 @@ ORBEON.xforms.Controls = {
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // Special case for RTE
             if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                ORBEON.widgets.RTE.setFocus(control);
+                ORBEON.xforms.Page.getControl(control).setFocus();
             } else {
                 // Not sure anything meaningful can be done for FCK
             }
@@ -3040,9 +3040,6 @@ ORBEON.xforms.Events = {
 
             if (targetControlElement != null && currentFocusControlElement != targetControlElement
                     && !YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
-
-                // The RTE interested in knowing when anyone gets a focus event
-                ORBEON.widgets.RTE.focusOnAnyFormControl(targetControlElement);
 
                 // Handle special value changes upon losing focus
 
@@ -4151,7 +4148,7 @@ ORBEON.xforms.Init = {
             "range": { "": ORBEON.xforms.Init._range },
             "textarea": {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
-                "text/html": ORBEON.xforms.Init._htmlArea
+                "text/html": genericInit
             },
             "dialog": {
                 "": ORBEON.xforms.Init._dialog,
@@ -4640,6 +4637,7 @@ ORBEON.xforms.Init = {
             } else if (YAHOO.util.Dom.hasClass(element, "xforms-textarea")
                            && YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")) {
                 // HTML area
+
                 ORBEON.xforms.Init._htmlArea(element);
             } else if (YAHOO.util.Dom.hasClass(element, "xforms-dialog")) {
                 // Dialog
@@ -4824,7 +4822,7 @@ ORBEON.xforms.Init = {
      */
     _htmlArea: function (htmlArea) {
         if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-            ORBEON.widgets.RTE.init(htmlArea);
+            ORBEON.xforms.Page.getControl(container);
         } else {
 
             // Initialize FCK editor

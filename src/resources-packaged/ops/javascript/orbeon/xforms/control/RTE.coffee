@@ -1,130 +1,104 @@
-rteEditors = {}             # Maps control ID to YUI RTE object
-isIncremental = {}          # Maps control ID to boolean telling us if this control is in incremental model
-editorWithFocus = null      # The control ID of the RTE editor that has the focus, null if none
+Control = ORBEON.xforms.control.Control
+RTEConfig = ORBEON.xforms.control.RTEConfig
+Events = ORBEON.xforms.Events
+Page = ORBEON.xforms.Page
+OD = ORBEON.util.Dom
+YD = YAHOO.util.Dom
+CustomEvent = YAHOO.util.CustomEvent
 
-# Maps control ID to either:
-#      undefined:      if the control is not rendered yet, and nobody is listening on render event.
-#      true:           if the control is rendered and nobody listened to a render event before it was rendered.
-#      a custom event: if someone listened to the render event before the control was rendered.
-renderedCustomEvents = {}
+class RTE extends Control
 
-# Event handler called by the RTE every time there is an event which can could potentially change the content
-# of the editor.
-changeEvent = (controlID) ->
-    # Simulate keyup
-    currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId
-    ORBEON.xforms.Events.keydown { target: ORBEON.util.Dom.get(currentFocusControlId) }
-    ORBEON.xforms.Events.keyup { target: ORBEON.util.Dom.get(currentFocusControlId) }
-
-ORBEON.widgets.RTE =
-
-    extending: ORBEON.widgets.Base
-    rteEditors: rteEditors
+    constructor: () ->
+        @yuiRTE = null
+        @isRendered = false
+        @renderedEvent = new CustomEvent "rteRendered"
 
     # Initializes the RTE editor for a particular control.
-    init: (control) ->
-        # Create RTE config
-        if (typeof YUI_RTE_CUSTOM_CONFIG != "undefined")
-            rteConfig = YUI_RTE_CUSTOM_CONFIG
-        else
-            rteConfig = ORBEON.xforms.control.RTEConfig
-
-        #    Create RTE object
-        textarea = if ORBEON.util.Utils.isNewXHTMLLayout() then control.getElementsByTagName("textarea")[0] else control
+    init: (container) ->
+        super container
+        # Create RTE object
+        textarea = if ORBEON.util.Utils.isNewXHTMLLayout() then container.getElementsByTagName("textarea")[0] else container
         # Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
-        textarea.disabled = YAHOO.util.Dom.hasClass control, "xforms-readonly"
-        yuiRTE = new YAHOO.widget.Editor textarea, rteConfig
+        textarea.disabled = YAHOO.util.Dom.hasClass container, "xforms-readonly"
+        rteConfig = if typeof YUI_RTE_CUSTOM_CONFIG != "undefined" then YUI_RTE_CUSTOM_CONFIG else RTEConfig
+        @yuiRTE = new YAHOO.widget.Editor textarea, rteConfig
 
-        # Register event listener for user interacting with the control
+        # Register event listener for user interacting with the container
         # RTE fires afterNodeChange right at the end of initialisation, which mistakenly results
         # in changeEvent being called onload, which has a side-effect of making Orbeon think the RTE
         # has focus. Avoid this by only registering the changeEvent listener when the first afterNodeChange
         # event is received.
-        controlId = control.id
-        registerChangeEvent = () ->
-            yuiRTE.on "editorKeyUp", () -> changeEvent controlId
-            yuiRTE.on "afterNodeChange", () -> changeEvent controlId
-            yuiRTE.on "editorWindowFocus", () -> ORBEON.xforms.Events.focus { target: control }
-            yuiRTE.on "editorWindowBlur", () -> ORBEON.xforms.Events.blur { target: control }
-            yuiRTE.removeListener "afterNodeChange", registerChangeEvent
-        yuiRTE.on "afterNodeChange", registerChangeEvent
+        containerId = container.id
+        registerChangeEvent = () =>
+            @yuiRTE.on "editorKeyUp", () => @changeEvent
+            @yuiRTE.on "afterNodeChange", () => @changeEvent
+            @yuiRTE.on "editorWindowFocus", () -> Events.focus { target: container }
+            @yuiRTE.on "editorWindowBlur", () -> Events.blur { target: container }
+            @yuiRTE.removeListener "afterNodeChange", registerChangeEvent
+        @yuiRTE.on "afterNodeChange", registerChangeEvent
 
-        # Store information about this RTE
-        rteEditors[control.id] = yuiRTE
-        isIncremental[control.id] = YAHOO.util.Dom.hasClass control, "xforms-incremental"
         # Transform text area into RTE on the page
-        yuiRTE.on "windowRender", () ->
+        @yuiRTE.on "windowRender", () =>
             # Store initial server value
             # If we don't and user's JS code calls ORBEON.xforms.Document.setValue(), the value of the RTE is changed, our RFE changeEvent() is called,
             # it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
             # Then in executeNextRequest() we ignore the value change because it is the same the server value.
-            controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue control
-            ORBEON.xforms.ServerValueStore.set control.id, controlCurrentValue
-            # Fire event we have a custom event listener from this RTE
-            if (YAHOO.lang.isObject(renderedCustomEvents[control.id]))
-                renderedCustomEvents[control.id].fire()
-            # Set to true, so future listeners are called back right away
-            renderedCustomEvents[control.id] = true
+            containerCurrentValue = ORBEON.xforms.Controls.getCurrentValue container
+            ORBEON.xforms.ServerValueStore.set container.id, containerCurrentValue
 
             if (! ORBEON.util.Utils.isNewXHTMLLayout())
                 # Move classes on the container created by YUI
-                rteContainer = control.parentNode
-                rteContainer.className += " " + control.className
-                control.className = ""
+                rteContainer = container.parentNode
+                rteContainer.className += " " + container.className
+                container.className = ""
                 # If classes are later changed, they need to be changed on the container, so move the id on the container
-                control.id = controlId + "-textarea"
-                rteContainer.id = controlId
-        yuiRTE.render()
+                container.id = containerId + "-textarea"
+                rteContainer.id = containerId
 
-    # TODO: destroy()
+            # Fire render event
+            @isRendered = true
+            @renderedEvent.fire()
 
-    # Called on any focus event of other form controls on the page
-    focusOnAnyFormControl: (control) ->
+        @yuiRTE.render()
+
+    # Event handler called by the RTE every time there is an event which can could potentially change the content
+    # of the editor.
+    changeEvent = (controlID) ->
+        # Simulate keyup
         currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId
-        # If the focus went to another control (not RTE) and the current is a an RTE
-        if (rteEditors[control.id] == null && rteEditors[currentFocusControlId] != null)
-            # Send blur to that RTE
-            ORBEON.xforms.Events.change({ target: ORBEON.util.Dom.get(currentFocusControlId) })
-            ORBEON.xforms.Events.blur({ target: ORBEON.util.Dom.get(currentFocusControlId) })
+        Events.keydown { target: OD.get(currentFocusControlId) }
+        Events.keyup { target: OD.get(currentFocusControlId) }
 
     # Called to set the value of the RTE
-    setValue: (control, newValue) ->
+    setValue: (newValue) ->
         # Don't update the textarea with HTML from the server while the user is typing, otherwise the user
         # loses their cursor position. This lets us have a certain level of support for incremental rich text areas,
         # however, ignoring server values means that the visual state of the RTE can become out of sync
         # with the server value (for example, the result of a calculation wouldn't be visible until focus moved
         # out of the field).
-        if (! YAHOO.util.Dom.hasClass(control, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != control.id)
-            yuiRTE = rteEditors[control.id]
-            yuiRTE.setEditorHTML(newValue)
+        if (not YD.hasClass(@container, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != @container.id)
+            @yuiRTE.setEditorHTML(newValue)
 
-    getValue: (control) ->
-        yuiRTE = rteEditors[control.id]
-        value = yuiRTE.getEditorHTML()
+    getValue: () ->
+        value = @yuiRTE.getEditorHTML()
         # HACK: with Firefox, it seems that sometimes, when setting the value of the editor to "" you get"<br>" back
         # The purpose of this hack is to work around that problem. It has drawbacks:
         # o This means setting "<br>" will also result in ""
         # o This doesn't fix the root of the problem so there may be other cases not caught by this
-        if (value == "<br>")
-            value = ""
+        value = "" if value == "<br>"
         return value
 
-    setFocus: (control) ->
-        yuiRTE = rteEditors[control.id]
-        yuiRTE.focus()
-
-    onRendered: (control, callback) ->
-        if (renderedCustomEvents[control.id] == true)
-            # Already rendered.
-            callback()
-        else
-            # Create custom event if necessary
-            if (renderedCustomEvents[control.id] == undefined)
-                renderedCustomEvents[control.id] = new YAHOO.util.CustomEvent("rteRendered")
-            # Custom event was already created
-            renderedCustomEvents[control.id].subscribe(callback)
+    setFocus: () ->
+        @yuiRTE.focus()
 
     # XForms readonly == RTE disabled configuration attribute.
-    setReadonly: (control, isReadonly) ->
-        yuiRTE = rteEditors[control.id]
-        yuiRTE.set("disabled", isReadonly)
+    setReadonly: (isReadonly) ->
+        @yuiRTE.set("disabled", isReadonly)
+
+    onRendered: (callback) ->
+        if @isRendered then callback() else @renderedEvent.subscribe callback
+
+Page.registerControlConstructor RTE, (container) ->
+    hasClass = (c) -> YD.hasClass container, c
+    (hasClass "xforms-textarea") and (hasClass "xforms-mediatype-text-html")
+ORBEON.xforms.control.RTE = RTE

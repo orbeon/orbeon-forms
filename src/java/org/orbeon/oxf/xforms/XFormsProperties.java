@@ -60,9 +60,6 @@ public class XFormsProperties {
     private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
     private static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
 
-    private static final String MINIMAL_RESOURCES_PROPERTY = "minimal-resources";
-    private static final String COMBINE_RESOURCES_PROPERTY = "combine-resources";
-
     private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
     private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
 
@@ -77,10 +74,8 @@ public class XFormsProperties {
     private static final String DATE_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "date";
     private static final String TIME_FORMAT_INPUT_PROPERTY = TYPE_INPUT_FORMAT_PROPERTY_PREFIX + "time";
 
-    private static final String DATEPICKER_PROPERTY = "datepicker";
     private static final String DATEPICKER_NAVIGATOR_PROPERTY = "datepicker.navigator";
     private static final String DATEPICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
-    private static final String XHTML_EDITOR_PROPERTY = "htmleditor";
     private static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
 
     private static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
@@ -88,7 +83,6 @@ public class XFormsProperties {
 
     private static final String SESSION_HEARTBEAT_PROPERTY = "session-heartbeat";
     public static final String SESSION_HEARTBEAT_DELAY_PROPERTY = "session-heartbeat-delay";
-    public static final String FCK_EDITOR_BASE_PATH_PROPERTY = "fck-editor-base-path";
     private static final String DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-incremental-request";
     private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
     private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
@@ -198,8 +192,6 @@ public class XFormsProperties {
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
-            new PropertyDefinition(MINIMAL_RESOURCES_PROPERTY, true, false),
-            new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -223,7 +215,6 @@ public class XFormsProperties {
             new PropertyDefinition(RETRY_MAX_DELAY, 30000, true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
-            new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),// dynamic
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),
             new PropertyDefinition(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY, 2000, true),
             new PropertyDefinition(DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY, 5000, true),
@@ -241,10 +232,8 @@ public class XFormsProperties {
             new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true),// dynamic
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
-            new PropertyDefinition(DATEPICKER_PROPERTY, "yui", true),
             new PropertyDefinition(DATEPICKER_NAVIGATOR_PROPERTY, true, true),
             new PropertyDefinition(DATEPICKER_TWO_MONTHS_PROPERTY, false, true),
-            new PropertyDefinition(XHTML_EDITOR_PROPERTY, "yui", true),
             new PropertyDefinition(SHOW_ERROR_DIALOG_PROPERTY, true, true),
             new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY, "default", true),
             new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true)
@@ -281,16 +270,20 @@ public class XFormsProperties {
     private static final String HOST_LANGUAGE_AVTS_PROPERTY = XFORMS_PROPERTY_PREFIX + "host-language-avts"; // global but should be per document
     private static final boolean HOST_LANGUAGE_AVTS_DEFAULT = false;
 
-    private static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources"; // global but could possibly be per document
+    private static final String MINIMAL_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "minimal-resources";
+    private static final boolean MINIMAL_RESOURCES_PROPERTY_DEFAULT = true;
+
+    private static final String COMBINE_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "combine-resources";
+    private static final boolean COMBINE_RESOURCES_PROPERTY_DEFAULT = true;
+
+    private static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources";
     private static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
 
-    private static final String TEST_AJAX_PROPERTY = XFORMS_PROPERTY_PREFIX + "test.ajax";
-    private static final boolean TEST_AJAX_DEFAULT = false;
+    private static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "javascript-at-bottom";
+    private static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
 
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
-
-    public static final String PIPELINE_TRACE_CLASS_PROPERTY = XFORMS_PROPERTY_PREFIX + "pipeline.trace.class";
 
     private static final String DEBUG_LOG_XPATH_ANALYSIS = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
 
@@ -350,11 +343,6 @@ public class XFormsProperties {
                 (GZIP_STATE_PROPERTY, GZIP_STATE_DEFAULT);
     }
 
-    public static boolean isAjaxTest() {
-        return Properties.instance().getPropertySet().getBoolean
-                (TEST_AJAX_PROPERTY, TEST_AJAX_DEFAULT);
-    }
-
     public static String getStoreUsername() {
         return Properties.instance().getPropertySet().getString
                 (STORE_APPLICATION_USERNAME_PROPERTY, STORE_APPLICATION_USERNAME_DEFAULT);
@@ -380,9 +368,24 @@ public class XFormsProperties {
                 (HOST_LANGUAGE_AVTS_PROPERTY, HOST_LANGUAGE_AVTS_DEFAULT);
     }
 
+    public static boolean isMinimalResources() {
+        return Properties.instance().getPropertySet().getBoolean
+                (MINIMAL_RESOURCES_PROPERTY, MINIMAL_RESOURCES_PROPERTY_DEFAULT);
+    }
+
+    public static boolean isCombinedResources() {
+        return Properties.instance().getPropertySet().getBoolean
+                (COMBINE_RESOURCES_PROPERTY, COMBINE_RESOURCES_PROPERTY_DEFAULT);
+    }
+
     public static boolean isCacheCombinedResources() {
         return Properties.instance().getPropertySet().getBoolean
                 (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT);
+    }
+
+    public static boolean isJavaScriptAtBottom() {
+        return Properties.instance().getPropertySet().getBoolean
+                (JAVASCRIPT_AT_BOTTOM_PROPERTY, JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT);
     }
 
     public static boolean getDebugLogXPathAnalysis() {
@@ -433,13 +436,6 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, AJAX_SHOW_ERRORS_PROPERTY);
     }
 
-    public static boolean isMinimalResources(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, MINIMAL_RESOURCES_PROPERTY);
-    }
-
-    public static boolean isCombinedResources(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, COMBINE_RESOURCES_PROPERTY);
-    }
 
     public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
@@ -530,10 +526,6 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, SESSION_HEARTBEAT_PROPERTY);
     }
 
-    public static boolean isOfflineMode(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, OFFLINE_SUPPORT_PROPERTY);
-    }
-
     public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument) {
         // Get from XForms property first, otherwise use global default
         final String result = getStringProperty(containingDocument, FORWARD_SUBMISSION_HEADERS);
@@ -553,14 +545,6 @@ public class XFormsProperties {
 
     public static boolean isXForms11Switch(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, XFORMS11_SWITCH_PROPERTY);
-    }
-
-    public static String getDatePicker(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, DATEPICKER_PROPERTY);
-    }
-
-    public static String getHTMLEditor(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, XHTML_EDITOR_PROPERTY);
     }
 
     // == Helpers ======================================================================================================

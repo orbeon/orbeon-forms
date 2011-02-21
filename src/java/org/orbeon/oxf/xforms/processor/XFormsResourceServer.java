@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import net.sf.ehcache.Element;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
@@ -22,13 +23,16 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.Caches;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -151,42 +155,28 @@ public class XFormsResourceServer extends ProcessorImpl {
                 return;
             }
 
-            // Find what features are requested
-            // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
-            boolean isMinimal = false;
-            final Map<String, XFormsFeatures.FeatureConfig> requestedFeaturesMap = new HashMap<String, XFormsFeatures.FeatureConfig>();
-            {
-                final StringTokenizer st = new StringTokenizer(filename.substring(0, filename.lastIndexOf(".")), "-");
-                while (st.hasMoreTokens()) {
-                    final String currentToken = st.nextToken();
-
-                    if (currentToken.equals("min")) {
-                        // Request for minimal resources
-                        isMinimal = true;
-                        continue;
-                    } else if (currentToken.equals("xforms")) {
-                        // Ignore this token
-                        continue;
-                    }
-
-                    final XFormsFeatures.FeatureConfig currentFeature = XFormsFeatures.getFeatureById(currentToken);
-                    if (currentFeature != null) {
-                        // Add feature
-                        requestedFeaturesMap.put(currentFeature.getName(), currentFeature);
-                    } else {
-                        // Don't allow unknown features
-                        response.setStatus(ExternalContext.SC_NOT_FOUND);
-                        return;
-                    }
-                }
-            }
-
-            // Determine list of resources to load
             final List<XFormsFeatures.ResourceConfig> resources;
-            if (isCSS)
-                resources = XFormsFeatures.getCSSResourcesByFeatureMap(requestedFeaturesMap);
-            else
-                resources = XFormsFeatures.getJavaScriptResourcesByFeatureMap(requestedFeaturesMap);
+            boolean isMinimal = false;
+            if (filename.startsWith("orbeon-")) {
+                // New hash-based mechanism
+
+                final String resourcesHash = filename.substring("orbeon-".length(), filename.lastIndexOf("."));
+                final Element cacheElement = Caches.resourcesCache().get(resourcesHash);
+                if (cacheElement != null) {
+                    // Mapping found
+                    final String[] resourcesStrings = (String[]) cacheElement.getValue();
+                    resources = new ArrayList<XFormsFeatures.ResourceConfig>(resourcesStrings.length);
+                    for (final String resourceString : resourcesStrings)
+                        resources.add(new XFormsFeatures.ResourceConfig(resourceString, resourceString));
+                } else {
+                    // Not found, either because the hash is invalid, or because the cache lost the mapping
+                    response.setStatus(ExternalContext.SC_NOT_FOUND);
+                    return;
+                }
+            } else {
+                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                return;
+            }
 
             // Get last modified date
             final long combinedLastModified = computeCombinedLastModified(resources, isMinimal);
@@ -216,7 +206,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(indentedLogger, resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
@@ -274,7 +264,6 @@ public class XFormsResourceServer extends ProcessorImpl {
     /**
      * Try to cache the combined resources on disk.
      *
-     * @param indentedLogger        logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
      * @param propertyContext       current PipelineContext (used for rewriting and matchers)
      * @param resourcePath          path to store the cached resource to
@@ -283,10 +272,12 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param isMinimal             whether to use minimal resources
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
-    public static File cacheResources(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources,
+    public static File cacheResources(List<XFormsFeatures.ResourceConfig> resources,
                                       PropertyContext propertyContext, String resourcePath, long combinedLastModified,
                                       boolean isCSS, boolean isMinimal) {
         try {
+            final IndentedLogger indentedLogger = getIndentedLogger();
+
             final File resourceFile;
             final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
@@ -347,8 +338,8 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 
-            // Create matcher that matches all paths in case resources are versioned
-            final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
+//            // Create matcher that matches all paths in case resources are versioned
+//            final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
 
             // Output Orbeon Forms version
             outputWriter.write("/* This file was produced by " + Version.getVersionString() + " */\n");
@@ -438,5 +429,15 @@ public class XFormsResourceServer extends ProcessorImpl {
         }
         os.flush();
         os.close();
+    }
+    
+    // For unit tests only (called from XSLT)
+    public static String[] testGetResources(String key) {
+        final Element cacheElement = Caches.resourcesCache().get(key);
+        if (cacheElement != null) {
+            return (String[]) cacheElement.getValue();
+        } else {
+            return null;
+        }
     }
 }

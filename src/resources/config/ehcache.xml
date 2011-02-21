@@ -43,4 +43,17 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
+    <!-- XForms resources. Only modify if you know what you are doing! -->
+    <cache name="xforms.resources"
+           maxElementsInMemory="50"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="true"
+           diskSpoolBufferSizeMB="1"
+           eternal="false"
+           timeToLiveSeconds="0"
+           timeToIdleSeconds="1800"
+           diskPersistent="false"
+           maxElementsOnDisk="0"
+           diskExpiryThreadIntervalSeconds="120"/>
+
 </ehcache>

@@ -107,6 +107,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
     // Controls
     private Map<String, Map<String, ElementAnalysis>> controlTypes;         // Map<String type, Map<String prefixedId, ElementAnalysis>>
+    private Map<String, Set<QName>> controlAppearances;                     // Map<String type, Set<QName appearance>>
     private Map<String, ElementAnalysis> controlAnalysisMap;                // Map<String controlPrefixedId, ElementAnalysis>: for all controls
 
     // xforms:repeat
@@ -285,6 +286,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         indentedLogger.startHandleOperation("", "performing static analysis");
 
         controlTypes = new HashMap<String, Map<String, ElementAnalysis>>();
+        controlAppearances = new HashMap<String, Set<QName>>();
         eventNames = new HashSet<String>();
         eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
         eventHandlerAncestorsMap = new HashMap<String, String>();
@@ -884,6 +886,11 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         return controlTypes.get(controlName) != null;
     }
 
+    public boolean hasControlAppearance(String controlName, QName appearance) {
+        final Set<QName> appearances = controlAppearances.get(controlName);
+        return appearances != null && appearances.contains(appearance);
+    }
+
     public SelectionControl getSelect1Analysis(String controlPrefixedId) {
         return ((SelectionControl) controlAnalysisMap.get(controlPrefixedId));
     }
@@ -1148,6 +1155,23 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                         controlTypes.put(controlName, controlsMap);
                     }
                     controlsMap.put(elementAnalysis.prefixedId(), elementAnalysis);
+                }
+
+                // Remember appearances in use
+                {
+                    Set<QName> appearances = controlAppearances.get(controlName);
+                    if (appearances == null) {
+                        appearances = new HashSet<QName>();
+                        controlAppearances.put(controlName, appearances);
+                    }
+                    final QName appearance = Dom4jUtils.extractAttributeValueQName(elementAnalysis.element(), XFormsConstants.APPEARANCE_QNAME);
+                    if ("textarea".equals(controlName) && "text/html".equals(elementAnalysis.element().attributeValue(XFormsConstants.MEDIATYPE_QNAME))) {
+                        // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxforms:richtext
+                        // appearance had been set, so that we can decide on feature usage based on appearance only.
+                        appearances.add(XFormsConstants.XXFORMS_RICH_TEXT_APPEARANCE_QNAME);
+                    } else if (appearance != null) {
+                        appearances.add(appearance);
+                    }
                 }
 
                 // Remember external LHHA if we are one

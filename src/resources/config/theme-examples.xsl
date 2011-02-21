@@ -47,18 +47,18 @@
         <xhtml:html>
             <xsl:apply-templates select="/xhtml:html/@*"/>
             <xhtml:head>
-                <!-- Add meta as early as possible -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
-                <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
-                <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
-                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
                 <!-- Handle head elements except scripts -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:link | xhtml:style)"/>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)"/>
+                <!-- CSS and title -->
+                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
+                <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
                 <!-- Orbeon Forms version -->
                 <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
+                <!-- Handle head scripts if present -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->
@@ -165,13 +165,8 @@
                 </xhtml:table>
                 <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
             </xhtml:body>
-            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
-                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
-            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                    <xsl:apply-templates select="@*|node()"/>
-                </xsl:element>
-            </xsl:for-each>
+            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:script"/>
         </xhtml:html>
     </xsl:template>
 

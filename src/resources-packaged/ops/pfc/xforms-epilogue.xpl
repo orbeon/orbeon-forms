@@ -110,6 +110,8 @@
                     <p:processor name="oxf:identity">
                         <p:input name="data" href="#preprocessed-view"/>
                         <p:output name="data" id="widgeted-view"/>
+                        <!-- This is here just so that we can reload the form when the properties or the resources change -->
+                        <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
                     </p:processor>
                 </p:otherwise>
             </p:choose>
@@ -131,6 +133,13 @@
             <!-- XInclude processing to add error dialog configuration and more -->
             <p:processor name="oxf:xinclude">
                 <p:input name="config" href="#xhtml-data"/>
+                <p:output name="data" id="xincluded-data"/>
+                <!--<p:output name="data" ref="xformed-data"/>-->
+            </p:processor>
+
+            <!-- Combine resources if needed -->
+            <p:processor name="oxf:resources-aggregator">
+                <p:input name="data" href="#xincluded-data"/>
                 <p:output name="data" ref="xformed-data"/>
             </p:processor>
         </p:when>

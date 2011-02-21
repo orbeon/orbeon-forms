@@ -513,6 +513,10 @@
         </instantiation>
     </processor>
 
+    <processor name="oxf:resources-aggregator">
+        <class name="org.orbeon.oxf.xforms.processor.ResourcesAggregator"/>
+    </processor>
+
     <!-- Other processors -->
     <processor name="oxf:delegation">
         <class name="org.orbeon.oxf.processor.DelegationProcessor"/>

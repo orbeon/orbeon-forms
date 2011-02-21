@@ -961,22 +961,7 @@
                                     var documentElementClasses = documentElement.className.split(" ");
                                     controlsWithUpdatedItemsets[controlId] = true;
 
-                                    if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
-
-                                        // Build list with new values
-                                        var newValues = new Array();
-                                        for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++)
-                                            newValues.push(itemsetTree[topIndex][1]);
-
-                                        // Case of the auto-complete control
-                                        var textfield = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
-                                        textfield.actb_keywords = newValues;
-                                        // Reopen auto-complete if necessary
-                                        var lastKeyCode = ORBEON.xforms.Globals.autoCompleteLastKeyCode[documentElement.id];
-                                        if (lastKeyCode != null)
-                                            ORBEON.xforms.Globals.autoCompleteOpen[documentElement.id](lastKeyCode);
-
-                                    } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")
+                                    if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-tree")) {
                                         ORBEON.xforms.Page.getControl(documentElement).setItemset(itemsetTree);
                                     } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
@@ -1523,13 +1508,6 @@
                                     if (newValid != null)
                                         ORBEON.xforms.Controls.setValid(documentElement, newValid);
 
-                                    // After we update classes on textarea, copy those classes on the FCKeditor iframe
-                                    if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                            && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")
-                                            && ORBEON.util.Properties.htmlEditor.get() == "fck") {
-                                        ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
-                                    }
-
                                     // Handle progress for upload controls
                                     if (progressState != null && progressReceived != null && progressExpected != null
                                             && progressState != "" && progressReceived != "" && progressExpected != "")
@@ -1649,7 +1627,6 @@
                                     var neighbor = ORBEON.util.Dom.getAttribute(divElement, "neighbor");
 
                                     var yuiDialog = ORBEON.xforms.Globals.dialogs[controlVisibilityChangeId];
-                                    var elementsWithVisibilityChanged = new Array();
                                     if (yuiDialog == null) {
                                         // This is a case
                                         var caseBeginId = "xforms-case-begin-" + controlVisibilityChangeId;
@@ -1709,51 +1686,18 @@
                                                         YAHOO.util.Dom.removeClass(cursor, "xforms-case-selected");
                                                     }
                                                 }
-                                                // Keep track of changed element for FCK workaround (see below)
-                                                elementsWithVisibilityChanged[elementsWithVisibilityChanged.length] = cursor;
                                             }
                                         }
                                     } else {
                                         // This is a dialog
                                         if (visible) {
                                             ORBEON.xforms.Controls.showDialog(controlVisibilityChangeId, neighbor);
-                                            elementsWithVisibilityChanged[0] = ORBEON.util.Dom.get(controlVisibilityChangeId);
                                         } else {
                                             ORBEON.xforms.Globals.maskDialogCloseEvents = true;
                                             yuiDialog.hide();
                                             ORBEON.xforms.Globals.maskDialogCloseEvents = false;
                                             // Fixes cursor Firefox issue; more on this in dialog init code
                                             yuiDialog.element.style.display = "none";
-                                        }
-                                    }
-
-                                    // After we display divs, we must re-enable the HTML editors.
-                                    // This is a workaround for a Gecko (pre-Firefox 3) bug documented at:
-                                    // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                                    if (elementsWithVisibilityChanged.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3OrNewer
-                                            && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
-
-                                        for (var childIndex = 0; childIndex < elementsWithVisibilityChanged.length; childIndex++) {
-                                            var child = elementsWithVisibilityChanged[childIndex];
-                                            var textHTMLElements = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", null, child);
-
-                                            // Below we try to find elements with both xforms-mediatype-text-html and xforms-textarea
-                                            if (textHTMLElements != null && textHTMLElements.length > 0) {
-                                                for (var htmlElementIndex = 0; htmlElementIndex < textHTMLElements.length; htmlElementIndex++) {
-                                                    var htmlElement = textHTMLElements[htmlElementIndex];
-                                                    // The code below tries to make sure we are getting an HTML form element
-                                                    if (htmlElement.name != null && htmlElement.name != "" && YAHOO.util.Dom.hasClass(htmlElement, "xforms-textarea")) {
-                                                        var editor = FCKeditorAPI.GetInstance(htmlElement.name);
-                                                        if (editor != null) {
-                                                            try {
-                                                                editor.EditorDocument.designMode = "on";
-                                                            } catch (e) {
-                                                                // Nop
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
                                         }
                                     }
                                 }

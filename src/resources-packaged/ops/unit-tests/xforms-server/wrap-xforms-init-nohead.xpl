@@ -24,37 +24,21 @@
     <p:param name="document" type="input"/>
     <p:param name="response" type="output"/>
 
-    <!-- Update input document -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="wrap-xforms-init.xpl"/>
+        <p:input name="document" href="#document"/>
+        <p:output name="response" id="xhtml"/>
+    </p:processor>
+
+    <!-- Filter stuff to make tests reproducible -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#document"/>
+        <p:input name="data" href="#xhtml"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="xforms:model[1]">
-                    <xsl:copy>
-                        <xsl:copy-of select="@*"/>
-                        <!-- Force client state mode -->
-                        <xsl:attribute name="xxforms:state-handling">client</xsl:attribute>
-                        <xsl:apply-templates/>
-                    </xsl:copy>
-                </xsl:template>
+                <xsl:template match="/xhtml:html/xhtml:head"/>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" id="updated-document"/>
-    </p:processor>
-
-    <!-- Native XForms Initialization -->
-    <p:processor name="oxf:xforms-to-xhtml">
-        <p:input name="annotated-document" href="#updated-document"/>
-        <p:input name="namespace"><request><container-namespace/></request></p:input>
-        <p:input name="data"><null xsi:nil="true"/></p:input>
-        <p:input name="instance"><null xsi:nil="true"/></p:input>
-        <p:output name="document" id="xhtml"/>
-    </p:processor>
-
-    <!-- Process XInclude if any -->
-    <p:processor name="oxf:xinclude">
-        <p:input name="config" href="#xhtml"/>
         <p:output name="data" ref="response"/>
     </p:processor>
 

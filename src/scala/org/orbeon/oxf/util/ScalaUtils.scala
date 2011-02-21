@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.util
 
+import java.security.MessageDigest
+
 object ScalaUtils {
 
     private val COPY_BUFFER_SIZE = 8192
@@ -93,4 +95,13 @@ object ScalaUtils {
         } catch {
             case _ => // NOP
         }
+
+    def digest(algorithm: String, data: Traversable[String]) = {
+        // Create and update digest
+        val messageDigest = MessageDigest.getInstance(algorithm)
+        data foreach (s => messageDigest.update(s.getBytes("utf-8")))
+
+        // Format result
+        SecureUtils.byteArrayToHex(messageDigest.digest())
+    }
 }

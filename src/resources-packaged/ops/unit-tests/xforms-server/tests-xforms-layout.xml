@@ -2294,4 +2294,98 @@
         </output>
     </test>
 
+    <test description="oxf:resources-aggregator" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="data" type="output"/>
+
+                <!-- Aggregate resources and cache -->
+                <p:processor name="oxf:resources-aggregator">
+                    <p:input name="data">
+                        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+                            <xh:head>
+                                <xh:title>Title</xh:title>
+                                <xh:link class="xforms-baseline" href="/css1.css" type="text/css"/>
+                                <xh:link class="xforms-baseline" href="/css2.css"/>
+                                <xh:link class="xforms-baseline" href="/css2.css"/>
+                                <xh:link class="xforms-baseline" href="/foobar1.foobar" type="text/x-foobar"/>
+                                <xh:link href="/css2.css"/>
+                                <xh:link href="/css3.css"/>
+                                <xh:link href="/css4.css"/>
+                                <xh:link href="/foobar2.foobar" type="text/x-foobar"/>
+                                <xh:script class="xforms-baseline" src="/js1.js" type="text/javascript"/>
+                                <xh:script class="xforms-baseline" src="/js2.js"/>
+                                <xh:script class="xforms-baseline" src="/js2.js"/>
+                                <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
+                                <xh:script src="/js2.js"/>
+                                <xh:script src="/js3.js" type="text/javascript"/>
+                                <xh:script src="/js4.js" type="text/javascript"/>
+                                <xh:script src="/cs2.cs" type="text/coffeescript"/>
+                            </xh:head>
+                            <xh:body/>
+                        </xh:html>
+                    </p:input>
+                    <p:output name="data" id="aggregated"/>
+                </p:processor>
+
+                <!-- Annotate result with values obtained from cache -->
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="config">
+                        <xsl:transform version="2.0" xmlns:xh="http://www.w3.org/1999/xhtml"
+                                       xmlns:rs="java:org.orbeon.oxf.xforms.processor.XFormsResourceServer">
+                            <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                            <xsl:template match="xh:body">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="@* | node()"/>
+                                    <xsl:for-each select="(//xh:link[starts-with(@href, '/xforms-server/')] | // xh:script[starts-with(@src, '/xforms-server/')])">
+                                        <xh:ul>
+                                            <xsl:for-each select="rs:testGetResources(substring-before(substring-after(concat(@href, @src), 'orbeon-'), '.'))">
+                                                <xh:li><xsl:value-of select="."/></xh:li>
+                                            </xsl:for-each>
+                                        </xh:ul>
+                                    </xsl:for-each>
+                                </xsl:copy>
+                            </xsl:template>
+                        </xsl:transform>
+                    </p:input>
+                    <p:input name="data" href="#aggregated"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
+                <xh:head>
+                    <xh:title>Title</xh:title>
+                    <xh:link class="xforms-baseline" href="/foobar1.foobar" type="text/x-foobar"/>
+                    <xh:link href="/foobar2.foobar" type="text/x-foobar"/>
+                    <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
+                    <xh:script src="/cs2.cs" type="text/coffeescript"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/3.9.0.pre/orbeon-89574b046e069a16542fbcf0f0e1bb0283ce3b24.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/3.9.0.pre/orbeon-2fb17e7ab4bac9efa45c11a68a9a4781dcd1e211.css" type="text/css" media="all"/>
+                </xh:head>
+                <xh:body>
+                    <xh:ul>
+                        <xh:li>/css1.css</xh:li>
+                        <xh:li>/css2.css</xh:li>
+                    </xh:ul>
+                    <xh:ul>
+                        <xh:li>/css3.css</xh:li>
+                        <xh:li>/css4.css</xh:li>
+                    </xh:ul>
+                    <xh:ul>
+                        <xh:li>/js1.js</xh:li>
+                        <xh:li>/js2.js</xh:li>
+                    </xh:ul>
+                    <xh:ul>
+                        <xh:li>/js3.js</xh:li>
+                        <xh:li>/js4.js</xh:li>
+                    </xh:ul>
+                </xh:body>
+                <xh:script type="text/javascript" src="/xforms-server/3.9.0.pre/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
+                <xh:script type="text/javascript" src="/xforms-server/3.9.0.pre/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
+            </xh:html>
+        </output>
+    </test>
+
 </group>

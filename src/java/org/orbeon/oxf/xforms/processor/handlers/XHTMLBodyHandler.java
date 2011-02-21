@@ -21,8 +21,13 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import java.util.Map;
 
@@ -338,7 +343,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         contentHandler.endElement(uri, localname, qName);
     }
 
-    private String getIncludedResourcePath(String requestPath, String fileName) {
+    public static String getIncludedResourcePath(String requestPath, String fileName) {
         // Path will look like "/app-name/whatever"
         final String[] pathElements = StringUtils.split(requestPath, '/');
         if (pathElements.length >= 2) {

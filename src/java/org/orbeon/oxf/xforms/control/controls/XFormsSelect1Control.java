@@ -50,7 +50,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static final String FULL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME);
     public static final String TREE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
     public static final String MENU_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
-    public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
     // List of attributes to handle as AVTs for select1 with appearance="full"
     private static final QName[] EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL = {
@@ -114,7 +113,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public boolean hasJavaScriptInitialization() {
         final String appearance = getAppearance();
         return appearance != null
-                && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
+                && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
     @Override

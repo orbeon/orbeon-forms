@@ -96,9 +96,13 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                            value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.combine-resources"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"                    value="false"/>
+
+    <property as="xs:boolean"  name="oxf.xforms.minimal-resources"                           value="true"/>
+    <property as="xs:boolean"  name="oxf.xforms.combine-resources"                           value="true"/>
+    <property as="xs:boolean"  name="oxf.xforms.cache-combined-resources"                    value="false"/>
+    <property as="xs:boolean"  name="oxf.xforms.javascript-at-bottom"                        value="true"/>
+    <property as="xs:NMTOKENS" name="oxf.xforms.resources.baseline-xbl"                      value="fr:button fr:tabview fr:autocomplete"/>
+
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
@@ -110,10 +114,8 @@
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                        value="4"/>
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
-    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>       <!-- jscalendar | yui -->
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
-    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>       <!-- fck | yui -->
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>

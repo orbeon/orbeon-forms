@@ -257,10 +257,6 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
     background: url(../../ops/images/xforms/slider-horizontal-thumb.png) no-repeat;
 }
 
-.xforms-select1-open-select {
-    display: none;
-}
-
 .xforms-upload-state-empty .xforms-upload-info { display: none; }
 .xforms-upload-state-empty .xforms-upload-progress { display: none; }
 .xforms-upload-state-progress .xforms-upload-select { display: none; }

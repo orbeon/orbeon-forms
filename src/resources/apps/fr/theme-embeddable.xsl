@@ -34,17 +34,14 @@
             <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
                 <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
             </xsl:if>
+            <!-- Handle head scripts if present -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
+            <!-- Body -->
             <xhtml:div class="orbeon-portlet-content">
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </xhtml:div>
-            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
-                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
-            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                    <xsl:copy-of select="@*"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:for-each>
+            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:script"/>
         </xhtml:div>
     </xsl:template>
 

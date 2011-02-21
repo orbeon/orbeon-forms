@@ -36,6 +36,9 @@
             <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
                 <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
             </xsl:if>
+            <!-- Handle head scripts if present -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
+            <!-- Body -->
             <xhtml:div class="orbeon-portlet-content">
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </xhtml:div>
@@ -43,16 +46,28 @@
             <xhtml:div class="orbeon-portlet-home">
                 <xhtml:a xmlns:f="http://orbeon.org/oxf/xml/formatting" href="/" f:portlet-mode="view">Home</xhtml:a>
             </xhtml:div>
-            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
-                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
-            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                    <xsl:copy-of select="@*"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:for-each>
+            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:script"/>
         </xhtml:div>
     </xsl:template>
+
+    <!-- Remember that we are embeddable -->
+    <xsl:template match="xhtml:form">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xhtml:input type="hidden" name="orbeon-embeddable" value="true"/>
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- If the field is a checkbox, add "[]", remove it. This is to support PHP-based proxies, which might add the brackets. -->
+    <xsl:template match="xhtml:input[@type = 'checkbox']">
+        <xsl:copy>
+            <xsl:attribute name="name" select="concat(@name, '[]')"/>
+            <xsl:apply-templates select="@* except @name | node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Simply copy everything that's not matched -->
     <xsl:template match="@*|node()" priority="-2">
         <xsl:copy>

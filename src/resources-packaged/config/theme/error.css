@@ -24,16 +24,16 @@
 .orbeon-error-table { border-collapse: collapse; width: 100% }
 
 .orbeon-error-table th {
-    background-color: &xlight-color;;
-    color: &dark-color;;
+    background-color: #dde;
+    color: #336;
     text-align: center;
     padding: .3em;
-    border: 1px solid &light-color;;
+    border: 1px solid #99c;
 }
 .orbeon-error-table td {
     color: black;
     padding: .3em;
-    border: 1px solid &light-color;;
+    border: 1px solid #99c;
     margin: 0;
     vertical-align: top
 }
@@ -46,7 +46,7 @@
 .orbeon-error-panel table { font-family: Arial, Helvetica, Geneva, sans-serif; font-size: 9pt; }
 .orbeon-error-panel h1 { background-color: #FF6600; color: white; font-size:14pt; padding: 2px }
 .orbeon-error-panel h2 { background-color: #FF6600; color: white; font-size:9pt; padding: 2px }
-.orbeon-error-panel a { color: &medium-color;; text-decoration: none }
+.orbeon-error-panel a { color: #669; text-decoration: none }
 .orbeon-error-panel a:hover { text-decoration: underline }
 .orbeon-error-panel img { border: 0 }
 .orbeon-error-disabled { display: none }

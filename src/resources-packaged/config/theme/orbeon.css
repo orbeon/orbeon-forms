@@ -1,17 +1,17 @@
-/*
-    Copyright (C) 2004-2007 Orbeon, Inc.
-
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-        GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-*/
-body { margin: .71em; padding: 0 }
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+body { margin: .71em; padding: 0; text-align: left }
 
 body, input, select, button, table {
     font-family: Arial, Helvetica, Geneva, sans-serif;
@@ -32,7 +32,7 @@ fieldset {
     padding-bottom: 1em;
     padding-left: 1.5em;
     padding-right: 1.5em;
-    border: &light-color; 1px solid;
+    border: #99c 1px solid;
 }
 
 .tt, textarea, code {
@@ -45,7 +45,7 @@ fieldset {
 }
 
 #main {
-    border-bottom:1px solid &dark-color;;
+    border-bottom:1px solid #336;
     min-width: 650px;
     width: expression(650 > document.body.clientWidth ? '650px' : '100%' );
 }
@@ -56,19 +56,19 @@ fieldset {
 }
 
 #main #leftcontent {
-    border-left: 1px solid &dark-color;;
+    border-left: 1px solid #336;
     width:230px;
     margin:0;
     padding-right: .5em;
     line-height: 15pt;
-    background-color: &xlight-color;;
+    background-color: #dde;
 }
 
 #maincontent {
     margin:0;
     background: white;
-    border-left: 1px solid &light-color;;
-    border-right: 1px solid &dark-color;;
+    border-left: 1px solid #99c;
+    border-right: 1px solid #336;
     vertical-align: top;
     width: 99%;
 }
@@ -121,8 +121,8 @@ h1 {
 }
 
 .subtabs {
-    background-color: &xlight-color;;
-    color: &dark-color;;
+    background-color: #dde;
+    color: #336;
     font-weight: bolder;
     text-align: left;
     padding: .2em .5em .2em .5em;
@@ -130,7 +130,7 @@ h1 {
     margin-bottom: 2em;
     margin-left: -.8em;
     margin-right: -0.8em;
-    border-bottom: solid 1px &dark-color;;
+    border-bottom: solid 1px #336;
     font-size: 10pt;
 }
 
@@ -158,7 +158,7 @@ h1 {
 
 .tab:hover {
     color: #000;
-    background-color: &medium-color;;
+    background-color: #669;
     text-decoration: none;
 }
 
@@ -183,7 +183,7 @@ h1 {
 }
 
 .left-link {
-    color: &medium-color;;
+    color: #669;
     background-color: #FFF;
     font-weight: bold;
     display: block;
@@ -194,13 +194,13 @@ h1 {
 
 .left-link:hover {
     color: #000;
-    background-color: &light-color;;
+    background-color: #99c;
     text-decoration: none;
 }
 
 .left-link-selected {
     color: #000;
-    background-color: &light-color;;
+    background-color: #99c;
     font-weight: bold;
     display: block;
     margin: 0 .71em 0 .71em;
@@ -209,7 +209,7 @@ h1 {
 }
 
 a {
-    color: &medium-color;;
+    color: #669;
     text-decoration: none;
 }
 
@@ -230,7 +230,7 @@ a:hover {
 }
 
 .maincontent h1 {
-    background-color: &xlight-color;;
+    background-color: #dde;
     font-weight: bold;
     font-size: 14px;
     text-align: left;
@@ -240,13 +240,13 @@ a:hover {
     padding-bottom: .2em;
     margin-top: 0;
     margin-bottom: 0;
-    border-bottom: solid 1px &light-color;;
+    border-bottom: solid 1px #99c;
     line-height: 180%;
 }
 
 .maincontent h2 {
-    color: &dark-color;;
-    background-color: &xlight-color;;
+    color: #336;
+    background-color: #dde;
     font-size: 9pt;
     font-weight: bold;
     padding-left: 1em;
@@ -255,19 +255,19 @@ a:hover {
     padding-bottom: .2em;
     margin-top: 2em;
     margin-bottom: 1em;
-    border-bottom: solid 1px &dark-color;;
+    border-bottom: solid 1px #336;
     clear: right;
 }
 
 .maincontent h3 {
-    color: &dark-color;;
+    color: #336;
     font-size: 10pt;
     font-weight: bold;
     clear: right;
 }
 
 .maincontent h4 {
-    color: &dark-color;;
+    color: #336;
     font-size: 10pt;
     font-weight: bold;
 }
@@ -277,7 +277,7 @@ a:hover {
 }
 
 .maincontent b, .bold {
-    color: &dark-color;;
+    color: #336;
 }
 
 .maincontent hr {
@@ -337,7 +337,7 @@ a:hover {
 }
 
 .tree-items-selected {
-    color: &medium-color;;
+    color: #669;
     font-weight: bold;
 }
 
@@ -347,7 +347,7 @@ a:hover {
 }
 
 .tree-items:hover {
-    color: &medium-color;;
+    color: #669;
     text-decoration: none;
 }
 
@@ -362,7 +362,7 @@ a:hover {
 
 .ops-doc-section { padding-left: 1em; padding-right: 1em }
 .ops-doc-code { border: 1px solid black; padding: .5em; margin: .5em; font-size: smaller }
-.ops-doc-figure { border: 3px solid &light-color;; padding: 3px; margin-left: 1em }
+.ops-doc-figure { border: 3px solid #99c; padding: 3px; margin-left: 1em }
 .ops-version { text-align: center; font-size: smaller }
 .ops-doc-image { clear: both; float: right; margin-left: 1em }
 
@@ -373,8 +373,8 @@ ul {
 .frame { margin: 5px 20px 5px 20px; font-size: 12px; }
 .frame .content { margin: 5px; }
 
-.note { border: solid 1px &medium-color;; background-color: &xlight-color;; }
-.note .label { background-color: &medium-color;; color: #ffffff; }
+.note { border: solid 1px #669; background-color: #dde; }
+.note .label { background-color: #669; color: #ffffff; }
 
 .notes { border: solid 1px #7099C5; background-color: #f0f0ff; }
 .notes .label { background-color: #7099C5; color: #ffffff; }
@@ -388,7 +388,7 @@ ul {
 .code { font-family: "Lucida Console", "Courier New", Courier, monospace; font-size: 9pt;
         padding-top: 0.5em; padding-bottom: 0.5em; padding-right: 1em; padding-left: 1em}
 
-.bordered { border-color: &light-color;; border-style: solid; border-width: 1px; line-height: 1.2em; }
+.bordered { border-color: #99c; border-style: solid; border-width: 1px; line-height: 1.2em; }
 
 .ops-action-table td { white-space: nowrap; vertical-align: middle }
 .ops-action-table input { vertical-align: middle;}
@@ -396,7 +396,7 @@ ul {
 
 .ops-source {
     background-color: #eeeeee;
-    border: solid &dark-color; 1px;
+    border: solid #336 1px;
     padding: 0.5em;
     line-height: 110%;
     overflow: auto;
@@ -412,16 +412,16 @@ ul {
     text-align: left;
 }
 .gridtable th {
-    background-color: &xlight-color;;
-    color: &dark-color;;
+    background-color: #dde;
+    color: #336;
     text-align: center;
     padding: .3em;
-    border:    1px solid &light-color;;
+    border:    1px solid #99c;
 }
 .gridtable td {
     color: black;
     padding: .3em;
-    border:    1px solid &light-color;;
+    border:    1px solid #99c;
     margin:    0;
     vertical-align: top
 }

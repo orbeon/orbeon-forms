@@ -341,7 +341,7 @@
     </target>
 
     <!-- JARs -->
-    <target name="jars" depends="classes, transform, orbeon-css-templates, orbeon-minify-js">
+    <target name="jars" depends="classes, transform, orbeon-minify-js">
       <jar destfile="${jar.file}" compress="false">
           <fileset dir="${java-src.dir}">
               <include name="**/*.xml"/>
@@ -401,8 +401,6 @@
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests"/>
                 <exclude name="ops/unit-tests/**"/>
-                <exclude name="ops/css-templates"/>
-                <exclude name="ops/css-templates/**"/>
                 <exclude name="ops/**/*.css"/>
                 <exclude name="ops/**/*.js"/>
                 <exclude name="ops/**/*.gif"/>
@@ -463,9 +461,6 @@
                 <exclude name="ops/fckeditor/_testcases/**"/>
                 <include name="config/theme/**/*.*"/>
             </fileset>
-            <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
-                <include name="*.css"/>
-            </zipfileset>
             <zipfileset dir="${war.dir}/WEB-INF/resources/ops" prefix="ops">
                 <include name="**/*.js"/>
             </zipfileset>
@@ -523,15 +518,6 @@
         </copy>
     </target>
 
-    <target name="dev-css-templates" depends="init">
-        <mkdir dir="${war.dir}/WEB-INF/resources/config/theme"/>
-        <copy file="${resources-packaged.dir}/ops/css-templates/orbeon.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/orbeon.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
-        <copy file="${resources-packaged.dir}/ops/css-templates/error.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/error.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
-    </target>
 
     <target name="war-copy-descriptors" depends="prepare">
         <copy todir="${war.inf}">
@@ -611,19 +597,6 @@
                 <include name="org/orbeon/oxf/xml/dom4j/LocationData.java"/>
             </fileset>
         </javadoc>
-    </target>
-
-    <target name="orbeon-css-templates" depends="init">
-        <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
-            <filtersfile file="${resources-packaged.dir}/ops/css-templates/css-constants.properties"/>
-        </filterset>
-        <mkdir dir="${build.temp.dir}/theme"/>
-        <copy file="${resources-packaged.dir}/ops/css-templates/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
-        <copy file="${resources-packaged.dir}/ops/css-templates/error.css.template" toFile="${build.temp.dir}/theme/error.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
     </target>
 
     <target name="orbeon-minify-js" depends="init, classes">

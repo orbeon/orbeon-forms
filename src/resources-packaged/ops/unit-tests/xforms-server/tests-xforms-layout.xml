@@ -2332,7 +2332,8 @@
                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="config">
                         <xsl:transform version="2.0" xmlns:xh="http://www.w3.org/1999/xhtml"
-                                       xmlns:rs="java:org.orbeon.oxf.xforms.processor.XFormsResourceServer">
+                                       xmlns:rs="java:org.orbeon.oxf.xforms.processor.XFormsResourceServer"
+                                       xmlns:version="java:org.orbeon.oxf.common.Version">
                             <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                             <xsl:template match="xh:body">
                                 <xsl:copy>
@@ -2345,6 +2346,10 @@
                                         </xh:ul>
                                     </xsl:for-each>
                                 </xsl:copy>
+                            </xsl:template>
+                            <!-- Remove version number from /xforms-server/ paths so that test  is independent from version number -->
+                            <xsl:template match="@href[version:isPE() and starts-with(., '/xforms-server/')] | @src[version:isPE() and starts-with(., '/xforms-server/')]">
+                                <xsl:attribute name="{name()}" select="string-join(remove(tokenize(., '/'), 3), '/')"/>
                             </xsl:template>
                         </xsl:transform>
                     </p:input>
@@ -2361,8 +2366,8 @@
                     <xh:link href="/foobar2.foobar" type="text/x-foobar"/>
                     <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
                     <xh:script src="/cs2.cs" type="text/coffeescript"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/3.9.0.pre/orbeon-89574b046e069a16542fbcf0f0e1bb0283ce3b24.css" type="text/css" media="all"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/3.9.0.pre/orbeon-2fb17e7ab4bac9efa45c11a68a9a4781dcd1e211.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-89574b046e069a16542fbcf0f0e1bb0283ce3b24.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-2fb17e7ab4bac9efa45c11a68a9a4781dcd1e211.css" type="text/css" media="all"/>
                 </xh:head>
                 <xh:body>
                     <xh:ul>
@@ -2382,8 +2387,8 @@
                         <xh:li>/js4.js</xh:li>
                     </xh:ul>
                 </xh:body>
-                <xh:script type="text/javascript" src="/xforms-server/3.9.0.pre/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
-                <xh:script type="text/javascript" src="/xforms-server/3.9.0.pre/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
+                <xh:script type="text/javascript" src="/xforms-server/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
+                <xh:script type="text/javascript" src="/xforms-server/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
             </xh:html>
         </output>
     </test>

@@ -4822,7 +4822,7 @@ ORBEON.xforms.Init = {
      */
     _htmlArea: function (htmlArea) {
         if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-            ORBEON.xforms.Page.getControl(container);
+            ORBEON.xforms.Page.getControl(htmlArea);
         } else {
 
             // Initialize FCK editor

@@ -126,7 +126,9 @@
                                         <xhtml:div>
                                             <!-- Tab content has outer scope -->
                                             <xforms:group xxbl:scope="outer">
-                                                <xsl:copy-of select="@model | @context | @ref | @bind"/>
+                                                <xsl:if test="pipeline:property('oxf.xforms.xbl.fr.tabview.tab-changes-context')">
+                                                    <xsl:copy-of select="@model | @context | @ref | @bind"/>
+                                                </xsl:if>
                                                 <xsl:if test="$case-id">
                                                     <xsl:attribute name="id" select="$case-id"/>
                                                     <!-- Custom events -->

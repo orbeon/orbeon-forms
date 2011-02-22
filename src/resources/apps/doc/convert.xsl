@@ -82,9 +82,9 @@
         <xsl:attribute name="href" select="concat('http://www.orbeon.com/orbeon/', if (starts-with(., '/')) then substring(., 2) else concat('doc/', .))"/>
     </xsl:template>
 
-    <xsl:template match="figure">
+    <xsl:template match="figure | img">
         <img style="display: block; margin-right: auto; margin-left: auto; text-align: center">
-            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="@* except @print-format"/>
             <xsl:attribute name="src"
                            select="if (matches(@ref, '[a-z]+://')) then @src
                                    else
@@ -102,7 +102,7 @@
                     <xsl:variable name="indent" select="string-length(tokenize(string-join(preceding-sibling::text(), ''), '\n')[last()])"/>
                     <xsl:variable name="spaces" select="substring('                                                ', 1, $indent)"/>
 
-                    <xsl:variable name="document" as="element()">
+                    <xsl:variable name="document" as="node()">
                         <xsl:apply-templates select="." mode="source"/>
                     </xsl:variable>
 

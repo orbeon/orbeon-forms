@@ -15,7 +15,7 @@
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu-item label="Installing" href="http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing"/>
-        <menu-item label="Orbeon XForms Tutorial" href="intro-tutorial"/>
+        <menu-item label="Orbeon XForms Tutorial" href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial"/>
         <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
         <menu-item label="Frequently Asked Questions" href="http://wiki.orbeon.com/forms/orbeon-forms-faq"/>
 
@@ -35,19 +35,19 @@
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="Page Flow">
-            <menu-item label="Page Flow Controller" href="reference-page-flow"/>
-            <menu-item label="Page Flow Epilogue" href="reference-epilogue"/>
+            <menu-item label="Page Flow Controller" href="http://wiki.orbeon.com/forms/doc/developer-guide/page-flow-controller"/>
+            <menu-item label="Page Flow Epilogue" href="http://wiki.orbeon.com/forms/doc/developer-guide/page-flow-epilogue"/>
         </menu>
         <menu label="XML Pipelines (XPL)">
-            <menu-item label="Introduction to XPL" href="reference-xpl-pipelines"/>
+            <menu-item label="Introduction to XPL" href="http://wiki.orbeon.com/forms/doc/developer-guide/xml-pipeline-language-xpl"/>
             <menu-item label="XPL 1.0 W3C Submission" href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/"/>
         </menu>
         <menu-item label="Resource Managers" href="http://wiki.orbeon.com/forms/doc/developer-guide/resource-managers"/>
-        <menu-item label="Configuration Properties" href="reference-properties"/>
-        <menu-item label="Non-XML Documents" href="reference-formats"/>
-        <menu-item label="Error Page and Dialog" href="reference-error-pipeline"/>
-        <menu-item label="Listeners" href="reference-listeners"/>
-        <menu-item label="XML Namespaces" href="reference-xml-namespaces"/>
+        <menu-item label="Configuration Properties" href="http://wiki.orbeon.com/forms/doc/developer-guide/configuration-properties"/>
+        <menu-item label="Non-XML Documents" href="http://wiki.orbeon.com/forms/doc/developer-guide/xpl-non-xml-documents"/>
+        <menu-item label="Error Page and Dialog" href="http://wiki.orbeon.com/forms/doc/developer-guide/error-page-and-error-dialog"/>
+        <menu-item label="Listeners" href="http://wiki.orbeon.com/forms/doc/developer-guide/context-and-session-listeners"/>
+        <menu-item label="XML Namespaces" href="http://wiki.orbeon.com/forms/doc/developer-guide/xml-namespaces"/>
     </menu>
     <menu label="XPL Processors Reference">
         <menu label="Producing XML">
@@ -74,7 +74,7 @@
         </menu>
         <menu label="Interoperability">
             <menu-item label="Delegation" href="processors-delegation"/>
-            <menu-item label="Java" href="processors-java"/>
+            <menu-item label="Java" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-java"/>
         </menu>
         <menu label="Document Formats">
             <menu-item label="Image Server" href="processors-image"/>
@@ -82,7 +82,7 @@
             <menu-item label="PDF Extraction" href="processors-pdf-extraction"/>
         </menu>
         <menu label="Messaging">
-            <menu-item label="Email" href="processors-messaging-email"/>
+            <menu-item label="Email" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-email"/>
         </menu>
         <menu label="XML Pipelines (XPL)">
             <menu-item label="Pipeline" href="processors-pipeline"/>

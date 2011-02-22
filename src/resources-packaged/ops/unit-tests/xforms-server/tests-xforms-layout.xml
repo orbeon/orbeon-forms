@@ -2366,8 +2366,8 @@
                     <xh:link href="/foobar2.foobar" type="text/x-foobar"/>
                     <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
                     <xh:script src="/cs2.cs" type="text/coffeescript"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-89574b046e069a16542fbcf0f0e1bb0283ce3b24.css" type="text/css" media="all"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-2fb17e7ab4bac9efa45c11a68a9a4781dcd1e211.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-31760c702d3619986af1c9a196821c56cf8e44ae.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-d6143e3d8bbef561e7f8608e6f2f17ddc7fb1790.css" type="text/css" media="all"/>
                 </xh:head>
                 <xh:body>
                     <xh:ul>
@@ -2387,8 +2387,8 @@
                         <xh:li>/js4.js</xh:li>
                     </xh:ul>
                 </xh:body>
-                <xh:script type="text/javascript" src="/xforms-server/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
-                <xh:script type="text/javascript" src="/xforms-server/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
+                <xh:script type="text/javascript" src="/xforms-server/orbeon-e3386f743649d644e767142dfe7d447175463880.js"/>
+                <xh:script type="text/javascript" src="/xforms-server/orbeon-bc2cdd195a4d1d6a4c12fc548cc9f7ab305d8965.js"/>
             </xh:html>
         </output>
     </test>

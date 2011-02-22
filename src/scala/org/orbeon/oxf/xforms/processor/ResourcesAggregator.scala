@@ -121,8 +121,12 @@ class ResourcesAggregator extends ProcessorImpl {
                         // Output combined resources
                         def outputCombined(resources: scala.collection.Set[String], isCSS: Boolean, outputElement: String => Unit) {
                             if (resources.nonEmpty) {
+                                // If there is at least one non-platform path, we also hash the app version number
+                                val hasAppResource = resources exists (!URLRewriterUtils.isPlatformPath(_))
+
                                 // All resource paths are hashed
-                                val resourcesHash = ScalaUtils.digest("SHA-1", Seq(resources mkString "|"))
+                                val itemsToHash = resources ++ (if (hasAppResource) Set(URLRewriterUtils.getApplicationResourceVersion) else Set())
+                                val resourcesHash = ScalaUtils.digest("SHA-1", Seq(itemsToHash mkString "|"))
 
                                 // Cache mapping so that resource can be served by oxf:resource-server
                                 Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is serializable and usable from Java

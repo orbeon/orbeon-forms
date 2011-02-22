@@ -894,8 +894,8 @@
             <arg value="${artifact.name}.zip.MD5"/>
             <arg value="${artifact.name}-proxy-portlet.war"/>
             <arg value="${artifact.name}-proxy-portlet.war.MD5"/>
-            <!--<arg value="${artifact.name}-src.zip"/>-->
-            <!--<arg value="${artifact.name}-src.zip.MD5"/>-->
+            <arg value="${artifact.name}-src.zip"/>
+            <arg value="${artifact.name}-src.zip.MD5"/>
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 

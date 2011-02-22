@@ -1761,7 +1761,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML text area
-            return ORBEON.widgets.RTE.getValue(control);
+            return ORBEON.xforms.Page.getControl(control).getValue();
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-static"))) {
             // Output and static input
             if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-image")) {
@@ -1970,7 +1970,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
-            ORBEON.widgets.RTE.setValue(control, newControlValue);
+            ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
                 || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
             return ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
@@ -2312,7 +2312,7 @@ ORBEON.xforms.Controls = {
             else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea") && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
-            ORBEON.widgets.RTE.setReadonly(control, isReadonly);
+            ORBEON.xforms.Page.getControl(control).setReadonly(isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
             ORBEON.xforms.Controls.setDisabledOnFormElement(
@@ -2430,7 +2430,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // Special case for RTE
-            ORBEON.widgets.RTE.setFocus(control);
+            ORBEON.xforms.Page.getControl(control).setFocus();
         } else {
             // Generic code to find focusable descendant-or-self HTML element and focus on it
             var htmlControlNames = [ "input", "textarea", "select", "button", "a" ];
@@ -2996,9 +2996,6 @@ ORBEON.xforms.Events = {
 
             if (targetControlElement != null && currentFocusControlElement != targetControlElement
                     && !YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
-
-                // The RTE interested in knowing when anyone gets a focus event
-                ORBEON.widgets.RTE.focusOnAnyFormControl(targetControlElement);
 
                 // Handle special value changes upon losing focus
 
@@ -4672,7 +4669,7 @@ ORBEON.xforms.Init = {
      * Initialize HTML areas.
      */
     _htmlArea: function (htmlArea) {
-        ORBEON.widgets.RTE.init(htmlArea);
+        ORBEON.xforms.Page.getControl(htmlArea);
     },
 
     /**
@@ -5825,13 +5822,6 @@ function getEventTarget(event) {
             return target;
         }
     }
-}
-
-function xformsHtmlEditorChange(editorInstance) {
-    editorInstance.LinkedField.value = editorInstance.GetXHTML();
-    // Throw value change event if the field is in incremental mode
-    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
-        xformsValueChanged(editorInstance.LinkedField, null);
 }
 
 function xformsDisplayLoading(progressMessage) {

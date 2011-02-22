@@ -4,7 +4,8 @@
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
         <xhtml:title>HTML Editor</xhtml:title>
@@ -21,21 +22,43 @@
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-control-xhtml-area.js"/>
+        <xhtml:script type="text/javascript">
+            // Set smaller width for RTE so they can be shown side-by-side
+            YUI_RTE_CUSTOM_CONFIG = ORBEON.xforms.control.RTEConfig
+            YUI_RTE_CUSTOM_CONFIG.width = "400px";
+            YUI_RTE_CUSTOM_CONFIG.height = "50px";
+        </xhtml:script>
+        <xhtml:style type="text/css">
+            td { vertical-align: top }
+            .xforms-repeat-selected-item-1 { background-color: transparent }
+            .xbl-fr-button .yui-button { margin-bottom: 1em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Add "42"</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="/gaga" value="concat(., '42')"/>
-        </xforms:trigger>
-        <xhtml:h2>text/html texarea</xhtml:h2>
-        <xhtml:div>
-            <xforms:textarea id="xhtml-editor-1" mediatype="text/html" ref="xhtml-editor-1">
-                <xforms:help>gaga</xforms:help>
-            </xforms:textarea>
-            <xforms:textarea id="xhtml-editor-2" mediatype="text/html" ref="xhtml-editor-2">
-                <xforms:help>gaga</xforms:help>
-            </xforms:textarea>
-            <xforms:textarea ref="xhtml-editor-1" id="xhtml-textarea"/>
-        </xhtml:div>
+        <xhtml:fieldset>
+            <xhtml:legend>Update and focus</xhtml:legend>
+            <xhtml:table>
+                <xhtml:tr>
+                    <xhtml:td><xforms:textarea id="xhtml-editor-1" mediatype="text/html" ref="xhtml-editor-1"/></xhtml:td>
+                    <xhtml:td><xforms:textarea id="xhtml-editor-2" mediatype="text/html" ref="xhtml-editor-2"/></xhtml:td>
+                    <xhtml:td><xforms:textarea ref="xhtml-editor-1" id="xhtml-textarea"/></xhtml:td>
+                </xhtml:tr>
+            </xhtml:table>
+        </xhtml:fieldset>
+        <xhtml:fieldset>
+            <xhtml:legend>In repeat</xhtml:legend>
+            <fr:button id="add-iteration">
+                <xforms:label>Add iteration</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:insert context="instance()" origin="xxforms:element('iteration')"/>
+                    <xforms:setvalue ref="iteration">Inside iteration</xforms:setvalue>
+                </xforms:action>
+            </fr:button>
+            <xforms:repeat ref="iteration">
+                <xhtml:div>
+                    <xforms:textarea mediatype="text/html" ref="." id="rte-in-iteration"/>
+                </xhtml:div>
+            </xforms:repeat>
+        </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

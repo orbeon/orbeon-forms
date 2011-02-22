@@ -19,9 +19,9 @@ class RTE extends Control
     init: (container) ->
         super container
         # Create RTE object
-        textarea = if Utils.isNewXHTMLLayout() then container.getElementsByTagName("textarea")[0] else container
+        textarea = if Utils.isNewXHTMLLayout() then @container.getElementsByTagName("textarea")[0] else @container
         # Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
-        textarea.disabled = YD.hasClass container, "xforms-readonly"
+        textarea.disabled = YD.hasClass @container, "xforms-readonly"
         rteConfig = if typeof YUI_RTE_CUSTOM_CONFIG != "undefined" then YUI_RTE_CUSTOM_CONFIG else RTEConfig
         @yuiRTE = new YAHOO.widget.Editor textarea, rteConfig
 
@@ -30,12 +30,12 @@ class RTE extends Control
         # in changeEvent being called onload, which has a side-effect of making Orbeon think the RTE
         # has focus. Avoid this by only registering the changeEvent listener when the first afterNodeChange
         # event is received.
-        containerId = container.id
+        containerId = @container.id
         registerChangeEvent = () =>
             @yuiRTE.on "editorKeyUp", () => @changeEvent
             @yuiRTE.on "afterNodeChange", () => @changeEvent
-            @yuiRTE.on "editorWindowFocus", () -> Events.focus { target: container }
-            @yuiRTE.on "editorWindowBlur", () -> Events.blur { target: container }
+            @yuiRTE.on "editorWindowFocus", () => Events.focus { target: @container }
+            @yuiRTE.on "editorWindowBlur", () => Events.blur { target: @container }
             @yuiRTE.removeListener "afterNodeChange", registerChangeEvent
         @yuiRTE.on "afterNodeChange", registerChangeEvent
 
@@ -45,16 +45,16 @@ class RTE extends Control
             # If we don't and user's JS code calls ORBEON.xforms.Document.setValue(), the value of the RTE is changed, our RFE changeEvent() is called,
             # it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
             # Then in executeNextRequest() we ignore the value change because it is the same the server value.
-            ServerValueStore.set container.id, @getValue()
+            ServerValueStore.set @container.id, @getValue()
 
             if not Utils.isNewXHTMLLayout()
                 # Move classes on the container created by YUI
-                rteContainer = container.parentNode
-                rteContainer.className += " " + container.className
-                container.className = ""
-                # If classes are later changed, they need to be changed on the container, so move the id on the container
-                container.id = containerId + "-textarea"
-                rteContainer.id = containerId
+                newContainer = @container.parentNode
+                newContainer.className += " " + @container.className
+                @container.className = ""
+                @container.id = containerId + "-textarea"
+                newContainer.id = containerId
+                @container = newContainer
 
             # Fire render event
             @isRendered = true
@@ -77,8 +77,9 @@ class RTE extends Control
         # however, ignoring server values means that the visual state of the RTE can become out of sync
         # with the server value (for example, the result of a calculation wouldn't be visible until focus moved
         # out of the field).
-        if (not YD.hasClass(@container, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != @container.id)
-            @yuiRTE.setEditorHTML(newValue)
+        @onRendered () =>
+            if (not YD.hasClass(@container, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != @container.id)
+                @yuiRTE.setEditorHTML(newValue)
 
     getValue: () ->
         value = @yuiRTE.getEditorHTML()

@@ -2,6 +2,7 @@ OD = ORBEON.util.Dom
 Document = ORBEON.xforms.Document
 Assert = YAHOO.util.Assert
 Page = ORBEON.xforms.Page
+Test = ORBEON.util.Test
 
 YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
 
@@ -25,6 +26,19 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
                         ORBEON.xforms.Document.setValue "xhtml-editor-1", htmlIn
                     , () => @assertHTML htmlOut
         , ORBEON.util.Properties.internalShortDelay.get()
+        @wait()
+
+
+    # Wait until both RTEs have been initialized
+    # setUp() method for this test (we can't use YUI's setUp() here as it doesn't support wait/resume)
+    testSetup: () ->
+        rteInitialized = 0;
+        [rte1, rte2] = for i in [1, 2]
+            container = OD.get "xhtml-editor-" + i
+            rte = Page.getControl container
+            rte.onRendered () =>
+                rteInitialized++
+                @resume() if rteInitialized == 2
         @wait()
 
     # Trivial case: simple HTML just goes through
@@ -71,6 +85,18 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
             # Use indexOf in test as inserthtml adds a <span> in Chrome
             () -> out = Document.getValue "xhtml-textarea"; Assert.isTrue (out.indexOf sampleHtml) isnt -1
         ]]
+
+    testAddIterationAndSetValue: () ->
+        ORBEON.util.Test.executeSequenceCausingAjaxRequest this, [[
+            () -> Test.click "add-iteration"
+            () ->
+                container = OD.get "rte-in-iteration" + XFORMS_SEPARATOR_1  + "1"
+                rte = Page.getControl container
+                # Delay call to getValue, which is synchronous and doesn't return the right value before RTE is rendered
+                rte.onRendered => @resume(); Assert.areEqual "Inside iteration", rte.getValue()
+                @wait()
+        ]]
+
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe () ->
     if parent and parent.TestManager

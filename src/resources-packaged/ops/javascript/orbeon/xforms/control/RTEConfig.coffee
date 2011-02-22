@@ -111,4 +111,3 @@ ORBEON.xforms.control.RTEConfig =
             }
         ]
     }
-

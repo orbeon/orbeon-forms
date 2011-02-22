@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -338,8 +339,11 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 
-//            // Create matcher that matches all paths in case resources are versioned
-//            final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
+            // Create matcher that matches all paths in case resources are versioned
+            if (propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS) == null) {
+                final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
+                propertyContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, matchAllPathMatcher);
+            }
 
             // Output Orbeon Forms version
             outputWriter.write("/* This file was produced by " + Version.getVersionString() + " */\n");

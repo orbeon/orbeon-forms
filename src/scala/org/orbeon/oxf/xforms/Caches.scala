@@ -48,15 +48,16 @@ object Caches {
                 cache
             // Otherwise use fallback configuration
             case _ =>
-                val cache = new Cache(new CacheConfiguration(cacheName, 50)
+                val cache = new Cache(new CacheConfiguration(cacheName, 200)
                         memoryStoreEvictionPolicy MemoryStoreEvictionPolicy.LFU
                         overflowToDisk true
                         diskSpoolBufferSizeMB 1
                         diskStorePath "java.io.tmpdir/orbeon/cache"
-                        eternal false
+                        eternal true
                         timeToLiveSeconds 0
-                        timeToIdleSeconds (30 * 60)
+                        timeToIdleSeconds 0
                         diskPersistent true
+                        maxElementsOnDisk 0
                         diskExpiryThreadIntervalSeconds 120)
 
                 Caches.cacheManager.addCache(cache)

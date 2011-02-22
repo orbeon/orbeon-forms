@@ -45,15 +45,16 @@
 
     <!-- XForms resources. Only modify if you know what you are doing! -->
     <cache name="xforms.resources"
-           maxElementsInMemory="50"
+           maxElementsInMemory="200"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="true"
            diskSpoolBufferSizeMB="1"
-           eternal="false"
+           eternal="true"
            timeToLiveSeconds="0"
-           timeToIdleSeconds="1800"
-           diskPersistent="false"
+           timeToIdleSeconds="0"
+           diskPersistent="true"
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
 </ehcache>
+

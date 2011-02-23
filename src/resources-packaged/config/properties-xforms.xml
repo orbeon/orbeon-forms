@@ -13,7 +13,8 @@
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
-            xmlns:xi="http://www.w3.org/2001/XInclude">
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- Encryption of XForms hidden fields and field names -->
     <property as="xs:string"  name="oxf.xforms.password"                                value="CHANGE THIS PASSWORD"/>
@@ -97,11 +98,11 @@
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
 
-    <property as="xs:boolean"  name="oxf.xforms.minimal-resources"                           value="true"/>
-    <property as="xs:boolean"  name="oxf.xforms.combine-resources"                           value="true"/>
-    <property as="xs:boolean"  name="oxf.xforms.cache-combined-resources"                    value="false"/>
-    <property as="xs:boolean"  name="oxf.xforms.javascript-at-bottom"                        value="true"/>
-    <property as="xs:NMTOKENS" name="oxf.xforms.resources.baseline-xbl"                      value="fr:button fr:tabview fr:autocomplete"/>
+    <property as="xs:boolean"  name="oxf.xforms.minimal-resources"                          value="true"/>
+    <property as="xs:boolean"  name="oxf.xforms.combine-resources"                          value="true"/>
+    <property as="xs:boolean"  name="oxf.xforms.cache-combined-resources"                   value="false"/>
+    <property as="xs:boolean"  name="oxf.xforms.resources.javascript-at-bottom"             value="true"/>
+    <property as="xs:string"   name="oxf.xforms.resources.baseline"                         value="fr:button fr:tabview fr:autocomplete"/>
 
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>

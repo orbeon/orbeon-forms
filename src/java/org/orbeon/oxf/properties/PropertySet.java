@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.URI;
 import java.util.*;
@@ -29,22 +30,24 @@ import java.util.*;
  */
 public class PropertySet {
 
-    private static class TypeValue {
+    public static class Property {
         public final QName type;
-        public Object value;
+        public final Object value;
+        public final Map<String, String> namespaces;
 
-        public TypeValue(final QName typ, final Object value) {
-            type = typ;
+        public Property(final QName type, final Object value, final Map<String, String> namespaces) {
+            this.type = type;
             this.value = value;
+            this.namespaces = namespaces;
         }
     }
 
     private static class PropertyNode {
-        public TypeValue typeValue;
+        public Property property;
         public Map<String, PropertyNode> children;// Map<String, PropertyNode> of token to property node
     }
 
-    private Map<String, TypeValue> exactProperties = new HashMap<String, TypeValue>();// Map<String, TypeValue> of property name to typed value
+    private Map<String, Property> exactProperties = new HashMap<String, Property>();// Map<String, TypeValue> of property name to typed value
     private PropertyNode wildcardProperties = new PropertyNode();
 
     /**
@@ -93,10 +96,10 @@ public class PropertySet {
     public void setProperty(final Element element, String name, final QName type, String stringValue) {
 
         final Object value = PropertyStore.getObjectFromStringValue(stringValue, type, element);
-        final TypeValue typeValue = new TypeValue(type, value);
+        final Property property = new Property(type, value, Dom4jUtils.getNamespaceContext(element));
 
         // Store exact property name anyway
-        exactProperties.put(name, typeValue);
+        exactProperties.put(name, property);
 
         // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
         final StringTokenizer st = new StringTokenizer(name, ".");
@@ -115,7 +118,7 @@ public class PropertySet {
         }
 
         // Store value
-        currentNode.typeValue = typeValue;
+        currentNode.property = property;
     }
 
 
@@ -144,11 +147,11 @@ public class PropertySet {
             // Find property node with *
             newPropertyNodes[1] = propertyNode.children.get("*");
             for (int newPropertNodesIndex = 0; newPropertNodesIndex < 2; newPropertNodesIndex++) {
-                final PropertyNode newPropertNode = newPropertyNodes[newPropertNodesIndex];
-                if (newPropertNode != null) {
+                final PropertyNode newPropertyNode = newPropertyNodes[newPropertNodesIndex];
+                if (newPropertyNode != null) {
                     final String actualToken = newPropertNodesIndex == 0 ? token : "*";
                     final String newConsumed = consumed.length() == 0 ? actualToken : consumed + "." +  actualToken;
-                    final List<String> keyProperties = getPropertiesStartsWithWorker(newPropertNode, newConsumed, tokens, currentTokenPosition + 1);
+                    final List<String> keyProperties = getPropertiesStartsWithWorker(newPropertyNode, newConsumed, tokens, currentTokenPosition + 1);
                     result.addAll(keyProperties);
                 }
             }
@@ -165,21 +168,21 @@ public class PropertySet {
     }
 
 
-    private TypeValue getPropertyWorker(PropertyNode propertyNode, String[] tokens, int currentTokenPosition) {
+    private Property getPropertyWorker(PropertyNode propertyNode, String[] tokens, int currentTokenPosition) {
 
         if (propertyNode == null) {
             // Dead end
             return null;
         } else if (currentTokenPosition == tokens.length) {
             // We're done with the search, see if we found something here
-            return propertyNode.typeValue != null ? propertyNode.typeValue : null;
+            return propertyNode.property != null ? propertyNode.property : null;
         } else {
             // Dead end
             if (propertyNode.children == null) return null;
             final String currentToken = tokens[currentTokenPosition];
             // Look for value with actual token
             PropertyNode newNode = propertyNode.children.get(currentToken);
-            TypeValue result = getPropertyWorker(newNode, tokens, currentTokenPosition + 1);
+            Property result = getPropertyWorker(newNode, tokens, currentTokenPosition + 1);
             if (result != null) return result;
             // If we couldn't find a value with the actual token, look for value with *
             newNode = propertyNode.children.get("*");
@@ -194,11 +197,11 @@ public class PropertySet {
      * @param type      property type to check against, or null
      * @return          property object if found
      */
-    private Object getProperty(String name, final QName type) {
+    private Property getProperty(String name, final QName type) {
 
         // Try first from exact properties
-        TypeValue typeValue = exactProperties.get(name);
-        if (typeValue == null) {
+        Property property = exactProperties.get(name);
+        if (property == null) {
             // If not found try traversing tree which contains properties with wildcards
 
             // Parse name and put into array
@@ -210,23 +213,32 @@ public class PropertySet {
                 tokensArray = tokensList.toArray(new String[tokensList.size()]);
             }
             // Call recursive worker
-            typeValue = getPropertyWorker(wildcardProperties, tokensArray, 0);
-            if (typeValue == null) return null;
+            property = getPropertyWorker(wildcardProperties, tokensArray, 0);
+            if (property == null) return null;
         }
 
         // Found a value, check type
-        if (type != null && !type.equals(typeValue.type))
+        if (type != null && !type.equals(property.type))
             throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
-                    + type.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
+                    + type.getQualifiedName() + ", found " + property.type.getQualifiedName());
 
         // Return value
-        return typeValue.value;
+        return property;
+    }
+
+    private Object getPropertyValue(String name, final QName type) {
+        final Property property = getProperty(name, type);
+        return (property == null) ? null : property.value;
     }
 
     /* All getters */
 
-    public Object getObject(String name) {
+    public Property getProperty(String name) {
         return getProperty(name, null);
+    }
+
+    public Object getObject(String name) {
+        return getPropertyValue(name, null);
     }
 
     public Object getObject(String name, Object defaultValue) {
@@ -256,16 +268,15 @@ public class PropertySet {
     }
 
     public String getString(String name) {
-        String result = (String) getProperty(name, XMLConstants.XS_STRING_QNAME);
+        String result = (String) getPropertyValue(name, XMLConstants.XS_STRING_QNAME);
         if (result == null)
             return null;
         result = result.trim();
         return (result.length() == 0) ? null : result;
     }
 
-    @SuppressWarnings("unchecked")
     public Set<String> getNmtokens(String name) {
-        final Set<String> result = (Set<String>) getProperty(name, XMLConstants.XS_NMTOKENS_QNAME);
+        final Set<String> result = (Set<String>) getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME);
         if (result == null)
             return null;
         return result;
@@ -277,7 +288,7 @@ public class PropertySet {
     }
 
     public Integer getInteger(String name) {
-        return (Integer) getProperty(name, XMLConstants.XS_INTEGER_QNAME);
+        return (Integer) getPropertyValue(name, XMLConstants.XS_INTEGER_QNAME);
     }
 
     public Integer getInteger(String name, int defaultValue) {
@@ -286,7 +297,7 @@ public class PropertySet {
     }
 
     public Boolean getBoolean(String name) {
-        return (Boolean) getProperty(name, XMLConstants.XS_BOOLEAN_QNAME);
+        return (Boolean) getPropertyValue(name, XMLConstants.XS_BOOLEAN_QNAME);
     }
 
     public Boolean getBoolean(String name, boolean defaultValue) {
@@ -295,15 +306,15 @@ public class PropertySet {
     }
 
     public Date getDate(String name) {
-        return (Date) getProperty(name, XMLConstants.XS_DATE_QNAME);
+        return (Date) getPropertyValue(name, XMLConstants.XS_DATE_QNAME);
     }
 
     public Date getDateTime(String name) {
-        return (Date) getProperty(name, XMLConstants.XS_DATETIME_QNAME);
+        return (Date) getPropertyValue(name, XMLConstants.XS_DATETIME_QNAME);
     }
 
     public QName getQName(String name) {
-        return (QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
+        return (QName) getPropertyValue(name, XMLConstants.XS_QNAME_QNAME);
     }
 
     public QName getQName(String name, QName defaultValue) {
@@ -312,18 +323,18 @@ public class PropertySet {
     }
 
     public URI getURI(String name) {
-        return (URI) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
+        return (URI) getPropertyValue(name, XMLConstants.XS_ANYURI_QNAME);
     }
 
     public Integer getNonNegativeInteger(final String nm) {
-        return (Integer) getProperty(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME);
+        return (Integer) getPropertyValue(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME);
     }
 
     public String getNCName(final String nm) {
-        return (String) getProperty(nm, XMLConstants.XS_NCNAME_QNAME);
+        return (String) getPropertyValue(nm, XMLConstants.XS_NCNAME_QNAME);
     }
 
     public String getNMTOKEN(final String nm) {
-        return (String) getProperty(nm, XMLConstants.XS_NMTOKEN_QNAME);
+        return (String) getPropertyValue(nm, XMLConstants.XS_NMTOKEN_QNAME);
     }
 }

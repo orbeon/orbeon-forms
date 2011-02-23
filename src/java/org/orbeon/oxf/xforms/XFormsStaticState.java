@@ -370,6 +370,9 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         // Analyze controls XPath
         analyzeControlsXPath();
 
+        // Set baseline resources before freeing transient state
+        xblBindings.getBaselineResources();
+
         // Once analysis is done, some state can be freed
         freeTransientState();
 
@@ -1573,7 +1576,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             }
         }
 
-        private String getAutomaticXBLMappingPath(String uri, String localname) {
+        public String getAutomaticXBLMappingPath(String uri, String localname) {
             if (automaticMappings == null) {
                 readAutomaticXBLMappingsIfNeeded();
             }

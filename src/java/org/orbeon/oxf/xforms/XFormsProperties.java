@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.saxon.om.FastStringBuffer;
 
@@ -279,8 +280,10 @@ public class XFormsProperties {
     private static final String CACHE_COMBINED_RESOURCES_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache-combined-resources";
     private static final boolean CACHE_COMBINED_RESOURCES_DEFAULT = false;
 
-    private static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "javascript-at-bottom";
+    private static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.javascript-at-bottom";
     private static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
+
+    private static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
 
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
@@ -386,6 +389,10 @@ public class XFormsProperties {
     public static boolean isJavaScriptAtBottom() {
         return Properties.instance().getPropertySet().getBoolean
                 (JAVASCRIPT_AT_BOTTOM_PROPERTY, JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT);
+    }
+
+    public static PropertySet.Property getResourcesBaseline() {
+        return Properties.instance().getPropertySet().getProperty(BASELINE_PROPERTY);
     }
 
     public static boolean getDebugLogXPathAnalysis() {

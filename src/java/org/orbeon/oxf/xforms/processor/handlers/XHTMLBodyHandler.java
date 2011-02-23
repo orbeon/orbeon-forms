@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -326,9 +326,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
 
         // Add handlers for custom components
-        final Map<QName, Element> componentBindings = staticState.getXBLBindings().getComponentBindings();
+        final Map<QName, XBLBindings.AbstractBinding> componentBindings = staticState.getXBLBindings().getComponentBindings();
         if (componentBindings != null) {
-            for (final QName currentQName: componentBindings.keySet()) {
+            for (final QName currentQName : componentBindings.keySet()) {
                 controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
             }
         }

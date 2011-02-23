@@ -195,7 +195,7 @@ public class PropertyStore {
             // Create Set from String
             final Set<String> tokens = new HashSet<String>(Arrays.asList(StringUtils.split(value)));
             // Check validity of individual tokens
-            for (String token: tokens) {
+            for (String token : tokens) {
                 if (!Name10Checker.getInstance().isValidNmtoken(token)) {
                     throw new ValidationException("Not an NMTOKENS: " + value, null);
                 }

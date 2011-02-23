@@ -42,7 +42,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         private String namespace = null;
 
         private Map<String, Object> attributesMap;
-        private Map<String, String> headerMap;
         private Map<String, String[]> headerValuesMap;
         private Map<String, Object[]> parameterMap;
 
@@ -614,44 +613,44 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
-    public class DirectResponse extends BaseResponse {
-
-        public DirectResponse() {
-        }
-
-        public OutputStream getOutputStream() throws IOException {
-            return mimeResponse.getPortletOutputStream();
-        }
-
-        public PrintWriter getWriter() throws IOException {
-            return mimeResponse.getWriter();
-        }
-
-        public void setContentType(String contentType) {
-            mimeResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
-        }
-
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
-            throw new IllegalStateException();
-        }
-
-        public String getCharacterEncoding() {
-            return mimeResponse.getCharacterEncoding();
-        }
-
-        public boolean isCommitted() {
-            return mimeResponse.isCommitted();
-        }
-
-        public void reset() {
-            mimeResponse.reset();
-        }
-
-        public void setTitle(String title) {
-            if (mimeResponse instanceof RenderResponse)
-                ((RenderResponse) mimeResponse).setTitle(title);
-        }
-    }
+//    public class DirectResponse extends BaseResponse {
+//
+//        public DirectResponse() {
+//        }
+//
+//        public OutputStream getOutputStream() throws IOException {
+//            return mimeResponse.getPortletOutputStream();
+//        }
+//
+//        public PrintWriter getWriter() throws IOException {
+//            return mimeResponse.getWriter();
+//        }
+//
+//        public void setContentType(String contentType) {
+//            mimeResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
+//        }
+//
+//        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
+//            throw new IllegalStateException();
+//        }
+//
+//        public String getCharacterEncoding() {
+//            return mimeResponse.getCharacterEncoding();
+//        }
+//
+//        public boolean isCommitted() {
+//            return mimeResponse.isCommitted();
+//        }
+//
+//        public void reset() {
+//            mimeResponse.reset();
+//        }
+//
+//        public void setTitle(String title) {
+//            if (mimeResponse instanceof RenderResponse)
+//                ((RenderResponse) mimeResponse).setTitle(title);
+//        }
+//    }
 
     private ExternalContext.Request request;
     private ExternalContext.Response response;

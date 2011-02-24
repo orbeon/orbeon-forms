@@ -13,22 +13,23 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import net.sf.ehcache.Element;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.Caches;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -39,8 +40,7 @@ public class XFormsResourceServer extends ProcessorImpl {
     private static final Logger logger = LoggerFactory.createLogger(XFormsResourceServer.class);
     private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
-    public XFormsResourceServer() {
-    }
+    public XFormsResourceServer() {}
 
     public static IndentedLogger getIndentedLogger() {
         return XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
@@ -151,42 +151,28 @@ public class XFormsResourceServer extends ProcessorImpl {
                 return;
             }
 
-            // Find what features are requested
-            // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
-            boolean isMinimal = false;
-            final Map<String, XFormsFeatures.FeatureConfig> requestedFeaturesMap = new HashMap<String, XFormsFeatures.FeatureConfig>();
-            {
-                final StringTokenizer st = new StringTokenizer(filename.substring(0, filename.lastIndexOf(".")), "-");
-                while (st.hasMoreTokens()) {
-                    final String currentToken = st.nextToken();
-
-                    if (currentToken.equals("min")) {
-                        // Request for minimal resources
-                        isMinimal = true;
-                        continue;
-                    } else if (currentToken.equals("xforms")) {
-                        // Ignore this token
-                        continue;
-                    }
-
-                    final XFormsFeatures.FeatureConfig currentFeature = XFormsFeatures.getFeatureById(currentToken);
-                    if (currentFeature != null) {
-                        // Add feature
-                        requestedFeaturesMap.put(currentFeature.getName(), currentFeature);
-                    } else {
-                        // Don't allow unknown features
-                        response.setStatus(ExternalContext.SC_NOT_FOUND);
-                        return;
-                    }
-                }
-            }
-
-            // Determine list of resources to load
             final List<XFormsFeatures.ResourceConfig> resources;
-            if (isCSS)
-                resources = XFormsFeatures.getCSSResourcesByFeatureMap(requestedFeaturesMap);
-            else
-                resources = XFormsFeatures.getJavaScriptResourcesByFeatureMap(requestedFeaturesMap);
+            boolean isMinimal = false;
+            if (filename.startsWith("orbeon-")) {
+                // New hash-based mechanism
+
+                final String resourcesHash = filename.substring("orbeon-".length(), filename.lastIndexOf("."));
+                final Element cacheElement = Caches.resourcesCache().get(resourcesHash);
+                if (cacheElement != null) {
+                    // Mapping found
+                    final String[] resourcesStrings = (String[]) cacheElement.getValue();
+                    resources = new ArrayList<XFormsFeatures.ResourceConfig>(resourcesStrings.length);
+                    for (final String resourceString : resourcesStrings)
+                        resources.add(new XFormsFeatures.ResourceConfig(resourceString, resourceString));
+                } else {
+                    // Not found, either because the hash is invalid, or because the cache lost the mapping
+                    response.setStatus(ExternalContext.SC_NOT_FOUND);
+                    return;
+                }
+            } else {
+                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                return;
+            }
 
             // Get last modified date
             final long combinedLastModified = computeCombinedLastModified(resources, isMinimal);
@@ -216,7 +202,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(indentedLogger, resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
@@ -229,13 +215,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
                                 indentedLogger.logDebug("resources", "caching requested but not possible, serving directly", "request path", requestPath);
-                            generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                            XFormsResourceRewriter.generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "caching not requested, serving directly", "request path", requestPath);
-                        generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                        XFormsResourceRewriter.generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {
@@ -274,7 +260,6 @@ public class XFormsResourceServer extends ProcessorImpl {
     /**
      * Try to cache the combined resources on disk.
      *
-     * @param indentedLogger        logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
      * @param propertyContext       current PipelineContext (used for rewriting and matchers)
      * @param resourcePath          path to store the cached resource to
@@ -283,10 +268,12 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param isMinimal             whether to use minimal resources
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
-    public static File cacheResources(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources,
+    public static File cacheResources(List<XFormsFeatures.ResourceConfig> resources,
                                       PropertyContext propertyContext, String resourcePath, long combinedLastModified,
                                       boolean isCSS, boolean isMinimal) {
         try {
+            final IndentedLogger indentedLogger = getIndentedLogger();
+
             final File resourceFile;
             final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
@@ -301,7 +288,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
+                        XFormsResourceRewriter.generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
                     } else {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
@@ -313,7 +300,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
+                    XFormsResourceRewriter.generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
                 }
             } else {
                 if (isDebugEnabled)
@@ -325,118 +312,14 @@ public class XFormsResourceServer extends ProcessorImpl {
             throw new OXFException(e);
         }
     }
-
-    /**
-     * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
-     *
-     * @param indentedLogger        logger
-     * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param propertyContext       current PipelineContext (used for rewriting and matchers)
-     * @param os                    OutputStream to write to
-     * @param isCSS                 whether to generate CSS or JavaScript resources
-     * @param isMinimal             whether to use minimal resources
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    private static void generate(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources, PropertyContext propertyContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
-        if (isCSS) {
-            // CSS: rewrite url() in content
-
-            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
-            final ExternalContext.Response response = externalContext.getResponse();
-
-            final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
-
-            // Create matcher that matches all paths in case resources are versioned
-            final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
-
-            // Output Orbeon Forms version
-            outputWriter.write("/* This file was produced by " + Version.getVersionString() + " */\n");
-
-            for (final XFormsFeatures.ResourceConfig resource: resources) {
-                final String resourcePath = resource.getResourcePath(isMinimal);
-                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
-
-                final String content;
-                {
-                    final Reader reader = new InputStreamReader(is, "utf-8");
-                    final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
-                    NetUtils.copyStream(reader, StringBuilderWriter);
-                    reader.close();
-                    content = StringBuilderWriter.toString();
-                }
-
-                {
-                    int index = 0;
-                    while (true) {
-                        final int newIndex = content.indexOf("url(", index);
-
-                        if (newIndex == -1) {
-                            // Output remainder
-                            if (index == 0)
-                                outputWriter.write(content);
-                            else
-                                outputWriter.write(content.substring(index));
-                            break;
-                        } else {
-                            // output so far
-                            outputWriter.write(content.substring(index, newIndex));
-                        }
-
-                        // Get URL
-                        String initialURI;
-                        {
-                            final int closingIndex = content.indexOf(")", newIndex + 4);
-                            if (closingIndex == -1)
-                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resource.getResourcePath(isMinimal));
-
-                            initialURI = content.substring(newIndex + 4, closingIndex);
-
-                            // Some URLs seem to start and end with quotes
-                            if (initialURI.startsWith("\""))
-                                initialURI = initialURI.substring(1);
-
-                            if (initialURI.endsWith("\""))
-                                initialURI = initialURI.substring(0, initialURI.length() - 1);
-
-                            index = closingIndex + 1;
-                        }
-                        // Rewrite URL and output it as an absolute path
-                        try {
-                            final String resolvedURI = NetUtils.resolveURI(initialURI, resourcePath);
-                            // Rewrite through response
-                            final String rewrittenURI = response.rewriteResourceURL(resolvedURI, false);
-
-                            outputWriter.write("url(" + rewrittenURI + ")");
-                        } catch (Exception e) {
-                            indentedLogger.logWarning("resources", "found invalid URI in CSS file", "uri", initialURI);
-                            outputWriter.write("url(" + initialURI + ")");
-                        }
-                    }
-                }
-            }
-            outputWriter.flush();
+    
+    // For unit tests only (called from XSLT)
+    public static String[] testGetResources(String key) {
+        final Element cacheElement = Caches.resourcesCache().get(key);
+        if (cacheElement != null) {
+            return (String[]) cacheElement.getValue();
         } else {
-            // JavaScript: just send out
-
-            // Output Orbeon Forms version
-            final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
-            outputWriter.write("// This file was produced by " + Version.getVersionString() + "\n");
-            outputWriter.flush();
-
-            // Output
-            int index = 0;
-            for (Iterator<XFormsFeatures.ResourceConfig> i = resources.iterator(); i.hasNext(); index++) {
-                final XFormsFeatures.ResourceConfig resourceConfig = i.next();
-                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(isMinimal));
-                // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
-                if (index > 0)
-                    os.write((byte) '\n');
-                NetUtils.copyStream(is, os);
-                is.close();
-            }
+            return null;
         }
-        os.flush();
-        os.close();
     }
 }

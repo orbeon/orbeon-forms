@@ -217,4 +217,71 @@
         </output>
     </test>
 
+    <test description="XML CP-1252 conversion" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <p:param type="output" name="result"/>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <document xsl:version="2.0">
+                            <xsl:for-each select="127 to 159">
+                                <xsl:value-of select="codepoints-to-string(.)"/>
+                            </xsl:for-each>
+                        </document>
+                    </p:input>
+                    <p:output name="data" id="data"/>
+                </p:processor>
+                <p:processor name="oxf:xml-converter">
+                    <p:input name="data" href="#data"/>
+                    <p:input name="config">
+                        <config>
+                            <method>p:org.orbeon.saxon.event.XML1252Emitter</method>
+                            <omit-xml-declaration>true</omit-xml-declaration>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="application/xml; charset=utf-8">&lt;document xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"&gt;&amp;#127;&amp;#8364;&amp;#129;&amp;#8218;&amp;#402;&amp;#8222;&amp;#8230;&amp;#8224;&amp;#8225;&amp;#710;&amp;#8240;&amp;#352;&amp;#8249;&amp;#338;&amp;#141;&amp;#381;&amp;#143;&amp;#144;&amp;#8216;&amp;#8217;&amp;#8220;&amp;#8221;&amp;#8226;&amp;#8211;&amp;#8212;&amp;#732;&amp;#8482;&amp;#353;&amp;#8250;&amp;#339;&amp;#157;&amp;#382;&amp;#376;&lt;/document&gt;</document>
+        </output>
+    </test>
+
+    <test description="HTML CP-1252 conversion" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <p:param type="output" name="result"/>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <html xsl:version="2.0">
+                            <body>
+                                <xsl:for-each select="127 to 159">
+                                    <xsl:value-of select="codepoints-to-string(.)"/>
+                                </xsl:for-each>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="data"/>
+                </p:processor>
+                <p:processor name="oxf:xml-converter">
+                    <p:input name="data" href="#data"/>
+                    <p:input name="config">
+                        <config>
+                            <method>p:org.orbeon.saxon.event.HTML1252Emitter</method>
+                            <version>4.01</version>
+                            <encoding>utf-8</encoding>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="application/xml; charset=utf-8">&lt;html xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"&gt;&lt;body&gt;&amp;#8364;&amp;#129;&amp;#8218;&amp;#402;&amp;#8222;&amp;#8230;&amp;#8224;&amp;#8225;&amp;#710;&amp;#8240;&amp;#352;&amp;#8249;&amp;#338;&amp;#141;&amp;#381;&amp;#143;&amp;#144;&amp;#8216;&amp;#8217;&amp;#8220;&amp;#8221;&amp;#8226;&amp;#8211;&amp;#8212;&amp;#732;&amp;#8482;&amp;#353;&amp;#8250;&amp;#339;&amp;#157;&amp;#382;&amp;#376;&lt;/body&gt;&lt;/html&gt;</document>
+        </output>
+    </test>
+
 </group>

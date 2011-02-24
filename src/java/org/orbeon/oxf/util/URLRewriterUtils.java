@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
@@ -89,7 +90,7 @@ public class URLRewriterUtils {
         final int rewriteMode = forceAbsolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
 
         final String baseURIProperty = getServiceBaseURI();
-        if (org.apache.commons.lang.StringUtils.isBlank(baseURIProperty)) {
+        if (StringUtils.isBlank(baseURIProperty)) {
             // Property not specified, use request to build base URI
             return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString),
                     request.getRequestPath(), urlString, rewriteMode);
@@ -222,8 +223,6 @@ public class URLRewriterUtils {
     /**
      * Rewrite a resource URL, possibly with version information, based on the incoming request as well as a list of
      * path matchers.
-     *
-     * NOTE: As of April 2009, this is only used in Servlet mode.
      *
      * @param request           incoming request
      * @param urlString         URL to rewrite
@@ -418,7 +417,7 @@ public class URLRewriterUtils {
 
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
-        return org.apache.commons.lang.StringUtils.isBlank(propertyString) ? null : propertyString.trim();
+        return StringUtils.isBlank(propertyString) ? null : propertyString.trim();
     }
 
     public static List<URLRewriterUtils.PathMatcher> getMatchAllPathMatcher() {

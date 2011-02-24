@@ -1513,4 +1513,45 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Elements containing other elements supports @constraint" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315821&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                  xmlns:xf="http://www.w3.org/2002/xforms"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model>
+                        <xf:instance>
+                            <instance>
+                                <outer><inner>Foo</inner></outer>
+                                <outer><inner>Foo</inner></outer>
+                                <outer><inner/></outer>
+                            </instance>
+                        </xf:instance>
+                        <!-- Constraint applies -->
+                        <xf:bind nodeset="outer[1]" constraint="false()"/>
+                        <!-- Type and required doesn't apply -->
+                        <xf:bind nodeset="outer[2]" type="xs:integer"/>
+                        <xf:bind nodeset="outer[3]" required="true()"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group ref="outer[1]" id="constraint"/>
+                    <xf:group ref="outer[2]" id="type"/>
+                    <xf:group ref="outer[3]" id="required"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="constraint" class="xforms-group xforms-invalid"/>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="type" class="xforms-group"/>
+                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="required" class="xforms-group xforms-required"/>
+            </controls>
+        </output>
+    </test>
+
 </group>

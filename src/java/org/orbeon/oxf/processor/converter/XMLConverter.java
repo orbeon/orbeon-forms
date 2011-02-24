@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.processor.converter;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -33,7 +35,7 @@ import java.io.Writer;
 public class XMLConverter extends TextConverterBase {
 
     public static final String DEFAULT_CONTENT_TYPE = "application/xml";
-    public static final String DEFAULT_METHOD = "xml";
+    public static final QName DEFAULT_METHOD = QName.get("xml");
     public static final String DEFAULT_VERSION = "1.0";
 
     public XMLConverter() {
@@ -52,7 +54,7 @@ public class XMLConverter extends TextConverterBase {
             throw new OXFException("System doctype is required if a public doctype is present");
 
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : DEFAULT_METHOD,
+                config.method != null ? config.method : Dom4jUtils.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
                 config.version != null ? config.version : DEFAULT_VERSION,
                 config.publicDoctype != null ? config.publicDoctype : null,
                 config.systemDoctype != null ? config.systemDoctype : null,

@@ -1,6 +1,8 @@
-RTE = ORBEON.widgets.RTE
+OD = ORBEON.util.Dom
 Document = ORBEON.xforms.Document
 Assert = YAHOO.util.Assert
+Page = ORBEON.xforms.Page
+Test = ORBEON.util.Test
 
 YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
 
@@ -17,28 +19,42 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
         htmlIn = newlineToSpace htmlIn
         htmlOut = newlineToSpace htmlOut
         window.setTimeout () =>
-            ORBEON.widgets.RTE.onRendered ORBEON.util.Dom.get("xhtml-editor-1"), () =>
-                this.resume () =>
+            rte = Page.getControl (OD.get "xhtml-editor-1")
+            rte.onRendered () =>
+                @resume () =>
                     ORBEON.util.Test.executeCausingAjaxRequest this, () =>
                         ORBEON.xforms.Document.setValue "xhtml-editor-1", htmlIn
-                    , () => this.assertHTML htmlOut
+                    , () => @assertHTML htmlOut
         , ORBEON.util.Properties.internalShortDelay.get()
-        this.wait()
+        @wait()
+
+
+    # Wait until both RTEs have been initialized
+    # setUp() method for this test (we can't use YUI's setUp() here as it doesn't support wait/resume)
+    testSetup: () ->
+        rteInitialized = 0;
+        [rte1, rte2] = for i in [1, 2]
+            container = OD.get "xhtml-editor-" + i
+            rte = Page.getControl container
+            rte.onRendered () =>
+                rteInitialized++
+                @resume() if rteInitialized == 2
+        @wait()
 
     # Trivial case: simple HTML just goes through
     testSimpleHTML: () ->
         simpleHTML = "Some different <b>content</b>."
-        this.settingValue simpleHTML, simpleHTML
+        @settingValue simpleHTML, simpleHTML
 
     # <script> is removed
     testJSInjection: () ->
-        this.settingValue \
+        @settingValue \
             "<div>Text to keep<script>doSomethingBad()</script></div>",
             "<div>Text to keep</div>"
 
     # Pasting Word HTML, which doesn't have quotes around some attributes, is parsed correctly on the server
     testWordHTML: () ->
-        this.settingValue "
+        @settingValue "
             <p class=MsoNormal align=center
             style='margin-bottom:0in;margin-bottom:.0001pt;text-align:center;line-height:normal'><b
             style='mso-bidi-font-weight:normal'><u><span
@@ -55,7 +71,10 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
 
     # Check we send the value of an RTE to the server when another RTE gets the focus
     testFocus: () ->
-        [rte1, rte2] = (RTE.rteEditors["xhtml-editor-" + i] for i in [1, 2])
+        [rte1, rte2] = for i in [1, 2]
+            container = OD.get "xhtml-editor-" + i
+            rte = Page.getControl container
+            rte.yuiRTE
         sampleHtml = "Hello, World!"
         ORBEON.util.Test.executeSequenceCausingAjaxRequest this, [[
             # Initially, focus on 1st RTE, empty the content
@@ -66,6 +85,18 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
             # Use indexOf in test as inserthtml adds a <span> in Chrome
             () -> out = Document.getValue "xhtml-textarea"; Assert.isTrue (out.indexOf sampleHtml) isnt -1
         ]]
+
+    testAddIterationAndSetValue: () ->
+        ORBEON.util.Test.executeSequenceCausingAjaxRequest this, [[
+            () -> Test.click "add-iteration"
+            () ->
+                container = OD.get "rte-in-iteration" + XFORMS_SEPARATOR_1  + "1"
+                rte = Page.getControl container
+                # Delay call to getValue, which is synchronous and doesn't return the right value before RTE is rendered
+                rte.onRendered => @resume(); Assert.areEqual "Inside iteration", rte.getValue()
+                @wait()
+        ]]
+
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe () ->
     if parent and parent.TestManager

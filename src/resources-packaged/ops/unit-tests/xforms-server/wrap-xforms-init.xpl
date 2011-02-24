@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -28,12 +27,12 @@
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
         <p:input name="document" href="#document"/>
-        <p:output name="response" id="xincluded"/>
+        <p:output name="response" id="xhtml"/>
     </p:processor>
 
     <!-- Filter stuff to make tests reproducible -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xincluded"/>
+        <p:input name="data" href="#xhtml"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>

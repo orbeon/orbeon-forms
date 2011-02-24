@@ -97,8 +97,8 @@
 
                     <xf:group class="fr-component-group">
                         <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                        (<xf:input ref="area" class="fr-us-phone-area fr-width-3em" xbl:attr="navindex navindex=tabindex"/>)
-                        <xf:input ref="local" class="fr-us-phone-local fr-width-7em"/>
+                        (<xf:input ref="area" class="fr-us-phone-area fr-width-3em xforms-width-3em" xbl:attr="navindex navindex=tabindex"/>)
+                        <xf:input ref="local" class="fr-us-phone-local fr-width-7em xforms-width-7em"/>
 
                         <!-- React to update to local values -->
                         <xf:action ev:event="xforms-value-changed">

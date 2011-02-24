@@ -35,7 +35,6 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     private String mediaType;
     private byte[] messageBody;
 
-    private Map<String, String> headerMap;
     private Map<String, String[]> headerValuesMap;
 
     private InputStream inputStream;
@@ -88,19 +87,13 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
          * the JSESSIONID cookie is enough while in other cases this leads to a 401 is unclear.
          */
         {
-            this.headerMap = new LinkedHashMap<String, String>();
             this.headerValuesMap = new LinkedHashMap<String, String[]>();
 
-            final Map<String, String> requestHeaderMap = request.getHeaderMap();
             final Map<String, String[]> requestHeaderValuesMap = request.getHeaderValuesMap();
 
             // Handle headers to forward
             if (namesOfHeadersToForward != null) {
                 for (final String currentHeaderName: namesOfHeadersToForward) {
-                    final String v1 = requestHeaderMap.get(currentHeaderName);
-                    if (v1 != null)
-                        headerMap.put(currentHeaderName, v1);
-
                     final String[] v2 = requestHeaderValuesMap.get(currentHeaderName);
                     if (v2 != null)
                         headerValuesMap.put(currentHeaderName, v2);
@@ -113,7 +106,6 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
                     final String currentHeaderName = (String) currentEntry.getKey();
                     final String[] currentHeaderValues = (String[]) currentEntry.getValue();
 
-                    headerMap.put(currentHeaderName, currentHeaderValues[0]);
                     headerValuesMap.put(currentHeaderName, currentHeaderValues);
                 }
             }
@@ -196,10 +188,6 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     public Map<String, Object> getAttributesMap() {
         // Just return super since we do not override attributes here
         return super.getAttributesMap();
-    }
-
-    public Map<String, String> getHeaderMap() {
-        return headerMap;
     }
 
     public Map<String, String[]> getHeaderValuesMap() {

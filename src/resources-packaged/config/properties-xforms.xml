@@ -13,7 +13,8 @@
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
-            xmlns:xi="http://www.w3.org/2001/XInclude">
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- Encryption of XForms hidden fields and field names -->
     <property as="xs:string"  name="oxf.xforms.password"                                value="CHANGE THIS PASSWORD"/>
@@ -96,9 +97,13 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                            value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.combine-resources"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"                    value="false"/>
+
+    <property as="xs:boolean"  name="oxf.xforms.minimal-resources"                          value="true"/>
+    <property as="xs:boolean"  name="oxf.xforms.combine-resources"                          value="true"/>
+    <property as="xs:boolean"  name="oxf.xforms.cache-combined-resources"                   value="false"/>
+    <property as="xs:boolean"  name="oxf.xforms.resources.javascript-at-bottom"             value="true"/>
+    <property as="xs:string"   name="oxf.xforms.resources.baseline"                         value="fr:button fr:tabview fr:autocomplete"/>
+
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
@@ -110,10 +115,8 @@
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                        value="4"/>
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
-    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>       <!-- jscalendar | yui -->
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
-    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>       <!-- fck | yui -->
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
@@ -139,6 +142,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.fusion-charts.uri-to-swf"             value=""/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.accordion.open-closes-others"         value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.tabview.tab-changes-context"          value="true"/>
 
     <!-- Automatically search for XBL components in fr:* namespace -->
     <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon"                          value="http://orbeon.org/oxf/xml/form-runner"/>

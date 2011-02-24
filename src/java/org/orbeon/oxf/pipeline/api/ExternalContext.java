@@ -44,7 +44,6 @@ public interface ExternalContext extends WebAppExternalContext {
         String getClientContextPath(String urlString);
 
         Map<String, Object> getAttributesMap();
-        Map<String, String> getHeaderMap();
         Map<String, String[]> getHeaderValuesMap();
         Map<String, Object[]> getParameterMap();
 

@@ -13,8 +13,8 @@ includes:
 - Form Builder, the WYSIWYG browser-based authoring tool
 - Form Runner, the runtime environment which facilitates the deployment and
   integration of large and complex forms
-- A core forms processing engine which implements specifications such as XForms
-  and XBL with no need for client-side software besides a standard web browser.
+- A core forms processing engine which implements specifications such as XForms 1.1
+  and XBL 2 with no need for client-side software besides a standard web browser.
 
 For more information about Orbeon Forms, please visit:
 

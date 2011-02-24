@@ -180,16 +180,13 @@
 
     <xsl:template name="fr-goto-page">
         <xsl:param name="fr-new-page"/>
-        <xsl:choose>
-            <xsl:when test="$is-externally-paginated">
-                <xforms:dispatch ev:event="DOMActivate" name="fr-goto-page" target="fr.datatable">
-                    <xxforms:context name="fr-new-page" select="{$fr-new-page}"/>
-                </xforms:dispatch>
-            </xsl:when>
-            <xsl:otherwise>
-                <xforms:setvalue ev:event="DOMActivate" model="datatable-model" ref="instance('page')" value="{$fr-new-page}"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xforms:action ev:event="DOMActivate">
+            <!-- Always dispatch the fr-goto-page; with external pagination, it used by the user of the datatable to load
+                 the corresponding data, but it can also be useful with internal paging -->
+            <xforms:dispatch name="fr-goto-page" target="fr.datatable">
+                <xxforms:context name="fr-new-page" select="{$fr-new-page}"/>
+            </xforms:dispatch>
+        </xforms:action>
     </xsl:template>
 
     <!--

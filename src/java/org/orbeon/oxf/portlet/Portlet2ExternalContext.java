@@ -42,7 +42,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         private String namespace = null;
 
         private Map<String, Object> attributesMap;
-        private Map<String, String> headerMap;
         private Map<String, String[]> headerValuesMap;
         private Map<String, Object[]> parameterMap;
 
@@ -78,7 +77,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
         public String getPathInfo() {
             // Use the resource id if we are a ResourceRequest
-            String result = (portletRequest instanceof ResourceRequest) ? ((ResourceRequest) portletRequest).getResourceID() : portletRequest.getParameter(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
+            // In that case, remove the query string part of the resource id, that's handled by getParameterMap()
+            String result = (portletRequest instanceof ResourceRequest) ? NetUtils.removeQueryString(((ResourceRequest) portletRequest).getResourceID()) : portletRequest.getParameter(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
             if (result == null) result = "";
             return (result.startsWith("/")) ? result : "/" + result;
         }
@@ -88,27 +88,29 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return null;
         }
 
-        public synchronized Map<String, String> getHeaderMap() {
-            // NOTE: The container may or may not make HTTP headers available through the properties API
-            if (headerMap == null) {
-                headerMap = new HashMap<String, String>();
-                for (Enumeration<String> e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
-                    String name = e.nextElement();
-                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerMap.put(name.toLowerCase(), portletRequest.getProperty(name));
-                }
-            }
-            return headerMap;
-        }
-
         public synchronized Map<String, String[]> getHeaderValuesMap() {
             // NOTE: The container may or may not make HTTP headers available through the properties API
             if (headerValuesMap == null) {
                 headerValuesMap = new HashMap<String, String[]>();
+
+                // NOTE: Not sure we should even pass these properties as "headers"
+                // Example of property: javax.portlet.markup.head.element.support = true
                 for (Enumeration<String> e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
                     headerValuesMap.put(name.toLowerCase(), StringConversions.stringEnumerationToArray(portletRequest.getProperties(name)));
+                }
+
+                // PLT.11.1.5 Request Properties: "client request HTTP headers may not be always available. Portlets
+                // should not rely on the presence of headers to function properly. The PortletRequest interface
+                // provides specific methods to access information normally available as HTTP headers: content-length,
+                // content-type, accept-language."
+                if (portletRequest instanceof ClientDataRequest) {
+                    final ClientDataRequest clientDataRequest = (ClientDataRequest) portletRequest;
+                    if (clientDataRequest.getContentType() != null)
+                        headerValuesMap.put("content-type", new String[] { clientDataRequest.getContentType() });
+                    if (clientDataRequest.getContentLength() != -1)
+                        headerValuesMap.put("content-length", new String[] { Integer.toString(clientDataRequest.getContentLength()) });
                 }
             }
             return headerValuesMap;
@@ -164,9 +166,15 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
                     // Decode the multipart data
                     parameterMap = Multipart.getParameterMapMultipart(pipelineContext, request, ServletExternalContext.DEFAULT_FORM_CHARSET_DEFAULT);
-
+                } else if (portletRequest instanceof ResourceRequest) {
+                    // We encoded query parameters directly into the resource id in this case
+                    final String queryString = NetUtils.getQueryString(((ResourceRequest) portletRequest).getResourceID());
+                    if (queryString != null)
+                        parameterMap = Collections.unmodifiableMap(StringConversions.stringArrayMapToObjectArrayMap(NetUtils.decodeQueryString(queryString, false)));
+                    else
+                        parameterMap = Collections.emptyMap();
                 } else {
-                    // Just use native request parameters
+                    // Not a resource request, so just use native request parameters
                     parameterMap = new HashMap<String, Object[]>(portletRequest.getParameterMap());
                     parameterMap.remove(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
                     parameterMap = Collections.unmodifiableMap(parameterMap);
@@ -391,7 +399,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
     public abstract class BaseResponse implements Response {
 
-        private URLRewriter urlRewriter = new WSRPURLRewriter(request);
+        private URLRewriter urlRewriter = new WSRPURLRewriter(pipelineContext, request);
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // NIY / FIXME
@@ -605,44 +613,44 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
-    public class DirectResponse extends BaseResponse {
-
-        public DirectResponse() {
-        }
-
-        public OutputStream getOutputStream() throws IOException {
-            return mimeResponse.getPortletOutputStream();
-        }
-
-        public PrintWriter getWriter() throws IOException {
-            return mimeResponse.getWriter();
-        }
-
-        public void setContentType(String contentType) {
-            mimeResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
-        }
-
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
-            throw new IllegalStateException();
-        }
-
-        public String getCharacterEncoding() {
-            return mimeResponse.getCharacterEncoding();
-        }
-
-        public boolean isCommitted() {
-            return mimeResponse.isCommitted();
-        }
-
-        public void reset() {
-            mimeResponse.reset();
-        }
-
-        public void setTitle(String title) {
-            if (mimeResponse instanceof RenderResponse)
-                ((RenderResponse) mimeResponse).setTitle(title);
-        }
-    }
+//    public class DirectResponse extends BaseResponse {
+//
+//        public DirectResponse() {
+//        }
+//
+//        public OutputStream getOutputStream() throws IOException {
+//            return mimeResponse.getPortletOutputStream();
+//        }
+//
+//        public PrintWriter getWriter() throws IOException {
+//            return mimeResponse.getWriter();
+//        }
+//
+//        public void setContentType(String contentType) {
+//            mimeResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
+//        }
+//
+//        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
+//            throw new IllegalStateException();
+//        }
+//
+//        public String getCharacterEncoding() {
+//            return mimeResponse.getCharacterEncoding();
+//        }
+//
+//        public boolean isCommitted() {
+//            return mimeResponse.isCommitted();
+//        }
+//
+//        public void reset() {
+//            mimeResponse.reset();
+//        }
+//
+//        public void setTitle(String title) {
+//            if (mimeResponse instanceof RenderResponse)
+//                ((RenderResponse) mimeResponse).setTitle(title);
+//        }
+//    }
 
     private ExternalContext.Request request;
     private ExternalContext.Response response;

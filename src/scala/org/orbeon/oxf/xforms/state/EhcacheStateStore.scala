@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import net.sf.ehcache.{Element => EhElement, _ }
 import config._
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.PropertyContext
 import store.MemoryStoreEvictionPolicy
 import org.orbeon.oxf.xforms._
@@ -24,27 +23,14 @@ import org.orbeon.oxf.xforms._
 /**
  * XForms state cache based on Ehcache.
  */
-class EhcacheStateStore extends XFormsStateStore {
+object EhcacheStateStore extends XFormsStateStore {
 
-    private val ehcachePath = "oxf:/config/ehcache.xml"
-    private val cacheName = "xforms.state"
     private val storeDebugName = "Ehcache"
 
-    private lazy val cacheManager =
-        try {
-            // Read configuration from XML file in resources
-            val manager = new CacheManager(URLFactory.createURL(ehcachePath))
-            debug("initialized cache manager from " + ehcachePath)
-            manager
-        } catch {
-            case _ =>
-                // Fallback configuration if not found
-                warn("unable to read cache manager configuration from " + ehcachePath)
-                new CacheManager
-        }
+    private val cacheName = "xforms.state"
 
     private lazy val stateCache =
-        cacheManager.getCache(cacheName) match {
+        Caches.cacheManager.getCache(cacheName) match {
             // If manager already knows about our cache we are good to go
             case cache: Cache =>
                 debug("found cache configuration for " + cacheName)
@@ -62,7 +48,7 @@ class EhcacheStateStore extends XFormsStateStore {
                         diskPersistent false
                         diskExpiryThreadIntervalSeconds 120)
                 
-                cacheManager.addCache(cache)
+                Caches.cacheManager.addCache(cache)
                 debug("used fallback cache configuration for " + cacheName)
                 cache
         }
@@ -137,8 +123,4 @@ class EhcacheStateStore extends XFormsStateStore {
 
     private def warn(message: String) =
         XFormsStateManager.getIndentedLogger.logWarning("", storeDebugName + " store: " + message)
-}
-
-object EhcacheStateStore {
-    lazy val instance = new EhcacheStateStore
 }

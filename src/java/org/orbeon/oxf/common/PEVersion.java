@@ -179,6 +179,9 @@ public class PEVersion extends Version {
     }
 
     @Override
+    public void checkPEFeature(String featureName) {}
+
+    @Override
     public boolean isPEFeatureEnabled(boolean featureRequested, String featureName) {
         return featureRequested;
     }

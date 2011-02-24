@@ -105,6 +105,7 @@ public abstract class Version {
         return "PE".equals(EDITION);
     }
 
+    public abstract void checkPEFeature(String featureName);
     public abstract boolean isPEFeatureEnabled(boolean featureRequested, String featureName);
     public abstract XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument);
 

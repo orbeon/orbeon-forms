@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -45,7 +46,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
 
             // Find submission object and dispatch submit event to it
 
-            final Object object = getXBLContainer().findResolutionScope(getEffectiveId()).resolveObjectById(getEffectiveId(), submissionId, null);
+            final Object object = getXBLContainer().findResolutionScope(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsSubmitEvent(containingDocument, submission));

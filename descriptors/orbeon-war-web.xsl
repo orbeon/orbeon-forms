@@ -420,15 +420,16 @@
                 <url-pattern>/exist/rest/*</url-pattern>
             </servlet-mapping>
 
-            <servlet-mapping>
-                <servlet-name>exist-webdav-servlet</servlet-name>
-                <url-pattern>/exist/webdav/*</url-pattern>
-            </servlet-mapping>
-
-            <servlet-mapping>
-                <servlet-name>exist-atom-servlet</servlet-name>
-                <url-pattern>/exist/atom/*</url-pattern>
-            </servlet-mapping>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'eXist WebDAV support'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <servlet-mapping>
+                        <servlet-name>exist-webdav-servlet</servlet-name>
+                        <url-pattern>/exist/webdav/*</url-pattern>
+                    </servlet-mapping>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>

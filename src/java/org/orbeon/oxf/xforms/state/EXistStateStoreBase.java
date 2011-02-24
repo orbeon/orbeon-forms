@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Base class for XForms state stores. This store deals with storing items in memory.
+ * Base class for eXist XForms state store. This store deals with storing items in memory.
  */
 public abstract class EXistStateStoreBase implements XFormsStateStore {
 

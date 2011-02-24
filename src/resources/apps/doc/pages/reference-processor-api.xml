@@ -511,7 +511,7 @@ State state = (State) getState(context);
                 In order to use a custom processor compiled and deployed within Orbeon Forms (as one or more
                 class files or JAR files), its main class (the one that implements the
                 <code>Processor</code> interface) must be mapped to an XML qualified name. You do
-                this mapping in a file called <code>custom-processors.xml</code> under the
+                this mapping in a file called <code>processors-local.xml</code> under the
                 <code>config</code> directory. This is an example illustrating the format of the
                 file:
             </p>
@@ -542,7 +542,7 @@ State state = (State) getState(context);
             </xml-source>
             <p>
                 You use processors in XPL using the same qualified names used in
-                <code>custom-processors.xml</code>:
+                <code>processors-local.xml</code>:
             </p>
             <xml-source>
                 <p:processor name="my:system-out">
@@ -551,7 +551,7 @@ State state = (State) getState(context);
             </xml-source>
             <p>
                 It is important to declare the namespace mapping in
-                <code>custom-processors.xml</code> as well as in the XPL programs that use those
+                <code>processors-local.xml</code> as well as in the XPL programs that use those
                 processors.
             </p>
             <p>

@@ -691,17 +691,16 @@ public class XFormsUtils {
      *
      * @param propertyContext       current context
      * @param containingDocument    current document
-     * @param isPortletLoad         whether this is called within a portlet
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
      * @return                      resolved URL
      */
-    public static String resolveRenderURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean isPortletLoad, Element currentElement, String url) {
+    public static String resolveRenderURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element currentElement, String url) {
         final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
 
         final String externalURL;
-        if (!isPortletLoad) {
+        if (!containingDocument.isPortletContainer()) {
             // XForms page was loaded from a servlet
             externalURL = NetUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIString, null, null);
         } else {
@@ -772,7 +771,7 @@ public class XFormsUtils {
         } else if ("href".equals(attributeName)) {
 
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
-            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, containingDocument.isPortletContainer(), element, attributeValue);
+            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, element, attributeValue);
         } else {
             rewrittenValue = attributeValue;
         }

@@ -30,10 +30,8 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xhtml:head>
-                <!-- Add meta as early as possible -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
                 <!-- Handle head elements except scripts -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:link | xhtml:style)"/>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:title/@*"/>
@@ -51,20 +49,13 @@
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
+                <!-- Handle head scripts if present -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
             </xhtml:head>
-            <xhtml:body>
-                <!-- Copy body attributes -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>
-                <!-- Copy body -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
-            </xhtml:body>
-            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
-                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
-            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                    <xsl:apply-templates select="@*|node()"/>
-                </xsl:element>
-            </xsl:for-each>
+            <!-- Body -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:body"/>
+            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:script"/>
         </xsl:copy>
     </xsl:template>
 

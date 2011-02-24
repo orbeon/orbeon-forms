@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
+import org.orbeon.oxf.common.Version
 import javax.portlet._
 import java.net.{HttpURLConnection, URL}
 import org.orbeon.oxf.util.StringBuilderWriter
@@ -48,7 +49,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
     private def getPreference(request: PortletRequest, pref: PreferenceName.Value) =
         request.getPreferences.getValue(pref.toString, getPortletConfig.getInitParameter(pref.toString))
 
-    override def init = {}
+    override def init = Version.instance().checkPEFeature("Form Runner proxy portlet")
 
     private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)""".r
     private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/]+)""".r
@@ -81,6 +82,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         connection.connect()
         try {
+            propagateHeaders(response, connection)
             getRemoteSessionId(request, connection)
             readRewrite(response, connection, true, false)
         } finally {
@@ -209,7 +211,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
     private val REMOTE_SESSION_ID_KEY = "org.orbeon.oxf.xforms.portlet.remote-session-id"
 
     // Propagate useful headers from Form Runner server to client
-    private def propagateHeaders(response: ResourceResponse, connection: HttpURLConnection): Unit =
+    private def propagateHeaders(response: MimeResponse, connection: HttpURLConnection): Unit =
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
             (name => (name, connection.getHeaderField(name))) foreach
                 { case (name, value: String) => response.setProperty(name, value) }

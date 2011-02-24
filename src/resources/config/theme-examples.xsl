@@ -47,27 +47,27 @@
         <xhtml:html>
             <xsl:apply-templates select="/xhtml:html/@*"/>
             <xhtml:head>
-                <!-- Add meta as early as possible -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
-                <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
-                <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
-                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
                 <!-- Handle head elements except scripts -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:link | xhtml:style)"/>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)"/>
+                <!-- CSS and title -->
+                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
+                <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
                 <!-- Orbeon Forms version -->
                 <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
+                <!-- Handle head scripts if present -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>
 
-                <xhtml:table id="main" width="100%" border="0" cellpadding="0" cellspacing="0">
+                <xhtml:table id="orbeon-main" width="100%" border="0" cellpadding="0" cellspacing="0">
                     <!-- Banner (with search) -->
                     <xhtml:tr>
-                        <xhtml:td colspan="2" id="banner">
+                        <xhtml:td colspan="2" id="orbeon-banner">
                             <xhtml:div style="float: left">
                                 <xhtml:a href="/" f:url-norewrite="true">
                                     <xhtml:img f:url-norewrite="false" width="212" height="42"
@@ -80,7 +80,11 @@
                                       action="http://www.google.com/custom">
                                     <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
                                     |
-                                    <xhtml:a href="/doc/">Documentation</xhtml:a>
+                                    <xhtml:a href="http://wiki.orbeon.com/forms/">Orbeon Wiki</xhtml:a>
+                                    |
+                                    <xhtml:a href="/doc/">Local Documentation</xhtml:a>
+                                    |
+                                    Demo Forms &amp; Apps
                                     |
                                     <xhtml:span style="white-space: nowrap">
                                         Search:
@@ -116,7 +120,7 @@
                     <xhtml:tr>
                         <!--List of examples -->
                         <xsl:if test="not($is-form-runner-home)">
-                            <xhtml:td id="leftcontent" valign="top" width="1%">
+                            <xhtml:td id="orbeon-leftcontent" valign="top" width="1%">
                                 <h1>Orbeon Forms Apps</h1>
                                 <xhtml:ul class="tree-sections">
                                     <xsl:for-each select="$applications/*/section">
@@ -144,7 +148,7 @@
                                 </xhtml:ul>
                             </xhtml:td>
                         </xsl:if>
-                        <xhtml:td id="maincontent" valign="top" width="99%">
+                        <xhtml:td id="orbeon-maincontent" valign="top" width="99%">
                             <xhtml:div class="maincontent">
                                 <!-- Title -->
                                 <xhtml:h1>
@@ -152,7 +156,7 @@
                                     <xsl:value-of select="$title"/>
                                 </xhtml:h1>
                                 <!-- Body -->
-                                <xhtml:div id="mainbody">
+                                <xhtml:div id="orbeon-mainbody">
                                     <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
                                 </xhtml:div>
                             </xhtml:div>
@@ -161,13 +165,8 @@
                 </xhtml:table>
                 <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
             </xhtml:body>
-            <!-- Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
-                 performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom -->
-            <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                    <xsl:apply-templates select="@*|node()"/>
-                </xsl:element>
-            </xsl:for-each>
+            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
+            <xsl:apply-templates select="/xhtml:html/xhtml:script"/>
         </xhtml:html>
     </xsl:template>
 

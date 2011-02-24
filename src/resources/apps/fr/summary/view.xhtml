@@ -126,7 +126,8 @@
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-pdf" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{normalize-space(instance('fr-selection-instance'))}?fr-language={xxforms:instance('fr-language-instance')}" xxforms:show-progress="false"/>
+                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{normalize-space(instance('fr-selection-instance'))}?fr-language={xxforms:instance('fr-language-instance')}"
+                             xxforms:show-progress="false" f:url-type="resource"/>
             </xforms:action>
 
             <xforms:action ev:event="fr-summary-test">

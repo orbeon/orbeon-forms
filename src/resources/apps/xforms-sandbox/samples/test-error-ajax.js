@@ -9,7 +9,6 @@
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
         name: "AJAX error",
-        initialShowDialogValue: ORBEON.util.Properties.showErrorDialog.get(),
 
         doTest: function(type) {
             var listenerCalled = false;

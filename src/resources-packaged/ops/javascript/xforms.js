@@ -34,7 +34,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 // These variables are not set by default, but if set will be used by this code:
 //
 //     YUI_RTE_CUSTOM_CONFIG
-//     FCK_CUSTOM_CONFIG
 //     USER_LANGUAGE
 
 (function() {
@@ -923,7 +922,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 this.sessionHeartbeat = new ORBEON.util.Property("session-heartbeat", true);
                 this.sessionHeartbeatDelay = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
                 this.revisitHandling = new ORBEON.util.Property("revisit-handling", "restore");
-                this.fckEditorBasePath = new ORBEON.util.Property("fck-editor-base-path", "/ops/fckeditor/");
                 this.delayBeforeIncrementalRequest = new ORBEON.util.Property("delay-before-incremental-request", 500);
                 this.delayBeforeForceIncrementalRequest = new ORBEON.util.Property("delay-before-force-incremental-request", 2000);
                 this.delayBeforeGeckoCommunicationError = new ORBEON.util.Property("delay-before-gecko-communication-error", 5000);
@@ -940,10 +938,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 this.offlineSupport = new ORBEON.util.Property("offline", false);
                 this.formatInputTime = new ORBEON.util.Property("format.input.time", "[h] =[m] =[s] [P]");
                 this.formatInputDate = new ORBEON.util.Property("format.input.date", "[M]/[D]/[Y]");
-                this.datePicker = new ORBEON.util.Property("datepicker", "yui");
                 this.datePickerNavigator = new ORBEON.util.Property("datepicker.navigator", true);
                 this.datePickerTwoMonths = new ORBEON.util.Property("datepicker.two-months", false);
-                this.htmlEditor = new ORBEON.util.Property("htmleditor", "yui");
                 this.showErrorDialog = new ORBEON.util.Property("show-error-dialog", true);
                 this.clientEventMode = new ORBEON.util.Property("client.events.mode", "default");
                 this.clientEventsFilter = new ORBEON.util.Property("client.events.filter", "");
@@ -1722,9 +1718,6 @@ ORBEON.xforms.Controls = {
             // Simple input
             var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
             return input.value;
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-select1-open")) {
-            // Native autocomplete
-            return YAHOO.util.Dom.getElementsByClassName("xforms-select1-open-input", null, control)[0].value;
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
@@ -1768,12 +1761,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML text area
-            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                return ORBEON.widgets.RTE.getValue(control);
-            } else {
-                var editorInstance = FCKeditorAPI.GetInstance(control.name);
-                return editorInstance.GetXHTML();
-            }
+            return ORBEON.xforms.Page.getControl(control).getValue();
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-static"))) {
             // Output and static input
             if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-image")) {
@@ -1851,13 +1839,6 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
                 || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
             // Triggers don't have a value: don't update them
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-select1-open")) {
-            // Auto-complete
-            if (control.value != newControlValue) {
-                control.value = newControlValue;
-                control.getElementsByTagName("input")[0].value = newControlValue;
-                control.previousValue = newControlValue;
-            }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
             // Time control
             var inputField = control.getElementsByTagName("input")[0];
@@ -1989,18 +1970,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
-            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                // YUI RTE
-                ORBEON.widgets.RTE.setValue(control, newControlValue);
-            } else {
-                // FCK
-                var htmlEditor = FCKeditorAPI.GetInstance(control.name);
-                // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
-                // as we loose our listeners after using the later
-                htmlEditor.EditorDocument.body.innerHTML = newControlValue;
-                control.value = newControlValue;
-                control.previousValue = newControlValue;
-            }
+            ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
                 || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
             return ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
@@ -2340,19 +2310,9 @@ ORBEON.xforms.Controls = {
             // XForms output and group
             if (isReadonly) YAHOO.util.Dom.addClass(control, "xforms-readonly");
             else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
-            // Auto-complete field
-            var autocompleteInput = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            ORBEON.xforms.Controls.setDisabledOnFormElement(autocompleteInput, isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea") && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
-            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                ORBEON.widgets.RTE.setReadonly(control, isReadonly);
-            } else {
-                var htmlEditor = FCKeditorAPI.GetInstance(control.name);
-                if (isReadonly) htmlEditor.ToolbarSet.Collapse();
-                else htmlEditor.ToolbarSet.Expand();
-            }
+            ORBEON.xforms.Page.getControl(control).setReadonly(isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
             ORBEON.xforms.Controls.setDisabledOnFormElement(
@@ -2470,11 +2430,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
                 && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // Special case for RTE
-            if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-                ORBEON.widgets.RTE.setFocus(control);
-            } else {
-                // Not sure anything meaningful can be done for FCK
-            }
+            ORBEON.xforms.Page.getControl(control).setFocus();
         } else {
             // Generic code to find focusable descendant-or-self HTML element and focus on it
             var htmlControlNames = [ "input", "textarea", "select", "button", "a" ];
@@ -3041,9 +2997,6 @@ ORBEON.xforms.Events = {
             if (targetControlElement != null && currentFocusControlElement != targetControlElement
                     && !YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
 
-                // The RTE interested in knowing when anyone gets a focus event
-                ORBEON.widgets.RTE.focusOnAnyFormControl(targetControlElement);
-
                 // Handle special value changes upon losing focus
 
                 // HTML area and trees does not throw value change event, so we send the value change to the server
@@ -3196,9 +3149,7 @@ ORBEON.xforms.Events = {
                     ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
                             : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
             }
-            if (ORBEON.widgets.JSCalendar.appliesToControl(target)) {
-                ORBEON.widgets.JSCalendar.keydown(event, target);
-            } else if (ORBEON.widgets.YUICalendar.appliesToControl(target)) {
+            if (ORBEON.widgets.YUICalendar.appliesToControl(target)) {
                 ORBEON.widgets.YUICalendar.keydown(event, target);
             }
         }
@@ -3208,8 +3159,7 @@ ORBEON.xforms.Events = {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
             // Input field and auto-complete: trigger DOMActive when when enter is pressed
-            if (YAHOO.util.Dom.hasClass(target, "xforms-select1-open")
-                    || (YAHOO.util.Dom.hasClass(target, "xforms-input") && !YAHOO.util.Dom.hasClass(target, "xforms-type-boolean"))
+            if ((YAHOO.util.Dom.hasClass(target, "xforms-input") && !YAHOO.util.Dom.hasClass(target, "xforms-type-boolean"))
                     || YAHOO.util.Dom.hasClass(target, "xforms-secret")) {
                 if (event.keyCode == 10 || event.keyCode == 13) {
                     // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
@@ -3228,9 +3178,6 @@ ORBEON.xforms.Events = {
     keyup: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-            // Save keycode
-            if (YAHOO.util.Dom.hasClass(target, "xforms-select1-open"))
-                ORBEON.xforms.Globals.autoCompleteLastKeyCode[target.id] = event.keyCode;
             // Remember we have received the keyup for this element
             if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode))
                 ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
@@ -3442,11 +3389,7 @@ ORBEON.xforms.Events = {
 
         } else if (target != null && YAHOO.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
             // Click on calendar inside input field
-            if (ORBEON.util.Properties.datePicker.get() == "jscalendar") {
-                ORBEON.widgets.JSCalendar.click(event, target);
-            } else {
-                ORBEON.widgets.YUICalendar.click(event, target);
-            }
+            ORBEON.widgets.YUICalendar.click(event, target);
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-upload") && YAHOO.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
             // Click on remove icon in upload control
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
@@ -3912,6 +3855,8 @@ ORBEON.xforms.Events = {
          * @param {!string} fullUpdateId    Id of the control that contains the section that was updated.
          */
         onFullUpdateDone: function(fullUpdateId) {
+
+            // Re-initialize all the existing XBL components inside the this container
             var me = this;
             var componentIds = this._fullUpdateToComponents[fullUpdateId];
             if (componentIds) {
@@ -3924,6 +3869,9 @@ ORBEON.xforms.Events = {
                     }
                 });
             }
+
+            // Re-initialize all the legacy/built-in controls
+            ORBEON.xforms.Init.insertedElement(YUD.get(fullUpdateId));
         }
     };
 
@@ -4042,357 +3990,6 @@ ORBEON.widgets.Base = function() {
     };
 }();
 
-ORBEON.widgets.JSCalendar = function() {
-
-    /**
-     * Send notification to XForms engine end-user clicked on day.
-     */
-    function update(calendar) {
-        if (YAHOO.util.Dom.hasClass(calendar.activeDiv, "day")) {
-            // Change value in field from ISO to display value
-            var element;
-			if(! YAHOO.lang.isNull(calendar.params.inputField)) {
-                var inputField = calendar.params.inputField;
-                var jsDate = ORBEON.util.DateTime.magicDateToJSDate(inputField.value);
-                inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
-                element = inputField.parentNode;
-			} else {
-                var imageField = calendar.params.imageField;
-				imageField.alt = ORBEON.util.DateTime.jsDateToformatDisplayDate(calendar.date);
-                element = imageField.parentNode;
-			}
-            var event = new ORBEON.xforms.server.AjaxServer.Event(null, element.id, null, ORBEON.xforms.Controls.getCurrentValue(element), "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-        }
-    }
-
-    return {
-
-        extending: ORBEON.widgets.Base,
-
-        appliesToControl: function(control) {
-            return (YAHOO.util.Dom.hasClass(control, "xforms-type-date") || YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime"))
-                    && ORBEON.util.Properties.datePicker.get() == "jscalendar";
-        },
-
-        click: function(event, target) {
-            // Initialize calendar when needed
-            var firstChildElement = ORBEON.util.Dom.getChildElementByIndex(target, 0);
-
-            // Setup calendar library
-            var calendarParameters = {
-                imageField : firstChildElement,
-                ifFormat       :    "%m/%d/%Y",
-                showsTime      :    false,
-                button         :    target.id,
-                singleClick    :    true,
-                step           :    1,
-                onUpdate       :    update,
-                electric       :    false
-            };
-            if (YAHOO.util.Dom.hasClass(firstChildElement, "xforms-input-appearance-minimal")) {
-                // Store the reference to the image so we can then update the alt on the image when the user selects a date
-                calendarParameters["imageField"] = firstChildElement;
-                // Set initial date
-                var dateFromAlt = ORBEON.util.Dom.getAttribute(firstChildElement, "alt");
-                calendarParameters["date"] = dateFromAlt;
-            } else {
-                // Calendar uses input field to get the date from/to
-                calendarParameters["inputField"] = firstChildElement;
-            }
-            Calendar.setup(calendarParameters);
-
-            // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
-            var jsCalendarOnclick = target.onclick;
-            target.onclick = null;
-            // Call jscalendar code that opens the calendar
-            jsCalendarOnclick();
-        },
-
-        blur: function(event, target) {},
-
-        keydown: function(event, target) {
-            // Close calendar when user starts typing
-            calendar.hide();
-        }
-    };
-}();
-
-ORBEON.widgets.RTE = function() {
-
-    // === PRIVATE ===
-
-    rteEditors = {};            // Maps control ID to YUI RTE object
-    isIncremental = {};         // Maps control ID to boolean telling us if this control is in incremental model
-    editorWithFocus = null;     // The control ID of the RTE editor that has the focus, null if none
-
-    /**
-     * Maps control ID to either:
-     *      undefined:      if the control is not rendered yet, and nobody is listening on render event.
-     *      true:           if the control is rendered and nobody listened to a render event before it was rendered.
-     *      a custom event: if someone listened to the render event before the control was rendered.
-     */
-    renderedCustomEvents = {};
-
-    /**
-     * Event handler called by the RTE every time there is an event which can could potentially change the content
-     * of the editor.
-     */
-    function changeEvent(controlID) {
-        // Simulate blur on previous, focus on this
-        var currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId;
-        if (currentFocusControlId != controlID) {
-            // If previous control was an RTE, send blur to it
-            if (rteEditors[currentFocusControlId] != null) {
-                ORBEON.xforms.Events.blur({ target: ORBEON.util.Dom.get(currentFocusControlId) });
-            }
-            // Send focus to current control
-            ORBEON.xforms.Events.focus({ target: ORBEON.util.Dom.get(controlID) });
-        }
-
-        // Simulate keyup
-        ORBEON.xforms.Events.keydown({ target: ORBEON.util.Dom.get(currentFocusControlId) });
-        ORBEON.xforms.Events.keyup({ target: ORBEON.util.Dom.get(currentFocusControlId) });
-    }
-
-    // === PUBLIC ===
-
-    var PUBLIC = {
-
-        extending: ORBEON.widgets.Base,
-        rteEditors: rteEditors,
-
-        /**
-         * Initializes the RTE editor for a particular control.
-         */
-        init: function(control) {
-            // Create RTE config
-            var rteConfig;
-            if (typeof YUI_RTE_CUSTOM_CONFIG != "undefined")
-                rteConfig = YUI_RTE_CUSTOM_CONFIG;
-            else
-                rteConfig = {
-                    toolbar: {
-                        collapse: true,
-                        // We don't want a titlebar to be shown above the editor
-                        titlebar: false,
-                        draggable: false,
-                        buttonType: 'advanced',
-                        buttons: [
-                            { group: 'fontstyle', label: 'Font Name and Size',
-                                buttons: [
-                                    { type: 'select', label: 'Arial', value: 'fontname', disabled: true,
-                                        menu: [
-                                            { text: 'Arial', checked: true },
-                                            { text: 'Arial Black' },
-                                            { text: 'Comic Sans MS' },
-                                            { text: 'Courier New' },
-                                            { text: 'Lucida Console' },
-                                            { text: 'Tahoma' },
-                                            { text: 'Times New Roman' },
-                                            { text: 'Trebuchet MS' },
-                                            { text: 'Verdana' }
-                                        ]
-                                    },
-                                    { type: 'spin', label: '13', value: 'fontsize', range: [ 9, 75 ], disabled: true }
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'textstyle', label: 'Font Style',
-                                buttons: [
-                                    { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
-                                    { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
-                                    { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
-                                    { type: 'separator' },
-                                    { type: 'push', label: 'Subscript', value: 'subscript', disabled: true },
-                                    { type: 'push', label: 'Superscript', value: 'superscript', disabled: true }
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'textstyle2', label: '&nbsp;',
-                                buttons: [
-                                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-                                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true },
-                                    { type: 'separator' },
-                                    { type: 'push', label: 'Remove Formatting', value: 'removeformat', disabled: true },
-                                    { type: 'push', label: 'Show/Hide Hidden Elements', value: 'hiddenelements' }
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'undoredo', label: 'Undo/Redo',
-                                buttons: [
-                                    { type: 'push', label: 'Undo', value: 'undo', disabled: true },
-                                    { type: 'push', label: 'Redo', value: 'redo', disabled: true }
-
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'alignment', label: 'Alignment',
-                                buttons: [
-                                    { type: 'push', label: 'Align Left CTRL + SHIFT + [', value: 'justifyleft' },
-                                    { type: 'push', label: 'Align Center CTRL + SHIFT + |', value: 'justifycenter' },
-                                    { type: 'push', label: 'Align Right CTRL + SHIFT + ]', value: 'justifyright' },
-                                    { type: 'push', label: 'Justify', value: 'justifyfull' }
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'parastyle', label: 'Paragraph Style',
-                                buttons: [
-                                { type: 'select', label: 'Normal', value: 'heading', disabled: true,
-                                    menu: [
-                                        { text: 'Normal', value: 'none', checked: true },
-                                        { text: 'Header 1', value: 'h1' },
-                                        { text: 'Header 2', value: 'h2' },
-                                        { text: 'Header 3', value: 'h3' },
-                                        { text: 'Header 4', value: 'h4' },
-                                        { text: 'Header 5', value: 'h5' },
-                                        { text: 'Header 6', value: 'h6' }
-                                    ]
-                                }
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'indentlist2', label: 'Indenting and Lists',
-                                buttons: [
-                                    { type: 'push', label: 'Indent', value: 'indent', disabled: true },
-                                    { type: 'push', label: 'Outdent', value: 'outdent', disabled: true },
-                                    { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
-                                    { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
-                                ]
-                            },
-                            { type: 'separator' },
-                            { group: 'insertitem', label: 'Insert Item',
-                                buttons: [
-                                    // The order of the following two lines is changed compared to the default in editor.js, to move
-                                    // the "Insert image" icon before the "Create link" icon. This solves an issue on IE6 where some
-                                    // space show up after the RTE icons when the RTE is placed inside a dialog and the dialog size
-                                    // is set relative to the viewport size using CSS. This can be reproduced by running the
-                                    // "dialog" sandbox example.
-                                    { type: 'push', label: 'Insert Image', value: 'insertimage' },
-                                    { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
-                                ]
-                            }
-                        ]
-                    }
-                };
-
-            // Create RTE object
-            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
-                ? control.getElementsByTagName("textarea")[0] : control;
-            // Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
-            textarea.disabled = YAHOO.util.Dom.hasClass(control, "xforms-readonly");
-            var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
-
-            // Register event listener for user interacting with the control
-            // RTE fires afterNodeChange right at the end of initialisation, which mistakenly results
-            // in changeEvent being called onload, which has a side-effect of making Orbeon think the RTE
-            // has focus. Avoid this by only registering the changeEvent listener when the first afterNodeChange
-            // event is received.
-            var registerChangeEvent = function() {
-                yuiRTE.on("editorKeyUp", function() { changeEvent(control.id); });
-                yuiRTE.on("afterNodeChange", function() { changeEvent(control.id); });
-                yuiRTE.on("editorWindowFocus", function() { ORBEON.xforms.Events.focus({ target: control }); });
-                yuiRTE.on("editorWindowBlur", function() { ORBEON.xforms.Events.blur({ target: control }); });
-                yuiRTE.removeListener("afterNodeChange", registerChangeEvent);
-            };
-            yuiRTE.on("afterNodeChange", registerChangeEvent);
-
-            // Store information about this RTE
-            rteEditors[control.id] = yuiRTE;
-            isIncremental[control.id] = YAHOO.util.Dom.hasClass(control, "xforms-incremental");
-            // Transform text area into RTE on the page
-            yuiRTE.on("editorContentLoaded", function() {
-                if (!ORBEON.util.Utils.isNewXHTMLLayout()) {
-                    var rteContainer = control.parentNode;
-                    rteContainer.className += " " + control.className;
-                }
-                // Store initial server value
-                // If we don't and user's JS code calls ORBEON.xforms.Document.setValue(), the value of the RTE is changed, our RFE changeEvent() is called,
-                // it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
-                // Then in executeNextRequest() we ignore the value change because it is the same the server value.
-                var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(control);
-                ORBEON.xforms.ServerValueStore.set(control.id, controlCurrentValue);
-                // Fire event we have a custom event listener from this RTE
-                if (YAHOO.lang.isObject(renderedCustomEvents[control.id]))
-                    renderedCustomEvents[control.id].fire();
-                // Set to true, so future listeners are called back right away
-                renderedCustomEvents[control.id] = true;
-            });
-            yuiRTE.render();
-        },
-
-        // TODO: destroy()
-
-        /**
-         * Called on any focus event of other form controls on the page
-         */
-        focusOnAnyFormControl: function(control) {
-            var currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId;
-            // If the focus went to another control (not RTE) and the current is a an RTE
-            if (rteEditors[control.id] == null && rteEditors[currentFocusControlId] != null) {
-                // Send blur to that RTE
-                ORBEON.xforms.Events.change({ target: ORBEON.util.Dom.get(currentFocusControlId) });
-                ORBEON.xforms.Events.blur({ target: ORBEON.util.Dom.get(currentFocusControlId) });
-            }
-        },
-
-        /**
-         * Called to set the value of the RTE
-         */
-        setValue: function(control, newValue) {
-            // Don't update the textarea with HTML from the server while the user is typing, otherwise the user
-            // loses their cursor position. This lets us have a certain level of support for incremental rich text areas,
-            // however, ignoring server values means that the visual state of the RTE can become out of sync
-            // with the server value (for example, the result of a calculation wouldn't be visible until focus moved
-            // out of the field).
-            if (! YAHOO.util.Dom.hasClass(control, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != control.id) {
-                var yuiRTE = rteEditors[control.id];
-                yuiRTE.setEditorHTML(newValue);
-            }
-        },
-
-        getValue: function(control) {
-            var yuiRTE = rteEditors[control.id];
-            var value = yuiRTE.getEditorHTML();
-            // HACK: with Firefox, it seems that sometimes, when setting the value of the editor to "" you get"<br>" back
-            // The purpose of this hack is to work around that problem. It has drawbacks:
-            // o This means setting "<br>" will also result in ""
-            // o This doesn't fix the root of the problem so there may be other cases not caught by this
-            if (value == "<br>")
-                value = "";
-            return value;
-        },
-
-        setFocus: function(control) {
-            var yuiRTE = rteEditors[control.id];
-            yuiRTE.focus();
-        },
-
-        onRendered: function(control, callback) {
-            if (renderedCustomEvents[control.id] === true) {
-                // Already rendered.
-                callback();
-            } else {
-                // Create custom event if necessary
-                if (renderedCustomEvents[control.id] === undefined)
-                    renderedCustomEvents[control.id] = new YAHOO.util.CustomEvent("rteRendered");
-                // Custom event was already created
-                renderedCustomEvents[control.id].subscribe(callback);
-            }
-        },
-
-        /**
-         * XForms readonly == RTE disabled configuration attribute.
-         */
-        setReadonly: function(control, isReadonly) {
-            var yuiRTE = rteEditors[control.id];
-            yuiRTE.set("disabled", isReadonly);
-        }
-    };
-
-    return PUBLIC;
-}();
-
 ORBEON.xforms.Init = {
 
     /**
@@ -4410,7 +4007,6 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
             "select1": {
                 "compact" : ORBEON.xforms.Init._list,
-                "{http://orbeon.org/oxf/xml/xforms}autocomplete": ORBEON.xforms.Init._autoComplete,
                 "{http://orbeon.org/oxf/xml/xforms}menu": ORBEON.xforms.Init._menu,
                 "{http://orbeon.org/oxf/xml/xforms}tree": genericInit
             },
@@ -4421,7 +4017,7 @@ ORBEON.xforms.Init = {
             "range": { "": ORBEON.xforms.Init._range },
             "textarea": {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
-                "text/html": ORBEON.xforms.Init._htmlArea
+                "text/html": genericInit
             },
             "dialog": {
                 "": ORBEON.xforms.Init._dialog,
@@ -4486,21 +4082,16 @@ ORBEON.xforms.Init = {
             maskDialogCloseEvents: false,        // Avoid catching a dialog close event received from the server, so we don't sent it back to the server
             currentFocusControlId: null,         // Id of the control that got the focus last
             currentFocusControlElement: null,    // Element for the control that got the focus last
-            htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
+            htmlAreaNames: [],                   // Names of the HTML editors, which we need to reenable them on Firefox
             repeatTreeChildToParent: {},         // Describes the repeat hierarchy
             repeatIndexes: {},                   // The current index for each repeat
             repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
-            inputCalendarCommitedValue: {},      // Maps input id to the value of JSCalendar actually selected by the user
             yuiCalendar: null,                   // Reusable calendar widget
             tooltipLibraryInitialized: false,
             changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
-            autoCompleteLastKeyCode: {},         // Stores the last key entered for each auto-complete field
-            autoCompleteOpen: {},
             loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
             activeControl: null,                 // The currently active control, used to disable hint
             autosizeTextareas: [],               // Ids of the autosize textareas on the page
-            fckEditorLoading: false,             // True if  a FCK editor is currently loading
-            fckEditorsToLoad: [],                // Queue of FCK editor to load
             dialogs: {},                         // Map for dialogs: id -> YUI dialog object
             dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
             hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
@@ -4561,7 +4152,7 @@ ORBEON.xforms.Init = {
                 ORBEON.xforms.Globals.ns[formID] = formID.substring(0, formID.indexOf("xforms-form"));
 
                 // Initialize XForms server URL
-                ORBEON.xforms.Init._setBasePaths(formID, document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get() == "true");
+                ORBEON.xforms.Init._setBasePaths(formID, document.getElementsByTagName("script"), ORBEON.util.Properties.resourcesVersioned.get());
 
                 // Remove class xforms-initially-hidden on form element, which might have been added to prevent user
                 // interaction with the form before it is initialized
@@ -4593,7 +4184,7 @@ ORBEON.xforms.Init = {
                         YAHOO.util.Dom.generateId(formChild);
                         YAHOO.util.Dom.removeClass(formChild, "xforms-initially-hidden");
                         var errorPanel = new YAHOO.widget.Panel(formChild.id, {
-                            width: "700px",
+                            width: "700px", // NOTE: iPhone 3G width is 320px, iPhone 4 640px
                             modal: true,
                             fixedcenter: false,
                             underlay: "shadow",
@@ -4858,7 +4449,7 @@ ORBEON.xforms.Init = {
         }
 
         // Run code sent by server
-        if (typeof xformsPageLoadedServer != "undefined" && !ORBEON.xforms.Globals.fckEditorLoading) {
+        if (typeof xformsPageLoadedServer != "undefined") {
             xformsPageLoadedServer();
         }
 
@@ -4904,10 +4495,7 @@ ORBEON.xforms.Init = {
     insertedElement: function(element) {
         // TODO: Also need destructors for controls
         if (element.nodeType == ORBEON.util.Dom.ELEMENT_TYPE) {
-            if (YAHOO.util.Dom.hasClass(element, "xforms-select1-appearance-xxforms-autocomplete")) {
-                // Autocomplete
-                ORBEON.xforms.Init._autoComplete(element);
-            } else if (YAHOO.util.Dom.hasClass(element, "xforms-textarea")
+            if (YAHOO.util.Dom.hasClass(element, "xforms-textarea")
                            && YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")) {
                 // HTML area
                 ORBEON.xforms.Init._htmlArea(element);
@@ -4998,18 +4586,6 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
     },
 
-    _autoComplete: function(autoComplete) {
-        var textfield = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 0);
-        var select = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 1);
-        // Get list of possible values from the select
-        var values = new Array();
-        for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
-            values.push(select.options[optionIndex].value);
-        // Initialize auto-complete input
-        var noFilter = YAHOO.util.Dom.hasClass(autoComplete, "xforms-select1-open-autocomplete-nofilter");
-        ORBEON.xforms.Globals.autoCompleteOpen[autoComplete.id] = actb(textfield, values, noFilter);
-    },
-
     _widetextArea: function(textarea) {
         ORBEON.xforms.Globals.autosizeTextareas.push(textarea);
         ORBEON.xforms.Controls.autosizeTextarea(textarea);
@@ -5093,39 +4669,7 @@ ORBEON.xforms.Init = {
      * Initialize HTML areas.
      */
     _htmlArea: function (htmlArea) {
-        if (ORBEON.util.Properties.htmlEditor.get() == "yui") {
-            ORBEON.widgets.RTE.init(htmlArea);
-        } else {
-
-            // Initialize FCK editor
-
-            var fckEditor = new FCKeditor(htmlArea.name);
-            if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
-                ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
-
-            var formID = ORBEON.xforms.Globals.requestForm.id;
-            fckEditor.BasePath = ORBEON.xforms.Globals.resourcesBaseURL[formID] + ORBEON.util.Properties.fckEditorBasePath.get();
-            fckEditor.ToolbarSet = "OPS";
-
-            // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
-            var type_check = typeof USER_LANGUAGE;
-            if (type_check != 'undefined') {
-                fckEditor.Config["AutoDetectLanguage"] = false;
-                fckEditor.Config["DefaultLanguage"] = (USER_LANGUAGE != '') ? USER_LANGUAGE : 'en';
-            }
-            // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable
-            type_check = typeof FCK_CUSTOM_CONFIG;
-            if (type_check != 'undefined')
-                fckEditor.Config["CustomConfigurationsPath"] = fckEditor.BasePath + FCK_CUSTOM_CONFIG;
-
-            if (ORBEON.xforms.Globals.fckEditorLoading) {
-                ORBEON.xforms.Globals.fckEditorsToLoad.push(fckEditor);
-            } else {
-                ORBEON.xforms.Globals.fckEditorLoading = true;
-                fckEditor.ReplaceTextarea();
-                ORBEON.xforms.Controls.updateHTMLAreaClasses(ORBEON.util.Dom.get(fckEditor.InstanceName));
-            }
-        }
+        ORBEON.xforms.Page.getControl(htmlArea);
     },
 
     /**
@@ -6256,12 +5800,6 @@ function xformsHandleClick(event) {
     return false;
 }
 
-function xformsHandleAutoCompleteMouseChange(input) {
-    input.parentNode.lastKeyCode = -1;
-    input.parentNode.value = input.value;
-    xformsValueChanged(input.parentNode, null);
-}
-
 function xformsCreateEventArray(target, eventName, value, other, additionalAttribs) {
     return new Array(target, eventName, value, other, additionalAttribs);
 }
@@ -6284,63 +5822,6 @@ function getEventTarget(event) {
             return target;
         }
     }
-}
-
-function xformsHtmlEditorChange(editorInstance) {
-    editorInstance.LinkedField.value = editorInstance.GetXHTML();
-    // Throw value change event if the field is in incremental mode
-    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
-        xformsValueChanged(editorInstance.LinkedField, null);
-}
-
-/**
- * Called by FCKeditor when an editor is fully loaded. This is our opportunity
- * to listen for events on this editor.
- */
-function FCKeditor_OnComplete(editorInstance) {
-    // Save reference to XForms element (textarea) in document for event handlers that receive the document
-    editorInstance.EditorDocument.xformsElement = editorInstance.LinkedField;
-    // Register value change handler when in incremental mode
-    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
-        editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
-    // Register focus/blur events for Gecko
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focus", ORBEON.xforms.Events.focus);
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "blur", ORBEON.xforms.Events.blur);
-    // Register focus/blur events for IE
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusin", ORBEON.xforms.Events.focus);
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusout", ORBEON.xforms.Events.blur);
-    // Load other editors in the queue
-    if (ORBEON.xforms.Globals.fckEditorsToLoad.length > 0) {
-        var fckEditor = ORBEON.xforms.Globals.fckEditorsToLoad.shift();
-        fckEditor.ReplaceTextarea();
-        ORBEON.xforms.Controls.updateHTMLAreaClasses(ORBEON.util.Dom.get(fckEditor.InstanceName));
-    } else {
-        ORBEON.xforms.Globals.fckEditorLoading = false;
-        if (typeof xformsPageLoadedServer != "undefined")
-            xformsPageLoadedServer();
-    }
-
-    // Work around for bug #308473 (http://tinyurl.com/2jv62f)
-    //
-    // About the bug:
-    //
-    // On IE6 (but not IE7), when a FCK editor is used on the page, the first time we change a class on a tr around
-    // the drop-down a "death flash" happens and if the drop-down was open it gets closed and its value is set to
-    // empty string. This creates the "death flash" right when the page is first loaded instead of doing it later,
-    // to avoid the issue described in bug #308473.
-    //
-    // Issue with the fix:
-    //
-    // On some deployments with some versions of IE this is causing the page to load and become blank until users
-    // move around the mouse on the page. Since this is caused by the FCK editor and we will be moving to using the
-    // YUI RTE, we will leave this open for now.
-    //
-    // When to remove this:
-    //
-    // This comment can be removed after the switch to YUI RTE.
-    //
-    //if (ORBEON.xforms.Globals.isRenderingEngineTrident)
-    //    document.body.className = document.body.className;
 }
 
 function xformsDisplayLoading(progressMessage) {

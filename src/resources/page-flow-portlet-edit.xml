@@ -12,7 +12,6 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->

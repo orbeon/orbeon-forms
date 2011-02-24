@@ -37,7 +37,7 @@
             <note>
                 <p>
                     You are encouraged to use REST APIs instead of these processors whenever possible, either directly
-                    from <a href="reference-xforms-guide">XForms</a> (typically using XForms'
+                    from XForms (typically using XForms'
                     <code>&lt;xforms:submission></code>, which supports REST since XForms 1.1) or with the <a
                     href="processors-submission">XForms Submission processor</a>, which exposes
                     <code>&lt;xforms:submission></code> to XML pipelines. The eXist XML database, for example, exposes a

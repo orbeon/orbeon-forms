@@ -1,0 +1,72 @@
+/*
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+.orbeon-error-panel-body { margin-left: 1em; margin-right: 1em; margin-bottom: .5em }
+.orbeon-error-panel-message { color: #FF6600; border: solid 2px #FF6600; padding: .5em }
+.orbeon-error-panel-call-stack { font-size: 90% }
+.orbeon-error-panel-url-cell { }
+.orbeon-error-panel-line-cell { text-align: right }
+.orbeon-error-panel-column-cell { text-align: right }
+.orbeon-error-panel-description-cell { }
+.orbeon-error-panel-xml-cell { }
+.orbeon-error-panel-param-block { font-size: smaller; margin-left: 1em; white-space: nowrap; padding: 0}
+
+.orbeon-error-table { border-collapse: collapse; width: 100% }
+
+.orbeon-error-table th {
+    background-color: #dde;
+    color: #336;
+    text-align: center;
+    padding: .3em;
+    border: 1px solid #99c;
+}
+.orbeon-error-table td {
+    color: black;
+    padding: .3em;
+    border: 1px solid #99c;
+    margin: 0;
+    vertical-align: top
+}
+
+.orbeon-error-java-table { width: 100% }
+
+/* Classes for standalone error page */
+.orbeon-error-panel { margin: .71em; padding: 0 }
+.orbeon-error-panel { font-family: Arial, Helvetica, Geneva, sans-serif; font-size: 9pt; }
+.orbeon-error-panel table { font-family: Arial, Helvetica, Geneva, sans-serif; font-size: 9pt; }
+.orbeon-error-panel h1 { background-color: #FF6600; color: white; font-size:14pt; padding: 2px }
+.orbeon-error-panel h2 { background-color: #FF6600; color: white; font-size:9pt; padding: 2px }
+.orbeon-error-panel a { color: #669; text-decoration: none }
+.orbeon-error-panel a:hover { text-decoration: underline }
+.orbeon-error-panel img { border: 0 }
+.orbeon-error-disabled { display: none }
+.orbeon-error-panel .ops-version { text-align: center; font-size: smaller }
+.orbeon-error-panel-show-details, .orbeon-error-panel-hide-details { cursor: pointer; }
+
+/* XML formatter definitions */
+.xml-cd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-rd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-id { margin-left: 2em; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-x {}
+.xml-c {}
+.xml-o {}
+
+.xml-symbol { color: black }
+.xml-text { color: black }
+.xml-comment { color: gray }
+.xml-elt-name { color: blue }
+.xml-elt-prefix { color: navy }
+.xml-att-prefix{ color: green }
+.xml-att-name { color: green }
+.xml-att-value { color: orange }
+

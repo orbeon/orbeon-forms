@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.processor.converter;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -32,7 +34,7 @@ import java.io.Writer;
 public class TextConverter extends TextConverterBase {
 
     public static String DEFAULT_CONTENT_TYPE = "text/plain";
-    public static String DEFAULT_METHOD = "text";
+    public static QName DEFAULT_METHOD = QName.get("text");
 
     public TextConverter() {
     }
@@ -46,7 +48,7 @@ public class TextConverter extends TextConverterBase {
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : DEFAULT_METHOD,
+                config.method != null ? config.method : Dom4jUtils.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
                 null,
                 null,
                 null,

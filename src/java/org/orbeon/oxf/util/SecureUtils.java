@@ -13,16 +13,26 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.cache.*;
+import org.orbeon.oxf.cache.Cache;
+import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.saxon.om.FastStringBuffer;
 
-import javax.crypto.*;
-import javax.crypto.spec.*;
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class SecureUtils {
 
@@ -263,9 +273,8 @@ public class SecureUtils {
     // As of 2009-03-11 XForms 1.1 says digits should be lowercase.
     private static final char[] HEXADECIMAL_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-    private static String byteArrayToHex(byte[] bytes) {
-//        final StringBuilder sb = new StringBuilder(bytes.length * 2);
-        final FastStringBuffer sb = new FastStringBuffer(bytes.length * 2);
+    public static String byteArrayToHex(byte[] bytes) {
+        final StringBuilder sb = new StringBuilder(bytes.length * 2);
         for (int i = 0; i < bytes.length; i++) {
             sb.append(HEXADECIMAL_DIGITS[(bytes[i] >> 4) & 0xf]);
             sb.append(HEXADECIMAL_DIGITS[bytes[i] & 0xf]);

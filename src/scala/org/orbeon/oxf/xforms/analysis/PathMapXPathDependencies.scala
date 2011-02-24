@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.analysis
 
@@ -39,6 +39,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         var useCalculateChangeset = false   // start dirty
         var useValidateChangeset = false    // start dirty
 
+        // Meaning of a change: "the string value of the node has changed"
         var recalculateChangeset = new MapSet[String, String]
         var revalidateChangeset = recalculateChangeset
 
@@ -51,16 +52,29 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                 val instance = containingDocument.getInstanceForNode(node)
 
                 val instancePrefixedId = instance.getPrefixedId
-                val path = PathMapXPathDependencies.createFingerprintedPath(node)
 
-                val instancePath = (instancePrefixedId -> path)
+                def processNode(n: NodeInfo) {
+                    val path = PathMapXPathDependencies.createFingerprintedPath(n)
 
-                // Update model and view changesets
-                recalculateChangeset += instancePath
-                if (revalidateChangeset ne recalculateChangeset)
-                    revalidateChangeset += instancePath // also add to revalidate changeset
-                
-                RefreshState.changeset += instancePath
+                    val instancePath = (instancePrefixedId -> path)
+
+                    // Update model and view changesets
+                    recalculateChangeset += instancePath
+                    if (revalidateChangeset ne recalculateChangeset)
+                        revalidateChangeset += instancePath // also add to revalidate changeset
+
+                    RefreshState.changeset += instancePath
+
+                    // Add parent elements as well. The idea is that if the string value of /a/b/c changed, then the
+                    // string value of /a/b did as well, and so did /a's.
+                    // This adds more entries to the changeset, but handles cases such as detecting changes impacting
+                    // the string() or serialize() functions.
+                    val parent = n.getParent
+                    if ((parent ne null) && parent.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE)
+                        processNode(parent)
+                }
+
+                processNode(node)
             }
         }
 
@@ -106,7 +120,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             else new MapSet[String, String]
         }
 
-        def refreshDone(): Unit = {}
+        def refreshDone(): Unit = ()
 
         def outOfDateChangesetForMip(mip: Model#Bind#MIP) = mip.isValidateMIP && !useValidateChangeset || !mip.isValidateMIP && !useCalculateChangeset
 

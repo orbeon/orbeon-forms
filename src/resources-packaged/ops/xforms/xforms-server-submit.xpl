@@ -15,12 +15,14 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <!-- Extract parameters -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
+                <include>/request/container-type</include>
                 <include>/request/parameters</include>
             </config>
         </p:input>
@@ -171,12 +173,34 @@
                  was a submission with replace="all", or a null document -->
             <p:choose href="#xformed-data">
                 <p:when test="not(/null[@xsi:nil = 'true'])">
-                    <p:processor name="oxf:pipeline">
-                        <p:input name="config" href="/config/epilogue-servlet.xpl"/>
-                        <p:input name="data"><null xsi:nil="true"/></p:input>
-                        <p:input name="xformed-data" href="#xformed-data"/>
-                        <p:input name="instance"><null xsi:nil="true"/></p:input>
+
+                    <!-- Combine resources if needed -->
+                    <p:processor name="oxf:resources-aggregator">
+                        <p:input name="data" href="#xformed-data"/>
+                        <p:output name="data" id="aggregated-data"/>
                     </p:processor>
+
+                    <!-- Choose which epilogue to call depending on container type -->
+                    <p:choose href="#request-params">
+                        <!-- If the container is a servlet, call the servlet epilogue pipeline -->
+                        <p:when test="/request/container-type = 'servlet'">
+                            <p:processor name="oxf:pipeline">
+                                <p:input name="config" href="/config/epilogue-servlet.xpl"/>
+                                <p:input name="data"><null xsi:nil="true"/></p:input>
+                                <p:input name="xformed-data" href="#aggregated-data"/>
+                                <p:input name="instance"><null xsi:nil="true"/></p:input>
+                            </p:processor>
+                        </p:when>
+                        <!-- If the container is a portlet, call the portlet epilogue pipeline -->
+                        <p:otherwise>
+                            <p:processor name="oxf:pipeline">
+                                <p:input name="config" href="/config/epilogue-portlet.xpl"/>
+                                <p:input name="data"><null xsi:nil="true"/></p:input>
+                                <p:input name="xformed-data" href="#aggregated-data"/>
+                                <p:input name="instance"><null xsi:nil="true"/></p:input>
+                            </p:processor>
+                        </p:otherwise>
+                    </p:choose>
                 </p:when>
             </p:choose>
         </p:otherwise>

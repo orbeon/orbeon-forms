@@ -56,7 +56,7 @@ public class CacheableSubmission extends BaseSubmission {
     public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
-        // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
+        // This can only happen is method="get" and replace="instance" and xxforms:cache="true"
 
         // Convert URL to string
         final String absoluteResolvedURLString = getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString);

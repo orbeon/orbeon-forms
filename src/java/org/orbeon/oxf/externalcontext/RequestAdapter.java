@@ -64,10 +64,6 @@ public class RequestAdapter implements ExternalContext.Request {
         return null;
     }
 
-    public Map<String, String> getHeaderMap() {
-        return null;
-    }
-
     public String getCharacterEncoding() {
         return null;
     }

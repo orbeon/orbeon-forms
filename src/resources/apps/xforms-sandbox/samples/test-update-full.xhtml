@@ -53,17 +53,16 @@
         </xforms:model>
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
+            fieldset div { margin-top: 1em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xhtml:fieldset>
             <xhtml:legend>Full update on group around tr</xhtml:legend>
-            <xhtml:div>
-                <fr:button id="toggle-two">
-                    <xforms:label>Toggle two</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/show-two" value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
-            </xhtml:div>
+            <fr:button id="toggle-two">
+                <xforms:label>Toggle two</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/show-two" value="if (. = 'true') then 'false' else 'true'"/>
+            </fr:button>
             <xhtml:div>
                 <xhtml:table>
                     <xforms:repeat nodeset="instance('numbers')/number">
@@ -86,12 +85,10 @@
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Full update on case</xhtml:legend>
-            <xhtml:div>
-                <fr:button id="increment-case-value">
-                    <xforms:label>Increment case value</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="case-value" value=". + 1"/>
-                </fr:button>
-            </xhtml:div>
+            <fr:button id="increment-case-value">
+                <xforms:label>Increment case value</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="case-value" value=". + 1"/>
+            </fr:button>
             <xhtml:div>
                 <xforms:switch>
                     <xforms:case id="case-1" xxforms:update="full">
@@ -102,12 +99,10 @@
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Full update on repeat</xhtml:legend>
-            <xhtml:div>
-                <fr:button id="toggle-one">
-                    <xforms:label>Show one</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="show-one" value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
-            </xhtml:div>
+            <fr:button id="toggle-one">
+                <xforms:label>Show one</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="show-one" value="if (. = 'true') then 'false' else 'true'"/>
+            </fr:button>
             <xhtml:div>
                 <xforms:repeat nodeset="instance('numbers')/number[if (instance('ui')/show-one = 'false') then @value != 1 else true()]"  xxforms:update="full" id="repeat-update-full">
                     <xforms:output value="." id="repeat-value"/>
@@ -137,10 +132,24 @@
                 <xforms:label>Set to false</xforms:label>
                 <xforms:setvalue ev:event="DOMActivate" ref="server-value">false</xforms:setvalue>
             </fr:button>
-            <xforms:group id="server-value-group"  xxforms:update="full">
+            <xforms:group id="server-value-group" xxforms:update="full">
                 <xforms:input ref="server-value" id="server-value-input"/>
             </xforms:group>
             <xforms:output ref="server-value" id="server-value-output"/>
+        </xhtml:fieldset>
+        <xhtml:fieldset>
+            <xhtml:legend>Dialog initialization</xhtml:legend>
+            <fr:button id="add-iteration">
+                <xforms:label>Add iteration</xforms:label>
+                <xforms:insert ev:event="DOMActivate" nodeset="*" origin="xxforms:element('dialog')"/>
+            </fr:button>
+            <xhtml:div>
+                <xforms:group id="dialog-container" xxforms:update="full">
+                    <xforms:repeat nodeset="dialog">
+                        <xxforms:dialog id="dialog">Dialog content</xxforms:dialog>
+                    </xforms:repeat>
+                </xforms:group>
+            </xhtml:div>
         </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

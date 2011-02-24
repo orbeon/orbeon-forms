@@ -48,16 +48,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     private boolean isMultiple;
     private boolean isOpenSelection;
-    private boolean isAutocomplete;
-    private boolean isAutocompleteNoFilter;
 
     private QName effectiveAppearance;
     private boolean isFull;
     private boolean isCompact;
     private boolean isTree;
     private boolean isMenu;
-
-    private static final Item EMPTY_TOP_LEVEL_ITEM = new Item(false, false, null, "", "");
 
     public XFormsSelect1Handler() {
         super(false);
@@ -83,9 +79,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
                     isOpenSelection = false;
                 } else if (isOpenSelection && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(plainAppearance)) {
-                    effectiveAppearance = plainAppearance;
-                    isAutocomplete = true;
-                    isAutocompleteNoFilter = isAutocomplete && "false".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
+                    effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+                    isOpenSelection = false;
                 } else {
                     effectiveAppearance = plainAppearance;
                 }
@@ -107,8 +102,6 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
         if (isOpenSelection)
             classes.append(" xforms-select1-open");
-        if (isAutocompleteNoFilter)
-            classes.append(" xforms-select1-open-autocomplete-nofilter");
         if (isTree)
             classes.append(" xforms-initially-hidden");
     }
@@ -152,69 +145,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             } else {
 
                 if (isOpenSelection) {
-
-                    if (isAutocomplete) {
-
-                        // Create xhtml:span
-                        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
-
-                        {
-                            {
-                                // Create xhtml:input
-                                final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-
-                                reusableAttributes.clear();
-                                reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
-                                reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "xforms-select1-open-input-" + effectiveId);
-                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-input");
-                                reusableAttributes.addAttribute("", "autocomplete", "autocomplete", ContentHandlerHelper.CDATA, "off");
-
-                                final String value = (xformsSelect1Control == null) ? null : xformsSelect1Control.getValue(pipelineContext);
-                                // NOTE: With open selection, we send all values to the client but not encrypt them because the client matches on values
-                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
-                                if (isHTMLDisabled(xformsSelect1Control))
-                                    outputDisabledAttribute(reusableAttributes);
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
-                            }
-                            {
-                                // Create xhtml:select
-                                final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
-
-                                reusableAttributes.clear();
-                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-select");
-
-                                if (isCompact)
-                                    reusableAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
-
-                                // Handle accessibility attributes
-                                handleAccessibilityAttributes(attributes, reusableAttributes);
-
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
-
-                                final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                                handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMultiple, EMPTY_TOP_LEVEL_ITEM);
-                                if (itemset != null) {
-                                    for (final Item item: itemset.toList()) {
-                                        if (item.getValue() != null)
-                                            handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMultiple, item);
-                                    }
-                                }
-
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
-                            }
-                        }
-
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-                    } else {
-                        // We do not support other appearances or regular open selection for now
-                        throw new ValidationException("Open selection currently only supports the xxforms:autocomplete appearance.",
-                                new ExtendedLocationData(handlerContext.getLocationData(), "producing markup for xforms:" + localname + " control",
-                                        (xformsSelect1Control != null) ? xformsSelect1Control.getControlElement() : null));
-                    }
-
+                    // We do not support other appearances or regular open selection for now
+                    throw new ValidationException("Open selection currently not supported.",
+                            new ExtendedLocationData(handlerContext.getLocationData(), "producing markup for xforms:" + localname + " control",
+                                    (xformsSelect1Control != null) ? xformsSelect1Control.getControlElement() : null));
                 } else if (isTree) {
                     // xxforms:tree appearance
 

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - Data-bound drop-down</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="main-instance">
+                <databound-select1>
+                    <state>CA</state>
+                    <city/>
+                    <zip/>
+                </databound-select1>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
+                <xforms:label>State: </xforms:label>
+                <xforms:itemset nodeset="/states/state">
+                    <xforms:label ref="@name"/>
+                    <xforms:value ref="@abbreviation"/>
+                </xforms:itemset>
+            </fr:databound-select1>
+            <fr:databound-select1 ref="city" appearance="minimal"
+                                   resource="/xforms-sandbox/service/zip-cities?state-abbreviation={state}">
+                <xforms:label>City: </xforms:label>
+                <xforms:itemset nodeset="/cities/city">
+                    <xforms:label ref="@name"/>
+                    <xforms:value ref="@name"/>
+                </xforms:itemset>
+            </fr:databound-select1>
+            <fr:databound-select1 ref="zip" appearance="minimal"
+                                   resource="/xforms-sandbox/service/zip-zips?state-abbreviation={state}&amp;city={city}">
+                <xforms:label>Zip: </xforms:label>
+                <xforms:itemset nodeset="/zips/zip">
+                    <xforms:label ref="@code"/>
+                    <xforms:value ref="@code"/>
+                </xforms:itemset>
+            </fr:databound-select1>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

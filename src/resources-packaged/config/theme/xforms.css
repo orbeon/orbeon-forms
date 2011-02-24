@@ -14,9 +14,9 @@
 
 /* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
 
-html body form.xforms-initially-hidden,
-    html body .xforms-form .xforms-initially-hidden,
-    html body .xforms-form .xforms-repeat-template,
+/* See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden  */
+
+html body .xforms-form .xforms-repeat-template,
     html body .xforms-form .xforms-template,
     html body .xforms-form .xforms-repeat-delimiter,
     html body .xforms-form .xforms-repeat-begin-end,
@@ -91,6 +91,11 @@ html body .xforms-form tr.xforms-disabled,
     border-style: none ! important;
 }
 
+/* Special text content that must remain hidden */
+#xforms-repeat-tree, #xforms-repeat-indexes {
+    display: none;
+}
+
 /**
  * XForms switch/case
  * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
@@ -102,10 +107,6 @@ html body .xforms-form tr.xforms-disabled,
 /* For animated toggle of switch/case */
 .xxforms-animate { overflow: hidden }
 
-/* Special text content that must remain hidden */
-#xforms-repeat-tree, #xforms-repeat-indexes {
-    display: none;
-}
 
 /* ***** Label, hint, help, alert *********************************************************************************** */
 
@@ -255,10 +256,6 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
     width: 18px;
     height: 20px;
     background: url(../../ops/images/xforms/slider-horizontal-thumb.png) no-repeat;
-}
-
-.xforms-select1-open-select {
-    display: none;
 }
 
 .xforms-upload-state-empty .xforms-upload-info { display: none; }
@@ -424,3 +421,23 @@ a.ygtvlabel { cursor: pointer; }
 /* YUI sets this to a color, but it is hindering more than anything else */
 .ygtvfocus { background-color: transparent }
 .xforms-select-appearance-xxforms-tree table, xforms-select1-appearance-xxforms-tree table { margin: 0 }/* as table style can be globally changed */
+
+/* Custom control widths */
+#xforms-form .xforms-width-2em input.xforms-input-input,
+    #xforms-form input.xforms-width-2em,
+    #xforms-form select.xforms-width-2em, #xforms-form .xforms-width-2em select { width: 2em }
+#xforms-form .xforms-width-3em input.xforms-input-input,
+    #xforms-form input.xforms-width-3em,
+    #xforms-form select.xforms-width-3em, #xforms-form .xforms-width-3em select { width: 3em }
+#xforms-form .xforms-width-5em input.xforms-input-input,
+    #xforms-form input.xforms-width-5em,
+    #xforms-form select.xforms-width-5em, #xforms-form .xforms-width-5em select { width: 5em }
+#xforms-form .xforms-width-7em input.xforms-input-input,
+    #xforms-form input.xforms-width-7em,
+    #xforms-form select.xforms-width-7em, #xforms-form .xforms-width-7em select { width: 7em }
+#xforms-form .xforms-width-10em input.xforms-input-input,
+    #xforms-form input.xforms-width-10em,
+    #xforms-form select.xforms-width-10em, #xforms-form .xforms-width-10em select { width: 10em }
+#xforms-form .xforms-width-15em input.xforms-input-input,
+    #xforms-form input.xforms-width-15em,
+    #xforms-form select.xforms-width-15em, #xforms-form .xforms-width-15em select { width: 15em }

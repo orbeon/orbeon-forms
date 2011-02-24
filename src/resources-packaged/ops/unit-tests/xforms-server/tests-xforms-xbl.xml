@@ -3824,6 +3824,59 @@
         </output>
     </test>
 
+    <test description="NPE with submit within repeat within tabs" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315848&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-submit"/>
+                        <xforms:instance id="instance">
+                            <item/>
+                        </xforms:instance>
+                        <xforms:submission id="my-submission" method="get" action="test:" replace="instance"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo">
+                        <xforms:repeat ref="." id="my-repeat">
+                            <xforms:submit id="my-submit" submission="my-submission"/>
+                        </xforms:repeat>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <item/>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-foo$my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

@@ -60,8 +60,8 @@ object Multipart {
         // Add a listener to destroy file items when the pipeline context is destroyed
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter {
             override def contextDestroyed(success: Boolean) =
-                for ((name, value) <- uploadParameterMap if value.isInstanceOf[FileItem])
-                    runQuietly(value.asInstanceOf[FileItem].delete())
+                uploadParameterMap.values.flatten foreach
+                    { case value: FileItem => runQuietly(value.delete()); case _ => }
         })
 
         // Parse the request and add file information
@@ -164,8 +164,8 @@ object Multipart {
                         // Get expected size first from part then from request
                         val expectedLength = item.getHeaders match {
                             case headers: FileItemHeaders if headers.getHeader("content-length") ne null => Some(headers.getHeader("content-length").toLong)
-                            case _ => request.getHeaderMap.get("content-length") match {
-                                case requestLength: String => Some(requestLength.toLong)
+                            case _ => request.getHeaderValuesMap.get("content-length") match {
+                                case Array(requestLength: String) => Some(requestLength.toLong)
                                 case _ => None
                             }
                         }

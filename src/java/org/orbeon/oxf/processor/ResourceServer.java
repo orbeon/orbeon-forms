@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import com.sun.mail.iap.ByteArray;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -22,6 +21,7 @@ import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UserAgent;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -29,14 +29,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -123,8 +116,8 @@ public class ResourceServer extends ProcessorImpl {
                             }
 
                             // Compile CoffeeScript to JavaScript if we have a .coffee and no .js
-                            // TODO: only run when minimal resources are enabled
-                            if (urlPath.endsWith(".js") && ! ResourceManagerWrapper.instance().exists(urlPath)) {
+                            if (! (XFormsProperties.isCombinedResources() || XFormsProperties.isMinimalResources())
+                                    && urlPath.endsWith(".js") && ! ResourceManagerWrapper.instance().exists(urlPath)) {
                                 final String coffeePath = urlPath.substring(0, urlPath.length() - 2) + "coffee";
                                 if (ResourceManagerWrapper.instance().exists(coffeePath)) {
                                     // Open URL for CoffeeScript file

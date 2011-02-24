@@ -12,7 +12,8 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/ops/unit-tests/log4j.xml"/>
     <property as="xs:string"  name="oxf.schemas.urn://adress-book"                   value="oxf:/ops/unit-tests/address-book-schema.xml"/>
@@ -26,6 +27,8 @@
     <property as="xs:string"  name="oxf.xforms.store.application.password"           value="guest"/>
     <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                value="xmldb:exist:///"/>
     <property as="xs:string"  name="oxf.xforms.store.application.collection"         value="/db/orbeon/xforms/cache/"/>
+
+    <property as="xs:string"   name="oxf.xforms.resources.baseline"                  value="fr:button fr:tabview fr:autocomplete"/>
 
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
 

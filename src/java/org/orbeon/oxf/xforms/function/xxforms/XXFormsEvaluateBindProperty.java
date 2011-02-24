@@ -42,7 +42,7 @@ public class XXFormsEvaluateBindProperty extends XFormsFunction {
             return null;
         } else {
             final PropertyContext propertyContext = getOrCreatePipelineContext();
-            return binds.evaluateBindByType(propertyContext, bind, bind.nodeset, 1, mipQName);
+            return binds.evaluateBindByType(propertyContext, bind, 1, mipQName);
         }
     }
 }

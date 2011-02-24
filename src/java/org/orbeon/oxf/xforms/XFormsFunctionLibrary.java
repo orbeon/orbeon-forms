@@ -248,9 +248,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:serialize
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}serialize", XXFormsSerialize.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}serialize", Serialize.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
-        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:repeat-current
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}repeat-current", XXFormsRepeatCurrent.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);

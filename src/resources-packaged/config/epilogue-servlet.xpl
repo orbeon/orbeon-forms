@@ -153,6 +153,7 @@
                                     <config>
                                         <method>xhtml</method>
                                         <public-doctype>-//W3C//DTD XHTML 1.0 Strict//EN</public-doctype>
+                                        <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</system-doctype>
                                         <encoding>utf-8</encoding>
                                         <content-type>application/xhtml+xml</content-type>
                                         <indent>true</indent>

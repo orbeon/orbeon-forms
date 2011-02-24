@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringConversions;
 
 import javax.portlet.*;
@@ -186,8 +187,15 @@ public class WSRP2Utils {
                 // The portal actually automatically adds existing parameters, including orbeon.path, in the resource URL.
                 // If we set orbeon.path again to store the resource URL, the resulting URL ends up having two orbeon.path.
                 // So instead we use the resource id, which seems to be designed for this anyway.
-                final String resourceId = navigationParameters.get(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME)[0];
-                resourceURL.setResourceID(resourceId);
+                final String resourcePath = navigationParameters.get(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME)[0];
+
+                // Encode the other parameters directly into the resource id, as they are really part of the identity
+                // of the resource and have nothing to do with the current render parameters.
+                navigationParameters.remove(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME); // WARNING: mutate navigationParameters
+                final String resourceQuery = NetUtils.encodeQueryString2(navigationParameters);
+
+                resourceURL.setResourceID(NetUtils.appendQueryString(resourcePath, resourceQuery));
+
                 // PAGE is the default
                 // Could set it to FULL or PORTLET for resources such as images, JavaScript, etc., but NOT for e.g. /xforms-server
                 resourceURL.setCacheability(ResourceURL.PAGE);
@@ -209,7 +217,7 @@ public class WSRP2Utils {
                     portletURL.setWindowState(new WindowState(windowState));
                 }
 
-                //
+                // Simply set all navigation parameters, including orbeon.path
                 portletURL.setParameters(navigationParameters);
             }
 

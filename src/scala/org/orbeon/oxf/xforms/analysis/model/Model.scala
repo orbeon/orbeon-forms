@@ -302,7 +302,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                 child.freeTransientState()
         }
 
-        override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
+        override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = ()) {
             super.toXML(propertyContext, helper, List("id", staticId, "context", context.orNull, "ref", ref.orNull)) {
                 // @ref analysis is handled by superclass
 
@@ -341,7 +341,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         }
     }
 
-    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = {}) {
+    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = ()) {
 
         super.toXML(propertyContext, helper, List(
                 "scope", scope.scopeId,

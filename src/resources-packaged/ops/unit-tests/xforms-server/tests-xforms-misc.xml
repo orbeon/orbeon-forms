@@ -896,7 +896,7 @@
     </test>
 
     <test description="Comments in XForms document are not propagated" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-init.xpl"/>
+        <input name="config" href="xforms-server/wrap-xforms-init-nohead.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <!-- Comment 1 -->
@@ -924,12 +924,6 @@
         </input>
         <output name="response">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:head>
-                    <xhtml:link rel="stylesheet" href="/xforms-server/xforms-yuicalendar-min.css" type="text/css" media="all"/>
-                    <xhtml:script type="text/javascript" src="/xforms-server/xforms-yuicalendar-min.js"/>
-                    <xhtml:script type="text/javascript">var opsXFormsProperties = {"session-heartbeat-delay":-1};</xhtml:script>
-                    <xhtml:script type="text/javascript">var orbeonInitData = orbeonInitData || {}; orbeonInitData["xforms-form"] = {"paths":{"xforms-server": "/orbeon/xforms-server","resources-base": "/orbeon/"}};</xhtml:script>
-                </xhtml:head>
                 <xhtml:body class="yui-skin-sam">
                     <noscript xmlns="http://www.w3.org/1999/xhtml">
                         <div class="xforms-noscript-panel">

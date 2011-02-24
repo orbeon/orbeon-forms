@@ -14,25 +14,45 @@
 package org.orbeon.oxf.xforms.xbl;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.Text;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.*;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
+import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.Attributes;
+import scala.Tuple2;
 
 import java.util.*;
 
@@ -59,11 +79,47 @@ public class XBLBindings {
 
     // Static xbl:xbl
     private Map<QName, XFormsControlFactory.Factory> xblComponentsFactories;    // Map<QName bindingQName, Factory> of QNames to component factory
-    private Map<QName, Element> xblComponentBindings;       // Map<QName bindingQName, Element bindingElement> of QNames to bindings
-    private List<Element> xblScripts;                       // List<Element xblScriptElements>
-    private List<Element> xblStyles;                        // List<Element xblStyleElements>
+    private Map<QName, AbstractBinding> xblComponentBindings;       // Map<QName bindingQName, Element bindingElement> of QNames to bindings
+    private List<Element> allScripts;                       // List<Element scriptElement>
+    private List<Element> allStyles;                        // List<Element styleElement>
     private Map<QName, List<Element>> xblHandlers;          // Map<QName bindingQName, List<Element handlerElement>>
     private Map<QName, List<Document>> xblImplementations;  // Map<QName bindingQName, List<Document>>
+
+    private Tuple2<scala.collection.Set<String>, scala.collection.Set<String>> baselineResources;
+
+    // Abstract XBL bindings
+    public static class AbstractBinding {
+        public final QName qNameMatch;
+        public final Element bindingElement;
+        public final List<Element> scripts;
+        public final List<Element> styles;
+
+        public AbstractBinding(Element bindingElement, NamespaceMapping namespaceMapping, List<Element> scripts) {
+            this.bindingElement = bindingElement;
+            this.scripts = scripts;
+
+            final String elementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
+
+            // For now, only handle "prefix|name" selectors
+            // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
+            qNameMatch = Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementAttribute.replace('|', ':'), true);
+
+            // Extract xbl:binding/xbl:resources/xbl:style
+            List<Element> styles = null;
+            final List<Element> resourcesElements = Dom4jUtils.elements(bindingElement, XFormsConstants.XBL_RESOURCES_QNAME);
+            for (final Element resourcesElement : resourcesElements) {
+                final List<Element> styleElements = Dom4jUtils.elements(resourcesElement, XFormsConstants.XBL_STYLE_QNAME);
+
+                if (styleElements.size() > 0) {
+                    if (styles == null)
+                        styles = new ArrayList<Element>(styleElements.size());
+
+                    styles.addAll(styleElements);
+                }
+            }
+            this.styles = styles != null ? styles : Collections.<Element>emptyList();
+        }
+    }
 
     // Concrete XBL bindings
     public static class ConcreteBinding {
@@ -238,7 +294,7 @@ public class XBLBindings {
         }
     }
 
-    private Document readXBLResource(String include) {
+    public Document readXBLResource(String include) {
         final boolean handleXInclude = true; // handle XInclude
         final boolean handleLexical = false; // don't handle comments and other lexical information
 
@@ -250,7 +306,7 @@ public class XBLBindings {
         return ResourceManagerWrapper.instance().getContentAsDOM4J(include, false, handleXInclude, handleLexical);
     }
 
-    private int extractXBLBindings(Document xblDocument, XFormsStaticState staticState) {
+    public int extractXBLBindings(Document xblDocument, XFormsStaticState staticState) {
 
         // Perform initialization for first binding
         if (concreteBindings == null) {
@@ -269,40 +325,39 @@ public class XBLBindings {
             metadata.idGenerator.setCheckDuplicates(false);
 
             xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
-            xblComponentBindings = new HashMap<QName, Element>();
+            xblComponentBindings = new HashMap<QName, AbstractBinding>();
         }
 
         // Extract xbl:xbl/xbl:script
         // TODO: should do this differently, in order to include only the scripts and resources actually used
         final List<Element> scriptElements = Dom4jUtils.elements(xblDocument.getRootElement(), XFormsConstants.XBL_SCRIPT_QNAME);
-        if (scriptElements != null && scriptElements.size() > 0) {
-            if (xblScripts == null)
-                xblScripts = new ArrayList<Element>();
-            xblScripts.addAll(scriptElements);
+        if (scriptElements.size() > 0) {
+            if (allScripts == null)
+                allScripts = new ArrayList<Element>();
+            allScripts.addAll(scriptElements);
         }
 
         // Find bindings
         int xblBindingCount = 0;
-        for (Iterator j = xblDocument.getRootElement().elements(XFormsConstants.XBL_BINDING_QNAME).iterator(); j.hasNext(); xblBindingCount++) {
-            final Element currentBindingElement = (Element) j.next();
+        for (final Element currentBindingElement : Dom4jUtils.elements(xblDocument.getRootElement(), XFormsConstants.XBL_BINDING_QNAME)) {
             final String currentElementAttribute = currentBindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
 
             if (currentElementAttribute != null) {
 
-                // For now, only handle "prefix|name" selectors
-                // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
-                final QName currentQNameMatch
-                        = Dom4jUtils.extractTextValueQName(staticState.getNamespaceMapping("", currentBindingElement).mapping, currentElementAttribute.replace('|', ':'), true);
+                final AbstractBinding abstractBinding = new AbstractBinding(currentBindingElement, staticState.getNamespaceMapping("", currentBindingElement), scriptElements);
 
                 // Create and remember factory for this QName
-                xblComponentsFactories.put(currentQNameMatch,
+                xblComponentsFactories.put(abstractBinding.qNameMatch,
                     new XFormsControlFactory.Factory() {
                         public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                             return new XFormsComponentControl(container, parent, element, name, effectiveId);
                         }
                     });
 
-                xblComponentBindings.put(currentQNameMatch, currentBindingElement);
+                if (allStyles == null)
+                    allStyles = new ArrayList<Element>(abstractBinding.styles.size());
+                allStyles.addAll(abstractBinding.styles);
+                xblComponentBindings.put(abstractBinding.qNameMatch, abstractBinding);
 
                 // Extract xbl:handlers/xbl:handler
                 {
@@ -314,7 +369,7 @@ public class XBLBindings {
                             xblHandlers = new LinkedHashMap<QName, List<Element>>();
                         }
 
-                        xblHandlers.put(currentQNameMatch, handlerElements);
+                        xblHandlers.put(abstractBinding.qNameMatch, handlerElements);
                     }
                 }
 
@@ -328,28 +383,11 @@ public class XBLBindings {
                             xblImplementations = new LinkedHashMap<QName, List<Document>>();
                         }
 
-                        xblImplementations.put(currentQNameMatch, modelDocuments);
+                        xblImplementations.put(abstractBinding.qNameMatch, modelDocuments);
                     }
                 }
-
-                // Extract xbl:binding/xbl:resources/xbl:style
-                // TODO: should do this differently, in order to include only the scripts and resources actually used
-                {
-                    final List resourcesElements = currentBindingElement.elements(XFormsConstants.XBL_RESOURCES_QNAME);
-                    if (resourcesElements != null) {
-                        for (Object resourcesElement: resourcesElements) {
-                            final Element currentResourcesElement = (Element) resourcesElement;
-                            final List<Element> styleElements = Dom4jUtils.elements(currentResourcesElement, XFormsConstants.XBL_STYLE_QNAME);
-                            if (styleElements != null && styleElements.size() > 0) {
-                                if (xblStyles == null) {
-                                    xblStyles = new ArrayList<Element>(styleElements);
-                                } else {
-                                    xblStyles.addAll(styleElements);
-                                }
-                            }
-                        }
-                    }
-                }
+                
+                xblBindingCount++;
             }
         }
         return xblBindingCount;
@@ -375,9 +413,10 @@ public class XBLBindings {
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope) {
 
         if (xblComponentBindings != null) {
-            final Element bindingElement = xblComponentBindings.get(controlElement.getQName());
-            if (bindingElement != null) {
+            final AbstractBinding abstractBinding = xblComponentBindings.get(controlElement.getQName());
+            if (abstractBinding != null) {
                 // A custom component is bound to this element
+                final Element bindingElement = abstractBinding.bindingElement;
 
                 // Find new prefix
                 final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
@@ -817,7 +856,7 @@ public class XBLBindings {
      *
      * @return Map<QName, Element> of QNames to bindings, or null
      */
-    public Map<QName, Element> getComponentBindings() {
+    public Map<QName, AbstractBinding> getComponentBindings() {
         return xblComponentBindings;
     }
 
@@ -896,7 +935,7 @@ public class XBLBindings {
      * @return list of <xbl:style> elements
      */
     public List<Element> getXBLStyles() {
-        return xblStyles;
+        return allStyles != null ? allStyles : Collections.<Element>emptyList();
     }
 
     /**
@@ -905,7 +944,13 @@ public class XBLBindings {
      * @return list of <xbl:script> elements
      */
     public List<Element> getXBLScripts() {
-        return xblScripts;
+        return allScripts != null ? allScripts : Collections.<Element>emptyList();
+    }
+
+    public Tuple2<scala.collection.Set<String>, scala.collection.Set<String>> getBaselineResources() {
+        if (baselineResources == null)
+            baselineResources = XHTMLHeadHandler.getBaselineResources(staticState);
+        return baselineResources;
     }
 
     public void freeTransientState() {

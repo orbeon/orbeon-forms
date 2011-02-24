@@ -22,7 +22,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.Stack;
 
 /**
- * Wrapper to a SAX ContentHandler. Provides more high-level methods to send events to a ContentHandler.
+ * Wrapper to an XML receiver. Provides more high-level methods to send events to a XML receiver.
  */
 public class ContentHandlerHelper {
 

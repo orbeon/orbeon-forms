@@ -208,20 +208,6 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/context-path");
         }
 
-        public Map<String, String> getHeaderMap() {
-            if (headerMap == null) {
-                final Map<String, String> map = new LinkedHashMap<String, String>();
-                for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
-                    final Element e = (Element) i.next();
-                    final String name = XPathUtils.selectStringValueNormalize(e, "name");
-                    final String value = XPathUtils.selectStringValueNormalize(e, "value[1]");
-                    map.put(name, value);
-                }
-                headerMap = Collections.unmodifiableMap(map);
-            }
-            return headerMap;
-        }
-
         public Map<String, String[]> getHeaderValuesMap() {
             if (headerValuesMap == null) {
                 final Map<String, String[]> map = new LinkedHashMap<String, String[]>();

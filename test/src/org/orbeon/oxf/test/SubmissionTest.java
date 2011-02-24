@@ -68,26 +68,20 @@ public class SubmissionTest extends TestCase {
                 "GET", RequestDispatcherSubmission.STANDARD_HEADERS_TO_FORWARD, customHeaderValuesMap);
 
         // Test standard headers received
-        final Map<String, String> headerMap = request.getHeaderMap();
         final Map<String, String[]> headerValuesMap = request.getHeaderValuesMap();
 
-        assertEquals("Mozilla 12.1", headerMap.get("user-agent"));
         assertEquals("Mozilla 12.1", (headerValuesMap.get("user-agent"))[0]);
 
-        assertEquals("xsifj1skf3", headerMap.get("authorization"));
         assertEquals("xsifj1skf3", (headerValuesMap.get("authorization"))[0]);
 
-        assertEquals("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C", headerMap.get("cookie"));
         assertEquals("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C", (headerValuesMap.get("cookie"))[0]);
 
-        assertNull(headerMap.get("host"));
-        assertNull(headerMap.get("foobar"));
+        assertNull(headerValuesMap.get("host"));
+        assertNull(headerValuesMap.get("foobar"));
 
         // Test custom headers received
-        assertEquals("my-value", headerMap.get("my-stuff"));
         assertEquals("my-value", (headerValuesMap.get("my-stuff"))[0]);
 
-        assertEquals("your-value-1", headerMap.get("your-stuff"));
         assertEquals("your-value-1", (headerValuesMap.get("your-stuff"))[0]);
         assertEquals("your-value-2", (headerValuesMap.get("your-stuff"))[1]);
     }

@@ -84,6 +84,8 @@
             <fr:tab ref="tab[2]/@mip" id="tab-2">
                 <fr:label>Second</fr:label>
                 Content of second tab.
+                <xforms:group ref="parent::tab">Tab changes context</xforms:group>
+                <xforms:group ref="tab">Tab keeps context</xforms:group>
             </fr:tab>
             <fr:tab ref="tab[3]/@mip" id="tab-3">
                 <fr:label>Third</fr:label>

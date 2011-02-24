@@ -2527,15 +2527,30 @@ YAHOO.tool.TestFormat.JSON = function(results /*:Object*/) /*:String*/ {
  */
 YAHOO.tool.TestFormat.XML = function(results /*:Object*/) /*:String*/ {
 
+    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+    function xmlEscape(text){
+        return text.replace(/["'<>&]/g, function(c){
+            switch(c){
+                case "<": return "&lt;";
+                case ">": return "&gt;";
+                case "\"": return "&quot;";
+                case "'": return "&apos;";
+                case "&": return "&amp;";
+            }
+        });
+    }
+
     var l = YAHOO.lang;
-    var xml /*:String*/ = "<" + results.type + " name=\"" + results.name.replace(/"/g, "&quot;").replace(/'/g, "&apos;") + "\"";
+    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+    var xml /*:String*/ = "<" + results.type + " name=\"" + xmlEscape(results.name) + "\"";
 
     if (l.isNumber(results.duration)){
         xml += " duration=\"" + results.duration + "\"";
     }
 
     if (results.type == "test"){
-        xml += " result=\"" + results.result + "\" message=\"" + results.message + "\">";
+        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+        xml += " result=\"" + results.result + "\" message=\"" + xmlEscape(results.message) + "\">";
     } else {
         xml += " passed=\"" + results.passed + "\" failed=\"" + results.failed + "\" ignored=\"" + results.ignored + "\" total=\"" + results.total + "\">";
         for (var prop in results) {

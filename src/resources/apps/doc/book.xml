@@ -67,7 +67,7 @@
         </menu>
         <menu label="Querying Data">
             <menu-item label="REST" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xforms-submission"/>
-            <menu-item label="SQL Databases" href="processors-sql"/>
+            <menu-item label="SQL Databases" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-sql"/>
             <menu-item label="XML Databases" href="processors-xmldb"/>
             <menu-item label="LDAP Directories" href="processors-ldap"/>
             <menu-item label="Directory Scanner" href="processors-directory-scanner"/>

@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="src/xslt"/>
 	<classpathentry kind="src" path="src/scala"/>
 	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="test/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ant-1_6_5.jar"/>
@@ -116,5 +117,5 @@
 	<classpathentry kind="lib" path="lib/oracle/xdb.jar"/>
 	<classpathentry kind="lib" path="lib/oracle/xmlparserv2.jar"/>
 	<classpathentry kind="lib" path="lib/saxon-9-1-0-8_orbeon_20110215.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="build/orbeon-war/WEB-INF/classes-eclipse"/>
 </classpath>

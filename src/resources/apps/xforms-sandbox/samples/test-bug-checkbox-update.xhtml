@@ -78,15 +78,14 @@
     <xhtml:body>
 
         <xhtml:p>
-            Repro steps (tried with Firefox or IE):
+            Steps to reproduce (doesn't seem browser-dependent):
         </xhtml:p>
-        <xhtml:ul>
+        <xhtml:ol>
             <xhtml:li>Change radio from 1 to 2</xhtml:li>
-            <xhtml:li>Checkbox remains selected</xhtml:li>
+            <xhtml:li>=> Checkbox should remain selected</xhtml:li>
             <xhtml:li>Change radio back from 2 to 1</xhtml:li>
-            <xhtml:li>Checkbox now deselected</xhtml:li>
-            <xhtml:li>Ajax response seems good, server seems to send right information</xhtml:li>
-        </xhtml:ul>
+            <xhtml:li>=> Checkbox should remain selected</xhtml:li>
+        </xhtml:ol>
 
         <xforms:select id="checkbox" ref="selection" appearance="full" xxforms:encrypt-item-values="false">
             <xforms:label>Selection: </xforms:label>

@@ -64,10 +64,10 @@
                 <!-- Copy body attributes -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>
 
-                <xhtml:table id="main" width="100%" border="0" cellpadding="0" cellspacing="0">
+                <xhtml:table id="orbeon-main" width="100%" border="0" cellpadding="0" cellspacing="0">
                     <!-- Banner (with search) -->
                     <xhtml:tr>
-                        <xhtml:td colspan="2" id="banner">
+                        <xhtml:td colspan="2" id="orbeon-banner">
                             <xhtml:div style="float: left">
                                 <xhtml:a href="/" f:url-norewrite="true">
                                     <xhtml:img f:url-norewrite="false" width="212" height="42"
@@ -120,7 +120,7 @@
                     <xhtml:tr>
                         <!--List of examples -->
                         <xsl:if test="not($is-form-runner-home)">
-                            <xhtml:td id="leftcontent" valign="top" width="1%">
+                            <xhtml:td id="orbeon-leftcontent" valign="top" width="1%">
                                 <h1>Orbeon Forms Apps</h1>
                                 <xhtml:ul class="tree-sections">
                                     <xsl:for-each select="$applications/*/section">
@@ -148,7 +148,7 @@
                                 </xhtml:ul>
                             </xhtml:td>
                         </xsl:if>
-                        <xhtml:td id="maincontent" valign="top" width="99%">
+                        <xhtml:td id="orbeon-maincontent" valign="top" width="99%">
                             <xhtml:div class="maincontent">
                                 <!-- Title -->
                                 <xhtml:h1>
@@ -156,7 +156,7 @@
                                     <xsl:value-of select="$title"/>
                                 </xhtml:h1>
                                 <!-- Body -->
-                                <xhtml:div id="mainbody">
+                                <xhtml:div id="orbeon-mainbody">
                                     <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
                                 </xhtml:div>
                             </xhtml:div>

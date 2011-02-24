@@ -42,8 +42,6 @@
 
         <xsl:variable name="repeat-expression" select="if (@nodeset) then @nodeset else if (@ref) then @ref else concat('xxforms:bind(''', @bind, ''')')" as="xs:string"/>
 
-        <xhtml:link rel="stylesheet" href="/ops/yui/datatable/assets/skins/sam/datatable.css" type="text/css" media="all"/>
-
         <xhtml:div class="yui-dt">
             <xhtml:div class="yui-dt-hd">
                 <xxforms:variable name="fr-repeat-sequence" select="{$repeat-expression}"/>

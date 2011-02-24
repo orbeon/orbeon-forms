@@ -28,9 +28,9 @@
                 <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
             </xhtml:head>
             <xhtml:body>
-                <xhtml:table cellpadding="0" cellspacing="0" border="0" id="main">
+                <xhtml:table cellpadding="0" cellspacing="0" border="0" id="orbeon-main">
                     <!-- Banner (with search) -->
-                    <xhtml:tr><xhtml:td colspan="2" id="banner">
+                    <xhtml:tr><xhtml:td colspan="2" id="orbeon-banner">
                         <xhtml:div id="orbeon-logo" style="float: left">
                             <xhtml:a href="/" f:url-norewrite="true">
                                 <xhtml:img f:url-norewrite="false" width="212" height="42"
@@ -38,7 +38,7 @@
                                      src="/config/theme/images/orbeon-logo-trimmed-transparent-42.png"/>
                             </xhtml:a>
                         </xhtml:div>
-                        <xhtml:span id="navigation" style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
+                        <xhtml:span id="orbeon-navigation" style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
                             <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
                                 <xhtml:a href="http://www.orbeon.com/">Orbeon.com</xhtml:a>
                                 |
@@ -66,18 +66,18 @@
                     </xhtml:tr>
                     <xhtml:tr>
                         <!-- List of sections -->
-                        <xhtml:td id="leftcontent" valign="top" width="1%">
+                        <xhtml:td id="orbeon-leftcontent" valign="top" width="1%">
                             <xhtml:h1>Orbeon Forms User Guide</xhtml:h1>
                             <xhtml:ul class="tree-sections">
                                 <xsl:apply-templates select="doc('book.xml')/book/menu"/>
                             </xhtml:ul>
                         </xhtml:td>
-                        <xhtml:td id="maincontent">
+                        <xhtml:td id="orbeon-maincontent">
                             <xhtml:div class="maincontent">
                                 <!-- Title -->
                                 <xhtml:h1><xsl:value-of select="/document/header/title"/></xhtml:h1>
                                 <!-- TOC  -->
-                                <xhtml:div id="mainbody">
+                                <xhtml:div id="orbeon-mainbody">
                                     <xhtml:div class="minitoc">
                                         <xhtml:ul>
                                             <xsl:for-each select="/document/body/section">

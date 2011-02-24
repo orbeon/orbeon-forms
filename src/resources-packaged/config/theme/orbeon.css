@@ -44,18 +44,13 @@ fieldset {
     margin-left: 1em;
 }
 
-#main {
+#orbeon-main {
     border-bottom:1px solid #336;
     min-width: 650px;
     width: expression(650 > document.body.clientWidth ? '650px' : '100%' );
 }
 
-#main1 {
-    margin: 0;
-    padding:0;
-}
-
-#main #leftcontent {
+#orbeon-leftcontent {
     border-left: 1px solid #336;
     width:230px;
     margin:0;
@@ -64,7 +59,7 @@ fieldset {
     background-color: #dde;
 }
 
-#maincontent {
+#orbeon-maincontent {
     margin:0;
     background: white;
     border-left: 1px solid #99c;
@@ -82,11 +77,7 @@ fieldset {
     background:transparent;
 }
 
-#rightcontent p {
-    font-size: x-small;
-}
-
-#banner {
+#orbeon-banner {
     background:#fff;
     height:3em;
 }
@@ -101,7 +92,7 @@ h1 {
     padding-top:.71em;
 }
 
-#banner h1 {
+#orbeon-banner h1 {
     font-size:14pt;
     padding:.71em .71em 0em .71em;
     margin:0em;
@@ -217,7 +208,7 @@ a:hover {
     text-decoration: underline;
 }
 
-#leftcontent h1 {
+#orbeon-leftcontent h1 {
     color: #000;
     font-weight: bolder;
     font-size: 14px;
@@ -286,7 +277,7 @@ a:hover {
     border-bottom: 0;
 }
 
-#mainbody {
+#orbeon-mainbody {
     margin-top: 0.5em;
     margin-left: 0.5em;
     margin-right: 0.5em;
@@ -468,15 +459,15 @@ ul {
 
 @media print {
     #orbeon-logo { display: none }
-    #main { border: none; }
-    #leftcontent { display: none }
-    #rightcontent { display: none }
-    #maincontent { border: none }
+    #orbeon-main { border: none; }
+    #orbeon-leftcontent { display: none }
+    #orbeon-rightcontent { display: none }
+    #orbeon-maincontent { border: none }
     .tabs { display: none }
     .tab { display: none }
-    #cleaner { display: none }
-    #navigation { display: none}
-    #main .maincontent { margin: 0; border: none; }
+    .cleaner { display: none }
+    #orbeon-navigation { display: none}
+    #orbeon-main .maincontent { margin: 0; border: none; }
 
     .maincontent h1 {
         color: black;

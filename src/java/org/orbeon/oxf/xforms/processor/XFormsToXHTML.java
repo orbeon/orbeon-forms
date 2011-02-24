@@ -17,7 +17,10 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ResponseAdapter;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
@@ -37,7 +40,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -495,6 +501,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 private String charset;
                 private PrintWriter printWriter;
+                private ExternalContext.Response originalResponse = externalContext.getResponse();
 
                 @Override
                 public OutputStream getOutputStream() throws IOException {
@@ -531,6 +538,46 @@ public class XFormsToXHTML extends ProcessorImpl {
                     // TODO: It is not sound that we output headers here as they should be passed to the
                     // binary document in the pipeline instead.
                     externalContext.getResponse().setHeader(name, value);
+                }
+
+                @Override
+                public void setTitle(String title) {
+                    originalResponse.setTitle(title);
+                }
+
+                @Override
+                public String getNamespacePrefix() {
+                    return originalResponse.getNamespacePrefix();
+                }
+
+                @Override
+                public String rewriteResourceURL(String urlString, int rewriteMode) {
+                    return originalResponse.rewriteResourceURL(urlString, rewriteMode);
+                }
+
+                @Override
+                public String rewriteResourceURL(String urlString, boolean absolute) {
+                    return originalResponse.rewriteResourceURL(urlString, absolute);
+                }
+
+                @Override
+                public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+                    return originalResponse.rewriteRenderURL(urlString, portletMode, windowState);
+                }
+
+                @Override
+                public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+                    return originalResponse.rewriteActionURL(urlString, portletMode, windowState);
+                }
+
+                @Override
+                public String rewriteRenderURL(String urlString) {
+                    return originalResponse.rewriteRenderURL(urlString);
+                }
+
+                @Override
+                public String rewriteActionURL(String urlString) {
+                    return originalResponse.rewriteActionURL(urlString);
                 }
             };
         } else {

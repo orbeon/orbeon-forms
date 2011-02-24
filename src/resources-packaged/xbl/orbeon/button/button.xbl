@@ -48,6 +48,8 @@
                          We only want to override the margin-bottom here, not other margins declared in button.css. -->
                     *margin-bottom: 1px;
                 }
+                <!-- Override Liferay rule that must not apply to us -->
+                .xbl-fr-button .yui-button button:hover { background-image: none }
             </xbl:style>
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

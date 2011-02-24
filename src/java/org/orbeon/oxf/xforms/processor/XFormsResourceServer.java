@@ -16,10 +16,8 @@ package org.orbeon.oxf.xforms.processor;
 import net.sf.ehcache.Element;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -29,10 +27,8 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -44,8 +40,7 @@ public class XFormsResourceServer extends ProcessorImpl {
     private static final Logger logger = LoggerFactory.createLogger(XFormsResourceServer.class);
     private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
-    public XFormsResourceServer() {
-    }
+    public XFormsResourceServer() {}
 
     public static IndentedLogger getIndentedLogger() {
         return XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
@@ -220,13 +215,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
                                 indentedLogger.logDebug("resources", "caching requested but not possible, serving directly", "request path", requestPath);
-                            generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                            XFormsResourceRewriter.generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "caching not requested, serving directly", "request path", requestPath);
-                        generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                        XFormsResourceRewriter.generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {
@@ -293,7 +288,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
+                        XFormsResourceRewriter.generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
                     } else {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
@@ -305,7 +300,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
+                    XFormsResourceRewriter.generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
                 }
             } else {
                 if (isDebugEnabled)
@@ -316,123 +311,6 @@ public class XFormsResourceServer extends ProcessorImpl {
         } catch (Exception e) {
             throw new OXFException(e);
         }
-    }
-
-    /**
-     * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
-     *
-     * @param indentedLogger        logger
-     * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param propertyContext       current PipelineContext (used for rewriting and matchers)
-     * @param os                    OutputStream to write to
-     * @param isCSS                 whether to generate CSS or JavaScript resources
-     * @param isMinimal             whether to use minimal resources
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    private static void generate(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources, PropertyContext propertyContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
-        if (isCSS) {
-            // CSS: rewrite url() in content
-
-            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
-            final ExternalContext.Response response = externalContext.getResponse();
-
-            final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
-
-            // Create matcher that matches all paths in case resources are versioned
-            if (propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS) == null) {
-                final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
-                propertyContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, matchAllPathMatcher);
-            }
-
-            // Output Orbeon Forms version
-            outputWriter.write("/* This file was produced by " + Version.getVersionString() + " */\n");
-
-            for (final XFormsFeatures.ResourceConfig resource: resources) {
-                final String resourcePath = resource.getResourcePath(isMinimal);
-                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
-
-                final String content;
-                {
-                    final Reader reader = new InputStreamReader(is, "utf-8");
-                    final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
-                    NetUtils.copyStream(reader, StringBuilderWriter);
-                    reader.close();
-                    content = StringBuilderWriter.toString();
-                }
-
-                {
-                    int index = 0;
-                    while (true) {
-                        final int newIndex = content.indexOf("url(", index);
-
-                        if (newIndex == -1) {
-                            // Output remainder
-                            if (index == 0)
-                                outputWriter.write(content);
-                            else
-                                outputWriter.write(content.substring(index));
-                            break;
-                        } else {
-                            // output so far
-                            outputWriter.write(content.substring(index, newIndex));
-                        }
-
-                        // Get URL
-                        String initialURI;
-                        {
-                            final int closingIndex = content.indexOf(")", newIndex + 4);
-                            if (closingIndex == -1)
-                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resource.getResourcePath(isMinimal));
-
-                            initialURI = content.substring(newIndex + 4, closingIndex);
-
-                            // Some URLs seem to start and end with quotes
-                            if (initialURI.startsWith("\""))
-                                initialURI = initialURI.substring(1);
-
-                            if (initialURI.endsWith("\""))
-                                initialURI = initialURI.substring(0, initialURI.length() - 1);
-
-                            index = closingIndex + 1;
-                        }
-                        // Rewrite URL and output it as an absolute path
-                        try {
-                            final String resolvedURI = NetUtils.resolveURI(initialURI, resourcePath);
-                            // Rewrite through response
-                            final String rewrittenURI = response.rewriteResourceURL(resolvedURI, false);
-
-                            outputWriter.write("url(" + rewrittenURI + ")");
-                        } catch (Exception e) {
-                            indentedLogger.logWarning("resources", "found invalid URI in CSS file", "uri", initialURI);
-                            outputWriter.write("url(" + initialURI + ")");
-                        }
-                    }
-                }
-            }
-            outputWriter.flush();
-        } else {
-            // JavaScript: just send out
-
-            // Output Orbeon Forms version
-            final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
-            outputWriter.write("// This file was produced by " + Version.getVersionString() + "\n");
-            outputWriter.flush();
-
-            // Output
-            int index = 0;
-            for (Iterator<XFormsFeatures.ResourceConfig> i = resources.iterator(); i.hasNext(); index++) {
-                final XFormsFeatures.ResourceConfig resourceConfig = i.next();
-                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(isMinimal));
-                // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
-                if (index > 0)
-                    os.write((byte) '\n');
-                NetUtils.copyStream(is, os);
-                is.close();
-            }
-        }
-        os.flush();
-        os.close();
     }
     
     // For unit tests only (called from XSLT)

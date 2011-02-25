@@ -4066,7 +4066,7 @@ ORBEON.xforms.Init = {
              * in the capture phase, we need to register a listener for certain events on the elements itself, instead of
              * just registering the event handler on the window object.
              */
-            ns: {},                                                    // Namespace of ids (for portlets)
+            ns: {},                              // Namespace of ids (for portlets)
             resourcesBaseURL: {},                // Base URL for resources e.g. /context[/version]
             xformsServerURL: {},                 // XForms Server URL
             eventQueue: [],                      // Events to be sent to the server

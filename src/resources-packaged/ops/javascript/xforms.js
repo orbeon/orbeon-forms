@@ -4184,7 +4184,6 @@ ORBEON.xforms.Init = {
                         YAHOO.util.Dom.generateId(formChild);
                         YAHOO.util.Dom.removeClass(formChild, "xforms-initially-hidden");
                         var errorPanel = new YAHOO.widget.Panel(formChild.id, {
-                            width: "700px", // NOTE: iPhone 3G width is 320px, iPhone 4 640px
                             modal: true,
                             fixedcenter: false,
                             underlay: "shadow",

@@ -373,6 +373,7 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 .xforms-error-panel-show-details, .xforms-error-panel-hide-details { cursor: pointer; }
 .xforms-error-panel-close { cursor: pointer; }
 .xforms-error-panel-reload { cursor: pointer; }
+.xforms-error-panel { width: 700px }
 
 .xforms-help-panel { width: 300px; }
 .xforms-help-panel-close { text-align: right; }

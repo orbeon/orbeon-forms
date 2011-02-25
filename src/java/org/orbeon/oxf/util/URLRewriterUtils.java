@@ -126,8 +126,7 @@ public class URLRewriterUtils {
         final String sourceContextPath = (String) attributes.get("javax.servlet.forward.context_path");
         if (sourceContextPath != null) {
             // We were forwarded to
-            final boolean isSeparateDeployment = "separate".equals(attributes.get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
-            if (isPlatformPath && isSeparateDeployment) {
+            if (isPlatformPath && isSeparateDeployment(request)) {
                 // This is the case of forwarding in separate deployment: Orbeon resources are forwarded
                 // E.g. /foobar/orbeon
                 return sourceContextPath + request.getContextPath();
@@ -144,6 +143,11 @@ public class URLRewriterUtils {
             // We were not forwarded to
             return request.getContextPath();
         }
+    }
+
+    public static boolean isSeparateDeployment(ExternalContext.Request request) {
+        final Map<String, Object> attributes = request.getAttributesMap();
+        return "separate".equals(attributes.get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
     }
 
     public static boolean isForwarded(ExternalContext.Request request) {
@@ -262,8 +266,8 @@ public class URLRewriterUtils {
 
             // TODO: get version only once for a run
             final String applicationVersion = getApplicationResourceVersion();
-            if (!isPlatformURL && applicationVersion == null) {
-                // There is no application version so do usual rewrite
+            if (!isPlatformURL && (applicationVersion == null || isSeparateDeployment(request))) {
+                // There is no application version OR we are in separate deployment so do usual rewrite
                 return rewriteURL(request, urlString, rewriteMode);
             }
 

@@ -84,7 +84,7 @@
                         <xxf:control id="my-inplace-input$xf-15$trigger" label="Apply"/>
                         <xxf:control id="my-inplace-input$xf-16" class="fr-inplace-cancel" label="Cancel"/>
                     </xxf:control-values>
-                    <xxf:script name="my_inplace_input_xf_15_xf_27_xforms_function" target-id="my-inplace-input$xf-15$trigger" observer-id="my-inplace-input$xf-15$trigger"/>
+                    <xxf:script name="my_inplace_input_xf_15_xf_26_xforms_function" target-id="my-inplace-input$xf-15$trigger" observer-id="my-inplace-input$xf-15$trigger"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

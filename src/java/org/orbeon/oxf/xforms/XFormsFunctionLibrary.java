@@ -150,9 +150,6 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("days-to-date", DaysToDate.class, 0, 1, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE, null);
 
-        e = register("seconds-from-dateTime", SecondsFromDateTime.class, 0, 1, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
-
         e = register("seconds-to-dateTime", SecondsToDateTime.class, 0, 1, 1, BuiltInAtomicType.DATE_TIME, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.NUMERIC, StaticProperty.EXACTLY_ONE, null);
 
@@ -397,6 +394,16 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
         // xxforms:pending-uploads()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}pending-uploads", XXFormsPendingUploads.class, 0, 0, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
+
+        // xforms:if()
+        e = register("{" + XFormsConstants.XFORMS_NAMESPACE_URI  + "}if", If.class, 0, 3, 3, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+
+        // xforms:seconds-from-dateTime(), which is incompatible with the XPath 2.0 version
+        e = register("{" + XFormsConstants.XFORMS_NAMESPACE_URI  + "}seconds-from-dateTime", SecondsFromDateTime.class, 0, 1, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // === XSLT 2.0 function
         e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);

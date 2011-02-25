@@ -25,7 +25,7 @@ import org.orbeon.oxf.util._
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
-import org.orbeon.oxf.xforms.{XFormsProperties, Caches}
+import org.orbeon.oxf.xforms._
 
 /**
  * Aggregate CSS and JS resources under <head>.
@@ -63,6 +63,12 @@ class ResourcesAggregator extends ProcessorImpl {
                     var inlineCSS = Buffer[InlineElement]()
                     var inlineJS = Buffer[InlineElement]()
 
+                    // Whether we are in separate deployment as in that case we don't combine paths to user resources
+                    val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(NetUtils.getExternalContext(pipelineContext).getRequest)
+
+                    // Whether a path is a user resource in separate deployment
+                    def isSeparatePath(path: String) = isSeparateDeployment && !URLRewriterUtils.isPlatformPath(path)
+
                     override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
                         level += 1
 
@@ -77,14 +83,14 @@ class ResourcesAggregator extends ProcessorImpl {
 
                             // Gather resources that match
                             localname match {
-                                case "link" if (href ne null) && ((resType eq null) || resType == "text/css") =>
+                                case "link" if (href ne null) && !isSeparatePath(href) && ((resType eq null) || resType == "text/css") =>
                                     (if (cssClasses == "xforms-baseline") baselineCSS else css) += href
                                     filter = true
-                                case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript")  =>
+                                case "script" if (src ne null) && !isSeparatePath(src) && ((resType eq null) || resType == "text/javascript")  =>
                                     (if (cssClasses == "xforms-baseline") baselineJS else js) += src
                                     filter = true
-                                case "style" if (resType eq null) =>
-                                    currentInlineElement = InlineElement(new AttributesImpl(attributes))
+                                case "style" =>
+                                    currentInlineElement = InlineElement(new AttributesImpl(attributes))    
                                     inlineCSS += currentInlineElement
                                     filter = true
                                 case "script" if (src eq null) =>

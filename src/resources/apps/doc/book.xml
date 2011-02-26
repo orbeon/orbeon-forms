@@ -99,7 +99,7 @@
         <menu-item label="Authentication" href="reference-authentication"/>
         <menu-item label="Command Line Applications" href="integration-command-line"/>
         <menu-item label="Web Services" href="integration-webservices"/>
-        <menu-item label="Packaging and Deployment" href="integration-packaging"/>
+        <menu-item label="Packaging and Deployment" href="http://wiki.orbeon.com/forms/doc/developer-guide/packaging-and-deployment"/>
         <menu-item label="EJB Support" href="integration-ejb"/>
     </menu>
 </book>

@@ -107,11 +107,16 @@
     <!-- ==== Other Services ======================================================================================= -->
 
     <!-- Email document -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(email)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(email)(/([^/]+))?" matcher="oxf:perl5-matcher"
           view="email/email-form.xpl"/>
 
-    <!-- Create PDF -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+    <!-- Create PDF directly from an XForms engine live document -->
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)/([^/]+)/([A-Z0-9\-]+)\.pdf" matcher="oxf:perl5-matcher"
+          view="print/pdf-instant-view.xpl">
+    </page>
+
+    <!-- Create PDF from a stored document -->
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)(/([^/]+))?" matcher="oxf:perl5-matcher"
           view="print/print-form.xpl"/>
 
     <!-- Generate HTML to be saved -->
@@ -162,7 +167,7 @@
 
     <!-- Summary -->
     <page id="summary"
-          path-info="/fr/([^/]+)/([^/]+)(/summary|/list|)?/?" matcher="oxf:perl5-matcher"
+          path-info="/fr/([^/]+)/([^/]+)(/summary|/list|)?" matcher="oxf:perl5-matcher"
           default-submission="request-parameters.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -172,18 +177,18 @@
 
     <page path-info="/fr/unauthorized" view="unauthorized.xhtml" matcher="oxf:perl5-matcher"/>
 
-    <!-- New, edit or view document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+    <!-- New, edit or view document (supports POST of XML, or GET)  -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?" matcher="oxf:perl5-matcher"
           model="detail/detail-model.xpl" view="html-view.xpl">
     </page>
 
-    <!-- View document as PDF -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/([^/]+))?/?" matcher="oxf:perl5-matcher"
+    <!-- View document as PDF (supports POST of XML, or GET) -->
+    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/([^/]+))?" matcher="oxf:perl5-matcher"
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
 
     <!-- Test form by retrieving form from the database first -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)/?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)" matcher="oxf:perl5-matcher"
           default-submission="request-parameters.xml"
           model="test-model.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -193,7 +198,7 @@
     </page>
 
     <!-- Test form "inline" (when being edited) with new empty document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(test)/?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)" matcher="oxf:perl5-matcher"
           model="inline-test-model.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>

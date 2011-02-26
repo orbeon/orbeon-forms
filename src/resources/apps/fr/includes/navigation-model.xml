@@ -55,6 +55,7 @@
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
     <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
+    <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
     <xforms:submission id="fr-pdf-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}?{$common-get-parameters}"
         method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
@@ -85,6 +86,11 @@
         <xforms:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
         <xi:include href="persistence-model-headers.xml"/>
     </xforms:submission>
+
+    <!-- Open PDF for the current form data -->
+    <xforms:action ev:event="fr-open-pdf">
+        <xforms:send submission="fr-pdf-submission"/>
+    </xforms:action>
 
     <!-- Go back to the Form Runner summary page -->
     <xforms:action ev:event="fr-goto-summary">

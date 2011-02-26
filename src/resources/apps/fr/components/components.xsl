@@ -171,7 +171,7 @@
 
         <!-- Model receiving input parameters -->
         <xforms:model id="fr-parameters-model"
-                      xxforms:external-events="{@xxforms:external-events}"
+                      xxforms:external-events="{@xxforms:external-events}{if ($mode = ('new', 'view', 'edit')) then ' fr-open-pdf' else ''}"
                       xxforms:readonly-appearance="{if ($mode = ('view', 'pdf', 'email')) then 'static' else 'dynamic'}"
                       xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:offline="false"

@@ -367,6 +367,8 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
     height: 0;
 }
 
+div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../../ops/images/xforms/processing.gif) }
+
 .xforms-error-panel .bd { overflow: auto; background-color: white }
 .xforms-error-panel .hd { background-color: #FF6600; }
 .xforms-error-panel-details-hidden, .xforms-error-panel-details-shown { vertical-align: middle; }

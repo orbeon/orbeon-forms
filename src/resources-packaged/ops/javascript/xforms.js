@@ -988,8 +988,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         modal: true,
                         visible: true
                     });
-                    ORBEON.xforms.Globals.modalProgressPanel.setBody('<img alt="Processing, please wait" src="'
-                            + ORBEON.xforms.Globals.resourcesBaseURL[formID] + '/ops/images/xforms/processing.gif"/>');
+                    ORBEON.xforms.Globals.modalProgressPanel.setBody('<div class="xforms-modal-progress"/>');
                     ORBEON.xforms.Globals.modalProgressPanel.render(document.body);
                 }
                 ORBEON.xforms.Globals.modalProgressPanel.show();

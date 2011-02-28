@@ -77,15 +77,15 @@ object XFormsResourceRewriter {
         outputWriter.flush
     }
 
-    private def rewriteCSS(css: String, namespace: String, resourcePath: String, response: ExternalContext.Response, logger: IndentedLogger) = {
+    def rewriteCSS(css: String, namespace: String, resourcePath: String, response: ExternalContext.Response, logger: IndentedLogger) = {
 
         // Match and rewrite an id within a selector
         val matchId = """#([\w]+)""".r
         def rewriteSelector(s: String) = matchId.replaceAllIn(s, e => "#" + namespace + e.group(1))
 
         // Match and rewrite a URL within a block
-        val matchURL = """url\("?([^"^\)]*)"?\)""".r
-        def rewriteBlock(s: String) = matchURL.replaceAllIn(s, e => rewriteURL(e.group(1)))
+        val matchURL = """url\(("|')?([^"^'^\)]*)("|')?\)""".r
+        def rewriteBlock(s: String) = matchURL.replaceAllIn(s, e => rewriteURL(e.group(2)))
 
         // Rewrite an individual URL
         def rewriteURL(url: String) =

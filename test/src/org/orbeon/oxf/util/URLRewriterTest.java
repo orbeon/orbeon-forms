@@ -413,15 +413,4 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("https://foo.com/bar?a=1&amp;b=2#there", rewriter.rewriteResourceURL("https://foo.com/bar?a=1&amp;b=2#there", ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH));
 
     }
-
-//    public void testXFormsRewrite() {
-//        // TODO
-//        resolveRenderURL()
-//        resolveServiceURL()
-//        resolveResourceURL()
-//    }
-
-//    public void testXMLBase() {
-//        // TODO: test XFormsUtils.resolveXMLBase()
-//    }
 }

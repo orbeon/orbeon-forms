@@ -55,11 +55,12 @@
                                                             then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
 
             <!--<xforms:message level="xxforms:log-debug">-->
-                <!--ORBEON ROLES DEBUG INFORMATION:-->
-                <!--Header name: <xforms:output value="$header-name"/>-->
-                <!--Header property name: <xforms:output value="$header-property-name"/>-->
-                <!--Tokens: <xforms:output value="$tokens"/>-->
-                <!--Roles extracted: <xforms:output value="instance('fr-roles-instance')/all-roles"/>-->
+            <!--ORBEON ROLES DEBUG INFORMATION:-->
+            <!--Header name: <xforms:output value="$header-name"/>-->
+            <!--Header value: <xforms:output value="xxforms:get-request-header($header-name)"/>-->
+            <!--Header property name: <xforms:output value="$header-property-name"/>-->
+            <!--Tokens: <xforms:output value="$tokens"/>-->
+            <!--Roles extracted: <xforms:output value="instance('fr-roles-instance')/all-roles"/>-->
             <!--</xforms:message>-->
 
             <!-- TODO: option of using servlet roles -->

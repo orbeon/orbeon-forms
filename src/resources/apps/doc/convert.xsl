@@ -146,7 +146,7 @@
     </xsl:template>
 
     <xsl:template match="comment" mode="source">
-        <xsl:comment><xsl:value-of select="."/></xsl:comment>
+        <xsl:comment><xsl:value-of select="concat(' ', normalize-space(.), ' ')"/></xsl:comment>
     </xsl:template>
 
     <xsl:template match="@*|node()" mode="source">

@@ -798,9 +798,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
             // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
             // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
+
+            // NOTE: Method can be null e.g. in a portlet render request
+            final String method = NetUtils.getExternalContext(propertyContext).getRequest().getMethod();
+
             isNoscript = containingDocument.getStaticState().isNoscript();
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument)
-                    && !NetUtils.getExternalContext(propertyContext).getRequest().getMethod().equalsIgnoreCase("get");
+                    && !(method != null && method.equalsIgnoreCase("get"));
 
             isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll && !containingDocument.isInitializing());
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;

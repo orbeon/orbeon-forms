@@ -5537,34 +5537,140 @@
         </output>
     </test>
 
-    <!-- TODO: NIY -->
-    <test description="Bind with name attribute" name="oxf:java" exclude="true">
+    <test description="Bind with name attribute" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
         <input name="form">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xh:head>
-                    <xf:model xxf:xpath-analysis="true" id="m1">
-                        <xf:instance id="i11">
-                            <instance/>
+                    <xf:model id="model" xxf:xpath-analysis="true">
+                        <xf:instance id="instance">
+                            <form source="" destination="" readonly=""/>
                         </xf:instance>
-                        <xf:bind id="b1" name="name1" ref=".">
-                            <xf:bind id="b2" name="name2" ref="foo"/>
+                        <xf:bind id="root-bind" ref="." name="root">
+                            <xf:bind id="source-bind" ref="@source" name="source"/>
+                            <xf:bind id="destination-bind" ref="@destination" name="destination" calculate="$source"/>
+                            <xf:bind id="readonly-bind" ref="@readonly" readonly="$root + $destination mod 2 = 0"/>
                         </xf:bind>
                     </xf:model>
                 </xh:head>
-                <xh:body>
-                    <xf:group ref="$name1">
-                        <xf:input id="id1" ref="$name2"/>
-                    </xf:group>
-                </xh:body>
+                <xh:body/>
             </xh:html>
         </input>
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
-
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
+                    <binds>
+                        <bind id="root-bind" ref=".">
+                            <binding>
+                                <analysis expression="." analyzed="true">
+                                    <returnable>
+                                        <path>instance('instance')</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>instance</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>instance</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </binding>
+                            <bind id="source-bind" ref="@source">
+                                <binding>
+                                    <analysis expression="@source" analyzed="true">
+                                        <returnable>
+                                            <path>instance('instance')/@source</path>
+                                        </returnable>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                        <returnable-instances>
+                                            <instance>instance</instance>
+                                        </returnable-instances>
+                                    </analysis>
+                                </binding>
+                            </bind>
+                            <bind id="destination-bind" ref="@destination">
+                                <binding>
+                                    <analysis expression="@destination" analyzed="true">
+                                        <returnable>
+                                            <path>instance('instance')/@destination</path>
+                                        </returnable>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                        <returnable-instances>
+                                            <instance>instance</instance>
+                                        </returnable-instances>
+                                    </analysis>
+                                </binding>
+                                <mip name="calculate" expression="$source">
+                                    <analysis expression="xs:string(($source)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('instance')/@source</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="readonly-bind" ref="@readonly">
+                                <binding>
+                                    <analysis expression="@readonly" analyzed="true">
+                                        <returnable>
+                                            <path>instance('instance')/@readonly</path>
+                                        </returnable>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                        <returnable-instances>
+                                            <instance>instance</instance>
+                                        </returnable-instances>
+                                    </analysis>
+                                </binding>
+                                <mip name="readonly" expression="$root + $destination mod 2 = 0">
+                                    <analysis expression="xs:boolean(($root + $destination mod 2 = 0)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('instance')</path>
+                                            <path>instance('instance')/@destination</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                        </bind>
+                    </binds>
+                    <bind-instances>
+                        <instance>instance</instance>
+                    </bind-instances>
+                    <computed-binds-instances>
+                        <instance>instance</instance>
+                    </computed-binds-instances>
+                </model>
             </request>
         </output>
     </test>

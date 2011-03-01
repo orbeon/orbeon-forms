@@ -31,7 +31,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
     // Scope and model
     val scopeModel: ScopeModel
     // In-scope variables (for XPath analysis)
-    val inScopeVariables: Map[String, VariableAnalysisTrait]
+    val inScopeVariables: Map[String, VariableTrait]
 
     // Ids
     val staticId = XFormsUtils.getElementStaticId(element)

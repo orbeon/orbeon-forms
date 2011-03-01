@@ -426,13 +426,13 @@ public class XFormsModelBinds {
 
     private Map<String, ValueRepresentation> getVariables(NodeInfo contextNodeInfo) {
 
-        if (staticModel.bindNamesToIds().size() > 0) {
+        if (staticModel.jBindsByName().size() > 0) {
             final Map<String, ValueRepresentation> bindVariablesValues = new HashMap<String, ValueRepresentation>();
 
             // Add bind variables
-            for (Map.Entry<String, String> currentEntry : staticModel.bindNamesToIds().entrySet()) {
+            for (Map.Entry<String, Model.Bind> currentEntry : staticModel.jBindsByName().entrySet()) {
                 final String currentVariableName = currentEntry.getKey();
-                final String currentBindId = currentEntry.getValue();
+                final String currentBindId = currentEntry.getValue().staticId();
 
                 final List<Item> currentBindNodeset = getBindNodeset(currentBindId, contextNodeInfo);
                 bindVariablesValues.put(currentVariableName, new SequenceExtent(currentBindNodeset));

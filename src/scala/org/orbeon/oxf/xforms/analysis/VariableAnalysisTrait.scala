@@ -20,10 +20,11 @@ import org.dom4j.Element
 /**
  * Trait representing a variable element, whether in the model or in the view.
  */
-trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait {
+trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait with VariableTrait {
 
-    // Variable name
+    // Variable name and value
     val name = element.attributeValue(XFormsConstants.NAME_QNAME)
+    def variableAnalysis = getValueAnalysis
 
     override val canHoldValue = true // TODO: not clear that this is useful at this point, see who calls this
 

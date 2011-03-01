@@ -103,7 +103,7 @@ object PathMapXPathAnalysis {
      * Create a new XPathAnalysis based on an initial XPath expression.
      */
     def apply(staticState: XFormsStaticState, xpathString: String, namespaceMapping: NamespaceMapping,
-              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableAnalysisTrait],
+              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
               pathMapContext: AnyRef, scope: XBLBindings#Scope, defaultInstancePrefixedId: Option[String],
               locationData: LocationData, element: Element): XPathAnalysis = {
 
@@ -115,15 +115,18 @@ object PathMapXPathAnalysis {
 
             // In-scope variables
             val variablePathMaps = new JHashMap[String, PathMap]
-            for ((name, variableControl) <- inScopeVariables; valueAnalysis = variableControl.getValueAnalysis; if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies)
-                variablePathMaps.put(name, valueAnalysis match {
-                    // Valid PathMap
-                    case Some(analysis: PathMapXPathAnalysis) if analysis.figuredOutDependencies => analysis.pathmap.get
-                    // Constant string
-                    case Some(analysis) if analysis.figuredOutDependencies => stringPathmap
-                    // Can't handle the other cases
-                    case _ => null
-                })
+            for {
+                (name, variable) <- inScopeVariables
+                valueAnalysis = variable.variableAnalysis
+                if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies
+            } variablePathMaps.put(name, valueAnalysis match {
+                // Valid PathMap
+                case Some(analysis: PathMapXPathAnalysis) if analysis.figuredOutDependencies => analysis.pathmap.get
+                // Constant string
+                case Some(analysis) if analysis.figuredOutDependencies => stringPathmap
+                // Can't handle the other cases
+                case _ => null
+            })
 
             def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
 

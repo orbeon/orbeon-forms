@@ -29,12 +29,12 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
     lazy val scopeModel = new ScopeModel(scope, findContainingModel)
     lazy val namespaceMapping = staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId)
 
-    lazy val inScopeVariables: Map[String, VariableAnalysisTrait] = getRootVariables ++ treeInScopeVariables
+    lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 
-    protected def getRootVariables: Map[String, VariableAnalysisTrait] = Map.empty
+    protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
-    lazy val treeInScopeVariables: Map[String, VariableAnalysisTrait] =
-        Map[String, VariableAnalysisTrait]() ++
+    lazy val treeInScopeVariables: Map[String, VariableTrait] =
+        Map[String, VariableTrait]() ++
             (ElementAnalysis.getClosestPrecedingInScope(this)() match {
                 case Some(preceding: VariableAnalysisTrait) => preceding.treeInScopeVariables + (preceding.name -> preceding)
                 case Some(preceding: SimpleElementAnalysis) => preceding.treeInScopeVariables
@@ -115,7 +115,10 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
         staticStateContext.staticState.getXBLBindings.getResolutionScopeByPrefixedId(childPrefixedId)
     }
 
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis = {
+    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
+        analyzeXPath(contextAnalysis, inScopeVariables, xpathString)
+
+    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String): XPathAnalysis = {
 
         def getDefaultInstancePrefixedId = scopeModel.containingModel match { case Some(model) => model.defaultInstancePrefixedId; case None => None }
 

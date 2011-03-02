@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
-import java.util.{Map => JMap, HashMap => JHashMap}
+import java.util.{Map => JMap}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import collection.mutable.{LinkedHashSet, Stack}
 import org.orbeon.oxf.xforms.{MapSet, XFormsConstants, XFormsContainingDocument, XFormsStaticState}
@@ -31,6 +31,7 @@ import org.orbeon.saxon.expr.PathMap.{PathMapNode, PathMapArc}
 import xml._
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.saxon.Configuration
+import scala.collection.JavaConversions._
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -114,19 +115,17 @@ object PathMapXPathAnalysis {
             val stringPathmap = new PathMap(new StringLiteral(""))
 
             // In-scope variables
-            val variablePathMaps = new JHashMap[String, PathMap]
-            for {
-                (name, variable) <- inScopeVariables
-                valueAnalysis = variable.variableAnalysis
-                if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies
-            } variablePathMaps.put(name, valueAnalysis match {
-                // Valid PathMap
-                case Some(analysis: PathMapXPathAnalysis) if analysis.figuredOutDependencies => analysis.pathmap.get
-                // Constant string
-                case Some(analysis) if analysis.figuredOutDependencies => stringPathmap
-                // Can't handle the other cases
-                case _ => null
-            })
+            val variablePathMaps: JMap[String, PathMap] =
+                for {
+                    (name, variable) <- inScopeVariables
+                    valueAnalysis = variable.variableAnalysis
+                    if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies
+                } yield (name, valueAnalysis match {
+                    // Valid PathMap
+                    case Some(analysis: PathMapXPathAnalysis) => analysis.pathmap.get
+                    // Constant string
+                    case _ => stringPathmap
+                })
 
             def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
 
@@ -307,13 +306,13 @@ object PathMapXPathAnalysis {
                                     originalInstanceId
                                 else if (searchAncestors)
                                     // xxf:instance()
-                                    staticState.findInstancePrefixedId(scope, originalInstanceId)
+                                    staticState.findInstancePrefixedId(scope, originalInstanceId) // can return null
                                 else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
                                     // HACK: datatable e.g. uses instance(prefixedId)!
-                                    originalInstanceId
+                                    originalInstanceId // TODO: warn: could be a non-existing instance id
                                 else
                                     // Normal use of instance()
-                                    scope.getPrefixedIdForStaticId(originalInstanceId)
+                                    scope.getPrefixedIdForStaticId(originalInstanceId) // TODO: warn: could be a non-existing instance id
 
                             if (prefixedInstanceId ne null) {
                                 // Instance found

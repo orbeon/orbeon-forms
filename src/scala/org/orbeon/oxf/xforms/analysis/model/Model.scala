@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
 import org.orbeon.oxf.util.PropertyContext
-import java.util.{Map => JMap, HashMap => JHashMap, LinkedHashMap => JLinkedHashMap, Set => JSet, List => JList }
+import java.util.{Map => JMap, LinkedHashMap => JLinkedHashMap, Set => JSet, List => JList }
 import org.orbeon.oxf.xforms._
 
 

@@ -5675,4 +5675,615 @@
         </output>
     </test>
 
+    <test description="xxforms:instance id resolution across XBL scopes" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xh:head>
+                    <xf:model id="m1" xxf:xpath-analysis="true">
+                        <xf:instance id="m1i1"><instance/></xf:instance>
+                        <xf:instance id="m1i2"><instance/></xf:instance>
+                    </xf:model>
+                    <xf:model id="m2">
+                        <xf:instance id="m2i1"><instance/></xf:instance>
+                        <xf:instance id="m2i2"><instance/></xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:implementation>
+                                <xf:model id="m1">
+                                    <xf:instance id="m1i1"><instance/></xf:instance>
+                                    <xf:instance id="m1i3"><instance/></xf:instance>
+                                </xf:model>
+                                <xf:model id="m2">
+                                    <xf:instance id="m2i1"><instance/></xf:instance>
+                                    <xf:instance id="m2i3"><instance/></xf:instance>
+                                </xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <!-- Must reach local instances -->
+                                <xf:output id="o1" value="xxf:instance('m1i1')"/>
+                                <xf:output id="o2" value="xxf:instance('m2i1')"/>
+                                <!-- Must reach top-level instances -->
+                                <xf:output id="o3" value="xxf:instance('m1i2')"/>
+                                <xf:output id="o4" value="xxf:instance('m2i2')"/>
+
+                                <fr:bar id="bar1"/>
+
+                                <!-- NOTE: We are playing with fire by specifying ids on outer scope elements here -->
+                                <xf:group id="g1" xxbl:scope="outer">
+                                    <!-- Must reach top-level instances -->
+                                    <xf:output id="o5" value="xxf:instance('m1i1')"/>
+                                    <xf:output id="o6" value="xxf:instance('m2i1')"/>
+                                    <xf:output id="o7" value="xxf:instance('m1i2')"/>
+                                    <xf:output id="o8" value="xxf:instance('m2i2')"/>
+
+                                    <fr:bar id="bar2"/>
+                                </xf:group>
+
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-bar" element="fr|bar">
+                            <xbl:implementation>
+                                <xf:model id="m1">
+                                    <xf:instance id="m1i1"><instance/></xf:instance>
+                                </xf:model>
+                                <xf:model id="m2">
+                                    <xf:instance id="m2i1"><instance/></xf:instance>
+                                </xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <!-- Must reach local instances -->
+                                <xf:output id="o1" value="xxf:instance('m1i1')"/>
+                                <xf:output id="o2" value="xxf:instance('m2i1')"/>
+                                <!-- Must reach parent instances -->
+                                <xf:output id="o3" value="xxf:instance('m1i3')"/>
+                                <xf:output id="o4" value="xxf:instance('m2i3')"/>
+                                <!-- Must reach top-level instances -->
+                                <xf:output id="o5" value="xxf:instance('m1i2')"/>
+                                <xf:output id="o6" value="xxf:instance('m2i2')"/>
+
+                                <!-- NOTE: We are playing with fire by specifying ids on outer scope elements here -->
+                                <xf:group id="g2" xxbl:scope="outer">
+                                    <!-- Must reach outer scope instances -->
+                                    <xf:output id="o9" value="xxf:instance('m1i1')"/>
+                                    <xf:output id="o10" value="xxf:instance('m2i1')"/>
+                                    <xf:output id="o11" value="xxf:instance('m1i3')"/>
+                                    <xf:output id="o12" value="xxf:instance('m2i3')"/>
+                                    <!-- Must reach top-level instances -->
+                                    <xf:output id="o13" value="xxf:instance('m1i2')"/>
+                                    <xf:output id="o14" value="xxf:instance('m2i2')"/>
+                                </xf:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <!-- Must reach top-level instances -->
+                    <xf:output id="o1" value="xxf:instance('m1i1')"/>
+                    <xf:output id="o2" value="xxf:instance('m2i1')"/>
+
+                    <fr:foo id="foo1"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <output scope="" prefixed-id="o1" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="o2" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <foo scope="" prefixed-id="foo1" model-prefixed-id="m1" binding="false" value="false"/>
+                <output scope="foo1" prefixed-id="foo1$o1" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$o2" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$o3" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$o4" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <bar scope="foo1" prefixed-id="foo1$bar1" model-prefixed-id="foo1$m1" binding="false" value="false"/>
+                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o1" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$bar1$m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$bar1$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$bar1$m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o2" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$bar1$m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$bar1$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$bar1$m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o3" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i3'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m1i3')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m1i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o4" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i3'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m2i3')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m2i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o5" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o6" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="foo1" prefixed-id="foo1$bar1$g2" model-prefixed-id="foo1$m1" binding="false" value="false"/>
+                <output scope="foo1" prefixed-id="foo1$bar1$o9" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$bar1$o10" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$bar1$o11" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i3'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m1i3')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m1i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$bar1$o12" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i3'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m2i3')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m2i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$bar1$o13" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1" prefixed-id="foo1$bar1$o14" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="foo1$g1" model-prefixed-id="m1" binding="false" value="false"/>
+                <output scope="" prefixed-id="foo1$o5" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$o6" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$o7" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$o8" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <bar scope="" prefixed-id="foo1$bar2" model-prefixed-id="m1" binding="false" value="false"/>
+                <output scope="foo1$bar2" prefixed-id="foo1$bar2$o1" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$bar2$m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$bar2$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$bar2$m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar2" prefixed-id="foo1$bar2$o2" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$bar2$m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$bar2$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$bar2$m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar2" prefixed-id="foo1$bar2$o3" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i3'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m1i3')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m1i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar2" prefixed-id="foo1$bar2$o4" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i3'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('foo1$m2i3')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>foo1$m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>foo1$m2i3</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar2" prefixed-id="foo1$bar2$o5" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="foo1$bar2" prefixed-id="foo1$bar2$o6" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="foo1$bar2$g2" model-prefixed-id="m1" binding="false" value="false"/>
+                <output scope="" prefixed-id="foo1$bar2$o9" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$bar2$o10" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i1'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$bar2$o11" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i3'))[1])" analyzed="true"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$bar2$o12" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i3'))[1])" analyzed="true"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$bar2$o13" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m1i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m1i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m1</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m1i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="foo1$bar2$o14" model-prefixed-id="m1" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((xxf:instance('m2i2'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('m2i2')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m2</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>m2i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <model scope="" prefixed-id="m1" default-instance-prefixed-id="m1i1" analyzed-binds="true"/>
+                <model scope="" prefixed-id="m2" default-instance-prefixed-id="m2i1" analyzed-binds="true"/>
+                <model scope="foo1" prefixed-id="foo1$m1" default-instance-prefixed-id="foo1$m1i1" analyzed-binds="true"/>
+                <model scope="foo1" prefixed-id="foo1$m2" default-instance-prefixed-id="foo1$m2i1" analyzed-binds="true"/>
+                <model scope="foo1$bar1" prefixed-id="foo1$bar1$m1" default-instance-prefixed-id="foo1$bar1$m1i1" analyzed-binds="true"/>
+                <model scope="foo1$bar1" prefixed-id="foo1$bar1$m2" default-instance-prefixed-id="foo1$bar1$m2i1" analyzed-binds="true"/>
+                <model scope="foo1$bar2" prefixed-id="foo1$bar2$m1" default-instance-prefixed-id="foo1$bar2$m1i1" analyzed-binds="true"/>
+                <model scope="foo1$bar2" prefixed-id="foo1$bar2$m2" default-instance-prefixed-id="foo1$bar2$m2i1" analyzed-binds="true"/>
+            </request>
+        </output>
+    </test>
+
 </group>

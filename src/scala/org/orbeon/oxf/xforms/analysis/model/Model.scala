@@ -269,38 +269,59 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         }
 
         // Return true if analysis succeeded
-        def analyzeXPathGather(): Boolean = {
+        def analyzeXPathGather: Boolean = {
 
             // Analyze context/binding
             analyzeXPath()
 
-            // Match on whether we have a @ref or not
+            // If successful, gather derived information
+            val refSucceeded =
+                ref match {
+                    case Some(_) =>
+                        getBindingAnalysis match {
+                            case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
+                                // There is a binding and analysis succeeded
+
+                                // Remember dependent instances
+                                val returnableInstances = bindingAnalysis.returnableInstances
+                                bindInstances.addAll(returnableInstances)
+
+                                if (hasCalculateComputedMIPs || hasCustomMIPs)
+                                    computedBindExpressionsInstances.addAll(returnableInstances)
+
+                                if (hasValidateMIPs)
+                                    validationBindInstances.addAll(returnableInstances)
+
+                                true
+
+                            case _ =>
+                                // Analysis failed
+                                false
+                        }
+
+                    case None =>
+                        // No binding, consider a success
+                        true
+                }
+
+            // Analyze children
+            val childrenSucceeded = (children map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+
+            // Result
+            refSucceeded && childrenSucceeded
+        }
+
+        def analyzeMIPs {
+            // Analyze local MIPs if there is a @ref
             ref match {
-                case Some(refValue) =>
-                    getBindingAnalysis match {
-                        case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
-                            // There is a binding and analysis succeeded
-
-                            // Remember dependent instances
-                            val returnableInstances = bindingAnalysis.returnableInstances
-                            bindInstances.addAll(returnableInstances)
-                            if (hasCalculateComputedMIPs || hasCustomMIPs)
-                                computedBindExpressionsInstances.addAll(returnableInstances)
-
-                            if (hasValidateMIPs)
-                                validationBindInstances.addAll(returnableInstances)
-
-                        case _ => // analysis failed
-                    }
-
-                    // MIP analysis
+                case Some(_) =>
                     for (mip <- allMIPNameToXPathMIP.values)
                         mip.analyzeXPath()
-                case None => // No binding so don't look at MIPs
+                case None =>
             }
 
-            // Analyze children and compute result
-            children.isEmpty || ((children map (_.analyzeXPathGather())) reduceLeft (_ && _))
+            // Analyze children
+            children foreach (_.analyzeMIPs)
         }
 
         override def freeTransientState() {
@@ -342,8 +363,12 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         for (variable <- variablesSeq)
             variable.analyzeXPath()
         
-        // Binds: analyze all binds and return whether all of them were successfully analyzed
-        figuredAllBindRefAnalysis = topLevelBinds.isEmpty || ((topLevelBinds map (_.analyzeXPathGather())) reduceLeft (_ && _))
+        // Analyze all binds and return whether all of them were successfully analyzed
+        figuredAllBindRefAnalysis = (topLevelBinds map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+
+        // Analyze all MIPs
+        // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first
+        topLevelBinds foreach (_.analyzeMIPs)
 
         if (!figuredAllBindRefAnalysis) {
             bindInstances.clear()

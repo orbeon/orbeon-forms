@@ -5552,8 +5552,8 @@
                         </xf:instance>
                         <xf:bind id="root-bind" ref="." name="root">
                             <xf:bind id="source-bind" ref="@source" name="source"/>
-                            <xf:bind id="destination-bind" ref="@destination" name="destination" calculate="$source"/>
                             <xf:bind id="readonly-bind" ref="@readonly" readonly="$root + $destination mod 2 = 0"/>
+                            <xf:bind id="destination-bind" ref="@destination" name="destination" calculate="$source"/>
                         </xf:bind>
                     </xf:model>
                 </xh:head>
@@ -5599,37 +5599,6 @@
                                     </analysis>
                                 </binding>
                             </bind>
-                            <bind id="destination-bind" ref="@destination">
-                                <binding>
-                                    <analysis expression="@destination" analyzed="true">
-                                        <returnable>
-                                            <path>instance('instance')/@destination</path>
-                                        </returnable>
-                                        <dependent-models>
-                                            <model>model</model>
-                                        </dependent-models>
-                                        <dependent-instances>
-                                            <instance>instance</instance>
-                                        </dependent-instances>
-                                        <returnable-instances>
-                                            <instance>instance</instance>
-                                        </returnable-instances>
-                                    </analysis>
-                                </binding>
-                                <mip name="calculate" expression="$source">
-                                    <analysis expression="xs:string(($source)[1])" analyzed="true">
-                                        <value-dependent>
-                                            <path>instance('instance')/@source</path>
-                                        </value-dependent>
-                                        <dependent-models>
-                                            <model>model</model>
-                                        </dependent-models>
-                                        <dependent-instances>
-                                            <instance>instance</instance>
-                                        </dependent-instances>
-                                    </analysis>
-                                </mip>
-                            </bind>
                             <bind id="readonly-bind" ref="@readonly">
                                 <binding>
                                     <analysis expression="@readonly" analyzed="true">
@@ -5652,6 +5621,37 @@
                                         <value-dependent>
                                             <path>instance('instance')</path>
                                             <path>instance('instance')/@destination</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
+                            </bind>
+                            <bind id="destination-bind" ref="@destination">
+                                <binding>
+                                    <analysis expression="@destination" analyzed="true">
+                                        <returnable>
+                                            <path>instance('instance')/@destination</path>
+                                        </returnable>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>instance</instance>
+                                        </dependent-instances>
+                                        <returnable-instances>
+                                            <instance>instance</instance>
+                                        </returnable-instances>
+                                    </analysis>
+                                </binding>
+                                <mip name="calculate" expression="$source">
+                                    <analysis expression="xs:string(($source)[1])" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('instance')/@source</path>
                                         </value-dependent>
                                         <dependent-models>
                                             <model>model</model>

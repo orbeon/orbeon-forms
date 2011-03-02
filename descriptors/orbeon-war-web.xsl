@@ -221,7 +221,6 @@
                     <param-name>oxf.error-processor.input.config</param-name>
                     <param-value>oxf:/config/error.xpl</param-value>
                 </init-param>
-                <load-on-startup>1</load-on-startup>
             </servlet>
 
             <servlet-mapping>
@@ -280,7 +279,6 @@
                         </init-param>
                     </xsl:with-param>
                 </xsl:call-template>
-                <load-on-startup>1</load-on-startup>
             </servlet>
 
             <xsl:comment>This is the XForms Server servlet</xsl:comment>
@@ -305,7 +303,6 @@
                     <param-name>oxf.error-processor.input.config</param-name>
                     <param-value>oxf:/ops/xforms/xforms-server-error.xpl</param-value>
                 </init-param>
-                <load-on-startup>1</load-on-startup>
             </servlet>
 
             <xsl:comment>This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR</xsl:comment>
@@ -335,7 +332,6 @@
             <servlet>
                 <servlet-name>display-chart-servlet</servlet-name>
                 <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
-                <load-on-startup>2</load-on-startup>
             </servlet>
 
             <servlet>
@@ -358,7 +354,6 @@
                     <param-name>start</param-name>
                     <param-value>true</param-value>
                 </init-param>
-                <load-on-startup>2</load-on-startup>
             </servlet>
 
             <servlet>
@@ -390,7 +385,6 @@
                             <param-name>hsqldb.server.database</param-name>
                             <param-value>orbeondb</param-value>
                         </init-param>
-                        <load-on-startup>4</load-on-startup>
                     </servlet>
                 </xsl:with-param>
             </xsl:call-template>

@@ -124,10 +124,6 @@
             <fr:autocomplete ref="instance('selected-countries')/static" id="static-autocomplete"
                              dynamic-itemset="false" max-results-displayed="4" show-full-itemset-dropdown="true" tabindex="1">
                 <xforms:label>Country code: </xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
                 <xforms:itemset nodeset="instance('all-countries')/country">
                     <xforms:label ref="name"/>
                     <xforms:value ref="us-code"/>

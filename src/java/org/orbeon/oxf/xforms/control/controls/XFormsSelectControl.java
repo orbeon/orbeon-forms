@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -24,7 +25,6 @@ import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
 
@@ -106,7 +106,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             }
 
             // Create resulting string
-            final FastStringBuffer sb = new FastStringBuffer(controlValue.length() + value.length() * 2);
+            final StringBuilder sb = new StringBuilder(controlValue.length() + value.length() * 2);
             int index = 0;
             for (Iterator<String> i = instanceValues.iterator(); i.hasNext(); index++) {
                 final String currentKey = i.next();
@@ -121,6 +121,19 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         // then we do NOT store the value in instance.
         // NOTE: At the moment we don't support open selection here anyway
         super.storeExternalValue(propertyContext, newValue, type);
+    }
+
+    @Override
+    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+
+        // Default implementation
+        super.markDirtyImpl(xpathDependencies);
+
+        if (!isExternalValueDirty() && xpathDependencies.requireItemsetUpdate(getPrefixedId())) {
+            // If the itemset has changed but the value has not changed, the external value might still need to be
+            // re-evaluated.
+            markExternalValueDirty();
+        }
     }
 
     @Override
@@ -140,7 +153,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                 final Set<String> instanceValues = tokenize(propertyContext, internalValue, false);
 
                 // Actual value to return is the intersection of values in the instance and values in the itemset
-                final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
+                final StringBuilder sb = new StringBuilder(internalValue.length());
                 int index = 0;
                 for (Item currentItem: itemset.toList()) {
                     final String currentValue = currentItem.getValue();

@@ -28,7 +28,10 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base class for all controls that hold a value.
@@ -56,9 +59,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         value = null;
         previousValue = null;
 
-        isExternalValueEvaluated = false;
-        externalValue = null;
-
+        markExternalValueDirty();
     }
 
     @Override
@@ -93,8 +94,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
             value = null;
 
-            isExternalValueEvaluated = false;
-            externalValue = null;
+            // Always mark the external value dirty if the value is dirty
+            markExternalValueDirty();
         }
     }
 
@@ -105,6 +106,15 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     protected void evaluateExternalValue(PropertyContext propertyContext) {
         // By default, same as value
         setExternalValue(getValue(propertyContext));
+    }
+
+    protected void markExternalValueDirty() {
+        isExternalValueEvaluated = false;
+        externalValue = null;
+    }
+
+    protected boolean isExternalValueDirty() {
+        return !isExternalValueEvaluated;
     }
 
     @Override

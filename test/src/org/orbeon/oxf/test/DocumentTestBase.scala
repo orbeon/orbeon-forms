@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.junit.After
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent
 import org.orbeon.oxf.xforms.control._
+import controls.XFormsSelect1Control
 import org.dom4j.{Element, Document => JDocument}
 import xml.{XML, Elem}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
@@ -70,11 +71,17 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def setControlValueWithEvent(controlId: String, value: String): Unit =
         ClientEvents.processEvent(pipelineContext, document, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
 
+    def getControlExternalValue(controlId: String) =
+        getObject(controlId).asInstanceOf[XFormsValueControl].getExternalValue(pipelineContext)
+
     def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
     def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
     def isValid(controlId: String) = getSingleNodeControl(controlId).isValid
     def getType(controlId: String) = getSingleNodeControl(controlId).getType
+
+    def getItemset(controlId: String) =
+        getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset(pipelineContext).getJSONTreeInfo(pipelineContext, null, false, null)
 
     // Automatically convert between Scala Elem andDom4j Document/Element
     implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)

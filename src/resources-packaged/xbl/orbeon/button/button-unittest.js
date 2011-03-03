@@ -42,6 +42,10 @@
                             buttonId + ": disabled attribute is not in the expected state");
                     }
                 }, this);
+                if (relevant)
+                    YUA.areEqual(false,
+                        this.isButtonYuiDisabled("my-button-in-group"),
+                        "my-button-in-group: should never be disabled if relevant");
             };
         },
 
@@ -79,7 +83,21 @@
         testInitAfterFullUpdate: function() {
             OUT.executeSequenceCausingAjaxRequest(this, [
                 [ this.toggleReadonly, this.checkButtonState(true, true) ],
-                [ this.triggerFullUpdate, this.checkButtonState(true, true) ]
+                [ this.triggerFullUpdate, this.checkButtonState(true, true) ],
+                [ this.toggleReadonly, this.checkButtonState(false, true) ]
+            ]);
+        },
+
+        /**
+         * [ #315870 ] fr:button: if a readonly group, when becomes non-relevant, and relevant again, button shows readonly
+         * http://forge.ow2.org/tracker/index.php?func=detail&aid=315870&group_id=168&atid=350207
+         */
+        testGroupReadonly: function() {
+            OUT.executeSequenceCausingAjaxRequest(this, [
+                [ this.toggleReadonly, this.checkButtonState(true, true) ],
+                [ this.toggleRelevant, this.checkButtonState(true, false) ],
+                [ this.toggleRelevant, this.checkButtonState(true, true) ],
+                [ this.toggleReadonly, this.checkButtonState(false, true) ]
             ]);
         },
 

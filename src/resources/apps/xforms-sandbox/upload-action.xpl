@@ -42,7 +42,7 @@
                 <url>
                     <!-- Also check that the URL supplied as a parameter starts with http:// for security reasons -->
                     <xsl:value-of select="if ($instance/form) then $instance/form/file[1]
-                        else if (starts-with($url-parameter, 'http://')) then $url-parameter
+                        else if (tokenize($url-parameter, ':')[1] = ('http', 'https')) then $url-parameter
                         else ()"/>
                 </url>
                 <content-type>application/xml</content-type>

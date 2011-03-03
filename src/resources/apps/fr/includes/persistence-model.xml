@@ -603,9 +603,10 @@
     <xxforms:variable name="workflow-success-method" as="xs:string"
         select="lower-case(xxforms:property(string-join(('oxf.fr.detail.send.success.method', $app, $form), '.')))"/>
 
+    <!-- NOTE: keep non-relevant fields for now, as this is what's done for save/update. Should probably be configurable by the form author. -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{$workflow-success-uri}"
-        method="{$workflow-success-method}"
+        relevant="false" method="{$workflow-success-method}"
         serialization="{if ($workflow-success-method = 'get') then 'none' else 'application/xml'}"
         ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
@@ -618,7 +619,7 @@
 
     <xforms:submission id="fr-workflow-error-submission"
         resource="{$workflow-error-uri}"
-        method="{$workflow-error-method}"
+        relevant="false" method="{$workflow-error-method}"
         serialization="{if ($workflow-error-method = 'get') then 'none' else 'application/xml'}"
         ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
@@ -626,12 +627,12 @@
     <!-- Call email service -->
     <xforms:submission id="fr-email-service-submission"
         resource="/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
+        relevant="false" method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
 
     <!-- Call PDF service -->
     <xforms:submission id="fr-pdf-service-submission"
         resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')"
+        relevant="false" method="post" ref="xxforms:instance('fr-form-instance')"
         replace="instance" instance="fr-workflow-confirmation-instance"/>
 
     <xforms:instance id="fr-workflow-confirmation-instance">

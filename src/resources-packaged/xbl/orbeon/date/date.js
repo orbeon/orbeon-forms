@@ -30,7 +30,7 @@ YAHOO.xbl.fr.Date.prototype = {
         this.pagedateElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-pagedate", null, this.container)[0];
 
         // Create YUI calendar
-        var hasTwoMonths = ORBEON.util.Utils.getProperty(DATE_PICKER_TWO_MONTHS_PROPERTY);
+        var hasTwoMonths = ORBEON.util.Properties.datePickerTwoMonths.get();
         yuiCalendar = hasTwoMonths
             ? new YAHOO.widget.CalendarGroup(calendarDivElement)
             : new YAHOO.widget.Calendar(calendarDivElement);

@@ -23,6 +23,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:template match="fr:refresh-button">
@@ -108,17 +109,34 @@
         </fr:button>
     </xsl:template>
 
+    <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
     <xsl:template match="fr:pdf-button">
         <!-- TODO: bind to strict-submit, but maybe fr-pdf-submission should check validity instead -->
-        <fr:button id="fr-pdf-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-            </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:send submission="fr-pdf-submission"/>
-            </xforms:action>
-        </fr:button>
+        <xforms:group id="fr-pdf-button-group">
+
+            <!-- Create the link so that the URL gets rewritten -->
+            <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
+            <xhtml:a style="display:none" class="fr-pdf-anchor" target="_blank" f:url-type="resource"
+                     href="/fr/service/{$app}/{$form}/pdf/{{xxforms:instance('fr-parameters-instance')/document}}/{{xxforms:document-id()}}.pdf"/>
+
+            <!-- In script mode, intercept client-side click and open window directly -->
+            <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
+                var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
+                YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
+                    var a = YAHOO.util.Dom.getElementsByClassName("fr-pdf-anchor", null, group)[0];
+                    window.open(a.href, a.target)
+                }, this);
+            </xxforms:script>
+
+            <fr:button id="fr-pdf-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
+                <xforms:label>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
+                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+                </xforms:label>
+                <!-- Only call submission directly in noscript mode -->
+                <xforms:dispatch ev:event="DOMActivate" if="property('xxforms:noscript')" name="fr-open-pdf" targetid="fr-navigation-model"/>
+            </fr:button>
+        </xforms:group>
     </xsl:template>
 
     <xsl:template match="fr:save-button">

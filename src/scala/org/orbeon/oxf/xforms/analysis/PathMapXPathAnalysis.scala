@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.util.{PropertyContext, XPathCache}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
-import java.util.{Map => JMap, HashMap => JHashMap}
+import java.util.{Map => JMap}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import collection.mutable.{LinkedHashSet, Stack}
 import org.orbeon.oxf.xforms.{MapSet, XFormsConstants, XFormsContainingDocument, XFormsStaticState}
@@ -31,6 +31,7 @@ import org.orbeon.saxon.expr.PathMap.{PathMapNode, PathMapArc}
 import xml._
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.saxon.Configuration
+import scala.collection.JavaConversions._
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -103,7 +104,7 @@ object PathMapXPathAnalysis {
      * Create a new XPathAnalysis based on an initial XPath expression.
      */
     def apply(staticState: XFormsStaticState, xpathString: String, namespaceMapping: NamespaceMapping,
-              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableAnalysisTrait],
+              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
               pathMapContext: AnyRef, scope: XBLBindings#Scope, defaultInstancePrefixedId: Option[String],
               locationData: LocationData, element: Element): XPathAnalysis = {
 
@@ -114,15 +115,16 @@ object PathMapXPathAnalysis {
             val stringPathmap = new PathMap(new StringLiteral(""))
 
             // In-scope variables
-            val variablePathMaps = new JHashMap[String, PathMap]
-            for ((name, variableControl) <- inScopeVariables; valueAnalysis = variableControl.getValueAnalysis; if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies)
-                variablePathMaps.put(name, valueAnalysis match {
+            val variablePathMaps: JMap[String, PathMap] =
+                for {
+                    (name, variable) <- inScopeVariables
+                    valueAnalysis = variable.variableAnalysis
+                    if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies
+                } yield (name, valueAnalysis match {
                     // Valid PathMap
-                    case Some(analysis: PathMapXPathAnalysis) if analysis.figuredOutDependencies => analysis.pathmap.get
+                    case Some(analysis: PathMapXPathAnalysis) => analysis.pathmap.get
                     // Constant string
-                    case Some(analysis) if analysis.figuredOutDependencies => stringPathmap
-                    // Can't handle the other cases
-                    case _ => null
+                    case _ => stringPathmap
                 })
 
             def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
@@ -304,13 +306,13 @@ object PathMapXPathAnalysis {
                                     originalInstanceId
                                 else if (searchAncestors)
                                     // xxf:instance()
-                                    staticState.findInstancePrefixedId(scope, originalInstanceId)
+                                    staticState.findInstancePrefixedId(scope, originalInstanceId) // can return null
                                 else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
                                     // HACK: datatable e.g. uses instance(prefixedId)!
-                                    originalInstanceId
+                                    originalInstanceId // TODO: warn: could be a non-existing instance id
                                 else
                                     // Normal use of instance()
-                                    scope.getPrefixedIdForStaticId(originalInstanceId)
+                                    scope.getPrefixedIdForStaticId(originalInstanceId) // TODO: warn: could be a non-existing instance id
 
                             if (prefixedInstanceId ne null) {
                                 // Instance found
@@ -405,47 +407,47 @@ object PathMapXPathAnalysis {
 
                 // TODO: handle ANCESTOR_OR_SELF axis
                 if (stack.nonEmpty) // all tests below assume at least a parent
-                    step.getAxis match {
-                        case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 =>
-                            // Found ancestor::foobar
-                            val nodeName = step.getNodeTest.getFingerprint
-                            val ancestorArcs = ancestorsWithFingerprint(nodeName)
-                            if (ancestorArcs.nonEmpty) {
-                                // There can be more than one ancestor with that fingerprint
-                                for (ancestorArc <- ancestorArcs)
-                                    moveArc(newNodeArc, ancestorArc.getTarget)
-                                return true
-                            } else {
-                                // E.g.: /a/b/ancestor::c
-                                // TODO
-                            }
-                        case Axis.PARENT => // don't test fingerprint as we could handle /a/*/..
-                            // Parent axis
+                step.getAxis match {
+                    case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 =>
+                        // Found ancestor::foobar
+                        val nodeName = step.getNodeTest.getFingerprint
+                        val ancestorArcs = ancestorsWithFingerprint(nodeName)
+                        if (ancestorArcs.nonEmpty) {
+                            // There can be more than one ancestor with that fingerprint
+                            for (ancestorArc <- ancestorArcs)
+                                moveArc(newNodeArc, ancestorArc.getTarget)
+                            return true
+                        } else {
+                            // E.g.: /a/b/ancestor::c
+                            // TODO
+                        }
+                    case Axis.PARENT => // don't test fingerprint as we could handle /a/*/..
+                        // Parent axis
                             if (stack.size >= 1) {
-                                val parentNodeArc = stack.top
-                                moveArc(newNodeArc, parentNodeArc.node)
-                                return true
-                            } else {
-                                // TODO: is this possible?
-                            }
-                        case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING =>
-                            // Simplify preceding-sibling::foobar / following-sibling::foobar
                             val parentNodeArc = stack.top
+                            moveArc(newNodeArc, parentNodeArc.node)
+                            return true
+                        } else {
+                            // TODO: is this possible?
+                        }
+                    case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING =>
+                        // Simplify preceding-sibling::foobar / following-sibling::foobar
+                        val parentNodeArc = stack.top
                             if (stack.size > 2) {
-                                val grandparentNodeArc = stack.tail.head
+                            val grandparentNodeArc = stack.tail.head
 
-                                val newStep = new AxisExpression(parentNodeArc.arc.getStep.getAxis, step.getNodeTest)
-                                newStep.setContainer(step.getContainer)
-                                grandparentNodeArc.node.createArc(newStep, arc.getTarget)
-                                node.removeArc(arc)
-                            } else {
-                                val newStep = new AxisExpression(Axis.CHILD, step.getNodeTest)
-                                newStep.setContainer(step.getContainer)
-                                parentNodeArc.node.createArc(newStep, arc.getTarget)
-                                node.removeArc(arc)
-                            }
-                        case _ => // NOP
-                    }
+                            val newStep = new AxisExpression(parentNodeArc.arc.getStep.getAxis, step.getNodeTest)
+                            newStep.setContainer(step.getContainer)
+                            grandparentNodeArc.node.createArc(newStep, arc.getTarget)
+                            node.removeArc(arc)
+                        } else {
+                            val newStep = new AxisExpression(Axis.CHILD, step.getNodeTest)
+                            newStep.setContainer(step.getContainer)
+                            parentNodeArc.node.createArc(newStep, arc.getTarget)
+                            node.removeArc(arc)
+                        }
+                    case _ => // NOP
+                }
 
                 stack.push(newNodeArc)
                 if (reduceAncestorAxis(arc.getTarget))

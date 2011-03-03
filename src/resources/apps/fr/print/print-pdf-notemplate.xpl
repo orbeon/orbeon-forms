@@ -56,7 +56,14 @@
                     <xsl:attribute name="id" select="substring-after(., doc('input:request')/*/container-namespace)"/>
                 </xsl:template>
                 <!-- While we are at it filter out scripts as they won't be used -->
-                <xsl:template match="*:script"/>
+                <xsl:template match="*:script | *:noscript"/>
+                <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
+                <xsl:template match="*:form">
+                    <xsl:copy>
+                        <xsl:attribute name="class" select="string-join(tokenize(@class, '\s+')[. != 'xforms-initially-hidden'], ' ')"/>
+                        <xsl:apply-templates select="@* except @class | node()"/>
+                    </xsl:copy>
+                </xsl:template>
                 <!-- Remove all prefixes because Flying Saucer doesn't like them -->
                 <xsl:template match="*">
                     <xsl:element name="{local-name()}">

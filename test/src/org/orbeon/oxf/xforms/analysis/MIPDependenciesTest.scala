@@ -18,12 +18,6 @@ import org.junit._
 import org.scalatest.junit._
 import org.orbeon.oxf.test.DocumentTestBase
 
-//import runner.RunWith
-//import org.scalatest.{BeforeAndAfterEach, FlatSpec}
-
-
-//@RunWith(classOf[JUnitRunner])
-//class MIPDependenciesTest extends ResourceManagerTestBase with FlatSpec with AssertionsForJUnit with BeforeAndAfterEach {
 class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
     @Before def setupDocument(): Unit = setupDocument("oxf:/org/orbeon/oxf/xforms/analysis/mips.xhtml")
@@ -174,21 +168,6 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
             assert(isRequired("input") === required)
         }
     }
-
-// Experiment with BDD style
-//    "The first name control" must "be valid" in {
-//       assert(isValid("name·1"))
-//    }
-//
-//    it must "be invalid when set to a non-empty, blank string" in {
-//        setControlValue("name·1", "    ") // series of spaces
-//        assert(!isValid("name·1"))
-//    }
-//
-//    it must "be valid again when set to a positive integer" in {
-//        setControlValue("name·1", "100")
-//        assert(isValid("name·1"))
-//    }
 
     // TODO: more tests
 }

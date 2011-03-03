@@ -69,63 +69,7 @@
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
-            <![CDATA[
-                var TestManager = YAHOO.tool.TestManager;
-
-                // Test pages to run
-                TestManager.setPages([
-                    "test-underscore",
-                    "test-message",
-                    "test-orbeon-dom",
-                    "test-xforms-controls",
-                    "test-control-xhtml-area",
-                    "test-deferred-client-events",
-                    "test-trigger-modal",
-                    "test-upload-replace-instance",
-                    "test-setbasepaths",
-                    "test-output-update",
-                    "test-custom-mips",
-                    "test-repeat",
-                    "test-error-ajax",
-                    "test-bug-checkbox-update",
-                    "test-do-update",
-                    "test-loading-indicator",
-                    "test-disabled-nested",
-                    "test-bug-checkbox-update",
-                    "test-repeat-setvalue",
-                    "xbl/orbeon/accordion/accordion-unittest",
-                    "xbl/orbeon/datatable/datatable-unittest",
-                    "xbl/orbeon/datatable/datatable-structure-unittest",
-                    "xbl/orbeon/datatable/datatable-dynamic-unittest",
-                    "xbl/orbeon/autocomplete/autocomplete-unittest",
-                    "xbl/orbeon/currency/currency-unittest",
-                    "xbl/orbeon/button/button-unittest"
-                ]);
-
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-
-                    // Test page stars:
-                    TestManager.subscribe(TestManager.TEST_PAGE_BEGIN_EVENT, function(data) {
-                        ORBEON.xforms.Document.setValue("page", data);
-                    });
-
-                    // Test page completed: update instance with results from this page
-                    TestManager.subscribe(TestManager.TEST_PAGE_COMPLETE_EVENT, function(data) {
-                        ORBEON.xforms.Document.setValue("report-text", YAHOO.tool.TestFormat.XML(data.results));
-                        ORBEON.xforms.Document.setValue("page", data.page);
-                        ORBEON.xforms.Document.dispatchEvent("main-model", "page-complete");
-                    });
-
-                    // Set "in progress" to false when all the test ran
-                    TestManager.subscribe(TestManager.TEST_MANAGER_COMPLETE_EVENT, function(data) {
-                        ORBEON.xforms.Document.setValue("in-progress", "false");
-                    });
-
-                    TestManager.start();
-                });
-            ]]>
-        </xhtml:script>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/unit-tests.js"/>
         <xhtml:style type="text/css">
             .progress { margin-bottom: 2em; }
             .progress img { vertical-align: middle; padding-bottom: 1em; }

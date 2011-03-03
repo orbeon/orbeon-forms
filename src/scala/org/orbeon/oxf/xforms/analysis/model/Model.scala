@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
 import org.orbeon.oxf.util.PropertyContext
-import java.util.{Map => JMap, HashMap => JHashMap, LinkedHashMap => JLinkedHashMap, Set => JSet, List => JList }
+import java.util.{Map => JMap, LinkedHashMap => JLinkedHashMap, Set => JSet, List => JList }
 import org.orbeon.oxf.xforms._
 
 
@@ -48,12 +48,12 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     override def getChildrenContext = defaultInstancePrefixedId match {
         case Some(defaultInstancePrefixedId) => // instance('defaultInstanceId')
             Some(PathMapXPathAnalysis(staticStateContext.staticState, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
-                null, None, Map.empty[String, VariableAnalysisTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element))
+                null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element))
         case None => None // no instance
     }
 
     // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
-    val inScopeVariables = Map.empty[String, VariableAnalysisTrait]
+    val inScopeVariables = Map.empty[String, VariableTrait]
 
     // Instance objects
     val instances = LinkedHashMap((
@@ -94,8 +94,8 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         }
     }
 
-    val variablesMap: Map[String, VariableAnalysisTrait] = Map(variablesSeq map (variable => (variable.name -> variable)): _*)
-    val jVariablesMap: JMap[String, VariableAnalysisTrait] = variablesMap
+    val variablesMap: Map[String, VariableTrait] = Map(variablesSeq map (variable => (variable.name -> variable)): _*)
+    val jVariablesMap: JMap[String, VariableTrait] = variablesMap
 
     // Handle binds
     val bindIds = new LinkedHashSet[String]
@@ -108,6 +108,10 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     // All binds by static id
     val bindsById = new JLinkedHashMap[String, Bind]// JAVA COLLECTION
 
+    // Binds by name (for binds with a name)
+    val bindsByName = new LinkedHashMap[String, Bind]
+    val jBindsByName: JMap[String, Bind] = bindsByName
+
     var hasInitialValueBind = false
     var hasCalculateBind = false
     var hasTypeBind = false
@@ -116,9 +120,6 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
     var hasCalculateComputedCustomBind = false // default
     var hasValidateBind = false // default
-
-    // Bind name -> id mapping
-    val bindNamesToIds: JMap[String, String] = new JHashMap[String, String]
 
     // Top-level binds and create static binds hierarchy
     val topLevelBinds: Seq[Bind] = {
@@ -129,6 +130,14 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     }
 
     val topLevelBindsJava: JList[Bind] = topLevelBinds
+
+    // In-scope variable on binds include variables implicitly declared with bind/@name
+    lazy val bindsVariablesSeq = variablesMap ++ (bindsByName map (e => (e._1 -> new BindAsVariable(e._2))))
+
+    class BindAsVariable(bind: Bind) extends VariableTrait {
+        def name = bind.name
+        def variableAnalysis = bind.getBindingAnalysis
+    }
 
     var figuredAllBindRefAnalysis = !hasBinds // default value sets to true if no binds
     
@@ -149,9 +158,11 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
         }
 
+        // Represent an XPath MIP
         class XPathMIP(name: String, val expression: String) extends MIP(name) {
 
-            var analysis: XPathAnalysis = NegativeAnalysis(expression) // default to negative, analyzeXPath() can change that
+            // Default to negative, analyzeXPath() can change that
+            var analysis: XPathAnalysis = NegativeAnalysis(expression)
 
             def analyzeXPath() {
 
@@ -159,13 +170,14 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                     if (Model.BOOLEAN_XPATH_MIP_NAMES.contains(name)) "xs:boolean((" + expression + ")[1])" else "xs:string((" + expression + ")[1])"
 
                 // Analyze and remember if figured out
-                Bind.this.analyzeXPath(getChildrenContext, booleanOrStringExpression) match {
+                Bind.this.analyzeXPath(getChildrenContext, bindsVariablesSeq, booleanOrStringExpression) match {
                     case valueAnalysis if valueAnalysis.figuredOutDependencies => this.analysis = valueAnalysis
                     case _ => // NOP
                 }
             }
         }
 
+        // The type MIP is not an XPath expression
         class TypeMIP(name: String, val datatype: String) extends MIP(name)
 
         // Globally remember binds ids
@@ -175,7 +187,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         // Remember variables mappings
         val name = element.attributeValue(XFormsConstants.NAME_QNAME)
         if (name != null)
-            bindNamesToIds.put(name, staticId)
+            bindsByName.put(name, Bind.this)
 
         // Built-in XPath MIPs
         val mipNameToXPathMIP =
@@ -257,38 +269,59 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         }
 
         // Return true if analysis succeeded
-        def analyzeXPathGather(): Boolean = {
+        def analyzeXPathGather: Boolean = {
 
             // Analyze context/binding
             analyzeXPath()
 
-            // Match on whether we have a @ref or not
+            // If successful, gather derived information
+            val refSucceeded =
+                ref match {
+                    case Some(_) =>
+                        getBindingAnalysis match {
+                            case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
+                                // There is a binding and analysis succeeded
+
+                                // Remember dependent instances
+                                val returnableInstances = bindingAnalysis.returnableInstances
+                                bindInstances.addAll(returnableInstances)
+
+                                if (hasCalculateComputedMIPs || hasCustomMIPs)
+                                    computedBindExpressionsInstances.addAll(returnableInstances)
+
+                                if (hasValidateMIPs)
+                                    validationBindInstances.addAll(returnableInstances)
+
+                                true
+
+                            case _ =>
+                                // Analysis failed
+                                false
+                        }
+
+                    case None =>
+                        // No binding, consider a success
+                        true
+                }
+
+            // Analyze children
+            val childrenSucceeded = (children map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+
+            // Result
+            refSucceeded && childrenSucceeded
+        }
+
+        def analyzeMIPs {
+            // Analyze local MIPs if there is a @ref
             ref match {
-                case Some(refValue) =>
-                    getBindingAnalysis match {
-                        case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
-                            // There is a binding and analysis succeeded
-
-                            // Remember dependent instances
-                            val returnableInstances = bindingAnalysis.returnableInstances
-                            bindInstances.addAll(returnableInstances)
-                            if (hasCalculateComputedMIPs || hasCustomMIPs)
-                                computedBindExpressionsInstances.addAll(returnableInstances)
-
-                            if (hasValidateMIPs)
-                                validationBindInstances.addAll(returnableInstances)
-
-                        case _ => // analysis failed
-                    }
-
-                    // MIP analysis
+                case Some(_) =>
                     for (mip <- allMIPNameToXPathMIP.values)
                         mip.analyzeXPath()
-                case None => // No binding so don't look at MIPs
+                case None =>
             }
 
-            // Analyze children and compute result
-            children.isEmpty || ((children map (_.analyzeXPathGather())) reduceLeft (_ && _))
+            // Analyze children
+            children foreach (_.analyzeMIPs)
         }
 
         override def freeTransientState() {
@@ -330,8 +363,12 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         for (variable <- variablesSeq)
             variable.analyzeXPath()
         
-        // Binds: analyze all binds and return whether all of them were successfully analyzed
-        figuredAllBindRefAnalysis = topLevelBinds.isEmpty || ((topLevelBinds map (_.analyzeXPathGather())) reduceLeft (_ && _))
+        // Analyze all binds and return whether all of them were successfully analyzed
+        figuredAllBindRefAnalysis = (topLevelBinds map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+
+        // Analyze all MIPs
+        // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first
+        topLevelBinds foreach (_.analyzeMIPs)
 
         if (!figuredAllBindRefAnalysis) {
             bindInstances.clear()

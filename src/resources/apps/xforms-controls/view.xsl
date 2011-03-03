@@ -246,7 +246,8 @@
                         <!-- NOTE: We can't use AVTs to implement this because we are changing an element id -->
                         <xxforms:script ev:event="xforms-value-changed">
                             var container = YAHOO.util.Dom.getAncestorByClassName(this, "fr-doc");
-                            container.id = ORBEON.xforms.Document.getValue('page-size');
+                            var formID = ORBEON.xforms.Controls.getForm(this).id;
+                            container.id = ORBEON.xforms.Document.getValue(ORBEON.xforms.Globals.ns[formID] + 'page-size');
                         </xxforms:script>
                     </fr:link-select1>
                     <xforms:output id="page-size" ref="instance('fr-settings-instance')/page-size" style="display: none"/>

@@ -274,7 +274,7 @@
     <!-- Submission to test the form -->
     <xforms:submission id="fb-test-form-submission"
             ref="instance('fr-form-to-test-instance')" method="post" replace="all"
-            resource="/fr/orbeon/builder/test/" xxforms:target="fb-test-iframe" xxforms:show-progress="false">
+            resource="/fr/orbeon/builder/test" xxforms:target="fb-test-iframe" xxforms:show-progress="false">
             <!-- TODO: Will want to change target to: fb-test-iframe -->
 
         <!-- Prepare submission -->

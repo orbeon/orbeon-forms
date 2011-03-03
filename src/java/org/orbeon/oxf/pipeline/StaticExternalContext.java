@@ -114,4 +114,8 @@ public class StaticExternalContext {
     public static boolean isPE() {
         return Version.isPE();
     }
+
+    public static boolean isPortlet() {
+        return "portlet".equals(StaticExternalContext.getStaticContext().getExternalContext().getRequest().getContainerType());
+    }
 }

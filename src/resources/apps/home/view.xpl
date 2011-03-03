@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,11 +11,16 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <page path-info="/home/xforms" model="examples-xforms.xml" view="view.xpl"/>
-    <page path-info="*" model="examples-form-runner.xml" view="view.xpl"/>
+    <p:param name="data" type="input"/>
+    <p:param name="data" type="output"/>
 
-    <epilogue url="oxf:/config/epilogue.xpl"/>
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="config" href="view.xsl"/>
+        <p:input name="data" href="#data"/>
+        <p:output name="data" ref="data"/>
+    </p:processor>
 
-</config>
+</p:config>

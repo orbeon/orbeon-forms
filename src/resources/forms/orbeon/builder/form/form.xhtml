@@ -890,7 +890,9 @@
                                                                                     <xxforms:variable name="instance-holder" as="element()"
                                                                                                       select="if ($is-component)
                                                                                                               then $component-binding//xforms:instance[@id = 'fr-form-instance']/*/*[name() = $control-name]
-                                                                                                              else $section-holder/*[name() = $control-name]" />
+                                                                                                              else if ($is-repeat)
+                                                                                                              then $section-holder/*/*[name() = $control-name]
+                                                                                                              else $section-holder/*[name() = $control-name]"/>
                                                                                     <xxforms:variable name="resource-holder" as="element()"
                                                                                                       select="if ($is-component)
                                                                                                               then $component-binding//xforms:instance[@id = 'fr-form-resources']/*/resource[1]/*[name() = $control-name]

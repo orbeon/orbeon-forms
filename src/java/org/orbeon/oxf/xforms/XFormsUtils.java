@@ -693,31 +693,26 @@ public class XFormsUtils {
      * @param containingDocument    current document
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
+     * @param skipRewrite           whether to skip the actual URL rewriting step
      * @return                      resolved URL
      */
-    public static String resolveRenderURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element currentElement, String url) {
+    public static String resolveRenderURL(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element currentElement, String url, boolean skipRewrite) {
         final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
-        final String resolvedURIString = resolvedURI.toString();
 
-        final String externalURL;
-        if (!containingDocument.isPortletContainer()) {
-            // XForms page was loaded from a servlet
-            externalURL = NetUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIString, null, null);
-        } else {
-            // XForms page was loaded from a portlet
-            if (resolvedURI.getFragment() != null) {
-                // Remove fragment if there is one, as it doesn't serve in a portlet
-                try {
-                    externalURL = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
-                } catch (URISyntaxException e) {
-                    throw new OXFException(e);
-                }
-            } else {
-                externalURL = resolvedURIString;
+        final String resolvedURIStringNoPortletFragment;
+        if (containingDocument.isPortletContainer() && resolvedURI.getFragment() != null) {
+            // XForms page was loaded from a portlet and there is a fragment, remove it
+            try {
+                resolvedURIStringNoPortletFragment = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
+            } catch (URISyntaxException e) {
+                throw new OXFException(e);
             }
+        } else {
+            resolvedURIStringNoPortletFragment = resolvedURI.toString();
         }
 
-        return externalURL;
+        return skipRewrite ? resolvedURIStringNoPortletFragment :
+                NetUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null);
     }
 
     /**
@@ -771,7 +766,7 @@ public class XFormsUtils {
         } else if ("href".equals(attributeName)) {
 
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
-            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, element, attributeValue);
+            rewrittenValue = resolveRenderURL(pipelineContext, containingDocument, element, attributeValue, false);
         } else {
             rewrittenValue = attributeValue;
         }

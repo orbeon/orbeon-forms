@@ -105,7 +105,9 @@ public class XFormsLoadAction extends XFormsAction {
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             } else {
                 // Load as render URL
-                externalURL = XFormsUtils.resolveRenderURL(propertyContext, containingDocument, currentElement, value);
+                // NOTE: Skip URL rewriting step in portlet mode, because this will trigger a two-pass load, and during
+                // the second pass we call sendRedirect(), which will actually rewrite the URL.
+                externalURL = XFormsUtils.resolveRenderURL(propertyContext, containingDocument, currentElement, value, containingDocument.isPortletContainer());
             }
         }
 

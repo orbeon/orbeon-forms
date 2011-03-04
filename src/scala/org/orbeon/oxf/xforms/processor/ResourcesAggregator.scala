@@ -26,6 +26,7 @@ import scala.collection.JavaConversions._
 import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
 import org.orbeon.oxf.xforms._
+import org.dom4j.QName
 
 /**
  * Aggregate CSS and JS resources under <head>.
@@ -83,10 +84,15 @@ class ResourcesAggregator extends ProcessorImpl {
                                 inHead = true
                             } else if (level == 3 && inHead) {
 
+                                implicit def attributesToSAXAttribute(attributes: Attributes) = new {
+                                    def getValue(qName: QName) = attributes.getValue(qName.getNamespaceURI, qName.getName)
+                                }
+
                                 lazy val href = attributes.getValue("href")
                                 lazy val src = attributes.getValue("src")
                                 lazy val resType = attributes.getValue("type")
                                 lazy val cssClasses = attributes.getValue("class")
+                                lazy val isNorewrite = attributes.getValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME) == "true"
 
 //                                lazy val rel: Set[String] = (Option(attributes.getValue("rel")) map (_.toLowerCase.split("""\s+""")) flatten) toSet
                                 lazy val rel = Option(attributes.getValue("rel")) getOrElse "" toLowerCase
@@ -94,13 +100,13 @@ class ResourcesAggregator extends ProcessorImpl {
                                 // Gather resources that match
                                 localname match {
                                     case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
-                                        if (isSeparatePath(href))
+                                        if (isSeparatePath(href) || isNorewrite)
                                             preservedCSS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineCSS else supplementalCSS) += href
                                         filter = true
                                     case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript")  =>
-                                        if (isSeparatePath(src))
+                                        if (isSeparatePath(src) || isNorewrite)
                                             preservedJS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineJS else supplementalJS) += src

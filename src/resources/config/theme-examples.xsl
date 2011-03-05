@@ -64,106 +64,105 @@
                 <!-- Copy body attributes -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>
 
-                <xhtml:table id="orbeon-main" width="100%" border="0" cellpadding="0" cellspacing="0">
-                    <!-- Banner (with search) -->
-                    <xhtml:tr>
-                        <xhtml:td colspan="2" id="orbeon-banner">
-                            <xhtml:div style="float: left">
-                                <xhtml:a href="/" f:url-norewrite="true">
-                                    <xhtml:img f:url-norewrite="false" width="212" height="42"
-                                               style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em"
-                                               src="/config/theme/images/orbeon-logo-trimmed-transparent-42.png" alt='home'/>
-                                </xhtml:a>
-                            </xhtml:div>
-                            <xhtml:span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
-                                <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0"
-                                      action="http://www.google.com/custom">
-                                    <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
-                                    |
-                                    <xhtml:a href="http://wiki.orbeon.com/forms/">Orbeon Wiki</xhtml:a>
-                                    |
-                                    <xhtml:a href="/doc/">Local Documentation</xhtml:a>
-                                    |
-                                    Demo Forms &amp; Apps
-                                    |
-                                    <xhtml:span style="white-space: nowrap">
-                                        Search:
-                                        <input type="text" name="q" size="10" maxlength="255" value=""/>
-                                        <input type="submit" name="sa" value="Go" style="margin-left: 0.2em;"/>
-                                    </xhtml:span>
-                                    <input type="hidden" name="cof"
-                                           value="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
-                                    <input type="hidden" name="sitesearch" value="orbeon.com"/>
-                                </form>
-                            </xhtml:span>
-                        </xhtml:td>
-                    </xhtml:tr>
+                <xhtml:div id="orbeon" class="orbeon">
+                    <!-- Banner -->
+                    <xhtml:div class="orbeon-banner">
+                        <xhtml:div style="float: left">
+                            <xhtml:a href="/" f:url-norewrite="true">
+                                <xhtml:img f:url-norewrite="false" width="212" height="42"
+                                           style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em"
+                                           src="/config/theme/images/orbeon-logo-trimmed-transparent-42.png" alt='home'/>
+                            </xhtml:a>
+                        </xhtml:div>
+                        <xhtml:span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
+                            <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0"
+                                  action="http://www.google.com/custom">
+                                <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
+                                |
+                                <xhtml:a href="http://wiki.orbeon.com/forms/">Orbeon Wiki</xhtml:a>
+                                |
+                                <xhtml:span style="white-space: nowrap">
+                                    Search:
+                                    <input type="text" name="q" size="10" maxlength="255" value=""/>
+                                    <input type="submit" name="sa" value="Go" style="margin-left: 0.2em;"/>
+                                </xhtml:span>
+                                <input type="hidden" name="cof"
+                                       value="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
+                                <input type="hidden" name="sitesearch" value="orbeon.com"/>
+                            </form>
+                        </xhtml:span>
+                    </xhtml:div>
                     <!-- Tabs -->
-                    <xhtml:tr>
-                        <xhtml:td colspan="2">
-                            <xhtml:div class="tabs">
-                                <xsl:choose>
-                                    <xsl:when test="not($is-form-runner-home)">
-                                        <xhtml:a class="tab" href="/home/">Form Builder &amp; Sample Forms</xhtml:a>
-                                        <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
-                                        <xhtml:span class="tab-selected">XForms Controls &amp; Demo Apps</xhtml:span>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
-                                        <xhtml:span class="tab-selected">Form Builder &amp; Sample Forms</xhtml:span>
-                                        <xhtml:a class="tab" href="/home/xforms">XForms Controls &amp; Demo Apps</xhtml:a>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xhtml:div>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xhtml:tr>
-                        <!--List of examples -->
-                        <xsl:if test="not($is-form-runner-home)">
-                            <xhtml:td id="orbeon-leftcontent" valign="top" width="1%">
-                                <h1>Orbeon Forms Apps</h1>
-                                <xhtml:ul class="tree-sections">
-                                    <xsl:for-each select="$applications/*/section">
-                                        <xhtml:li class="tree-section">
-                                            <xsl:value-of select="@label"/>
-                                        </xhtml:li>
-                                        <xhtml:ul class="tree-items">
-                                            <xsl:for-each select="application">
-                                                <xsl:variable name="selected" as="xs:boolean" select="@id = $current-application-id"/>
-                                                <xhtml:li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
-                                                    <xsl:choose>
-                                                        <xsl:when test="$selected">
-                                                            <xsl:value-of select="@label"/>
-                                                        </xsl:when>
-                                                        <xsl:otherwise>
-                                                            <xhtml:a href="/{@id}{if (tokenize(@id, '/')[1] != 'fr') then '/' else ''}">
+                    <xhtml:div class="orbeon-tabs">
+                        <xsl:choose>
+                            <xsl:when test="not($is-form-runner-home)">
+                                <xhtml:a class="tab" href="/home/">Form Builder &amp; Sample Forms</xhtml:a>
+                                <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
+                                <xhtml:span class="tab-selected">XForms Controls &amp; Demo Apps</xhtml:span>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
+                                <xhtml:span class="tab-selected">Form Builder &amp; Sample Forms</xhtml:span>
+                                <xhtml:a class="tab" href="/home/xforms">XForms Controls &amp; Demo Apps</xhtml:a>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xhtml:div>
+                    <xhtml:table class="orbeon-content">
+                        <xhtml:tr>
+                            <!--List of examples -->
+                            <xsl:if test="not($is-form-runner-home)">
+                                <xhtml:td class="orbeon-leftcontent">
+                                    <h1>Orbeon Forms Apps</h1>
+                                    <xhtml:ul class="tree-sections">
+                                        <xsl:for-each select="$applications/*/section">
+                                            <xhtml:li class="tree-section">
+                                                <xsl:value-of select="@label"/>
+                                            </xhtml:li>
+                                            <xhtml:ul class="tree-items">
+                                                <xsl:for-each select="application">
+                                                    <xsl:variable name="selected" as="xs:boolean" select="@id = $current-application-id"/>
+                                                    <xhtml:li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$selected">
                                                                 <xsl:value-of select="@label"/>
-                                                            </xhtml:a>
-                                                        </xsl:otherwise>
-                                                    </xsl:choose>
-                                                </xhtml:li>
-                                            </xsl:for-each>
-                                        </xhtml:ul>
-                                    </xsl:for-each>
-                                </xhtml:ul>
-                            </xhtml:td>
-                        </xsl:if>
-                        <xhtml:td id="orbeon-maincontent" valign="top" width="99%">
-                            <xhtml:div class="maincontent">
-                                <!-- Title -->
-                                <xhtml:h1>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <xhtml:a href="/{@id}{if (tokenize(@id, '/')[1] != 'fr') then '/' else ''}">
+                                                                    <xsl:value-of select="@label"/>
+                                                                </xhtml:a>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xhtml:li>
+                                                </xsl:for-each>
+                                            </xhtml:ul>
+                                        </xsl:for-each>
+                                    </xhtml:ul>
+                                </xhtml:td>
+                            </xsl:if>
+                            <xhtml:td class="orbeon-maincontent">
+                                <xhtml:div class="maincontent">
                                     <!-- Title -->
-                                    <xsl:value-of select="$title"/>
-                                </xhtml:h1>
-                                <!-- Body -->
-                                <xhtml:div id="orbeon-mainbody">
-                                    <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
+                                    <xhtml:h1>
+                                        <!-- Title -->
+                                        <xsl:value-of select="$title"/>
+                                    </xhtml:h1>
+                                    <!-- Source code if needed -->
+                                    <xsl:if test="normalize-space($current-application-id) and $current-application-id != 'home'">
+                                        <xhtml:div class="orbeon-source">
+                                            <a href="https://github.com/orbeon/orbeon-forms/tree/master/src/resources/apps/{$current-application-id}/" target="_blank">View the source code of this demo on</a>
+                                            <a href="https://github.com/orbeon/orbeon-forms/tree/master/src/resources/apps/{$current-application-id}/" target="_blank"><xhtml:img src="/config/theme/images/github.png" alt="github"/></a>
+                                        </xhtml:div>
+                                    </xsl:if>
+                                    <!-- Body -->
+                                    <xhtml:div class="orbeon-mainbody">
+                                        <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
+                                    </xhtml:div>
                                 </xhtml:div>
-                            </xhtml:div>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xhtml:table>
-                <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xhtml:table>
+                    <xhtml:p class="orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
+                </xhtml:div>
             </xhtml:body>
             <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
             <xsl:apply-templates select="/xhtml:html/xhtml:script"/>

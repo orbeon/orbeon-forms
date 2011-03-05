@@ -50,7 +50,7 @@
 .orbeon-error-panel a:hover { text-decoration: underline }
 .orbeon-error-panel img { border: 0 }
 .orbeon-error-disabled { display: none }
-.orbeon-error-panel .ops-version { text-align: center; font-size: smaller }
+.orbeon-error-panel .orbeon-version { text-align: center; font-size: smaller }
 .orbeon-error-panel-show-details, .orbeon-error-panel-hide-details { cursor: pointer; }
 
 /* XML formatter definitions */

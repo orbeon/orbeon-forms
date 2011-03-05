@@ -18,11 +18,11 @@ body, input, select, button, table {
     font-size: 9pt;
 }
 
-th {
+.orbeon th {
     color: #333333;
 }
 
-input[type = "submit"] {
+.orbeon input[type = "submit"] {
     font-size: 8pt;
 }
 
@@ -35,7 +35,7 @@ fieldset {
     border: #99c 1px solid;
 }
 
-.tt, textarea, code {
+.orbeon .tt, .orbeon textarea, .orbeon code {
     font-family: "Lucida Console", "Courier New", Courier, monospace;
     font-size: 12px;
 }
@@ -44,31 +44,42 @@ fieldset {
     margin-left: 1em;
 }
 
-#orbeon-main {
-    border-bottom:1px solid #336;
+#orbeon {
     min-width: 650px;
-    width: expression(650 > document.body.clientWidth ? '650px' : '100%' );
+    width: 100%
 }
 
-#orbeon-leftcontent {
+#orbeon .orbeon-content {
+    border: none;
+    border-bottom: 1px solid #336;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#orbeon .orbeon-leftcontent {
     border-left: 1px solid #336;
-    width:230px;
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
     margin:0;
-    padding-right: .5em;
+    padding: 0;
     line-height: 15pt;
     background-color: #dde;
+    vertical-align: top;
 }
 
-#orbeon-maincontent {
+#orbeon .orbeon-maincontent {
     margin:0;
+    padding: 0;
     background: white;
     border-left: 1px solid #99c;
     border-right: 1px solid #336;
     vertical-align: top;
-    width: 99%;
+    width: 100%;
+    vertical-align: top;
 }
 
-.cleaner {
+#orbeon .cleaner {
     clear:both;
     height:1px;
     font-size:1px;
@@ -77,19 +88,14 @@ fieldset {
     background:transparent;
 }
 
-#orbeon-banner {
+#orbeon .orbeon-banner {
     background:#fff;
     height:3em;
 }
 
-p,h1,pre {
+.orbeon p, .orbeon h1, .orbeon pre {
     margin-top: .71em;
     margin-bottom: .71em;
-}
-
-h1 {
-    font-size:14pt;
-    padding-top:.71em;
 }
 
 #orbeon-banner h1 {
@@ -98,7 +104,7 @@ h1 {
     margin:0em;
 }
 
-.tabs {
+#orbeon .orbeon-tabs {
     background-image:  url('images/tabbar-blue.png');
     background-repeat: repeat-x;
     height: 23px;
@@ -111,29 +117,7 @@ h1 {
     line-height: 13pt;
 }
 
-.subtabs {
-    background-color: #dde;
-    color: #336;
-    font-weight: bolder;
-    text-align: left;
-    padding: .2em .5em .2em .5em;
-    margin-top: 0;
-    margin-bottom: 2em;
-    margin-left: -.8em;
-    margin-right: -0.8em;
-    border-bottom: solid 1px #336;
-    font-size: 10pt;
-}
-
-.subtab {
-    margin: 0 0 0 0;
-    padding: 0 1em 0 1em;
-    height: 17px;
-    position: relative;
-    border-right: 1px solid white;
-}
-
-.tab {
+#orbeon .tab {
     color: #000;
     margin: 0 0 0 0;
     padding: 0 1em 0 1em;
@@ -143,17 +127,17 @@ h1 {
     border-right: 1px solid white;
 }
 
-.tab:first-child {
+#orbeon .tab:first-child {
     border-left: 1px solid white;
 }
 
-.tab:hover {
+#orbeon .tab:hover {
     color: #000;
     background-color: #669;
     text-decoration: none;
 }
 
-.tab-selected {
+#orbeon .tab-selected {
     position: relative;
     top: 3px;
     margin: 0 0 0 0;
@@ -163,7 +147,7 @@ h1 {
     background-color: #FFF;
 }
 
-.tab-selected-left {
+#orbeon .tab-selected-left {
     position: relative;
     top: 3px;
     margin: 0 0 0 0;
@@ -173,7 +157,7 @@ h1 {
     background-color: #FFF;
 }
 
-.left-link {
+#orbeon .left-link {
     color: #669;
     background-color: #FFF;
     font-weight: bold;
@@ -183,13 +167,13 @@ h1 {
     text-decoration: none;
 }
 
-.left-link:hover {
+#orbeon .left-link:hover {
     color: #000;
     background-color: #99c;
     text-decoration: none;
 }
 
-.left-link-selected {
+#orbeon .left-link-selected {
     color: #000;
     background-color: #99c;
     font-weight: bold;
@@ -204,11 +188,11 @@ a {
     text-decoration: none;
 }
 
-a:hover {
+.orbeon a:hover {
     text-decoration: underline;
 }
 
-#orbeon-leftcontent h1 {
+.orbeon .orbeon-leftcontent h1 {
     color: #000;
     font-weight: bolder;
     font-size: 14px;
@@ -220,7 +204,7 @@ a:hover {
     margin-bottom: 0;
 }
 
-.maincontent h1 {
+.orbeon .maincontent h1 {
     background-color: #dde;
     font-weight: bold;
     font-size: 14px;
@@ -235,7 +219,7 @@ a:hover {
     line-height: 180%;
 }
 
-.maincontent h2 {
+.orbeon .maincontent h2 {
     color: #336;
     background-color: #dde;
     font-size: 9pt;
@@ -250,57 +234,73 @@ a:hover {
     clear: right;
 }
 
-.maincontent h3 {
+.orbeon .maincontent h3 {
     color: #336;
     font-size: 10pt;
     font-weight: bold;
     clear: right;
 }
 
-.maincontent h4 {
+.orbeon .maincontent h4 {
     color: #336;
     font-size: 10pt;
     font-weight: bold;
 }
 
-.maincontent h5 {
+.orbeon .maincontent h5 {
     padding: 0.5em;
 }
 
-.maincontent b, .bold {
+#orbeon .maincontent .orbeon-source {
+    /*background-color: #dde;*/
+    font-size: 14px;
+    text-align: left;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-bottom: solid 1px #99c;
+    line-height: 180%;
+}
+
+#orbeon .maincontent .orbeon-source img { vertical-align: middle; margin-left: .5em; border: none }
+
+#orbeon .maincontent b, #orbeon .bold {
     color: #336;
 }
 
-.maincontent hr {
+.orbeon .maincontent hr {
     height: 0;
     border-top: solid gray 1px;
     border-bottom: 0;
 }
 
-#orbeon-mainbody {
+#orbeon .orbeon-mainbody {
     margin-top: 0.5em;
     margin-left: 0.5em;
     margin-right: 0.5em;
     padding: .5em;
 }
 
-.box {
+#orbeon .box {
      margin-left:3px;
 }
 
-.tree-sections {
+#orbeon .tree-sections {
     margin-left: 0;
     padding-left: 1em;
     list-style-type: none;
 }
 
-.tree-section {
+#orbeon .tree-section {
     padding-top: 1em;
     font-weight: bold;
     color: #333333;
 }
 
-.tree-section .tree-section {
+#orbeon .tree-section .tree-section {
     padding-top: 0;
     padding-left: 1em;
     font-weight: bold;
@@ -308,11 +308,11 @@ a:hover {
     color: #555555;
 }
 
-.tree-section:first-child {
+#orbeon .tree-section:first-child {
     padding-top: 0;
 }
 
-.tree-items, .tree-items-selected {
+#orbeon .tree-items, #orbeon .tree-items-selected {
     margin-left: 0;
     padding-left: 1em;
     list-style-type: none;
@@ -322,27 +322,27 @@ a:hover {
     white-space: nowrap;
 }
 
-.tree-items a {
+#orbeon .tree-items a {
     color: black;
     font-weight: normal;
 }
 
-.tree-items-selected {
+#orbeon .tree-items-selected {
     color: #669;
     font-weight: bold;
 }
 
-.tree-items a:hover {
+#orbeon .tree-items a:hover {
     color: black;
     text-decoration: underline;
 }
 
-.tree-items:hover {
+#orbeon .tree-items:hover {
     color: #669;
     text-decoration: none;
 }
 
-.minitoc ul {
+#orbeon .minitoc ul {
     list-style: none;
     margin-top: .5em;
     margin-bottom: .5em;
@@ -354,10 +354,10 @@ a:hover {
 .ops-doc-section { padding-left: 1em; padding-right: 1em }
 .ops-doc-code { border: 1px solid black; padding: .5em; margin: .5em; font-size: smaller }
 .ops-doc-figure { border: 3px solid #99c; padding: 3px; margin-left: 1em }
-.ops-version { text-align: center; font-size: smaller }
+.orbeon-version { text-align: center; font-size: smaller }
 .ops-doc-image { clear: both; float: right; margin-left: 1em }
 
-ul {
+.orbeon ul {
     list-style-type: square;
 }
 
@@ -438,13 +438,6 @@ ul {
 .xml-att-name { color: green }
 .xml-att-value { color: orange }
 
-/* Deprecated (for XForms Classic) */
-.calendar-button {
-    margin: 0 16px 3px 5px;
-    padding:0;
-    vertical-align: top;
-}
-
 /* This should not be here because it is too specific to particular applications */
 .fixed-width {
     display: -moz-inline-box;
@@ -459,17 +452,17 @@ ul {
 
 @media print {
     #orbeon-logo { display: none }
-    #orbeon-main { border: none; }
-    #orbeon-leftcontent { display: none }
-    #orbeon-rightcontent { display: none }
-    #orbeon-maincontent { border: none }
-    .tabs { display: none }
-    .tab { display: none }
-    .cleaner { display: none }
+    #orbeon { border: none; }
+    #orbeon .orbeon-leftcontent { display: none }
+    #orbeon .orbeon-rightcontent { display: none }
+    #orbeon .orbeon-maincontent { border: none }
+    #orbeon .tabs { display: none }
+    #orbeon .tab { display: none }
+    #orbeon .cleaner { display: none }
     #orbeon-navigation { display: none}
-    #orbeon-main .maincontent { margin: 0; border: none; }
+    #orbeon .maincontent { margin: 0; border: none; }
 
-    .maincontent h1 {
+    .orbeon .maincontent h1 {
         color: black;
         background-color: white;
         border: none;
@@ -478,7 +471,7 @@ ul {
         padding-left: 0;
     }
 
-    .maincontent h2 {
+    .orbeon .maincontent h2 {
         color: black;
         background-color: white;
         border: none;
@@ -488,7 +481,7 @@ ul {
         padding-left: 0;
     }
 
-    .maincontent h3 {
+    .orbeon .maincontent h3 {
         color: black;
         border: none;
         page-break-before: always;
@@ -497,9 +490,9 @@ ul {
         padding-left: 0;
     }
 
-    .maincontent a:first-child + h3 { page-break-before: avoid }
+    #orbeon .maincontent a:first-child + h3 { page-break-before: avoid }
 
-    .maincontent h4 {
+    .orbeon .maincontent h4 {
         color: black;
         border: none;
         font-size: 9pt;
@@ -507,10 +500,10 @@ ul {
         padding-left: 0;
     }
 
-    .maincontent thead { display: table-header-group }
-    .maincontent tfoot { display: table-footer-group }
+    #orbeon .maincontent thead { display: table-header-group }
+    #orbeon .maincontent tfoot { display: table-footer-group }
 
-    a:link { color: black }
-    a:visited { color: black }
-    a { border: none }
+    .orbeon a:link { color: black }
+    .orbeon a:visited { color: black }
+    .orbeon a { border: none }
 }

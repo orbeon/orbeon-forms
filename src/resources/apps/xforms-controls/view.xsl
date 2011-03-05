@@ -37,6 +37,8 @@
             <xsl:apply-templates/>
             <!-- Just put grids CSS otherwise overall style differs from that of other examples -->
             <xhtml:link rel="stylesheet" href="/ops/yui/grids/grids-min.css" type="text/css" media="all"/>
+            <!-- This is needed for the repeater -->
+            <xhtml:link rel="stylesheet" href="/ops/yui/datatable/assets/skins/sam/datatable.css" type="text/css" media="all"/>
             <!-- Reuse Form Runner base CSS -->
             <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-base.css" type="text/css" media="all"/>
             <!-- Add our own CSS tweaks -->

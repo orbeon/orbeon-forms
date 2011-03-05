@@ -22,11 +22,11 @@
         <menu label="Changes">
             <menu-item label="Version 3.9" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-39"/>
             <menu-item label="Version 3.8" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38"/>
-
-            <menu-item label="Version 3.7.1" href="home-changes-371" printed-book="false"/>
-            <menu-item label="Version 3.6" href="home-changes-36" printed-book="false"/>
-            <menu-item label="Version 3.5" href="home-changes-35" printed-book="false"/>
-            <menu-item label="Version 3.0" href="home-changes-30" printed-book="false"/>
+  
+            <menu-item label="Version 3.7.1" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-371"/>
+            <menu-item label="Version 3.6" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-36"/>
+            <menu-item label="Version 3.5" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-35"/>
+            <menu-item label="Version 3.0" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-version-30"/>
         </menu>
     </menu>
     <menu label="XForms Documentation">
@@ -77,29 +77,29 @@
             <menu-item label="Java" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-java"/>
         </menu>
         <menu label="Document Formats">
-            <menu-item label="Image Server" href="processors-image"/>
-            <menu-item label="Charts and Spreadsheets" href="processors-charts-spreadsheets"/>
-            <menu-item label="PDF Extraction" href="processors-pdf-extraction"/>
+            <menu-item label="Image Server" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-image"/>
+            <menu-item label="Charts and Spreadsheets" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-charts-and-spreadsheets"/>
+            <menu-item label="PDF Extraction" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-pdf-extraction"/>
         </menu>
         <menu label="Messaging">
             <menu-item label="Email" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-email"/>
         </menu>
         <menu label="XML Pipelines (XPL)">
-            <menu-item label="Pipeline" href="processors-pipeline"/>
+            <menu-item label="Pipeline" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-pipeline"/>
         </menu>
-        <menu-item label="Validation" href="processors-validation"/>
-        <menu-item label="Scheduler" href="processors-scheduler"/>
-        <menu-item label="Other Processors" href="processors-other"/>
+        <menu-item label="Validation" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-validation"/>
+        <menu-item label="Scheduler" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-scheduler"/>
+        <menu-item label="Other Processors" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-other"/>
     </menu>
     <menu label="XPL API Reference">
-        <menu-item label="Processor API" href="reference-processor-api"/>
-        <menu-item label="Pipeline Engine API" href="reference-pipeline-api"/>
+        <menu-item label="Processor API" href="http://wiki.orbeon.com/forms/doc/developer-guide/api-xpl-processor-api"/>
+        <menu-item label="Pipeline Engine API" href="http://wiki.orbeon.com/forms/doc/developer-guide/api-pipeline-engine-api"/>
     </menu>
     <menu label="Integration">
-        <menu-item label="Authentication" href="reference-authentication"/>
-        <menu-item label="Command Line Applications" href="integration-command-line"/>
-        <menu-item label="Web Services" href="integration-webservices"/>
+        <menu-item label="Authentication" href="http://wiki.orbeon.com/forms/doc/developer-guide/authentication"/>
+        <menu-item label="Command Line Applications" href="http://wiki.orbeon.com/forms/doc/developer-guide/xpl-command-line-applications"/>
+        <menu-item label="Web Services" href="http://wiki.orbeon.com/forms/doc/developer-guide/integration-web-services"/>
         <menu-item label="Packaging and Deployment" href="http://wiki.orbeon.com/forms/doc/developer-guide/packaging-and-deployment"/>
-        <menu-item label="EJB Support" href="integration-ejb"/>
+        <menu-item label="EJB Support" href="http://wiki.orbeon.com/forms/doc/developer-guide/integration-ejb"/>
     </menu>
 </book>

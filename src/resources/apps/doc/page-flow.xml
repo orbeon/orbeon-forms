@@ -14,19 +14,8 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Doc index -->
-    <page path-info="/doc/" default-submission="default-submission.xml" model="pages/index.xml" view="doc-view.xpl"/>
-
-    <!-- PDF output -->
-    <page path-info="/doc/pdf" default-submission="default-submission.xml" model="generate-single-static-html.xpl">
-        <setvalue ref="/form/pdf" parameter="pdf"/>
-    </page>
-
-    <!-- All other doc pages -->
-    <page path-info="/doc/(.*)" matcher="oxf:perl5-matcher" default-submission="default-submission.xml"
-          model="pages/${1}.xml" view="doc-view.xpl">
-        <setvalue ref="/*/page" matcher-group="1"/>
-    </page>
+    <!-- Convert markup -->
+    <page path-info="/doc/convert" model="pages/home-changes-older.xml" view="convert.xsl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

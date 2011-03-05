@@ -22,6 +22,7 @@ TestManager.setPages [
     "test-disabled-nested"
     "test-bug-checkbox-update"
     "test-repeat-setvalue"
+    "xbl/orbeon/date-picker/date-picker-unittest"
     "xbl/orbeon/accordion/accordion-unittest"
     "xbl/orbeon/datatable/datatable-unittest"
     "xbl/orbeon/datatable/datatable-structure-unittest"

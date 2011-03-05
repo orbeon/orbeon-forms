@@ -42,27 +42,26 @@
         </xforms:model>
         <xhtml:style type="text/css">
             #xforms-form label { display: inline-block; width: 10em; }
-            .xbl-fr-date-picker { display: inline-block; }
+            .xbl-fr-button .yui-button { margin-bottom: 1em }
+            .xbl-fr-date-picker { margin-bottom: .5em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+        <fr:button id="copy-to-input">
+            <xforms:label>Copy to input</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="input" value="../date-picker"/>
+        </fr:button>
+        <fr:button id="copy-to-date-picker">
+            <xforms:label>Copy to date picker</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="date-picker" value="../input"/>
+        </fr:button>
         <xhtml:div>
             <fr:date-picker ref="date-picker" id="date-picker">
                 <xforms:label>Date picker:</xforms:label>
             </fr:date-picker>
-            <xforms:trigger appearance="minimal" id="copy-to-input">
-                <xforms:label>Copy to input</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="input" value="../date-picker"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
             <xforms:input ref="input" id="input">
-                <xforms:label>Source date: </xforms:label>
+                <xforms:label>Source date:</xforms:label>
             </xforms:input>
-            <xforms:trigger appearance="minimal" id="copy-to-date-picker">
-                <xforms:label>Copy to date picker</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="date-picker" value="../input"/>
-            </xforms:trigger>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

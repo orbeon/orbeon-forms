@@ -1693,14 +1693,13 @@ ORBEON.xforms.Controls = {
             var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
             var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
             return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date")) {
+        } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date") && YAHOO.util.Dom.hasClass(control, "xforms-input")) {
             // Date control
 			var dateInputValue;
 			if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
 				var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
 				dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
-			}
-			else {
+			} else {
 				dateInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
 			}
             var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
@@ -3334,7 +3333,6 @@ ORBEON.xforms.Events = {
         // Stop processing if the mouse button that was clicked is not the left button
         // See: http://www.quirksmode.org/js/events_properties.html#button
         if (event.button != 0 && event.button != 1) return;
-
         ORBEON.xforms.Events.clickEvent.fire(event);
         var originalTarget = YAHOO.util.Event.getTarget(event);
         if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {

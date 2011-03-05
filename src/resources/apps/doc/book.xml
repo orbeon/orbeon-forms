@@ -53,27 +53,27 @@
         <menu label="Producing XML">
             <menu-item label="URL Generator" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-url-generator"/>
             <menu-item label="Request Generator" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-request-generator"/>
-            <menu-item label="Other Generators" href="processors-generators"/>
+            <menu-item label="Other Generators" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-other-generators"/>
         </menu>
         <menu label="Serializing XML">
-            <menu-item label="HTTP Serializer" href="processors-serializers-http"/>
-            <menu-item label="Other Serializers" href="processors-serializers"/>
+            <menu-item label="HTTP Serializer" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-http-serializer"/>
+            <menu-item label="Other Serializers" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-other-serializers"/>
         </menu>
         <menu label="Transforming XML">
             <menu-item label="Converters" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-converters#TOC-Custom-serializer-classes"/>
-            <menu-item label="XSLT and TrAX" href="http://wiki.orbeon.com/forms/doc/xslt-jaxp-processors"/>
-            <menu-item label="XInclude" href="processors-xinclude"/>
-            <menu-item label="XUpdate" href="processors-xupdate"/>
+            <menu-item label="XSLT and TrAX" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xslt-jaxp"/>
+            <menu-item label="XInclude" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xinclude"/>
+            <menu-item label="XUpdate" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xupdate"/>
         </menu>
         <menu label="Querying Data">
             <menu-item label="REST" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xforms-submission"/>
             <menu-item label="SQL Databases" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-sql"/>
-            <menu-item label="XML Databases" href="processors-xmldb"/>
-            <menu-item label="LDAP Directories" href="processors-ldap"/>
-            <menu-item label="Directory Scanner" href="processors-directory-scanner"/>
+            <menu-item label="XML Databases" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-xml-databases"/>
+            <menu-item label="LDAP Directories" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-ldap"/>
+            <menu-item label="Directory Scanner" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-directory-scanner"/>
         </menu>
         <menu label="Interoperability">
-            <menu-item label="Delegation" href="processors-delegation"/>
+            <menu-item label="Delegation" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-delegation"/>
             <menu-item label="Java" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-java"/>
         </menu>
         <menu label="Document Formats">

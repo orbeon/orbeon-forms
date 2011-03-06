@@ -172,7 +172,6 @@ This product includes software developed by the Apache Software Foundation
 - Batik (<http://xmlgraphics.apache.org/batik/>)
 - Commons (<http://commons.apache.org/>)
 - FOP (<http://xmlgraphics.apache.org/fop/>)
-- Forrest (<http://forrest.apache.org/>)
 - HttpComponents (<http://hc.apache.org/>)
 - log4j (<http://logging.apache.org/log4j/>)
 - Mime4j (<http://james.apache.org/mime4j/>)

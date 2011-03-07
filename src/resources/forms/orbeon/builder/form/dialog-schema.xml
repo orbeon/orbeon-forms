@@ -89,13 +89,8 @@
                         <xforms:mediatype ref="@mediatype"/>
                         <xxforms:size ref="@size"/>
 
-                        <!-- Upload file when selected -->
-                        <xforms:action ev:event="xforms-select">
-                            <xforms:send submission="fb-schema-upload-submission"/>
-                        </xforms:action>
-
                         <!-- Handle a successful submission -->
-                        <xforms:action ev:event="xforms-submit-done" ev:observer="fb-schema-upload-submission" context="$instance">
+                        <xforms:action ev:event="xxforms-upload-done" context="$instance">
                             <!-- Read the schema and store it -->
                             <!-- TODO: support catching dynamic XPath error in case doc() fails -->
                             <xforms:insert context="schema" origin="doc(../schema-uri)"/>

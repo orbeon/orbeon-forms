@@ -668,10 +668,6 @@
         <xforms:bind nodeset="temp-type" readonly="true()"/>
     </xforms:bind>
 
-    <!-- Submission to upload the schema -->
-    <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
-                       method="post" replace="none" resource="test:"/>
-
     <!-- Submission to load the components library -->
     <!-- NOTE: We only pass the app name, not the form name -->
     <xforms:submission id="fb-load-components" serialization="none"

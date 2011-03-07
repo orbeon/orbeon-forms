@@ -171,7 +171,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                 connection.setRequestMethod("POST")
                 connection.setRequestProperty("Content-Type", request.getContentType)
                 setRemoteSessionId(request, connection)
-
+                
                 connection.connect()
                 try {
                     // Write content
@@ -214,7 +214,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
     private def propagateHeaders(response: MimeResponse, connection: HttpURLConnection): Unit =
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
             (name => (name, connection.getHeaderField(name))) foreach
-                { case (name, value: String) => response.setProperty(name, value) }
+                { case (name, value: String) => response.setProperty(name, value); case _ => }
 
     // If we know about the remote session id, set it on the connection to Form Runner
     private def setRemoteSessionId(request: PortletRequest, connection: HttpURLConnection): Unit =

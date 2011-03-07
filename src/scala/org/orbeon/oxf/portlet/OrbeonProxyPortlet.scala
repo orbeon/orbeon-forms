@@ -213,8 +213,11 @@ class OrbeonProxyPortlet extends GenericPortlet {
     // Propagate useful headers from Form Runner server to client
     private def propagateHeaders(response: MimeResponse, connection: HttpURLConnection): Unit =
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
-            (name => (name, connection.getHeaderField(name))) foreach
-                { case (name, value: String) => response.setProperty(name, value); case _ => }
+            (name => (name, connection.getHeaderField(name))) foreach {
+                case (name, value: String) => response.setProperty(name, value)
+                case ("Content-Type", null) => getPortletContext.log("WARNING: Received null Content-Type for URL: " + connection.getURL.toString)
+                case _ =>
+            }
 
     // If we know about the remote session id, set it on the connection to Form Runner
     private def setRemoteSessionId(request: PortletRequest, connection: HttpURLConnection): Unit =

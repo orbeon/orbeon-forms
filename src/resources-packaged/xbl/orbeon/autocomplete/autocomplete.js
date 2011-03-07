@@ -173,7 +173,8 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         // YUI autocomplete give us an escaped string
         query = unescape(query);
         // Look again for the element, as on IE the <select> is recreated when the itemset changes, and so can't be cached
-        var select1Element = this.container.getElementsByTagName("select")[0];
+        var select1Container = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-select1", null, this.container)[0];
+        var select1Element = ORBEON.util.Dom.getElementByTagName(select1Container, "select");
         var options = select1Element.options;
         var foundExactMatch = false;
         if (query != "") {

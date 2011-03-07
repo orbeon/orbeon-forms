@@ -67,10 +67,6 @@
                 <xforms:setvalue ref="textfield-value" value="event('label')"/>
                 <xxforms:script id="arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
             </xbl:handler>
-            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <!-- Override default behavior and focus on search input -->
-                <xforms:setfocus control="search"/>
-            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
@@ -98,37 +94,13 @@
 
                             <!-- Variable pointing to external single-node binding -->
                             <xxforms:variable name="external-value" as="node()?"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable>
+                            <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
 
                             <!-- Init event -->
                             <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
                                 <xxforms:script id="init">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
                             </xforms:action>
 
-                            <!-- Configuration -->
-                            <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
-                            <xforms:output id="itemset" class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
-
-                            <!-- Dropdown with value shown by autocomplete -->
-                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false" style="display: none">
-                                <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-label"/>
-                                <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-value"/>
-                            </xforms:select1>
-                            <!-- Input with external value -->
-                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
-                                <xforms:setvalue ev:event="xforms-readonly" ref="instance()/readonly">true</xforms:setvalue>
-                                <xforms:setvalue ev:event="xforms-readwrite" ref="instance()/readonly">false</xforms:setvalue>
-                                <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset = 'true')">
-                                    <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
-                                    <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]"/>
-                                    <xxforms:variable name="label" select="$select-items[index-of($values, $external-value)]/label"/>
-                                    <xforms:setvalue if="exists($label)" ref="instance()/textfield-value" value="$label"/>
-                                </xforms:action>
-                            </xforms:input>
-                            <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
-                            <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none">
-                                <xforms:label/>
-                            </xforms:trigger>
                             <!-- Markup with input for the YUI autocomplete -->
                             <xhtml:div xbl:attr="class style">
                                 <xforms:input id="search" ref="instance()/textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
@@ -153,6 +125,31 @@
                                 </xsl:if>
                                 <xhtml:div class="fr-autocomplete-yui-div"/>
                             </xhtml:div>
+
+                            <!-- Configuration -->
+                            <xforms:output id="itemset" class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
+
+                            <!-- Dropdown with value shown by autocomplete -->
+                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false" style="display: none">
+                                <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-label"/>
+                                <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-value"/>
+                            </xforms:select1>
+                            <!-- Input with external value -->
+                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
+                                <xforms:setvalue ev:event="xforms-readonly" ref="instance()/readonly">true</xforms:setvalue>
+                                <xforms:setvalue ev:event="xforms-readwrite" ref="instance()/readonly">false</xforms:setvalue>
+                                <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset = 'true')">
+                                    <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
+                                    <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]"/>
+                                    <xxforms:variable name="label" select="$select-items[index-of($values, $external-value)]/label"/>
+                                    <xforms:setvalue if="exists($label)" ref="instance()/textfield-value" value="$label"/>
+                                </xforms:action>
+                            </xforms:input>
+                            <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
+                            <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none">
+                                <xforms:label/>
+                            </xforms:trigger>
 
                             <!-- Stop propagation of all UI events -->
                             <xforms:action ev:event="#all" ev:propagate="stop"/>

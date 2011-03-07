@@ -155,15 +155,15 @@ class ResourcesAggregator extends ProcessorImpl {
                                     // Output link to resource
                                     val path = "" :: "xforms-server" ::
                                         (if (URLRewriterUtils.isResourcesVersioned) List(Version.getVersionNumber) else Nil) :::
-                                        "orbeon-" + resourcesHash + (if (isCSS) ".css" else ".js") :: Nil
+                                        "orbeon-" + resourcesHash + (if (isCSS) ".css" else ".js") :: Nil mkString "/"
 
-                                    outputElement(path mkString "/")
+                                    outputElement(path)
 
                                     // Store on disk if requested to make the resource available to external software, like Apache
                                     if (XFormsProperties.isCacheCombinedResources) {
                                         val resourcesConfig = resources map (r => new XFormsFeatures.ResourceConfig(r, r)) toList
                                         val combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resourcesConfig, false)
-                                        XFormsResourceServer.cacheResources(resourcesConfig, pipelineContext, resourcesHash, combinedLastModified, isCSS, false)
+                                        XFormsResourceServer.cacheResources(resourcesConfig, pipelineContext, path, combinedLastModified, isCSS, false)
                                     }
                                 }
                             }

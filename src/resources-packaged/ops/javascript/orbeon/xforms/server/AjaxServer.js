@@ -478,6 +478,7 @@
                                 if (typeof event.value == "string") {
                                     event.value = event.value.replace(XFORMS_REGEXP_AMPERSAND, "&amp;");
                                     event.value = event.value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
+                                    event.value = event.value.replace(XFORMS_REGEXP_CLOSE_ANGLE, "&gt;");
                                 }
                                 requestDocumentString.push(event.value);
                             }

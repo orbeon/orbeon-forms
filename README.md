@@ -19,7 +19,6 @@ includes:
 For more information about Orbeon Forms, please visit:
 
 - <http://www.orbeon.com/>
-- <http://www.orbeon.com/orbeon/doc/>
 - <http://wiki.orbeon.com/forms/>
 
 Also check the Orbeon Forms Frequently Asked Questions (FAQ):
@@ -83,11 +82,6 @@ Most of the new documentation is available on the Orbreon Forms wiki:
 
 > <http://wiki.orbeon.com/forms/>
 
-Older documentation, which is progressively being migrated to the wiki,
-is available at:
-
-> <http://www.orbeon.com/orbeon/doc/>
-
 
 6. System requirements and installation
 ---------------------------------------
@@ -98,7 +92,7 @@ The system requirements and installation procedure are detailed at:
 
 In addition, the Orbeon Forms tutorial also tackles installation:
 
-> <http://www.orbeon.com/orbeon/doc/intro-tutorial>
+> <http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial>
 
 
 7. What's happening?

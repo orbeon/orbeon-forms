@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.NamingConvention;
 import org.xml.sax.ContentHandler;
 
@@ -26,7 +25,7 @@ import java.util.Map;
 
 /**
  * This is the class that must be extended to create a custom processor. See the <a
- * href="http://www.orbeon.com/ops/doc/reference-processor-api">Processor API section</a>  for more information.
+ * href="http://wiki.orbeon.com/forms/doc/developer-guide/api-xpl-processor-api">Processor API section</a>  for more information.
  */
 public abstract class SimpleProcessor extends ProcessorImpl {
 

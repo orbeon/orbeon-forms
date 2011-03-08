@@ -79,7 +79,7 @@
                                   action="http://www.google.com/custom">
                                 <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
                                 |
-                                <xhtml:a href="http://wiki.orbeon.com/forms/">Orbeon Documentation Wiki</xhtml:a>
+                                <xhtml:a href="http://wiki.orbeon.com/forms/" target="_blank">Orbeon Documentation Wiki</xhtml:a>
                                 |
                                 <xhtml:span style="white-space: nowrap">
                                     Search:

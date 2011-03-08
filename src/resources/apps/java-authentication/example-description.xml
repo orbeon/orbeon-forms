@@ -21,12 +21,12 @@
         <li>You can implement a "logout" functionality.</li>
     </ul>
     <p>
-        If you have <a href="/doc/intro-install">configured authentication in your application server</a>, access to
-        this application requires you to login through a login page. After you have successfully logged in, the
-        application displays your username and other authentication information.
+        If you have <a href="http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing">configured authentication
+        in your application server</a>, access to this application requires you to login through a login page. After you
+        have successfully logged in, the application displays your username and other authentication information.
     </p>
     <p>
-        If you followed the <a href="/doc/intro-install">installation instructions to the letter</a>, the username and
-        password are <code>orbeonadmin/xforms</code>.
+        If you followed the <a href="http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing">installation
+        instructions to the letter</a>, the username and password are <code>orbeonadmin/xforms</code>.
     </p>
 </div>

@@ -26,7 +26,10 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -988,7 +991,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     }
 
                     // Process "action at target"
-                    // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
+                    // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete processing,
+                    // and in XFormsUploadControl for upload processing.
+                    // NOTE: Possibly testing on retargetedEvent.getTargetObject() might be more correct, but we should
+                    // fix event retargeting to make more sense in the first place.
                     final boolean isAtTarget = currentEventObserver == targetObject;
                     if (isAtTarget) {
                         currentEventObserver.performTargetAction(propertyContext, currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);

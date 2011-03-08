@@ -38,6 +38,7 @@
                     <required-empty/>
                     <required-filled>42</required-filled>
                     <setfocus>3.1415</setfocus>
+                    <large>12345678901234567890123</large>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
@@ -62,7 +63,7 @@
             .xforms-input.xforms-invalid-visited,
             .xbl-fr-currency .xforms-invalid-visited
                 { background: url('../../../../../ops/images/xforms/exclamation.png') right top no-repeat; padding-right: 0 20px 1px 0; }
-
+            #large input { width: 18em }
         </xhtml:style>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -173,6 +174,11 @@
                 <xforms:label>Setfocus</xforms:label>
                 <xforms:setfocus ev:event="DOMActivate" control="setfocus"/>
             </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="large" id="large">
+                <xforms:label>Large</xforms:label>
+            </fr:currency>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

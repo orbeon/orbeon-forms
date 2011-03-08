@@ -55,12 +55,10 @@ YAHOO.xbl.fr.Currency.prototype = {
         // Remove prefix if at the beginning of the string
         if (cleanString.indexOf(this.prefix) == 0)
             cleanString = cleanString.substring(this.prefix.length);
-        var cleanNumber = new Number(cleanString).toString();
-        var newValue = this.visibleInputElement.value == "" || cleanNumber == "NaN" ? this.visibleInputElement.value : cleanNumber;
-        ORBEON.xforms.Document.setValue(this.xformsInputElement.id, newValue);
+        ORBEON.xforms.Document.setValue(this.xformsInputElement.id, cleanString);
         this.visibleInputElement.value = this.numberToCurrency(this.visibleInputElement.value);
         // Update xforms-required-empty/xforms-required-filled and xforms-visited
-        ORBEON.xforms.Controls.updateRequiredEmpty(this.groupElement, newValue);
+        ORBEON.xforms.Controls.updateRequiredEmpty(this.groupElement, cleanString);
         if (! YAHOO.util.Dom.hasClass(this.groupElement, "xforms-visited"))
             ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(this.groupElement);
     },
@@ -98,16 +96,23 @@ YAHOO.xbl.fr.Currency.prototype = {
             if (isNaN(numberObject)) {
                 result = number;
             } else {
-                var fixed = numberObject.toFixed(this.digitsAfterDecimal);
-                var parts = fixed.split(".");
+                // Extract integer and fractional parts
+                var parts = Array.concat(cleaned.split("."), "");
+                var integerPart = parts[0];
+                var fractionalPart = parts[1];
+
+                // Add thousand separator for integer
                 var regExp = /(\d+)(\d{3})/;
-                while (regExp.test(parts[0])) {
-                    parts[0] = parts[0].replace(regExp, "$1" + "," + "$2");
-                }
+                while (regExp.test(integerPart)) integerPart = integerPart.replace(regExp, "$1" + "," + "$2");
+
+                // Get fractional part to be of the demanded length
+                if (fractionalPart.length > this.digitsAfterDecimal) fractionalPart = fractionalPart.substring(0, this.digitsAfterDecimal);
+                while (fractionalPart.length < this.digitsAfterDecimal) fractionalPart += "0";
+
+                // Build result
                 result = this.prefix == "" ? "" : this.prefix + " ";
-                result += parts[0];
-                if (parts.length > 1)
-                    result += "." + parts[1];
+                result += integerPart;
+                if (fractionalPart.length > 1) result += "." + fractionalPart;
             }
         }
         return result;

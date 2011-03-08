@@ -23,6 +23,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
     var floatDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-dynamic")[0];
     var floatNoDigitsInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-no-digits")[0];
     var readonlyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "readonly")[0];
+    var largeInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "large")[0];
 
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -103,7 +104,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 YAHOO.util.UserAction.click(YAHOO.util.Dom.get("change-digits"));
             }, function() {
-                YAHOO.util.Assert.areEqual("$ 123.46", floatDynamicInput.value);
+                YAHOO.util.Assert.areEqual("$ 123.45", floatDynamicInput.value);
             });
         },
         testNoDigits: function() {
@@ -211,6 +212,21 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.UserAction.click(YAHOO.util.Dom.get("setfocus-trigger"));
             }, function() {
                 YAHOO.util.Assert.isTrue(gotFocus);
+            });
+        },
+
+        // Currency field should not be susceptible to limitations of number precision imposed by the platform
+        testLarge: function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                YAHOO.util.Assert.areEqual("$ 12,345,678,901,234,567,890,123.00", largeInput.value);
+                largeInput.focus();
+                YAHOO.util.Assert.areEqual("12345678901234567890123.00", largeInput.value);
+                largeInput.value = "12345678901234567890124";
+                largeInput.blur();
+                emptyInput.focus();
+                YAHOO.util.Assert.areEqual("$ 12,345,678,901,234,567,890,124.00", largeInput.value);
+            }, function() {
+                // nop
             });
         }
     }));

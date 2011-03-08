@@ -615,7 +615,7 @@ public class TestExternalContext implements ExternalContext  {
         logger.info(msg);
     }
 
-    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
-        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
+    public String rewriteServiceURL(String urlString, int rewriteMode) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, rewriteMode);
     }
 }

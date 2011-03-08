@@ -746,7 +746,7 @@ public class XFormsUtils {
 
         final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
-        return NetUtils.getExternalContext(propertyContext).rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+        return NetUtils.getExternalContext(propertyContext).rewriteServiceURL(resolvedURI.toString(), rewriteMode);
     }
 
     /**

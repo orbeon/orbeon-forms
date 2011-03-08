@@ -110,7 +110,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     OutputStream os = null;
                     try {
                         // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
-                        final String absoluteResourceURI = externalContext.rewriteServiceURL(resource.getURI(), true);
+                        final String absoluteResourceURI = externalContext.rewriteServiceURL(resource.getURI(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                         is = URLFactory.createURL(absoluteResourceURI).openStream();
                         os = response.getOutputStream();

@@ -73,12 +73,12 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testServiceRewrite() {
 
         // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "https://foo.com/bar", true));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", true));
-        assertEquals("http://example.org/cool/service/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar", true));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2", true));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2#there", true));
-        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "?a=1&amp;b=2", true));
+        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "https://foo.com/bar", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2#there", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "?a=1&amp;b=2", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
 
         // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
         // TODO: test without oxf.url-rewriting.service.base-uri set
@@ -173,12 +173,12 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testServiceRewriteForward() {
 
         // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "https://foo.com/bar", true));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", true));
-        assertEquals("http://example.org/cool/service/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar", true));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2", true));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2#there", true));
-        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "?a=1&amp;b=2", true));
+        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "https://foo.com/bar", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2#there", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "?a=1&amp;b=2", ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
 
         // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
         // TODO: test without oxf.url-rewriting.service.base-uri set

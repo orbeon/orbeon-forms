@@ -59,7 +59,7 @@ public class CacheableSubmission extends BaseSubmission {
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true"
 
         // Convert URL to string
-        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString);
+        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString, submission.isURLNorewrite());
 
         // Compute a hash of the body if needed
         final String requestBodyHash;

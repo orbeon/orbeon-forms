@@ -81,7 +81,8 @@ public class StaticExternalContext {
     }
 
     public static String rewriteServiceURL(String urlString, boolean forceAbsolute) {
-        return getStaticContext().getExternalContext().rewriteServiceURL(urlString, forceAbsolute);
+        return getStaticContext().getExternalContext().rewriteServiceURL(urlString,
+                forceAbsolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
     }
 
     public static String setTitle(String title) {

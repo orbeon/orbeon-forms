@@ -27,15 +27,22 @@ import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
+import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.SAXException;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class XPathProcessor extends ProcessorImpl {
 
@@ -86,50 +93,10 @@ public class XPathProcessor extends ProcessorImpl {
                     // connected to an aggregator, which adds a new root node.
                     for (Iterator i = results.iterator(); i.hasNext();) {
                         Object result = i.next();
-                        if (result == null) continue;
-                        String strVal = null;
+                        if (result == null)
+                            continue;
 
-                        if (result instanceof org.dom4j.Element || result instanceof org.dom4j.Document) {
-                            // If element or document, serialize it to content handler
-                            final org.dom4j.Element element = result instanceof org.dom4j.Element
-                                    ? (org.dom4j.Element) result
-                                    : ((org.dom4j.Document) result).getRootElement();
-                            final String systemId = Dom4jUtils.makeSystemId(element);
-                            // TODO: Should probably use Dom4jUtils.createDocumentCopyParentNamespaces() or equivalent to handle namespaces better
-                            // -> could maybe simply get the list of namespaces in scope on both sides, and output start/endPrefixMapping()
-                            final DOMGenerator domGenerator = new DOMGenerator
-                                    (element, "xpath result doc", DOMGenerator.ZeroValidity, systemId);
-                            final ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
-                            domOutput.read(context, new EmbeddedDocumentXMLReceiver(xmlReceiver));
-                        } else if (result instanceof NodeInfo) {
-                            final NodeInfo nodeInfo = (NodeInfo) result;
-                            TransformerUtils.writeTinyTree(nodeInfo, new EmbeddedDocumentXMLReceiver(xmlReceiver));
-                        } else if (result instanceof DefaultProcessingInstruction) {
-                            DefaultProcessingInstruction processingInstruction = (DefaultProcessingInstruction) result;
-                            xmlReceiver.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
-                        } else if (result instanceof DefaultText) {
-                            strVal = ((DefaultText) result).getText();
-                        } else if (result instanceof String) {
-                            strVal = (String) result;
-                        } else if (result instanceof Double) {
-                            final double d = ((Double) result).doubleValue();
-                            strVal = XMLUtils.removeScientificNotation(d);
-                        } else if (result instanceof Boolean) {
-                            strVal = ((Boolean) result).toString();
-                        } else if (result instanceof FastStringBuffer) {
-                            strVal = result.toString();
-                        } else {
-                            String message = "Unsupported type returned by XPath expression: "
-                                    + (result == null ? "null" : result.getClass().getName());
-                            throw new ValidationException(message, locationData);
-                        }
-
-                        // Send string representation of simple type to content handler
-                        if (strVal != null) {
-                            final char[] ch = strVal.toCharArray();
-                            final int len = strVal.length();
-                            xmlReceiver.characters( ch, 0, len );
-                        }
+                        streamResult(context, xmlReceiver, result, locationData);
                     }
                     xmlReceiver.endDocument();
                 } catch (XPathException xpe) {
@@ -144,6 +111,52 @@ public class XPathProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    public static void streamResult(PipelineContext context, XMLReceiver xmlReceiver, Object result, LocationData locationData) throws SAXException {
+
+        String strVal = null;
+        if (result instanceof Element || result instanceof Document) {
+            // If element or document, serialize it to content handler
+            final Element element = result instanceof Element
+                    ? (Element) result
+                    : ((Document) result).getRootElement();
+            final String systemId = Dom4jUtils.makeSystemId(element);
+            // TODO: Should probably use Dom4jUtils.createDocumentCopyParentNamespaces() or equivalent to handle namespaces better
+            // -> could maybe simply get the list of namespaces in scope on both sides, and output start/endPrefixMapping()
+            final DOMGenerator domGenerator = new DOMGenerator
+                    (element, "xpath result doc", DOMGenerator.ZeroValidity, systemId);
+            final ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
+            domOutput.read(context, new EmbeddedDocumentXMLReceiver(xmlReceiver));
+        } else if (result instanceof NodeInfo) {
+            final NodeInfo nodeInfo = (NodeInfo) result;
+            TransformerUtils.writeTinyTree(nodeInfo, new EmbeddedDocumentXMLReceiver(xmlReceiver));
+        } else if (result instanceof DefaultProcessingInstruction) {
+            DefaultProcessingInstruction processingInstruction = (DefaultProcessingInstruction) result;
+            xmlReceiver.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
+        } else if (result instanceof DefaultText) {
+            strVal = ((DefaultText) result).getText();
+        } else if (result instanceof String) {
+            strVal = (String) result;
+        } else if (result instanceof Double) {
+            final double d = ((Double) result).doubleValue();
+            strVal = XMLUtils.removeScientificNotation(d);
+        } else if (result instanceof Boolean) {
+            strVal = ((Boolean) result).toString();
+        } else if (result instanceof FastStringBuffer) {
+            strVal = result.toString();
+        } else {
+            String message = "Unsupported type returned by XPath expression: "
+                    + (result == null ? "null" : result.getClass().getName());
+            throw new ValidationException(message, locationData);
+        }
+
+        // Send string representation of simple type to content handler
+        if (strVal != null) {
+            final char[] ch = strVal.toCharArray();
+            final int len = strVal.length();
+            xmlReceiver.characters( ch, 0, len );
+        }
     }
 
     protected static class Config {

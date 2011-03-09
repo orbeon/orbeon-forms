@@ -40,6 +40,9 @@ public class XMLConstants {
     public static final String XINCLUDE_URI = "http://www.w3.org/2001/XInclude";
     public static final String OLD_XINCLUDE_URI = "http://www.w3.org/2003/XInclude";
     public static final String XXINCLUDE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xinclude";
+    public static final Namespace XXINCLUDE_NAMESPACE = new Namespace("xxi", XXINCLUDE_NAMESPACE_URI);
+    public static final QName XXINCLUDE_OMIT_XML_BASE = new QName("omit-xml-base", XXINCLUDE_NAMESPACE);
+    public static final QName XINCLUDE_FIXUP_XML_BASE = new QName("fixup-xml-base", Namespace.NO_NAMESPACE);
 
     public static final Namespace XINCLUDE_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
 

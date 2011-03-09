@@ -19,13 +19,20 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
+import org.orbeon.oxf.processor.transformer.XPathProcessor;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.xml.sax.*;
 
 import javax.xml.transform.sax.SAXSource;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -200,32 +207,56 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                         final String href = attributes.getValue("href");
                         final String parse = attributes.getValue("parse");
-
+                        final String xpointer = attributes.getValue("xpointer");
+ 
                         // Whether to create/update xml:base attribute or not
                         final boolean generateXMLBase;
                         {
-                            final String disableXMLBase = attributes.getValue(XMLConstants.XXINCLUDE_NAMESPACE_URI, "omit-xml-base");
-                            generateXMLBase = !"true".equals(disableXMLBase);
+                            final String disableXMLBase = attributes.getValue(XMLConstants.XXINCLUDE_OMIT_XML_BASE.getNamespaceURI(), XMLConstants.XXINCLUDE_OMIT_XML_BASE.getName());
+                            final String fixupXMLBase = attributes.getValue(XMLConstants.XINCLUDE_FIXUP_XML_BASE.getNamespaceURI(), XMLConstants.XINCLUDE_FIXUP_XML_BASE.getName());
+                            generateXMLBase = !("true".equals(disableXMLBase) || "false".equals(fixupXMLBase));
                         }
 
                         if (parse != null && !parse.equals("xml"))
                             throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(outputLocator));
+
+                        if (xpointer != null && !(xpointer.startsWith("xpath(") && xpointer.endsWith(")")))
+                            throw new ValidationException("Invalid 'xpointer' attribute value: " + xpointer, new LocationData(outputLocator));
 
                         String systemId = null;
                         try {
                             // Get SAXSource
                             final String base = outputLocator == null ? null : outputLocator.getSystemId();
                             final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
-                            final XMLReader xmlReader = source.getXMLReader();
-                            xmlReader.setContentHandler(new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
 
-                            // Keep URI reference
-                            if (uriReferences != null)
-                                uriReferences.addReference(base, href, null, null, null, null);
+                            if (xpointer != null) {
+                                // Experimental support for xpath() scheme
+                                final String xpath = xpointer.substring("xpath(".length(), xpointer.length() - 1);
 
-                            // Read document
-                            systemId = source.getSystemId();
-                            xmlReader.parse(new InputSource(systemId)); // Yeah, the SAX API doesn't make much sense
+                                // Document is read entirely in memory for XPath processing
+                                final DocumentInfo document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(), source, false);
+                                final List result = XPathCache.evaluate(pipelineContext, document, xpath, new NamespaceMapping(Collections.<String, String>emptyMap()),
+                                        Collections.<String, ValueRepresentation>emptyMap(), PipelineFunctionLibrary.instance(), null, source.getSystemId(), null);
+
+                                // Each resulting object is output through the next level of processing
+                                for (final Object o : result) {
+                                    final XIncludeXMLReceiver newReceiver = new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator);
+                                    XPathProcessor.streamResult(pipelineContext, newReceiver, o, new LocationData(outputLocator));
+                                }
+
+                            } else {
+                                // No xpointer attribute specified, just stream the child document
+                                final XMLReader xmlReader = source.getXMLReader();
+                                xmlReader.setContentHandler(new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
+
+                                // Keep URI reference
+                                if (uriReferences != null)
+                                    uriReferences.addReference(base, href, null, null, null, null);
+
+                                // Read document
+                                systemId = source.getSystemId();
+                                xmlReader.parse(new InputSource(systemId)); // Yeah, the SAX API doesn't make much sense
+                            }
 
                         } catch (Exception e) {
                             // Resource error, must go to fallback if possible

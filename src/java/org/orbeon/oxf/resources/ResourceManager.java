@@ -14,6 +14,7 @@
 package org.orbeon.oxf.resources;
 
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
 
@@ -55,13 +56,12 @@ public interface ResourceManager {
      * Gets a DOM4J document for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
      *
-     * @param key               a Resource Manager key
-     * @param validating        whether the XML parser must attempt to validate the resource
-     * @param handleXInclude    whether the XML parser must process XInclude instructions
-     * @param handleLexical     whether the XML parser must output SAX LexicalHandler events, including comments
-     * @return  a document element
+     *
+     * @param key                   a Resource Manager key
+     * @param parserConfiguration   parser configuration
+     * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments  @return  a document element
      */
-    org.dom4j.Document getContentAsDOM4J(String key, boolean validating, boolean handleXInclude, boolean handleLexical);
+    org.dom4j.Document getContentAsDOM4J(String key, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical);
 
     /**
      * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an
@@ -75,14 +75,13 @@ public interface ResourceManager {
     /**
      * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an
      * XML document, or a OXFException is raised.
-     * 
-     * @param key            a Resource Manager key
-     * @param xmlReceiver    receiver where SAX events are sent
-     * @param validating     whether the XML parser must attempt to validate the resource
-     * @param handleXInclude whether the XML parser must process XInclude instructions
-     * @param handleLexical  whether the XML parser must output SAX LexicalHandler events, including comments
+     *
+     * @param key                   a Resource Manager key
+     * @param xmlReceiver           receiver where SAX events are sent
+     * @param parserConfiguration   parser configuration
+     * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    void getContentAsSAX(String key, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical);
+    void getContentAsSAX(String key, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical);
 
     /**
      * Returns a binary input stream for the specified key. The key could point

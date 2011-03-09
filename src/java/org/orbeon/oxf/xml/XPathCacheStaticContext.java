@@ -54,7 +54,7 @@ public class XPathCacheStaticContext extends IndependentContext {
                 if ("".equals(base))
                     base = null;
                 final URL url = URLFactory.createURL(base, href);
-                return new SAXSource(XMLUtils.newXMLReader(false, false), new InputSource(url.openStream()));
+                return new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(url.openStream()));
             } catch (IOException e) {
                 throw new TransformerException(e);
             }

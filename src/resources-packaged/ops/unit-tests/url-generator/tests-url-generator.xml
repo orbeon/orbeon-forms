@@ -307,4 +307,63 @@ Le bruit persistait toujours.
             </html>
         </output>
     </test>
+
+    <test description="Text external entities disabled" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="data" type="output"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude5.xml</url>
+                         </config>
+                    </p:input>
+                    <p:output name="data" id="including"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#including"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message> </message>
+        </output>
+    </test>
+
+    <test description="Text external entities enabled" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="data" type="output"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude5.xml</url>
+                            <external-entities>true</external-entities>
+                         </config>
+                    </p:input>
+                    <p:output name="data" id="including"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#including"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="text/plain">This is simple body content</body>
+            </message>
+        </output>
+    </test>
 </group>

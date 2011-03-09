@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
@@ -65,6 +64,7 @@ public class URLGenerator extends ProcessorImpl {
 
     public static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
+    public static final boolean DEFAULT_EXTERNAL_ENTITIES = false;
     public static final boolean DEFAULT_HANDLE_LEXICAL = true;
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
@@ -120,10 +120,10 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, boolean handleLexical,
+                      boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical,
                       String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
-                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, handleLexical, mode,
+                forceEncoding, ignoreConnectionEncoding, parserConfiguration, handleLexical, mode,
                 headerNameValues, forwardHeaders,
                 cacheUseLocalCache, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -136,10 +136,9 @@ public class URLGenerator extends ProcessorImpl {
         private String encoding;
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
-        private boolean validating = DEFAULT_VALIDATING;
         private Map<String, String[]> headerNameValues;
         private String forwardHeaders;
-        private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
+        private XMLUtils.ParserConfiguration parserConfiguration = null;
         private boolean handleLexical = DEFAULT_HANDLE_LEXICAL;
 
         private String mode;
@@ -150,12 +149,13 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url) {
             this.url = url;
+            this.parserConfiguration = XMLUtils.ParserConfiguration.PLAIN;
             this.tidyConfig = new TidyConfig(null);
         }
 
         public Config(URL url, boolean handleXInclude) {
             this.url = url;
-            this.handleXInclude = handleXInclude;
+            this.parserConfiguration = new XMLUtils.ParserConfiguration(DEFAULT_VALIDATING, handleXInclude, DEFAULT_EXTERNAL_ENTITIES);
             this.tidyConfig = new TidyConfig(null);
         }
 
@@ -168,9 +168,9 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, boolean handleLexical,
-                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache,
-                      TidyConfig tidyConfig) {
+                      boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration,
+                      boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
+                      boolean cacheUseLocalCache, TidyConfig tidyConfig) {
 
             this.url = url;
             this.contentType = contentType;
@@ -178,10 +178,9 @@ public class URLGenerator extends ProcessorImpl {
             this.encoding = encoding;
             this.forceEncoding = forceEncoding;
             this.ignoreConnectionEncoding = ignoreConnectionEncoding;
-            this.validating = validating;
             this.headerNameValues = headerNameValues;
             this.forwardHeaders = forwardHeaders;
-            this.handleXInclude = handleXInclude;
+            this.parserConfiguration = parserConfiguration;
             this.handleLexical = handleLexical;
 
             this.mode = mode;
@@ -219,12 +218,8 @@ public class URLGenerator extends ProcessorImpl {
             return tidyConfig;
         }
 
-        public boolean isValidating() {
-            return validating;
-        }
-
-        public boolean isHandleXInclude() {
-            return handleXInclude;
+        public XMLUtils.ParserConfiguration getParserConfiguration() {
+            return parserConfiguration;
         }
 
         public boolean isHandleLexical() {
@@ -249,7 +244,7 @@ public class URLGenerator extends ProcessorImpl {
 
         @Override
         public String toString() {
-            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + isValidating() + "|" + isHandleXInclude() + "|" + isForceContentType()
+            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + parserConfiguration.getKey() + "|" + isHandleLexical() + "|" + isForceContentType()
                     + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + tidyConfig + "]";
         }
     }
@@ -343,6 +338,9 @@ public class URLGenerator extends ProcessorImpl {
                                 final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE);
                                 final boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
 
+                                // External entities
+                                final boolean externalEntities = ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", DEFAULT_EXTERNAL_ENTITIES);
+
                                 final boolean defaultHandleLexical = getPropertySet().getBoolean(HANDLE_LEXICAL_PROPERTY, DEFAULT_HANDLE_LEXICAL);
                                 final boolean handleLexical = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-lexical", defaultHandleLexical);
 
@@ -367,7 +365,7 @@ public class URLGenerator extends ProcessorImpl {
 
                                     // Create configuration
                                     final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                            ignoreConnectionEncoding, validating, handleXInclude, handleLexical, mode,
+                                            ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
                                             headerNameValues, forwardHeaders,
                                             cacheUseLocalCache, tidyConfig);
                                     if (logger.isDebugEnabled())
@@ -718,11 +716,11 @@ public class URLGenerator extends ProcessorImpl {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
                 XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(),
-                        xmlReceiver, config.isValidating(), config.isHandleXInclude(), config.isHandleLexical());
+                        xmlReceiver, config.getParserConfiguration(), config.isHandleLexical());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
                 ResourceManagerWrapper.instance().getContentAsSAX(getKey(),
-                        xmlReceiver, config.isValidating(), config.isHandleXInclude(), config.isHandleLexical());
+                        xmlReceiver, config.getParserConfiguration(), config.isHandleLexical());
             }
         }
 
@@ -858,7 +856,7 @@ public class URLGenerator extends ProcessorImpl {
             checkStatusCode();
             // Read the resource from the resource manager and parse it as XML
             try {
-                final XMLReader reader = XMLUtils.newXMLReader(config.isValidating(), config.isHandleXInclude());
+                final XMLReader reader = XMLUtils.newXMLReader(config.getParserConfiguration());
                 reader.setContentHandler(xmlReceiver);
                 final InputSource inputSource;
                 if (getExternalEncoding() != null) {

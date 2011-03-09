@@ -20,11 +20,16 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
-import org.xml.sax.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.*;
@@ -138,7 +143,7 @@ public class StreamInterceptor {
 
                 } else {
                     // Assume it is XML and parse the output
-                    final XMLReader reader = XMLUtils.newXMLReader(false, false);
+                    final XMLReader reader = XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN);
 
                     if (fragment) {
                         // Do not generate start and end document events

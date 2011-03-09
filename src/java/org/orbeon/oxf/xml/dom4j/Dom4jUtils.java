@@ -58,8 +58,8 @@ public class Dom4jUtils {
         NULL_DOCUMENT.setRootElement(nullElement);
     }
 
-    private static SAXReader createSAXReader(boolean validating, boolean handleXInclude) throws SAXException {
-        final XMLReader xmlReader = XMLUtils.newXMLReader(validating, handleXInclude);
+    private static SAXReader createSAXReader(XMLUtils.ParserConfiguration parserConfiguration) throws SAXException {
+        final XMLReader xmlReader = XMLUtils.newXMLReader(parserConfiguration);
 
         final SAXReader saxReader = new SAXReader(xmlReader);
         final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
@@ -68,7 +68,7 @@ public class Dom4jUtils {
     }
 
     private static SAXReader createSAXReader() throws SAXException {
-        return createSAXReader(XMLUtils.DEFAULT_VALIDATING, XMLUtils.DEFAULT_HANDLE_XINCLUDE);
+        return createSAXReader(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
     }
 
     /**
@@ -165,7 +165,7 @@ public class Dom4jUtils {
      */
     public static String prettyfy(String xmlString) {
         try {
-            return domToPrettyString(readDom4j(xmlString, false, false));
+            return domToPrettyString(readDom4j(xmlString));
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -222,19 +222,16 @@ public class Dom4jUtils {
     /**
      * Read a document from a URL.
      *
-     * @param urlString         URL
-     * @param validating        whether to validate
-     * @param handleXInclude    whether to process XInclude
-     * @return
-     * @throws SAXException
-     * @throws DocumentException
+     * @param urlString             URL
+     * @param parserConfiguration   parser configuration
+     * @return                      document
      */
-    public static Document readFromURL(String urlString, boolean validating, boolean handleXInclude) {
+    public static Document readFromURL(String urlString, XMLUtils.ParserConfiguration parserConfiguration) {
         InputStream is = null;
         try {
             final URL url = URLFactory.createURL(urlString);
             is = url.openStream();
-            return readDom4j(is, urlString, validating, handleXInclude);
+            return readDom4j(is, urlString, parserConfiguration);
         } catch (Exception e) {
             throw new OXFException(e);
         } finally {
@@ -262,18 +259,18 @@ public class Dom4jUtils {
      * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it creates work for GC
      * (because it relies on JAXP).
      */
-    public static Document readDom4j(String xmlString, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(validating, handleXInclude);
+    public static Document readDom4j(String xmlString, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader(parserConfiguration);
         final StringReader stringReader = new StringReader(xmlString);
         return saxReader.read(stringReader);
     }
 
     public static Document readDom4j(String xmlString) throws SAXException, DocumentException {
-        return readDom4j(xmlString, false, false);
+        return readDom4j(xmlString, XMLUtils.ParserConfiguration.PLAIN);
     }
 
-    public static Document readDom4j(InputStream inputStream, String uri, boolean validating, boolean handleXInclude) throws SAXException, DocumentException {
-        final SAXReader saxReader = createSAXReader(validating, handleXInclude);
+    public static Document readDom4j(InputStream inputStream, String uri, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader(parserConfiguration);
         return saxReader.read(inputStream, uri);
     }
 

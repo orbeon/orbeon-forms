@@ -186,7 +186,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         final Document config;
                         try {
                             config = Dom4jUtils.readDom4j
-                                    ("<config><include>/request/request-path</include><include>/request/method</include></config>", false, false);
+                                    ("<config><include>/request/request-path</include><include>/request/method</include></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         } catch ( final SAXException e ) {
@@ -942,7 +942,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final boolean useLegacyTransformation =
             (resultElement != null && !resultElement.elements().isEmpty() && resultElement.attribute("transform") == null);
 
-        // Whether we use the desintation page's instance
+        // Whether we use the destination page's instance
         final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null || !useLegacyTransformation;
 
         final ASTOutput instanceToUpdate;

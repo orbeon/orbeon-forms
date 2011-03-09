@@ -43,19 +43,15 @@ public class ToXMLConverter extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 // Read config input
-                final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                final XMLUtils.ParserConfiguration config = (XMLUtils.ParserConfiguration) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
-                        final Config result = new Config();
 
                         final Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
-                        // Validation setting
-                        result.validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING);
-
-                        // XInclude handling
-                        result.handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", URLGenerator.DEFAULT_HANDLE_XINCLUDE);
-
-                        return result;
+                        return new XMLUtils.ParserConfiguration(
+                                ProcessorUtils.selectBooleanValue(configElement, "/config/validating", URLGenerator.DEFAULT_VALIDATING),
+                                ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", URLGenerator.DEFAULT_HANDLE_XINCLUDE),
+                                ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", URLGenerator.DEFAULT_EXTERNAL_ENTITIES));
                     }
                 });
 
@@ -69,7 +65,7 @@ public class ToXMLConverter extends ProcessorImpl {
                     readInputAsSAX(pipelineContext, INPUT_DATA, new BinaryTextXMLReceiver(null, fileItem.getOutputStream(), true, false, null, false, false, null, false));
 
                     // Create parser
-                    final XMLReader reader = XMLUtils.newXMLReader(config.validating, config.handleXInclude);
+                    final XMLReader reader = XMLUtils.newXMLReader(config);
 
                     // Run parser on InputStream
                     //inputSource.setSystemId();
@@ -83,10 +79,5 @@ public class ToXMLConverter extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
-    }
-
-    private static class Config {
-        public boolean validating;
-        public boolean handleXInclude;
     }
 }

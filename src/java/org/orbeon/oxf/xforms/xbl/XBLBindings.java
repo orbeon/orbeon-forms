@@ -47,6 +47,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -300,15 +301,12 @@ public class XBLBindings {
     }
 
     public Document readXBLResource(String include) {
-        final boolean handleXInclude = true; // handle XInclude
-        final boolean handleLexical = false; // don't handle comments and other lexical information
-
         // Update last modified so that dependencies on external XBL files can be handled
         final long lastModified = ResourceManagerWrapper.instance().lastModified(include, false);
         metadata.updateBindingsLastModified(lastModified);
 
         // Read
-        return ResourceManagerWrapper.instance().getContentAsDOM4J(include, false, handleXInclude, handleLexical);
+        return ResourceManagerWrapper.instance().getContentAsDOM4J(include, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false);
     }
 
     public int extractXBLBindings(Document xblDocument, XFormsStaticState staticState) {

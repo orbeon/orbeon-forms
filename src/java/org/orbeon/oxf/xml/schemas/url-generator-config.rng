@@ -76,6 +76,12 @@
                     </optional>
                     <optional>
                         <!-- This will make sense only if the source is XML -->
+                        <element name="external-entities">
+                            <data type="boolean"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <!-- This will make sense only if the source is XML -->
                         <element name="handle-lexical">
                             <data type="boolean"/>
                         </element>

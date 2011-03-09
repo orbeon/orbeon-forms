@@ -377,7 +377,7 @@
                             <xxforms:sequence>1</xxforms:sequence>
                             <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
                             <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
-                            <!-- Copy action which should not contained the external entity resolved -->
+                            <!-- Copy action which should not contain the external entity resolved -->
                             <xsl:copy-of select="doc('input:request')/*/xxforms:action"/>
                         </xxforms:event-request>
                     </p:input>

@@ -91,7 +91,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
         //                from here into ExceptionInInitializerError without setting the cause.
         //                This of course makes diagnosing reports from the field a major pain.
         try {
-            factory = XMLUtils.createSAXParserFactory(false, true);
+            factory = XMLUtils.createSAXParserFactory(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
         } catch (final Error e) {
             throw new ExceptionInInitializerError(e);
         } catch (final RuntimeException e) {

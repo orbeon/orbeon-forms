@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xml;
 
-import orbeon.apache.xerces.impl.*;
+import orbeon.apache.xerces.impl.Constants;
+import orbeon.apache.xerces.impl.XMLEntityManager;
+import orbeon.apache.xerces.impl.XMLErrorReporter;
 import orbeon.apache.xerces.xni.parser.XMLInputSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,13 +23,21 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.*;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorFactory;
+import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -35,12 +45,17 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.*;
-import javax.xml.transform.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.*;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -48,9 +63,6 @@ import java.util.*;
 public class XMLUtils {
 
     private static Logger logger = Logger.getLogger(XMLUtils.class);
-
-    public static final boolean DEFAULT_VALIDATING = false;
-    public static final boolean DEFAULT_HANDLE_XINCLUDE = true;// TODO: this should probably not be the default
 
     public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
@@ -61,16 +73,32 @@ public class XMLUtils {
     private static final DocumentBuilderFactory documentBuilderFactory;
     private static Map<Thread, DocumentBuilder> documentBuilders = null;
 
-    private static SAXParserFactory nonValidatingXIncludeSAXParserFactory;
-    private static SAXParserFactory validatingXIncludeSAXParserFactory;
-    private static SAXParserFactory nonValidatingSAXParserFactory;
-    private static SAXParserFactory validatingSAXParserFactory;
+    private static Map<String, SAXParserFactory> parserFactories = new HashMap<String, SAXParserFactory>();
 
     public static final String XML_CONTENT_TYPE1 = "text/xml";
     public static final String XML_CONTENT_TYPE2 = "application/xml";
     public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
     public static final String XML_CONTENT_TYPE = XML_CONTENT_TYPE2;
     public static final String TEXT_CONTENT_TYPE_PREFIX = "text/";
+
+    public static class ParserConfiguration {
+        public final boolean validating;
+        public final boolean handleXInclude;
+        public final boolean externalEntities;
+
+        public ParserConfiguration(boolean validating, boolean handleXInclude, boolean externalEntities) {
+            this.validating = validating;
+            this.handleXInclude = handleXInclude;
+            this.externalEntities = externalEntities;
+        }
+
+        public String getKey() {
+            return (validating ? "1" : "0") + (handleXInclude ? "1" : "0") + (externalEntities ? "1" : "0");
+        }
+
+        public static final ParserConfiguration PLAIN = new ParserConfiguration(false, false, false);
+        public static final ParserConfiguration XINCLUDE_ONLY = new ParserConfiguration(false, true, false);
+    }
 
     static {
         try {
@@ -108,11 +136,9 @@ public class XMLUtils {
      *
      * WARNING: Use this only in special cases. In general, use newSAXParser().
      */
-    public static SAXParserFactory createSAXParserFactory(boolean validating, boolean handleXInclude) {
+    public static SAXParserFactory createSAXParserFactory(XMLUtils.ParserConfiguration parserConfiguration) {
         try {
-            SAXParserFactory factory = new XercesSAXParserFactoryImpl(validating, handleXInclude);
-            factory.setValidating(validating);
-            return factory;
+            return new XercesSAXParserFactoryImpl(parserConfiguration);
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -121,55 +147,42 @@ public class XMLUtils {
     /**
      * Get a SAXParserFactory to build combinations of validating and XInclude-aware SAXParser.
      *
-     * @param validating        whether the factory creates validating parsers
-     * @param handleXInclude    whether the factory creates XInclude-aware parsers
-     * @return                  the SAXParserFactory
+     * @param parserConfiguration  parser configuration
+     * @return                     the SAXParserFactory
      */
-    public static synchronized SAXParserFactory getSAXParserFactory(boolean validating, boolean handleXInclude) {
-        if (validating) {
-            if (handleXInclude) {
-                if (validatingXIncludeSAXParserFactory == null)
-                    validatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                return validatingXIncludeSAXParserFactory;
-            } else {
-                if (validatingSAXParserFactory == null)
-                    validatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                return validatingSAXParserFactory;
-            }
-        } else {
-            if (handleXInclude) {
-                if (nonValidatingXIncludeSAXParserFactory == null)
-                    nonValidatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                return nonValidatingXIncludeSAXParserFactory;
-            } else {
-                if (nonValidatingSAXParserFactory == null)
-                    nonValidatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
-                return nonValidatingSAXParserFactory;
-            }
-        }
+    public static synchronized SAXParserFactory getSAXParserFactory(XMLUtils.ParserConfiguration parserConfiguration) {
+
+        final String key = parserConfiguration.getKey();
+
+        final SAXParserFactory existingFactory = parserFactories.get(key);
+        if (existingFactory != null)
+            return existingFactory;
+
+        final SAXParserFactory newFactory = createSAXParserFactory(parserConfiguration);
+        parserFactories.put(key, newFactory);
+        return newFactory;
     }
 
     /**
      * Create a new SAXParser, which can be a combination of validating and/or XInclude-aware.
      *
-     * @param validating        whether the parser is validating
-     * @param handleXInclude    whether the parser is XInclude-aware
-     * @return                  the SAXParser
+     * @param parserConfiguration  parser configuration
+     * @return                     the SAXParser
      */
-    private static synchronized SAXParser newSAXParser(boolean validating, boolean handleXInclude) {
+    private static synchronized SAXParser newSAXParser(XMLUtils.ParserConfiguration parserConfiguration) {
         try {
-            return getSAXParserFactory(validating, handleXInclude).newSAXParser();
+            return getSAXParserFactory(parserConfiguration).newSAXParser();
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
     public static SAXParser newSAXParser() {
-        return newSAXParser(DEFAULT_VALIDATING, DEFAULT_HANDLE_XINCLUDE);
+        return newSAXParser(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
     }
 
-    public static XMLReader newXMLReader(boolean validating, boolean handleXInclude) {
-        final SAXParser saxParser = XMLUtils.newSAXParser(validating, handleXInclude);
+    public static XMLReader newXMLReader(XMLUtils.ParserConfiguration parserConfiguration) {
+        final SAXParser saxParser = XMLUtils.newSAXParser(parserConfiguration);
         try {
             final XMLReader xmlReader = saxParser.getXMLReader();
             xmlReader.setEntityResolver(XMLUtils.ENTITY_RESOLVER);
@@ -342,11 +355,10 @@ public class XMLUtils {
      * @param xml                   XML string
      * @param systemId              system id of the document, or null
      * @param xmlReceiver           receiver to output to
-     * @param validating            whether validation must be performed
-     * @param handleXInclude        whether XInclude must be performed
+     * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    public static void stringToSAX(String xml, String systemId, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    public static void stringToSAX(String xml, String systemId, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         if (xml.trim().equals("")) {
             try {
                 xmlReceiver.startDocument();
@@ -355,7 +367,7 @@ public class XMLUtils {
                 throw new OXFException(e);
             }
         } else {
-            readerToSAX(new StringReader(xml), systemId, xmlReceiver, validating, handleXInclude, handleLexical);
+            readerToSAX(new StringReader(xml), systemId, xmlReceiver, parserConfiguration, handleLexical);
         }
     }
 
@@ -364,18 +376,17 @@ public class XMLUtils {
      *
      * @param systemId              system id of the document
      * @param xmlReceiver           receiver to output to
-     * @param validating            whether validation must be performed
-     * @param handleXInclude        whether XInclude must be performed
+     * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    public static void urlToSAX(String systemId, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    public static void urlToSAX(String systemId, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         try {
             final URL url = URLFactory.createURL(systemId);
             final InputStream is = url.openStream();
             final InputSource inputSource = new InputSource(is);
             inputSource.setSystemId(systemId);
             try {
-                inputSourceToSAX(inputSource, xmlReceiver, validating, handleXInclude, handleLexical);
+                inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical);
             } finally {
                 is.close();
             }
@@ -384,21 +395,21 @@ public class XMLUtils {
         }
     }
 
-    public static void inputStreamToSAX(InputStream inputStream, String systemId, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    public static void inputStreamToSAX(InputStream inputStream, String systemId, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         final InputSource inputSource = new InputSource(inputStream);
         inputSource.setSystemId(systemId);
-        inputSourceToSAX(inputSource, xmlReceiver, validating, handleXInclude, handleLexical);
+        inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical);
     }
 
-    public static void readerToSAX(Reader reader, String systemId, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    public static void readerToSAX(Reader reader, String systemId, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         final InputSource inputSource = new InputSource(reader);
         inputSource.setSystemId(systemId);
-        inputSourceToSAX(inputSource, xmlReceiver, validating, handleXInclude, handleLexical);
+        inputSourceToSAX(inputSource, xmlReceiver, parserConfiguration, handleLexical);
     }
 
-    private static void inputSourceToSAX(InputSource inputSource, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    private static void inputSourceToSAX(InputSource inputSource, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         try {
-            final XMLReader xmlReader = newSAXParser(validating, handleXInclude).getXMLReader();
+            final XMLReader xmlReader = newSAXParser(parserConfiguration).getXMLReader();
 //            xmlReader.setContentHandler(new SAXLoggerProcessor.DebugContentHandler(contentHandler));
             xmlReader.setContentHandler(xmlReceiver);
             if (handleLexical)
@@ -427,7 +438,7 @@ public class XMLUtils {
             return false;
 
         try {
-            final XMLReader xmlReader = newSAXParser(false, false).getXMLReader();
+            final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
             xmlReader.setContentHandler(NULL_CONTENT_HANDLER);
             xmlReader.setEntityResolver(ENTITY_RESOLVER);
             xmlReader.setErrorHandler(new org.xml.sax.ErrorHandler() {

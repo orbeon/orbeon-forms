@@ -60,11 +60,12 @@ package org.orbeon.oxf.xml.xerces;
 import orbeon.apache.xerces.impl.Constants;
 import orbeon.apache.xerces.jaxp.JAXPConstants;
 import orbeon.apache.xerces.util.SAXMessageFormatter;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.SAXParserFactory;
-import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * The only real difference between this class and orbeon.apache.xerces.jaxp.SAXParserImpl is that this class
@@ -130,13 +131,13 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser {
     /**
      * Create a SAX parser with the associated features
      *
-     * @param features Hashtable of SAX features, may be null
+     * @param features Map of SAX features
      */
-    XercesJAXPSAXParser(SAXParserFactory spf, Hashtable features, boolean validating, boolean handleXInclude) throws SAXException {
+    XercesJAXPSAXParser(SAXParserFactory spf, Map<String, Boolean> features, XMLUtils.ParserConfiguration parserConfiguration) throws SAXException {
 
         // Instantiate a SAXParser directly and not through SAX so that we
         // use the right ClassLoader
-        xmlReader = new XercesSAXParser(validating, handleXInclude);
+        xmlReader = new XercesSAXParser(parserConfiguration);
 
         // If validating, provide a default ErrorHandler that prints
         // validation errors with a warning telling the user to set an
@@ -162,23 +163,9 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser {
                 Constants.NAMESPACE_PREFIXES_FEATURE,
                 !spf.isNamespaceAware());
 
-        setFeatures(features);
-    }
-
-    /**
-     * Set any features of our XMLReader based on any features set on the SAXParserFactory.
-     *
-     * XXX Does not handle possible conflicts between SAX feature names and JAXP specific feature names, eg.
-     * SAXParserFactory.isValidating()
-     */
-    private void setFeatures(java.util.Hashtable features)
-            throws SAXNotSupportedException, SAXNotRecognizedException {
-        if (features != null) {
-            for (java.util.Enumeration e = features.keys(); e.hasMoreElements();) {
-                String feature = (String) e.nextElement();
-                boolean value = ((Boolean) features.get(feature)).booleanValue();
-                xmlReader.setFeature(feature, value);
-            }
+        // Set any features of our XMLReader based on any features set on the SAXParserFactory.
+        for (final Map.Entry<String, Boolean> entry : features.entrySet()) {
+            xmlReader.setFeature(entry.getKey(), entry.getValue());
         }
     }
 

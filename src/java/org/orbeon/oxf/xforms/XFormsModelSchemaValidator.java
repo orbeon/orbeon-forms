@@ -698,7 +698,7 @@ public class XFormsModelSchemaValidator {
 
                 final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", schemaURI);
                 final MSVGrammarReaderController controller = new MSVGrammarReaderController(schemaURI, newSchemaInfo);
-                final SAXParserFactory factory = XMLUtils.createSAXParserFactory(false, true);// could we use getSAXParserFactory() instead?
+                final SAXParserFactory factory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
                 newSchemaInfo.setGrammar(grammar);
@@ -722,9 +722,9 @@ public class XFormsModelSchemaValidator {
 //    private Grammar loadInlineGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
     private Grammar loadInlineGrammar(final String baseURI, final Element schemaElement) {
         final SchemaInfo newSchemaInfo = new SchemaInfo(); // used for resolving external dependencies
-        // TODO: Use SchemaInfo to cache depdencies if any
+        // TODO: Use SchemaInfo to cache dependencies if any
         final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
-        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(false, false);
+        final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.PLAIN);
         final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
 
 //        TransformerUtils.writeTinyTree(schemaElementInfo, reader);

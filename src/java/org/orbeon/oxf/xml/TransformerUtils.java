@@ -346,7 +346,7 @@ public class TransformerUtils {
             } else {
                 xmlReceiver = dom4jResult;
             }
-            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, false, false, handleLexical);
+            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
         }
         return dom4jResult.getDocument();
 
@@ -386,7 +386,7 @@ public class TransformerUtils {
             } else {
                 xmlReceiver = identityHandler;
             }
-            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, false, false, handleLexical);
+            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
         }
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
@@ -422,7 +422,7 @@ public class TransformerUtils {
     public static Document tinyTreeToDom4j2(NodeInfo nodeInfo) {
         try {
             final String xmlString = tinyTreeToString(nodeInfo);
-            return Dom4jUtils.readDom4j(xmlString, false, false);
+            return Dom4jUtils.readDom4j(xmlString);
         } catch (Exception e) {
             throw new OXFException(e);
         }

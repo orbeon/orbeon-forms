@@ -67,7 +67,7 @@ public class PEVersion extends Version {
         try {
             final Document rawLicenceDocument = ResourceManagerWrapper.instance().getContentAsDOM4J(LICENSE_PATH);
             final String compactString = Dom4jUtils.domToCompactString(rawLicenceDocument);
-            final Document licenseDocument = Dom4jUtils.readDom4j(compactString, false, false);
+            final Document licenseDocument = Dom4jUtils.readDom4j(compactString);
             licence = new DOMGenerator(licenseDocument, "license", DOMGenerator.ZeroValidity, LICENSE_URL);
         } catch (Exception e) {
             throw new OXFException(e);

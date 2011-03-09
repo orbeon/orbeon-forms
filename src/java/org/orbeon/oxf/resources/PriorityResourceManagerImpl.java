@@ -16,10 +16,13 @@ package org.orbeon.oxf.resources;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -97,10 +100,10 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
     
-    public Document getContentAsDOM4J(final String key, final boolean validating, final boolean handleXInclude, final boolean handleLexical) {
+    public Document getContentAsDOM4J(final String key, final XMLUtils.ParserConfiguration parserConfiguration, final boolean handleLexical) {
         return (Document) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return resourceManager.getContentAsDOM4J(key, validating, handleXInclude, handleLexical);
+                return resourceManager.getContentAsDOM4J(key, parserConfiguration, handleLexical);
             }
         });
     }
@@ -114,10 +117,10 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    public void getContentAsSAX(final String key, final XMLReceiver xmlReceiver, final boolean validating, final boolean handleXInclude, final boolean handleLexical) {
+    public void getContentAsSAX(final String key, final XMLReceiver xmlReceiver, final XMLUtils.ParserConfiguration parserConfiguration, final boolean handleLexical) {
         delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                resourceManager.getContentAsSAX(key, xmlReceiver, validating, handleXInclude, handleLexical);
+                resourceManager.getContentAsSAX(key, xmlReceiver, parserConfiguration, handleLexical);
                 return null;
             }
         });

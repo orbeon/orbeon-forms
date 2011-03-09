@@ -21,10 +21,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.xml.ForwardingXMLReader;
-import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
-import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
-import org.orbeon.oxf.xml.TeeXMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -113,7 +110,7 @@ public class TransformerURIResolver implements URIResolver {
                     // with HTTP and HTTPS. When would it make sense to use local caching?
                     final String protocol = url.getProtocol();
                     final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
-                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, handleXInclude, true, mode, null, null, cacheUseLocalCache);
+                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, new XMLUtils.ParserConfiguration(false, handleXInclude, false), true, mode, null, null, cacheUseLocalCache);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                     systemId = url.toExternalForm();
                 }
@@ -159,10 +156,6 @@ public class TransformerURIResolver implements URIResolver {
 
     protected PipelineContext getPipelineContext() {
         return pipelineContext;
-    }
-
-    protected boolean isHandleXInclude() {
-        return handleXInclude;
     }
 
     /**

@@ -182,7 +182,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) value), resultStore);
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse
-                    XMLUtils.stringToSAX((String) value, "", resultStore, false, false, true);
+                    XMLUtils.stringToSAX((String) value, "", resultStore, XMLUtils.ParserConfiguration.PLAIN, true);
                 } else {
                     // Consider the object a JavaBean
                     readBean(value, mapping, resultStore);

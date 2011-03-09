@@ -79,17 +79,17 @@ public abstract class ResourceManagerBase implements ResourceManager {
         return lch.getDocument();
     }
     
-    public org.dom4j.Document getContentAsDOM4J(String key, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    public org.dom4j.Document getContentAsDOM4J(String key, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         final LocationSAXContentHandler lch = new LocationSAXContentHandler();
-        getContentAsSAX(key, lch, validating, handleXInclude, handleLexical);
+        getContentAsSAX(key, lch, parserConfiguration, handleLexical);
         return lch.getDocument();
     }
 
     public void getContentAsSAX(final String key, XMLReceiver handler) {
-        getContentAsSAX(key, handler, false, true, true);
+        getContentAsSAX(key, handler, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, true);
     }
 
-    public void getContentAsSAX(String key, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical) {
+    public void getContentAsSAX(String key, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
         InputStream inputStream = null;
         final Locator[] locator = new Locator[1];
         try {
@@ -99,7 +99,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
                     locator[0] = loc;
                     super.setDocumentLocator(loc);
                 }
-            }, validating, handleXInclude, handleLexical);
+            }, parserConfiguration, handleLexical);
         } catch (ValidationException ve) {
             throw ve;
         } catch (ResourceNotFoundException rnfe) {

@@ -14,21 +14,29 @@
 package org.orbeon.oxf.xml.xerces;
 
 import orbeon.apache.xerces.parsers.XIncludeAwareParserConfiguration;
+import org.orbeon.oxf.xml.XMLUtils;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration {
 
+    private boolean externalEntities;
+
     public OrbeonParserConfiguration() {
-        this(false, false);
+        this(XMLUtils.ParserConfiguration.PLAIN);
     }
 
-    public OrbeonParserConfiguration(boolean validating, boolean handleXInclude) {
+    public OrbeonParserConfiguration(XMLUtils.ParserConfiguration parserConfiguration) {
         super(null, null, null);
+        this.externalEntities = parserConfiguration.externalEntities;
+
         // Set validation feature
-        super.setFeature(VALIDATION, validating);
+        super.setFeature(VALIDATION, parserConfiguration.validating);
         // Set XInclude feature
-        if (handleXInclude) {
+        if (parserConfiguration.handleXInclude) {
             super.setFeature(XINCLUDE_FEATURE, true);
             fXIncludeHandler = new XIncludeHandler();
             setProperty(XINCLUDE_HANDLER, fXIncludeHandler);
@@ -38,12 +46,11 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
         }
     }
 
-    // Used by our XercesSAXParserFactoryImpl
     private static final String FEATURE_NS_PREFIXES = "http://xml.org/sax/features/namespace-prefixes";
 
     // Used by our XercesSAXParserFactoryImpl
-    public Collection getRecognizedFeatures() {
-        final TreeSet result = new TreeSet();
+    public Set<String> getRecognizedFeatures() {
+        final TreeSet<String> result = new TreeSet<String>();
         result.addAll(fRecognizedFeatures);
         // Xerces uses PARSER_SETTINGS internally and makes sure that nothing from outside Xerces passes it in. But
         // we are exposing features collection here so need to remove PARSER_SETTING in case the feature set is passed
@@ -58,12 +65,19 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
     }
 
     // Used by our XercesSAXParserFactoryImpl
-    public Map getFeatures() {
+    public Map<String, Boolean> getFeatures() {
         // Xerces uses PARSER_SETTINGS internally and makes sure that nothing from outside Xerces passes it in. But
         // we are exposing features collection here so need to remove PARSER_SETTING in case the feature set is passed
         // back in to Xerces.
-        final TreeMap result = new TreeMap(fFeatures);
+        final TreeMap<String, Boolean> result = new TreeMap<String, Boolean>(fFeatures);
         result.remove(PARSER_SETTINGS);
+        
+        result.put("http://xml.org/sax/features/namespaces", true);
+        result.put("http://xml.org/sax/features/namespace-prefixes", false);
+
+        result.put("http://xml.org/sax/features/external-general-entities", externalEntities);
+        result.put("http://xml.org/sax/features/external-parameter-entities", externalEntities);
+
         return result;
     }
 }

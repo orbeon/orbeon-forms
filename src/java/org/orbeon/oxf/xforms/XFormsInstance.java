@@ -121,10 +121,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 if (!readonly) {
                     if (exposeXPathTypes) {
                         // Make a typed document wrapper
-                        documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, configuration);
+                        documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, configuration);
                     } else {
                         // Make a non-typed document wrapper
-                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, configuration);
+                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, configuration);
                     }
                 } else {
                     // Just use TinyTree as is

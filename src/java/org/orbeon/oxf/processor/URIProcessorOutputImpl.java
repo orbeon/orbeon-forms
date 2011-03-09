@@ -420,11 +420,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                     throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.statusCode);
 
                 // Read connection into SAXStore
-                final boolean handleXInclude = false; // don't handle XInclude
-                final boolean handleLexical = true;   // handle comments and other lexical information
-                
+                final XMLUtils.ParserConfiguration parserConfiguration = XMLUtils.ParserConfiguration.PLAIN;
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, false, handleXInclude, handleLexical);
+                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, parserConfiguration, true);
 
                 // Obtain last modified
                 lastModifiedLong = connectionResult.getLastModified();

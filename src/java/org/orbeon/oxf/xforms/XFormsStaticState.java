@@ -257,7 +257,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         // Extract properties information
         // Do this first so that e.g. extracted models know about properties
-        extractProperties(staticStateElement, topLevelModelsElements);
+        extractProperties(staticStateElement);
 
         // Extract controls, models and components documents
         extractControlsModelsComponents(propertyContext, staticStateElement, topLevelModelsElements);
@@ -273,6 +273,28 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         }
 
         indentedLogger.endHandleOperation();
+    }
+
+    private void extractProperties(Element staticStateElement) {
+        // NOTE: XFormsExtractorContentHandler takes care of propagating only non-default properties
+        final Element propertiesElement = staticStateElement.element(XFormsConstants.STATIC_STATE_PROPERTIES_QNAME);
+        if (propertiesElement != null) {
+            for (final Attribute attribute : Dom4jUtils.attributes(propertiesElement)) {
+                final String propertyName = attribute.getName();
+                final Object propertyValue = XFormsProperties.parseProperty(propertyName, attribute.getValue());
+
+                nonDefaultProperties.put(propertyName, propertyValue);
+            }
+        }
+
+        // Parse external-events property
+        final String externalEvents = getStringProperty(XFormsProperties.EXTERNAL_EVENTS_PROPERTY);
+        if (externalEvents != null) {
+            final StringTokenizer st = new StringTokenizer(externalEvents);
+            while (st.hasMoreTokens()) {
+                allowedExternalEvents.add(st.nextToken());
+            }
+        }
     }
 
     /**
@@ -389,96 +411,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         for (final Model model: modelsByPrefixedId.values()) {
             model.freeTransientState();
-        }
-    }
-
-    private void extractProperties(Element staticStateElement, List<Element> topLevelModelsElements) {
-        // Gather xxforms:* properties
-        {
-            // Global properties (outside models and controls)
-            {
-                final Element propertiesElement = staticStateElement.element(XFormsConstants.STATIC_STATE_PROPERTIES_QNAME);
-                if (propertiesElement != null) {
-                    for (Iterator i = propertiesElement.attributeIterator(); i.hasNext();) {
-                        final Attribute currentAttribute = (Attribute) i.next();
-                        final String propertyName = currentAttribute.getName();
-                        final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
-                        if (propertyValue != null) {
-                            nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
-                        } else {
-                            indentedLogger.logWarning("", "ignoring global property", "name", propertyName);
-                        }
-                    }
-                }
-            }
-            // Properties on top-level xforms:model elements
-            for (final Element modelElement: topLevelModelsElements) {
-                for (Iterator j = modelElement.attributeIterator(); j.hasNext();) {
-                    final Attribute currentAttribute = (Attribute) j.next();
-                    if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
-                        final String propertyName = currentAttribute.getName();
-                        final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
-                        if (propertyValue != null) {
-                            // Only take the first occurrence into account, and make sure the property is supported
-                            if (nonDefaultProperties.get(propertyName) == null && XFormsProperties.getPropertyDefinition(propertyName) != null)
-                                nonDefaultProperties.put(propertyName, propertyValue);
-                        } else {
-                            indentedLogger.logWarning("", "ignoring property on xforms:model element", "name", propertyName);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Handle default for properties
-        final PropertySet propertySet = Properties.instance().getPropertySet();
-        for (Iterator i = XFormsProperties.getPropertyDefinitionEntryIterator(); i.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) i.next();
-            final String propertyName = (String) currentEntry.getKey();
-            final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
-
-            final Object defaultPropertyValue = propertyDefinition.getDefaultValue(); // value can be String, Boolean, Integer
-            final Object actualPropertyValue = nonDefaultProperties.get(propertyName); // value can be String, Boolean, Integer
-            if (actualPropertyValue == null) {
-                // Property not defined in the document, try to obtain from global properties
-                final Object globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue);
-
-                // If the global property is different from the default, add it
-                if (!globalPropertyValue.equals(defaultPropertyValue))
-                    nonDefaultProperties.put(propertyName, globalPropertyValue);
-
-            } else {
-                // Property defined in the document
-
-                // If the property is identical to the default, remove it
-                if (actualPropertyValue.equals(defaultPropertyValue))
-                    nonDefaultProperties.remove(propertyName);
-            }
-        }
-
-        // Check validity of properties of known type
-        {
-            {
-                if (!isClientStateHandling() && !isServerStateHandling())
-                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.STATE_HANDLING_PROPERTY
-                            + " attribute value: " + getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY), getLocationData());
-            }
-            {
-                final String readonlyAppearance = getStringProperty(XFormsProperties.READONLY_APPEARANCE_PROPERTY);
-                if (!(readonlyAppearance.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
-                                || readonlyAppearance.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
-                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.READONLY_APPEARANCE_PROPERTY
-                            + " attribute value: " + readonlyAppearance, getLocationData());
-            }
-        }
-
-        // Parse external-events property
-        final String externalEvents = getStringProperty(XFormsProperties.EXTERNAL_EVENTS_PROPERTY);
-        if (externalEvents != null) {
-            final StringTokenizer st = new StringTokenizer(externalEvents);
-            while (st.hasMoreTokens()) {
-                allowedExternalEvents.add(st.nextToken());
-            }
         }
     }
 

@@ -14,9 +14,11 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
@@ -169,15 +171,35 @@ public class XFormsProperties {
                 return value;
             }
         }
+
+        public void validate(Object value, LocationData locationData) {}
     }
 
     private static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
-            new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false),
+            new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false) {
+                @Override
+                public void validate(Object value, LocationData locationData) {
+                    final String stringValue = value.toString();
+                    if (!(stringValue.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)
+                            || stringValue.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)))
+                        throw new ValidationException("Invalid xxforms:" + getName()
+                                + " property value value: " + stringValue, locationData);
+                }
+            },
             new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
             new PropertyDefinition(NOSCRIPT_SUPPORT_PROPERTY, true, false),
             new PropertyDefinition(AJAX_PORTLET_PROPERTY, false, false),
             new PropertyDefinition(READONLY_PROPERTY, false, false),
-            new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false),
+            new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false) {
+                @Override
+                public void validate(Object value, LocationData locationData) {
+                    final String stringValue = value.toString();
+                    if (!(stringValue.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
+                            || stringValue.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
+                        throw new ValidationException("Invalid xxforms:" + getName()
+                                + " property value value: " + stringValue, locationData);
+                }
+            },
             new PropertyDefinition(ORDER_PROPERTY, DEFAULT_ORDER_PROPERTY, false),
             new PropertyDefinition(LABEL_ELEMENT_NAME_PROPERTY, "label", false),
             new PropertyDefinition(HINT_ELEMENT_NAME_PROPERTY, "span", false),

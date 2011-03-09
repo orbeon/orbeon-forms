@@ -19,7 +19,7 @@
             .orbeon .examples .example .image { height: 310px; overflow-y: auto; overflow-x: hidden; padding: 1px 0 } <!-- padding 1px to make FF 3.6 happy -->
             .orbeon .examples .example img { border: none; display: block; margin: 0 auto; padding: 1px 0 1px }
             .orbeon .examples .example:hover { background-color: #FFCC66 }
-            .orbeon .examples .example h2 { color: #004B92; font-size: 14px; margin-top: 0; margin-bottom: .3em }
+            .orbeon .examples .example h2 { font-size: 14px }
             .orbeon .examples .example .description { padding: .5em 1em; font-family: georgia,serif; font-size: 14px; line-height: 1.3 }
             .orbeon .examples .example.last .image { margin-top: 5em }
             .orbeon .examples .example.last .description {  text-align: center; font-style: italic }

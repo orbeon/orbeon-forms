@@ -193,53 +193,38 @@ a {
     font-size: 14px;
     text-align: left;
     padding: 0.1em .5em .1em .5em;
-    margin-top: 0.5em;
-    margin-left: 0.1em;
-    margin-right: 0.1em;
-    margin-bottom: 0;
+    margin: 0.5em 0.1em 0.1em 0;
+}
+
+.orbeon .maincontent h1, .orbeon .maincontent h2, .orbeon .maincontent h3, .orbeon .maincontent h4 {
+    color: #336;
+    font-weight: bold;
+    clear: both;
+    text-align: left;
+}
+
+.orbeon .maincontent h1, .orbeon .maincontent h2 {
+    background-color: #dde;
+    padding: .2em 1em;
+    margin: 0 0 .3em 0;
+    border-bottom: solid 1px #99c;
 }
 
 .orbeon .maincontent h1 {
-    background-color: #dde;
-    font-weight: bold;
-    font-size: 14px;
-    text-align: left;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: .2em;
-    padding-bottom: .2em;
-    margin-top: 0;
-    margin-bottom: 0;
-    border-bottom: solid 1px #99c;
     line-height: 180%;
+    font-size: 14px;
 }
 
 .orbeon .maincontent h2 {
-    color: #336;
-    background-color: #dde;
     font-size: 9pt;
-    font-weight: bold;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: .2em;
-    padding-bottom: .2em;
-    margin-top: 2em;
-    margin-bottom: 1em;
-    border-bottom: solid 1px #336;
-    clear: right;
 }
 
 .orbeon .maincontent h3 {
-    color: #336;
     font-size: 10pt;
-    font-weight: bold;
-    clear: right;
 }
 
 .orbeon .maincontent h4 {
-    color: #336;
     font-size: 10pt;
-    font-weight: bold;
 }
 
 .orbeon .maincontent h5 {

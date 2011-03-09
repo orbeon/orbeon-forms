@@ -161,7 +161,10 @@ class ResourcesAggregator extends ProcessorImpl {
 
                                     // Store on disk if requested to make the resource available to external software, like Apache
                                     if (XFormsProperties.isCacheCombinedResources) {
-                                        val resourcesConfig = resources map (r => new XFormsFeatures.ResourceConfig(r, r)) toList
+                                        val resourcesConfig = resources.toSeq map (r => new XFormsFeatures.ResourceConfig(r, r))
+
+                                        assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
+
                                         val combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resourcesConfig, false)
                                         XFormsResourceServer.cacheResources(resourcesConfig, pipelineContext, path, combinedLastModified, isCSS, false)
                                     }

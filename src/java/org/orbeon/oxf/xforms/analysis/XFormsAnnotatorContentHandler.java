@@ -16,11 +16,18 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
@@ -464,7 +471,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttribute[0],
                         new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));
 
-            // TODO: Make sure we can test on the presense of "$" without breaking ids produced by XBLBindings
+            // TODO: Make sure we can test on the presence of "$" without breaking ids produced by XBLBindings
 //            else if (newIdAttribute[0].contains("$"))
 //                throw new ValidationException("Id for XForms element cannot contain the \"$\" character: " + newIdAttribute[0],
 //                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));

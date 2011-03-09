@@ -34,10 +34,6 @@ public class IdGenerator {
         this.currentId = currentId;
     }
 
-    public IdGenerator(Set<String> ids) {
-        this.ids = ids;
-    }
-
     public boolean isDuplicate(String id) {
         return isCheckDuplicates && ids.contains(id);
     }

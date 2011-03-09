@@ -130,7 +130,7 @@ object XHTMLHeadHandler {
 
                             // Try to find binding
                             (Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME) map
-                                (e => new XBLBindings.AbstractBinding(e, staticState.getNamespaceMapping("", e), scripts)) find
+                                (e => new XBLBindings.AbstractBinding(e, staticState.getNamespaceMapping("", e), scripts, null)) find
                                     (_.qNameMatch == qName)) match {
                                 case Some(binding) => (binding.scripts, binding.styles)
                                 case None => (JCollections.emptyList[Element], JCollections.emptyList[Element])

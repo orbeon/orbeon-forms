@@ -27,6 +27,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
 var XFORMS_REGEXP_SINGLE_QUOTE = new RegExp("'", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
+var XFORMS_REGEXP_CLOSE_ANGLE = new RegExp(">", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
 var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
 var DEFAULT_LOADING_TEXT = "Loading...";
@@ -862,7 +863,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              *  an error if 0 or more than 1 matches
              */
             _parseMonth: function(month) {
-                var matches = ORBEON.util.DateTime._monthNames.filter(function(item) {
+                var matches = _.filter(ORBEON.util.DateTime._monthNames, function(item) {
                     return new RegExp("^" + month, "i").test(item);
                 });
                 if (matches.length == 0) {
@@ -871,12 +872,12 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (matches.length > 1) {
                     throw new Error("Ambiguous month");
                 }
-                return ORBEON.util.DateTime._monthNames.indexOf(matches[0]);
+                return _.indexOf(ORBEON.util.DateTime._monthNames, matches[0]);
             },
 
             /* Same as parseMonth but for days of the week */
             _parseWeekday: function(weekday) {
-                var matches = ORBEON.util.DateTime._weekdayNames.filter(function(item) {
+                var matches = _.filter(ORBEON.util.DateTime._weekdayNames, function(item) {
                     return new RegExp("^" + weekday, "i").test(item);
                 });
                 if (matches.length == 0) {
@@ -885,7 +886,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (matches.length > 1) {
                     throw new Error("Ambiguous weekday");
                 }
-                return ORBEON.util.DateTime._weekdayNames.indexOf(matches[0]);
+                return _.indexOf(ORBEON.util.DateTime._weekdayNames, matches[0]);
             },
 
             _currentYear: new Date().getFullYear(),
@@ -1693,14 +1694,13 @@ ORBEON.xforms.Controls = {
             var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
             var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
             return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date")) {
+        } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date") && YAHOO.util.Dom.hasClass(control, "xforms-input")) {
             // Date control
 			var dateInputValue;
 			if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
 				var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
 				dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
-			}
-			else {
+			} else {
 				dateInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
 			}
             var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
@@ -3334,7 +3334,6 @@ ORBEON.xforms.Events = {
         // Stop processing if the mouse button that was clicked is not the left button
         // See: http://www.quirksmode.org/js/events_properties.html#button
         if (event.button != 0 && event.button != 1) return;
-
         ORBEON.xforms.Events.clickEvent.fire(event);
         var originalTarget = YAHOO.util.Event.getTarget(event);
         if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {

@@ -46,7 +46,7 @@ ORBEON.testcases = {
             window.opsXFormsProperties = {};
             window.opsXFormsProperties[FORMAT_INPUT_TIME_PROPERTY] = "[h]:[m]:[s] [P]";
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate("11:22:33");
-            var displayTime = ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
+            var displayTime = ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
             YAHOO.util.Assert.areEqual("11:22:33 a.m.", displayTime);
         },
 
@@ -54,13 +54,13 @@ ORBEON.testcases = {
             window.opsXFormsProperties = {};
             window.opsXFormsProperties[FORMAT_INPUT_TIME_PROPERTY] = "[h]:[m]:[s] [P]";
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate("16:22:33");
-            var displayTime = ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
+            var displayTime = ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
             YAHOO.util.Assert.areEqual("4:22:33 p.m.", displayTime);
         },
 
         testDisplayDate: function() {
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate("4/25/1998");
-            var displayDate = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+            var displayDate = ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
             YAHOO.util.Assert.areEqual("4/25/1998", displayDate);
         },
 

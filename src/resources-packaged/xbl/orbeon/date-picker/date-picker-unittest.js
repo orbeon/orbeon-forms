@@ -20,19 +20,27 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         var output = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, "date-picker")[0];
         YAHOO.util.Assert.areEqual("Friday May 15, 2009 ", output.innerHTML);
     },
-    
+
+    // [ #315874 ] fr:date-picker: click on text to the right of the image leads to JavaScript error
+    // http://forge.ow2.org/tracker/index.php?func=detail&aid=315874&group_id=168&atid=350207
+    testClickOnText: function() {
+        // Click on the text; we don't expect any result, just no error
+        var textOutput = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", "span", "date-picker")[0];
+        ORBEON.xforms.Events.click({target: textOutput, button: 0 });
+    },
+
     // Check date change by interacting with date picker
     testChangeDatePicker: function() {
         // Click on image to open YUI date picker
         var datePickerImage = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", "date-picker")[0];
-        ORBEON.xforms.Events.click({target: datePickerImage });
+        ORBEON.xforms.Events.click({target: datePickerImage, button: 0 });
         this.wait(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 // Click on day 20
                 var day20 = YAHOO.util.Dom.getElementsByClassName("d20", null, "orbeon-calendar-div")[0];
                 YAHOO.util.UserAction.click(day20);
                 // Copy new value to input
-                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("copy-to-input"));
+                ORBEON.util.Test.click("copy-to-input");
             }, function() {
                 // Check that date picker output is updated
                 var output = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, "date-picker")[0];
@@ -41,22 +49,22 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 var input = YAHOO.util.Dom.get("input$xforms-input-1");
                 YAHOO.util.Assert.areEqual("2009-05-20", input.value);
             });
-            
+
         }, ORBEON.util.Properties.internalShortDelay.get());
     },
-    
+
     testChangeInput: function() {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             // Set value of input and copy to date picker
             ORBEON.xforms.Document.setValue("input", "2009-06-25");
-            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("copy-to-date-picker"));
+            ORBEON.util.Test.click("copy-to-date-picker");
         }, function() {
             // Check that date picker output is updated
             var output = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, "date-picker")[0];
             YAHOO.util.Assert.areEqual("Thursday June 25, 2009 ", output.innerHTML);
         });
     }
-    
+
 }));
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {

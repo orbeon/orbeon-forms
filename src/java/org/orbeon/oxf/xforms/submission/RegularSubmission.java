@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -44,12 +42,7 @@ public class RegularSubmission extends BaseSubmission {
     public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
-        final URL absoluteResolvedURL;
-        try {
-            absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString));
-        } catch (MalformedURLException e) {
-            throw new OXFException(e);
-        }
+        final URL absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString, submission.isURLNorewrite()));
 
         // Gather remaining information to process the request
         final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);

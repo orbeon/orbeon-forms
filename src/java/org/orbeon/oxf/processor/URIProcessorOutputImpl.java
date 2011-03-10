@@ -406,7 +406,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 // Compute absolute submission URL
                 final URL submissionURL;
                 try {
-                    submissionURL = URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, true));
+                    submissionURL = URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }

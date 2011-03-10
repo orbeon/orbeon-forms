@@ -19,7 +19,6 @@ import org.orbeon.oxf.externalcontext.ServletURLRewriter;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
@@ -33,8 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -83,7 +80,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // addition to that, we must still rewrite the path as a resource, so that versioned resources are
                     // handled properly.
                     final String path = servletRewriter.rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
-                    return externalContext.rewriteServiceURL(path, true);
+                    return externalContext.rewriteServiceURL(path, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
                 }
 
                 protected InputStream resolveAndOpenStream(String uri) {

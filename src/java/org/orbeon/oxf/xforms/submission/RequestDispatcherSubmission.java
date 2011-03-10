@@ -65,7 +65,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
                 "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
                 "is asynchronous", Boolean.toString(p2.isAsynchronous),
-                "container type", request.getContainerType(), "norewrite", Boolean.toString(submission.isURLNorewrite()),
+                "container type", request.getContainerType(),
+                "norewrite", Boolean.toString(submission.isURLNorewrite()),
                 "url type", submission.getUrlType(),
                 "local-submission-forward", Boolean.toString(XFormsProperties.isLocalSubmissionForward(containingDocument)),
                 "local-submission-include", Boolean.toString(XFormsProperties.isLocalSubmissionInclude(containingDocument))

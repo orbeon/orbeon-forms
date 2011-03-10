@@ -1358,9 +1358,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Register that an upload has ended.
      */
     public void endUpload(String uploadId) {
-        assert pendingUploads != null;
-        boolean found = pendingUploads.remove(uploadId);
-        assert found;
+        // NOTE: Don't enforce existence of upload, as this is also called if upload control becomes non-relevant, and
+        // also because asynchronously if the client notifies us to end an upload after a control has become non-relevant,
+        // we don't want to fail.
+        if (pendingUploads != null)
+            pendingUploads.remove(uploadId);
     }
 
     /**

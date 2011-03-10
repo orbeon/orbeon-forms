@@ -81,7 +81,8 @@ public class StaticExternalContext {
     }
 
     public static String rewriteServiceURL(String urlString, boolean forceAbsolute) {
-        return getStaticContext().getExternalContext().rewriteServiceURL(urlString, forceAbsolute);
+        return getStaticContext().getExternalContext().rewriteServiceURL(urlString,
+                forceAbsolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
     }
 
     public static String setTitle(String title) {
@@ -113,5 +114,9 @@ public class StaticExternalContext {
 
     public static boolean isPE() {
         return Version.isPE();
+    }
+
+    public static boolean isPortlet() {
+        return "portlet".equals(StaticExternalContext.getStaticContext().getExternalContext().getRequest().getContainerType());
     }
 }

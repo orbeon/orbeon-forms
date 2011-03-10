@@ -49,7 +49,7 @@ ORBEON.widgets.YUICalendar = function() {
     // User selected a date in the picker
     function dateSelected() {
         var jsDate = yuiCalendar.getSelectedDates()[0];
-        inputField.value = ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
+        inputField.value = ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
 		if(YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal"))
 			inputField.alt = inputField.value;
         var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
@@ -84,8 +84,7 @@ ORBEON.widgets.YUICalendar = function() {
         extending: ORBEON.widgets.Base,
 
         appliesToControl: function(control) {
-            return (YAHOO.util.Dom.hasClass(control, "xforms-type-date") || YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime"))
-                    && ORBEON.util.Properties.datePicker.get() == "yui";
+            return YAHOO.util.Dom.hasClass(control, "xforms-type-date") || YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime");
         },
 
         click: function(event, target) {

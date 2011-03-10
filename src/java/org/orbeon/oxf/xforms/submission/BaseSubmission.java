@@ -26,8 +26,12 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public abstract class BaseSubmission implements Submission {
@@ -40,7 +44,7 @@ public abstract class BaseSubmission implements Submission {
         this.containingDocument = submission.getContainingDocument();
     }
 
-    protected String getAbsoluteSubmissionURL(PropertyContext propertyContext, String resolvedActionOrResource, String queryString) {
+    protected String getAbsoluteSubmissionURL(PropertyContext propertyContext, String resolvedActionOrResource, String queryString, boolean isNorewrite) {
 
         if ("resource".equals(submission.getUrlType())) {
             // In case, for some reason, author forces a resource URL
@@ -50,7 +54,7 @@ public abstract class BaseSubmission implements Submission {
 
             return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                    isNorewrite ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE_NO_CONTEXT : ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         } else {
             // Regular case of service URL
 
@@ -65,7 +69,7 @@ public abstract class BaseSubmission implements Submission {
 
             return XFormsUtils.resolveServiceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                    isNorewrite ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE_NO_CONTEXT : ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         }
     }
 

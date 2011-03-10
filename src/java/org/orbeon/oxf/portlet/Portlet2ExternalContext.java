@@ -847,7 +847,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
-    public String rewriteServiceURL(String urlString, boolean forceAbsolute) {
-        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, forceAbsolute);
+    public String rewriteServiceURL(String urlString, int rewriteMode) {
+        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, rewriteMode);
     }
 }

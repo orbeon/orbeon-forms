@@ -2303,7 +2303,7 @@
                 <p:processor name="oxf:resources-aggregator">
                     <p:input name="data">
                         <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
-                            <xh:head>
+                            <xh:head xmlns:f="http://orbeon.org/oxf/xml/formatting">
                                 <xh:title>Title</xh:title>
                                 <xh:link rel="STYLESHEET" class="xforms-baseline" href="/css1.css" type="text/css"/>
                                 <xh:style>.red { color: red }</xh:style>
@@ -2313,6 +2313,7 @@
                                 <xh:link rel="stylesheet" href="/css2.css"/>
                                 <xh:link rel="STYLESHEET" href="/css3.css"/>
                                 <xh:link rel="stylesheet" href="/css4.css"/>
+                                <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
                                 <xh:style type="text/css">.blue { color: blue }</xh:style>
                                 <xh:link rel="stylesheet" href="/foobar2.foobar" type="text/x-foobar"/>
                                 <xh:script class="xforms-baseline" src="/js1.js" type="text/javascript"/>
@@ -2323,6 +2324,7 @@
                                 <xh:script src="/js2.js"/>
                                 <xh:script src="/js3.js" type="text/javascript"/>
                                 <xh:script src="/js4.js" type="text/javascript"/>
+                                <xh:script src="/js5.js" type="text/javascript" f:url-norewrite="true"/>
                                 <xh:script>function bar()</xh:script>
                                 <xh:script src="/cs2.cs" type="text/coffeescript"/>
                             </xh:head>
@@ -2364,7 +2366,7 @@
         </input>
         <output name="data">
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
-                <xh:head>
+                <xh:head xmlns:f="http://orbeon.org/oxf/xml/formatting">
                     <xh:title>Title</xh:title>
                     <xh:link rel="stylesheet" class="xforms-baseline" href="/foobar1.foobar" type="text/x-foobar"/>
                     <xh:link rel="stylesheet" href="/foobar2.foobar" type="text/x-foobar"/>
@@ -2373,6 +2375,7 @@
                     <xh:link rel="stylesheet" href="/xforms-server/orbeon-31760c702d3619986af1c9a196821c56cf8e44ae.css" type="text/css" media="all"/>
                     <xh:link rel="stylesheet" href="/xforms-server/orbeon-d6143e3d8bbef561e7f8608e6f2f17ddc7fb1790.css" type="text/css" media="all"/>
                     <xh:style>.red { color: red }</xh:style>
+                    <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
                     <xh:style type="text/css">.blue { color: blue }</xh:style>
                 </xh:head>
                 <xh:body>
@@ -2396,8 +2399,10 @@
                 <xh:script type="text/javascript" src="/xforms-server/orbeon-e3386f743649d644e767142dfe7d447175463880.js"/>
                 <xh:script type="text/javascript" src="/xforms-server/orbeon-bc2cdd195a4d1d6a4c12fc548cc9f7ab305d8965.js"/>
                 <xh:script>function foo()</xh:script>
+                <xh:script xmlns:f="http://orbeon.org/oxf/xml/formatting" src="/js5.js" type="text/javascript" f:url-norewrite="true"></xh:script>
                 <xh:script>function bar()</xh:script>
             </xh:html>
+
         </output>
     </test>
 

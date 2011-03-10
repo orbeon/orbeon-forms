@@ -38,7 +38,8 @@
          * was disabled, without an xforms-readonly or xforms-readwrite event being dispatched.
          */
         enabled: function() {
-            this.yuiButton.set("disabled", YAHOO.util.Dom.hasClass(this.yuiButtonSpan, "xforms-readonly"));
+            var triggerSpan = YD.getElementsByClassName("xforms-trigger", null, this.container)[0];
+            this.yuiButton.set("disabled", YAHOO.util.Dom.hasClass(triggerSpan, "xforms-readonly"));
         },
 
         readonly:  function() { this.yuiButton.set("disabled", true); },

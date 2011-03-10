@@ -44,7 +44,12 @@
                                     <static-state xmlns="">
                                         <xsl:copy-of select="doc('input:controls')/*/*"/>
                                         <xsl:copy-of select="doc('input:models')/*/*"/>
-                                        <properties xxforms:state-handling="client"/>
+                                        <properties xxforms:state-handling="client">
+                                            <!-- Add properties on models, as XFormsExtractorContentHandler does -->
+                                            <xsl:for-each select="doc('input:models')/*/*/@xxforms:*">
+                                                <xsl:attribute name="{name()}" select="."/>
+                                            </xsl:for-each>
+                                        </properties>
                                         <last-id id="1000"/>
                                     </static-state>
                                 </xsl:document>

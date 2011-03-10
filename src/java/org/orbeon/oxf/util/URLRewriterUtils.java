@@ -82,12 +82,12 @@ public class URLRewriterUtils {
      *
      * @param request           incoming request
      * @param urlString         URL to rewrite
-     * @param forceAbsolute     whether to force an absolute URL in case the request is used as a base
+     * @param rewriteMode       rewrite mode
      * @return                  rewritten URL
      */
-    public static String rewriteServiceURL(ExternalContext.Request request, String urlString, boolean forceAbsolute) {
+    public static String rewriteServiceURL(ExternalContext.Request request, String urlString, int rewriteMode) {
 
-        final int rewriteMode = forceAbsolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
+        assert (rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE) != 0;
 
         final String baseURIProperty = getServiceBaseURI();
         if (StringUtils.isBlank(baseURIProperty)) {
@@ -102,7 +102,7 @@ public class URLRewriterUtils {
                 return rewriteURL(baseURI.getScheme() != null ? baseURI.getScheme() : request.getScheme(),
                         baseURI.getHost() != null ? baseURI.getHost() : request.getServerName(),
                         baseURI.getHost() != null ? baseURI.getPort() : request.getServerPort(),
-                        baseURI.getPath(), "", urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                        baseURI.getPath(), "", urlString, rewriteMode);
 
             } catch (URISyntaxException e) {
                 throw new OXFException("Incorrect base URI property specified: " + baseURIProperty);
@@ -183,13 +183,13 @@ public class URLRewriterUtils {
             {
                 String _baseURLString;
                 // Prepend absolute base if needed
-                if (rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE) {
+                if ((rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE) != 0) {
                     _baseURLString = scheme + "://" + host + ((port == 80 || port == -1) ? "" : ":" + port);
                 } else {
                     _baseURLString = "";
                 }
                 // Append context path if needed
-                if (rewriteMode != ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
+                if ((rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT) == 0)
                     _baseURLString = _baseURLString + contextPath;
 
                 baseURLString = _baseURLString;
@@ -200,7 +200,7 @@ public class URLRewriterUtils {
                 // This is a special case that appears to be implemented
                 // in Web browsers as a convenience. Users may use it.
                 return baseURLString + requestPath + urlString;
-            } else if (rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE && !urlString.startsWith("/") && !"".equals(urlString)) {
+            } else if ((rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE) != 0 && !urlString.startsWith("/") && !"".equals(urlString)) {
                 // Don't change the URL if it is a relative path and we don't force absolute
                 return urlString;
             } else {

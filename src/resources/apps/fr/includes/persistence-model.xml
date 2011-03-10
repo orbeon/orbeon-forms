@@ -604,6 +604,7 @@
         select="lower-case(xxforms:property(string-join(('oxf.fr.detail.send.success.method', $app, $form), '.')))"/>
 
     <!-- NOTE: keep non-relevant fields for now, as this is what's done for save/update. Should probably be configurable by the form author. -->
+    <!-- TODO: possibly: pass app/form name, e.g.: resource="{$workflow-success-uri}?fr-app={$app}&amp;fr-form={$form}" -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{$workflow-success-uri}"
         relevant="false" method="{$workflow-success-method}"

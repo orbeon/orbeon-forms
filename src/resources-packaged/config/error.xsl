@@ -272,7 +272,7 @@
                             </table>
                         </div>
                     </div>
-                    <p class="ops-version"><xsl:value-of select="$orbeon-forms-version"/></p>
+                    <p class="orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></p>
                 </div>
             </body>
         </html>

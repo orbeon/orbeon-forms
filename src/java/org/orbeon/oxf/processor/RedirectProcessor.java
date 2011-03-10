@@ -19,7 +19,9 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XPathUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class RedirectProcessor extends ProcessorImpl {
 
@@ -63,7 +65,10 @@ public class RedirectProcessor extends ProcessorImpl {
             // Send the redirect
             final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ExternalContext.Response response = externalContext.getResponse();
-            response.sendRedirect(response.rewriteRenderURL(pathInfo), parameters, isServerSide, isExitPortal);
+
+            // Don't rewrite the path if doing a server-side redirect, because the forward expects a URL without the servlet context
+            final String redirectURL = isServerSide ? pathInfo : response.rewriteRenderURL(pathInfo);
+            response.sendRedirect(redirectURL, parameters, isServerSide, isExitPortal);
         } catch (Exception e) {
             throw new OXFException(e);
         }

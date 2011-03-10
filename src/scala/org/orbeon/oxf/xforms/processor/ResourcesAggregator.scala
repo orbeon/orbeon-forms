@@ -26,6 +26,7 @@ import scala.collection.JavaConversions._
 import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
 import org.orbeon.oxf.xforms._
+import org.dom4j.QName
 
 /**
  * Aggregate CSS and JS resources under <head>.
@@ -83,10 +84,15 @@ class ResourcesAggregator extends ProcessorImpl {
                                 inHead = true
                             } else if (level == 3 && inHead) {
 
+                                implicit def attributesToSAXAttribute(attributes: Attributes) = new {
+                                    def getValue(qName: QName) = attributes.getValue(qName.getNamespaceURI, qName.getName)
+                                }
+
                                 lazy val href = attributes.getValue("href")
                                 lazy val src = attributes.getValue("src")
                                 lazy val resType = attributes.getValue("type")
                                 lazy val cssClasses = attributes.getValue("class")
+                                lazy val isNorewrite = attributes.getValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME) == "true"
 
 //                                lazy val rel: Set[String] = (Option(attributes.getValue("rel")) map (_.toLowerCase.split("""\s+""")) flatten) toSet
                                 lazy val rel = Option(attributes.getValue("rel")) getOrElse "" toLowerCase
@@ -94,13 +100,13 @@ class ResourcesAggregator extends ProcessorImpl {
                                 // Gather resources that match
                                 localname match {
                                     case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
-                                        if (isSeparatePath(href))
+                                        if (isSeparatePath(href) || isNorewrite)
                                             preservedCSS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineCSS else supplementalCSS) += href
                                         filter = true
                                     case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript")  =>
-                                        if (isSeparatePath(src))
+                                        if (isSeparatePath(src) || isNorewrite)
                                             preservedJS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineJS else supplementalJS) += src
@@ -149,15 +155,18 @@ class ResourcesAggregator extends ProcessorImpl {
                                     // Output link to resource
                                     val path = "" :: "xforms-server" ::
                                         (if (URLRewriterUtils.isResourcesVersioned) List(Version.getVersionNumber) else Nil) :::
-                                        "orbeon-" + resourcesHash + (if (isCSS) ".css" else ".js") :: Nil
+                                        "orbeon-" + resourcesHash + (if (isCSS) ".css" else ".js") :: Nil mkString "/"
 
-                                    outputElement(path mkString "/")
+                                    outputElement(path)
 
                                     // Store on disk if requested to make the resource available to external software, like Apache
                                     if (XFormsProperties.isCacheCombinedResources) {
-                                        val resourcesConfig = resources map (r => new XFormsFeatures.ResourceConfig(r, r)) toList
+                                        val resourcesConfig = resources.toSeq map (r => new XFormsFeatures.ResourceConfig(r, r))
+
+                                        assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
+
                                         val combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resourcesConfig, false)
-                                        XFormsResourceServer.cacheResources(resourcesConfig, pipelineContext, resourcesHash, combinedLastModified, isCSS, false)
+                                        XFormsResourceServer.cacheResources(resourcesConfig, pipelineContext, path, combinedLastModified, isCSS, false)
                                     }
                                 }
                             }

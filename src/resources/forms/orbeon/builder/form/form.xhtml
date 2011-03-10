@@ -890,7 +890,9 @@
                                                                                     <xxforms:variable name="instance-holder" as="element()"
                                                                                                       select="if ($is-component)
                                                                                                               then $component-binding//xforms:instance[@id = 'fr-form-instance']/*/*[name() = $control-name]
-                                                                                                              else $section-holder/*[name() = $control-name]" />
+                                                                                                              else if ($is-repeat)
+                                                                                                              then $section-holder/*/*[name() = $control-name]
+                                                                                                              else $section-holder/*[name() = $control-name]"/>
                                                                                     <xxforms:variable name="resource-holder" as="element()"
                                                                                                       select="if ($is-component)
                                                                                                               then $component-binding//xforms:instance[@id = 'fr-form-resources']/*/resource[1]/*[name() = $control-name]
@@ -961,9 +963,6 @@
 
             <!-- Add language dialog -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-language.xml" xxi:omit-xml-base="true"/>
-
-            <!-- CSS upload dialog -->
-            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-css.xml" xxi:omit-xml-base="true"/>
 
             <!-- PDF upload dialog -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-pdf.xml" xxi:omit-xml-base="true"/>

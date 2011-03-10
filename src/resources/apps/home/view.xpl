@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,18 +11,16 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <header>
-        <title>XSLT and JAXP (TrAX) Processors</title>
-    </header>
-    <body>
-        <section>
-            <title>Introduction</title>
-            <p>
-                This section has <a href="http://wiki.orbeon.com/forms/doc/xslt-jaxp-processors">moved to the Orbeon Forms wiki</a>.
-            </p>
-        </section>
-    </body>
-</document>
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <p:param name="data" type="input"/>
+    <p:param name="data" type="output"/>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="config" href="view.xsl"/>
+        <p:input name="data" href="#data"/>
+        <p:output name="data" ref="data"/>
+    </p:processor>
+
+</p:config>

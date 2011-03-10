@@ -88,10 +88,15 @@ public interface ExternalContext extends WebAppExternalContext {
 
     public interface Response {
 
+        // Works as a bitset
+        // 1: whether to produce an absolute URL (starting with "http" or "https")
+        // 2: whether to leave the URL as is if it is does not start with "/"
+        // 4: whether to prevent insertion of a context at the start of the path
         static final int REWRITE_MODE_ABSOLUTE = 1;
-        static final int REWRITE_MODE_ABSOLUTE_PATH = 2;
-        static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 3;
+        static final int REWRITE_MODE_ABSOLUTE_PATH = 0;
+        static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 2;
         static final int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
+        static final int REWRITE_MODE_ABSOLUTE_NO_CONTEXT = 5;
 
         PrintWriter getWriter() throws IOException;
         OutputStream getOutputStream() throws IOException;
@@ -199,10 +204,10 @@ public interface ExternalContext extends WebAppExternalContext {
      * o the incoming request if not specified externally
      *
      * @param urlString     URL to rewrite
-     * @param forceAbsolute force absolute URL
+     * @param rewriteMode   rewrite mode
      * @return              rewritten URL
      */
-    String rewriteServiceURL(String urlString, boolean forceAbsolute);
+    String rewriteServiceURL(String urlString, int rewriteMode);
 
     String getStartLoggerString();
     String getEndLoggerString();

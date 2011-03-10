@@ -12,7 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <examples title="Orbeon Forms - Form Builder and Demo Forms">
-    <example title="Form Builder" href="/fr/orbeon/builder/summary" img="/apps/home/images/form-builder-small.png">
+    <example title="Form Builder" href="/fr/orbeon/builder/summary" img="/apps/home/images/form-builder-small.png" portlet-exclude="true">
         <b>Orbeon Form Builder</b> is the Orbeon Forms visual form designer. It allows you to build and deploy forms in minutes right from your web browser.
     </example>
     <example title="Bookshelf Form" href="/fr/orbeon/bookshelf/summary" img="/apps/home/images/form-bookshelf-small.png">

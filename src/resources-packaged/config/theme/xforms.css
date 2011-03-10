@@ -204,7 +204,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
-.xforms-textarea, .xforms-textarea textarea {
+.xforms-form .xforms-textarea, .xforms-textarea textarea {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
     font-family: Arial,Helvetica,Geneva,sans-serif
 }

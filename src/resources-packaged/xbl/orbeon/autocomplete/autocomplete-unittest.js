@@ -124,10 +124,10 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          */
         testHasTabIndex: function() {
             // On the static autocomplete we have tabindex="1"
-            var staticVisibleInput = YAHOO.util.Dom.get("static-autocomplete").getElementsByTagName("input")[1];
+            var staticVisibleInput = YAHOO.util.Dom.get("static-autocomplete").getElementsByTagName("input")[0];
             YAHOO.util.Assert.areEqual("1", ORBEON.util.Dom.getAttribute(staticVisibleInput, "tabindex"));
             // On the dynamic autocomplete we don't have a tabindex
-            var dynamicVisibleInput = YAHOO.util.Dom.get("dynamic-autocomplete").getElementsByTagName("input")[1];
+            var dynamicVisibleInput = YAHOO.util.Dom.get("dynamic-autocomplete").getElementsByTagName("input")[0];
             var noTabindex = ORBEON.util.Dom.getAttribute(dynamicVisibleInput, "tabindex");
             // IE 6/7 returns 0, while other browsers returns null
             YAHOO.util.Assert.isTrue(noTabindex == null || noTabindex == 0);
@@ -308,7 +308,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
 
-        testSetFocus: function() {
+        workerTestFocus: function(innerOrOuter) {
             var staticAutocompleteInput = YAHOO.util.Dom.getElementsByClassName("yui-ac-input", null, "static-autocomplete")[0];
             var dynamicAutocompleteInput = YAHOO.util.Dom.getElementsByClassName("yui-ac-input", null, "dynamic-autocomplete")[0];
             var staticGotFocus = false;
@@ -316,19 +316,22 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 YAHOO.util.Event.addFocusListener(staticAutocompleteInput, function() { staticGotFocus = true; }, this, true);
                 YAHOO.util.Event.addFocusListener(dynamicAutocompleteInput, function() { dynamicGotFocus = true; }, this, true);
-                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("static-setfocus"));
+                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("static-setfocus-" + innerOrOuter));
             }, function() {
                 YAHOO.util.Assert.isTrue(staticGotFocus);
                 YAHOO.util.Assert.isFalse(dynamicGotFocus);
 
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get("dynamic-setfocus"));
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get("dynamic-setfocus-" + innerOrOuter));
                 }, function() {
                     YAHOO.util.Assert.isTrue(staticGotFocus);
                     YAHOO.util.Assert.isTrue(dynamicGotFocus);
                 });
             });
         },
+
+        testSetFocusOuter: function() { this.workerTestFocus("outer"); },
+        testSetFocusInner: function() { this.workerTestFocus("inner"); },
 
         testValueForStatic: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {

@@ -274,7 +274,7 @@
     <!-- Submission to test the form -->
     <xforms:submission id="fb-test-form-submission"
             ref="instance('fr-form-to-test-instance')" method="post" replace="all"
-            resource="/fr/orbeon/builder/test/" xxforms:target="fb-test-iframe" xxforms:show-progress="false">
+            resource="/fr/orbeon/builder/test" xxforms:target="fb-test-iframe" xxforms:show-progress="false">
             <!-- TODO: Will want to change target to: fb-test-iframe -->
 
         <!-- Prepare submission -->
@@ -667,10 +667,6 @@
     <xforms:bind nodeset="instance('fb-schema-upload-instance')">
         <xforms:bind nodeset="temp-type" readonly="true()"/>
     </xforms:bind>
-
-    <!-- Submission to upload the schema -->
-    <xforms:submission id="fb-schema-upload-submission" ref="instance('fb-schema-upload-instance')"
-                       method="post" replace="none" resource="test:"/>
 
     <!-- Submission to load the components library -->
     <!-- NOTE: We only pass the app name, not the form name -->

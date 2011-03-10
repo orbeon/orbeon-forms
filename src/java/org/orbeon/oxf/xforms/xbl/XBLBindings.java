@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -91,18 +92,22 @@ public class XBLBindings {
     public static class AbstractBinding {
         public final QName qNameMatch;
         public final Element bindingElement;
+        public final String bindingId;
         public final List<Element> scripts;
         public final List<Element> styles;
 
-        public AbstractBinding(Element bindingElement, NamespaceMapping namespaceMapping, List<Element> scripts) {
+        public AbstractBinding(Element bindingElement, NamespaceMapping namespaceMapping, List<Element> scripts, IdGenerator idGenerator) {
             this.bindingElement = bindingElement;
             this.scripts = scripts;
 
-            final String elementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
-
             // For now, only handle "prefix|name" selectors
             // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
+            final String elementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
             qNameMatch = Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementAttribute.replace('|', ':'), true);
+
+            // Binding id
+            final String existingBindingId = XFormsUtils.getElementStaticId(bindingElement);
+            this.bindingId = (existingBindingId != null) ? existingBindingId : (idGenerator != null) ? idGenerator.getNextId() : null; // idGenerator can be null when this is used to find styles
 
             // Extract xbl:binding/xbl:resources/xbl:style
             List<Element> styles = null;
@@ -129,15 +134,15 @@ public class XBLBindings {
         public final String bindingId;
         public String containerElementName;
 
-        public ConcreteBinding(Scope innerScope, Element bindingElement, Document fullShadowTree, Document compactShadowTree) {
+        public ConcreteBinding(AbstractBinding abstractBinding, Scope innerScope, Document fullShadowTree, Document compactShadowTree) {
             this.innerScope = innerScope;
             this.fullShadowTree = fullShadowTree;
             this.compactShadowTree = compactShadowTree;
 
-            this.bindingId = XFormsUtils.getElementStaticId(bindingElement);
-            assert bindingId != null : "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(bindingElement);
+            this.bindingId = abstractBinding.bindingId;
+            assert this.bindingId != null : "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement);
 
-            this.containerElementName = bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME);
+            this.containerElementName = abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME);
             if (this.containerElementName == null)
                 this.containerElementName = "div";
         }
@@ -344,7 +349,7 @@ public class XBLBindings {
 
             if (currentElementAttribute != null) {
 
-                final AbstractBinding abstractBinding = new AbstractBinding(currentBindingElement, staticState.getNamespaceMapping("", currentBindingElement), scriptElements);
+                final AbstractBinding abstractBinding = new AbstractBinding(currentBindingElement, staticState.getNamespaceMapping("", currentBindingElement), scriptElements, metadata.idGenerator);
 
                 // Create and remember factory for this QName
                 xblComponentsFactories.put(abstractBinding.qNameMatch,
@@ -416,7 +421,6 @@ public class XBLBindings {
             final AbstractBinding abstractBinding = xblComponentBindings.get(controlElement.getQName());
             if (abstractBinding != null) {
                 // A custom component is bound to this element
-                final Element bindingElement = abstractBinding.bindingElement;
 
                 // Find new prefix
                 final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
@@ -428,7 +432,7 @@ public class XBLBindings {
                 }
 
                 // Generate the shadow content for this particular binding
-                final Document fullShadowTreeDocument = generateShadowTree(propertyContext, indentedLogger, controlsDocumentInfo, controlElement, bindingElement, newPrefix);
+                final Document fullShadowTreeDocument = generateShadowTree(propertyContext, indentedLogger, controlsDocumentInfo, controlElement, abstractBinding.bindingElement, newPrefix);
                 if (fullShadowTreeDocument != null) {
 
                     // Process newly added automatic XBL includes if any
@@ -481,7 +485,7 @@ public class XBLBindings {
                     staticState.analyzeModelsXPathForScope(newInnerScope);
 
                     // Remember concrete binding information
-                    final ConcreteBinding newConcreteBinding = new ConcreteBinding(newInnerScope, bindingElement, fullShadowTreeDocument, compactShadowTreeDocument);
+                    final ConcreteBinding newConcreteBinding = new ConcreteBinding(abstractBinding, newInnerScope, fullShadowTreeDocument, compactShadowTreeDocument);
                     concreteBindings.put(controlPrefixedId, newConcreteBinding);
 
                     // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style

@@ -45,45 +45,45 @@ public class TransformerURIResolver implements URIResolver {
     private ProcessorImpl processor;
     private PipelineContext pipelineContext;
     private String prohibitedInput;
-    private boolean handleXInclude;
+    private XMLUtils.ParserConfiguration parserConfiguration;
     private String mode;
 
     /**
      * Create a URI resolver.
      *
-     * @param processor         processor of which inputs will be read for "input:*"
-     * @param pipelineContext   pipeline context
-     * @param prohibitedInput   name of an input which triggers and exception if read (usually "data" or "config")
-     * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
+     * @param processor             processor of which inputs will be read for "input:*"
+     * @param pipelineContext       pipeline context
+     * @param prohibitedInput       name of an input which triggers and exception if read (usually "data" or "config")
+     * @param parserConfiguration   parser configuration
      */
-    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude) {
-        this(processor, pipelineContext, prohibitedInput, handleXInclude, null);
+    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, XMLUtils.ParserConfiguration parserConfiguration) {
+        this(processor, pipelineContext, prohibitedInput, parserConfiguration, null);
     }
 
     /**
      * Create a URI resolver with a mode.
      *
-     * @param processor         processor of which inputs will be read for "input:*"
-     * @param pipelineContext   pipeline context
-     * @param prohibitedInput   name of an input which triggers and exception if read (usually "data" or "config")
-     * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
-     * @param mode              "xml", "html", "text" or "binary"
+     * @param processor             processor of which inputs will be read for "input:*"
+     * @param pipelineContext       pipeline context
+     * @param prohibitedInput       name of an input which triggers and exception if read (usually "data" or "config")
+     * @param parserConfiguration   parser configuration
+     * @param mode                  "xml", "html", "text" or "binary"
      */
-    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude, String mode) {
+    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, XMLUtils.ParserConfiguration parserConfiguration, String mode) {
         this.processor = processor;
         this.pipelineContext = pipelineContext;
         this.prohibitedInput = prohibitedInput;
-        this.handleXInclude = handleXInclude;
+        this.parserConfiguration = parserConfiguration;
         this.mode = mode;
     }
 
     /**
      * Create a URI resolver. Use this constructor when using this from outside a processor.
      *
-     * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
+     * @param parserConfiguration   parser configuration
      */
-    public TransformerURIResolver(boolean handleXInclude) {
-        this(null, new PipelineContext(), null, handleXInclude);
+    public TransformerURIResolver(XMLUtils.ParserConfiguration parserConfiguration) {
+        this(null, new PipelineContext(), null, parserConfiguration);
     }
 
     public Source resolve(String href, String base) throws TransformerException {
@@ -110,7 +110,7 @@ public class TransformerURIResolver implements URIResolver {
                     // with HTTP and HTTPS. When would it make sense to use local caching?
                     final String protocol = url.getProtocol();
                     final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
-                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, new XMLUtils.ParserConfiguration(false, handleXInclude, false), true, mode, null, null, cacheUseLocalCache);
+                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, parserConfiguration, true, mode, null, null, cacheUseLocalCache);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                     systemId = url.toExternalForm();
                 }

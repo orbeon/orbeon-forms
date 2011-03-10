@@ -108,7 +108,7 @@ public class SchemaRepository {
 
         // XSLT schemas
         SCHEMAS.put(XSLTTransformer.XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/xslt-transformer-config.rng");
-        SCHEMAS.put(XSLTTransformer.XSLT_PREFERENCES_CONFIG_NAMESPACE_URI, "schemas/xslt-preferences-config.rng");
+        SCHEMAS.put(XSLTTransformer.XSLT_PREFERENCES_CONFIG_NAMESPACE_URI, "schemas/attributes-config.rng");
         SCHEMAS.put(TraxTransformer.TRAX_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/trax-transformer-config.rng");
 
         SCHEMAS.put(PageFlowControllerProcessor.CONTROLLER_NAMESPACE_URI, "schemas/page-flow-controller-runtime.xsd");

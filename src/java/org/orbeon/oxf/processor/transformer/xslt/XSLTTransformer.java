@@ -26,7 +26,6 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.properties.PropertySet;
@@ -34,6 +33,7 @@ import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -173,7 +173,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final TransformerHandler transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
 
                     final Transformer transformer = transformerHandler.getTransformer();
-                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                    final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
                     transformer.setURIResolver(transformerURIResolver);
                     transformer.setErrorListener(errorListener);
                     if (smartOutputLocation)
@@ -549,7 +549,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         });
                         final TransformerURIResolver uriResolver
-                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
                         templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener, uriResolver);
                         uriResolver.destroy();
                         templatesInfo.transformerClass = transformerClass;

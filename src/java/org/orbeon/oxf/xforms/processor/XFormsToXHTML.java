@@ -22,7 +22,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.*;
@@ -164,7 +163,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // Create containing document and initialize XForms engine
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput,
-                                pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                                pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
                         containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
@@ -216,7 +215,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     }
                 }
 
-                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
                 containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
             } else {
                 assert !cachedStatus[0];

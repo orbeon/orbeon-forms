@@ -17,6 +17,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -78,7 +79,7 @@ public class XXFormsDocBase64 extends XFormsFunction {
             final PipelineContext pipelineContext = getOrCreatePipelineContext();
 
             // Use resolver as it does a series of tasks for us, and use "binary" mode
-            final TransformerURIResolver resolver = new TransformerURIResolver(null, pipelineContext, null, false, "binary");
+            final TransformerURIResolver resolver = new TransformerURIResolver(null, pipelineContext, null, XMLUtils.ParserConfiguration.PLAIN, "binary");
 
             final StringBuilder sb = new StringBuilder(1024);
 

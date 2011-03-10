@@ -19,13 +19,12 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
-import org.orbeon.oxf.xml.ForwardingXMLReceiver;
-import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.InputSource;
 
 import javax.xml.transform.Templates;
@@ -116,7 +115,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Perform transformation
                     final Transformer transformer = templates.newTransformer();
-                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
+                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN));
 
                     final SAXResult saxResult = new SAXResult(xmlReceiver);
                     saxResult.setLexicalHandler(xmlReceiver);

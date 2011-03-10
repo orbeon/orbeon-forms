@@ -14,7 +14,10 @@
 package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -30,7 +33,6 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
-import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -185,12 +187,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
                         final Document config;
                         try {
-                            config = Dom4jUtils.readDom4j
-                                    ("<config><include>/request/request-path</include><include>/request/method</include></config>");
-                        } catch (DocumentException e) {
+                            config = Dom4jUtils.readDom4j("<config><include>/request/request-path</include><include>/request/method</include></config>");
+                        } catch (Exception e) {
                             throw new OXFException(e);
-                        } catch ( final SAXException e ) {
-                            throw new OXFException( e );
                         }
                         addInput(new ASTInput("config", config));
                         addOutput(request);
@@ -1457,6 +1456,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     urlElement.addText(url);
                     final Element handleXIncludeElement = configDocument.getRootElement().addElement("handle-xinclude");
                     handleXIncludeElement.addText("false");
+                    // Allow external entities in document
+                    final Element externalEntitiesElement = configDocument.getRootElement().addElement("external-entities");
+                    externalEntitiesElement.addText("true");
                 }
 
                 addInput(new ASTInput("step-url", configDocument));

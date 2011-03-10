@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLReaderToReceiver;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -55,8 +56,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
 
     private URIProcessorOutputImpl processorOutput;
 
-    public XFormsURIResolver(ProcessorImpl processor, URIProcessorOutputImpl processorOutput, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude) {
-        super(processor, pipelineContext, prohibitedInput, handleXInclude);
+    public XFormsURIResolver(ProcessorImpl processor, URIProcessorOutputImpl processorOutput, PipelineContext pipelineContext,
+                             String prohibitedInput, XMLUtils.ParserConfiguration parserConfiguration) {
+        super(processor, pipelineContext, prohibitedInput, parserConfiguration);
         this.processorOutput = processorOutput;
     }
 

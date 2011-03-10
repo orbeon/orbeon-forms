@@ -88,7 +88,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
             }
         }), "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
         // 02/06/2004 d : If we don't do anything VM would just convert unchecked exceptions thrown
-        //                from here into ExceptionInIntializerError without setting the cause.
+        //                from here into ExceptionInInitializerError without setting the cause.
         //                This of course makes diagnosing reports from the field a major pain.
         try {
             factory = XMLUtils.createSAXParserFactory(false, true);
@@ -102,6 +102,8 @@ public class MSVValidationProcessor extends ProcessorImpl {
 
     public MSVValidationProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
+        // NOTE: Don't set a schema here, because that will trigger the insertion of a validation processor in the
+        // pipeline engine recursively, causing a StackOverflowError.
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_SCHEMA));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -121,7 +123,8 @@ public class MSVValidationProcessor extends ProcessorImpl {
         final ProcessorOutput output = new CacheableTransformerOutputImpl(MSVValidationProcessor.this, name) {
             protected void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
-                    // read config input ot determine of we should decorate or not
+                    // Read config input ot determine of we should decorate or not
+                    // Would be nice to validate it, but we can't simply use the schema on the input as usual (recursion)
                     final Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);
                     final boolean decorateOutput = Boolean.valueOf(XPathUtils.selectStringValueNormalize(configDoc, "/config/decorate")).booleanValue();
 

@@ -14,11 +14,17 @@
 package org.orbeon.oxf.pipeline;
 
 import org.apache.log4j.Logger;
-import org.dom4j.*;
-import org.orbeon.oxf.cache.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.orbeon.oxf.cache.Cache;
+import org.orbeon.oxf.cache.CacheStatistics;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.properties.Properties;
@@ -261,7 +267,7 @@ public class InitUtils {
         if (!processorDefinitionsInitialized) {
             synchronized (PipelineEngineImpl.class) {
                 if (!processorDefinitionsInitialized) {
-                    // Register inital processors with the default XML Processor Registry
+                    // Register initial processors with the default XML Processor Registry
                     Processor processorDefinitions = PipelineUtils.createURLGenerator(DEFAULT_PROLOGUE, true);
                     Processor registry = new XMLProcessorRegistry();
                     PipelineUtils.connect(processorDefinitions, "data", registry, "config");

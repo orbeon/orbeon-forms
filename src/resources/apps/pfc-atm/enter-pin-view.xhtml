@@ -27,35 +27,33 @@
             <xforms:bind nodeset="pin" constraint="number(.) = 42"/>
             <xforms:submission id="main-submission" method="post" action="."/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            img.site-navigation { display: block; border: 1px solid #336; margin-top: 1em; padding: 1em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xforms:group>
-                <xforms:secret ref="pin">
-                    <xforms:alert>Invalid PIN</xforms:alert>
-                </xforms:secret>
-                <xforms:trigger>
-                    <xforms:label>Access Account</xforms:label>
-                </xforms:trigger>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="action">submit</xforms:setvalue>
-                    <xforms:send submission="main-submission"/>
-                </xforms:action>
-            </xforms:group>
+            This example emulates a very simple ATM machine and shows how to declare the site navigation logic in
+            the Page Flow Controller configuration. The site navigation logic is this way kept separate from the
+            pages themselves, thus achieving a better separation of concerns.
         </xhtml:p>
-        <xhtml:p>(The PIN is: 42)</xhtml:p>
-        <xhtml:div style="background-color: #eeeeee; border: solid #336 1px; padding: 1em">
-            <xhtml:img src="/apps/pfc-atm/images/site-navigation.png" style="padding: 1em; float: right" width="366" height="439" alt="Navigation logic in the ATM application"/>
-            <xhtml:p>
-                This example emulates a very simple ATM machine and shows how to declare the site navigation logic in
-                the Page Flow Controller configuration. The site navigation logic is this way kept separate from the
-                pages themselves, thus achieving a better separation of concerns.
-            </xhtml:p>
-            <xhtml:p>
-                The diagram on the right exposes the logic of the ATM. Each page in this application is very simple
-                and the interesting part lies in the navigation logic between pages.
-            </xhtml:p>
-            <xhtml:div style="clear: both"/>
-        </xhtml:div>
+        <xhtml:p>
+            The diagram on the right exposes the logic of the ATM. Each page in this application is very simple
+            and the interesting part lies in the navigation logic between pages.
+        </xhtml:p>
+        <xforms:group>
+            <xforms:secret ref="pin">
+                <xforms:alert>Invalid PIN</xforms:alert>
+                <xforms:hint>The PIN is: 42</xforms:hint>
+            </xforms:secret>
+            <xforms:trigger>
+                <xforms:label>Access Account</xforms:label>
+            </xforms:trigger>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="action">submit</xforms:setvalue>
+                <xforms:send submission="main-submission"/>
+            </xforms:action>
+        </xforms:group>
+        <xhtml:img class="site-navigation" src="/apps/pfc-atm/images/site-navigation.png" alt="Navigation logic in the ATM application"/>
     </xhtml:body>
 </xhtml:html>

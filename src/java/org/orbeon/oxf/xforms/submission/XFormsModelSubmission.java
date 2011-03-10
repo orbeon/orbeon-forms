@@ -660,7 +660,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             } else if (connectionResult.statusCode == 302 || connectionResult.statusCode == 301) {
                 // Got a redirect
 
-                // TODO: only for replace="all", right?
+                // Currently we don't know how to handle a redirect for replace != "all"
+                if (!p.isReplaceAll)
+                    throw new XFormsSubmissionException(this, "xforms:submission for submission id: " + id + ", redirect code received with replace=\"" + replace + "\"", "processing submission response",
+                            new XFormsSubmitErrorEvent(containingDocument, propertyContext, this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
 
                 replacer = new RedirectReplacer(this, containingDocument);
 

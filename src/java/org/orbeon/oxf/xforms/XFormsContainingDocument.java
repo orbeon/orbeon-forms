@@ -141,6 +141,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private XFormsModelSubmission activeSubmissionFirstPass;
     private Callable<SubmissionResult> replaceAllCallable;
     private boolean gotSubmissionReplaceAll;
+    private boolean gotSubmissionRedirect;
     private List<Message> messagesToRun;
     private List<Load> loadsToRun;
     private List<Script> scriptsToRun;
@@ -492,6 +493,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.activeSubmissionFirstPass = null;
         this.replaceAllCallable = null;
         this.gotSubmissionReplaceAll = false;
+        this.gotSubmissionRedirect = false;
 
         this.messagesToRun = null;
         this.loadsToRun = null;
@@ -534,6 +536,17 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     public boolean isGotSubmissionReplaceAll() {
         return gotSubmissionReplaceAll;
+    }
+
+    public void setGotSubmissionRedirect() {
+        if (this.gotSubmissionRedirect)
+            throw new ValidationException("Unable to run a second submission with replace=\"all\" redirection within a same action sequence.", getLocationData());
+
+        this.gotSubmissionRedirect = true;
+    }
+
+    public boolean isGotSubmissionRedirect() {
+        return gotSubmissionRedirect;
     }
 
     /**

@@ -11,8 +11,7 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller" 
-        xmlns:xu="http://www.xmldb.org/xupdate">
+<config xmlns="http://www.orbeon.com/oxf/controller">
 
     <page path-info="/pfc-atm/" view="enter-pin-view.xhtml">
         <action when="/form/action = 'submit'" action="enter-pin-action.xsl">

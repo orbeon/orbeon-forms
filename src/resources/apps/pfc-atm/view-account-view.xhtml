@@ -14,13 +14,11 @@
 <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xi="http://www.w3.org/2001/XInclude">
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
     <xhtml:head>
         <xhtml:title>View Account</xhtml:title>
         <xforms:model>
-            <xforms:instance id="balance-instance">
-                <xi:include href="input:data"/>
-            </xforms:instance>
+            <xforms:instance id="balance-instance" src="input:data"/>
             <xforms:instance id="withdraw-instance">
                 <amount/>
             </xforms:instance>

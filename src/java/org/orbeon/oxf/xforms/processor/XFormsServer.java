@@ -239,6 +239,10 @@ public class XFormsServer extends ProcessorImpl {
                             if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
                                 // NOP: Response already sent out by a submission
                                 indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
+                            } else if (containingDocument.isGotSubmissionRedirect()) {
+                                // Redirect already sent, output a null document is output so that rest of pipeline doesn't fail
+                                indentedLogger.logDebug("response", "handling submission with replace=\"all\" with redirect");
+                                XMLUtils.streamNullDocument(xmlReceiver);
                             } else if (!isNoscript) {
                                 // This is an Ajax response
                                 indentedLogger.startHandleOperation("response", "handling regular Ajax response");

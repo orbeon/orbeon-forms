@@ -230,5 +230,41 @@ public class Item implements ItemContainer {
 		public boolean isHTML() {
 			return isHTML;
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (isHTML ? 1231 : 1237);
+			result = prime * result + ((label == null) ? 0 : label.hashCode());
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			final Label other = (Label) obj;
+			if (isHTML != other.isHTML)
+				return false;
+			if (label == null) {
+				if (other.label != null)
+					return false;
+			} else if (!label.equals(other.label))
+				return false;
+			return true;
+		}
+		
+		
     }
 }

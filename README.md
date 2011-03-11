@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 3.9, January 2011
+Last updated for Orbeon Forms 3.9, March 2011
 
 
 1. What is Orbeon Forms?
@@ -78,7 +78,7 @@ Changes for the previous release:
 5. Documentation
 ----------------
 
-Most of the new documentation is available on the Orbreon Forms wiki:
+All new documentation is available on the Orbeon Forms wiki:
 
 > <http://wiki.orbeon.com/forms/>
 
@@ -106,8 +106,8 @@ In addition, the Orbeon Forms tutorial also tackles installation:
 8. Compiling Orbeon Forms
 -------------------------
 
-You usually don't have to compile Orbeon Forms yourself, but for
-information about compiling Orbeon Forms from sources, please visit:
+You usually don't have to compile Orbeon Forms yourself. Now if you want to,
+please visit:
 
 > <http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development>
 
@@ -126,7 +126,7 @@ Orbeon Forms is written mainly using the following languages and technologies:
 9. Known bugs and requests for enhancements
 -------------------------------------------
 
-For a list of known issues and RFEs, consult the OW2 issue tracking system:
+For a list of known issues and RFEs, check the issue tracking system:
 
 > <http://goo.gl/iSEyq>
 

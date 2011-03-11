@@ -34,7 +34,7 @@
             //final ServletContext servletContext = getServletConfig().getServletContext();
             // Example 2: This gets another servlet's context (cross-context)
             final ServletContext servletContext = getServletConfig().getServletContext().getContext("/orbeon");
-            final RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/fr/orbeon/bookcast/?orbeon-embeddable=true");
+            final RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/fr/orbeon/bookshelf/summary?orbeon-embeddable=true");
 
             dispatcher.include(request, new HttpServletResponseWrapper(response) {
 

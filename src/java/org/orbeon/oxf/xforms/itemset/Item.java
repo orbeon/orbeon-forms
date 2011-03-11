@@ -17,16 +17,16 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an item (xforms:item, xforms:choice, or item in itemset).
@@ -214,23 +214,45 @@ public class Item implements ItemContainer {
 
         return sb.toString();
     }
-    
+
     public static class Label {
-    	
-    	private final String label;
-    	private final boolean isHTML;
-		
-		public Label(String label, boolean isHTML) {
-			this.label = label;
-			this.isHTML = isHTML;
-		}
 
-		public String getLabel() {
-			return label;
-		}
+        private final String label;
+        private final boolean isHTML;
 
-		public boolean isHTML() {
-			return isHTML;
-		}
+        public Label(String label, boolean isHTML) {
+            this.label = label;
+            this.isHTML = isHTML;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public boolean isHTML() {
+            return isHTML;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (isHTML ? 1231 : 1237);
+            result = prime * result + ((label == null) ? 0 : label.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+
+            final Label other = (Label) obj;
+            return isHTML == other.isHTML && XFormsUtils.compareStrings(label, other.label);
+        }
     }
 }

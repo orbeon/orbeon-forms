@@ -16,12 +16,18 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * Handle elements to which custom components are bound.
  */
 public class XXFormsComponentHandler extends XFormsBaseHandler {
+
+    private String elementName;
+    private String elementQName;
 
     public XXFormsComponentHandler() {
         // Don't forward, we must instead feed the handlers with the shadow content
@@ -39,9 +45,10 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
 
         final XBLBindings xblBindings = containingDocument.getStaticState().getXBLBindings();
 
-        final String elementName = xblBindings.getContainerElementName(prefixedId);
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
+
+        this.elementName = xblBindings.getContainerElementName(prefixedId);
+        this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         // Produce class of the form xbl-foo-bar
         final String classes = "xbl-component xbl-" + qName.replace(':', '-');
@@ -98,10 +105,6 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
 
         final ElementHandlerController controller = handlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();
-
-        final String elementName = "div";
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName);
     }

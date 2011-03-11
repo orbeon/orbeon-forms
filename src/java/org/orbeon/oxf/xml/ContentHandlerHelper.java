@@ -27,10 +27,21 @@ import java.util.Stack;
 public class ContentHandlerHelper {
 
     public static final String CDATA = "CDATA";
-    private Stack<String> elementNamespaces = new Stack<String>();
-    private Stack<String> elements = new Stack<String>();
+    private Stack<ElementInfo> elements = new Stack<ElementInfo>();
     private XMLReceiver xmlReceiver;
     private AttributesImpl attributesImpl = new AttributesImpl();
+
+    private static class ElementInfo {
+        public final String uri;
+        public final String name;
+        public final String qName;
+
+        private ElementInfo(String uri, String name, String qName) {
+            this.uri = uri;
+            this.name = name;
+            this.qName = qName;
+        }
+    }
 
     public ContentHandlerHelper(XMLReceiver xmlReceiver) {
         this.xmlReceiver = xmlReceiver;
@@ -72,10 +83,9 @@ public class ContentHandlerHelper {
 
     public void startElement(String prefix, String namespaceURI, String name, Attributes attributes) {
         try {
-            String qname = prefix == null || "".equals(prefix) ? name : prefix + ":" + name;
-            xmlReceiver.startElement(namespaceURI, name, qname, attributes);
-            elementNamespaces.add(namespaceURI);
-            elements.add(name);
+            final String qName = prefix == null || "".equals(prefix) ? name : prefix + ":" + name;
+            xmlReceiver.startElement(namespaceURI, name, qName, attributes);
+            elements.add(new ElementInfo(namespaceURI, name, qName));
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -97,9 +107,8 @@ public class ContentHandlerHelper {
 
     public void endElement() {
         try {
-            String name = elements.pop();
-            String namespace = elementNamespaces.pop();
-            xmlReceiver.endElement(namespace, name, name);
+            final ElementInfo elementInfo = elements.pop();
+            xmlReceiver.endElement(elementInfo.uri, elementInfo.name, elementInfo.qName);
         } catch (SAXException e) {
             throw new OXFException(e);
         }

@@ -466,7 +466,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         {
             final Item.Label itemLabel = item.getLabel();
-            if (itemLabel != null && !itemLabel.getLabel().isEmpty()) { // empty only for xforms|input:xxforms-type(xs:boolean)
+            final boolean labelNonEmpty = itemLabel != null && !itemLabel.getLabel().isEmpty();// empty only for xforms|input:xxforms-type(xs:boolean)
+            if (labelNonEmpty) {
                 reusableAttributes.clear();
                 outputLabelForStart(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", false);
             }
@@ -503,7 +504,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }
 
-            if (itemLabel != null) { // null only for xforms|input:xxforms-type(xs:boolean)
+            if (labelNonEmpty) {
                 outputLabelForEnd(handlerContext, "label", itemLabel.getLabel(), itemLabel.isHTML());
             }
         }

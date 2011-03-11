@@ -24,7 +24,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-source-editor-dialog" level="modeless" close="true" draggable="true" class="fr-dialog" model="fb-source-editor-model">
+      id="fb-source-editor-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-source-editor-model">
 
     <xforms:label ref="$form-resources/dialog-edit-source/dialog-title"/>
 
@@ -38,18 +38,10 @@
             <fr:button class="fr-inplace-rename" ref="save-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <xforms:action ev:event="DOMActivate">
-
                     <!-- Parse the XML and insert it -->
-
-                    <!-- TODO: extra line breaks are added as you edit and save the XML -->
-                    <!--<xforms:message level="xxforms:log-debug">-->
-                        <!--<xforms:output value="replace($variables/new-source, '&#x0d;', '&#x0d;')"/>-->
-                    <!--</xforms:message>-->
-
                     <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="saxon:parse(instance('fb-source-editor-instance')/source)"/>
                     <!-- Saxon serialization adds an extra meta element -->
                     <xforms:delete nodeset="xxforms:instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
-
                 </xforms:action>
             </fr:button>
             <xforms:output value="$form-resources/or/label"/>
@@ -61,8 +53,21 @@
     <!-- Hide dialog -->
     <xxforms:hide ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
     <!-- Serialize XML when the dialog opens -->
-    <xforms:setvalue ev:event="xxforms-dialog-open" ref="source"
-                     value="saxon:serialize(xxforms:instance('fr-form-instance'), xxforms:instance('fr-xsl-output-instance'))"/>
+    <xforms:action ev:event="xxforms-dialog-open">
+        <!-- TODO: size dialog to be larger -->
+        <!--<xxforms:script>-->
+            <!--&lt;!&ndash; Dialog set to 90% of the viewport width/height &ndash;&gt;-->
+            <!--var dialogWidth = YAHOO.util.Dom.getViewportWidth() * .9;-->
+            <!--var dialogHeight = YAHOO.util.Dom.getViewportHeight() * .9;-->
+            <!--&lt;!&ndash; Get references to elements in the dialog &ndash;&gt;-->
+            <!--var dialog = YAHOO.util.Dom.get("fb-source-editor-dialog");-->
+            <!--&lt;!&ndash; Set width/height of dialog &ndash;&gt;-->
+            <!--dialog.style.width = dialogWidth + "px";-->
+            <!--dialog.style.height = dialogHeight + "px";-->
+        <!--</xxforms:script>-->
+        <xforms:setvalue ref="source"
+                         value="saxon:serialize(xxforms:instance('fr-form-instance'), xxforms:instance('fr-xsl-output-instance'))"/>
+    </xforms:action>
 
     <!-- Model for the source editor -->
     <xforms:model id="fb-source-editor-model">

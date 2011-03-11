@@ -97,7 +97,8 @@ YAHOO.xbl.fr.Currency.prototype = {
                 result = number;
             } else {
                 // Extract integer and fractional parts
-                var parts = Array.concat(cleaned.split("."), "");
+                var parts = cleaned.split(".");
+                parts.push("");
                 var integerPart = parts[0];
                 var fractionalPart = parts[1];
 

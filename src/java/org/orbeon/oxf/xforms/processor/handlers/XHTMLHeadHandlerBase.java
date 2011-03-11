@@ -69,7 +69,10 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
 
         // Include static XForms CSS. This makes sure that
         final String requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
-        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", XHTMLBodyHandler.getIncludedResourcePath(requestPath, "static-xforms-css.xml") });
+        helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+                "href", XHTMLBodyHandler.getIncludedResourcePath(requestPath, "static-xforms-css.xml"),
+                "fixup-xml-base", "false"
+        });
 
         // Stylesheets
         final AttributesImpl attributesImpl = new AttributesImpl();

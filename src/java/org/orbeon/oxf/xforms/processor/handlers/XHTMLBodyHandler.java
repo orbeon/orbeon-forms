@@ -83,8 +83,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
         if (!handlerContext.isNoScript()) {
-            // TODO: must send startPrefixMapping()/endPrefixMapping()?
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", getIncludedResourcePath(requestPath, "noscript-panel.xml") });
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+                    "href", getIncludedResourcePath(requestPath, "noscript-panel.xml"),
+                    "fixup-xml-base", "false"
+            });
         }
 
         // Create xhtml:form element
@@ -181,13 +183,17 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             // Ajax error panel
             if (XFormsProperties.isAjaxShowErrors(containingDocument)) {
                 // XInclude dialog so users can configure it
-                // TODO: must send startPrefixMapping()/endPrefixMapping()?
-                helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", getIncludedResourcePath(requestPath, "error-dialog.xml") });
+                helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+                        "href", getIncludedResourcePath(requestPath, "error-dialog.xml"),
+                        "fixup-xml-base", "false"
+                });
             }
 
             // Help panel
-            // TODO: must send startPrefixMapping()/endPrefixMapping()?
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", getIncludedResourcePath(requestPath, "help-panel.xml") });
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+                    "href", getIncludedResourcePath(requestPath, "help-panel.xml"),
+                    "fixup-xml-base", "false"
+            });
 
             // Templates
             {

@@ -195,7 +195,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             }
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // Rewrite the HTML value with resolved @href and @src attributes
-            return getEscapedHTMLValue(pipelineContext, getExternalValue(pipelineContext));
+            return XFormsCaseControl.getEscapedHTMLValue(pipelineContext, getLocationData(), getExternalValue(pipelineContext));
         } else {
             // Return external value as is
             return getExternalValue(pipelineContext);

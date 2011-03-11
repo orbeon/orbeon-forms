@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xforms.itemset.Item.Label;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -126,11 +127,11 @@ public class XFormsItemUtils {
                     // xforms:item
 
 //                    mayReuse[0] = false;
-                    final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
+                    final Label label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     final Map<QName, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), StringUtils.defaultString(value)));
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
@@ -163,7 +164,7 @@ public class XFormsItemUtils {
                                     // the nodeset.
                                     final boolean isRelevant = (!(currentNodeInfo instanceof NodeInfo)) || InstanceData.getInheritedRelevant((NodeInfo) currentNodeInfo);
                                     if (isRelevant) {
-                                        final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
+                                        final Label label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                                         final Element valueCopyElement;
                                         {
                                             final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
@@ -205,7 +206,7 @@ public class XFormsItemUtils {
                                             // a leaf item, so we prune such non-relevant items later.
 
                                             final Map<QName, String> attributes = getAttributes(element);
-                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, StringUtils.defaultString(label), value));
+                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label, value));
                                         } else {
                                             // TODO: handle xforms:copy
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -227,7 +228,7 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = getLabelValue(labelElement);
+                        final Label label = getLabelValue(labelElement);
 
                         // NOTE: returned label can be null in some cases
 
@@ -247,12 +248,15 @@ public class XFormsItemUtils {
                 return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, valueElement, false, null);
             }
 
-            private String getLabelValue(Element labelElement) {
+            private Label getLabelValue(Element labelElement) {
                 if (labelElement == null)
                     throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:label element.", select1Control.getLocationData());
                 final XBLBindings.Scope elementScope = select1Control.getChildElementScope(labelElement);
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
-                return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, labelElement, false, null);
+                final boolean supportsHTML = select1Control.isFullAppearance(); // Only support HTML when appearance is "full"
+                final boolean[] containsHTML = new boolean[] { false }; 
+                final String label =  XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, labelElement, supportsHTML, containsHTML);
+                return new Label(StringUtils.defaultString(label), containsHTML[0]);
             }
 
             private Map<QName, String> getAttributes(Element itemChoiceItemsetElement) {

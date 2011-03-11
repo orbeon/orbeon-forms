@@ -1083,7 +1083,7 @@
                                             var itemElement = itemsetTree[k];
                                             var templateClone = template.cloneNode(true);
                                             spanContainer.appendChild(templateClone);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
+                                            templateClone.innerHTML = new String(templateClone.innerHTML).replace(new RegExp("\\$xforms-template-label\\$", "g"), itemElement[0].replace(new RegExp("\\$", "g"), "$$$$"));
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);

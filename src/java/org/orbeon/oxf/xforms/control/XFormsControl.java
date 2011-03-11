@@ -669,7 +669,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param rawValue          value to rewrite
      * @return                  rewritten value
      */
-    public String getEscapedHTMLValue(final PropertyContext propertyContext, String rawValue) {
+    public static String getEscapedHTMLValue(final PropertyContext propertyContext, final LocationData locationData, String rawValue) {
 
         if (rawValue == null)
             return null;
@@ -718,7 +718,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     }
                     isStartElement = false;
                 }
-            }, true), rawValue, getLocationData(), "xhtml");
+            }, true), rawValue, locationData, "xhtml");
             result = sb.toString();
         } else {
             // No rewriting needed
@@ -1230,7 +1230,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         public String getEscapedValue(PipelineContext pipelineContext) {
             final String value = getValue(pipelineContext);
-            return isHTML ? XFormsControl.this.getEscapedHTMLValue(pipelineContext, value) : XMLUtils.escapeXMLMinimal(value);
+            return isHTML ? XFormsControl.getEscapedHTMLValue(pipelineContext, getLocationData(), value) : XMLUtils.escapeXMLMinimal(value);
         }
 
         public boolean isHTML(PropertyContext propertyContext) {

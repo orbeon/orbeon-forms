@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.itemset;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
@@ -115,7 +116,7 @@ public class Itemset implements ItemContainer {
 
                         // Item label and value
                         sb.append('"');
-                        sb.append(item.getExternalJSLabel());
+                        sb.append(item.getExternalJSLabel(context, locationData));
                         sb.append("\",\"");
                         sb.append(item.getExternalJSValue(context));
                         sb.append('\"');
@@ -194,7 +195,7 @@ public class Itemset implements ItemContainer {
      * @param isMultiple    whether multiple selection is allowed (to determine selected item)
      * @return              XML document
      */
-    public DocumentInfo getXMLTreeInfo(Configuration configuration, final String controlValue, final boolean isMultiple, LocationData locationData) {
+    public DocumentInfo getXMLTreeInfo(Configuration configuration, final String controlValue, final boolean isMultiple, final LocationData locationData) {
         // Produce a JSON fragment with hierarchical information
 
         final TinyBuilder treeBuilder = new TinyBuilder();
@@ -254,10 +255,14 @@ public class Itemset implements ItemContainer {
                         ch.startElement("item", itemAttributes);
                         {
                             // Label and value
-                            final String itemLabel = (item.getLabel() != null) ? item.getLabel() : "";
+                            final Item.Label itemLabel = item.getLabel();
                             {
                                 ch.startElement("label");
-                                ch.text(itemLabel);
+                                if (itemLabel.isHTML()) {
+                                	XFormsUtils.streamHTMLFragment(ch.getXmlReceiver(), itemLabel.getLabel(), locationData, "");
+                                } else {
+                                	ch.text(StringUtils.defaultString(itemLabel.getLabel()));
+                                }
                                 ch.endElement();
                             }
                             {

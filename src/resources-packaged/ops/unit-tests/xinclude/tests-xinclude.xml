@@ -88,4 +88,139 @@
         </output>
     </test>
 
+    <test description="Inclusion without xml:base using fixup-xml-base" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude3.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="text/plain">This is simple body content</body>
+            </message>
+        </output>
+    </test>
+
+    <test description="Inclusion of included file using an external entity" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude4.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message xml:base="oxf:/ops/unit-tests/xinclude/xinclude5.xml">
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="text/plain">This is simple body content</body>
+            </message>
+        </output>
+    </test>
+
+    <test description="Simple xpointer attribute" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude6.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to>
+                    <email xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">joe@example.org</email>
+                    <name xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="text/plain">This is simple body content</body>
+            </message>
+        </output>
+    </test>
+
+    <test description="xpointer attribute returning various types" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude7.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>before
+                <email xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">joe@example.org</email>42
+                <name xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">Joe</name>after
+            </message>
+        </output>
+    </test>
+
 </group>

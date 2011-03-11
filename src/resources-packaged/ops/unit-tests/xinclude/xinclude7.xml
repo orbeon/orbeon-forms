@@ -1,0 +1,3 @@
+<message xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xi:include href="xinclude-to.xml" xpointer="xpath(('before', /*/*[1], 42, /*/*[2], 'after'))"/>
+</message>

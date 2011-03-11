@@ -1,0 +1,8 @@
+<smtp-host>mail.example.org</smtp-host>
+<from>
+    <email>joe@example.org</email>
+    <name>Joe</name>
+</from>
+<xi:include href="xinclude-to.xml"/>
+<subject>Hello</subject>
+<body content-type="text/plain">This is simple body content</body>

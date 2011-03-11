@@ -1,0 +1,12 @@
+<message xmlns:xi="http://www.w3.org/2001/XInclude">
+    <smtp-host>mail.example.org</smtp-host>
+    <from>
+        <email>joe@example.org</email>
+        <name>Joe</name>
+    </from>
+    <to>
+        <xi:include href="xinclude-to.xml" xpointer="xpath(/*/*)"/>
+    </to>
+    <subject>Hello</subject>
+    <body content-type="text/plain">This is simple body content</body>
+</message>

@@ -83,7 +83,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 }
 
                 // URL resolver is initialized with a parser configuration which can be configured to support external entities or not.
-                final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(false, false, configurationAttributes.get("external-entities"));
+                final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(false, false, !Boolean.FALSE.equals(configurationAttributes.get("external-entities")));
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, parserConfiguration);
 
                 /**

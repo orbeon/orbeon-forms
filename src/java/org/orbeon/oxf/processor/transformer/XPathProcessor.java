@@ -138,6 +138,8 @@ public class XPathProcessor extends ProcessorImpl {
             strVal = ((DefaultText) result).getText();
         } else if (result instanceof String) {
             strVal = (String) result;
+        } else if (result instanceof Long) {
+            strVal = Long.toString((Long) result);
         } else if (result instanceof Double) {
             final double d = ((Double) result).doubleValue();
             strVal = XMLUtils.removeScientificNotation(d);

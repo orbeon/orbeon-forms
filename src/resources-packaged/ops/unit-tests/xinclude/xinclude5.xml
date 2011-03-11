@@ -1,0 +1,6 @@
+<!DOCTYPE foo [
+    <!ENTITY bar SYSTEM "bar.txt">
+]>
+<message xmlns:xi="http://www.w3.org/2001/XInclude">
+    &bar;
+</message>

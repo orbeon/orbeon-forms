@@ -1,67 +1,92 @@
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>PO</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
-                <po>
-                    <row>
-                        <quantity/>
-                        <price/>
-                        <line-total/>
-                    </row>
-                    <total/>
-                </po>
-            </xforms:instance>
-            <xforms:bind nodeset="instance('instance')">
-                <xforms:bind nodeset="row">
-                    <xforms:bind name="quantity" nodeset="quantity"/>
-                    <xforms:bind name="price" nodeset="price"/>
-                    <xforms:bind name="line-total" nodeset="line-total" calculate="if ($quantity castable as xs:decimal and $price castable as xs:decimal) then $quantity * $price else ''" xxforms:offline="true"/>
-                </xforms:bind>
-                <xforms:bind nodeset="total" calculate="if (for $lt in $line-total return $lt castable as xs:decimal) then sum($line-total) else ''"/>
-            </xforms:bind>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:repeat nodeset="row">
-            <xforms:input ref="quantity">
-                <xforms:label>Quantity</xforms:label>
-            </xforms:input>
-            <xforms:input ref="price">
-                <xforms:label>Price</xforms:label>
-            </xforms:input>
-            <xforms:output ref="line-total">
-                <xforms:label>Line Total</xforms:label>
-            </xforms:output>
-            <xhtml:br/>
-        </xforms:repeat>
-        <xforms:output ref="total">
-            <xforms:label>Total</xforms:label>
-        </xforms:output>
+    <xh:head>
+        <xf:model id="model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
+            <xf:instance id="po">
+                <purchaseOrder xmlns="">
+                    <items>
+                        <item>
+                            <name>Item 1</name>
+                            <units>3</units>
+                            <price>50</price>
+                            <total>0</total>
+                        </item>
+                        <item>
+                            <name>Item 2</name>
+                            <units>1</units>
+                            <price>500</price>
+                            <total>0</total>
+                        </item>
+                        <item>
+                            <name>Item 3</name>
+                            <units>1</units>
+                            <price>1500</price>
+                            <total>0</total>
+                        </item>
+                    </items>
+                    <totals>
+                        <subtotal>0</subtotal>
+                        <tax>0</tax>
+                        <total>0</total>
+                    </totals>
+                    <info>
+                        <tax>0.22</tax>
+                    </info>
+                </purchaseOrder>
+            </xf:instance>
 
-        <xforms:trigger>
-            <xforms:label>Go Offline</xforms:label>
-            <xxforms:offline ev:event="DOMActivate"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            <xf:bind id="item-bind" ref="items/item">
+                <xf:bind id="name-bind" ref="name" required="true()"/>
+                <xf:bind id="units-bind" ref="units" type="xs:integer" constraint=". > 0"/>
+                <xf:bind id="price-bind" ref="price" type="xs:decimal" constraint=". > 0"/>
+                <xf:bind id="line-total-bind" ref="total"
+                         type="xs:decimal"
+                         calculate="if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-'"
+                         relevant="for $u in ../units return $u castable as xs:decimal and $u > 0"/>
+            </xf:bind>
+
+            <xf:bind id="totals-bind" ref="totals">
+                <xf:bind id="subtotal-bind" ref="subtotal" type="xs:decimal" calculate="sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t)"/>
+                <xf:bind id="tax-bind" ref="tax" type="xs:decimal" calculate="../subtotal * ../../info/tax"/>
+                <xf:bind id="total-bind" ref="total" type="xs:decimal" calculate="for $t in ../subtotal + ../tax return if ($t > 4000) then $t else $t * 0.9"/>
+            </xf:bind>
+
+            <xf:bind id="info-tax-bind" ref="info/tax" type="xs:decimal"/>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+
+        <xf:repeat id="item-repeat" ref="items/item">
+            <xh:div>
+                <xf:input id="name" ref="name"/>
+                <xf:input id="units" ref="units"/>
+                <xf:input id="price" ref="price"/>
+                <xf:output id="line-total" ref="total"/>
+            </xh:div>
+        </xf:repeat>
+
+        <xf:output id="subtotal" ref="totals/subtotal"/>
+        <xh:br/>
+        <xf:output id="tax" ref="totals/tax"/>
+        <xh:br/>
+        <xf:output id="total" ref="totals/total"/>
+
+    </xh:body>
+</xh:html>

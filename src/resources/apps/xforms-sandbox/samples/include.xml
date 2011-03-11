@@ -15,6 +15,6 @@
               xmlns:xhtml="http://www.w3.org/1999/xhtml"
               xmlns:foo="http://orbeon.org/oxf/xml/foo">
     <xforms:input ref="/foo:value">
-    <xforms:label>Value:</xforms:label>
-</xforms:input>
+        <xforms:label>Value:</xforms:label>
+    </xforms:input>
 </xhtml:div>

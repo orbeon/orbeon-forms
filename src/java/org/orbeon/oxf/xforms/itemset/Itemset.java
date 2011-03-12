@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.itemset;
 
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
@@ -255,21 +254,13 @@ public class Itemset implements ItemContainer {
                         ch.startElement("item", itemAttributes);
                         {
                             // Label and value
-                            final Item.Label itemLabel = item.getLabel();
-                            {
-                                ch.startElement("label");
-                                if (itemLabel.isHTML()) {
-                                	XFormsUtils.streamHTMLFragment(ch.getXmlReceiver(), itemLabel.getLabel(), locationData, "");
-                                } else {
-                                	ch.text(StringUtils.defaultString(itemLabel.getLabel()));
-                                }
-                                ch.endElement();
-                            }
-                            {
-                                ch.startElement("value");
-                                ch.text(itemValue);
-                                ch.endElement();
-                            }
+                            ch.startElement("label");
+                            item.getLabel().streamAsHTML(ch, locationData);
+                            ch.endElement();
+
+                            ch.startElement("value");
+                            ch.text(itemValue);
+                            ch.endElement();
                         }
                     }
 

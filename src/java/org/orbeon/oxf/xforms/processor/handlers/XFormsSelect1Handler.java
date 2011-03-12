@@ -133,7 +133,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                               final XFormsValueControl xformsSelect1Control, Itemset itemset,
                               final boolean isMultiple, final boolean isFull, boolean isBooleanInput) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsSelect1Control, !isFull);
 
@@ -157,11 +157,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     if (isHTMLDisabled(xformsSelect1Control))
                         outputDisabledAttribute(containerAttributes);
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
+                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
                     if (itemset != null) { // can be null if the control is non-relevant
-                        outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
+                        outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, xmlReceiver);
                     }
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 } else if (isMenu) {
                     // xxforms:menu appearance
@@ -174,11 +174,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     if (isHTMLDisabled(xformsSelect1Control))
                         outputDisabledAttribute(containerAttributes);
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
+                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
                     if (itemset != null) { // can be null if the control is non-relevant
                         // Create xhtml:div with initial menu entries
                         {
-                            itemset.visit(contentHandler, new ItemsetListener() {
+                            itemset.visit(xmlReceiver, new ItemsetListener() {
 
                                 private boolean groupJustStarted = false;
 
@@ -252,13 +252,13 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                         reusableAttributes.clear();
                         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
 
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+                        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                         if (itemset != null) { // can be null if the control is non-relevant
-                            outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
+                            outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, xmlReceiver);
                         }
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
                     }
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 } else {
                     // Create xhtml:select
@@ -273,7 +273,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     if (isHTMLDisabled(xformsSelect1Control))
                         outputDisabledAttribute(containerAttributes);
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
+                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
                     {
                         final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
                         final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
@@ -288,7 +288,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     //                                            Collections.EMPTY_LIST, "", xformsControl.getValue(pipelineContext), 1));
     //                        }
 
-                            itemset.visit(contentHandler, new ItemsetListener() {
+                            itemset.visit(xmlReceiver, new ItemsetListener() {
 
                                 private int optgroupCount = 0;
 
@@ -327,35 +327,32 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                             });
                         }
                     }
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
+                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
                 }
             }
         } else {
             // Read-only mode
 
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
+            xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
             if (!handlerContext.isTemplate()) {
                 final String value = (xformsSelect1Control == null || xformsSelect1Control.getValue(pipelineContext) == null) ? "" : xformsSelect1Control.getValue(pipelineContext);
-                final StringBuilder sb = new StringBuilder();
                 if (itemset != null) {
                     int selectedFound = 0;
-                    for (final Item currentItem: itemset.toList()) {
+                    final ContentHandlerHelper ch = new ContentHandlerHelper(xmlReceiver);
+                    for (final Item currentItem : itemset.toList()) {
                         if (XFormsItemUtils.isSelected(isMultiple, value, currentItem.getValue())) {
                             if (selectedFound > 0)
-                                sb.append(" - ");
-                            sb.append(currentItem.getLabel());
+                                ch.text(" - ");
+
+                            currentItem.getLabel().streamAsHTML(ch, xformsSelect1Control.getLocationData());
+
                             selectedFound++;
                         }
                     }
                 }
-
-                if (sb.length() > 0) {
-                    final String result = sb.toString();
-                    contentHandler.characters(result.toCharArray(), 0, result.length());
-                }
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+            xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }
     }
 

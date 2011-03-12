@@ -18,6 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
@@ -231,6 +232,14 @@ public class Item implements ItemContainer {
 
         public boolean isHTML() {
             return isHTML;
+        }
+
+        public void streamAsHTML(ContentHandlerHelper ch, LocationData locationData) {
+            if (isHTML) {
+                XFormsUtils.streamHTMLFragment(ch.getXmlReceiver(), label, locationData, "");
+            } else {
+                ch.text(StringUtils.defaultString(label));
+            }
         }
 
         @Override

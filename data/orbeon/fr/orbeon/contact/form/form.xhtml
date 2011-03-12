@@ -1,34 +1,19 @@
-<!--
-  Copyright (C) 2009 Orbeon, Inc.
-
-  This program is free software; you can redistribute it and/or modify it under the terms of the
-  GNU Lesser General Public License as published by the Free Software Foundation; either version
-  2.1 of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
-
-  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  -->
-<xhtml:html xmlns:xi="http://www.w3.org/2001/XInclude"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+<xhtml:html xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:saxon="http://saxon.sf.net/"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:sql="http://orbeon.org/oxf/xml/sql"
-            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:exforms="http://www.exforms.org/exf/1-0"
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            xmlns:sql="http://orbeon.org/oxf/xml/sql"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xhtml:head>
         <xhtml:title>Contact</xhtml:title>
         <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
-
-
             <xforms:instance id="fr-form-instance">
                 <form>
                     <contact>
@@ -44,8 +29,6 @@
                     </message>
                 </form>
             </xforms:instance>
-
-
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
                 <xforms:bind id="contact-bind" nodeset="contact" name="contact">
                     <xforms:bind id="first-name-bind" nodeset="first-name" type="xs:string" required="true()"
@@ -65,30 +48,24 @@
                                  name="comments"/>
                 </xforms:bind>
             </xforms:bind>
-
-
             <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>contact</form-name>
                     <title xml:lang="en">Contact</title>
-                    <description xml:lang="en"/>
+                    <description xml:lang="en">The Contact form is a simple form designed with Form Builder. It can be entirely created in about 10 minutes as shown in the Form Builder screencast.</description>
                     <title xml:lang="fr">Contact</title>
-                    <description xml:lang="fr"/>
+                    <description xml:lang="fr">Le formulaire Contact est un formulaire simple créé à l'aide de Form Builder. Il peut être entièrement créé en 10 minutes comme montré dans la vidéo Form Builder.</description>
                     <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
             </xforms:instance>
-
-
             <xforms:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xforms:instance>
-
-
             <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
                     <resource xml:lang="en">
@@ -129,11 +106,6 @@
                                 <label>Other</label>
                                 <value>other</value>
                             </item>
-
-
-
-
-
                         </topic>
                         <contact>
                             <label>Contact Information</label>
@@ -206,11 +178,6 @@
                                 <label>Autre</label>
                                 <value>other</value>
                             </item>
-
-
-
-
-
                         </topic>
                         <contact>
                             <label>Informations de contact</label>
@@ -247,16 +214,12 @@
                     </resource>
                 </resources>
             </xforms:instance>
-
-
             <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
                 <request/>
             </xforms:instance>
-
             <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
                 <response/>
             </xforms:instance>
-
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -277,9 +240,9 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                               bind="last-name-bind"
                                               id="last-name-control"
@@ -293,9 +256,9 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                               bind="email-bind"
                                               id="email-control"
@@ -307,11 +270,11 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <fr:us-phone xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xbl="http://www.w3.org/ns/xbl"
                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                             xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                              xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                              bind="phone-bind"
                                              id="phone-control">
                                     <xforms:label ref="$form-resources/phone/label"/>
@@ -329,9 +292,9 @@
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                               bind="order-number-bind"
                                               id="order-number-control"
@@ -343,9 +306,9 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:select1 xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                xmlns:xbl="http://www.w3.org/ns/xbl"
                                                 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                                 appearance="minimal"
                                                 bind="topic-bind"
@@ -369,9 +332,9 @@
                     <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:textarea xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:textarea xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                  xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
                                                  xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
                                                  bind="comments-bind"
                                                  id="comments-control">

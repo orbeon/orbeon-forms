@@ -93,7 +93,6 @@
     <!-- Configuration of demo forms -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookshelf.form"           value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.contact.form"             value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.controls.form"            value="/fr/service/resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh pdf workflow-review collapse-all expand-all"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.dmv-14.form"              value="/fr/service/resource"/>

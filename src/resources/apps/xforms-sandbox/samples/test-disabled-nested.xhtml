@@ -43,7 +43,7 @@
                             testCase.wait(function() {
                                 // Try setting the focus on the input or button
                                 var formElement = control.tagName.toLowerCase() == tagName ? control : control.getElementsByTagName(tagName)[0];
-                                formElement.focus();
+                                try { formElement.focus(); } catch (e) { /* On IE if focus can't be set */ }
                                 testCase.wait(function() {
                                     // Check if the input got the focus
                                     var formControlGotFocus = ORBEON.xforms.Globals.currentFocusControlId == control.id;

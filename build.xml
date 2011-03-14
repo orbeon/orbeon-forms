@@ -941,8 +941,6 @@
         <xdb:store configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="guest" password="guest">
             <fileset dir="data">
                 <include name="orbeon/**"/>
-                <!-- TODO: Some examples forms in the builder -->
-                <exclude name="orbeon/fr/orbeon/builder/**"/>
             </fileset>
         </xdb:store>
         <!-- Make sure the database is shut down -->

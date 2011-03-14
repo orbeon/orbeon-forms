@@ -30,9 +30,9 @@ TestManager.setPages [
     "xbl/orbeon/autocomplete/autocomplete-unittest"
     "xbl/orbeon/button/button-unittest"
     "xbl/orbeon/currency/currency-unittest"
-    "xbl/orbeon/datatable/datatable-dynamic-unittest"
-    "xbl/orbeon/datatable/datatable-structure-unittest"
-    "xbl/orbeon/datatable/datatable-unittest"
+    #"xbl/orbeon/datatable/datatable-dynamic-unittest"
+    #"xbl/orbeon/datatable/datatable-structure-unittest"
+    #"xbl/orbeon/datatable/datatable-unittest"
     "xbl/orbeon/date-picker/date-picker-unittest"
 ]
 

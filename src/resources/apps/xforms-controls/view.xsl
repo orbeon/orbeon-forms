@@ -56,6 +56,7 @@
                 #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
+                #fb-itemset-editor-dialog .yui-dt { clear: both } /* help IE 6/7 */
 
                 /* Edit Items trigger */
                 .edit-items-trigger { font-size: smaller; display: block }
@@ -89,8 +90,7 @@
                 .xforms-alert-active {
                     font-weight: bold;
                     font-size: smaller;
-                    background-color: #DF731B;
-                    color: white;
+                    color: #DF731B;
                     border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px; /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
                 }
 

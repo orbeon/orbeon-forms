@@ -192,7 +192,7 @@ a {
     font-weight: bolder;
     font-size: 14px;
     text-align: left;
-    padding: 0.1em .5em .1em .5em;
+    padding: 0.1em .5em;
     margin: 0.5em 0.1em 0.1em 0;
 }
 
@@ -339,6 +339,7 @@ a {
 
 .orbeon ul {
     list-style-type: square;
+    margin-top: .5em
 }
 
 .frame { margin: 5px 20px 5px 20px; font-size: 12px; }

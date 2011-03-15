@@ -587,7 +587,7 @@
             <xsl:if test="$hasLoadingFeature">
                 <!-- The trick with the spans is working fine for simple case where we don't need to specify the height or width.
                     In other cases, the elements "gain layout" in IE world and the width of the div that contains the
-                    scrollbar takes all the page in IE 6 if not explicitely set...-->
+                    scrollbar takes all the page in IE 6 if not explicitly set...-->
                 <xforms:group ref="xxforms:component-context()[$fr-dt-loading = true()]">
                     <xforms:action ev:event="xforms-enabled">
                         <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).initLoadingIndicator(this, <xsl:value-of select="$scrollV"/>,

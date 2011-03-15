@@ -70,6 +70,7 @@
                 .xbl-fr-box-select ul .xforms-repeat-selected-item-1 { background-color: transparent}
                 .xbl-fr-box-select .fr-component-group { display: inline-block; display: -moz-inline-block }
                 .xbl-fr-box-select ul li { list-style-type: none; margin-left: .2em; margin-top: .2em }
+                .xbl-fr-box-select ul { position: relative }
 
                 #doc .fr-grid .xbl-fr-box-select .xforms-select-appearance-full span label,
                         #doc4 .fr-grid .xbl-fr-box-select .xforms-select-appearance-full span label {

@@ -40,6 +40,10 @@
     vertical-align: middle;
 }
 
+/* With IE 6/7, legend and overflow don't behave */
+.xforms-noscript .fr-summary-table-div td legend { display: none }
+.xforms-noscript .fr-summary-table-div td .datatable-cell-content { overflow: visible }
+
 .fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
 
 .fr-summary-search { display: block; margin: 2em 0 }

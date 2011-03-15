@@ -203,7 +203,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Error summary */
 .xbl-fr-error-summary .fr-error-summary-body { padding: 0 10px; margin: 10px 0 0 }
-.xbl-fr-error-summary .fr-error-title { margin: 0; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; width: 100% }
+.xbl-fr-error-summary .fr-error-title { margin: 0; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; width: 100%; *width: 97.5% }
 .xbl-fr-error-summary .fr-error-list { padding-top: 10px; margin-top: 0  } 
 
 /* Table of contents */
@@ -456,9 +456,12 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 /* TODO: more controls */
 #doc4 .fr-grid-1-columns .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
 
-#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
-#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
-#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
+#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input,
+    #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-secret { *width: 99.5% }
+#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input,
+    #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-secret { *width: 95% }
+#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content .xforms-input-input,
+    #doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content .xforms-secret { *width: 95% }
 
 #doc4 .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } /* Undo effect of previous rule for image in minimal date picker */
 

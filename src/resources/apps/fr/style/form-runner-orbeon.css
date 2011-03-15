@@ -109,7 +109,6 @@ p, fieldset, table { margin-bottom: 1em }
 
 .fr-container {
     background-color: white;
-    /*border: 1px solid #cccccc;*/
 }
 
 .fr-separator {
@@ -152,8 +151,7 @@ p, fieldset, table { margin-bottom: 1em }
 .xforms-alert-active {
     font-weight: bold;
     font-size: smaller;
-    background-color: #DF731B;
-    color: white;
+    color: #DF731B;
     border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
 }
 

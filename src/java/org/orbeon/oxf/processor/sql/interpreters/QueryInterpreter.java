@@ -123,7 +123,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     if (isGetColumn) {
                         // Generic getter
                         final String xmlType = GetterInterpreter.getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), getInterpreterContext().getPropertySet(), attributes.getValue("type"), getInterpreterContext().getPrefixesMap(), columnType);
-                        if (SQLProcessor.qNameToexplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
+                        if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                             if (columnType == Types.CLOB) {
                                 value = rs.getClob(columnName);
                             } else if (columnType == Types.BLOB) {
@@ -290,7 +290,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 throw new OXFException("Cannot replace value with null result");
 
                                             final String type = parameter.getType();
-                                            if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_INT_QNAME).equals(type)) {
+                                            if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_INT_QNAME).equals(type)) {
                                                 replacedQuery.append(Integer.parseInt(stringValue));
                                             } else if ("literal-string".equals(type) || "oxf:literalString".equals(type)) {
                                                 replacedQuery.append(stringValue);
@@ -348,7 +348,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                     boolean doSetNull = parameter.getNullIf() != null
                                             && XPathUtils.selectBooleanValue(currentNode, parameter.getNullIf(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext()).booleanValue();
 
-                                    if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_STRING_QNAME).equals(xmlType) || SQLProcessor.qNameToexplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
+                                    if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_STRING_QNAME).equals(xmlType) || Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                                         // Set a string or XML Fragment
 
                                         // List of Clobs, strings or nodes
@@ -370,7 +370,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (objectValue instanceof Clob || objectValue instanceof Blob || objectValue instanceof String) {
                                                     // Leave unchanged
                                                     value = objectValue;
-                                                } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
+                                                } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                                                     // Case of XML Fragment
                                                     // Get an Element or a String
                                                     if (objectValue instanceof Element)
@@ -478,7 +478,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                             } else
                                                 throw new OXFException("Invalid parameter type: " + parameter.getType());
                                         }
-                                    } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_BASE64BINARY_QNAME).equals(xmlType)) {
+                                    } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_BASE64BINARY_QNAME).equals(xmlType)) {
                                         // We are writing binary data encoded in Base 64. The only target supported
                                         // is Blob
                                         // For now, only support passing a string from the input document
@@ -525,46 +525,46 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                     stringValue = XPathUtils.selectStringValue((Node) objectValue, ".");
                                             }
                                             // For the specific type, set to null or convert String value
-                                            if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_INT_QNAME).equals(xmlType)) {
+                                            if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_INT_QNAME).equals(xmlType)) {
                                                 if (stringValue == null)
                                                     stmt.setNull(index, Types.INTEGER);
                                                 else
                                                     stmt.setInt(index, Integer.parseInt(stringValue));
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_DATE_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_DATE_QNAME).equals(xmlType)) {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.DATE);
                                                 } else {
                                                     java.sql.Date date = new java.sql.Date(ISODateUtils.parseDate(stringValue).getTime());
                                                     stmt.setDate(index, date);
                                                 }
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_DATETIME_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_DATETIME_QNAME).equals(xmlType)) {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.TIMESTAMP);
                                                 } else {
                                                     java.sql.Timestamp timestamp = new java.sql.Timestamp(ISODateUtils.parseDate(stringValue).getTime());
                                                     stmt.setTimestamp(index, timestamp);
                                                 }
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_BOOLEAN_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_BOOLEAN_QNAME).equals(xmlType)) {
                                                 if (stringValue == null)
                                                     stmt.setNull(index, Types.BOOLEAN);
                                                 else
                                                     stmt.setBoolean(index, "true".equals(stringValue));
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_DECIMAL_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_DECIMAL_QNAME).equals(xmlType)) {
                                                 if (stringValue == null)
                                                     stmt.setNull(index, Types.DECIMAL);
                                                 else
                                                     stmt.setBigDecimal(index, new BigDecimal(stringValue));
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_FLOAT_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_FLOAT_QNAME).equals(xmlType)) {
                                                 if (stringValue == null)
                                                     stmt.setNull(index, Types.FLOAT);
                                                 else
                                                     stmt.setFloat(index, Float.parseFloat(stringValue));
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_DOUBLE_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_DOUBLE_QNAME).equals(xmlType)) {
                                                 if (stringValue == null)
                                                     stmt.setNull(index, Types.DOUBLE);
                                                 else
                                                     stmt.setDouble(index, Double.parseDouble(stringValue));
-                                            } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_ANYURI_QNAME).equals(xmlType)) {
+                                            } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_ANYURI_QNAME).equals(xmlType)) {
                                                 String sqlType = parameter.getSqlType();
                                                 if (sqlType != null && !(SQL_TYPE_BLOB.equals(sqlType) || SQL_TYPE_CLOB.equals(sqlType)))
                                                     throw new OXFException("Invalid sql-type attribute: " + sqlType);

@@ -550,7 +550,10 @@
                 <include name="orbeon-xforms-filter.jar"/>
             </lib>
             <lib dir="${lib.dir}">
-                <include name="scala-library-2.8.1.jar"/>
+                <include name="scala-library-*.jar"/>
+                <include name="commons-fileupload-*.jar"/>
+                <include name="commons-lang-*.jar"/>
+                <include name="log4j-*.jar"/>
             </lib>
         </war>
     </target>

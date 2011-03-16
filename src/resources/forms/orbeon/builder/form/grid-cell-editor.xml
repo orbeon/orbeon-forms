@@ -25,7 +25,7 @@
           xmlns:saxon="http://saxon.sf.net/"
           xmlns:xbl="http://www.w3.org/ns/xbl"
 
-        class="fb-grid-td" rowspan="{if (@rowspan) then if (instance('fb-user-agent-instance')/is-ie = 'true') then @rowspan * 2 - 1 else @rowspan else 1}">
+        class="fb-grid-td" rowspan="{if (@rowspan) then if (instance('fb-user-agent-instance')/is-ie = 'true' and xs:integer(instance('fb-user-agent-instance')/ie-version) le 7) then @rowspan * 2 - 1 else @rowspan else 1}">
         <!-- The rowspan above is an IE HACK as IE messes up rowspan with invisible <tr> elements -->
 
     <xhtml:div class="fb-grid-cell-icons">

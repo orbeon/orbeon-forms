@@ -30,43 +30,6 @@
         </portlet-info>
     </portlet>
 
-    <!-- Orbeon Forms proxy portlet (to access a remote Form Runner instance) -->
-    <portlet>
-        <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OrbeonProxyPortlet</portlet-class>
-        <supports>
-            <mime-type>text/html</mime-type>
-            <portlet-mode>view</portlet-mode>
-            <portlet-mode>edit</portlet-mode>
-        </supports>
-
-        <!-- Initialization parameters -->
-        <init-param>
-            <name>form-runner-url</name>
-            <value>http://localhost:8080/orbeon/</value>
-        </init-param>
-        <init-param>
-            <name>app-name</name>
-            <value>orbeon</value>
-        </init-param>
-        <init-param>
-            <name>form-name</name>
-            <value>bookshelf</value>
-        </init-param>
-        <init-param>
-            <name>action</name>
-            <value>new</value>
-        </init-param>
-        <init-param>
-            <name>read-only</name>
-            <value>false</value>
-        </init-param>
-
-        <portlet-info>
-            <title>Form Runner</title>
-        </portlet-info>
-    </portlet>
-
     <!-- Sample separate deployment portlet (for Orbeon Forms running directly within a portlet) -->
     <portlet>
         <portlet-name>orbeon-filter-sample-portlet</portlet-name>

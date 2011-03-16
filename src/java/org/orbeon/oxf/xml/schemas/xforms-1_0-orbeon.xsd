@@ -371,6 +371,7 @@
             <!-- XForms 1.2 deprecates @nodeset -->
             <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="name">

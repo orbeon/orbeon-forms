@@ -94,6 +94,22 @@
             <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
             <xhtml:div>
                 <xforms:group appearance="xxforms:internal" ref="instance('fb-metadata-instance')">
+
+                    <!-- IE warning -->
+                    <xforms:group ref=".[xxforms:instance('fr-parameters-instance')/mode = 'new' and instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
+                        <xhtml:div class="fb-ie-warning">
+                            It appears that you are using Internet Explorer 6 or earlier. Form Builder is
+                            likely not working properly with this browser. We recommend you upgrade
+                            to Internet Explorer 8 or newer, or use
+                            <a href="http://www.google.com/chrome">Google Chrome</a>,
+                            <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                            <a href="http://www.apple.com/safari/">Safari</a>, or
+                            <a href="http://www.opera.com/">Opera</a>.
+                            If we made a mistake and you are not using Internet Explorer 6 or earlier, please
+                            <a href="mailto:info@orbeon.com?subject=Form Builder Internet Explorer Version">let us know</a>.
+                        </xhtml:div>
+                    </xforms:group>
+
                     <xhtml:p>
                         <!-- Display message to user -->
                         <xforms:output value="if ($is-new-form)
@@ -377,18 +393,20 @@
                     </fr:footer>
                     <fr:body>
 
-                        <!--<xforms:output ref="instance('fb-user-agent-instance')/value"/>-->
-                        <xforms:group ref=".[instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
+                        <!-- IE warning -->
+                        <xforms:group ref=".[xxforms:instance('fr-parameters-instance')/mode != 'new' and instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
                             <xforms:switch>
                                 <xforms:case id="fb-ie-warning-case-on">
                                     <xhtml:div class="fb-ie-warning">
 
-                                        It appears that you are using Internet Explorer 6 or earlier. We recommend you upgrade
-                                        to Internet Explorer 7 or later, or use <a
-                                        href="http://www.mozilla.com/firefox/">Firefox</a>, <a
-                                        href="http://www.apple.com/safari/">Safari</a>, or <a
-                                        href="http://www.opera.com/">Opera</a>. If we made a mistake and you are not using
-                                        Internet Explorer 6 or earlier, please
+                                        It appears that you are using Internet Explorer 6 or earlier. Form Builder is
+                                        likely not working properly with this browser. We recommend you upgrade
+                                        to Internet Explorer 8 or newer, or use
+                                        <a href="http://www.google.com/chrome">Google Chrome</a>,
+                                        <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                                        <a href="http://www.apple.com/safari/">Safari</a>, or
+                                        <a href="http://www.opera.com/">Opera</a>.
+                                        If we made a mistake and you are not using Internet Explorer 6 or earlier, please
                                         <a href="mailto:info@orbeon.com?subject=Form Builder Internet Explorer Version">let us know</a>.
 
                                         <xforms:trigger appearance="minimal">

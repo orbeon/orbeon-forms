@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -95,7 +96,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 final int columnType = metadata.getColumnType(columnIndex);
 
                 final String xmlType = getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), interpreterContext.getPropertySet(), attributes.getValue("type"), interpreterContext.getPrefixesMap(), columnType);
-                if (SQLProcessor.qNameToexplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
+                if (Dom4jUtils.qNameToExplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                     // XML fragment requested
                     String columnTypeName = metadata.getColumnTypeName(columnIndex);
                     if (columnType == Types.CLOB) {

@@ -20,15 +20,13 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.sql.interpreters.*;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -70,31 +68,9 @@ public class SQLProcessor extends ProcessorImpl {
     private static final String INPUT_DATASOURCE = "datasource";
     public static final String SQL_DATASOURCE_URI = "http://www.orbeon.org/oxf/sql-datasource";
 
-    public static final Document NULL_DOCUMENT;
-
-    // TODO: START Move this once binary 2.8 compatibliity is no longer required
-    public static final Namespace XSI_NAMESPACE = new Namespace(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-    static {
-        NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
-        Element nullElement = factory.createElement("null");
-        final QName attNm = new QName
-                (XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
-        nullElement.addAttribute(attNm, "true");
-        NULL_DOCUMENT.setRootElement(nullElement);
-    }
-    public static String qNameToexplodedQName(QName qName) {
-        if ("".equals(qName.getNamespaceURI()))
-            return qName.getName();
-        else
-            return "{" + qName.getNamespaceURI() + "}" + qName.getName();
-    }
-    // TODO: END Move this once binary 2.8 compatibliity is no longer required
-
     public SQLProcessor() {
         // Mandatory config input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
-//        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
 
         // Optional datasource input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATASOURCE, SQL_DATASOURCE_URI));
@@ -228,7 +204,7 @@ public class SQLProcessor extends ProcessorImpl {
                 throw new OXFException("The data input must be connected when the configuration uses XPath expressions.");
             if (!hasDataInput || !config.useXPathExpressions) {
                 // Just use an empty document
-                data = NULL_DOCUMENT;
+                data = Dom4jUtils.NULL_DOCUMENT;
             } else {
                 // There is a data input connected and there are some XPath epxressions operating on it
                 boolean useXPathContentHandler = false;

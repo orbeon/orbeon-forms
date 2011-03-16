@@ -522,6 +522,9 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
   .xforms-noscript .fr-mode-pdf .xforms-help-image,
   .xforms-noscript .fr-mode-email .xforms-help-image { display: none }
 
+/* For those controls that still have a display: block in view mode, make sure there is no top margin */
+.fr-mode-view .fr-grid-content .xforms-control, .fr-mode-view .fr-grid-content .fr-component-group { margin-top: 0 }
+
 /* This is also used for PDF generation */
 @media print {
     /* Don't hide as there is no script running */

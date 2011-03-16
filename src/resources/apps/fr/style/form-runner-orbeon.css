@@ -256,7 +256,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
 /* Add background to static read-only fields and special output fields */
 .xforms-static, .fr-static { min-height: 1em }
 .fr-mode-view .fr-grid-content { margin-bottom: 1em; background-color: #E8F2FF }
-.fr-mode-view .fr-repeat .fr-grid-content { background-color: transparent } 
+.fr-mode-view .fr-repeat .fr-grid-content { background-color: transparent; margin-bottom: 0 }
 .fr-mode-view #fr-form-group { margin-top: 1em }
 
 /* Messages area */

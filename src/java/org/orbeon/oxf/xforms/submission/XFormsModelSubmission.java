@@ -796,7 +796,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     && isReplaceAll
                     && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
                     && avtXXFormsUsername == null // can't optimize if there are authentication credentials
-                    && avtXXFormsTarget == null;  // can't optimize if there is a target
+                    && avtXXFormsTarget == null   // can't optimize if there is a target
+                    && Dom4jUtils.elements(getSubmissionElement(), XFormsConstants.XFORMS_HEADER_QNAME).size() == 0; // can't optimize if there are headers specified
 
             // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
             // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of

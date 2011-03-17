@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.xinclude;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
@@ -268,7 +269,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                                 // Document is read entirely in memory for XPath processing
                                 final DocumentInfo document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(), source, false);
-                                final List result = XPathCache.evaluate(pipelineContext, document, xpath, new NamespaceMapping(Collections.<String, String>emptyMap()),
+                                final List result = XPathCache.evaluate(pipelineContext, document, xpath, new NamespaceMapping(getPrefixMappings()),
                                         Collections.<String, ValueRepresentation>emptyMap(), PipelineFunctionLibrary.instance(), null, source.getSystemId(), null);
 
                                 // Each resulting object is output through the next level of processing
@@ -321,6 +322,26 @@ public class XIncludeProcessor extends ProcessorImpl {
             }
 
             level++;
+        }
+
+        private Map<String, String> getPrefixMappings() throws SAXException {
+            final Map<String, String> result = new HashMap<String, String>();
+
+            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                final String namespacePrefix = (String) e.nextElement();
+                if (StringUtils.isNotBlank(namespacePrefix))
+                    result.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+            }
+
+            // Default namespace if present
+            final String defaultNamespaceURI = namespaceSupport.getURI("");
+            if (StringUtils.isNotBlank(defaultNamespaceURI))
+                result.put("", defaultNamespaceURI);
+
+            // Just in case this is missing
+            result.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
+
+            return result;
         }
 
         private void sendClearStartPrefixMappings() throws SAXException {

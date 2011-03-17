@@ -223,4 +223,30 @@
         </output>
     </test>
 
+    <test description="xpointer attribute using namespaces" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude8.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <content xmlns:xforms="http://www.w3.org/2002/xforms">
+                <xf:bind xmlns:xf="http://www.w3.org/2002/xforms" id="info-tax-bind" ref="info/tax" type="xs:decimal"/>
+            </content>
+        </output>
+    </test>
+
 </group>

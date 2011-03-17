@@ -1,0 +1,3 @@
+<content xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <xi:include href="../xforms-server/po.xhtml" xpointer="xpath(/xhtml:html/xhtml:head/xforms:model/xforms:bind[3])" fixup-xml-base="false"/>
+</content>

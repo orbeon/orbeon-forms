@@ -17,8 +17,6 @@
     border-bottom:  #7f7f7f 1px solid;
 }
 
-
-
 .xforms-data {
     display: none
 }
@@ -26,12 +24,12 @@
 .datatable-cell-content {
     overflow:hidden;
 }
-                                                           
-.fr-datatable-is-loading { 
+
+.fr-datatable-is-loading {
     background-image:
-    url(../../../ops/images/xforms/processing.gif); 
+    url(../../../ops/images/xforms/processing.gif);
     height: 50px; background-position: center;
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
 }
 
 .yui-pg-page  {
@@ -50,10 +48,10 @@
     visibilty: hidden;
 }
 
-/* Needed for IE7 to display correctly multi header rows scrollable datatables */ 
+/* Needed for IE7 to display correctly multi header rows scrollable datatables */
 .yui-dt-scrollable .yui-dt-bd thead tr {
     display: none;
-    top: -10000px;     
+    top: -10000px;
     visibility: hidden;
 }
 
@@ -65,3 +63,8 @@
 .yui-skin-sam .yui-dt th {
     vertical-align: middle !important;
 }
+
+/* Prevents part of a date picker from still showing when the date picker is closed. The date picker is hidden with
+   visibility: hidden, but the datatable sets a visibility: visible on the tr inside the datatable, which applies
+   to parts of the date picker and prevents it from being completely hidden. */
+.yui-dt-scrollable .yui-dt-hd .yui-calcontainer thead tr { visibility: inherit }

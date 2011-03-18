@@ -57,7 +57,6 @@ public class XFormsProperties {
     private static final String LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
     private static final String LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
-    private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
@@ -211,7 +210,6 @@ public class XFormsProperties {
             new PropertyDefinition(LOCAL_SUBMISSION_FORWARD_PROPERTY, true, false),
             new PropertyDefinition(LOCAL_SUBMISSION_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
-            new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
@@ -463,11 +461,6 @@ public class XFormsProperties {
 
     public static boolean isAjaxShowErrors(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, AJAX_SHOW_ERRORS_PROPERTY);
-    }
-
-
-    public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
     }
 
     public static boolean isSpanHTMLLayout(XFormsContainingDocument containingDocument) {

@@ -104,7 +104,6 @@
     <property as="xs:boolean"  name="oxf.xforms.resources.javascript-at-bottom"             value="true"/>
     <property as="xs:string"   name="oxf.xforms.resources.baseline"                         value="fr:button fr:tabview fr:autocomplete"/>
 
-    <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>
     <property as="xs:boolean" name="oxf.xforms.session-heartbeat"                           value="true"/>
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                          value="true"/>

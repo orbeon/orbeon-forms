@@ -58,7 +58,7 @@
                             <!-- Clear submission result -->
                             <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
                             <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
-                                <xxforms:context name="fb:application" select="$metadata-instance/application-name"/>
+                                <xxforms:context name="fb:app" select="$metadata-instance/application-name"/>
                                 <xxforms:context name="fb:form" select="$metadata-instance/form-name"/>
                             </xforms:dispatch>
                         </xforms:action>
@@ -145,12 +145,9 @@
         <xforms:action ev:event="fr-publish-form">
             <!-- TODO: must also publish attachments! and make sure URLs are relative (?) -->
             <!-- Determine the URI of the collection to deploy to -->
-            <xxforms:variable name="app" select="event('fb:application')"/>
-            <xxforms:variable name="form" select="event('fb:form')"/>
             <xforms:send submission="fr-publish-form-submission">
-                <xxforms:context name="fb:collection" select="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
-                <xxforms:context name="fb:application" select="$app"/>
-                <xxforms:context name="fb:form" select="$form"/>
+                <xxforms:context name="fb:app" select="event('fb:app')"/>
+                <xxforms:context name="fb:form" select="event('fb:form')"/>
             </xforms:send>
         </xforms:action>
 
@@ -167,11 +164,11 @@
         <!-- Submission to publish the form -->
         <xforms:submission id="fr-publish-form-submission"
                 ref="instance('fr-form-to-publish-instance')" method="put"
-
-                resource="{event('fb:collection')}/crud/{event('fb:application')}/{event('fb:form')}/form/form.xhtml"
+                resource="{xxforms:instance('fr-provider-instance')/publish/uri}/crud/{event('fb:app')}/{event('fb:form')}/form/form.xhtml"
                 replace="text" target="instance('fr-publish-form-submission-response')">
-            <!-- Headers to pass -->
-            <xi:include href="oxf:/apps/fr/includes/persistence-model-headers.xml"/>
+            <!-- Headers -->
+            <xi:include href="../../../../apps/fr/includes/persistence/headers-authentication.xml"/>
+            <xi:include href="../../../../apps/fr/includes/persistence/headers-publish.xml"/>
 
             <!-- Prepare submission -->
             <!-- See also model.xml -->

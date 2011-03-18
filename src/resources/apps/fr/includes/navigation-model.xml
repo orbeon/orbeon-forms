@@ -71,7 +71,7 @@
         <xforms:setvalue ev:event="xforms-submit" ref="xxforms:instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
         <!-- Reset data-safe-override -->
         <xforms:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="persistence/headers-authentication.xml"/>
     </xforms:submission>
 
     <!-- Submission to preview the XML form -->
@@ -84,7 +84,7 @@
         <xforms:setvalue ev:event="xforms-submit" ref="xxforms:instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
         <!-- Reset data-safe-override -->
         <xforms:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="persistence/headers-authentication.xml"/>
     </xforms:submission>
 
     <!-- Open PDF for the current form data -->

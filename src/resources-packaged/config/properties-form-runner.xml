@@ -15,12 +15,19 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <!-- Form Runner properties -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.*.*.*"                           value="/fr/service/exist"/>
+    <!-- === Persistence configuration === -->
 
-    <property as="xs:anyURI"  name="oxf.fr.persistence.service.exist.uri"                       value="/exist/rest/db/orbeon/fr"/>
-    <property as="xs:anyURI " name="oxf.fr.persistence.service.oracle.datasource"               value="oracle"/>
-    <property as="xs:anyURI " name="oxf.fr.persistence.service.mysql.datasource"                value="mysql"/>
+    <!-- Default provider is "exist" -->
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.*.*.*"                          value="exist"/>
+    <!-- Define resource, exist, oracle, and mysql providers with their parameters -->
+    <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                            value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.exist.uri"                               value="/fr/service/exist"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.exist.exist-uri"                         value="/exist/rest/db/orbeon/fr"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                              value="/fr/service/oracle"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.datasource"                       value="oracle"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                               value="/fr/service/mysql"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
+
 
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
@@ -91,21 +98,21 @@
     <property as="xs:boolean" name="oxf.fr.alfresco.send-xml.*.*"                               value="false"/>
 
     <!-- Configuration of demo forms -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.builder.form"             value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.bookshelf.form"           value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.controls.form"            value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.orbeon.builder.form"            value="resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh pdf workflow-review collapse-all expand-all"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.dmv-14.form"              value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="resource"/>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
 
     <!-- Register and license forms -->
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.register.form"            value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.orbeon.register.form"           value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.register"                      value="refresh workflow-review"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.register"                 value="refresh workflow-edit workflow-send"/>
     <property as="xs:string"  name="oxf.fr.detail.send.uri.orbeon.register"                     value="/fr/orbeon/license/view/bc3b89cdb12968bb96a8dd6b69fbf85a"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.register"                    value="false"/>
 
-    <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.license.form"             value="/fr/service/resource"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider.orbeon.license.form"            value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.license"                       value="close"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.license"                  value="home"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>

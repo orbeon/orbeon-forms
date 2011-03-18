@@ -30,12 +30,22 @@
     <!-- Search result -->
     <p:param name="data" type="output"/>
 
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config stream-type="xs:anyURI">
+                <include>/request/headers/header[name = 'orbeon-exist-uri']</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
     <!-- Prepare submission -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config">
             <xforms:submission xsl:version="2.0" method="post"
-                               resource="{{xxforms:property('oxf.fr.persistence.service.exist.uri')}}/{/*/app}/{/*/form
+                               resource="{doc('input:request')/request/headers/header[name = 'orbeon-exist-uri']/value}/{/*/app}/{/*/form
                                             }/data/?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
                                             }&amp;query={

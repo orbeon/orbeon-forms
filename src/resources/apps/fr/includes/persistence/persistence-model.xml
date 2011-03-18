@@ -27,24 +27,11 @@
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
-    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
-    <xxforms:variable name="app" select="$parameters/app"/>
-    <xxforms:variable name="form" select="$parameters/form"/>
-    <xxforms:variable name="document" select="$parameters/document"/>
+    <xi:include href="provider.xml" xpointer="xpath(/*/*)"/>
 
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
     <xforms:action ev:event="xforms-model-construct-done">
-
-        <!-- Initialize form service URI -->
-        <xforms:setvalue ref="instance('fr-uris-instance')/form-collection"
-                         value="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'form'), '.'))"/>
-        <!-- Initialize data service URI -->
-        <xforms:setvalue ref="instance('fr-uris-instance')/data-collection"
-                         value="xxforms:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.'))"/>
-        <!-- Initialize new service URI -->
-        <xforms:setvalue ref="instance('fr-uris-instance')/new-service-uri"
-                         value="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"/>
 
         <!-- Initialize parameters to pass to "new" service -->
         <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -138,7 +125,8 @@
                 </xforms:action>
             </xforms:action>
         </xforms:action>
-
+        <!-- Now that we loaded the document, update the providers, as the document impact the provide used for publishing -->
+        <xforms:dispatch name="fr-update-persistence-provider" target="fr-persistence-model"/>
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">
@@ -180,9 +168,10 @@
 
     <xforms:submission id="fr-delete-document-submission"
             method="delete" serialization="none"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$app}/{$form}/data/{event('document-id')}/data.xml"
+            resource="{instance('fr-provider-instance')/data/uri}/crud/{$app}/{$form}/data/{event('document-id')}/data.xml"
             replace="none">
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="headers-authentication.xml"/>
+        <xi:include href="headers-data.xml"/>
     </xforms:submission>
 
     <!-- Respond to save button activation -->
@@ -316,7 +305,7 @@
                                 <xxforms:variable name="new-filename" select="string-join(($new-id,
                                                                                             if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')" as="xs:string"/>
                                 <xxforms:variable name="resource" as="xs:string"
-                                                  select="concat(instance('fr-uris-instance')/data-collection, '/crud/',
+                                                  select="concat(instance('fr-provider-instance')/data/uri, '/crud/',
                                                             $app, '/', $form, '/data/',
                                                             $document, '/', $new-filename)"/>
 
@@ -353,15 +342,6 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Persistence URIs -->
-    <xforms:instance id="fr-uris-instance">
-        <uris xmlns="">
-            <form-collection/>
-            <data-collection/>
-            <new-service-uri/>
-        </uris>
-    </xforms:instance>
-
     <!-- Instance to store the result of the create/update submission -->
     <xforms:instance id="fr-create-update-submission-response">
         <response xmlns=""/>
@@ -375,9 +355,10 @@
     <xforms:submission id="fr-create-update-submission"
             validate="false" relevant="false" method="put"
             ref="event('holder')"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$app}/{$form}/data/{$document}/{event('resource')}"
+            resource="{instance('fr-provider-instance')/data/uri}/crud/{$app}/{$form}/data/{$document}/{event('resource')}"
             replace="text" target="instance('fr-create-update-submission-response')">
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="headers-authentication.xml"/>
+        <xi:include href="headers-data.xml"/>
     </xforms:submission>
 
     <!-- Submission to create/update an attachment -->
@@ -386,15 +367,17 @@
             ref="event('holder')"
             resource="{event('resource')}"
             replace="none">
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="headers-authentication.xml"/>
+        <xi:include href="headers-data.xml"/>
     </xforms:submission>
 
     <!-- Get document -->
     <xforms:submission id="fr-get-document-submission"
             method="get" serialization="none"
-            resource="{instance('fr-uris-instance')/data-collection}/crud/{$app}/{$form}/data/{$document}/data.xml"
+            resource="{instance('fr-provider-instance')/data/uri}/crud/{$app}/{$form}/data/{$document}/data.xml"
             replace="instance" xxforms:instance="fr-form-instance">
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="headers-authentication.xml"/>
+        <xi:include href="headers-data.xml"/>
     </xforms:submission>
 
     <!-- Source form with metadata -->
@@ -404,9 +387,10 @@
 
     <xforms:submission id="get-source-form-submission"
             method="get" serialization="none"
-            resource="{instance('fr-uris-instance')/form-collection}/crud/{$app}/{$form}/form/form.xhtml"
+            resource="{instance('fr-provider-instance')/form/uri}/crud/{$app}/{$form}/form/form.xhtml"
             replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="true">
-        <xi:include href="persistence-model-headers.xml"/>
+        <xi:include href="headers-authentication.xml"/>
+        <xi:include href="headers-form.xml"/>
     </xforms:submission>
 
     <xforms:instance id="fr-service-parameters">
@@ -416,7 +400,7 @@
     <!-- Calls a service to get the initial instance -->
     <xforms:submission id="fr-get-instance-from-service"
             method="get" separator="&amp;" ref="instance('fr-service-parameters')"
-            resource="{instance('fr-uris-instance')/new-service-uri}"
+            resource="{instance('fr-provider-instance')/new-service-uri}"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <xforms:instance id="fr-persistence-instance">

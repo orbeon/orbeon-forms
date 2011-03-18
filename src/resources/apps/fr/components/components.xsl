@@ -142,7 +142,7 @@
                     <xsl:apply-templates select="@*|node()"/>
                 </xsl:element>
             </xsl:for-each>
-    
+
             <!-- Process the rest -->
             <xsl:apply-templates select="node() except (xhtml:link | xhtml:style)"/>
 
@@ -265,7 +265,7 @@
             </xforms:action>
         </xforms:model>
         <!-- This model handles document persistence -->
-        <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->
         <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->

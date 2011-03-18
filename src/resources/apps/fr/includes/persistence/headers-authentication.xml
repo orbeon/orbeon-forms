@@ -1,0 +1,5 @@
+<!-- Go through authentication headers -->
+<xforms:header nodeset="xxforms:instance('fr-authentication-headers')/header[@value != '']" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    <xforms:name value="if (@name = 'username') then 'Orbeon-Username' else 'Orbeon-Roles'"/>
+    <xforms:value value="@value"/>
+</xforms:header>

@@ -34,10 +34,22 @@
                 <include>/request/content-type</include>
                 <include>/request/method</include>
                 <include>/request/body</include>
+                <include>/request/headers/header[name = 'orbeon-exist-uri']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
+
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#request"/>
+        <p:input name="config">
+            <request-description xsl:version="2.0">
+                <exist-uri><xsl:value-of select="/request/headers/header[name = 'orbeon-exist-uri']/value"/></exist-uri>
+            </request-description>
+        </p:input>
+        <p:output name="data" id="request-description"/>
+    </p:processor>
+
 
     <p:processor name="oxf:perl5-matcher">
         <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))</config></p:input>
@@ -52,10 +64,10 @@
 
             <!-- Read URL -->
             <p:processor name="oxf:url-generator">
-                <p:input name="config" transform="oxf:unsafe-xslt" href="#matcher-groups">
+                <p:input name="config" transform="oxf:unsafe-xslt" href="aggregate('root', #request-description, #matcher-groups)">
                     <config xsl:version="2.0">
                         <url>
-                            <xsl:value-of select="pipeline:rewriteServiceURI(concat(pipeline:property('oxf.fr.persistence.service.exist.uri'), '/', /*/group[1]), true())"/>
+                            <xsl:value-of select="pipeline:rewriteServiceURI(concat(/root/request-description/exist-uri, '/', /root/result/group[1]), true())"/>
                         </url>
                         <!-- Forward the same headers that the XForms engine forwards -->
                         <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
@@ -91,7 +103,7 @@
                             <!-- NOTE: The <body> element contains the xs:anyURI type -->
                             <xforms:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
-                                    resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                                    resource="{/root/request-description/exist-uri}/{/root/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete nodeset="/*/*"/>
@@ -100,7 +112,7 @@
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
-                        <p:input name="request" href="aggregate('root', #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>
+                        <p:input name="request" href="aggregate('root', #request-description, #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>
                         <p:output name="response" id="response"/>
                     </p:processor>
 
@@ -111,7 +123,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xforms:submission method="delete" replace="none" serialization="none"
-                                    resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                                    resource="{/root/request-description/exist-uri}/{/root/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete nodeset="/*/*"/>
@@ -120,7 +132,7 @@
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
-                        <p:input name="request" href="#matcher-groups"/>
+                        <p:input name="request" href="aggregate('root', #request-description, #matcher-groups#xpointer(/*/group))"/>
                         <p:output name="response" id="response"/>
                     </p:processor>
 
@@ -131,7 +143,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xforms:submission ref="/*/*[1]" method="put" replace="none"
-                                    resource="{xxforms:property('oxf.fr.persistence.service.exist.uri')}/{/*/group[1]}">
+                                    resource="{/root/request-description/exist-uri}/{/root/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete nodeset="/*/*"/>
@@ -140,7 +152,7 @@
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
-                        <p:input name="request" href="aggregate('root', #instance, #matcher-groups#xpointer(/*/group))"/>
+                        <p:input name="request" href="aggregate('root', #instance, #request-description, #matcher-groups#xpointer(/*/group))"/>
                         <p:output name="response" id="response"/>
                     </p:processor>
                 </p:when>

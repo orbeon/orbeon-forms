@@ -1,4 +1,0 @@
-<xforms:header model="fr-persistence-model" nodeset="instance('fr-authentication-headers')/header" xmlns:xforms="http://www.w3.org/2002/xforms">
-    <xforms:name value="if (@name = 'username') then 'Orbeon-Username' else 'Orbeon-Roles'"/>
-    <xforms:value value="@value"/>
-</xforms:header>

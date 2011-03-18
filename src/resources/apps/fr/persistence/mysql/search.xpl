@@ -85,12 +85,7 @@
                     <sql:config>
                         <documents>
                             <sql:connection>
-                                <sql:datasource>
-                                    <xsl:variable name="datasource-header" select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']"/>
-                                    <xsl:value-of select="if (exists($datasource-header))
-                                        then $datasource-header/value
-                                        else pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
-                                </sql:datasource>
+                                <sql:datasource><xsl:value-of select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                                 <!-- Query that returns all the search results, which we will reuse in multiple palces -->
                                 <xsl:variable name="query">
                                     select

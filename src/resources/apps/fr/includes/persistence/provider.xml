@@ -68,7 +68,6 @@
                 </xforms:action>
             </xforms:action>
         </xforms:action>
-        <xforms:message level="xxforms:log-debug" value="concat('XXX fr-provider-instance: ', saxon:serialize(instance('fr-provider-instance'), 'xml'))"/>
         <!-- Initialize new service URI -->
         <xforms:setvalue ref="instance('fr-provider-instance')/new-service-uri" value="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"/>
 

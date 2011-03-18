@@ -72,13 +72,7 @@
                     <document-id><xsl:value-of select="$matcher-groups[7]"/></document-id>
                 </xsl:if>
                 <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
-                <!-- For the datasource, we either use the HTTP header if present, otherwise we use the global property -->
-                <sql:datasource>
-                    <xsl:variable name="datasource-header" select="$request/headers/header[name = 'orbeon-datasource']"/>
-                    <xsl:value-of select="if (exists($datasource-header))
-                        then $datasource-header/value
-                        else pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
-                </sql:datasource>
+                <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>

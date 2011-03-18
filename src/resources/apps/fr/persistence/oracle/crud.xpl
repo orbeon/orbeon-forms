@@ -34,7 +34,7 @@
                 <include>/request/request-path</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
-                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles']</include>
+                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource']</include>
                 <include>/request/body</include>
             </config>
         </p:input>
@@ -90,10 +90,11 @@
                     <document-id><xsl:value-of select="$matcher-groups[7]"/></document-id>
                 </xsl:if>
                 <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
+                <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
-        <p:output name="data" id="request-description"/>
+        <p:output name="data" id="request-description" debug="request-description"/>
     </p:processor>
 
     <p:processor name="oxf:null-serializer">
@@ -111,9 +112,7 @@
                     <sql:config xsl:version="2.0">
                         <sql-out>
                             <sql:connection>
-                                <sql:datasource>
-                                    <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                                </sql:datasource>
+                                <xsl:copy-of select="/request/sql:datasource"/>
 
                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
                                 <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
@@ -242,9 +241,7 @@
                             <sql:config xsl:version="2.0">
                                 <result>
                                     <sql:connection>
-                                        <sql:datasource>
-                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                                        </sql:datasource>
+                                        <xsl:copy-of select="/request/sql:datasource"/>
                                         <sql:execute>
                                             <sql:update>
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
@@ -293,9 +290,7 @@
                             <sql:config xsl:version="2.0">
                                 <result>
                                     <sql:connection>
-                                        <sql:datasource>
-                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.oracle.datasource')"/>
-                                        </sql:datasource>
+                                        <xsl:copy-of select="/request/sql:datasource"/>
                                         <sql:execute>
                                             <sql:update>
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>

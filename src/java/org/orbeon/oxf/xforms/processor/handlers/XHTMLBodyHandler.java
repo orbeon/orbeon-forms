@@ -344,6 +344,13 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
+
+        // Add global top-level XBL markup
+        final XBLBindings xblBindings = containingDocument.getStaticState().getXBLBindings();
+        if (xblBindings != null)
+            for (final XBLBindings.Global global : xblBindings.getGlobals().values())
+                XXFormsComponentHandler.processShadowTree(handlerContext.getController(), global.fullShadowTree.getRootElement());
+
         // Close xhtml:form
         helper.endElement();
 

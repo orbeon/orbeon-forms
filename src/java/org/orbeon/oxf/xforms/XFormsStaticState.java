@@ -329,6 +329,13 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         analyzeComponentTree(propertyContext, xpathConfiguration, rootScope, controlsDocument.getRootElement(),
                 rootControlAnalysis, externalLHHA);
 
+        // Analyze new global XBL controls introduced above
+        // NOTE: should recursively check?
+        if (xblBindings != null)
+            for (final XBLBindings.Global global : xblBindings.getGlobals().values())
+                analyzeComponentTree(propertyContext, xpathConfiguration, rootScope, global.compactShadowTree.getRootElement(),
+                        rootControlAnalysis, externalLHHA);
+
         // Process deferred external LHHA elements
         for (final ExternalLHHAAnalysis entry : externalLHHA)
             entry.attachToControl();
@@ -617,8 +624,22 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         }
     }
 
-    public Document getControlsDocument() {
-        return controlsDocument;
+    public List<Element> getTopLevelControlElements() {
+
+        final List<Element> result = new ArrayList<Element>();
+
+        if (controlsDocument != null)
+            result.add(controlsDocument.getRootElement());
+
+        if (xblBindings != null)
+            for (final XBLBindings.Global global : xblBindings.getGlobals().values())
+                result.add(global.compactShadowTree.getRootElement());
+
+        return result;
+    }
+
+    public boolean hasControls() {
+        return getTopLevelControlElements().size() > 0;
     }
 
     public Model getDefaultModelForScope(XBLBindings.Scope scope) {

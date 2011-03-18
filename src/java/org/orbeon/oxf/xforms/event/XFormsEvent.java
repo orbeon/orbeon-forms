@@ -17,18 +17,23 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -46,6 +51,8 @@ public abstract class XFormsEvent implements Cloneable {
     private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
     private static final String XXFORMS_REPEAT_ANCESTORS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-ancestors");
     private static final String XXFORMS_TARGET_PREFIXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target-prefixes");
+
+    private static final String XXFORMS_EFFECTIVE_TARGETID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "effective-targetid");
 
     // Properties that change as the event propagates
     // TODO
@@ -150,6 +157,9 @@ public abstract class XFormsEvent implements Cloneable {
         } else if (XXFORMS_PHASE_ATTRIBUTE.equals(name)) {
             // Return the current event phase
             return SingletonIterator.makeIterator(StringValue.makeStringValue(getCurrentPhase().name()));
+        } else if (XXFORMS_EFFECTIVE_TARGETID_ATTRIBUTE.equals(name)) {
+            // Return the target effective id
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(targetObject.getEffectiveId()));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
             return (customAttributes.get(name)).iterate();

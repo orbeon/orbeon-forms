@@ -61,41 +61,44 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
 
         // Process shadow content if present
         final Element shadowTree = xblBindings.getFullShadowTree(prefixedId);
-        if (shadowTree != null) {
-            // Tell the controller we are providing a new body
-            controller.startBody();
+        if (shadowTree != null)
+            processShadowTree(controller, shadowTree);
+    }
 
-            // Forward shadow content to handler
-            // TODO: would be better to handle inclusion and namespaces using XIncludeProcessor facilities instead of custom code
-            TransformerUtils.writeDom4j(shadowTree, new EmbeddedDocumentXMLReceiver(controller) {
+    public static void processShadowTree(final ElementHandlerController controller, Element shadowTree) {
+        // Tell the controller we are providing a new body
+        controller.startBody();
 
-                private int level = 0;
+        // Forward shadow content to handler
+        // TODO: would be better to handle inclusion and namespaces using XIncludeProcessor facilities instead of custom code
+        TransformerUtils.writeDom4j(shadowTree, new EmbeddedDocumentXMLReceiver(controller) {
 
-                public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+            private int level = 0;
 
-                    if (level != 0)
-                        super.startElement(uri, localname, qName, attributes);
+            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-                    level++;
-                }
+                if (level != 0)
+                    super.startElement(uri, localname, qName, attributes);
 
-                public void endElement(String uri, String localname, String qName) throws SAXException {
+                level++;
+            }
 
-                    level--;
+            public void endElement(String uri, String localname, String qName) throws SAXException {
 
-                    if (level != 0)
-                        super.endElement(uri, localname, qName);
-                }
+                level--;
 
-                @Override
-                public void setDocumentLocator(Locator locator) {
-                    // NOP for now. In the future, we should push/pop the locator on ElementHandlerController
-                }
-            });
+                if (level != 0)
+                    super.endElement(uri, localname, qName);
+            }
 
-            // Tell the controller we are done with the new body
-            controller.endBody();
-        }
+            @Override
+            public void setDocumentLocator(Locator locator) {
+                // NOP for now. In the future, we should push/pop the locator on ElementHandlerController
+            }
+        });
+
+        // Tell the controller we are done with the new body
+        controller.endBody();
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

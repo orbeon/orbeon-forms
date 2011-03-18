@@ -21,7 +21,10 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventFactory;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
@@ -92,7 +95,15 @@ public class XFormsDispatchAction extends XFormsAction {
             // action."
 
             // Find actual target
-            final Object xformsEventTarget = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedNewEventTargetStaticId);
+            final Object xformsEventTarget;
+            if (resolvedNewEventTargetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
+                || resolvedNewEventTargetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+                // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
+                xformsEventTarget = containingDocument.getObjectByEffectiveId(resolvedNewEventTargetStaticId);
+            } else {
+                xformsEventTarget = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedNewEventTargetStaticId);
+            }
+
             if (xformsEventTarget instanceof XFormsEventTarget) {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(containingDocument, resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);

@@ -149,7 +149,7 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     private void createControlTree(PropertyContext propertyContext) {
-        if (containingDocument.getStaticState().getControlsDocument() != null) {
+        if (containingDocument.getStaticState().hasControls()) {
 
             // Create new controls tree
             // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case()
@@ -175,7 +175,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
         assert initialized;
 
-        if (containingDocument.getStaticState().getControlsDocument() != null) {
+        if (containingDocument.getStaticState().hasControls()) {
 
             // Keep only one control tree
             initialControlTree = currentControlTree;
@@ -343,10 +343,11 @@ public class XFormsControls implements XFormsObjectResolver {
                                                     XBLContainer rootXBLContainer, ControlElementVisitorListener controlElementVisitorListener) {
         rootXBLContainer.getContextStack().resetBindingContext(propertyContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
-        final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
-    
-        visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), rootXBLContainer, rootElement, "", "");
+        final List<Element> topLevelControlElements = containingDocument.getStaticState().getTopLevelControlElements();
+
+        for (final Element topLevelControlElement : topLevelControlElements)
+            visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
+                    containingDocument.getStaticState(), rootXBLContainer, topLevelControlElement, "", "");
     }
 
     public void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsRepeatControl enclosingRepeatControl,

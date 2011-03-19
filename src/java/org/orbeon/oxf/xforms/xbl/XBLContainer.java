@@ -883,19 +883,18 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Get event according to its target
             int nextBoundaryIndex = 0;
-            String nextBoundaryEffectiveId;
+            XFormsEventObserver nextBoundary;
             XFormsEvent retargetedEvent;
 
             // Handle event retargeting
             if (boundaries.size() == 0) {
                 // Original event all the way
-                nextBoundaryEffectiveId = null;
+                nextBoundary = null;
                 retargetedEvent = originalEvent;
             } else {
                 // Start with retargeted event
-                final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
-                nextBoundaryEffectiveId = observer.getEffectiveId();
-                retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                nextBoundary = boundaries.get(nextBoundaryIndex);
+                retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundary, originalEvent);
                 nextBoundaryIndex++;
             }
 
@@ -931,17 +930,16 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 }
 
                 // Handle event retargeting
-                if (nextBoundaryEffectiveId != null && currentEventObserver.getEffectiveId().equals(nextBoundaryEffectiveId)) {
+                if (currentEventObserver == nextBoundary) {
 
                     if (nextBoundaryIndex == boundaries.size()) {
                         // Original event
-                        nextBoundaryEffectiveId = null;
+                        nextBoundary = null;
                         retargetedEvent = originalEvent;
                     } else {
                         // Retargeted event
-                        final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
-                        nextBoundaryEffectiveId = observer.getEffectiveId();
-                        retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                        nextBoundary = boundaries.get(nextBoundaryIndex);
+                        retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundary, originalEvent);
                         nextBoundaryIndex++;
                     }
 
@@ -960,26 +958,30 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
                 // Go from leaf to root
                 Collections.reverse(eventObservers);
-                Collections.reverse(boundaries);
 
                 // Handle event retargeting
+                Collections.reverse(boundaries);
+                nextBoundaryIndex = 0;
                 if (boundaries.size() > 0) {
-                    nextBoundaryIndex--;
-                    final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
-                    nextBoundaryEffectiveId = observer.getEffectiveId();
+                    nextBoundary = boundaries.get(nextBoundaryIndex);
+                    nextBoundaryIndex++;
                 }
 
                 for (XFormsEventObserver currentEventObserver: eventObservers) {
                     final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
                     // Handle event retargeting
-                    if (nextBoundaryEffectiveId != null && currentEventObserver.getEffectiveId().equals(nextBoundaryEffectiveId)) {
+                    if (currentEventObserver == nextBoundary) {
 
                         // Retargeted event
-                        final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
-                        nextBoundaryEffectiveId = observer.getEffectiveId();
-                        retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
-                        nextBoundaryIndex--;
+                        retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundary, originalEvent);
+
+                        if (nextBoundaryIndex == boundaries.size()) {
+                            nextBoundary = null;
+                        } else {
+                            nextBoundary = boundaries.get(nextBoundaryIndex);
+                            nextBoundaryIndex++;
+                        }
 
                         if (indentedLogger.isDebugEnabled()) {
                             indentedLogger.logDebug("dispatchEvent", "retargeting",
@@ -1056,8 +1058,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    private XFormsEvent getRetargetedEvent(Map<String, XFormsEvent> eventsForBoundaries, String boundaryId, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
-        XFormsEvent retargetedEvent = eventsForBoundaries.get(boundaryId);
+    private XFormsEvent getRetargetedEvent(Map<String, XFormsEvent> eventsForBoundaries, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
+        XFormsEvent retargetedEvent = eventsForBoundaries.get(newEventTarget.getEffectiveId());
 
         // Event already created, just return it
         if (retargetedEvent != null)
@@ -1065,7 +1067,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Clone original event, retarget it, and remember it
         retargetedEvent = originalEvent.retarget(newEventTarget);
-        eventsForBoundaries.put(boundaryId, retargetedEvent);
+        eventsForBoundaries.put(newEventTarget.getEffectiveId(), retargetedEvent);
 
         return retargetedEvent;
     }

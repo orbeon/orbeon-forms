@@ -277,7 +277,7 @@
                 </xxforms:variable>
                 <xforms:group ref="$binding" id="container">
                     <!-- Trigger that starts spell checking -->
-                    <xforms:trigger class="fr-spell-checker-start" id="spell-check">
+                    <fr:button class="fr-spell-checker-start" id="spell-check">
                         <!-- Bind trigger so it can handle read-only -->
                         <xsl:if test="exists(/fr:spell-checker/(@ref, @bind))"><xsl:attribute name="ref">$binding</xsl:attribute></xsl:if>
                         <xforms:label>Spell check</xforms:label>
@@ -288,7 +288,7 @@
                         </xforms:dispatch>
                         <!-- Dialog is calling us back with the result -->
                         <xforms:setvalue ev:event="fr-spell-check-done" ref="$binding" value="event('fr-text')"/>
-                    </xforms:trigger>
+                    </fr:button>
                 </xforms:group>
             </xforms:group>
         </xbl:template>

@@ -96,14 +96,14 @@
                         </xforms:dispatch>
                         <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
                         <xforms:group ref=".[not($readonly)]" id="edit-button">
-                            <xforms:trigger id="open-edit" class="fr-dialog-editor-open-edit">
+                            <fr:button id="open-edit" class="fr-dialog-editor-open-edit">
                                 <xforms:label>Edit</xforms:label>
-                            </xforms:trigger>
+                            </fr:button>
                         </xforms:group>
                         <xforms:group ref=".[$readonly]" id="view-button">
-                            <xforms:trigger id="open-view" class="fr-dialog-editor-open-view">
+                            <fr:button id="open-view" class="fr-dialog-editor-open-view">
                                 <xforms:label>View</xforms:label>
-                            </xforms:trigger>
+                            </fr:button>
                         </xforms:group>
                     </xforms:group>
                 </xforms:group>

@@ -80,17 +80,15 @@ object Headers {
                     result
                 }
 
-                val currentHeaderValue = headerNameValues.get(headerName)
+                // Array of existing values (an empty Array if none)
+                val existingHeaderValues = Option(headerNameValues(headerName)) getOrElse Array()
 
                 // Append/prepend/replace
-                headerNameValues += (combine match {
-                    case "prepend" if currentHeaderValue ne null =>
-                        (headerName -> (headerValue +: currentHeaderValue))
-                    case "append" if currentHeaderValue ne null =>
-                        (headerName -> (currentHeaderValue :+ headerValue))
-                    case _ => // replace or prepend/append to an empty initial value
-                        (headerName -> Array(headerValue))
-                })
+                headerNameValues += (headerName -> (combine match {
+                    case "append" => existingHeaderValues :+ headerValue
+                    case "prepend" => headerValue +: existingHeaderValues
+                    case _ => Array(headerValue)
+                }))
             }
 
             // Process all nested <header> elements
@@ -103,14 +101,14 @@ object Headers {
                     for (position <- 1 to contextStack.getCurrentNodeset.size) {
                         contextStack.pushIteration(position)
                         handleHeaderElement(headerElement)
-                        contextStack.popBinding
+                        contextStack.popBinding()
                     }
                 } else {
                     // No binding, this is single header
                     handleHeaderElement(headerElement)
                 }
 
-                contextStack.popBinding
+                contextStack.popBinding()
             }
             headerNameValues
         } else

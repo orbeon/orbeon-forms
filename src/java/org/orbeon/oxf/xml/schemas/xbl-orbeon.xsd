@@ -48,6 +48,7 @@
                     <xs:element ref="xbl:implementation"/>
                     <xs:element ref="xbl:resources"/>
                     <xs:element ref="xbl:template"/>
+                    <xs:any namespace="##other" processContents="lax"/>
                 </xs:choice>
             </xs:sequence>
             <xs:attribute name="id"/>

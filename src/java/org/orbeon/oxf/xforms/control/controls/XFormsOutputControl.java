@@ -28,12 +28,15 @@ import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
+import org.orbeon.oxf.xforms.submission.Headers;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -144,6 +147,12 @@ public class XFormsOutputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
+    private Map<String, String[]> evaluateHeaders(PropertyContext propertyContext) {
+        getContextStack().setBinding(this); // evaluateHeaders() requires this (bad, but do this until we can pass BindingContext directly)
+        return Headers.evaluateHeaders(propertyContext, getXBLContainer(), getContextStack(),
+                getEffectiveId(), getElementAnalysis().element());
+    }
+
     private String proxyValueIfNeeded(PropertyContext propertyContext, String internalValue, String defaultValue, String mediatype) {
         String updatedValue;
         final String typeName = getBuiltinTypeName();
@@ -157,7 +166,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                     final String resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
 
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
-                    updatedValue = NetUtils.proxyURI(propertyContext, resolvedURI, fileInfo.getFileName(propertyContext), mediatype, lastModified);
+                    updatedValue = XFormsResourceServer.proxyURI(propertyContext, resolvedURI, fileInfo.getFileName(propertyContext), mediatype, lastModified, evaluateHeaders(propertyContext));
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -167,7 +176,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // TODO: avoid cast to PipelineContext
                 final String uri = NetUtils.base64BinaryToAnyURI((PipelineContext) propertyContext, internalValue, NetUtils.SESSION_SCOPE);
                 // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
-                updatedValue = NetUtils.proxyURI(propertyContext, uri, fileInfo.getFileName(propertyContext), mediatype, -1);
+                updatedValue = XFormsResourceServer.proxyURI(propertyContext, uri, fileInfo.getFileName(propertyContext), mediatype, -1, evaluateHeaders(propertyContext));
 
             } else {
                 // Return dummy image

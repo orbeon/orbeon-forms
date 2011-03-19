@@ -40,11 +40,6 @@ public class NetUtils {
 
     private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
 
-    public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.resources.dynamic.";
-
-    // Resources are served by the XForms server. It is not ideal to refer to XForms-related functionality from here.
-    public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
-
     private static final Pattern PATTERN_NO_AMP;
     private static final Pattern PATTERN_AMP;
 
@@ -910,36 +905,6 @@ public class NetUtils {
     }
 
     /**
-     * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
-     * session.
-     *
-     * @param propertyContext   context to obtain session
-     * @param uri               server URI to transform
-     * @param filename          file name
-     * @param contentType       type of the content referred to by the URI, or null if unknown
-     * @param lastModified      last modification timestamp
-     * @return                  client URI
-     */
-    public static String proxyURI(PropertyContext propertyContext, String uri, String filename, String contentType, long lastModified) {
-
-        // Create a digest, so that for a given URI we always get the same key
-        final String digest = SecureUtils.digestString(uri, "MD5", "hex");
-
-        // Get session
-        final ExternalContext externalContext = getExternalContext(propertyContext);
-        final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
-
-        if (session != null) {
-            // Store mapping into session
-            session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                    new DynamicResource(uri, filename, contentType, -1, lastModified));
-        }
-
-        // Rewrite new URI to absolute path without the context
-        return DYNAMIC_RESOURCES_PATH + digest;
-    }
-
-    /**
      * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
      *
      * NOTE: See more recent W3C note: http://www.w3.org/TR/2008/NOTE-leiri-20081103/
@@ -992,42 +957,6 @@ public class NetUtils {
      */
     public static ExternalContext getExternalContext(PropertyContext propertyContext) {
         return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-    }
-
-    public static class DynamicResource implements Serializable {
-        private String uri;
-        private String filename;
-        private String contentType;
-        private long size;
-        private long lastModified;
-
-        public DynamicResource(String uri, String filename, String contentType, long size, long lastModified) {
-            this.uri = uri;
-            this.filename = filename;
-            this.contentType = contentType;
-            this.size = size;
-            this.lastModified = lastModified;
-        }
-
-        public String getURI() {
-            return uri;
-        }
-
-        public String getFilename() {
-            return filename;
-        }
-
-        public String getContentType() {
-            return contentType;
-        }
-
-        public long getSize() {
-            return size;
-        }
-
-        public long getLastModified() {
-            return lastModified;
-        }
     }
 
     public static File renameAndExpireWithSession(PropertyContext propertyContext, String existingFileURI, final Logger logger) {

@@ -21,12 +21,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.SAXException;
@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 
 /**
  * The File Serializer serializes text and binary documents to files on disk.
@@ -319,7 +320,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = NetUtils.proxyURI(pipelineContext, localURL, null, config.getRequestedContentType(), -1);
+                            resultURL = XFormsResourceServer.proxyURI(pipelineContext, localURL, null, config.getRequestedContentType(), -1, Collections.<String, String[]>emptyMap());
                         else
                             resultURL = localURL;
                     }

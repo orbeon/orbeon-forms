@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,7 +15,10 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.portlet.OrbeonPortlet2Delegate;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 

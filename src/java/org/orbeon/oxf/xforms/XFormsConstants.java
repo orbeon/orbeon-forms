@@ -247,6 +247,7 @@ public class XFormsConstants {
     public static final QName HELP_QNAME = new QName("help", XFORMS_NAMESPACE);
     public static final QName HINT_QNAME = new QName("hint", XFORMS_NAMESPACE);
     public static final QName ALERT_QNAME = new QName("alert", XFORMS_NAMESPACE);
+    public static final QName XFORMS_NAME_QNAME = new QName("name", XFORMS_NAMESPACE);
     public static final QName XFORMS_VALUE_QNAME = new QName("value", XFORMS_NAMESPACE);
     public static final QName COPY_QNAME = new QName("copy", XFORMS_NAMESPACE);
     public static final QName ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);

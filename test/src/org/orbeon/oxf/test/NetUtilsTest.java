@@ -79,12 +79,6 @@ public class NetUtilsTest extends ResourceManagerTestBase {
     }
 
     @Test
-    public void testProxyURI() {
-        assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "/foo/bar.png", null, null, -1));
-        assertEquals("/xforms-server/dynamic/674c2ff956348155ff60c01c0c0ec2e0", NetUtils.proxyURI(pipelineContext, "http://example.org/foo/bar.png", null, null, -1));
-    }
-
-    @Test
     public void testConvertUploadTypes() {
 
         final String testDataURI = "oxf:/org/orbeon/oxf/test/anyuri-test-content.xml";

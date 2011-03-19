@@ -27,9 +27,11 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -39,6 +41,9 @@ public class XFormsResourceServer extends ProcessorImpl {
     public static final String LOGGING_CATEGORY = "resources";
     private static final Logger logger = LoggerFactory.createLogger(XFormsResourceServer.class);
     private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
+
+    public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.resources.dynamic.";
+    public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
 
     public XFormsResourceServer() {}
 
@@ -57,17 +62,17 @@ public class XFormsResourceServer extends ProcessorImpl {
         
         final IndentedLogger indentedLogger = getIndentedLogger();
 
-        if (requestPath.startsWith(NetUtils.DYNAMIC_RESOURCES_PATH)) {
+        if (requestPath.startsWith(DYNAMIC_RESOURCES_PATH)) {
             // Dynamic resource requested
 
             final ExternalContext.Session session = externalContext.getSession(false);
             if (session != null) {
                 // Store mapping into session
-                final String lookupKey = NetUtils.DYNAMIC_RESOURCES_SESSION_KEY + filename;
+                final String lookupKey = DYNAMIC_RESOURCES_SESSION_KEY + filename;
                 // Use same session scope as proxyURI()
-                NetUtils.DynamicResource resource = (NetUtils.DynamicResource) session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).get(lookupKey);
+                final DynamicResource resource = (DynamicResource) session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).get(lookupKey);
 
-                if (resource != null && resource.getURI() != null) {
+                if (resource != null && resource.uri != null) {
                     // Found URI, stream it out
 
                     // Set caching headers
@@ -79,20 +84,20 @@ public class XFormsResourceServer extends ProcessorImpl {
                     // This is some work though. Might have to proxy conditional GET as well. So for now we don't
                     // handle conditional GET and produce a non-now last modified only in a few cases.
                     
-                    response.setCaching(resource.getLastModified(), false, false);
+                    response.setCaching(resource.lastModified, false, false);
 
-                    if (resource.getSize() > 0)
-                        response.setContentLength((int) resource.getSize());// NOTE: Why does this API (and Servlet counterpart) take an int?
+                    if (resource.size > 0)
+                        response.setContentLength((int) resource.size);// NOTE: Why does this API (and Servlet counterpart) take an int?
                     
                     // TODO: for Safari, try forcing application/octet-stream
                     // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
-                    if (resource.getContentType() != null)
-                        response.setContentType(resource.getContentType());
+                    if (resource.contentType != null)
+                        response.setContentType(resource.contentType);
                     else
                         response.setContentType("application/octet-stream");
 
                     // File name visible by the user
-                    final String contentFilename = resource.getFilename() != null ? resource.getFilename() : filename;
+                    final String contentFilename = resource.filename != null ? resource.filename : filename;
 
                     // Handle as attachment
                     // TODO: should try to provide extension based on mediatype if file name is not provided?
@@ -110,9 +115,19 @@ public class XFormsResourceServer extends ProcessorImpl {
                     OutputStream os = null;
                     try {
                         // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
-                        final String absoluteResourceURI = externalContext.rewriteServiceURL(resource.getURI(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                        final String absoluteResourceURI = externalContext.rewriteServiceURL(resource.uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
-                        is = URLFactory.createURL(absoluteResourceURI).openStream();
+                        final URLConnection connection = URLFactory.createURL(absoluteResourceURI).openConnection();
+
+                        // Outgoing headers if specified
+                        for (final Map.Entry<String, String[]> entry : resource.headers.entrySet() ) {
+                            final String name = entry.getKey();
+                            for (final String value : entry.getValue())
+                                connection.addRequestProperty(name, value);
+                        }
+
+                        is = connection.getInputStream();
+
                         os = response.getOutputStream();
                         NetUtils.copyStream(is, os);
                         os.flush();
@@ -312,6 +327,37 @@ public class XFormsResourceServer extends ProcessorImpl {
             throw new OXFException(e);
         }
     }
+
+    /**
+     * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
+     * session.
+     *
+     * @param propertyContext   context to obtain session
+     * @param uri               server URI to transform
+     * @param filename          file name
+     * @param contentType       type of the content referred to by the URI, or null if unknown
+     * @param lastModified      last modification timestamp
+     * @param headers           connection headers
+     * @return                  client URI
+     */
+    public static String proxyURI(PropertyContext propertyContext, String uri, String filename, String contentType, long lastModified, Map<String, String[]> headers) {
+
+        // Create a digest, so that for a given URI we always get the same key
+        final String digest = SecureUtils.digestString(uri, "MD5", "hex");
+
+        // Get session
+        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+        final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
+
+        if (session != null) {
+            // Store mapping into session
+            session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
+                    new DynamicResource(uri, filename, contentType, -1, lastModified, headers));
+        }
+
+        // Rewrite new URI to absolute path without the context
+        return DYNAMIC_RESOURCES_PATH + digest;
+    }
     
     // For unit tests only (called from XSLT)
     public static String[] testGetResources(String key) {
@@ -320,6 +366,24 @@ public class XFormsResourceServer extends ProcessorImpl {
             return (String[]) cacheElement.getValue();
         } else {
             return null;
+        }
+    }
+
+    public static class DynamicResource implements Serializable {
+        public final String uri;
+        public final String filename;
+        public final String contentType;
+        public final long size;
+        public final long lastModified;
+        public final Map<String, String[]> headers;
+
+        public DynamicResource(String uri, String filename, String contentType, long size, long lastModified, Map<String, String[]> headers) {
+            this.uri = uri;
+            this.filename = filename;
+            this.contentType = contentType;
+            this.size = size;
+            this.lastModified = lastModified;
+            this.headers = headers;
         }
     }
 }

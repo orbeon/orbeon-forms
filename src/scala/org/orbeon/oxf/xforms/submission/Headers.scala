@@ -81,7 +81,7 @@ object Headers {
                 }
 
                 // Array of existing values (an empty Array if none)
-                val existingHeaderValues = Option(headerNameValues(headerName)) getOrElse Array()
+                val existingHeaderValues = headerNameValues.getOrElse(headerName, Array.empty[String])
 
                 // Append/prepend/replace
                 headerNameValues += (headerName -> (combine match {

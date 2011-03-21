@@ -95,15 +95,15 @@ class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
         // Expected results per control
         val expected = LinkedHashMap(
             ("output1" -> LinkedHashMap(
-                ("Header1" -> Array("value1")),
-                ("Header2" -> Array("value2")),
-                ("Header3" -> Array("value3"))
+                ("Header1" -> Seq("value1")),
+                ("Header2" -> Seq("value2")),
+                ("Header3" -> Seq("value3"))
             )),
             ("output2" -> LinkedHashMap(
-                ("Header1" -> Array("prepend2", "prepend1", "value1", "append2")),
-                ("Header2" -> Array("prepend2", "value2", "append2", "append2")),
-                ("Header3" -> Array("prepend2", "replace3", "append2")),
-                ("Header4" -> Array("value4"))
+                ("Header1" -> Seq("prepend2", "prepend1", "value1", "append2")),
+                ("Header2" -> Seq("prepend2", "value2", "append2", "append2")),
+                ("Header3" -> Seq("prepend2", "replace3", "append2")),
+                ("Header4" -> Seq("value4"))
             ))
         )
 
@@ -114,6 +114,6 @@ class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
             actualHeaders = control.testEvaluateHeaders(getPipelineContext)
             (expectedHeaderName, expectedHeaderValues) <- expectedHeaders
         } yield
-            assert(expectedHeaderValues sameElements actualHeaders(expectedHeaderName))
+            assert(expectedHeaderValues === actualHeaders(expectedHeaderName).toSeq)
     }
 }

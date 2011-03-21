@@ -58,21 +58,18 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
         document.beforeExternalEvents(pipelineContext, null)
     }
 
-    def getControlValue(controlId: String) =
-        getObject(controlId).asInstanceOf[XFormsValueControl].getValue(pipelineContext)
+    def getControlValue(controlId: String) = getValueControl(controlId).getValue(pipelineContext)
+    def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue(pipelineContext)
 
     def setControlValue(controlId: String, value: String) {
         // This stores the value without testing for readonly
         document.startOutermostActionHandler()
-        getObject(controlId).asInstanceOf[XFormsValueControl].storeExternalValue(pipelineContext, value, null)
+        getValueControl(controlId).storeExternalValue(pipelineContext, value, null)
         document.endOutermostActionHandler(pipelineContext)
     }
 
     def setControlValueWithEvent(controlId: String, value: String): Unit =
         ClientEvents.processEvent(pipelineContext, document, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
-
-    def getControlExternalValue(controlId: String) =
-        getObject(controlId).asInstanceOf[XFormsValueControl].getExternalValue(pipelineContext)
 
     def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
@@ -92,6 +89,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]) = seq map (elemToElement(_)) toList
     implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]) = seq map (elementToElem(_)) toList
 
-    private def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
-    private def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)
+    protected def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
+    protected def getValueControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsValueControl]
+    protected def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)
 }

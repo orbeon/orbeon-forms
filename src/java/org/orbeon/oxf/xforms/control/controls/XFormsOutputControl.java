@@ -147,6 +147,11 @@ public class XFormsOutputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
+    // For unit tests
+    public Map<String, String[]> testEvaluateHeaders(PropertyContext propertyContext) {
+        return evaluateHeaders(propertyContext);
+    }
+
     private Map<String, String[]> evaluateHeaders(PropertyContext propertyContext) {
         getContextStack().setBinding(this); // evaluateHeaders() requires this (bad, but do this until we can pass BindingContext directly)
         return Headers.evaluateHeaders(propertyContext, getXBLContainer(), getContextStack(),

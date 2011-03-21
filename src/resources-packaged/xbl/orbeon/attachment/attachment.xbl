@@ -63,6 +63,8 @@
                         <xhtml:span>Download</xhtml:span>
                     </xforms:label>
                     <xbl:content includes="xforms|filename,xforms|mediatype"/>
+                    <!-- FR-specific: set outgoing headers for persistence layer. -->
+                    <xi:include href="oxf:/apps/fr/includes/persistence/headers-data.xml" fixup-xml-base="false"/>
                 </xforms:output>
             </xforms:group>
         </xbl:template>

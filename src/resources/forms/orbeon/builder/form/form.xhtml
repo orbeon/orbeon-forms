@@ -280,21 +280,14 @@
                         <!-- Image -->
                         <xforms:group id="fb-logo-group" class="fr-logo">
                             <xforms:label ref="$form-resources/logo/label" class="fr-hidden"/>
-                            <xforms:group ref="$metadata-instance/logo[normalize-space() != '']">
-                                <xforms:output ref="." mediatype="image/*">
-                                    <xforms:label class="fb-xforms-disabled"/>
-                                </xforms:output>
-                            </xforms:group>
-                            <!-- File chooser -->
-                            <xforms:group ref=".[xxforms:property('oxf.fb.metadata.logo')]">
-                                <xforms:upload id="logo-control" bind="logo-bind" class="fr-attachment">
-                                    <xforms:label class="fb-xforms-disabled"/>
-                                    <xforms:filename ref="@filename"/>
-                                    <xforms:mediatype ref="@mediatype"/>
-                                    <xxforms:size ref="@size"/>
-                                    <xforms:hint ref="$form-resources/logo/hint"/>
-                                </xforms:upload>
-                            </xforms:group>
+                            <fr:image-attachment bind="logo-bind" class="fr-attachment">
+                                <!-- Only show hint if there is no attachment -->
+                                <xforms:hint ref="$form-resources/logo/hint[not(normalize-space(context()))]"/>
+                                <!-- Store all the details -->
+                                <xforms:filename ref="@filename"/>
+                                <xforms:mediatype ref="@mediatype"/>
+                                <xxforms:size ref="@size"/>
+                            </fr:image-attachment>
                         </xforms:group>
 
                         <!-- Language selector -->

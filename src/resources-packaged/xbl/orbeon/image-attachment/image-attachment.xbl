@@ -56,7 +56,10 @@
                 <xforms:upload ref=".">
                     <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert,xforms|filename,xforms|mediatype,xxforms:size"/>
                 </xforms:upload>
-                <xforms:output mediatype="image/*" ref=".[normalize-space()]"/>
+                <xforms:output mediatype="image/*" ref=".[normalize-space()]">
+                    <!-- FR-specific: set outgoing headers for persistence layer. -->
+                    <xi:include href="oxf:/apps/fr/includes/persistence/headers-data.xml" fixup-xml-base="false"/>
+                </xforms:output>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

@@ -305,6 +305,10 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
     color: gray
 }
 
+.fr-logo .xforms-upload-mediatype, .fr-logo .xforms-upload-size, .fr-logo .xforms-upload-filename { display: none }
+.fr-logo .xforms-upload-info { background-image: none; padding-left: 0 }
+.fr-logo .xforms-upload-remove { padding-left: 0 }
+
 /* ***** Grid ******************************************************************************************************* */
 
 .fb-grid-table { margin: 0 0 0 1px; width: 99.5%; *width: 99.5% }

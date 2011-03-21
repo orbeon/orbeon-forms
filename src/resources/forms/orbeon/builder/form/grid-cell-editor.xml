@@ -325,6 +325,8 @@
                     <!-- Image -->
                     <xforms:group ref="$instance-holder[normalize-space() != '']">
                         <xforms:output ref="." mediatype="image/*" id="fb-edit-output-image-control">
+                            <!-- Set outgoing headers for persistence layer. -->
+                            <xi:include href="oxf:/apps/fr/includes/persistence/headers-data.xml" fixup-xml-base="false"/>
                         </xforms:output>
                     </xforms:group>
                     <!-- File chooser -->

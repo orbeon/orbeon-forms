@@ -121,8 +121,6 @@
                 <!-- Dialogs -->
                 <xsl:call-template name="fr-dialogs"/>
             </xforms:group>
-
-            <!--<fr:xforms-inspector/>-->
         </xsl:copy>
     </xsl:template>
 

@@ -429,7 +429,7 @@ a {
 
 .orbeon-portlet-div { text-align: left; margin: 1em }
 .orbeon-portlet-content { }
-.orbeon-portlet-home { margin-top: 1em; font-style: italic }
+.orbeon-portlet-home { margin-top: 1em; font-style: italic; clear: both }
 
 /* Re-apply YUI rules for RTE that are too weak */
 .orbeon h2.yui-editor-skipheader, .orbeon h3.yui-editor-skipheader { padding: 0 }

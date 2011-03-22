@@ -15,7 +15,7 @@
     <head>
         <title><xsl:value-of select="/*/@title"/></title>
         <style type="text/css">
-            .orbeon .examples .example { float: left; width: 360px; height: 455px; margin: 0 .5em .5em 0; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc }
+            .orbeon .examples .example { float: left; width: 360px; height: 455px; margin: 0 .5em .5em 0; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background-color: white }
             .orbeon .examples .example .image { height: 310px; overflow-y: auto; overflow-x: hidden; padding: 1px 0 } <!-- padding 1px to make FF 3.6 happy -->
             .orbeon .examples .example img { border: none; display: block; margin: 0 auto; padding: 1px 0 1px }
             .orbeon .examples .example:hover { background-color: #FFCC66 }

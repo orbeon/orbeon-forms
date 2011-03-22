@@ -86,4 +86,4 @@
  * [1] http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Absolutely-positioned-box-inside-a-1
  * [2] http://rowanw.com/bugs/overflow_relative.htm
  */
-.xbl-fr-datatable .yui-dt-scrollable .yui-dt-hd { position: static }
+.xbl-fr-datatable .yui-dt-scrollable .yui-dt-hd { position: static; *position: relative }

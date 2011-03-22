@@ -1,0 +1,49 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Minimum viewport width</xhtml:title>
+        <!--<xhtml:meta name="viewport" content="width=device-width"/>-->
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-min-viewport-width.js"/>
+        <xhtml:style type="text/css">
+            .test-top-level-div { border: 2px solid #999; position: absolute; overflow: auto; height: 100px; width: 200px }
+            html { overflow-x: auto }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <fr:button>
+                <xforms:label>Show</xforms:label>
+                <xforms:message level="modal" ev:event="DOMActivate">Message</xforms:message>
+            </fr:button></xhtml:div>
+    </xhtml:body>
+</xhtml:html>

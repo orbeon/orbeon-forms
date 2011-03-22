@@ -999,6 +999,17 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 ORBEON.xforms.Globals.modalProgressPanel.show();
             },
 
+            /**
+             * For the initial overlays (error dialog, loading indicator, message), which don't contains any XForms
+             * markup that relies on the container being rendered on the page to initialize, we want the overlay
+             * to be really hidden so it doesn't constrain how wide or high our browser needs to be.
+             */
+            overlayUseDisplayHidden: function(overlay) {
+                YD.setStyle(overlay.element, "display", "none");
+                overlay.beforeShowEvent.subscribe(function() { YD.setStyle(overlay.element, "display", "block"); });
+                overlay.beforeHideEvent.subscribe(function() { YD.setStyle(overlay.element, "display", "none"); });
+            },
+
             countOccurrences: function(str, character) {
                 var count = 0;
                 var pos = str.indexOf(character);
@@ -4174,6 +4185,7 @@ ORBEON.xforms.Init = {
                     if (formChild.className == "xforms-loading-loading") {
                         formChild.style.display = "block";
                         ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild, { visible: false, monitorresize: true });
+                        ORBEON.util.Utils.overlayUseDisplayHidden(ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID]);
                         ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID] = [
                             YAHOO.util.Dom.getViewportWidth() - YAHOO.util.Dom.getX(formChild),
                             YAHOO.util.Dom.getY(formChild)
@@ -4194,6 +4206,7 @@ ORBEON.xforms.Init = {
                             draggable: true
                         });
                         errorPanel.render();
+                        ORBEON.util.Utils.overlayUseDisplayHidden(errorPanel);
                         errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
                         ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 

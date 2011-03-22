@@ -17,6 +17,7 @@
     var OD = ORBEON.util.Dom;
     var YD = YAHOO.util.Dom;
     var Event = YAHOO.util.Event;
+    var Utils = ORBEON.util.Utils;
 
     ORBEON.xforms.action.Message = {
 
@@ -52,6 +53,7 @@
                 });
                 this._messageDialog.setHeader("Message");
                 this._messageDialog.render(document.body);
+                Utils.overlayUseDisplayHidden(this._messageDialog);
 
                 // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
                 var dialogDiv = OD.get("xforms-message-dialog");

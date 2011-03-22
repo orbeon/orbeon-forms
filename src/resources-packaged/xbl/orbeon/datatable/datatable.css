@@ -79,11 +79,13 @@
  * Allows the date picker not to be clipped by the datatable
  *
  * The datatable defined a rule: .yui-dt-scrollable .yui-dt-hd { position:relative }. As a result, it clips the date
- * picker [1]. According to a comment in YUI's CSS, this rule is added to get around an IE bug where relatively
- * positioned content inside the datatable doesn't scroll and shows as fixed [2]. However we haven't this problem
- * and for now are overriding YUI's workaround so the date picker doesn't get clipped when inside the datatable.
+ * picker [1][2]. According to a comment in YUI's CSS, this rule is added to get around an IE bug where relatively
+ * positioned content inside the datatable doesn't scroll and shows as fixed [3]. So here we want to keep that
+ * workaround for IE, but but undo it on other browsers where it isn't necessary. As a result, the date picker is
+ * clipped on IE (too bad, in some cases on IE users will need to scroll to reach it), but it isn't on other browsers.
  *
  * [1] http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Absolutely-positioned-box-inside-a-1
+ # [2] http://forge.ow2.org/tracker/index.php?func=detail&aid=315903&group_id=168&atid=350207
  * [2] http://rowanw.com/bugs/overflow_relative.htm
  */
 .xbl-fr-datatable .yui-dt-scrollable .yui-dt-hd { position: static; *position: relative }

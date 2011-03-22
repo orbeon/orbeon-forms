@@ -87,7 +87,7 @@
             <xforms:group ref=".[in-progress = 'true']">
                 <xhtml:img src="/apps/fr/style/progress_bar.gif" alt="In progress" class="progress-bar"/>
                 <xforms:group ref=".[page != '']">
-                    <xhtml:div>Running page: <xhtml:b><xforms:output value="tokenize(page, '/')[last()]"/></xhtml:b></xhtml:div>
+                    <xhtml:div>Running page: <xhtml:b><xforms:output value="substring-before(tokenize(page, '/')[last()], '?')"/></xhtml:b></xhtml:div>
                     <xhtml:div>Time for this page: <xhtml:b><xforms:output value="page-duration"/></xhtml:b></xhtml:div>
                 </xforms:group>
             </xforms:group>

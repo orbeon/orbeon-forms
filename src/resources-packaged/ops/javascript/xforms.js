@@ -42,9 +42,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
     /**
      * Shortcuts
      */
-    var YD, OD;
+    var YD = YAHOO.util.Dom;
+    var OD;
     _.defer(function() {
-        YD = YAHOO.util.Dom;
         OD = ORBEON.util.Dom;
     });
 

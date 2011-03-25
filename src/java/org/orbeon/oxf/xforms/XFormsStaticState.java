@@ -147,7 +147,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      */
     public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata) {
         // Set XPath configuration
-        propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
         initialize(propertyContext, staticStateDocument, digest, metadata, null);
     }
 
@@ -160,9 +159,6 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      * @param encodedStaticState    encoded static state (digest + serialized XML)
      */
     public XFormsStaticState(PropertyContext propertyContext, String staticStateDigest, String encodedStaticState) {
-
-        // Set XPath configuration
-        propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
 
         // Decode encodedStaticState into staticStateDocument
         final Document staticStateDocument = XFormsUtils.decodeXML(propertyContext, encodedStaticState);

@@ -73,8 +73,6 @@ public class XPathCache {
     public static final String XPATH_CACHE_NAME = "cache.xpath";
     private static final int XPATH_CACHE_DEFAULT_SIZE = 200;
 
-    public static final String XPATH_CACHE_CONFIGURATION_PROPERTY = "orbeon.cache.xpath.configuration";
-
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
 
     public static class XPathContext {
@@ -100,11 +98,6 @@ public class XPathCache {
         return CONFIGURATION;
     }
 
-    private static Configuration getConfiguration(PropertyContext propertyContext) {
-        // TEMP: XPath configuration from PropertyContext so we don't have to change all calls to XPath expressions
-        return (Configuration) propertyContext.getAttribute(XPATH_CACHE_CONFIGURATION_PROPERTY);
-    }
-
     /**
      * Evaluate an XPath expression on the document.
      */
@@ -124,7 +117,7 @@ public class XPathCache {
                                 FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition,
+                getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
             return xpathExpression.evaluateKeepNodeInfo(functionContext);
@@ -144,7 +137,7 @@ public class XPathCache {
                                                FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition,
+                getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
             return xpathExpression.evaluateKeepItems(functionContext);
@@ -164,7 +157,7 @@ public class XPathCache {
                                                   FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition,
+                getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
             return xpathExpression.evaluateAsExtent(functionContext);
@@ -204,7 +197,7 @@ public class XPathCache {
                                  FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition,
+                getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
             return xpathExpression.evaluateSingleKeepNodeInfo(functionContext);
@@ -243,7 +236,7 @@ public class XPathCache {
                                        FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition, xpathString,
+                getGlobalConfiguration(), contextItems, contextPosition, xpathString,
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, true, locationData);
         try {
             final Object result = xpathExpression.evaluateSingleKeepNodeInfo(functionContext);
@@ -274,7 +267,7 @@ public class XPathCache {
                                           FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
         final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(propertyContext,
-                getConfiguration(propertyContext), contextItems, contextPosition, "xs:string((" + xpathString + ")[1])",
+                getGlobalConfiguration(), contextItems, contextPosition, "xs:string((" + xpathString + ")[1])",
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
             final Object result = xpathExpression.evaluateSingleKeepNodeInfo(functionContext);

@@ -181,7 +181,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     private boolean isEmpty(XFormsControl control) {
-        return control instanceof XFormsValueControl && XFormsModelBinds.isEmptyValue(((XFormsValueControl) control).getValue(pipelineContext));
+        return control instanceof XFormsValueControl && XFormsModelBinds.isEmptyValue(((XFormsValueControl) control).getValue());
     }
 
     protected static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {

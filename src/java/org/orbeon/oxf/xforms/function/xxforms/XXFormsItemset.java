@@ -48,7 +48,7 @@ public class XXFormsItemset extends XFormsFunction {
             final PropertyContext pipelineContext = getOrCreatePipelineContext();
             final Itemset itemset = select1Control.getItemset(pipelineContext);
 
-            final String controlValueForSelection = selected ? select1Control.getValue(pipelineContext) : null;
+            final String controlValueForSelection = selected ? select1Control.getValue() : null;
             final boolean isMultiple = select1Control instanceof XFormsSelectControl;
 
             if ("json".equalsIgnoreCase(format)) {

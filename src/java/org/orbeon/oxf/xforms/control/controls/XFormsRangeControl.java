@@ -75,7 +75,7 @@ public class XFormsRangeControl extends XFormsValueControl {
 
     @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
-        final String internalValue = getValue(propertyContext);
+        final String internalValue = getValue();
         final String updatedValue;
         if (internalValue == null) {// can it be really?
             updatedValue = null;

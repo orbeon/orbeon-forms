@@ -66,7 +66,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     protected void evaluateImpl(PropertyContext propertyContext) {
         super.evaluateImpl(propertyContext);
 
-        getState(propertyContext);
+        getState();
         getFileMediatype(propertyContext);
         getFileName(propertyContext);
         getFileSize(propertyContext);
@@ -239,7 +239,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     private void setExternalValue(PropertyContext propertyContext, String value, String type, boolean handleTemporaryFiles) {
 
-        final String oldValue = getValue(propertyContext);
+        final String oldValue = getValue();
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
@@ -287,8 +287,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
     }
 
-    public String getState(PropertyContext propertyContext) {
-        return fileInfo.getState(propertyContext);
+    public String getState() {
+        return fileInfo.getState();
     }
 
     public String getFileMediatype(PropertyContext propertyContext) {
@@ -338,7 +338,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         final XFormsUploadControl otherUploadControl = (XFormsUploadControl) other;
 
-        if (!XFormsUtils.compareStrings(getState(propertyContext), otherUploadControl.getState(propertyContext)))
+        if (!XFormsUtils.compareStrings(getState(), otherUploadControl.getState()))
             return false;
         if (!XFormsUtils.compareStrings(getFileMediatype(propertyContext), otherUploadControl.getFileMediatype(propertyContext)))
             return false;
@@ -366,8 +366,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         boolean added = false;
         {
             // State
-            final String stateValue1 = (uploadControl1 == null) ? null : uploadControl1.getState(pipelineContext);
-            final String stateValue2 = uploadControl2.getState(pipelineContext);
+            final String stateValue1 = (uploadControl1 == null) ? null : uploadControl1.getState();
+            final String stateValue2 = uploadControl2.getState();
 
             if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
                 final String attributeValue = stateValue2 != null ? stateValue2 : "";
@@ -513,9 +513,9 @@ class FileInfo implements ExternalCopyable {
         isProgressExpectedEvaluated = false;
     }
 
-    public String getState(PropertyContext propertyContext) {
+    public String getState() {
         if (!isStateEvaluated) {
-            final boolean isEmpty = control.getValue(propertyContext) == null || control.getValue(propertyContext).length() == 0;
+            final boolean isEmpty = control.getValue() == null || control.getValue().length() == 0;
             state = isEmpty ? "empty" : "file";
             isStateEvaluated = true;
         }

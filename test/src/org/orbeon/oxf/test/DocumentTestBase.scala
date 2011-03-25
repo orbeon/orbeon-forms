@@ -58,7 +58,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
         document.beforeExternalEvents(pipelineContext, null)
     }
 
-    def getControlValue(controlId: String) = getValueControl(controlId).getValue(pipelineContext)
+    def getControlValue(controlId: String) = getValueControl(controlId).getValue
     def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue(pipelineContext)
 
     def setControlValue(controlId: String, value: String) {

@@ -74,7 +74,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
         // Determine attribute value
-        setExternalValue(getExternalValueHandleSrc(getValue(propertyContext), nameAttribute));
+        setExternalValue(getExternalValueHandleSrc(getValue(), nameAttribute));
     }
 
     public String getNameAttribute() {
@@ -116,10 +116,10 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         }
     }
 
-    public static String getExternalValue(PipelineContext pipelineContext, XXFormsAttributeControl attributeControl, String attributeName) {
+    public static String getExternalValue(XXFormsAttributeControl attributeControl, String attributeName) {
         if (attributeControl != null) {
             // Get control value
-            return getExternalValueHandleSrc(attributeControl.getValue(pipelineContext), attributeName);
+            return getExternalValueHandleSrc(attributeControl.getValue(), attributeName);
         } else {
             // Provide default
             return getExternalValueHandleSrc(null, attributeName);

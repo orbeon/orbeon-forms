@@ -52,7 +52,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
     @Override
     public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
 
-        final String controlValue = getValue(propertyContext);
+        final String controlValue = getValue();
 
         // Actual new value to store
         final String newValue;
@@ -139,7 +139,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
     @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
 
-        final String internalValue = getValue(propertyContext);
+        final String internalValue = getValue();
         final String updatedValue;
         if (StringUtils.isEmpty(internalValue)) {
             // Keep null or ""

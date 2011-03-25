@@ -215,7 +215,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
     @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
-        final String internalValue = getValue(propertyContext);
+        final String internalValue = getValue();
         final String updatedValue;
 
         if (StringUtils.isEmpty(internalValue)) {
@@ -252,7 +252,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             }
 
             // Current control value
-            final String controlValue = getValue(propertyContext);
+            final String controlValue = getValue();
 
             // Iterate over all the items
             final Itemset itemset = getItemset(propertyContext);

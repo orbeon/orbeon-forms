@@ -27,7 +27,7 @@ class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
             def setValue(controlId: String, value: String): Unit =
                 getValueControl(controlId).storeExternalValue(propertyContext, value, null)
 
-            def getValue(controlId: String) = getValueControl(controlId).getValue(propertyContext)
+            def getValue(controlId: String) = getValueControl(controlId).getValue
 
             private def getValueControl(controlId: String) = containingDocument.getObjectByEffectiveId(controlId).asInstanceOf[XFormsValueControl]
         }

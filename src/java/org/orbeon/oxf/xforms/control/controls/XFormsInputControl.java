@@ -43,8 +43,18 @@ public class XFormsInputControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME
     };
 
+    // Optional display format
+    private final String format;
+    private final String unformat;
+
     public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
+        if (element != null) { // can be null in some unit tests only
+            this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
+            this.unformat = element.attributeValue(new QName("unformat", XFormsConstants.XXFORMS_NAMESPACE));
+        } else {
+            this.format = this.unformat = null;
+        }
     }
 
     @Override
@@ -67,7 +77,11 @@ public class XFormsInputControl extends XFormsValueControl {
     @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
 
-        final String internalValue = getValue(propertyContext);
+        assert isRelevant();
+
+        final String internalValue = getValue();
+        assert internalValue != null;
+
         final String updatedValue;
 
         final String typeName = getBuiltinTypeName();
@@ -82,11 +96,12 @@ public class XFormsInputControl extends XFormsValueControl {
                 updatedValue = Boolean.toString("true".equals(internalValue));
             } else {
                 // Other types
-                updatedValue = internalValue;
+                // For now, format only if the format attribute is present
+                updatedValue = (format != null) ?  getValueUseFormat(propertyContext, format) : internalValue;
             }
         } else {
-            // No type
-            updatedValue = internalValue;
+            // No type, format if the format attribute is present
+            updatedValue = (format != null) ?  getValueUseFormat(propertyContext, format) : internalValue;
         }
 
         setExternalValue(updatedValue);
@@ -95,10 +110,16 @@ public class XFormsInputControl extends XFormsValueControl {
     @Override
     public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
         // Store after converting
-        super.storeExternalValue(propertyContext, convertFromExternalValue(value), type);
+        super.storeExternalValue(propertyContext, convertFromExternalValue(propertyContext, value), type);
+
+        // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
+        if (format != null) {
+            markExternalValueDirty();
+            containingDocument.getControls().markDirtySinceLastRequest(false);
+        }
     }
 
-    private String convertFromExternalValue(String externalValue) {
+    private String convertFromExternalValue(PropertyContext propertyContext, String externalValue) {
         final String typeName = getBuiltinTypeName();
         if (typeName != null) {
             if (typeName.equals("boolean")) {
@@ -143,11 +164,26 @@ public class XFormsInputControl extends XFormsValueControl {
                         final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
                         externalValue = parse(matcher, DATE_PARSE_PATTERNS, datePart) + 'T' + parse(matcher, TIME_PARSE_PATTERNS, timePart);
                     }
+                } else {
+                    externalValue = convertFromExternalValueUseUnformat(propertyContext, externalValue);
                 }
+            } else {
+                externalValue = convertFromExternalValueUseUnformat(propertyContext, externalValue);
             }
+        } else {
+            externalValue = convertFromExternalValueUseUnformat(propertyContext, externalValue);
         }
 
         return externalValue;
+    }
+
+    private String convertFromExternalValueUseUnformat(PropertyContext propertyContext, String externalValue) {
+        if (unformat != null) {
+            final String result = evaluateAsString(propertyContext, unformat, Collections.<Item>singletonList(StringValue.makeStringValue(externalValue)), 1);
+            return (result != null) ? result : externalValue;
+        } else {
+            return externalValue;
+        }
     }
 
     private static String getDateTimeDatePart(String value, char separator) {
@@ -389,11 +425,11 @@ public class XFormsInputControl extends XFormsValueControl {
             final String typeName = getBuiltinTypeName();
             if ("date".equals(typeName) || "time".equals(typeName)) {
                 // Format value specially
-                result = formatSubValue(pipelineContext, getFirstValueType(), getValue(pipelineContext));
+                result = formatSubValue(pipelineContext, getFirstValueType(), getValue());
             } else if ("dateTime".equals(typeName)) {
                 // Format value specially
                 // Extract date part
-                final String datePart = getDateTimeDatePart(getValue(pipelineContext), 'T');
+                final String datePart = getDateTimeDatePart(getValue(), 'T');
                 result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
             } else {
                 // Regular case, use external value
@@ -420,7 +456,7 @@ public class XFormsInputControl extends XFormsValueControl {
             if ("dateTime".equals(typeName)) {
                 // Format value specially
                 // Extract time part
-                final String timePart = getDateTimeTimePart(getValue(pipelineContext), 'T');
+                final String timePart = getDateTimeTimePart(getValue(), 'T');
                 result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
             } else {
                 // N/A
@@ -440,7 +476,7 @@ public class XFormsInputControl extends XFormsValueControl {
      * @return                  formatted value
      */
     public String getReadonlyValueUseFormat(PipelineContext pipelineContext) {
-        return getValueUseFormat(pipelineContext, getControlElement().attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE)));
+        return isRelevant() ? getValueUseFormat(pipelineContext, format) : null;
     }
 
     private String formatSubValue(PipelineContext pipelineContext, String valueType, String value) {

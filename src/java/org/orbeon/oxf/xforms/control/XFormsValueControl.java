@@ -27,11 +27,9 @@ import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.value.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Base class for all controls that hold a value.
@@ -105,7 +103,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     protected void evaluateExternalValue(PropertyContext propertyContext) {
         // By default, same as value
-        setExternalValue(getValue(propertyContext));
+        setExternalValue(getValue());
     }
 
     protected void markExternalValueDirty() {
@@ -154,6 +152,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     protected String getValueUseFormat(PropertyContext propertyContext, String format) {
 
+        assert isRelevant();
+        assert getValue() != null;
+
         final String result;
         if (format == null) {
             // Try default format for known types
@@ -167,7 +168,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             }
 
             if (format != null) {
-                result = evaluateAsString(propertyContext, getBoundItem(), format,
+                result = evaluateAsString(propertyContext, StringValue.makeStringValue(getValue()), format,
                         FORMAT_NAMESPACE_MAPPING, getContextStack().getCurrentVariables());
             } else {
                 result = null;
@@ -175,7 +176,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         } else {
             // Format value according to format attribute
-            result = evaluateAsString(propertyContext, format);
+            result = evaluateAsString(propertyContext, format, Collections.<Item>singletonList(StringValue.makeStringValue(getValue())), 1);
         }
         return result;
     }
@@ -183,9 +184,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return the control's internal value.
      *
-     * @param propertyContext   current context
      */
-    public final String getValue(PropertyContext propertyContext) {
+    public final String getValue() {
         return value;
     }
 

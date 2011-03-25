@@ -781,11 +781,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param xpathString       XPath expression
      * @return                  value, or null if cannot be computed
      */
-    protected String evaluateAsString(PropertyContext propertyContext, String xpathString) {
+    protected String evaluateAsString(PropertyContext propertyContext, String xpathString, List<Item> contextItems, int contextPosition) {
 
         // NOTE: the control may or may not be bound, so don't use getBoundNode()
-        final List<Item> contextNodeset = bindingContext.getNodeset();
-        if (contextNodeset == null || contextNodeset.size() == 0) {
+        if (contextItems == null || contextItems.size() == 0) {
             // TODO: in the future we should be able to try evaluating anyway
             return null;
         } else {
@@ -795,7 +794,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             contextStack.setBinding(this);
 
             try {
-                return XPathCache.evaluateAsString(propertyContext, contextNodeset, bindingContext.getPosition(),
+                return XPathCache.evaluateAsString(propertyContext, contextItems, contextPosition,
                                     xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
                                     XFormsContainingDocument.getFunctionLibrary(),
                                     getFunctionContext(), null, getLocationData());

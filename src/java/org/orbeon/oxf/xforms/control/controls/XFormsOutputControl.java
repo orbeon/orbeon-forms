@@ -52,7 +52,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     private static final String DOWNLOAD_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME);
 
     // Optional display format
-    private String format;
+    private final String format;
 
     // Value attribute
     private String valueAttribute;
@@ -89,7 +89,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     protected void evaluateImpl(PropertyContext propertyContext) {
         super.evaluateImpl(propertyContext);
 
-        getState(propertyContext);
+        getState();
         getFileMediatype(propertyContext);
         getFileName(propertyContext);
         getFileSize(propertyContext);
@@ -110,7 +110,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             value = (tempValue != null) ? tempValue : "";
         } else {
             // Value comes from the XPath expression within the value attribute
-            value = evaluateAsString(propertyContext, valueAttribute);
+            value = evaluateAsString(propertyContext, valueAttribute, bindingContext.getNodeset(), bindingContext.getPosition());
         }
         setValue((value != null) ? value : "");
     }
@@ -118,7 +118,11 @@ public class XFormsOutputControl extends XFormsValueControl {
     @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
 
-        final String internalValue = getValue(propertyContext);
+        assert isRelevant();
+
+        final String internalValue = getValue();
+        assert internalValue != null;
+
         final String updatedValue;
         if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
             // Download appearance
@@ -245,8 +249,8 @@ public class XFormsOutputControl extends XFormsValueControl {
         return (valueAttribute == null) ? super.getType() : null;
     }
 
-    public String getState(PropertyContext propertyContext) {
-        return fileInfo.getState(propertyContext);
+    public String getState() {
+        return fileInfo.getState();
     }
 
     public String getFileMediatype(PropertyContext propertyContext) {

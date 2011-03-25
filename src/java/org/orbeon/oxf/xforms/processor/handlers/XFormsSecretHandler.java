@@ -67,7 +67,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
             } else {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
-                final String value = secretControl.getValue(pipelineContext);
+                final String value = secretControl.getValue();
                 // TODO: Make sure that Ajax response doesn't send the value back
                 if (value != null && value.length() > 0)
                     contentHandler.characters(HIDDEN_PASSWORD.toCharArray(), 0, HIDDEN_PASSWORD.length());

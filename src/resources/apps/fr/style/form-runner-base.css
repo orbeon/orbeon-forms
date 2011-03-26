@@ -204,7 +204,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* Error summary */
 .xbl-fr-error-summary .fr-error-summary-body { padding: 0 10px; margin: 10px 0 0 }
 .xbl-fr-error-summary .fr-error-title { margin: 0; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; width: 100%; *width: 97.5% }
-.xbl-fr-error-summary .fr-error-list { padding-top: 10px; margin-top: 0  } 
+.xbl-fr-error-summary .fr-error-list { padding-top: 10px; margin-top: 0  }
 
 /* Table of contents */
 .fr-toc { }
@@ -334,14 +334,14 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 .fr-grid-content .xforms-label {
     margin-top: .25em;      /* Space between control and the one on top of this one */
-    margin-bottom: 0;       /* Space between label control and control "field" */
+    margin-bottom: 0.3em;   /* Insert some space between the label / help and the control (we add spacing below the label rather
+                               than above the control to make the CSS more generally applicable to XBL components) */
     display: block;         /* So the margin has an effect */
 }
 
 /* Style controls or component groups */
 .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group {
     display: block;     /* So control is not displayed next to the help icon but on a new line */
-    margin-top: 0.3em;  /* Insert some space between the label / help and the control */
     clear: both;
 }
 

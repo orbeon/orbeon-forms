@@ -4185,11 +4185,11 @@ ORBEON.xforms.Init = {
                     if (formChild.className == "xforms-loading-loading") {
                         formChild.style.display = "block";
                         ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild, { visible: false, monitorresize: true });
-                        ORBEON.util.Utils.overlayUseDisplayHidden(ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID]);
                         ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID] = [
                             YAHOO.util.Dom.getViewportWidth() - YAHOO.util.Dom.getX(formChild),
                             YAHOO.util.Dom.getY(formChild)
                         ];
+                        ORBEON.util.Utils.overlayUseDisplayHidden(ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID]);
                         formChild.style.right = "auto";
                         xformsLoadingCount++;
                     } else if (ORBEON.util.Dom.isElement(formChild) && YAHOO.util.Dom.hasClass(formChild, "xforms-error-panel")) {

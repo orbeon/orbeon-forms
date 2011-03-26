@@ -354,7 +354,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 /* ***** Indicators and messages ************************************************************************************ */
 
 .xforms-loading-loading {
-    display: none;
     background-color: #c44;
     color: #fff;
     padding: 2px;

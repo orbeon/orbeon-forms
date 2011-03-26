@@ -137,7 +137,7 @@ h1.fr-form-title {
 
 /* Other dialogs */
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
-.xforms-dialog .xforms-label img { vertical-align: middle } 
+.xforms-dialog .xforms-label img { vertical-align: middle }
 
 #fb-css-upload-dialog, #fb-schema-upload-dialog { width: 35em }
 
@@ -162,6 +162,8 @@ h1.fr-form-title {
 
 /* TODO: change this to properly dynamically size dialog */
 #fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
+#fb-source-editor-dialog .xbl-fr-code-mirror-editor-container { height: 50em; display: block }
+#fb-source-editor-dialog .xforms-alert-active { display: block }
 /*#fb-xml-dialog { width: 70em }*/
 
 /*#fb-source-editor-dialog_c {*/

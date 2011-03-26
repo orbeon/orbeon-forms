@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         script-type="application/xhtml+xml">
+    <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-0.94/js/codemirror.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/code-mirror.js"/>
+    <xbl:binding id="fr-code-mirror" element="fr|code-mirror">
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xforms:group appearance="xxforms:internal">
+                <xxforms:variable name="binding" as="node()?">
+                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                </xxforms:variable>
+                <xforms:group id="outer" ref="$binding">
+                    <xbl:content includes="xforms|label, xforms|alert, xforms|help, xforms|hint"/>
+                    <xforms:textarea ref="$binding" id="textarea">
+                        <xxforms:script ev:event="xforms-value-changed" id="xf-value-changed">YAHOO.xbl.fr.CodeMirror.instance(this).valueChanged();</xxforms:script>
+                    </xforms:textarea>
+                    <xforms:group ref="$binding" id="editor-container" class="xbl-fr-code-mirror-editor-container">
+                        <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" id="xf-init" ev:target="#observer">YAHOO.xbl.fr.CodeMirror.instance(this).init();</xxforms:script>
+                    </xforms:group>
+                </xforms:group>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

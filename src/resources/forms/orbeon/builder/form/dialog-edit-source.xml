@@ -29,9 +29,9 @@
     <xforms:label ref="$form-resources/dialog-edit-source/dialog-title"/>
 
     <xhtml:div class="fb-xml-dialog-view">
-        <xforms:textarea ref="source">
+        <fr:code-mirror ref="source">
             <xforms:alert ref="$form-resources/dialog-edit-source/source/alert"/>
-        </xforms:textarea>
+        </fr:code-mirror>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span>

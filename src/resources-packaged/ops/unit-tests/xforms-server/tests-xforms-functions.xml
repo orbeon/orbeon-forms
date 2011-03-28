@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -32,7 +31,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -117,7 +116,7 @@
     </test>
 
     <test description="call-xpl() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -215,7 +214,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -300,7 +299,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -363,7 +362,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html xmlns:exforms="http://www.exforms.org/exf/1-0">
                             <xhtml:head>
@@ -475,7 +474,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -677,7 +676,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0">
                             <xhtml:head>
@@ -771,7 +770,7 @@
     </test>
 
     <test description="xxforms:evaluate-avt() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -826,7 +825,7 @@
     </test>
 
     <test description="instance() function with blank parameter or without parameter" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -900,7 +899,7 @@
     </test>
     
     <test description="hmac() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -951,7 +950,7 @@
     </test>
 
     <test description="is-card-number() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -1018,7 +1017,7 @@
     </test>
 
     <test description="power() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -1056,7 +1055,7 @@
     </test>
 
     <test description="local-date() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -1090,7 +1089,7 @@
     </test>
 
     <test description="local-dateTime() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -1124,7 +1123,7 @@
     </test>
 
     <test description="days-to-date() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -1162,7 +1161,7 @@
     </test>
 
     <test description="choose() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -1239,7 +1238,7 @@
     </test>
 
     <test description="boolean-from-string() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.com">
               <xhtml:head>
@@ -1320,7 +1319,7 @@
     </test>    
 
     <test description="seconds-to-dateTime() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.org">
                 <xhtml:head>
@@ -1364,7 +1363,7 @@
     </test>    
 
     <test description="digest() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.org">
                 <xhtml:head>
@@ -1403,7 +1402,7 @@
     </test>
 
     <test description="saxon:in-summer-time() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
                        xmlns:saxon="http://saxon.sf.net/">
@@ -1434,7 +1433,7 @@
     </test>
 
     <test description="Top-level last() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
                        xmlns:saxon="http://saxon.sf.net/">
@@ -1479,7 +1478,7 @@
     </test>
 
     <test description="saxon:evaluate() function in AVT" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
                        xmlns:saxon="http://saxon.sf.net/">
@@ -1526,7 +1525,7 @@
     </test>
 
     <test description="current() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="config" href="wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
                        xmlns:saxon="http://saxon.sf.net/">
@@ -1618,7 +1617,7 @@
 
     <test description="exforms:sort() doesn't cause 'invalid slot for variable' error in Saxon" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315140&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:xhtml="http://www.w3.org/1999/xhtml"
                         xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -1659,7 +1658,7 @@
     </test>
 
     <test description="xxforms:evaluate-avt() doesn't cause 'invalid slot for variable' error in Saxon" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1699,7 +1698,7 @@
     </test>
 
     <test description="Simple xxforms:lang() on controls and actions" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1748,7 +1747,7 @@
     </test>
 
     <test description="xxforms:lang() with top-level AVT xml:lang" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xml:lang="{instance()}">
@@ -1792,7 +1791,7 @@
     </test>
 
     <test description="xxforms:lang() and XBL" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
@@ -1849,7 +1848,7 @@
     </test>
 
     <test description="xxforms:format-message()" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1906,7 +1905,7 @@
     </test>
 
     <test description="xxforms:format-message() with top-level static xml:lang" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xml:lang="fr">
@@ -1937,7 +1936,7 @@
     </test>
 
     <test description="xxforms:format-message() with top-level AVT xml:lang" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xml:lang="{.}">
@@ -1976,7 +1975,7 @@
     </test>
 
     <test description="xxforms:get-request-path()" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>

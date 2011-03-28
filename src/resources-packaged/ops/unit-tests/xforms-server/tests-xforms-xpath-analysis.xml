@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -2522,7 +2521,7 @@
     </test>
 
     <test description="Simple change of control validity based on MIP" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xh:head>
@@ -3222,7 +3221,7 @@
     </test>
 
     <test description="PO example: change to values causing change to MIPs" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document" href="oxf:/ops/unit-tests/xforms-server/po.xhtml"/>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -5079,7 +5078,7 @@
 
     <test description="Handling of required upon initialization" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315598&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
                      xmlns:xh="http://www.w3.org/1999/xhtml"

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -33,7 +32,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -148,7 +147,7 @@
     </test>
 
     <test description="xforms:repeat insert action" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -262,7 +261,7 @@
     </test>
 
      <test description="xforms:repeat delete action" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -346,7 +345,7 @@
     </test>
 
     <test description="Simple xforms:repeat startindex" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -417,7 +416,7 @@
     </test>
 
     <test description="xforms:repeat setindex action in reaction to event dispatched to nested repeat" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -503,7 +502,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="config" href="wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
                             <xxforms:event name="DOMFocusIn" source-control-id="id125·3-2"/>
@@ -522,7 +521,7 @@
                             </xforms:repeat>
                         </controls>
                     </p:input>
-                    <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
+                    <p:input name="models" href="aggregate('models', repeat-model.xml)"/>
                     <p:input name="instances">
                         <instances>
                             <instance model-id="main-model" id="main-instance">
@@ -595,7 +594,7 @@
     </test>
 
     <test description="xforms:insert with @context and @origin" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -688,7 +687,7 @@
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -761,7 +760,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -853,7 +852,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -914,7 +913,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1005,7 +1004,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="config" href="wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
                             <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
@@ -1172,7 +1171,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1252,7 +1251,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1332,7 +1331,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1414,7 +1413,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1502,7 +1501,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1595,7 +1594,7 @@
     </test>
 
     <test description="Simple event dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1703,7 +1702,7 @@
     </test>
 
     <test description="Complex dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1933,7 +1932,7 @@
     </test>
 
     <test description="xxforms:repeat-nodeset() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2049,7 +2048,7 @@
     </test>
 
     <test description="xxforms:index() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2176,7 +2175,7 @@
     </test>
 
     <test description="xxforms:index() function" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2249,7 +2248,7 @@
     </test>
 
     <test description="Repeat iteration update upon nodeset shuffle with exf:sort()" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -2322,7 +2321,7 @@
     </test>
 
     <test description="xxforms-index-changed event" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -2387,7 +2386,7 @@
     </test>
 
     <test description="xforms-enabled event on xforms:repeat" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -2523,7 +2522,7 @@
     </test>
 
     <test description="Repeat bound to items" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -2576,7 +2575,7 @@
     </test>
 
     <test description="xforms-enabled dispatch when new iteration appears upon refresh" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -2659,7 +2658,7 @@
     </test>
 
     <test description="xxforms-iteration-changed event" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -2751,7 +2750,7 @@
 
     <test description="index() function resolves nested repeats as per XForms 1.1" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=313774&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <head>
@@ -2831,7 +2830,7 @@
 
     <test description="Delete action deletes detached node upon xforms-disabled" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314760&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2879,7 +2878,7 @@
 
     <test description="AVT on xforms:insert/@position" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=314804&group_id=168 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2931,7 +2930,7 @@
 
     <test description="Comparison of various item types in repeat nodeset change" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314831&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2984,7 +2983,7 @@
 
     <test description="Insert upon Ajax request causes repeat iteration creation without error" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315081&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-server.xpl"/>
+        <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xxforms:event name="DOMActivate" source-control-id="insert-trigger"/>
@@ -3049,7 +3048,7 @@
 
     <test description="Insert causes repeat update with top-level preceding variables" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315434&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>

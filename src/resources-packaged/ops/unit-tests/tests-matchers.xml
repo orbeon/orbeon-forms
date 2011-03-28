@@ -12,7 +12,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="Matchers" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+<group description="Matchers" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <test description="Perl5" name="oxf:perl5-matcher">
         <input name="data">

@@ -1,5 +1,5 @@
 <config>
-    <url>cache/document3.xml</url>
+    <url>document3.xml</url>
     <content-type>application/xml</content-type>
     <force-content-type>true</force-content-type>
 </config>

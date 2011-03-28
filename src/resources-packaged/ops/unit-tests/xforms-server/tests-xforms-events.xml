@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -33,7 +32,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -92,7 +91,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -170,7 +169,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
@@ -366,7 +365,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -506,7 +505,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -583,7 +582,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -675,7 +674,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -756,7 +755,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -829,7 +828,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -898,7 +897,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -990,7 +989,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="config" href="wrap-server.xpl"/>
                     <!--
                         The two events must end up on controls on the same repeat iteration, even though the first
                         event causes its iteration to move.
@@ -1100,7 +1099,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="config" href="wrap-server.xpl"/>
                     <!--
                         The first event doesn't cause the other controls to block incoming values. So all first three
                         "good" values must make it into the instance. But value "42" blocks the other controls, so the
@@ -1179,7 +1178,7 @@
     </test>
 
     <test description="Test of capture, target, and bubbling phases" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -1295,7 +1294,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1353,7 +1352,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1419,7 +1418,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1477,7 +1476,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1566,7 +1565,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1616,7 +1615,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -1657,7 +1656,7 @@
     </test>
 
     <test description="XForms 1.1 switch enabled: dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1739,7 +1738,7 @@
     </test>
 
     <test description="XForms 1.1 switch disabled: dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1820,7 +1819,7 @@
     </test>
 
     <test description="Dialog dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1904,7 +1903,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -2014,7 +2013,7 @@
     </test>
 
     <test description="xforms:setvalue upon xforms-enabled dispatches proper xforms-value-change event" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2087,7 +2086,7 @@
     </test>
 
     <test description="xforms:refresh upon xforms-enabled dispatches proper events" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -2159,7 +2158,7 @@
     </test>
 
     <test description="Destruction events upon iteration removal" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>

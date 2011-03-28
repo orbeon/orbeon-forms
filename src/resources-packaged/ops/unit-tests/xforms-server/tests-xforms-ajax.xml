@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2011 Orbeon, Inc.
 
@@ -34,7 +33,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -118,7 +117,7 @@
                 <p:processor name="oxf:identity">
                     <p:input name="data" href="aggregate('responses', #response1, #response2, #response3, #exception4)" transform="oxf:unsafe-xslt">
                         <xsl:transform version="2.0">
-                            <xsl:import href="xforms-server/wrap-server-decode-nofilter.xsl"/>
+                            <xsl:import href="wrap-server-decode-nofilter.xsl"/>
                             <xsl:template match="stack-trace-elements"/>
                             <xsl:template match="dynamic-state[@uuid]">
                                 <xsl:copy>
@@ -229,7 +228,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -304,7 +303,7 @@
                 <p:processor name="oxf:identity">
                     <p:input name="data" href="aggregate('responses', #response1, #response2, #response3)" transform="oxf:unsafe-xslt">
                         <xsl:transform version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                            <xsl:import href="xforms-server/wrap-server-decode-nofilter.xsl"/>
+                            <xsl:import href="wrap-server-decode-nofilter.xsl"/>
                             <xsl:template match="xxf:dynamic-state"/>
                         </xsl:transform>
                     </p:input>
@@ -352,7 +351,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -383,7 +382,7 @@
                     </p:input>
                     <p:input name="data" href="#xhtml"/>
                     <!-- This causes the file to be parsed, with or without the external entity resolved -->
-                    <p:input name="request" href="xforms-server/ajax-request-with-external-entity.xml"/>
+                    <p:input name="request" href="ajax-request-with-external-entity.xml"/>
                     <p:output name="data" id="request"/>
                 </p:processor>
 
@@ -422,7 +421,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-init-nofilter.xpl"/>
+                    <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>

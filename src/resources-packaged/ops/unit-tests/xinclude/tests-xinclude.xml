@@ -23,7 +23,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude1.xml</url>
+                            <url>../xinclude/xinclude1.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
@@ -59,7 +59,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude2.xml</url>
+                            <url>../xinclude/xinclude2.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
@@ -95,7 +95,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude3.xml</url>
+                            <url>../xinclude/xinclude3.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
@@ -131,7 +131,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude4.xml</url>
+                            <url>../xinclude/xinclude4.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
@@ -167,7 +167,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude6.xml</url>
+                            <url>../xinclude/xinclude6.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
@@ -203,7 +203,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude7.xml</url>
+                            <url>../xinclude/xinclude7.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
@@ -230,7 +230,7 @@
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude8.xml</url>
+                            <url>../xinclude/xinclude8.xml</url>
                             <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>

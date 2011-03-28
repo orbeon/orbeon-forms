@@ -27,12 +27,11 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
+import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -85,11 +84,24 @@ public class XMLUtils {
         public final boolean validating;
         public final boolean handleXInclude;
         public final boolean externalEntities;
+        public final URIProcessorOutputImpl.URIReferences uriReferences;
 
         public ParserConfiguration(boolean validating, boolean handleXInclude, boolean externalEntities) {
+            this(validating, handleXInclude, externalEntities, null);
+        }
+
+        public ParserConfiguration(boolean validating, boolean handleXInclude, boolean externalEntities, URIProcessorOutputImpl.URIReferences uriReferences) {
             this.validating = validating;
             this.handleXInclude = handleXInclude;
             this.externalEntities = externalEntities;
+            this.uriReferences = uriReferences;
+        }
+
+        public ParserConfiguration(ParserConfiguration parserConfiguration, URIProcessorOutputImpl.URIReferences uriReferences) {
+            this.validating = parserConfiguration.validating;
+            this.handleXInclude = parserConfiguration.handleXInclude;
+            this.externalEntities = parserConfiguration.externalEntities;
+            this.uriReferences = uriReferences;
         }
 
         public String getKey() {
@@ -169,16 +181,12 @@ public class XMLUtils {
      * @param parserConfiguration  parser configuration
      * @return                     the SAXParser
      */
-    private static synchronized SAXParser newSAXParser(XMLUtils.ParserConfiguration parserConfiguration) {
+    public static synchronized SAXParser newSAXParser(XMLUtils.ParserConfiguration parserConfiguration) {
         try {
             return getSAXParserFactory(parserConfiguration).newSAXParser();
         } catch (Exception e) {
             throw new OXFException(e);
         }
-    }
-
-    public static SAXParser newSAXParser() {
-        return newSAXParser(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
     }
 
     public static XMLReader newXMLReader(XMLUtils.ParserConfiguration parserConfiguration) {
@@ -408,9 +416,15 @@ public class XMLUtils {
     }
 
     private static void inputSourceToSAX(InputSource inputSource, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
+
+        // Insert XInclude processor if needed
+        if (parserConfiguration.handleXInclude) {
+            parserConfiguration =  new XMLUtils.ParserConfiguration(parserConfiguration.validating, false, parserConfiguration.externalEntities, parserConfiguration.uriReferences);
+            xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, xmlReceiver, parserConfiguration.uriReferences, new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN));
+        }
+
         try {
             final XMLReader xmlReader = newSAXParser(parserConfiguration).getXMLReader();
-//            xmlReader.setContentHandler(new SAXLoggerProcessor.DebugContentHandler(contentHandler));
             xmlReader.setContentHandler(xmlReceiver);
             if (handleLexical)
                 xmlReader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver);

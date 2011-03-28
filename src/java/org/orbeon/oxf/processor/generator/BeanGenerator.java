@@ -120,7 +120,7 @@ public class BeanGenerator extends ProcessorImpl {
             xmlReceiver.startElement("", rootElementName, rootElementName, XMLUtils.EMPTY_ATTRIBUTES);
 
             // Initialize Castor
-            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser().getParser());
+            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getParser());
             adapter.setContentHandler(xmlReceiver);
             Marshaller marshaller = new Marshaller(adapter);
             marshaller.setMarshalAsDocument(false);

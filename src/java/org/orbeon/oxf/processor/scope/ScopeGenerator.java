@@ -198,7 +198,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
             contentHandler.startDocument();
 
             // Initialize Castor
-            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser().getParser());
+            ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getParser());
             adapter.setContentHandler(contentHandler);
             Marshaller marshaller = new Marshaller(adapter);
             marshaller.setMarshalAsDocument(false);

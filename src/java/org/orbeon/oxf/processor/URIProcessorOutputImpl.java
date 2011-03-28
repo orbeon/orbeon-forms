@@ -259,6 +259,14 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
     }
 
     public static class URIReference {
+
+        public final String context;
+        public final String spec;
+        public final String username;
+        public final String password;
+        public final String domain;
+        public final String headersToForward;
+
         public URIReference(String context, String spec, String username, String password,
         					String domain, String headersToForward) {
             this.context = context;
@@ -268,13 +276,6 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
             this.domain = domain;
             this.headersToForward = headersToForward;
         }
-
-        public String context;
-        public String spec;
-        public String username;
-        public String password;
-        public String domain;
-        public String headersToForward;
 
         @Override
         public String toString() {
@@ -340,23 +341,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
             if (references == null)
                 references = new ArrayList<URIReference>();
 
-//            logger.info("URIProcessorOutputImpl: adding reference: context = " + context + ", spec = " + spec);
-
             references.add(new URIReference(context, spec, username, password, domain, headersToForward));
-        }
-
-        /**
-         * Calling this makes sure the associated output cannot be cached.
-         */
-        public void setNoCache() {
-            // Make sure we have an empty list of references
-            if (references == null)
-                references = new ArrayList<URIReference>();
-            else
-                references.clear();
-
-            // Store a null reference to prevent caching
-            references.add(null);
         }
 
         /**
@@ -420,9 +405,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                     throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.statusCode);
 
                 // Read connection into SAXStore
-                final XMLUtils.ParserConfiguration parserConfiguration = XMLUtils.ParserConfiguration.PLAIN;
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, parserConfiguration, true);
+                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, XMLUtils.ParserConfiguration.PLAIN, true);
 
                 // Obtain last modified
                 lastModifiedLong = connectionResult.getLastModified();

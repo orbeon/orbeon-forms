@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -12,7 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="URL Rewrite">
+<group description="URL Rewrite" xmlns:oxf="http://www.orbeon.com/oxf/processors">
     <!-- This test is a good start, but could probably be improved -->
     <!-- TODO: Portlet URL rewriting testing; need a way to specify to the test what -->
     <!-- pseudo-External Context to use -->

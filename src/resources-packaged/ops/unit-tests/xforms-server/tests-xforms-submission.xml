@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -27,7 +26,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="Instance replacement with index updates" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -155,7 +154,7 @@
     </test>
 
     <test description="Submitting required but empty values fails submission" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -208,7 +207,7 @@
     </test>
 
     <test description="Instance replacement on xforms-ready with read-only instance properly updates controls" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -265,7 +264,7 @@
     </test>
 
     <test description="XInclude upon replacement of cached instance" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -320,7 +319,7 @@
     </test>
 
     <test description="Instance replacement: replace submitted instance" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -390,7 +389,7 @@
     </test>
 
     <test description="Instance replacement: replace submitted instance using @targetref" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -460,7 +459,7 @@
     </test>
 
     <test description="Instance replacement: replace subset of submitted instance using @targetref" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -539,7 +538,7 @@
     </test>
 
     <test description="Instance replacement: replace other instance" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -616,7 +615,7 @@
     </test>
 
     <test description="Instance replacement: replace other instance using @instance and @targetref" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -693,7 +692,7 @@
     </test>
 
     <test description="Instance replacement: replace other instance using @targetref only" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -770,7 +769,7 @@
     </test>
 
     <test description="Instance replacement: replace subset of other instance using @targetref only" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -856,7 +855,7 @@
     </test>
 
     <test description="Instance replacement: destination points to instance element node" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -937,7 +936,7 @@
     </test>
 
     <test description="Instance replacement: replace dispatches events for controls bound to replaced subset" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1050,7 +1049,7 @@
     </test>
 
     <test description="Instance replacement: replace text" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
@@ -1098,7 +1097,7 @@
                     <dynamic-state>
                         <instances>
                             <instance id="source-instance" model-id="model">
-                                <book>&lt;?xml version="1.0" encoding="UTF-8"?&gt; &lt;book&gt; &lt;title lang="en"&gt;Pale Blue Dot&lt;/title&gt; &lt;author&gt;Carl Sagan&lt;/author&gt; &lt;/book&gt;</book>
+                                <book>&lt;book&gt; &lt;title lang="en"&gt;Pale Blue Dot&lt;/title&gt; &lt;author&gt;Carl Sagan&lt;/author&gt; &lt;/book&gt;</book>
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
@@ -1116,7 +1115,7 @@
     </test>
 
     <test description="Instance replacement: errors when using xxforms:readonly and/or xxforms:shared" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1206,7 +1205,7 @@
     </test>
 
     <test description="Replacement of read-write cached instance keeps instances separate" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1264,7 +1263,7 @@
     </test>
 
     <test description="Test xforms:submission/@xxforms:recalculate" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1430,7 +1429,7 @@
     </test>
 
     <test description="Test xforms:submission/@validate" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1651,7 +1650,7 @@
 
     <test description="xforms:submit within XBL outer scope resolves submission" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315509&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -1702,7 +1701,7 @@
 
     <test description="Submission replace=&quot;all&quot; upon initialization with content response" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-init.xpl"/>
+        <input name="config" href="wrap-xforms-init.xpl"/>
         <input name="document">
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
                      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -1720,14 +1719,14 @@
             </xh:html>
         </input>
         <output name="response">
-            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/xml">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGJvb2s+CiAgICA8ZGV0YWls cz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUgZXQgc29uIG1hw650cmU8L3Rp dGxlPgogICAgICAgIDxhdXRob3I+RGVuaXMgRGlkZXJvdDwvYXV0aG9yPgogICAgICAgIDxsYW5n dWFnZT5mcjwvbGFuZ3VhZ2U+CiAgICAgICAgPGxpbmsvPgogICAgICAgIDxyYXRpbmcvPgogICAg ICAgIDxwdWJsaWNhdGlvbi15ZWFyLz4KICAgICAgICA8cmV2aWV3Lz4KICAgICAgICA8aW1hZ2Ug ZmlsZW5hbWU9IiIgbWVkaWF0eXBlPSIiIHNpemU9IiIvPgogICAgPC9kZXRhaWxzPgogICAgPG5v<?oxf-serializer flush?>
-dGVzPgogICAgICAgIDxub3RlLz4KICAgIDwvbm90ZXM+CjwvYm9vaz4K</document>
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/xml">PGJvb2s+CiAgICA8ZGV0YWlscz4KICAgICAgICA8dGl0bGU+SmFjcXVlcyBsZSBmYXRhbGlzdGUg ZXQgc29uIG1hw650cmU8L3RpdGxlPgogICAgICAgIDxhdXRob3I+RGVuaXMgRGlkZXJvdDwvYXV0 aG9yPgogICAgICAgIDxsYW5ndWFnZT5mcjwvbGFuZ3VhZ2U+CiAgICAgICAgPGxpbmsvPgogICAg ICAgIDxyYXRpbmcvPgogICAgICAgIDxwdWJsaWNhdGlvbi15ZWFyLz4KICAgICAgICA8cmV2aWV3 Lz4KICAgICAgICA8aW1hZ2UgZmlsZW5hbWU9IiIgbWVkaWF0eXBlPSIiIHNpemU9IiIvPgogICAg PC9kZXRhaWxzPgogICAgPG5vdGVzPgogICAgICAgIDxub3RlLz4KICAgIDwvbm90ZXM+CjwvYm9v<?oxf-serializer flush?>
+az4K</document>
         </output>
     </test>
 
     <test description="Submission replace=&quot;all&quot; upon initialization with redirect response" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207 -->
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
                      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"

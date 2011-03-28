@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xforms="http://www.w3.org/2002/xforms"

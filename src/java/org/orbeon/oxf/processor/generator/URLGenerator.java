@@ -36,7 +36,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.xerces.XIncludeHandler;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 
@@ -255,7 +254,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config config;
-        public URIReferences uriReferences;
+        public List<URIProcessorOutputImpl.URIReference> uriReferences;
     }
 
     @Override
@@ -452,14 +451,9 @@ public class URLGenerator extends ProcessorImpl {
                                 configURIReferences.uriReferences = null;
                             } else if (mode.equals("xml")) {
                                 // XML mode
-                                final LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
-                                XIncludeHandler.setXIncludeListener(localXIncludeListener);
-                                try {
-                                    handler.readXML(pipelineContext, output);
-                                } finally {
-                                    XIncludeHandler.setXIncludeListener(null);
-                                }
-                                localXIncludeListener.updateCache(configURIReferences);
+                                final URIProcessorOutputImpl.URIReferences uriReferences = new URIProcessorOutputImpl.URIReferences();
+                                handler.readXML(pipelineContext, output, uriReferences);
+                                configURIReferences.uriReferences = uriReferences.getReferences();
                             } else if (mode.equals("text")) {
                                 // Text mode
                                 handler.readText(output, contentType, validity);
@@ -508,7 +502,7 @@ public class URLGenerator extends ProcessorImpl {
                     }
 
                     final int keyCount = 1 + ((localConfigURIReferences == null) ? 1 : 0)
-                            + ((configURIReferences.uriReferences != null) ? configURIReferences.uriReferences.references.size() : 0);
+                            + ((configURIReferences.uriReferences != null) ? configURIReferences.uriReferences.size() : 0);
                     final CacheKey[] outputKeys = new CacheKey[keyCount];
 
                     // Handle config if read as input
@@ -524,7 +518,7 @@ public class URLGenerator extends ProcessorImpl {
                     outputKeys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
-                        for (URIReference uriReference: configURIReferences.uriReferences.references) {
+                        for (URIProcessorOutputImpl.URIReference uriReference : configURIReferences.uriReferences) {
                             outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
                         }
                     }
@@ -557,7 +551,7 @@ public class URLGenerator extends ProcessorImpl {
                     validities.add(getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), resourceHandler));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
-                        for (URIReference uriReference: configURIReferences.uriReferences.references) {
+                        for (URIProcessorOutputImpl.URIReference uriReference: configURIReferences.uriReferences) {
                             validities.add(getHandlerValidity(pipelineContext, URLFactory.createURL(uriReference.context, uriReference.spec), null));
                         }
                     }
@@ -640,7 +634,7 @@ public class URLGenerator extends ProcessorImpl {
         void destroy() throws IOException;
         void readHTML(XMLReceiver xmlReceiver) throws IOException;
         void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
-        void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws IOException;
+        void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException;
         void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
     }
 
@@ -711,16 +705,17 @@ public class URLGenerator extends ProcessorImpl {
             ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
-        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws IOException {
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
+            final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(config.getParserConfiguration(), uriReferences);
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
                 XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(),
-                        xmlReceiver, config.getParserConfiguration(), config.isHandleLexical());
+                        xmlReceiver, parserConfiguration, config.isHandleLexical());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
                 ResourceManagerWrapper.instance().getContentAsSAX(getKey(),
-                        xmlReceiver, config.getParserConfiguration(), config.isHandleLexical());
+                        xmlReceiver, parserConfiguration, config.isHandleLexical());
             }
         }
 
@@ -733,21 +728,6 @@ public class URLGenerator extends ProcessorImpl {
             if (resourceManagerKey == null)
                 resourceManagerKey = config.getURL().getFile();
             return resourceManagerKey;
-        }
-    }
-
-    private static class LocalXIncludeListener implements XIncludeHandler.XIncludeListener {
-
-        private URIReferences uriReferences;
-
-        public void inclusion(String base, String href) {
-            if (uriReferences == null)
-                uriReferences = new URIReferences();
-            uriReferences.references.add(new URIReference(base, href));
-        }
-
-        public void updateCache(ConfigURIReferences configURIReferences) {
-            configURIReferences.uriReferences = uriReferences;
         }
     }
 
@@ -851,13 +831,15 @@ public class URLGenerator extends ProcessorImpl {
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
-        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws IOException {
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
             openConnection();
             checkStatusCode();
-            // Read the resource from the resource manager and parse it as XML
+
+            final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(config.getParserConfiguration(), uriReferences);
             try {
-                final XMLReader reader = XMLUtils.newXMLReader(config.getParserConfiguration());
+                final XMLReader reader = XMLUtils.newXMLReader(parserConfiguration);
                 reader.setContentHandler(xmlReceiver);
+                // TODO: lexical handler?
                 final InputSource inputSource;
                 if (getExternalEncoding() != null) {
                     // The encoding is set externally, either force by the user, or set by the connection
@@ -893,20 +875,6 @@ public class URLGenerator extends ProcessorImpl {
             TransformerUtils.sourceToSAX(new DOMSource(tidy.parseDOM(is, null)), output);
         }
 
-    }
-
-    private static class URIReference {
-        public URIReference(String context, String spec) {
-            this.context = context;
-            this.spec = spec;
-        }
-
-        public String context;
-        public String spec;
-    }
-
-    private static class URIReferences {
-        public List<URIReference> references = new ArrayList<URIReference>();
     }
 
     // The idea of URLGeneratorState is that, during a pipeline execution with a given PipelineContext, there is typically:

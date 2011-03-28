@@ -113,7 +113,7 @@ public class TaminoImport {
 
     private boolean isXMLFile(File file) {
          try {
-             XMLUtils.newSAXParser().parse(file, new DefaultHandler());
+             XMLUtils.newSAXParser(XMLUtils.ParserConfiguration.PLAIN).parse(file, new DefaultHandler());
              return true;
          } catch (Exception e) {
              return false;

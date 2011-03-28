@@ -12,14 +12,14 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="URL Generator" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+<group description="URL Generator" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <test description="Encodings when parsing XML" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param name="data" type="output"/>
                 <p:processor name="oxf:xslt">
-                    <p:input name="data" href="aggregate('root', url-generator/encoding-iso.xml, url-generator/encoding-utf8.xml)"/>
+                    <p:input name="data" href="aggregate('root', encoding-iso.xml, encoding-utf8.xml)"/>
                     <p:input name="config">
                         <result xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                             <xsl:for-each select="/root/root">
@@ -242,7 +242,7 @@ Le bruit persistait toujours.
                             <form xmlns="" xml:base="oxf:/ops/unit-tests/url-generator/included-1.xml">
                                 <document-id>123456789</document-id>
                                 <include2>
-                                    <html xmlns="http://www.w3.org/1999/xhtml" xml:base="/ops/unit-tests/url-generator/included-2.xml">
+                                    <html xmlns="http://www.w3.org/1999/xhtml" xml:base="oxf:/ops/unit-tests/url-generator/included-2.xml">
                                         <head>
                                             <title>Summary</title>
                                         </head>
@@ -250,7 +250,7 @@ Le bruit persistait toujours.
                                 </include2>
                             </form>
                         </xforms:instance>
-                        <html xml:base="/ops/unit-tests/url-generator/included-2.xml">
+                        <html xml:base="oxf:/ops/unit-tests/url-generator/included-2.xml">
                             <head>
                                 <title>Summary</title>
                             </head>
@@ -315,7 +315,7 @@ Le bruit persistait toujours.
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude5.xml</url>
+                            <url>../xinclude/xinclude5.xml</url>
                          </config>
                     </p:input>
                     <p:output name="data" id="including"/>
@@ -338,7 +338,7 @@ Le bruit persistait toujours.
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
                         <config>
-                            <url>xinclude/xinclude5.xml</url>
+                            <url>../xinclude/xinclude5.xml</url>
                             <external-entities>true</external-entities>
                          </config>
                     </p:input>

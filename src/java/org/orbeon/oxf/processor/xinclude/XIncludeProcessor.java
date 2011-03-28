@@ -263,6 +263,13 @@ public class XIncludeProcessor extends ProcessorImpl {
                             final String base = outputLocator == null ? null : outputLocator.getSystemId();
                             final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
 
+                            // Keep URI reference
+                            if (uriReferences != null)
+                                uriReferences.addReference(base, href, null, null, null, null);
+
+                            // Read document
+                            systemId = source.getSystemId();
+
                             if (xpointer != null) {
                                 // Experimental support for xpath() scheme
                                 final String xpath = xpointer.substring("xpath(".length(), xpointer.length() - 1);
@@ -277,18 +284,13 @@ public class XIncludeProcessor extends ProcessorImpl {
                                     final XIncludeXMLReceiver newReceiver = new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator);
                                     XPathProcessor.streamResult(pipelineContext, newReceiver, o, new LocationData(outputLocator));
                                 }
-
                             } else {
                                 // No xpointer attribute specified, just stream the child document
                                 final XMLReader xmlReader = source.getXMLReader();
-                                xmlReader.setContentHandler(new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
+                                final XMLReceiver xmlReceiver = new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator);
+                                xmlReader.setContentHandler(xmlReceiver);
+                                xmlReader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver);
 
-                                // Keep URI reference
-                                if (uriReferences != null)
-                                    uriReferences.addReference(base, href, null, null, null, null);
-
-                                // Read document
-                                systemId = source.getSystemId();
                                 xmlReader.parse(new InputSource(systemId)); // Yeah, the SAX API doesn't make much sense
                             }
 

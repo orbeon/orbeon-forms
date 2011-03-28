@@ -38,7 +38,7 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
         // Set XInclude feature
         if (parserConfiguration.handleXInclude) {
             super.setFeature(XINCLUDE_FEATURE, true);
-            fXIncludeHandler = new XIncludeHandler();
+            fXIncludeHandler = new orbeon.apache.xerces.xinclude.XIncludeHandler();
             setProperty(XINCLUDE_HANDLER, fXIncludeHandler);
             addCommonComponent(fXIncludeHandler);
         } else {

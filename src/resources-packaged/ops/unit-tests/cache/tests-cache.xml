@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -12,8 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="Cache" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<group description="Cache" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <test description="Simple URL Generator" name="oxf:test-script">
         <input name="config">
@@ -21,15 +19,15 @@
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config>
-                            <url>cache/document1.xml</url>
+                            <url>document1.xml</url>
                         </config>
                     </input>
                 </processor>
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/><!-- Do this for now because last modified values are cached for 2 seconds -->
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>
@@ -46,26 +44,26 @@
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config>
-                            <url>cache/document3.xml</url>
+                            <url>document3.xml</url>
                             <handle-xinclude>true</handle-xinclude>
                         </config>
                     </input>
                 </processor>
-                <touch url="cache/document3.xml"/>
+                <touch url="document3.xml"/>
                 <wait delay="2100"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
-                <touch url="cache/document3.xml"/>
+                <touch url="document3.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
-                <touch url="cache/document2.xml"/>
+                <touch url="document2.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v3"/>
                 <assert output-name="data" condition="cached-value-equal" value="v3"/>
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v4"/>
@@ -79,38 +77,38 @@
             <script>
                 <!-- Initial config -->
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/url-generator-config1.xml' />
+                    <input name="config" href='url-generator-config1.xml' />
                 </processor>
-                <touch url="cache/document3.xml"/>
+                <touch url="document3.xml"/>
                 <wait delay="2100"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <!-- Change config -->
                 <wait delay="2100"/>
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/url-generator-config2.xml' />
+                    <input name="config" href='url-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
                 <!-- Check that both configs cache -->
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/url-generator-config1.xml' />
+                    <input name="config" href='url-generator-config1.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/url-generator-config2.xml' />
+                    <input name="config" href='url-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
                 <!-- Check that both are invalidated -->
-                <touch url="cache/document3.xml"/>
+                <touch url="document3.xml"/>
                 <wait delay="2100"/>
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/url-generator-config1.xml' />
+                    <input name="config" href='url-generator-config1.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/url-generator-config2.xml' />
+                    <input name="config" href='url-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
             </script>
@@ -121,22 +119,22 @@
         <input name="config">
             <script>
                 <processor name="oxf:xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href="cache/stylesheet1.xsl"/>
-                    <input name="data" href="cache/document1.xml"/>
+                    <input name="config" href="stylesheet1.xsl"/>
+                    <input name="data" href="document1.xml"/>
                 </processor>
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <!-- Touch input document -->
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>
                 <assert output-name="data" condition="output-cached"/>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
                 <!-- Touch stylesheet -->
-                <touch url="cache/stylesheet1.xsl"/>
+                <touch url="stylesheet1.xsl"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v3"/>
@@ -152,76 +150,76 @@
             <script>
                 <processor name="oxf:pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <!-- FIXME: xslt-with-dependencies.xpl (using ops:xinclude) causes an exception because a base URL cannot be found -->
-                    <!--<input name="config" href="cache/xslt-with-dependencies.xpl"/>-->
-                    <input name="config" href="cache/xslt-with-dependencies-2.xpl"/>
+                    <!--<input name="config" href="xslt-with-dependencies.xpl"/>-->
+                    <input name="config" href="xslt-with-dependencies-2.xpl"/>
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
                 <!-- Touch doc()'ed file -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/document4.xml"/>
+                <touch url="document4.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v3"/>
                 <assert output-name="data" condition="cached-value-equal" value="v3"/>
                 <!-- Touch document()'ed file -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/document5.xml"/>
+                <touch url="document5.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v4"/>
                 <assert output-name="data" condition="cached-value-equal" value="v4"/>
                 <!-- Touch imported file -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/stylesheet3.xsl"/>
+                <touch url="stylesheet3.xsl"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v5"/>
                 <assert output-name="data" condition="cached-value-equal" value="v5"/>
                 <!-- Touch imported file -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/stylesheet4.xsl"/>
+                <touch url="stylesheet4.xsl"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v6"/>
                 <assert output-name="data" condition="cached-value-equal" value="v6"/>
                 <!-- Touch imported file (second level) -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/stylesheet5.xsl"/>
+                <touch url="stylesheet5.xsl"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v7"/>
                 <assert output-name="data" condition="cached-value-equal" value="v7"/>
                 <!-- Touch file XIncluded from main stylesheet -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/stylesheet-fragment1.xml"/>
+                <touch url="stylesheet-fragment1.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v8"/>
                 <assert output-name="data" condition="cached-value-equal" value="v8"/>
                 <!-- Touch file XIncluded from main stylesheet (second level) -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/document1.xml"/>
+                <touch url="document1.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v9"/>
                 <assert output-name="data" condition="cached-value-equal" value="v9"/>
                 <!-- Touch file connected to user-defined input but not referenced -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/c-2.xml"/>
+                <touch url="c-2.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v10"/>
                 <assert output-name="data" condition="cached-value-equal" value="v10"/>
                 <!-- Touch file doc('input:*')'ed from main stylesheet -->
                 <assert output-name="data" condition="output-cached"/>
-                <touch url="cache/b-2.xml"/>
+                <touch url="b-2.xml"/>
                 <wait delay="2100"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v11"/>
@@ -229,7 +227,7 @@
                 <!-- Touch file XIncluded from depending stylesheet (second level) -->
                 <!-- This doesn't work FIXME (XSLTTransformer) -->
 <!--                <assert output-name="data" condition="output-cached"/>-->
-<!--                <touch url="cache/d-1.xml"/>-->
+<!--                <touch url="d-1.xml"/>-->
 <!--                <wait delay="2100"/>-->
 <!--                <assert output-name="data" condition="output-not-cached"/>-->
 <!--                <cache-value output-name="data" value="v12"/>-->
@@ -237,7 +235,7 @@
                 <!-- Touch file XIncluded from doc()'ed file -->
                 <!-- This doesn't work FIXME (XSLTTransformer) -->
 <!--                <assert output-name="data" condition="output-cached"/>-->
-<!--                <touch url="cache/e-1.xml"/>-->
+<!--                <touch url="e-1.xml"/>-->
 <!--                <wait delay="2100"/>-->
 <!--                <assert output-name="data" condition="output-not-cached"/>-->
 <!--                <cache-value output-name="data" value="v13"/>-->
@@ -300,13 +298,13 @@
                         </config>
                     </input>
                 </processor>
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="output-cached"/>
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
                 <assert output-name="data" condition="output-cached"/>
-                <set-request href="cache/request2.xml"/>
+                <set-request href="request2.xml"/>
                 <assert output-name="data" condition="output-not-cached"/>
             </script>
         </input>
@@ -323,14 +321,14 @@
                         </config>
                     </input>
                 </processor>
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="output-cached"/>
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
                 <assert output-name="data" condition="output-cached"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
-                <set-request href="cache/request3.xml"/>
+                <set-request href="request3.xml"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <!-- Test different request -->
                 <assert output-name="data" condition="output-equals">
@@ -391,7 +389,7 @@
                         </config>
                     </input>
                 </processor>
-                <set-request href="cache/request4.xml"/>
+                <set-request href="request4.xml"/>
                 <assert output-name="data" condition="output-not-cacheable"/>
             </script>
         </input>
@@ -401,7 +399,7 @@
         <input name="config">
             <script>
                 <!-- Set a request because the Scope processors need an external context -->
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
 
                 <!-- First, store a document into the application scope -->
                 <processor name="oxf:scope-serializer" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -422,7 +420,7 @@
                 <run-processor/>
                 <!-- Setup generator without using key/validity -->
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config1.xml' />
+                    <input name="config" href='scope-generator-config1.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
@@ -453,7 +451,7 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config1.xml' />
+                    <input name="config" href='scope-generator-config1.xml' />
                 </processor>
                 <assert output-name="data" condition="output-cached"/>
                 <assert output-name="data" condition="output-equals">
@@ -483,7 +481,7 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config1.xml' />
+                    <input name="config" href='scope-generator-config1.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <assert output-name="data" condition="output-equals">
@@ -529,7 +527,7 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config1.xml' />
+                    <input name="config" href='scope-generator-config1.xml' />
                 </processor>
                 <assert output-name="data" condition="output-cached"/>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
@@ -625,7 +623,7 @@
         <input name="config">
             <script>
                 <!-- Set a request because the Scope processors need an external context -->
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
 
                 <!-- First, store a JavaBean into the request scope -->
                 <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -643,7 +641,7 @@
 
                 <!-- Now read the bean -->
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config2.xml' />
+                    <input name="config" href='scope-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
@@ -675,7 +673,7 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config2.xml' />
+                    <input name="config" href='scope-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <assert output-name="data" condition="output-equals">
@@ -742,7 +740,7 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config2.xml' />
+                    <input name="config" href='scope-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <assert output-name="data" condition="output-equals">
@@ -782,7 +780,7 @@
 
                 <!-- Check that we still cache our bean in the app context -->
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config2.xml' />
+                    <input name="config" href='scope-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
@@ -825,7 +823,7 @@
 
                 <!-- Check that we still cache our first bean in the app context -->
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config2.xml' />
+                    <input name="config" href='scope-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
@@ -871,7 +869,7 @@
 
                 <!-- Check that we still cache our first bean in the app context -->
                 <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/scope-generator-config2.xml' />
+                    <input name="config" href='scope-generator-config2.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
@@ -883,7 +881,7 @@
         <input name="config">
             <script>
                 <!-- Set a request because the Bean generator needs an external context -->
-                <set-request href="cache/request1.xml"/>
+                <set-request href="request1.xml"/>
 
                 <!-- First, store a JavaBean into the request scope -->
                 <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -901,8 +899,8 @@
 
                 <!-- Now read the bean -->
                 <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/bean-generator-config1.xml' />
-                    <input name="mapping" href='cache/bean-generator-mapping1.xml' />
+                    <input name="config" href='bean-generator-config1.xml' />
+                    <input name="mapping" href='bean-generator-mapping1.xml' />
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
@@ -936,8 +934,8 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/bean-generator-config1.xml' />
-                    <input name="mapping" href='cache/bean-generator-mapping1.xml' />
+                    <input name="config" href='bean-generator-config1.xml' />
+                    <input name="mapping" href='bean-generator-mapping1.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <assert output-name="data" condition="output-equals">
@@ -1011,8 +1009,8 @@
                 </processor>
                 <run-processor/>
                 <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/bean-generator-config1.xml' />
-                    <input name="mapping" href='cache/bean-generator-mapping1.xml' />
+                    <input name="config" href='bean-generator-config1.xml' />
+                    <input name="mapping" href='bean-generator-mapping1.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
                 <assert output-name="data" condition="output-equals">
@@ -1060,8 +1058,8 @@
 
                 <!-- Check that we still cache our bean in the app context -->
                 <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/bean-generator-config1.xml' />
-                    <input name="mapping" href='cache/bean-generator-mapping1.xml' />
+                    <input name="config" href='bean-generator-config1.xml' />
+                    <input name="mapping" href='bean-generator-mapping1.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
@@ -1109,8 +1107,8 @@
 
                 <!-- Check that we still cache our first bean in the app context -->
                 <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/bean-generator-config1.xml' />
-                    <input name="mapping" href='cache/bean-generator-mapping1.xml' />
+                    <input name="config" href='bean-generator-config1.xml' />
+                    <input name="mapping" href='bean-generator-mapping1.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
@@ -1158,8 +1156,8 @@
 
                 <!-- Check that we still cache our first bean in the app context -->
                 <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href='cache/bean-generator-config1.xml' />
-                    <input name="mapping" href='cache/bean-generator-mapping1.xml' />
+                    <input name="config" href='bean-generator-config1.xml' />
+                    <input name="mapping" href='bean-generator-mapping1.xml' />
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
             </script>
@@ -1172,13 +1170,13 @@
         <input name="config">
             <script>
                 <processor name="oxf:pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href="cache/pipeline-identity-1.xpl"/>
+                    <input name="config" href="pipeline-identity-1.xpl"/>
                 </processor>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
                 <processor name="oxf:pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href="cache/pipeline-identity-2.xpl"/>
+                    <input name="config" href="pipeline-identity-2.xpl"/>
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>

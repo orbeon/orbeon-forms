@@ -12,7 +12,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="Converters" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+<group description="Converters" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!--
     TODO: o all converters (XML, HTML, Text, XSL:FO, Chart)
@@ -21,7 +21,7 @@
     -->
 
     <test description="XML conversion" name="oxf:xml-converter">
-        <input name="data" href="converters/claim-1.xml"/>
+        <input name="data" href="claim-1.xml"/>
         <input name="config">
             <config>
                 <content-type>application/xml</content-type>
@@ -35,7 +35,7 @@
     </test>
 
     <test description="HTML conversion" name="oxf:html-converter">
-        <input name="data" href="converters/hello3-view.xhtml"/>
+        <input name="data" href="hello3-view.xhtml"/>
         <input name="config">
             <config>
                 <content-type>text/html</content-type>
@@ -66,7 +66,7 @@
         </output>
     </test>
     <test description='Test from xls' name='oxf:from-xls-converter' >
-        <input name='data' href='converters/employees2.xls' />
+        <input name='data' href='employees2.xls' />
         <output name="data">
             <workbook>
                 <sheet>

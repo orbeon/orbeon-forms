@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -27,7 +26,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="Calculator" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -113,7 +112,7 @@
     </test>
 
     <test description="Default instances" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -204,7 +203,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -393,7 +392,7 @@
                 <!--<p:param name="response" type="output"/>-->
 <!---->
                 <!--<p:processor name="oxf:pipeline">-->
-                    <!--<p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>-->
+                    <!--<p:input name="config" href="wrap-xforms-state.xpl"/>-->
                     <!--<p:input name="controls">-->
                         <!--<controls>-->
                             <!--<xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>-->
@@ -465,7 +464,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="config" href="wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
                             <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id123">Hello!</xxforms:event>
@@ -529,7 +528,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
@@ -594,7 +593,7 @@
     </test>
 
     <test description="xforms:setfocus on xforms:group" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -646,7 +645,7 @@
     </test>
 
     <test description="xforms:setfocus on xforms:switch" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -720,7 +719,7 @@
     </test>
 
     <test description="xforms:setfocus on xforms:repeat" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -778,7 +777,7 @@
     </test>
 
     <test description="Label change on xxforms:dialog" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
@@ -832,7 +831,7 @@
     </test>
 
     <test description="Label change on xxforms:dialog" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -896,7 +895,7 @@
     </test>
 
     <test description="Comments in XForms document are not propagated" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-init-nohead.xpl"/>
+        <input name="config" href="wrap-xforms-init-nohead.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <!-- Comment 1 -->
@@ -1026,7 +1025,7 @@
     </test>
 
     <test description="Comments in inline instance are preserved" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1073,7 +1072,7 @@
     </test>
 
     <test description="Comments in external instances are preserved" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1125,7 +1124,7 @@
     </test>
 
     <test description="Comments in instance loaded by submission are preserved" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
@@ -1186,7 +1185,7 @@
     </test>
 
     <test description="Instance comments preserved in state deserialization" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-server.xpl"/>
+        <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xxforms:event name="update" source-control-id="model"/>
@@ -1279,7 +1278,7 @@
     </test>
 
     <test description="Interaction of context and xxforms:iterate" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 

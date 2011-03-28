@@ -31,8 +31,7 @@ import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.naming.Context;
@@ -88,9 +87,8 @@ public class ProcessorTest extends ResourceManagerTestBase {
             // Run registry.
             XMLProcessorRegistry registry = new XMLProcessorRegistry();
             final String fname = "processors.xml";
-            final org.dom4j.Document doc = resourceManager.getContentAsDOM4J(fname);
-            final DOMGenerator config = PipelineUtils.createDOMGenerator
-                    (doc, fname, DOMGenerator.ZeroValidity, fname);
+            final org.dom4j.Document doc = resourceManager.getContentAsDOM4J(fname, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, true);
+            final DOMGenerator config = PipelineUtils.createDOMGenerator(doc, fname, DOMGenerator.ZeroValidity, fname);
             PipelineUtils.connect(config, "data", registry, "config");
             registry.start(pipelineContext);
         } catch (Exception e) {
@@ -108,33 +106,10 @@ public class ProcessorTest extends ResourceManagerTestBase {
             setupContext();
             
             final List<Object[]> parameters = new ArrayList<Object[]>();
-            final boolean useParserXInclude = true;
-            final Document tests;
-            if (useParserXInclude) {
+            final Document tests; {
                 final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG), true);
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
-                domSerializer.start(pipelineContext);
-                tests = domSerializer.getDocument(pipelineContext);
-            } else {
-                // Create processor
-                final QName xincludeProcessorName = XMLConstants.XINCLUDE_PROCESSOR_QNAME;
-                final ProcessorFactory xincludeProcessorFactory = ProcessorFactoryRegistry.lookup(xincludeProcessorName);
-                if (xincludeProcessorFactory == null)
-                    throw new OXFException("Cannot find processor factory with name '"
-                            + xincludeProcessorName.getNamespacePrefix() + ":" + xincludeProcessorName.getName() + "'");
-
-                final Processor xincludeProcessor = xincludeProcessorFactory.createInstance();
-
-                // Connect input
-                final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG));
-                PipelineUtils.connect(urlGenerator, "data", xincludeProcessor, "config");
-
-                // Connect output
-                final DOMSerializer domSerializer = new DOMSerializer();
-                PipelineUtils.connect(xincludeProcessor, "data", domSerializer, "data");
-
-                final PipelineContext pipelineContext = new PipelineContext();
                 domSerializer.start(pipelineContext);
                 tests = domSerializer.getDocument(pipelineContext);
             }

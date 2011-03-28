@@ -14,7 +14,8 @@
 -->
 <group description="XUpdate" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xu="http://www.xmldb.org/xupdate">
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <test description="Remove, insert-after, insert-before" name="oxf:xupdate">
         <input name="data">

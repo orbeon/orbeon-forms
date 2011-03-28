@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -144,20 +145,10 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getName())) {
-            // Close the dialog
+    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+        super.performTargetAction(propertyContext, container, event);
 
-            final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
-            localForUpdate.visible = false;
-            containingDocument.getControls().markDirtySinceLastRequest(false);
-
-            if (isXForms11Switch()) {
-                // Partial refresh
-                containingDocument.getControls().doPartialRefresh(propertyContext, this);
-            }
-
-        } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
+        if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
             // Open the dialog
 
             final XXFormsDialogOpenEvent dialogOpenEvent = (XXFormsDialogOpenEvent) event;
@@ -174,6 +165,27 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 // Partial refresh
                 containingDocument.getControls().doPartialRefresh(propertyContext, this);
             }
+
+            // Automatically set focus on the dialog
+            // NOTE: Form author can override this with a setfocus on xxforms-dialog-open
+            getXBLContainer().dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, this));
+        }
+    }
+
+    @Override
+    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getName())) {
+            // Close the dialog
+
+            final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
+            localForUpdate.visible = false;
+            containingDocument.getControls().markDirtySinceLastRequest(false);
+
+            if (isXForms11Switch()) {
+                // Partial refresh
+                containingDocument.getControls().doPartialRefresh(propertyContext, this);
+            }
+
         }
         super.performDefaultAction(propertyContext, event);
     }

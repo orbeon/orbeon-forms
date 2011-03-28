@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -12,22 +11,12 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
+<xbl:xbl xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
+    <xbl:script src="/xbl/orbeon/number/number.js"/>
     <xbl:script src="/xbl/orbeon/currency/currency.js"/>
     <xbl:binding id="fr-currency" element="fr|currency">
 
@@ -54,50 +43,7 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/currency/currency.css"/>
         </xbl:resources>
-        <xbl:handlers>
-            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <xxforms:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxforms:script>
-            </xbl:handler>
-        </xbl:handlers>
-        <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <xsl:transform version="2.0">
-                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
-                <xsl:template match="/*">
-                    <!-- Outer group -->
-                    <xforms:group xbl:attr="model context ref bind" class="{{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}" xxbl:scope="outer">
-                        <xbl:content includes="xforms|label"/>
-
-                        <!-- Init event -->
-                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>
-                        <xxforms:script ev:event="xforms-disabled" ev:target="#observer">YAHOO.xbl.fr.Currency.instance(this).destroy();</xxforms:script>
-
-                        <!-- Inner group -->
-                        <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
-
-                            <!-- Variable pointing to external single-node binding -->
-                            <xxforms:variable name="result" as="node()?">
-                                <xxforms:sequence select="." xxbl:scope="outer"/>
-                            </xxforms:variable>
-
-                            <!-- Access to XForms value and change event -->
-                            <xforms:input ref="$result" id="currency-input" class="xbl-fr-currency-xforms-input fr-hidden">
-                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved">YAHOO.xbl.fr.Currency.instance(this).update();</xxforms:script>
-                                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.instance(this).readonly();</xxforms:script>
-                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.instance(this).readwrite();</xxforms:script>
-                            </xforms:input>
-                            <!-- Access to parameters -->
-                            <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
-                            <!-- The visible input -->
-                            <xhtml:input class="xbl-fr-currency-visible-input xbl-html-input" xbl:attr="tabindex tabindex=navindex"/>
-
-                            <!-- Stop propagation of all local UI events -->
-                            <xforms:action ev:event="#all" ev:propagate="stop"/>
-                        </xforms:group>
-                        <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
-                    </xforms:group>
-                </xsl:template>
-            </xsl:transform>
-        </xbl:template>
+        <!-- Delegate to fr:number -->
+        <xi:include href="/xbl/orbeon/number/number.xbl" xpointer="xpath(/xbl:xbl/xbl:binding/(xbl:handlers | xbl:template))"/>
     </xbl:binding>
 </xbl:xbl>

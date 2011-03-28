@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -27,7 +26,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="fr:inplace-input's hint evaluates in outer context" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -91,7 +90,7 @@
     </test>
 
     <test description="fr:inplace-input pointing to readonly node" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -151,7 +150,7 @@
     </test>
 
     <test description="fr:tabview id and XPath references" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -284,7 +283,7 @@
     </test>
 
     <test description="fr:tabview label resolution" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -406,7 +405,7 @@
     </test>
 
     <test description="fr:error-summary" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                         xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
@@ -474,93 +473,93 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <first-name/>
-                                    <note/>
-                                    <note/>
-                                    <note/>
-                                    <last-name/>
-                                </instance>
-                            </instance>
-                            <instance id="error-summary-instance" model-id="model">
-                                <error-summary>
-                                    <valid>false</valid>
-                                    <errors-count>5</errors-count>
-                                    <visible-errors-count>2</visible-errors-count>
-                                </error-summary>
-                            </instance>
-                            <instance id="fr-errors-instance" model-id="my-summary$fr-error-summary-model">
-                                <errors>
-                                    <error id="first-name-control" full-id="first-name-control" position="31" repeats="" indexes="" label="First name" alert="Invalid first name" binds="first-name-bind"/>
-                                    <error id="note-control" full-id="repeat·1/note-control" position="33" repeats="repeat" indexes="1" label="Note" alert="Invalid note" binds="note-bind"/>
-                                    <error id="note-control" full-id="repeat·2/note-control" position="33" repeats="repeat" indexes="2" label="Note" alert="Invalid note" binds="note-bind"/>
-                                    <error id="note-control" full-id="repeat·3/note-control" position="33" repeats="repeat" indexes="3" label="Note" alert="Invalid note" binds=""/>
-                                    <error id="last-name-control" full-id="last-name-control" position="34" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind"/>
-                                </errors>
-                            </instance>
-                            <instance id="fr-snapshot-instance" model-id="my-summary$fr-error-summary-model">
-                                <errors/>
-                            </instance>
-                            <instance id="fr-visited-instance" model-id="my-summary$fr-error-summary-model">
-                                <controls all="false">last-name-control repeat·3/note-control</controls>
-                            </instance>
-                            <instance id="fr-state-instance" model-id="my-summary$fr-error-summary-model">
-                                <state>
-                                    <!-- Whether errors are shown incrementally or not -->
-                                    <incremental/>
-                                    <!-- Observer element -->
-                                    <observer>my-group</observer>
-                                    <!-- Whether the form is valid or invalid -->
-                                    <valid>false</valid>
-                                    <!-- Number of errors -->
-                                    <errors-count>5</errors-count>
-                                    <!-- Number of visible errors -->
-                                    <visible-errors-count>2</visible-errors-count>
-                                </state>
-                            </instance>
-                        </instances>
-                        <controls>
-                            <control effective-id="my-summary$er" index="2"/>
-                            <control effective-id="repeat" index="2"/>
-                        </controls>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-summary$xf-18" class="xbl-fr-error-summary-observer">my-group</xxf:control>
-                        <xxf:attribute id="my-summary$xf-18" for="my-summary$xf-18" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-summary$body" class="fr-error-summary-body"/>
-                        <xxf:control id="my-summary$xf-107·1" relevant="false"/>
-                        <xxf:attribute id="my-summary$xf-109·1" for="my-summary$xf-108·1" name="href"/>
-                        <xxf:control id="my-summary$xf-110·1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary$xf-111·1" class="fr-error-label" label="Note"/>
-                        <xxf:control id="my-summary$io·1" class="fr-error-row">[3]</xxf:control>
-                        <xxf:control id="my-summary$xf-116·1" class="fr-error-dash">-</xxf:control>
-                        <xxf:control id="my-summary$ao·1" class="fr-error-alert">Invalid note</xxf:control>
-                        <xxf:control id="my-summary$xf-107·2" relevant="false"/>
-                        <xxf:attribute id="my-summary$xf-109·2" for="my-summary$xf-108·2" name="href"/>
-                        <xxf:control id="my-summary$xf-110·2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary$xf-111·2" class="fr-error-label" label="Last name"/>
-                        <xxf:control id="my-summary$io·2" class="fr-error-row" relevant="false"/>
-                        <xxf:control id="my-summary$xf-116·2" class="fr-error-dash">-</xxf:control>
-                        <xxf:control id="my-summary$ao·2" class="fr-error-alert">Invalid last name</xxf:control>
-                        <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" valid="false"/>
-                        <xxf:control id="note-control·1" label="Note" alert="Invalid note" required="true" valid="false"/>
-                        <xxf:control id="note-control·2" label="Note" alert="Invalid note" required="true" valid="false"/>
-                        <xxf:control id="note-control·3" label="Note" alert="Invalid note" required="true" valid="false"/>
-                        <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" required="true" valid="false"/>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
+    <xxf:dynamic-state>
+        <dynamic-state>
+            <instances>
+                <instance id="instance" model-id="model">
+                    <instance>
+                        <first-name/>
+                        <note/>
+                        <note/>
+                        <note/>
+                        <last-name/>
+                    </instance>
+                </instance>
+                <instance id="error-summary-instance" model-id="model">
+                    <error-summary>
+                        <valid>false</valid>
+                        <errors-count>5</errors-count>
+                        <visible-errors-count>2</visible-errors-count>
+                    </error-summary>
+                </instance>
+                <instance id="fr-errors-instance" model-id="my-summary$fr-error-summary-model">
+                    <errors>
+                        <error id="first-name-control" full-id="first-name-control" position="32" repeats="" indexes="" label="First name" alert="Invalid first name" binds="first-name-bind"/>
+                        <error id="note-control" full-id="repeat·1/note-control" position="34" repeats="repeat" indexes="1" label="Note" alert="Invalid note" binds="note-bind"/>
+                        <error id="note-control" full-id="repeat·2/note-control" position="34" repeats="repeat" indexes="2" label="Note" alert="Invalid note" binds="note-bind"/>
+                        <error id="note-control" full-id="repeat·3/note-control" position="34" repeats="repeat" indexes="3" label="Note" alert="Invalid note" binds=""/>
+                        <error id="last-name-control" full-id="last-name-control" position="35" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind"/>
+                    </errors>
+                </instance>
+                <instance id="fr-snapshot-instance" model-id="my-summary$fr-error-summary-model">
+                    <errors/>
+                </instance>
+                <instance id="fr-visited-instance" model-id="my-summary$fr-error-summary-model">
+                    <controls all="false">last-name-control repeat·3/note-control</controls>
+                </instance>
+                <instance id="fr-state-instance" model-id="my-summary$fr-error-summary-model">
+                    <state>
+                        <!-- Whether errors are shown incrementally or not -->
+                        <incremental/>
+                        <!-- Observer element -->
+                        <observer>my-group</observer>
+                        <!-- Whether the form is valid or invalid -->
+                        <valid>false</valid>
+                        <!-- Number of errors -->
+                        <errors-count>5</errors-count>
+                        <!-- Number of visible errors -->
+                        <visible-errors-count>2</visible-errors-count>
+                    </state>
+                </instance>
+            </instances>
+            <controls>
+                <control effective-id="my-summary$er" index="2"/>
+                <control effective-id="repeat" index="2"/>
+            </controls>
+        </dynamic-state>
+    </xxf:dynamic-state>
+    <xxf:action>
+        <xxf:control-values>
+            <xxf:control id="my-summary$xf-19" class="xbl-fr-error-summary-observer">my-group</xxf:control>
+            <xxf:attribute id="my-summary$xf-19" for="my-summary$xf-19" name="style">display: none</xxf:attribute>
+            <xxf:control id="my-summary$body" class="fr-error-summary-body"/>
+            <xxf:control id="my-summary$xf-108·1" relevant="false"/>
+            <xxf:attribute id="my-summary$xf-110·1" for="my-summary$xf-109·1" name="href"/>
+            <xxf:control id="my-summary$xf-111·1" class="fr-error-label" relevant="false"/>
+            <xxf:control id="my-summary$xf-112·1" class="fr-error-label" label="Note"/>
+            <xxf:control id="my-summary$io·1" class="fr-error-row">[3]</xxf:control>
+            <xxf:control id="my-summary$xf-117·1" class="fr-error-dash">-</xxf:control>
+            <xxf:control id="my-summary$ao·1" class="fr-error-alert">Invalid note</xxf:control>
+            <xxf:control id="my-summary$xf-108·2" relevant="false"/>
+            <xxf:attribute id="my-summary$xf-110·2" for="my-summary$xf-109·2" name="href"/>
+            <xxf:control id="my-summary$xf-111·2" class="fr-error-label" relevant="false"/>
+            <xxf:control id="my-summary$xf-112·2" class="fr-error-label" label="Last name"/>
+            <xxf:control id="my-summary$io·2" class="fr-error-row" relevant="false"/>
+            <xxf:control id="my-summary$xf-117·2" class="fr-error-dash">-</xxf:control>
+            <xxf:control id="my-summary$ao·2" class="fr-error-alert">Invalid last name</xxf:control>
+            <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" valid="false"/>
+            <xxf:control id="note-control·1" label="Note" alert="Invalid note" required="true" valid="false"/>
+            <xxf:control id="note-control·2" label="Note" alert="Invalid note" required="true" valid="false"/>
+            <xxf:control id="note-control·3" label="Note" alert="Invalid note" required="true" valid="false"/>
+            <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" required="true" valid="false"/>
+        </xxf:control-values>
+    </xxf:action>
+</xxf:event-response>
         </output>
     </test>
 
     <test description="xforms:setfocus on fr:date" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                 <xhtml:head>
@@ -599,12 +598,12 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-date$xf-6">2010-01-13</xxf:control>
-                        <xxf:control id="my-date$xf-8" class="xbl-fr-date-mindate"/>
-                        <xxf:attribute id="my-date$xf-8" for="my-date$xf-8" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-date$xf-10" class="xbl-fr-date-maxdate"/>
-                        <xxf:attribute id="my-date$xf-10" for="my-date$xf-10" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-date$xf-12" class="xbl-fr-date-pagedate"/>
+                        <xxf:control id="my-date$xf-9" class="xbl-fr-date-mindate"/>
+                        <xxf:attribute id="my-date$xf-9" for="my-date$xf-9" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date$xf-12" class="xbl-fr-date-maxdate"/>
                         <xxf:attribute id="my-date$xf-12" for="my-date$xf-12" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date$xf-15" class="xbl-fr-date-pagedate"/>
+                        <xxf:attribute id="my-date$xf-15" for="my-date$xf-15" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:setfocus control-id="my-date$xf-6"/>
                 </xxf:action>
@@ -613,7 +612,7 @@
     </test>
 
     <test description="xforms:setfocus on fr:currency" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                 <xhtml:head>
@@ -651,11 +650,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency$currency-input" class="xbl-fr-currency-xforms-input fr-hidden">12.34</xxf:control>
-                        <xxf:control id="my-currency$xf-12" class="xbl-fr-currency-prefix"/>
-                        <xxf:attribute id="my-currency$xf-12" for="my-currency$xf-12" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-14" class="xbl-fr-currency-digits-after-decimal"/>
-                        <xxf:attribute id="my-currency$xf-14" for="my-currency$xf-14" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-13" class="xbl-fr-currency-prefix">$</xxf:control>
+                        <xxf:attribute id="my-currency$xf-13" for="my-currency$xf-13" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-16" class="xbl-fr-currency-decimal-separator">.</xxf:control>
+                        <xxf:attribute id="my-currency$xf-16" for="my-currency$xf-16" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-19" class="xbl-fr-currency-grouping-separator">,</xxf:control>
+                        <xxf:attribute id="my-currency$xf-19" for="my-currency$xf-19" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
+                        <xxf:attribute id="my-currency$xf-22" for="my-currency$xf-22" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$number-input" class="xbl-fr-number-xforms-input fr-hidden">$ 12.34</xxf:control>
                     </xxf:control-values>
                     <xxf:script name="my_currency_xf_6_xforms_function" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
                     <xxf:script name="my_currency_xf_sf_xforms_function" target-id="my-currency" observer-id="my-currency"/>
@@ -665,7 +668,7 @@
     </test>
 
     <test description="xforms:setfocus on fr:autocomplete" name="oxf:pipeline">
-        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                 <xhtml:head>
@@ -698,46 +701,46 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>One</value>
-                                    <item>One</item>
-                                    <item>Two</item>
-                                    <item>Three</item>
-                                </instance>
-                            </instance>
-                            <instance id="autocomplete-instance" model-id="my-autocomplete$autocomplete-model">
-                                <autocomplete>
-                                    <readonly>false</readonly>
-                                    <textfield-value/>
-                                </autocomplete>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-autocomplete$xf-5" class="fr-autocomplete-container"/>
-                        <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
-                        <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
-                        <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$xf-16" class="xbl-fr-autocomplete-max-results-displayed"/>
-                        <xxf:attribute id="my-autocomplete$xf-16" for="my-autocomplete$xf-16" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
-                        <xxf:attribute id="my-autocomplete$select1" for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
-                        <xxf:itemset id="my-autocomplete$select1">[["One","One"],["Two","Two"],["Three","Three"],["One","One"],["Two","Two"],["Three","Three"]]</xxf:itemset>
-                        <xxf:control id="my-autocomplete$external-value" class="fr-autocomplete-external-value">One</xxf:control>
-                        <xxf:attribute id="my-autocomplete$external-value" for="my-autocomplete$external-value" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$value-selected" class="fr-autocomplete-value-selected"/>
-                        <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
-                    </xxf:control-values>
-                    <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
-                    <xxf:setfocus control-id="my-autocomplete$search"/>
-                </xxf:action>
-            </xxf:event-response>
+    <xxf:dynamic-state>
+        <dynamic-state>
+            <instances>
+                <instance id="instance" model-id="model">
+                    <instance>
+                        <value>One</value>
+                        <item>One</item>
+                        <item>Two</item>
+                        <item>Three</item>
+                    </instance>
+                </instance>
+                <instance id="autocomplete-instance" model-id="my-autocomplete$autocomplete-model">
+                    <autocomplete>
+                        <readonly>false</readonly>
+                        <textfield-value/>
+                    </autocomplete>
+                </instance>
+            </instances>
+        </dynamic-state>
+    </xxf:dynamic-state>
+    <xxf:action>
+        <xxf:control-values>
+            <xxf:control id="my-autocomplete$xf-5" class="fr-autocomplete-container"/>
+            <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
+            <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
+            <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
+            <xxf:control id="my-autocomplete$xf-17" class="xbl-fr-autocomplete-max-results-displayed"/>
+            <xxf:attribute id="my-autocomplete$xf-17" for="my-autocomplete$xf-17" name="style">display: none</xxf:attribute>
+            <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
+            <xxf:attribute id="my-autocomplete$select1" for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
+            <xxf:itemset id="my-autocomplete$select1">[["One","One"],["Two","Two"],["Three","Three"],["One","One"],["Two","Two"],["Three","Three"]]</xxf:itemset>
+            <xxf:control id="my-autocomplete$external-value" class="fr-autocomplete-external-value">One</xxf:control>
+            <xxf:attribute id="my-autocomplete$external-value" for="my-autocomplete$external-value" name="style">display: none</xxf:attribute>
+            <xxf:control id="my-autocomplete$value-selected" class="fr-autocomplete-value-selected"/>
+            <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
+        </xxf:control-values>
+        <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
+        <xxf:setfocus control-id="my-autocomplete$search"/>
+    </xxf:action>
+</xxf:event-response>
         </output>
     </test>
 

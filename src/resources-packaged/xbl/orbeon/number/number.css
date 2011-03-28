@@ -1,0 +1,3 @@
+.xbl-fr-number { display: inline; }
+.xbl-fr-number input { width: 6em }
+.xbl-fr-number .fr-hidden { display: none } /* for use outside Form Runner */

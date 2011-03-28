@@ -13,17 +13,17 @@
  */
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
 
-    var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "empty")[0];
-    var valueInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "value")[0];
+    var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "empty")[0];
+    var valueInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "value")[0];
     var valueOutput = YAHOO.util.Dom.get("value-output");
-    var doubleInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "double")[0];
-    var prefixStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "prefix-static")[0];
-    var prefixDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "prefix-dynamic")[0];
-    var floatStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-static")[0];
-    var floatDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-dynamic")[0];
-    var floatNoDigitsInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "float-no-digits")[0];
-    var readonlyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "readonly")[0];
-    var largeInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "large")[0];
+    var doubleInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "double")[0];
+    var prefixStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "prefix-static")[0];
+    var prefixDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "prefix-dynamic")[0];
+    var floatStaticInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "float-static")[0];
+    var floatDynamicInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "float-dynamic")[0];
+    var floatNoDigitsInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "float-no-digits")[0];
+    var readonlyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "readonly")[0];
+    var largeInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "large")[0];
 
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -104,7 +104,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 YAHOO.util.UserAction.click(YAHOO.util.Dom.get("change-digits"));
             }, function() {
-                YAHOO.util.Assert.areEqual("$ 123.45", floatDynamicInput.value);
+                YAHOO.util.Assert.areEqual("$ 123.46", floatDynamicInput.value);
             });
         },
         testNoDigits: function() {
@@ -142,6 +142,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.Assert.areEqual("4242", ORBEON.xforms.Controls.getCurrentValue(valueOutput), "1st attempt, value in instance");
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     valueInput.focus();
+                    console.log(valueInput.value);
                     valueInput.value = "$4242";
                     doubleInput.focus();
                 }, function() {
@@ -151,7 +152,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
         testNoPrefix: function() {
-            var noPrefixInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "no-prefix")[0];
+            var noPrefixInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "no-prefix")[0];
             YAHOO.util.Assert.areEqual("42.00", noPrefixInput.value);
         },
         testInRepeat: function() {
@@ -161,7 +162,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     YAHOO.util.UserAction.click(YAHOO.util.Dom.get("repeat-show-hide"));
                 }, function() {
-                    var repeatInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "in-repeat" + XFORMS_SEPARATOR_1 + "1")[0];
+                    var repeatInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "in-repeat" + XFORMS_SEPARATOR_1 + "1")[0];
                     YAHOO.util.Assert.areEqual("$ 42.00", repeatInput.value);
                 });
             });
@@ -169,9 +170,9 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         testClasses: function() {
             var requiredEmptyControl = YAHOO.util.Dom.get("required-empty");
             var requiredEmptyGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredEmptyControl)[0];
-            var requiredEmptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, requiredEmptyGroup)[0];
+            var requiredEmptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, requiredEmptyGroup)[0];
             var emptyControl = YAHOO.util.Dom.get("empty");
-            var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, emptyControl)[0];
+            var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, emptyControl)[0];
 
             var requiredFilledControl = YAHOO.util.Dom.get("required-filled");
             var requiredFilledGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredFilledControl)[0];
@@ -205,7 +206,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
         testSetfocus: function() {
-            var setfocusInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "setfocus")[0];
+            var setfocusInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "setfocus")[0];
             var gotFocus = false;
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 YAHOO.util.Event.addFocusListener(setfocusInput, function() { gotFocus = true; }, this, true);
@@ -224,9 +225,8 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 largeInput.value = "12345678901234567890124";
                 largeInput.blur();
                 emptyInput.focus();
-                YAHOO.util.Assert.areEqual("$ 12,345,678,901,234,567,890,124.00", largeInput.value);
             }, function() {
-                // nop
+                YAHOO.util.Assert.areEqual("$ 12,345,678,901,234,567,890,124.00", largeInput.value);
             });
         }
     }));

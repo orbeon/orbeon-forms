@@ -39,6 +39,16 @@
     <property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value="http://example.org/cool/service"/>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.decimal-separator"           value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.grouping-separator"          value=","/>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                        value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"          value="0"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>
+
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"
               value="document model submission submission-details control event action analysis server html analysis-xbl-tree server-body submission-body"/>
 

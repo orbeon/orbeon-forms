@@ -1,0 +1,123 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:script src="/xbl/orbeon/number/number.js"/>
+    <xbl:binding id="fr-number" element="fr|number">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Number</display-name>
+            <display-name lang="fr">Nombre</display-name>
+            <display-name lang="ru">[Number]</display-name>
+            <icon lang="en">
+                <!-- TODO: icons -->
+                <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
+            </icon>
+            <datatype>xforms:decimal</datatype>
+            <template>
+                 <fr:number>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </fr:number>
+            </template>
+        </metadata>
+        
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/number/number.css"/>
+        </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
+                <xxforms:script id="xf-sf">YAHOO.xbl.fr.Number.instance(this).setfocus();</xxforms:script>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+                <xsl:template match="/*">
+                    <!-- Outer group -->
+                    <xforms:group xbl:attr="model context ref bind" class="{{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}" xxbl:scope="outer">
+                        <xbl:content includes="xforms|label"/>
+
+                        <!-- Init event -->
+                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.Number.instance(this).init();</xxforms:script>
+                        <xxforms:script ev:event="xforms-disabled" ev:target="#observer">YAHOO.xbl.fr.Number.instance(this).destroy();</xxforms:script>
+
+                        <!-- Inner group -->
+                        <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+
+                            <!-- Variable pointing to external single-node binding -->
+                            <xxforms:variable name="result" as="node()?">
+                                <xxforms:sequence select="." xxbl:scope="outer"/>
+                            </xxforms:variable>
+
+                            <!-- Access to parameters -->
+                            <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'decimal-separator')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/> 
+
+                            <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
+                            <!--<xsl:copy-of select="xxbl:parameter(., 'picture')"/>-->
+
+                            <xxforms:variable name="picture-string" select="concat('#,###', if (xs:integer($digits-after-decimal) gt 0) then '.' else '', substring('0000000000', 1, xs:integer($digits-after-decimal)))"/>
+
+                            <!--<xforms:output value="$picture-string"/>-->
+
+                            <!-- Access to XForms value and change event -->
+                            <xforms:input ref="$result" id="number-input" class="xbl-fr-number-xforms-input fr-hidden"
+                                    xxforms:format="if (. castable as xs:decimal)
+                                          then concat(normalize-space($prefix),
+                                                      if (normalize-space($prefix)) then ' ' else '',
+                                                      translate(format-number(xs:decimal(.), $picture-string), ',.', concat($grouping-separator, $decimal-separator)))
+                                          else $result"
+                                    xxforms:unformat="replace(
+                                          replace(., concat('[\s', $grouping-separator, ']'), ''),
+                                          concat('^', string-join(for $p in string-to-codepoints($prefix) return concat('[', codepoints-to-string($p), ']'), '')),
+                                          '')">
+
+                                <!-- [\^$.|?*+() -->
+
+                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved">YAHOO.xbl.fr.Number.instance(this).update();</xxforms:script>
+                                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Number.instance(this).readonly();</xxforms:script>
+                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Number.instance(this).readwrite();</xxforms:script>
+                            </xforms:input>
+
+                            <!-- The visible HTML input -->
+                            <xhtml:input class="xbl-fr-number-visible-input xbl-html-input" xbl:attr="tabindex tabindex=navindex"/>
+
+                            <!-- Stop propagation of all local UI events -->
+                            <xforms:action ev:event="#all" ev:propagate="stop"/>
+                        </xforms:group>
+                        <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
+                    </xforms:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

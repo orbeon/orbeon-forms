@@ -137,6 +137,7 @@
         <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
         <!-- Open start area -->
         <xforms:toggle case="fb-publish-dialog-message-start"/>
+        <xforms:setfocus control="fb-publish-dialog"/>
     </xforms:action>
 
     <!-- Local model -->

@@ -899,7 +899,7 @@ public class XMLUtils {
     public static void parseDocumentFragment(String fragment, XMLReceiver xmlReceiver) throws SAXException {
         if (fragment.indexOf("<") != -1 || fragment.indexOf("&") != -1) {
             try {
-                final XMLReader xmlReader = newSAXParser().getXMLReader();
+                final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
                 xmlReader.setContentHandler(new XMLFragmentReceiver(xmlReceiver));
                 xmlReader.parse(new InputSource(new StringReader("<root>" + fragment + "</root>")));
             } catch (IOException e) {
@@ -1204,7 +1204,7 @@ public class XMLUtils {
         }
         return newAttributes;
     }
-    
+
     public static AttributesImpl removeAttribute(Attributes attributes, String uri, String localname) {
         final AttributesImpl newAttributes = new AttributesImpl();
         for (int i = 0; i < attributes.getLength(); i++) {

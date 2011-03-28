@@ -884,7 +884,7 @@ public class XMLUtils {
 
     public static void parseDocumentFragment(Reader reader, XMLReceiver xmlReceiver) throws SAXException {
         try {
-            final XMLReader xmlReader = newSAXParser().getXMLReader();
+            final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
             xmlReader.setContentHandler(new XMLFragmentReceiver(xmlReceiver));
             final ArrayList<Reader> readers = new ArrayList<Reader>(3);
             readers.add(new StringReader("<root>"));

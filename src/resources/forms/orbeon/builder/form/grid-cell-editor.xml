@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -238,7 +237,7 @@
                 </xforms:output>
             </xforms:group>
             <xforms:group ref=".[not($is-component)]">
-                <xforms:input id="fb-control-label-control" ref="$resource-holder/label"
+                <xforms:input id="fb-control-label-control" ref="$resource-holder/label" xxforms:autocomplete="off"
                               appearance="fr:in-place" class="fb-control-label">
                     <xforms:hint ref="$form-resources/enter-label/label"/>
                 </xforms:input>
@@ -250,7 +249,7 @@
 
             <!-- Display representation of the control -->
             <xhtml:div class="fb-control-control">
-                <xforms:group ref="xforms:input | xforms:secret">
+                <xforms:group ref="xforms:input | xforms:secret" xxforms:autocomplete="off">
                     <xforms:input ref="$instance-holder"/>
                 </xforms:group>
                 <xforms:group ref="xforms:textarea">
@@ -378,7 +377,7 @@
                 <xforms:output ref="$resource-holder/hint"/>
             </xforms:group>
             <xforms:group ref=".[not($is-component)]">
-                <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint"
+                <xforms:input id="fb-control-hint-control" ref="$resource-holder/hint" xxforms:autocomplete="off"
                               appearance="fr:in-place" class="fb-control-hint">
                     <xforms:hint ref="$form-resources/enter-hint/label"/>
                 </xforms:input>

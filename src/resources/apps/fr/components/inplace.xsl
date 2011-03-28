@@ -69,7 +69,7 @@
                                 <xsl:if test="@tabindex | @navindex">
                                     <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
                                 </xsl:if>
-                                <xsl:apply-templates select="@incremental"/>
+                                <xsl:apply-templates select="@incremental | @xxforms:autocomplete"/>
                                 <xforms:toggle ev:event="DOMActivate" case="fr-inplace-{@id}-view"/>
                             </xforms:input>
                             <xhtml:span class="fr-inplace-buttons">

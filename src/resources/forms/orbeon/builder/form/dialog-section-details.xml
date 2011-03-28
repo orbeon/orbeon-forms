@@ -162,9 +162,6 @@
         <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $section-name]" as="element(xforms:bind)"/>
         <xforms:setvalue ref="$instance/relevant" value="$bind/@relevant"/>
         <xforms:setvalue ref="$instance/readonly" value="$bind/@readonly"/>
-
-        <!-- Set focus when the dialog open  -->
-        <xforms:setfocus control="fb-section-name-input"/>
     </xforms:action>
 
     <xforms:model id="fb-section-details-model">

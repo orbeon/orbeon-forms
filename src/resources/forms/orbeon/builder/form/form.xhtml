@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -87,9 +86,6 @@
         <xxforms:dialog id="fb-editor-metadata-dialog" close="false">
             <xforms:label value="$form-resources/messages/metadata-title"/>
 
-            <!-- Set initial focus (this should probably be automatically handled by the XForms engine) -->
-            <xforms:setfocus ev:event="xxforms-dialog-open" control="fb-editor-metadata-dialog"/>
-
             <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
             <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
             <xhtml:div>
@@ -123,7 +119,7 @@
                         <!-- Use an input if app name is a wildcard -->
                         <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                         <xforms:group ref=".[$is-input]">
-                            <xforms:input ref="application-name" id="fb-application-name-input" tabindex="1">
+                            <xforms:input ref="application-name" id="fb-application-name-input" tabindex="1" xxforms:autocomplete="off">
                                 <xforms:label ref="$form-resources/application-name/label"/>
                                 <xforms:hint ref="$form-resources/application-name/hint"/>
                                 <xforms:alert ref="$form-resources/application-name/alert"/>
@@ -141,7 +137,7 @@
                         </xforms:group>
 
                         <!-- Form name -->
-                        <xforms:input ref="form-name" id="fb-form-name-input" tabindex="2">
+                        <xforms:input ref="form-name" id="fb-form-name-input" tabindex="2" xxforms:autocomplete="off">
                             <xforms:label ref="$form-resources/form-name/label"/>
                             <xforms:hint ref="$form-resources/form-name/hint"/>
                             <xforms:alert ref="$form-resources/form-name/alert"/>

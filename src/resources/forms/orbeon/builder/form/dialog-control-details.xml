@@ -133,9 +133,6 @@
 
         <xxforms:variable name="control" select="$body//*[@id = concat(event('control-name'), '-control')]"/>
         <xforms:setvalue ref="classes" value="$control/@class"/>
-
-        <!-- Set focus when the dialog open  -->
-        <xforms:setfocus control="fb-edit-details-control-name-input"/>
     </xforms:action>
 
     <!-- Local model -->

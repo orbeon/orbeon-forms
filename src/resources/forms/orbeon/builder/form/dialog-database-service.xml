@@ -168,9 +168,6 @@
                 <xforms:setvalue ref="$instance/query" value="substring-before(substring-after(saxon:serialize($sql-query/sql:query, xxforms:instance('fr-xsl-output-instance')), '>'), '&lt;/sql:query>')"/>
             </xforms:action>
         </xforms:action>
-
-        <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-database-service-dialog"/>
     </xforms:action>
 
     <!-- Model for the submission editor -->

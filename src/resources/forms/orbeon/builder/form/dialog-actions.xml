@@ -300,9 +300,6 @@
             <xforms:setvalue ref="$instance/initial-name" value="$binding-name"/>
             <xforms:insert nodeset="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
         </xforms:action>
-
-        <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-action-dialog"/>
     </xforms:action>
 
     <!-- Model for the bindings editor -->

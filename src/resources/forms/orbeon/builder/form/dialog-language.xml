@@ -85,6 +85,5 @@
     <!-- Clear selection list when the dialog opens -->
     <xforms:action ev:event="xxforms-dialog-open">
         <xforms:setvalue ref="$variables/new-language"/>
-        <xforms:setfocus control="fb-add-language-select1"/>
     </xforms:action>
 </xxforms:dialog>

@@ -335,9 +335,6 @@
             <xforms:setvalue ref="$instance/request/username" value="$submission/@xxforms:username"/>
             <xforms:setvalue ref="$instance/request/password" value="$submission/@xxforms:password"/>
         </xforms:action>
-
-        <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-service-name-input"/>
     </xforms:action>
 
     <!-- Model for the service editor -->

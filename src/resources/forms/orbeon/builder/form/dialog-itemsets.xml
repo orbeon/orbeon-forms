@@ -134,7 +134,7 @@
         <!-- Start with current language -->
         <xforms:setvalue ref="$itemset-lang" value="$fb-lang"/>
 
-        <!-- Set focus when the dialog open  -->
+        <!-- Set focus on input rather than button when the dialog open  -->
         <xforms:setfocus control="fb-itemset-label-input"/>
     </xforms:action>
 

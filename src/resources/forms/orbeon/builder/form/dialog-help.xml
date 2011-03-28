@@ -65,7 +65,6 @@
         <xxforms:variable name="instance" select="instance('fb-edit-help-instance')" as="element()"/>
         <xforms:setvalue ref="$instance/result-path" value="event('fb:node')/saxon:path()"/>
         <xforms:setvalue ref="$instance/help-text" value="event('fb:node')"/>
-        <xforms:setfocus control="fb-edit-help-dialog-text"/>
     </xforms:action>
 
     <xforms:model id="fb-edit-help-model">

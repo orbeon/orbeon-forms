@@ -1875,9 +1875,9 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event type="xxforms-dialog-open" target="my-dialog" indexes=""/>
                                     <event type="xforms-enabled" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>
+                                    <event type="xxforms-dialog-open" target="my-dialog" indexes=""/>
                                     <event type="xxforms-dialog-close" target="my-dialog" indexes=""/>
                                     <event type="xforms-disabled" target="input1" indexes=""/>
                                     <event type="xforms-disabled" target="input2" indexes=""/>

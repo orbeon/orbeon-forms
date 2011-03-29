@@ -32,17 +32,18 @@
         <!-- Summary page XForms model -->
         <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
 
-            <!-- NOTE: This test is duplicated in other places -->
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
-            <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
+            
+            <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
+            <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
+
+            <!-- NOTE: This test is duplicated in other places -->
+            <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'"/>
 
             <xxforms:variable name="has-roles" select="xxforms:instance('fr-roles-instance')/has-roles = 'true'" as="xs:boolean"/>
             <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xxforms:variable name="form-query" select="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xxforms:variable name="initial-app-value" select="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
-
-            <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
-            <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
 
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
@@ -64,7 +65,7 @@
                     <xforms:insert nodeset="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
                 </xforms:action>
                 <!-- Update to current language -->
-                <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>
+                <xforms:dispatch name="fr-update-language" targetid="fr-resources-model"/>
 
                 <!-- Set page size -->
                 <xxforms:variable name="page-size" select="instance('fr-search-instance')/page-size" as="element(page-size)"/>
@@ -101,6 +102,7 @@
                     <view/>
                     <pdf/>
                     <delete/>
+                    <import/>
                 </triggers>
             </xforms:instance>
 
@@ -113,25 +115,11 @@
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
             <xforms:action ev:event="fr-summary-create">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/new{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+                <xforms:load resource="/fr/{$app}/{$form}/new{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
-
-            <!-- Currently unused -->
-            <!--<xforms:action ev:event="fr-summary-edit">-->
-                <!--<xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/edit/{normalize-space(instance('fr-selection-instance'))}/{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank"/>-->
-            <!--</xforms:action>-->
 
             <xforms:action ev:event="fr-summary-view" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/view/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
-            </xforms:action>
-
-            <xforms:action ev:event="fr-summary-test">
-                <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/test/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}" xxforms:target="_blank" xxforms:show-progress="false"/>
-            </xforms:action>
-
-            <xforms:action ev:event="fr-summary-xml">
-                <!-- TODO -->
-                <!--<xforms:load resource="abc" f:url-type="resource"/>-->
+                <xforms:load resource="/fr/{$app}/{$form}/view/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
             </xforms:action>
 
             <!-- Instance to track search results and paging -->
@@ -225,7 +213,7 @@
             <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
 
-                <xforms:dispatch name="get-source-form-submission-done" target="fr-form-model"/>
+                <xforms:dispatch name="get-source-form-submission-done" targetid="fr-form-model"/>
 
                 <xxforms:variable name="summary-elements" as="element()*"
                                   select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
@@ -314,7 +302,7 @@
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
             <xforms:submission id="search-submission"
                     ref="instance('fr-search-instance')" validate="false"
-                    method="post" resource="{xxforms:instance('fr-provider-instance')/data/uri}/search/{$parameters/app}/{$parameters/form}"
+                    method="post" resource="{xxforms:instance('fr-provider-instance')/data/uri}/search/{$app}/{$form}"
                     replace="instance" instance="fr-summary-instance">
                 <xi:include href="../includes/persistence/headers-authentication.xml"/>
                 <xi:include href="../includes/persistence/headers-data.xml"/>
@@ -322,36 +310,13 @@
                 <xforms:action ev:event="xforms-submit">
                     <xforms:setvalue ref="lang" value="xxforms:instance('fr-language-instance')"/>
                 </xforms:action>
-                <!-- Handle offline mode -->
-                <!--<xxforms:script ev:event="xforms-submit-done">-->
-                    <!--if (ORBEON.xforms.Document.isOfflineAvailable()) {-->
-                        <!--var noFormDataDiv = ORBEON.util.Dom.get("fr-no-form-data");-->
-                        <!--// If the table is empty, skip this-->
-                        <!--if (YAHOO.util.Dom.hasClass(noFormDataDiv, "xforms-disabled")) {-->
-                            <!--var summaryIndex = 1;-->
-                            <!--while (true) {-->
-                                <!--// Check if there is an item at this index; otherwise stop.-->
-                                <!--var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + summaryIndex;-->
-                                <!--if (ORBEON.util.Dom.get(nameControlId) == null) break;-->
-                                <!--// Get URL for edit page of this form-->
-                                <!--var name = ORBEON.xforms.Document.getValue(nameControlId);-->
-                                <!--var url = window.location.href + "/" + name + "/edit";-->
-                                <!--// Store in instance if this form is offline or not-->
-                                <!--var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + summaryIndex;-->
-                                <!--var isOffline = ORBEON.xforms.Document.isFormOffline(url);-->
-                                <!--ORBEON.xforms.Document.setValue(offlineControlId, isOffline ? "true" : "false");-->
-                                <!--summaryIndex++;-->
-                            <!--}-->
-                        <!--}-->
-                    <!--}-->
-                <!--</xxforms:script>-->
             </xforms:submission>
 
         </xforms:model>
     </head>
     <body>
         <!-- Whether this is the summary page for the form builder -->
-        <xxforms:variable name="is-form-builder" select="$parameters/app = 'orbeon' and $parameters/form = 'builder'"/>
+        <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'"/>
         <fr:view>
             <xforms:label>Orbeon Form Runner</xforms:label>
             <fr:body>
@@ -613,7 +578,7 @@
 
                                         <!-- Document name and href for edition -->
                                         <xxforms:variable name="document-name" select="@name" as="xs:string"/>
-                                        <xxforms:variable name="document-href" select="concat('/fr/', $parameters/app, '/', $parameters/form, '/edit/',
+                                        <xxforms:variable name="document-href" select="concat('/fr/', $app, '/', $form, '/edit/',
                                                 $document-name, if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
 
                                         <tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
@@ -779,7 +744,7 @@
                                     </xforms:label>
                                     <!-- TODO: add hints to buttons -->
                                     <!--<xforms:hint>Create a new form</xforms:hint>-->
-                                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-create"/>
+                                    <xforms:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
                                 </fr:button>
                             </xforms:group>
                             <!-- Print button -->
@@ -794,7 +759,7 @@
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Assertion: only one document selected -->
                                         <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
-                                        <xforms:dispatch target="fr-form-model" name="fr-summary-view"/>
+                                        <xforms:dispatch targetid="fr-form-model" name="fr-summary-view"/>
                                     </xforms:action>
                                 </fr:button>
                             </xforms:group>
@@ -803,7 +768,7 @@
 
                                 <!-- Create the link so that the URL gets rewritten -->
                                 <xhtml:a style="display:none" class="fr-summary-pdf-anchor" target="_blank" f:url-type="resource"
-                                         href="/fr/{$parameters/app}/{$parameters/form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxforms:instance('fr-language-instance')}"/>
+                                         href="/fr/{$app}/{$form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxforms:instance('fr-language-instance')}"/>
 
                                 <!-- In script mode, intercept client-side click and open window directly -->
                                 <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
@@ -820,25 +785,46 @@
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
                                     </xforms:label>
 
-                                    <!-- Only call submission directly in noscript mode and if only one document selected -->
+                                    <!-- Only load directly in noscript mode and if only one document selected -->
                                     <xforms:action ev:event="DOMActivate"
-                                                   if="property('xxforms:noscript')and count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
-                                        <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxforms:instance('fr-language-instance')}"
+                                                   if="property('xxforms:noscript') and count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
+                                        <xforms:load resource="/fr/{$app}/{$form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxforms:instance('fr-language-instance')}"
                                                      xxforms:show-progress="false" f:url-type="resource"/>
                                     </xforms:action>
                                 </fr:button>
                             </xforms:group>
                             <!-- Test button -->
                             <xforms:group ref="if (. = 'test') then instance('fr-summary-triggers-instance')/view else ()">
+
+                                <!-- Create the link so that the URL gets rewritten -->
+                                <xhtml:a style="display:none" class="fr-summary-test-anchor" target="_blank" f:url-type="resource"
+                                         href="/fr/{$app}/{$form}/test/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
+
+                                <!-- In script mode, intercept client-side click and open window directly -->
+                                <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
+                                    var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
+                                    YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
+                                        var a = YAHOO.util.Dom.getElementsByClassName("fr-summary-test-anchor", null, group)[0];
+                                        window.open(a.href, a.target)
+                                    }, this);
+                                </xxforms:script>
+
                                 <fr:button ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="" title="Test Form"/>
                                         <xhtml:span>Test</xhtml:span>
                                     </xforms:label>
+                                    <!-- Only load directly in noscript mode and if only one document selected -->
+                                    <xforms:action ev:event="DOMActivate"
+                                                   if="property('xxforms:noscript') and count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
+                                        <xforms:load resource="/fr/{$app}/{$form}/test/{normalize-space(instance('fr-selection-instance'))}{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"
+                                                     xxforms:show-progress="false" f:url-type="resource"/>
+                                    </xforms:action>
+
                                     <xforms:action ev:event="DOMActivate">
                                         <!-- Assertion: only one document selected -->
                                         <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
-                                        <xforms:dispatch target="fr-form-model" name="fr-summary-test"/>
+                                        <xforms:dispatch targetid="fr-form-model" name="fr-summary-test"/>
                                     </xforms:action>
                                 </fr:button>
                             </xforms:group>
@@ -851,6 +837,33 @@
                                     </xforms:label>
                                     <!-- Open delete confirmation dialog -->
                                     <xforms:dispatch ev:event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
+                                </fr:button>
+                            </xforms:group>
+                            <!-- Import button -->
+                            <xforms:group ref="if (. = 'import') then instance('fr-summary-triggers-instance')/import else ()">
+
+                                <!-- Create the link so that the URL gets rewritten -->
+                                <xhtml:a style="display:none" class="fr-summary-import-anchor" target="_blank" f:url-type="resource"
+                                         href="/fr/{$app}/{$form}/import"/>
+
+                                <!-- In script mode, intercept client-side click and open window directly -->
+                                <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
+                                    var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
+                                    YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
+                                        var a = YAHOO.util.Dom.getElementsByClassName("fr-summary-import-anchor", null, group)[0];
+                                        window.open(a.href, a.target)
+                                    }, this);
+                                </xxforms:script>
+
+                                <fr:button ref=".">
+                                    <xforms:label>
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/up_16.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$fr-resources/summary/labels/import-forms"/></xhtml:span>
+                                    </xforms:label>
+                                    <!-- Only load directly in noscript mode -->
+                                    <xforms:action ev:event="DOMActivate" if="property('xxforms:noscript')">
+                                        <xforms:load resource="/fr/{$app}/{$form}/import" xxforms:show-progress="false" f:url-type="resource"/>
+                                    </xforms:action>
                                 </fr:button>
                             </xforms:group>
                         </xhtml:span>
@@ -867,7 +880,7 @@
                             <!-- Parse the selected rows -->
                             <xforms:action xxforms:iterate="tokenize(instance('fr-selection-instance'), '\s+')">
                                 <xxforms:variable name="document-name" select="." as="xs:string"/>
-                                <xforms:dispatch name="fr-delete-data" target="fr-persistence-model">
+                                <xforms:dispatch name="fr-delete-data" targetid="fr-persistence-model">
                                     <xxforms:context name="document-id" select="$document-name"/>
                                 </xforms:dispatch>
                             </xforms:action>

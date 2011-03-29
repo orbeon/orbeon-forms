@@ -1,0 +1,473 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xh:head>
+        <xh:style>
+            .fr-status-icons { display: none }
+            .fb-import-warning { color: #DF731B; display: block }
+            .fb-import-success { color: green; display: block }
+            .fb-import-error { color: red; display: block }
+        </xh:style>
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:submission-poll-delay="2000">
+
+            <xf:action ev:event="xforms-ready" type="xpath">
+                xxf:set-session-attribute('org.orbeon.fr.import.total', ()),
+                xxf:set-session-attribute('org.orbeon.fr.import.processed', ()),
+                xxf:set-session-attribute('org.orbeon.fr.import.skipped', ()),
+                xxf:set-session-attribute('org.orbeon.fr.import.cancel', ())
+            </xf:action>
+
+            <xxf:var name="app" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/app)"/>
+            <xxf:var name="form" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/form)"/>
+
+            <!-- Main data -->
+            <xf:instance id="fr-form-instance">
+                <wizard current="1">
+                    <upload>
+                        <file mediatype="" filename="" size=""/>
+                        <validating>false</validating>
+                    </upload>
+                    <import>
+                        <importing>false</importing>
+                    </import>
+                    <confirm tab="" previous=""/>
+                </wizard>
+            </xf:instance>
+
+            <xf:bind ref="instance()">
+                <xf:bind ref="upload">
+                    <xf:bind ref="file"/>
+                </xf:bind>
+                <xf:bind ref="import">
+                    <xf:bind ref="@import-button" readonly="../importing = 'true'" relevant="not($import-done)"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Validation and import status -->
+            <xxf:var name="validation-done" context="instance('fr-validation-result')" value="exists(*)"/>
+            <xxf:var name="validation-canceled" context="instance('fr-validation-result')" value="$validation-done and total != processed"/>
+
+            <xxf:var name="import-done" context="instance('fr-import-result')" value="exists(*)"/>
+            <xxf:var name="import-canceled" context="instance('fr-import-result')" value="$import-done and total != processed"/>
+
+            <xf:instance id="fr-validation-result">
+                <dummy/>
+            </xf:instance>
+
+            <xf:instance id="fr-import-result">
+                <dummy/>
+            </xf:instance>
+
+            <xf:submission id="fr-import-validate-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
+                           action="/fr/service/{$app}/{$form}/validate" replace="instance" instance="fr-validation-result">
+                <!-- Reset stats -->
+                <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
+                    <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
+                    <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                </xf:action>:setvalue>
+
+                <!-- Flag indicating we are validating -->
+                <xf:setvalue ev:event="xforms-submit" ref="instance()/upload/validating">true</xf:setvalue>
+                <xf:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="instance()/upload/validating">false</xf:setvalue>
+                <xf:message ev:event="xforms-submit-error">An error occurred while validating the data.</xf:message>
+
+                <xf:send ev:event="xforms-submit-done" context="instance('fr-validation-result')" if="total = processed" submission="search-submission"/>
+            </xf:submission>
+
+            <xf:submission id="fr-import-import-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
+                           action="/fr/service/{$app}/{$form}/import" replace="instance" instance="fr-import-result">
+                <!-- Reset stats -->
+                <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
+                    <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
+                    <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                </xf:action>
+
+                <!-- Flag indicating we are importing -->
+                <xf:setvalue ev:event="xforms-submit" ref="instance()/import/importing">true</xf:setvalue>
+                <xf:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="instance()/import/importing">false</xf:setvalue>
+                <xf:message ev:event="xforms-submit-error">An error occurred while importing the data.</xf:message>
+            </xf:submission>
+
+            <!-- Statistics gathered upon polling event -->
+            <xf:instance id="fr-batch-stats">
+                <stats>
+                    <total>0</total>
+                    <processed>0</processed>
+                    <succeeded>0</succeeded>
+                    <progress/>
+                    <start-time/>
+                    <eta/>
+                </stats>
+            </xf:instance>
+
+            <xf:bind ref="instance('fr-batch-stats')">
+                <xf:bind ref="progress" calculate="if (../total != 0) then xs:decimal(../processed) div xs:decimal(../total) else 0"/>
+                <xf:bind ref="start-time" calculate="if (. = '' and ../total != 0) then current-dateTime() else ."/>
+                <xf:bind ref="eta" calculate="if (../start-time != '' and ../processed != 0 and xs:decimal(../progress) != 0) then
+                    (current-dateTime() - xs:dateTime(../start-time)) * ((1.0 - ../progress) div ../progress) else ''"/>
+            </xf:bind>
+
+            <!-- Update progress upon poll event -->
+            <xf:action context="instance('fr-batch-stats')"
+                       if="xs:boolean(instance()/upload/validating) or xs:boolean(instance()/import/importing)"
+                       ev:event="xxforms-poll" ev:observer="#document">
+                <xf:setvalue ref="total" value="xxf:get-session-attribute('org.orbeon.fr.import.total')"/>
+                <xf:setvalue ref="processed" value="xxf:get-session-attribute('org.orbeon.fr.import.processed')"/>
+                <xf:setvalue ref="succeeded" value="xxf:get-session-attribute('org.orbeon.fr.import.succeeded')"/>
+            </xf:action>
+
+            <!-- Search request -->
+            <xf:instance id="fr-search-request">
+                <search>
+                    <!-- Application name -->
+                    <app/>
+                    <!-- Form name -->
+                    <form/>
+                    <!-- Free text search query -->
+                    <query/>
+                    <!-- Paging -->
+                    <page-size>1</page-size>
+                    <page-number>1</page-number>
+                    <!-- Sorting -->
+                    <sort-key/>
+                    <!-- Language -->
+                    <lang/>
+                </search>
+            </xf:instance>
+
+            <!-- Search response -->
+            <xf:instance id="fr-search-response"><dummy/></xf:instance>
+
+            <!-- Search submission -->
+            <xf:submission id="search-submission"
+                    ref="instance('fr-search-request')" validate="false"
+                    method="post" resource="{xxf:instance('fr-provider-instance')/data/uri}/search/{$app}/{$form}"
+                    replace="instance" instance="fr-search-response">
+                <xi:include href="../includes/persistence/headers-authentication.xml"/>
+                <xi:include href="../includes/persistence/headers-data.xml"/>
+                <!-- Set language upon submitting -->
+                <xf:action ev:event="xforms-submit">
+                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
+                </xf:action>
+            </xf:submission>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata xmlns="">
+                    <application-name>orbeon</application-name>
+                    <form-name>runner</form-name>
+                    <title>Orbeon Form Runner</title>
+                    <description>Orbeon Form Runner is the start page for all your forms.</description>
+                    <author>Orbeon, Inc.</author>
+                    <logo mediatype="" filename="" size=""/>
+                </metadata>
+            </xf:instance>
+
+            <!-- Standard Form Runner resources instance -->
+            <xf:instance id="fr-form-resources">
+                <resources xmlns=""/>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <!--<xf:label>Orbeon Form Runner - Import</xf:label>-->
+            <fr:body>
+
+                <xf:action ev:event="DOMActivate" ev:observer="next-button">
+                    <xf:setvalue ref="instance()/@current" value="xs:integer(instance()/@current) + 1"/>
+                    <xf:refresh/>
+                    <xf:dispatch name="fr-toggle" targetid="import-step-{instance()/@current}"/>
+                </xf:action>
+
+                <xf:action ev:event="DOMActivate" ev:observer="previous-button">
+                    <xf:setvalue ref="instance()/@current" value="xs:integer(instance()/@current) - 1"/>
+                    <xf:refresh/>
+                    <xf:dispatch name="fr-toggle" targetid="import-step-{instance()/@current}"/>
+                </xf:action>
+
+                <xf:action ev:event="DOMActivate" ev:observer="next-button" if="instance()/@current = 1">
+                    <xf:action type="application/xpath">
+                        xxf:set-session-attribute('org.orbeon.fr.import.total', ()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.processed', ()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.succeeded', ()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.cancel', ())
+                    </xf:action>
+                </xf:action>
+
+                <fr:section id="upload-validate-section" ref="instance()/upload">
+                    <xf:label>Selection and validation</xf:label>:label>
+
+                    <xxf:var name="tab" value="."/>
+                    <xxf:var name="validating" value="xs:boolean($tab/validating)"/>
+
+                    <fr:grid columns="3">
+                        <xf:group ref="$tab/file[not(normalize-space())]">
+                            <fr:tr>
+                                <fr:td colspan="3">
+                                    <xf:upload ref=".">
+                                        <xf:label>Select a file to import:</xf:label>
+                                        <xf:hint>File can be an Excel 2007 (.xlsx) or a plain zip archive of XML documents</xf:hint>
+                                        <xf:alert/>
+
+                                        <xf:filename ref="@filename"/>
+                                        <xf:mediatype ref="@mediatype"/>
+                                        <xxf:size ref="@size"/>
+
+                                        <!-- Start validation once the file is uploaded -->
+                                        <xf:send ev:event="xxforms-upload-done" submission="fr-import-validate-submission"/>
+
+                                    </xf:upload>
+
+                                </fr:td>
+                            </fr:tr>
+                        </xf:group>
+
+                        <xf:group ref="$tab/file[normalize-space()]">
+                            <fr:tr>
+                                <fr:td>
+                                    <xf:output ref="@filename">
+                                        <xf:label>File name:</xf:label>
+                                    </xf:output>
+                                </fr:td>
+                                <fr:td>
+                                    <xf:output value="format-number(@size, '#,###')">
+                                        <xf:label>Size:</xf:label>
+                                    </xf:output>
+                                </fr:td>
+                            </fr:tr>
+                        </xf:group>
+
+                        <xf:group ref=".[$validating]">
+
+                            <fr:tr>
+                                <fr:td>
+                                    <!-- Progress status -->
+                                    <xf:output value="format-number(instance('fr-batch-stats')/progress, '###%')">
+                                        <xf:label>Validating:</xf:label>
+                                    </xf:output>
+                                </fr:td>
+                                <fr:td>
+                                    <xf:output value="for $ds in instance('fr-batch-stats')/eta return
+                                                      if ($ds castable as xs:dayTimeDuration)
+                                                        then for $d in xs:dayTimeDuration($ds) return
+                                                          xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
+                                                                             (hours-from-duration($d), minutes-from-duration($d), round(seconds-from-duration($d))))
+                                                        else '-'">
+                                        <xf:label>ETA</xf:label>
+                                    </xf:output>
+                                </fr:td>
+                                <fr:td>
+                                    <!-- Cancel validation -->
+                                    <fr:button>
+                                        <xf:label>Cancel</xf:label>
+                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                            xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
+                                        </xf:action>
+                                    </fr:button>
+                                </fr:td>
+                                <fr:td/>
+                            </fr:tr>
+                        </xf:group>
+
+                        <!-- Validation results when available -->
+                        <xf:group context="instance('fr-validation-result')" ref=".[$validation-done]">
+                            <!-- Validation results -->
+
+                            <xxf:var name="invalid" value="xs:integer(processed) - succeeded"/>
+                            <xxf:var name="some-invalid" value="$invalid gt 0"/>
+
+                            <!-- No invalid documents -->
+                            <xf:group ref=".[not($some-invalid) and not($validation-canceled)]">
+                                <fr:tr>
+                                    <fr:td colspan="2">
+                                        <xh:span class="fb-import-success">
+                                            <xf:output value="xxf:format-message(
+                                                                '{0,number,integer} {0,choice,1#document|1&lt;documents}  {0,choice,1#has|1&lt;have} been validated and will be imported.',
+                                                                xs:integer(processed)
+                                                              )"/>
+                                        </xh:span>
+                                    </fr:td>
+                                </fr:tr>
+                            </xf:group>
+                            <!-- Warn user if there is any invalid documents -->
+                            <xf:group ref=".[$some-invalid and not($validation-canceled)]">
+                                <fr:tr>
+                                    <fr:td colspan="2">
+                                        <xh:span class="fb-import-warning">
+                                            <xf:output value="xxf:format-message(
+                                                                'NOTE: {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid. Only valid documents will be imported.',
+                                                                for $n in ($invalid, processed) return xs:integer($n)
+                                                              )"/>
+                                        </xh:span>
+                                    </fr:td>
+                                </fr:tr>
+                            </xf:group>
+                            <!-- Case where validation was canceled -->
+                            <xf:group ref=".[$validation-canceled]">
+                                <fr:tr>
+                                    <fr:td colspan="2">
+                                        <xh:span class="fb-import-warning">
+                                            Validation was canceled. You can upload a new file to start over, or cancel the import.
+                                        </xh:span>
+                                    </fr:td>
+                                </fr:tr>
+                            </xf:group>
+                        </xf:group>
+                    </fr:grid>
+
+                </fr:section>
+                <fr:section id="import-section" ref="instance()/import[$validation-done and not($validation-canceled)]">
+                    <xf:label>Import</xf:label>
+
+                    <fr:grid columns="3">
+
+                        <xxf:var name="tab" value="."/>
+
+                        <xxf:var name="searched" context="instance('fr-search-response')" value="exists(self::documents)"/>
+                        <xxf:var name="importing" value="xs:boolean($tab/importing)"/>
+
+                        <xf:group ref=".[$searched]">
+
+                            <xxf:var name="existing" value="xs:integer(instance('fr-search-response')/@total)"/>
+
+                            <xf:group ref=".[not($importing or $import-done)]">
+                                <xf:group ref=".[$existing gt 0]">
+                                    <fr:tr>
+                                        <fr:td>
+                                            <xf:output value="xxf:format-message(
+                                                                'There {0,choice,1#is|1&lt;are} {0,number,integer}
+                                                                 existing {0,choice,1#document|1&lt;documents} in the database for form
+                                                                 {1}/{2}.',
+                                                                ($existing, $app, $form)
+                                                              )"/>
+                                            Please choose whether to add to existing data, or to delete existing data first.
+                                        </fr:td>
+                                    </fr:tr>
+                                    <fr:tr>
+                                        <fr:td>
+                                            <!-- Start import -->
+                                            <fr:button>
+                                                <xf:label>Add</xf:label>
+                                                <xf:action ev:event="DOMActivate">
+                                                    <xf:send submission="fr-import-import-submission"/>
+                                                </xf:action>
+                                            </fr:button>
+                                            <fr:button>
+                                                <xf:label>Delete</xf:label>
+                                                <!-- TODO -->
+                                            </fr:button>
+                                        </fr:td>
+                                    </fr:tr>
+                                </xf:group>
+                                <xf:group ref=".[$existing le 0]">
+                                    <fr:tr>
+                                        <fr:td>
+                                            <fr:button>
+                                                <xf:label>Import</xf:label>
+                                                <xf:action ev:event="DOMActivate">
+                                                    <xf:send submission="fr-import-import-submission"/>
+                                                </xf:action>
+                                            </fr:button>
+                                        </fr:td>
+                                    </fr:tr>
+                                </xf:group>
+                            </xf:group>
+
+                            <xf:group ref=".[$importing]">
+
+                                <fr:tr>
+                                    <fr:td>
+                                        <xf:output value="format-number(if (instance('fr-batch-stats')/total != 0)
+                                                            then xs:decimal(instance('fr-batch-stats')/processed) div xs:decimal(instance('fr-batch-stats')/total)
+                                                            else 0, '###%')">
+                                            <xf:label>Importing:</xf:label>
+                                        </xf:output>
+                                    </fr:td>
+                                    <fr:td>
+                                        <xf:output value="for $ds in instance('fr-batch-stats')/eta return
+                                                          if ($ds castable as xs:dayTimeDuration)
+                                                            then for $d in xs:dayTimeDuration($ds) return
+                                                              xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
+                                                                                 (hours-from-duration($d), minutes-from-duration($d), round(seconds-from-duration($d))))
+                                                            else '-'">
+                                            <xf:label>ETA</xf:label>
+                                        </xf:output>
+                                    </fr:td>
+                                    <fr:td>
+                                        <!-- Cancel import -->
+                                        <fr:button>
+                                            <xf:label>Cancel</xf:label>
+                                            <xf:action ev:event="DOMActivate" type="xpath">
+                                                xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
+                                            </xf:action>
+                                        </fr:button>
+                                    </fr:td>
+                                </fr:tr>
+                            </xf:group>
+
+                            <!-- Validation results when available -->
+                            <xf:group context="instance('fr-import-result')" ref=".[$import-done]">
+                                <!-- Validation results -->
+
+                                <xxf:var name="skipped" value="xs:integer(processed) - succeeded"/>
+
+                                <xf:group ref=".[not($import-canceled)]">
+                                    <fr:tr>
+                                        <fr:td colspan="2">
+                                            <xh:span class="fb-import-success">
+                                                <xf:output value="xxf:format-message(
+                                                                    'Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete.
+                                                                     {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.',
+                                                                    (xs:integer(succeeded), $skipped)
+                                                                  )"/>
+                                            </xh:span>
+                                        </fr:td>
+                                    </fr:tr>
+                                </xf:group>
+                                <!-- Case where validation was canceled -->
+                                <xf:group ref=".[$import-canceled]">
+                                    <fr:tr>
+                                        <fr:td colspan="2">
+                                            <xh:span class="fb-import-warning">
+                                                Import was canceled. You can upload a new file to start over.
+                                            </xh:span>
+                                        </fr:td>
+                                    </fr:tr>
+                                </xf:group>
+
+                            </xf:group>
+                        </xf:group>
+                    </fr:grid>
+                </fr:section>
+
+                <!--<fr:xforms-inspector/>-->
+
+            </fr:body>
+            <fr:buttons>
+                <fr:close-button/>
+            </fr:buttons>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -70,7 +70,7 @@
             </messages>
             <labels>
                 <new-form>New</new-form>
-                <import-forms>Import Forms</import-forms>
+                <import-forms>Import</import-forms>
                 <edit-form>Edit</edit-form>
                 <delete-form>Delete</delete-form>
                 <view-readonly>View HTML</view-readonly>
@@ -392,7 +392,7 @@
             </messages>
             <labels>
                 <new-form>Nuevo</new-form><!-- Formulario -->
-                <import-forms>Importar Formulario</import-forms>
+                <import-forms>Importar</import-forms>
                 <edit-form>Editar</edit-form><!-- Formulario -->
                 <delete-form>Eliminar</delete-form><!-- Formulario -->
                 <view-readonly>Ver HTML</view-readonly>
@@ -554,7 +554,7 @@
             </messages>
             <labels>
                 <new-form>Nytt skjema</new-form>
-                <import-forms>Importer skjema</import-forms>
+                <import-forms>Importer</import-forms>
                 <edit-form>Rediger</edit-form>
                 <delete-form>Slett</delete-form>
                 <view-readonly>Vis HTML</view-readonly>
@@ -720,7 +720,7 @@
             </messages>
             <labels>
                 <new-form>Новая</new-form>
-                <import-forms>Импорт форм</import-forms>
+                <import-forms>Импорт</import-forms>
                 <edit-form>Редактировать</edit-form>
                 <delete-form>Удалить</delete-form>
                 <view-readonly>Просмотр HTML</view-readonly>

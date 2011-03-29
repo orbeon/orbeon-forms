@@ -53,7 +53,6 @@
                 <xhtml:body/>
             </xhtml:html>
         </p:input>
-        <p:input name="namespace"><request><container-namespace/></request></p:input>
         <p:input name="data"><null xsi:nil="true"/></p:input>
         <p:input name="instance" href="#instance"/>
         <p:output name="document" id="binary-document"/>

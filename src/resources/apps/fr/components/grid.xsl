@@ -33,14 +33,14 @@
                 <xhtml:div class="fr-grid fr-grid-{@columns}-columns{ if (@class) then concat(' ', @class) else ()}">
                     <!-- Grid content -->
                     <xsl:apply-templates select="xhtml:* except xforms:label" mode="grid-content"/>
-                    <xsl:apply-templates select="fr:* except xforms:label"/>
+                    <xsl:apply-templates select="(fr:* | xforms:* | xxforms:*) except xforms:label"/>
                 </xhtml:div>
             </xsl:when>
             <xsl:otherwise>
                 <xhtml:table class="fr-grid fr-grid-{@columns}-columns{ if (@class) then concat(' ', @class) else ()}">
                     <!-- Grid content -->
                     <xsl:apply-templates select="xhtml:* except xforms:label" mode="grid-content"/>
-                    <xsl:apply-templates select="fr:* except xforms:label"/>
+                    <xsl:apply-templates select="(fr:* | xforms:* | xxforms:*) except xforms:label"/>
                 </xhtml:table>
             </xsl:otherwise>
         </xsl:choose>

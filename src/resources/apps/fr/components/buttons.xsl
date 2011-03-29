@@ -171,7 +171,6 @@
         <fr:button xxforms:modal="true" id="fr-workflow-review-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-review">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                <!--<xhtml:span>→ </xhtml:span>-->
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-review"/></xhtml:span>
             </xforms:label>
         </fr:button>
@@ -181,7 +180,6 @@
         <fr:button xxforms:modal="true" id="fr-workflow-edit-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-edit">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
-                <!--<xhtml:span>← </xhtml:span>-->
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-edit"/></xhtml:span>
             </xforms:label>
         </fr:button>
@@ -191,7 +189,6 @@
         <fr:button xxforms:modal="true" id="fr-workflow-send-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-send">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                <!--<xhtml:span>→ </xhtml:span>-->
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>
             </xforms:label>
         </fr:button>

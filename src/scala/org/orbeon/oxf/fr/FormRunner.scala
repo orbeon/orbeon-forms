@@ -47,7 +47,7 @@ object FormRunner {
                     if lowerSuffix != "uri"
                     upperSuffix = lowerSuffix split '-' map (_.capitalize) mkString "-"
                     headerName = "Orbeon-" + upperSuffix
-                    headerValue = propertySet.getString(propertyName)
+                    headerValue = propertySet.getObject(propertyName).toString
                 } yield
                     <header><name>{XMLUtils.escapeXMLMinimal(headerName)}</name><value>{XMLUtils.escapeXMLMinimal(headerValue)}</value></header>
             }</headers>.toString

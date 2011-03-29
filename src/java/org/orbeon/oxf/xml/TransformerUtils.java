@@ -493,6 +493,7 @@ public class TransformerUtils {
     public static String dom4jToString(Document document) {
         try {
             final Transformer identity = getXMLIdentityTransformer();
+            identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             final StringBuilderWriter writer = new StringBuilderWriter();
             identity.transform(new LocationDocumentSource(document), new StreamResult(writer));
             return writer.toString();
@@ -507,6 +508,7 @@ public class TransformerUtils {
     public static String tinyTreeToString(NodeInfo nodeInfo) {
         try {
             final Transformer identity = getXMLIdentityTransformer();
+            identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             final StringBuilderWriter writer = new StringBuilderWriter();
             identity.transform(nodeInfo, new StreamResult(writer));
             return writer.toString();

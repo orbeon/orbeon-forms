@@ -49,6 +49,15 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>
 
+    <property as="xs:string"  name="oxf.fr.persistence.provider.cities.*.form"              value="provider1"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider1.city-uri"                  value="http://en.wikipedia.org/wiki/Mexico_City"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider1.city-name"                 value="Mexico City"/>
+    <property as="xs:integer" name="oxf.fr.persistence.provider1.population"                value="8851080"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.cities.*.data"              value="provider2"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.provider2.city-uri"                  value="http://en.wikipedia.org/wiki/S%C3%A3o_Paulo"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider2.city-name"                 value="São Paulo"/>
+    <property as="xs:integer" name="oxf.fr.persistence.provider2.population"                value="11244369"/>
+
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"
               value="document model submission submission-details control event action analysis server html analysis-xbl-tree server-body submission-body"/>
 

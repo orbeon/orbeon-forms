@@ -38,7 +38,7 @@
             <!-- Mark data as dirty upon insert/delete -->
             <xforms:setvalue ev:event="xforms-insert xforms-delete" ref="instance('control-instance')/dirty">true</xforms:setvalue>
 
-            <xforms:submission id="save-submission" method="post" replace="none" resource="test:">
+            <xforms:submission id="save-submission" method="post" replace="none" resource="echo:">
                 <!-- Mark data as clean when submission completes -->
                 <xforms:setvalue ev:event="xforms-submit-done" ref="instance('control-instance')/dirty">false</xforms:setvalue>
             </xforms:submission>

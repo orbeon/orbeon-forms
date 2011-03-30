@@ -711,7 +711,7 @@
                                                 </xforms:instance>
 
                                                 <xforms:submission id="replace-submission"
-                                                                   ref="instance('new-instance')" method="post" resource="test:"
+                                                                   ref="instance('new-instance')" method="post" resource="echo:"
                                                                    replace="instance" instance="initial-instance"
                                                                    xxforms:readonly="false"/>
 
@@ -3836,7 +3836,7 @@
                         <xforms:instance id="instance">
                             <item/>
                         </xforms:instance>
-                        <xforms:submission id="my-submission" method="get" action="test:" replace="instance"/>
+                        <xforms:submission id="my-submission" method="get" action="echo:" replace="instance"/>
                     </xforms:model>
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">

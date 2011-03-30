@@ -41,7 +41,7 @@
             <xforms:bind nodeset="instance('download')" type="xs:base64Binary"/>
             <xforms:bind nodeset="instance('upload')" type="xs:base64Binary"/>
             <xforms:submission id="upload-submission" ref="instance('upload')" validate="false"
-                               relevant="false" method="post" replace="none" resource="test:">
+                               relevant="false" method="post" replace="none" resource="echo:">
                 <xforms:insert ev:event="xforms-submit-done" nodeset="instance('main-instance')"
                                origin="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary(instance('upload')), 'UTF-8'))"/>
             </xforms:submission>

@@ -66,7 +66,7 @@
                                <r4/>
                            </instance>
                         </xforms:instance>
-                        <xforms:submission id="test-submission" ref="instance('new-instance')" action="test:"
+                        <xforms:submission id="test-submission" ref="instance('new-instance')" action="echo:"
                                            replace="instance" instance="main-instance" method="post"/>
 
                         <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
@@ -171,7 +171,7 @@
                         <xforms:bind nodeset="required-but-emtpy-element" required="true()"/>
                         <xforms:bind nodeset="other-element/@required-but-emtpy-attribute" required="true()"/>
 
-                        <xforms:submission id="test-submission" method="post" action="test:" replace="instance">
+                        <xforms:submission id="test-submission" method="post" action="echo:" replace="instance">
                             <xforms:setvalue ev:event="xforms-submit-error" ref="submission-result">error</xforms:setvalue>
                             <xforms:setvalue ev:event="xforms-submit-done" ref="submission-result">done</xforms:setvalue>
                             <xforms:setvalue ev:event="xforms-submit-serialize" ref="submission-serialized">true</xforms:setvalue>
@@ -225,7 +225,7 @@
                         </xforms:instance>
 
                         <xforms:submission id="replace-submission"
-                                           ref="instance('new-instance')" method="post" resource="test:"
+                                           ref="instance('new-instance')" method="post" resource="echo:"
                                            replace="instance" instance="initial-instance"
                                            xxforms:readonly="true"/>
 
@@ -1309,7 +1309,7 @@
                             <!-- TODO: case of serialization="none" -->
                         </xforms:action>
 
-                        <xforms:submission id="calculate-norebuild" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="calculate-norebuild" ref="instance()" method="post" resource="echo:"
                                            replace="instance" instance="response-calculate-norebuild"
                                            validate="false" relevant="false">
 
@@ -1325,7 +1325,7 @@
                             </xforms:action>
                         </xforms:submission>
 
-                        <xforms:submission id="calculate-rebuild" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="calculate-rebuild" ref="instance()" method="post" resource="echo:"
                                            replace="instance" instance="response-calculate-rebuild"
                                            validate="false" relevant="false">
 
@@ -1339,7 +1339,7 @@
                             </xforms:action>
                         </xforms:submission>
 
-                        <xforms:submission id="nocalculate-norebuild1" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="nocalculate-norebuild1" ref="instance()" method="post" resource="echo:"
                                            replace="instance" instance="response-nocalculate-norebuild1"
                                            validate="false" relevant="false" xxforms:calculate="false">
 
@@ -1355,7 +1355,7 @@
                             </xforms:action>
                         </xforms:submission>
 
-                        <xforms:submission id="nocalculate-norebuild2" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="nocalculate-norebuild2" ref="instance()" method="post" resource="echo:"
                                            replace="instance" instance="response-nocalculate-norebuild2"
                                            validate="false" relevant="false" xxforms:calculate="false">
 
@@ -1486,7 +1486,7 @@
                             <!-- TODO: case of serialization="none" -->
                         </xforms:action>
 
-                        <xforms:submission id="validate-norebuild" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="validate-norebuild" ref="instance()" method="post" resource="echo:"
                                            replace="none" validate="true" relevant="false" xxforms:calculate="false">
 
                             <xforms:action ev:event="xforms-submit">
@@ -1504,7 +1504,7 @@
                             </xforms:action>
                         </xforms:submission>
 
-                        <xforms:submission id="validate-rebuild" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="validate-rebuild" ref="instance()" method="post" resource="echo:"
                                            replace="none" validate="true" relevant="false" xxforms:calculate="false">
 
                             <xforms:action ev:event="xforms-submit">
@@ -1520,7 +1520,7 @@
                             </xforms:action>
                         </xforms:submission>
 
-                        <xforms:submission id="novalidate-norebuild1" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="novalidate-norebuild1" ref="instance()" method="post" resource="echo:"
                                            replace="none" validate="false" relevant="false" xxforms:calculate="false">
 
                             <xforms:action ev:event="xforms-submit">
@@ -1538,7 +1538,7 @@
                             </xforms:action>
                         </xforms:submission>
 
-                        <xforms:submission id="novalidate-norebuild2" ref="instance()" method="post" resource="test:"
+                        <xforms:submission id="novalidate-norebuild2" ref="instance()" method="post" resource="echo:"
                                            replace="none" validate="false" relevant="false" xxforms:calculate="false">
 
                             <xforms:action ev:event="xforms-submit">

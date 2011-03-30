@@ -155,6 +155,9 @@
 
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.tabview.tab-changes-context"          value="true"/>
 
+    <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.max-characters"     value="60"/>
+    <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.tolerance"          value="20"/>
+
     <!-- Automatically search for XBL components in fr:* namespace -->
     <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon"                          value="http://orbeon.org/oxf/xml/form-runner"/>
 

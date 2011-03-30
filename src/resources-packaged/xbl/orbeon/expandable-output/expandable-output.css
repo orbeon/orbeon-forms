@@ -1,0 +1,32 @@
+/**
+ * Copyright (C) 2011 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+.xbl-fr-expandable-output {
+    display: inline-block;          /* Counteract the display: block on the trigger so the component is inline */
+    *display: inline; *zoom: 1;     /* Same as the previous line for IE 6/7 */
+    vertical-align: top;            /* Top-align the content of the block within the block */
+}
+
+.xbl-fr-expandable-output-output {
+    display: inline-block;          /* Must be inline block so we can constrain the output width */
+    *display: inline; zoom: 1;      /* Same as the previous line for IE 6/7 */
+    width: 20em;                    /* A default constraint on max width of the text */
+}
+
+.xbl-fr-expandable-output .xforms-label {
+    vertical-align: top;            /* Top-align the label, so it is aligned with the top of the text output */
+}
+
+.xbl-fr-expandable-output-output .xforms-trigger {
+    display: block;                 /* Put trigger on a new line after the text output */
+}

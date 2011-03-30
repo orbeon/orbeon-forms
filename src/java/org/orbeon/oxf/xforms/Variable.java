@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -68,7 +69,7 @@ public class Variable {
             this.valueElement = sequenceElement;
         }
 
-        this.selectAttribute = valueElement.attributeValue(XFormsConstants.SELECT_QNAME);
+        this.selectAttribute = VariableAnalysis.valueOrSelectAttribute(valueElement);
     }
 
     private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext) {

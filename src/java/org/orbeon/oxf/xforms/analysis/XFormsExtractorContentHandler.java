@@ -263,7 +263,6 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         final boolean isExtension = metadata.isXBLBinding(uri, localname);
         final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
 
-
         // Handle outer xml:base and xml:lang
         if (!inXFormsOrExtension) {
             final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");

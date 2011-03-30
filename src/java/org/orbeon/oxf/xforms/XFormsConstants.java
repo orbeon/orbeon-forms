@@ -43,6 +43,7 @@ public class XFormsConstants {
     static {
         // TODO: Keeping this static list is not ideal
         ALLOWED_XXFORMS_ELEMENTS.add("dialog");
+        ALLOWED_XXFORMS_ELEMENTS.add("var");
         ALLOWED_XXFORMS_ELEMENTS.add("variable");
         ALLOWED_XXFORMS_ELEMENTS.add("sequence");
         ALLOWED_XXFORMS_ELEMENTS.add("attribute");
@@ -173,9 +174,11 @@ public class XFormsConstants {
     public enum DeploymentType { separate, integrated, standalone}
 
     // Variables
-    public static final String XXFORMS_VARIABLE_NAME = "variable"; // don't use QName so we can support exforms/xxforms/xforms
-    public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
+    public static final QName XXFORMS_VAR_QNAME = new QName("var", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_VARIABLE_QNAME = new QName("variable", XXFORMS_NAMESPACE);
+    public static final QName XFORMS_VAR_QNAME = new QName("var", XFORMS_NAMESPACE);
+    public static final QName XFORMS_VARIABLE_QNAME = new QName("variable", XFORMS_NAMESPACE);
+    public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
     public static final QName XXFORMS_SEQUENCE_QNAME = new QName("sequence", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);

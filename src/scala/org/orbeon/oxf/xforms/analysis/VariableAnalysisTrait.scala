@@ -29,7 +29,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait wi
     override val canHoldValue = true // TODO: not clear that this is useful at this point, see who calls this
 
     override def computeValueAnalysis = {
-
+    
         element.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME) match {
             case sequenceElement: Element =>
                 // Value is provided by nested xxf:sequence/@select
@@ -38,17 +38,14 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait wi
                 val sequenceScope = getChildElementScope(sequenceElement)
 
                 val sequenceAnalysis = new SimpleElementAnalysis(staticStateContext, sequenceElement, Some(VariableAnalysisTrait.this), None, sequenceScope) {
-                    override protected def computeValueAnalysis = {
-                        Some(element.attributeValue(XFormsConstants.SELECT_QNAME) match {
-                            case selectAttribute: String =>
-                                // Value is provided by @select
-                                analyzeXPath(getChildrenContext, selectAttribute)
-                            case _ =>
-                                // Value is constant
-                                StringAnalysis()
-                                // TODO: store constant value?
+
+                    override protected def computeValueAnalysis =
+                        Some(VariableAnalysis.valueOrSelectAttribute(element) match {
+                            // @value or @select
+                            case value: String => analyzeXPath(getChildrenContext, value)
+                            // Value is constant
+                            case _ => StringAnalysis() // TODO: store constant value?
                         })
-                    }
 
                     // If in same scope as xxf:variable, in-scope variables are the same as xxf:variable because we don't
                     // want the variable defined by xxf:variable to be in-scope for xxf:sequence. Otherwise, use
@@ -70,15 +67,24 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with ContainerTrait wi
                 sequenceAnalysis.getValueAnalysis
             case _ =>
                 // No nested xxf:sequence element
-                Some(element.attributeValue(XFormsConstants.SELECT_QNAME) match {
-                    case selectAttribute: String =>
-                        // Value is provided by @select
-                        analyzeXPath(getChildrenContext, selectAttribute)
-                    case _ =>
-                        // Value is constant
-                        StringAnalysis()
-                        // TODO: store constant value?
+                Some(VariableAnalysis.valueOrSelectAttribute(element) match {
+                    // @value or @select
+                    case value: String => analyzeXPath(getChildrenContext, value)
+                    // Value is constant
+                    case _ => StringAnalysis() // TODO: store constant value?
                 })
         }
     }
+}
+
+object VariableAnalysis {
+
+    def valueOrSelectAttribute(element: Element) = {
+        val select = element.attributeValue(XFormsConstants.SELECT_QNAME)
+        if (select ne null) select else element.attributeValue(XFormsConstants.VALUE_QNAME)
+    }
+
+    def isVariableElement(element: Element) =
+        element.getName == XFormsConstants.XXFORMS_VAR_QNAME.getName ||
+            element.getName == XFormsConstants.XXFORMS_VARIABLE_QNAME.getName
 }

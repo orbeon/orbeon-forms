@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
@@ -463,7 +464,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 listener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 listener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
-            } else if (currentControlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
+            } else if (VariableAnalysis.isVariableElement(currentControlElement)) {
                 // Handle xxforms:variable as a leaf control
 
                 listener.pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);

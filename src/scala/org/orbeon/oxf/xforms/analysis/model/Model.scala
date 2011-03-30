@@ -69,11 +69,11 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     val defaultInstanceStaticId = if (hasInstances) instances.head._1 else null
     val defaultInstancePrefixedId = Option(if (hasInstances) scope.getFullPrefix + defaultInstanceStaticId else null)
 
+    // Get *:variable/*:var elements
+    val variableElements: JList[Element] = Dom4jUtils.elements(element) filter (VariableAnalysis.isVariableElement(_))
+
     // Handle variables
     val variablesSeq: Seq[VariableAnalysisTrait] = {
-
-        // Get xxf:variable, exf:variable and xf:variable (in fact *:variable) elements
-        val variableElements = Dom4jUtils.elements(element) filter (_.getName == XXFORMS_VARIABLE_NAME)
 
         // NOTE: For now, all top-level variables in a model are visible first, then only are binds variables visible.
         // In the future, we might want to change that to use document order between variables and binds, but some

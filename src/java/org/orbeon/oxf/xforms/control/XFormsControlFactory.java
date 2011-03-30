@@ -77,6 +77,9 @@ public class XFormsControlFactory {
         BUILTIN_CONTROLS.addAll(CORE_CONTROLS);
 
         BUILTIN_CONTROLS.add(XFormsConstants.XXFORMS_VARIABLE_QNAME);
+        BUILTIN_CONTROLS.add(XFormsConstants.XXFORMS_VAR_QNAME);
+        BUILTIN_CONTROLS.add(XFormsConstants.XFORMS_VARIABLE_QNAME);
+        BUILTIN_CONTROLS.add(XFormsConstants.XFORMS_VAR_QNAME);
         BUILTIN_CONTROLS.add(XFormsConstants.EXFORMS_VARIABLE_QNAME);
 
         MANDATORY_SINGLE_NODE_CONTROLS.addAll(CORE_VALUE_CONTROLS);
@@ -204,6 +207,21 @@ public class XFormsControlFactory {
             }
         });
         nameToClassMap.put(XFormsConstants.XXFORMS_VARIABLE_QNAME, new Factory() {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+                return new XXFormsVariableControl(container, parent, element, name, effectiveId);
+            }
+        });
+        nameToClassMap.put(XFormsConstants.XXFORMS_VAR_QNAME, new Factory() {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+                return new XXFormsVariableControl(container, parent, element, name, effectiveId);
+            }
+        });
+        nameToClassMap.put(XFormsConstants.XFORMS_VARIABLE_QNAME, new Factory() {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+                return new XXFormsVariableControl(container, parent, element, name, effectiveId);
+            }
+        });
+        nameToClassMap.put(XFormsConstants.XFORMS_VAR_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
                 return new XXFormsVariableControl(container, parent, element, name, effectiveId);
             }

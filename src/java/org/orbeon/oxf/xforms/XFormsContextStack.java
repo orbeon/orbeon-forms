@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
@@ -132,7 +133,7 @@ public class XFormsContextStack {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
         // All variables in the model are in scope for the nested binds and actions.
-        final List<Element> elements = Dom4jUtils.elements(xformsModel.getStaticModel().element(), XFormsConstants.XXFORMS_VARIABLE_NAME);
+        final List<Element> elements = xformsModel.getStaticModel().variableElements();
         final List<BindingContext.VariableInfo> variableInfos
                 = addAndScopeVariables(propertyContext, xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
 
@@ -157,8 +158,7 @@ public class XFormsContextStack {
         List<BindingContext.VariableInfo> variableInfos = null;
         final XBLBindings bindings = containingDocument.getStaticState().getXBLBindings();
         for (Element currentElement: elements) {
-            final String currentElementName = currentElement.getName();
-            if (currentElementName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
+            if (VariableAnalysis.isVariableElement(currentElement)) {
                 // Create variable object
                 final Variable variable = new Variable(container, this, currentElement);
 

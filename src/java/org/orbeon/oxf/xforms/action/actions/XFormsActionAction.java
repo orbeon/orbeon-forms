@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -44,9 +44,8 @@ public class XFormsActionAction extends XFormsAction {
         final List<Element> currentVariableElements = new ArrayList<Element>();
         for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
             final Element currentActionElement = (Element) i.next();
-            final String currentActionName = currentActionElement.getName();
 
-            if (currentActionName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
+            if (VariableAnalysis.isVariableElement(currentActionElement)) {
                 // Remember variable element
                 currentVariableElements.add(currentActionElement);
             } else {

@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.common.OXFException
+
 object ControlAnalysisFactory {
 
     def create(staticStateContext: StaticStateContext, parent: ContainerTrait, preceding: ElementAnalysis,
@@ -36,7 +37,7 @@ object ControlAnalysisFactory {
                 new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope)
             case XFORMS_SELECT_QNAME | XFORMS_SELECT1_QNAME =>
                 new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ValueTrait with SelectionControl
-            case XXFORMS_VARIABLE_QNAME | EXFORMS_VARIABLE_QNAME =>
+            case XXFORMS_VARIABLE_QNAME | XXFORMS_VAR_QNAME | XFORMS_VARIABLE_QNAME | XFORMS_VAR_QNAME | EXFORMS_VARIABLE_QNAME =>
                 new VariableControl(staticStateContext, controlElement, parent, Option(preceding), scope)
             case XXFORMS_ATTRIBUTE_QNAME =>
                 new AttributeControl(staticStateContext, controlElement, parent, Option(preceding), scope)

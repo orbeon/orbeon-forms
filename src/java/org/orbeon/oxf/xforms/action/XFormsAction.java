@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -54,9 +55,9 @@ public abstract class XFormsAction {
             if (name == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
 
-            final String select = currentContextInfo.attributeValue(XFormsConstants.SELECT_QNAME);
-            if (select == null)
-                throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"select\" attribute.");
+            final String valueOrSelect = VariableAnalysis.valueOrSelectAttribute(currentContextInfo);
+            if (valueOrSelect == null)
+                throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"value\" or \"select\" attribute.");
 
             // Set context on context element
             final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
@@ -65,7 +66,7 @@ public abstract class XFormsAction {
             // Evaluate context parameter
             final SequenceExtent value = XPathCache.evaluateAsExtent(propertyContext,
                     actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                    select, actionInterpreter.getNamespaceMappings(currentContextInfo),
+                    valueOrSelect, actionInterpreter.getNamespaceMappings(currentContextInfo),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                     contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)), null,
                     (LocationData) currentContextInfo.getData());

@@ -1173,7 +1173,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 handleControlsStatic(controlElementVisitorListener, currentElement, (ContainerTrait) currentElementAnalysis);
             } else if (XFormsControlFactory.isCoreControl(currentElement.getNamespaceURI(), elementName)
                     || xblBindings.isComponent(currentElement.getQName())
-                    || elementName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)
+                    || VariableAnalysis.isVariableElement(currentElement)
                     || (XFormsControlFactory.isLHHA(currentElement.getNamespaceURI(), elementName) && currentElement.attribute(XFormsConstants.FOR_QNAME) != null)) {
                 // Handle core control, component, variable, and external LHHA
                 currentElementAnalysis = controlElementVisitorListener.startVisitControl(currentElement, containerTrait, currentElementAnalysis, elementStaticId);

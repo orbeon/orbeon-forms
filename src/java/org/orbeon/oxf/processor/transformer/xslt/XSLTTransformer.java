@@ -37,9 +37,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.Controller;
-import org.orbeon.saxon.FeatureKeys;
+import org.orbeon.saxon.*;
 import org.orbeon.saxon.event.ContentHandlerProxyLocator;
 import org.orbeon.saxon.event.MessageEmitter;
 import org.orbeon.saxon.event.SaxonOutputKeys;
@@ -54,6 +52,7 @@ import org.orbeon.saxon.sxpath.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.*;
 
+import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -61,11 +60,11 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -102,68 +101,105 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     }
 
     @Override
-    public ProcessorOutput createOutput(String name) {
+    public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new CacheableTransformerOutputImpl(XSLTTransformer.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+                makeSureStateIsSet(pipelineContext);
 
-                // Get URI references from cache
-                final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
-                final URIReferences uriReferences = getURIReferences(pipelineContext, configKeyValidity);
+                final XSLTTransformerState state = (XSLTTransformerState) getState(pipelineContext);
 
-                // Get transformer from cache
-                TemplatesInfo templatesInfo = null;
-                if (uriReferences != null) {
-                    // FIXME: this won't depend on the transformer input.
-                    final KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
-                    if (stylesheetKeyValidity != null)
-                        templatesInfo = (TemplatesInfo) ObjectCache.instance()
-                                .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
-                }
+                if (!state.hasTransformationRun) {
 
-                // Get transformer attributes if any
-                Map<String, Boolean> attributes = null;
-                {
-                    // Read attributes input only if connected
-                    if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
-                        // Read input as an attribute Map and cache it
-                        attributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
-                            public Object read(PipelineContext context, ProcessorInput input) {
-                                final Document preferencesDocument = readInputAsDOM4J(context, input);
-                                final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
-                                final PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                                return propertySet.getObjectMap();
-                            }
-                        });
+                    state.hasTransformationRun = true;
+
+                    // Get URI references from cache
+                    final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                    final URIReferences uriReferences = getURIReferences(pipelineContext, configKeyValidity);
+
+                    // Get transformer from cache
+                    TemplatesInfo templatesInfo = null;
+                    if (uriReferences != null) {
+                        // FIXME: this won't depend on the transformer input.
+                        final KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
+                        if (stylesheetKeyValidity != null)
+                            templatesInfo = (TemplatesInfo) ObjectCache.instance()
+                                    .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
+                    }
+
+                    // Get transformer attributes if any
+                    Map<String, Boolean> attributes = null;
+                    {
+                        // Read attributes input only if connected
+                        if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
+                            // Read input as an attribute Map and cache it
+                            attributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                                public Object read(PipelineContext context, ProcessorInput input) {
+                                    final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                    final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
+                                    final PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                    return propertySet.getObjectMap();
+                                }
+                            });
+                        }
+                    }
+
+                    // Output location mode
+                    final String outputLocationMode = getPropertySet().getString(OUTPUT_LOCATION_MODE_PROPERTY, OUTPUT_LOCATION_MODE_DEFAULT);
+                    final boolean isDumbOutputLocation = OUTPUT_LOCATION_DUMB.equals(outputLocationMode);
+                    final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
+                    if (isSmartOutputLocation) {
+                        // Create new HashMap as we don't want to change the one in cache
+                        attributes = (attributes == null) ? new HashMap<String, Boolean>() : new HashMap<String, Boolean>(attributes);
+                        // Set attributes for Saxon source location
+                        attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
+                        attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
+                    }
+
+                    // Create transformer if we did not find one in cache
+                    if (templatesInfo == null) {
+                        // Get transformer configuration
+                        final Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER);
+                        final String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
+                        // Create transformer
+                        // NOTE: createTransformer() handles its own exceptions
+                        templatesInfo = createTransformer(pipelineContext, transformerClass, attributes);
+                    }
+
+                    // At this point, we have a templatesInfo, so run the transformation
+
+                    // Find which receiver to use
+                    final XMLReceiver outputReceiver;
+                    if (name.equals(OUTPUT_DATA)) {
+                        // The first output called is the main output: output directly
+                        outputReceiver = xmlReceiver;
+                    } else {
+                        // The first output called is not the main output: store main result
+                        final SAXStore store = new SAXStore();
+                        state.addOutputDocument(OUTPUT_DATA, store);
+                        outputReceiver = store;
+
+                        // First output will stream out
+                        state.setFirstXMLReceiver(name, xmlReceiver);
+                    }
+
+                    runTransformer(pipelineContext, outputReceiver, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
+                } else {
+                    // Transformation has run already, replay output
+                    if (state.outputDocuments == null)
+                        throw new OXFException("Attempt to read non-existing output: " + name);
+                    try {
+                        final SAXStore outputStore = state.outputDocuments.get(name);
+                        if (outputStore == null)
+                            throw new OXFException("Attempt to read non-existing output: " + name);
+                        outputStore.replay(xmlReceiver);
+                        state.outputDocuments.remove(name);
+                    } catch (SAXException e) {
+                        throw new OXFException(e);
                     }
                 }
-
-                // Output location mode
-                final String outputLocationMode = getPropertySet().getString(OUTPUT_LOCATION_MODE_PROPERTY, OUTPUT_LOCATION_MODE_DEFAULT);
-                final boolean isDumbOutputLocation = OUTPUT_LOCATION_DUMB.equals(outputLocationMode);
-                final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
-                if (isSmartOutputLocation) {
-                    // Create new HashMap as we don't want to change the one in cache
-                    attributes = (attributes == null) ? new HashMap<String, Boolean>() : new HashMap<String, Boolean>(attributes);
-                    // Set attributes for Saxon source location
-                    attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
-                    attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
-                }
-
-                // Create transformer if we did not find one in cache
-                if (templatesInfo == null) {
-                    // Get transformer configuration
-                    final Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER);
-                    final String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
-                    // Create transformer
-                    // NOTE: createTransformer() handles its own exceptions
-                    templatesInfo = createTransformer(pipelineContext, transformerClass, attributes);
-                }
-
-                // At this point, we have a templatesInfo, so run the transformation
-                runTransformer(pipelineContext, xmlReceiver, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
             }
 
-            private void runTransformer(PipelineContext pipelineContext, final XMLReceiver xmlReceiver, TemplatesInfo templatesInfo,
+            private void runTransformer(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, TemplatesInfo templatesInfo,
                                         Map<String, Boolean> attributes, final boolean dumbOutputLocation, final boolean smartOutputLocation) {
 
                 StringBuilderWriter saxonStringBuilderWriter = null;
@@ -171,6 +207,82 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // Create transformer handler and set output writer for Saxon
                     final StringErrorListener errorListener = new StringErrorListener(logger);
                     final TransformerHandler transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
+
+                    // Set handler for xsl:result-document
+                    if (transformerHandler instanceof TransformerHandlerImpl) {
+                        final TransformerHandlerImpl saxonTransformerHandler = (TransformerHandlerImpl) transformerHandler;
+                        ((Controller) saxonTransformerHandler.getTransformer()).setOutputURIResolver(new OutputURIResolver() {
+                            public Result resolve(String href, String base) throws TransformerException {
+
+                                final String outputName = getProcessorOutputSchemeInputName(href);
+                                if (outputName == null) {
+                                    // Regular URL
+                                    try {
+                                        final URL url = URLFactory.createURL(base, href);
+                                        final StreamResult result;
+                                        if (url.getProtocol().equals("file")) {
+                                            // Special handling of file as URLConnection does not support writing to a file
+                                            result = new StreamResult(new FileOutputStream(new File(url.toURI())));
+                                        } else {
+                                            // Other protocols
+                                            final URLConnection urlConnection = url.openConnection();
+                                            urlConnection.setDoOutput(true);
+                                            result = new StreamResult(urlConnection.getOutputStream());
+                                        }
+                                        result.setSystemId(url.toExternalForm());
+                                        return result;
+                                    } catch (Exception e) {
+                                        throw new OXFException(e);
+                                    }
+                                } else {
+                                    // output:*
+                                    final XSLTTransformerState state = (XSLTTransformerState) getState(pipelineContext);
+
+                                    final XMLReceiver outputReceiver;
+                                    if (outputName.equals(state.firstOutputName)) {
+                                        // Stream through first receiver
+                                        outputReceiver = state.firstXMLReceiver;
+                                    } else {
+                                        // Store
+                                        final SAXStore store = new SAXStore();
+                                        state.addOutputDocument(outputName, store);
+
+                                        outputReceiver = store;
+                                    }
+
+                                    final SAXResult result = new SAXResult(outputReceiver);
+                                    result.setLexicalHandler(outputReceiver);
+                                    result.setSystemId(href);
+
+                                    return result;
+                                }
+                            }
+
+                            public void close(Result result) throws TransformerException {
+                                // Free information from the state
+                                final String outputName = getProcessorOutputSchemeInputName(result.getSystemId());
+                                if (outputName == null) {
+                                    // Regular URL
+                                    if (result instanceof StreamResult) {
+                                        final OutputStream os = ((StreamResult) result).getOutputStream();
+                                        if (os != null)
+                                            try {
+                                                os.close();
+                                            } catch (IOException e) {
+                                                throw new OXFException(e);
+                                            }
+                                    }
+                                } else {
+                                    // output:*
+                                    final XSLTTransformerState state = (XSLTTransformerState) getState(pipelineContext);
+                                    if (outputName.equals(state.firstOutputName)) {
+                                        state.firstOutputName = null;
+                                        state.firstXMLReceiver = null;
+                                    }
+                                }
+                            }
+                        });
+                    }
 
                     final Transformer transformer = transformerHandler.getTransformer();
                     final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
@@ -215,22 +327,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             public void setLocationData(LocationData locationData) {
                                 this.currentLocationData = locationData;
                             }
-                        }
-
-                        // Saxon happens to issue such prefix mappings from time to time. Those
-                        // cause issues later down the chain, and anyway serialize to incorrect XML
-                        // if xmlns:xmlns="..." gets generated. This appears to happen when Saxon
-                        // uses the Copy() instruction. It may be that the source is then
-                        // incorrect, but we haven't traced this further. It may also simply be a
-                        // bug in Saxon.
-                        @Override
-                        public void startPrefixMapping(String s, String s1) throws SAXException {
-                            if ("xmlns".equals(s)) {
-                                // TODO: This may be an old Saxon bug which doesn't occur anymore. Try to see if it occurs again.
-                                throw new IllegalArgumentException("xmlns");
-//                                return;
-                            }
-                            super.startPrefixMapping(s, s1);
                         }
 
                         @Override
@@ -439,6 +535,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             @Override
             protected CacheKey getLocalKey(PipelineContext context) {
+                makeSureStateIsSet(context);
                 try {
                     final KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);
@@ -461,6 +558,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             @Override
             protected Object getLocalValidity(PipelineContext context) {
+                makeSureStateIsSet(context);
                 try {
                     final KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                     final URIReferences uriReferences = getURIReferences(context, configKeyValidity);
@@ -904,5 +1002,31 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         public Templates templates;
         public String transformerClass;
         public String systemId;
+    }
+
+    private static class XSLTTransformerState {
+
+        public boolean hasTransformationRun;
+
+        public Map<String, SAXStore> outputDocuments;
+
+        public String firstOutputName;
+        public XMLReceiver firstXMLReceiver;
+
+        public void addOutputDocument(String uri, SAXStore store) {
+            if (outputDocuments == null)
+                outputDocuments = new HashMap<String, SAXStore>();
+            outputDocuments.put(uri, store);
+        }
+
+        public void setFirstXMLReceiver(String firstOutputName, XMLReceiver firstXMLReceiver) {
+            this.firstOutputName = firstOutputName;
+            this.firstXMLReceiver = firstXMLReceiver;
+        }
+    }
+
+    private void makeSureStateIsSet(PipelineContext pipelineContext) {
+        if (!hasState(pipelineContext))
+            setState(pipelineContext, new XSLTTransformerState());
     }
 }

@@ -76,6 +76,7 @@ public abstract class ProcessorImpl implements Processor {
     private LocationData locationData;
 
     public static final String PROCESSOR_INPUT_SCHEME = "input:";
+    public static final String PROCESSOR_OUTPUT_SCHEME = "output:";
 
     /**
      * This is for internal pipeline engine use.
@@ -460,14 +461,24 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     /**
+     * Check if the given URI is referring to a processor output.
+     */
+    public static boolean isProcessorOutputScheme(String uri) {
+        return uri.startsWith(PROCESSOR_OUTPUT_SCHEME) && !uri.startsWith(PROCESSOR_OUTPUT_SCHEME + "/");
+    }
+
+    /**
      * Return the input name if the URI is referring to a processor input, null otherwise.
      */
     public static String getProcessorInputSchemeInputName(String uri) {
-        if (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/")) {
-            return uri.substring(PROCESSOR_INPUT_SCHEME.length());
-        } else {
-            return null;
-        }
+        return isProcessorInputScheme(uri) ? uri.substring(PROCESSOR_INPUT_SCHEME.length()) : null;
+    }
+
+    /**
+     * Return the output name if the URI is referring to a processor output, null otherwise.
+     */
+    public static String getProcessorOutputSchemeInputName(String uri) {
+        return isProcessorOutputScheme(uri) ? uri.substring(PROCESSOR_OUTPUT_SCHEME.length()) : null;
     }
 
     public static OutputCacheKey getInputKey(PipelineContext context, ProcessorInput input) {

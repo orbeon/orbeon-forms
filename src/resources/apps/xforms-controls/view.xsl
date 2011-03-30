@@ -207,16 +207,6 @@
             <!-- Form Builder resources for itemset editor -->
             <xforms:instance id="fb-resources" resource="oxf:/forms/orbeon/builder/form/resources.xml" xxforms:readonly="true" xxforms:cache="true"/>
 
-            <!-- Perform background submission upon xforms-select for xforms:upload -->
-            <xforms:action ev:observer="fr-form-group" ev:event="xforms-select"
-                    if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">
-                <xforms:send submission="fr-upload-attachment-submission"/>
-            </xforms:action>
-
-            <xforms:submission id="fr-upload-attachment-submission"
-                               ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"
-                               method="post" replace="none" resource="test:"/>
-
             <!-- Set focus on first focusable control -->
             <xforms:setfocus ev:event="xforms-ready" control="fr-form-group"/>
         </xsl:copy>

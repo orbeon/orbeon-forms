@@ -29,7 +29,6 @@
                     <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                     <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                     <my-element>my-content</my-element>
-                    <counter>1</counter>
                 </files>
             </xforms:instance>
             <xforms:instance id="selected">
@@ -51,8 +50,6 @@
                 <xforms:bind nodeset="add-upload-trigger" readonly="false()"/>
                 <xforms:bind nodeset="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
             </xforms:bind>
-            <!-- Background submission -->
-            <xforms:submission id="background-submission" method="post" replace="none" resource="test:"/>
             <!-- Main submission which uploads the files
                  This would be nice but is blocked by Firefox: xxforms:target="_blank" xxforms:show-progress="false"
             -->
@@ -73,11 +70,6 @@
             This sample application shows how you can use the XForms upload control, and how file uploads take place in
             the background.
         </p>
-        <fr:button>
-            <xforms:label>Increment</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="counter" value=". + 1"/>
-        </fr:button>
-        <xforms:output value="counter"/>
         <p>
             Please select the files to upload:
         </p>

@@ -42,7 +42,7 @@ object ClientEvents {
         val bubbles = element.attributeValue("bubbles") != "false" // default is true
         val cancelable = element.attributeValue("cancelable") != "false" // default is true
         val otherTargetEffectiveId = element.attributeValue("other-control-id")
-        val value = element.getText()
+        val value = element.getText
     }
 
     /**

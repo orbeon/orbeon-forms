@@ -71,7 +71,7 @@ object EhcacheStateStore extends XFormsStateStore {
         addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
         // Static and dynamic states
-        addOrReplaceOne(staticStateDigest, document.getStaticState.getEncodedStaticState())
+        addOrReplaceOne(staticStateDigest, document.getStaticState.getEncodedStaticState)
         addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(XFormsProperties.isGZIPState, false))
     }
 
@@ -107,8 +107,8 @@ object EhcacheStateStore extends XFormsStateStore {
         }
     }
 
-    def getMaxSize() = stateCache.getCacheConfiguration.getMaxElementsInMemory
-    def getCurrentSize() = stateCache.getMemoryStoreSize.toInt
+    def getMaxSize = stateCache.getCacheConfiguration.getMaxElementsInMemory
+    def getCurrentSize = stateCache.getMemoryStoreSize.toInt
 
     def findStateCombined(staticStateDigest: String, dynamicStateUUID: String) = null
     def addStateCombined(staticStateDigest: String, dynamicStateUUID: String, xformsState: XFormsState, sessionId: String) = ()
@@ -116,7 +116,7 @@ object EhcacheStateStore extends XFormsStateStore {
     private def getDynamicStateKey(documentUUID: String, isInitialState: Boolean) =
         documentUUID + (if (isInitialState) "-I" else "-C") // key is different for initial vs. subsequent state
 
-    private def isDebugEnabled() = XFormsStateManager.getIndentedLogger.isDebugEnabled
+    private def isDebugEnabled = XFormsStateManager.getIndentedLogger.isDebugEnabled
 
     private def debug(message: String) =
         XFormsStateManager.getIndentedLogger.logDebug("", storeDebugName + " store: " + message)

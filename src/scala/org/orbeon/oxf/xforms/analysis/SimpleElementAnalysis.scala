@@ -18,6 +18,7 @@ import org.dom4j.Element
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.xbl.XBLBindings
+
 /**
  * Representation of a common XForms element supporting optional context, binding and value.
  */

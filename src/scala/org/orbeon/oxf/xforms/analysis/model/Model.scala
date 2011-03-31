@@ -310,7 +310,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             refSucceeded && childrenSucceeded
         }
 
-        def analyzeMIPs {
+        def analyzeMIPs() {
             // Analyze local MIPs if there is a @ref
             ref match {
                 case Some(_) =>
@@ -320,7 +320,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             }
 
             // Analyze children
-            children foreach (_.analyzeMIPs)
+            children foreach (_.analyzeMIPs())
         }
 
         override def freeTransientState() {
@@ -342,7 +342,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                 for (mip <- allMIPNameToXPathMIP.values) {
                     helper.startElement("mip", Array("name", mip.name, "expression", mip.expression))
                     mip.analysis.toXML(helper)
-                    helper.endElement
+                    helper.endElement()
                 }
 
                 // Children
@@ -367,7 +367,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
         // Analyze all MIPs
         // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first
-        topLevelBinds foreach (_.analyzeMIPs)
+        topLevelBinds foreach (_.analyzeMIPs())
 
         if (!figuredAllBindRefAnalysis) {
             bindInstances.clear()
@@ -394,7 +394,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                 helper.startElement("binds")
                 for (bind <- topLevelBinds)
                     bind.toXML(helper)()
-                helper.endElement
+                helper.endElement()
             }
 
             // Output instances information

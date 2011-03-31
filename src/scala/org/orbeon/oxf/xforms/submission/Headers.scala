@@ -70,7 +70,7 @@ object Headers {
                         contextStack.getCurrentBindingContext.getPosition, contextStack.getCurrentVariables, XFormsContainingDocument.getFunctionLibrary,
                         contextStack.getFunctionContext(sourceEffectiveId), xblContainer.getContainingDocument.getNamespaceMappings(headerElement),
                         headerElement.getData.asInstanceOf[LocationData], avtCombine)
-                    contextStack.returnFunctionContext
+                    contextStack.returnFunctionContext()
 
                     if (!allowedCombineValues(result))
                         throw new OXFException("Invalid value '" + result + "' for attribute combine.")

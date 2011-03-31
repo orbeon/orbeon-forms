@@ -32,7 +32,7 @@ class Instance(val element: Element, val scope: XBLBindings#Scope) {
     val locationData = element.getData.asInstanceOf[LocationData]
 
     val staticId = XFormsUtils.getElementStaticId(element)
-    val prefixedId = scope.getFullPrefix() + staticId;;
+    val prefixedId = scope.getFullPrefix + staticId;;
 
     val isReadonlyHint = XFormsInstance.isReadonlyHint(element)
     val isCacheHint = Version.instance.isPEFeatureEnabled(XFormsInstance.isCacheHint(element), "cached XForms instance")

@@ -30,7 +30,6 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsStaticState;
@@ -418,9 +417,9 @@ public class XBLBindings {
         return result;
     }
 
-    public ConcreteBinding processElementIfNeeded(PropertyContext propertyContext, IndentedLogger indentedLogger, Element controlElement,
-                                       String controlPrefixedId, LocationData locationData,
-                                       DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope) {
+    public ConcreteBinding processElementIfNeeded(IndentedLogger indentedLogger, Element controlElement,
+                                                  String controlPrefixedId, LocationData locationData,
+                                                  DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope) {
 
         if (xblComponentBindings != null) {
             final AbstractBinding abstractBinding = xblComponentBindings.get(controlElement.getQName());
@@ -437,7 +436,7 @@ public class XBLBindings {
                 }
 
                 // Generate the shadow content for this particular binding
-                final Document fullShadowTreeDocument = generateShadowTree(propertyContext, indentedLogger, controlsDocumentInfo, controlElement, abstractBinding.bindingElement, newPrefix);
+                final Document fullShadowTreeDocument = generateShadowTree(indentedLogger, controlsDocumentInfo, controlElement, abstractBinding.bindingElement, newPrefix);
                 if (fullShadowTreeDocument != null) { // null if there is no template
 
                     // Process newly added automatic XBL includes if any
@@ -473,7 +472,7 @@ public class XBLBindings {
                     // Extract and register models from within the template
                     {
                         final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
-                        final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(propertyContext, compactShadowTreeWrapper, true, locationData);
+                        final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(compactShadowTreeWrapper, true, locationData);
                         if (templateModelDocuments.size() > 0) {
                             // Say we don't annotate documents because already annotated as part as template processing
                             addModelDocuments(templateModelDocuments, newPrefix, false, newInnerScope, null, null);
@@ -502,7 +501,7 @@ public class XBLBindings {
                         // Extract and register models from within the template
                         {
                             final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(globalCompactShadowTreeDocument, null, xpathConfiguration);
-                            final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(propertyContext, compactShadowTreeWrapper, true, locationData);
+                            final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(compactShadowTreeWrapper, true, locationData);
                             if (templateModelDocuments.size() > 0) {
                                 // Say we don't annotate documents because already annotated as part as template processing
                                 addModelDocuments(templateModelDocuments, TOP_LEVEL_SCOPE.getFullPrefix(), false, TOP_LEVEL_SCOPE, null, null);
@@ -541,7 +540,7 @@ public class XBLBindings {
 
                         // Extract scripts in the handler
                         final DocumentWrapper handlerWrapper = new DocumentWrapper(currentHandlerAnnotatedElement.getDocument(), null, xpathConfiguration);
-                        staticState.extractXFormsScripts(propertyContext, handlerWrapper, newPrefix);
+                        staticState.extractXFormsScripts(handlerWrapper, newPrefix);
                     }
 
                     return newConcreteBinding;
@@ -576,7 +575,6 @@ public class XBLBindings {
     /**
      * Generate shadow content for the given control id and XBL binding.
      *
-     * @param propertyContext   context
      * @param indentedLogger    logger
      * @param documentWrapper   wrapper around controls document
      * @param boundElement      element to which the binding applies
@@ -584,7 +582,7 @@ public class XBLBindings {
      * @param prefix            prefix of the ids within the new shadow tree, e.g. component1$component2$
      * @return                  shadow tree document
      */
-    private Document generateShadowTree(final PropertyContext propertyContext, final IndentedLogger indentedLogger, final DocumentWrapper documentWrapper,
+    private Document generateShadowTree(final IndentedLogger indentedLogger, final DocumentWrapper documentWrapper,
                                         final Element boundElement, Element binding, final String prefix) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
@@ -604,7 +602,7 @@ public class XBLBindings {
             final Document shadowTreeDocument = applyPipelineTransform(templateElement, boundElement);
 
             // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
-            XBLTransformer.transform(propertyContext, documentWrapper, shadowTreeDocument, boundElement);
+            XBLTransformer.transform(documentWrapper, shadowTreeDocument, boundElement);
 
             // 3: Annotate tree
             final boolean hasUpdateFull = hasFullUpdate(shadowTreeDocument);
@@ -872,10 +870,17 @@ public class XBLBindings {
 
             // Run the transformation
             final PipelineContext newPipelineContext = new PipelineContext();
-            domSerializerData.start(newPipelineContext);
+            boolean success = false;
+            final Document generated;
+            try {
+                domSerializerData.start(newPipelineContext);
 
-            // Get the result, move its root element into a xbl:template and return it
-            final Document generated = domSerializerData.getDocument(newPipelineContext);
+                // Get the result, move its root element into a xbl:template and return it
+                generated = domSerializerData.getDocument(newPipelineContext);
+                success = true;
+            } finally {
+                newPipelineContext.destroy(success);
+            }
             final Element result = (Element) generated.getRootElement().detach();
             generated.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"));
             final Element newRoot = generated.getRootElement();

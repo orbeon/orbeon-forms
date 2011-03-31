@@ -54,7 +54,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
             {
-                final String labelValue = (control != null) ? control.getLabel(pipelineContext) : null;
+                final String labelValue = (control != null) ? control.getLabel() : null;
                 final boolean mustOutputHTMLFragment = control != null && control.isHTMLLabel(pipelineContext);
                 outputLabelText(xmlReceiver, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
@@ -66,7 +66,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
     private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {
         final AttributesImpl aAttributes = handlerContext.isSpanHTMLLayout() ? containerAttributes : new AttributesImpl();
-        final String hrefValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, null);
+        final String hrefValue = XFormsOutputControl.getExternalValue(outputControl, null);
 
         if (hrefValue == null || hrefValue.trim().equals("")) {
             // No URL so make sure a click doesn't cause navigation, and add class

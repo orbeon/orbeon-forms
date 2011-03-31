@@ -64,15 +64,15 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected void onDestroy(PropertyContext propertyContext) {
-        super.onDestroy(propertyContext);
+    protected void onDestroy() {
+        super.onDestroy();
         // Set default MIPs so that diff picks up the right values
         setDefaultMIPs();
     }
 
     @Override
-    protected void onCreate(PropertyContext propertyContext) {
-        super.onCreate(propertyContext);
+    protected void onCreate() {
+        super.onCreate();
 
         readBinding();
 
@@ -82,8 +82,8 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected void onBindingUpdate(PropertyContext propertyContext, XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
-        super.onBindingUpdate(propertyContext, oldBinding, newBinding);
+    protected void onBindingUpdate(XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+        super.onBindingUpdate(oldBinding, newBinding);
         readBinding();
     }
 

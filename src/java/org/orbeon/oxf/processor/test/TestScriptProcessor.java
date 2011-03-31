@@ -95,18 +95,24 @@ public class TestScriptProcessor extends ProcessorImpl {
     }
 
     private void handleCacheValueCommand(ExecutionContext executionContext, Element commandElement) {
-        String outputName = commandElement.attributeValue("output-name");
-        String value = commandElement.attributeValue("value");
+        final String outputName = commandElement.attributeValue("output-name");
+        final String value = commandElement.attributeValue("value");
 
         // Make sure output to read is connected
         ensureOutputConnected(executionContext, outputName);
 
         // Tell output processor to read and cache value
-        PipelineContext pipelineContext = new PipelineContext();
-        if (executionContext.externalContext != null)
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
-        executionContext.mainProcessor.reset(pipelineContext);
-        executionContext.outputProcessor.readCacheInputWithValue(pipelineContext, outputName, value);
+        final PipelineContext pipelineContext = new PipelineContext();
+        boolean success = false;
+        try {
+            if (executionContext.externalContext != null)
+                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+            executionContext.mainProcessor.reset(pipelineContext);
+            executionContext.outputProcessor.readCacheInputWithValue(pipelineContext, outputName, value);
+            success = true;
+        } finally {
+            pipelineContext.destroy(success);
+        }
     }
 
     private void ensureOutputConnected(ExecutionContext executionContext, String outputName) {
@@ -121,52 +127,59 @@ public class TestScriptProcessor extends ProcessorImpl {
     }
 
     private void handleAssertCommand(ExecutionContext executionContext, Element commandElement) {
-        String outputName = commandElement.attributeValue("output-name");
-        String condition = commandElement.attributeValue("condition");
-        String value = commandElement.attributeValue("value");
+        final String outputName = commandElement.attributeValue("output-name");
+        final String condition = commandElement.attributeValue("condition");
+        final String value = commandElement.attributeValue("value");
 
         // Make sure output to read is connected
         if (outputName != null)
             ensureOutputConnected(executionContext, outputName);
 
-        PipelineContext pipelineContext = new PipelineContext();
-        if (executionContext.externalContext != null)
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
-        executionContext.mainProcessor.reset(pipelineContext);
+        final PipelineContext pipelineContext = new PipelineContext();
+        boolean success = false;
+        try {
+            if (executionContext.externalContext != null)
+                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+            executionContext.mainProcessor.reset(pipelineContext);
 
-        if (condition.equals("output-cached")) {
-            if (!executionContext.outputProcessor.isInputInCache(pipelineContext, outputName))
-                throw new OXFException("Assertion failed: output '" + outputName + "' is not cached, but was expected to be.");
-        } else if (condition.equals("output-not-cached")) {
-            if (executionContext.outputProcessor.isInputInCache(pipelineContext, outputName))
-                throw new OXFException("Assertion failed: output '" + outputName + "' is cached, but was expected not to be.");
-        } else if (condition.equals("output-cacheable")) {
-            if (executionContext.outputProcessor.getInputKeyValidity(pipelineContext, outputName) == null)
-                throw new OXFException("Assertion failed: output '" + outputName + "' is not cacheable, but was expected to be.");
-        } else if (condition.equals("output-not-cacheable")) {
-            if (executionContext.outputProcessor.getInputKeyValidity(pipelineContext, outputName) != null)
-                throw new OXFException("Assertion failed: output '" + outputName + "' is cacheable, but was expected not to be.");
-        } else if (condition.equals("cached-value-equal")) {
-            Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
-            if (!value.equals(result))
-                throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but expected '" + value + "'.");
-        } else if (condition.equals("cached-value-not-equal")) {
-            Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
-            if (value.equals(result))
-                throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but was expected to be different.");
-        } else if (condition.equals("output-equals")) {
+            if (condition.equals("output-cached")) {
+                if (!executionContext.outputProcessor.isInputInCache(pipelineContext, outputName))
+                    throw new OXFException("Assertion failed: output '" + outputName + "' is not cached, but was expected to be.");
+            } else if (condition.equals("output-not-cached")) {
+                if (executionContext.outputProcessor.isInputInCache(pipelineContext, outputName))
+                    throw new OXFException("Assertion failed: output '" + outputName + "' is cached, but was expected not to be.");
+            } else if (condition.equals("output-cacheable")) {
+                if (executionContext.outputProcessor.getInputKeyValidity(pipelineContext, outputName) == null)
+                    throw new OXFException("Assertion failed: output '" + outputName + "' is not cacheable, but was expected to be.");
+            } else if (condition.equals("output-not-cacheable")) {
+                if (executionContext.outputProcessor.getInputKeyValidity(pipelineContext, outputName) != null)
+                    throw new OXFException("Assertion failed: output '" + outputName + "' is cacheable, but was expected not to be.");
+            } else if (condition.equals("cached-value-equal")) {
+                Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
+                if (!value.equals(result))
+                    throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but expected '" + value + "'.");
+            } else if (condition.equals("cached-value-not-equal")) {
+                Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
+                if (value.equals(result))
+                    throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but was expected to be different.");
+            } else if (condition.equals("output-equals")) {
 
-            Document actualDocument = executionContext.outputProcessor.readInputAsDOM4J(pipelineContext, outputName);
-            Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
+                final Document actualDocument = executionContext.outputProcessor.readInputAsDOM4J(pipelineContext, outputName);
+                final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
-            String expectedDataString = Dom4jUtils.domToCompactString(expectedDocument);
-            String actualDataString = Dom4jUtils.domToCompactString(actualDocument);
+                final String expectedDataString = Dom4jUtils.domToCompactString(expectedDocument);
+                final String actualDataString = Dom4jUtils.domToCompactString(actualDocument);
 
-            if (!expectedDataString.equals(actualDataString))
-                throw new OXFException("Assertion failed: output '" + outputName + "' got '" + actualDataString +  " ', but expected '" + expectedDataString + "'.");
+                if (!expectedDataString.equals(actualDataString))
+                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + actualDataString +  " ', but expected '" + expectedDataString + "'.");
 
-        } else {
-            throw new IllegalArgumentException("Not implemented yet.");
+            } else {
+                throw new IllegalArgumentException("Not implemented yet.");
+            }
+
+            success = true;
+        } finally {
+            pipelineContext.destroy(success);
         }
     }
 
@@ -192,11 +205,17 @@ public class TestScriptProcessor extends ProcessorImpl {
     }
 
     private void handleRunCommand(ExecutionContext executionContext, Element commandElement) {
-        PipelineContext pipelineContext = new PipelineContext();
-        if (executionContext.externalContext != null)
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
-        executionContext.mainProcessor.reset(pipelineContext);
-        executionContext.mainProcessor.start(pipelineContext);
+        final PipelineContext pipelineContext = new PipelineContext();
+        boolean success = false;
+        try {
+            if (executionContext.externalContext != null)
+                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+            executionContext.mainProcessor.reset(pipelineContext);
+            executionContext.mainProcessor.start(pipelineContext);
+            success = true;
+        } finally {
+            pipelineContext.destroy(success);
+        }
     }
 
     private void handleSetRequestCommand(ExecutionContext executionContext, Element commandElement, PipelineContext pipelineContext) {
@@ -229,7 +248,7 @@ public class TestScriptProcessor extends ProcessorImpl {
             if (keyValidity == null)
                 throw new OXFException("Cannot cache value '" + value + "' from output '" + inputName + "'.");
 
-            ObjectCache.instance().add(pipelineContext, keyValidity.key, keyValidity.validity, value);
+            ObjectCache.instance().add(keyValidity.key, keyValidity.validity, value);
         }
 
         @Override
@@ -249,7 +268,7 @@ public class TestScriptProcessor extends ProcessorImpl {
             KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
             if (keyValidity == null)
                 return null;
-            return ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+            return ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity);
         }
 
         @Override

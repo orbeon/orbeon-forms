@@ -14,6 +14,7 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.dom4j.Document;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orbeon.oxf.common.OXFException;
@@ -42,6 +43,11 @@ public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTes
         final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
         pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         request = externalContext.getRequest();
+    }
+
+    @After
+    public void tearDown() {
+        PipelineContext.get().destroy(true);
     }
 
     @Test

@@ -37,7 +37,7 @@ public class XFormsOutputTextHandler extends XFormsOutputHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         if (isConcreteControl) {
-            final String externalValue = outputControl.getExternalValue(pipelineContext);
+            final String externalValue = outputControl.getExternalValue();
             if (externalValue != null && externalValue.length() > 0)
                 contentHandler.characters(externalValue.toCharArray(), 0, externalValue.length());
         }

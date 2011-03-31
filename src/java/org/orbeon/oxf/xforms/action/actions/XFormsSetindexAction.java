@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -31,7 +30,7 @@ import org.orbeon.saxon.om.Item;
  * 9.3.7 The setindex Element
  */
 public class XFormsSetindexAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -48,20 +47,20 @@ public class XFormsSetindexAction extends XFormsAction {
             return;
 
         // Get repeat static id
-        final String repeatStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, repeatAttribute);
+        final String repeatStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, repeatAttribute);
 
         // Determine index
         final String indexXPath = actionElement.attributeValue("index");
-        final String indexString = actionInterpreter.evaluateStringExpression(propertyContext, actionElement,
+        final String indexString = actionInterpreter.evaluateStringExpression(actionElement,
                 contextStack.getCurrentNodeset(), contextStack.getCurrentPosition(), "number(" + indexXPath + ")");
 
         actionInterpreter.getIndentedLogger().logDebug("xforms:setindex", "setting index", "index", indexString);
 
         // Execute
-        executeSetindexAction(actionInterpreter, propertyContext, eventObserver, actionElement, repeatStaticId, indexString);
+        executeSetindexAction(actionInterpreter, eventObserver, actionElement, repeatStaticId, indexString);
     }
 
-    private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventObserver eventObserver,
+    private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, XFormsEventObserver eventObserver,
                                               Element actionElement, String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
@@ -72,10 +71,10 @@ public class XFormsSetindexAction extends XFormsAction {
 
         // "This XForms Action begins by invoking the deferred update behavior."
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
-        containingDocument.synchronizeAndRefresh(propertyContext);
+        containingDocument.synchronizeAndRefresh();
 
         // Find repeat control
-        final Object control = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, repeatStaticId);
+        final Object control = actionInterpreter.resolveEffectiveControl(actionElement, repeatStaticId);
         if (control instanceof XFormsRepeatControl) {
             // Set its new index
             final int newRepeatIndex = Integer.parseInt(indexString);
@@ -88,7 +87,7 @@ public class XFormsSetindexAction extends XFormsAction {
                 }
 
                 // Set index on control
-                repeatControl.setIndex(propertyContext, newRepeatIndex);
+                repeatControl.setIndex(newRepeatIndex);
             }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as

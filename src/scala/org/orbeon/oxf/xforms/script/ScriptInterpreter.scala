@@ -21,11 +21,11 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
 
     // VERY experimental implementation of a Java API exposed to JavaScript
-    class ORBEON(propertyContext: PropertyContext) {
+    class ORBEON {
         class Controls {
 
             def setValue(controlId: String, value: String): Unit =
-                getValueControl(controlId).storeExternalValue(propertyContext, value, null)
+                getValueControl(controlId).storeExternalValue(value, null)
 
             def getValue(controlId: String) = getValueControl(controlId).getValue
 
@@ -48,7 +48,7 @@ class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
         }
     }
 
-    def runScript(propertyContext: PropertyContext, scriptId: String): Unit = {
+    def runScript(scriptId: String): Unit = {
         // 1. Get compiled script
         val compiledScript = containingDocument.getStaticState.getScripts.get(scriptId).asInstanceOf[ServerScript].compiledScript
 
@@ -56,8 +56,7 @@ class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
         val result = {
             val cx = Context.enter()
             try {
-                // TODO: any better way to scope ORBEON with propertyContext?
-                topLevelScope.put("ORBEON", topLevelScope, Context.javaToJS(new ORBEON(propertyContext), topLevelScope))
+                topLevelScope.put("ORBEON", topLevelScope, Context.javaToJS(new ORBEON, topLevelScope))
                 try {
                     compiledScript.exec(cx, topLevelScope)
                 } finally {

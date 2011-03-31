@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -55,9 +54,9 @@ public class XFormsRangeControl extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
+    public void storeExternalValue(String value, String type) {
         // Store after converting
-        super.storeExternalValue(propertyContext, convertFromExternalValue(value), type);
+        super.storeExternalValue(convertFromExternalValue(value), type);
     }
 
     private String convertFromExternalValue(String externalValue) {
@@ -74,7 +73,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue(PropertyContext propertyContext) {
+    protected void evaluateExternalValue() {
         final String internalValue = getValue();
         final String updatedValue;
         if (internalValue == null) {// can it be really?

@@ -283,11 +283,10 @@ public class XFormsSubmissionUtils {
     /**
      * Annotate the DOM with information about file name and mediatype provided by uploads if available.
      *
-     * @param propertyContext       current context
      * @param containingDocument    current XFormsContainingDocument
      * @param currentInstance       instance containing the nodes to check
      */
-    public static void annotateBoundRelevantUploadControls(final PropertyContext propertyContext, XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
+    public static void annotateBoundRelevantUploadControls(XFormsContainingDocument containingDocument, XFormsInstance currentInstance) {
         final XFormsControls xformsControls = containingDocument.getControls();
         final Map<String, XFormsControl> uploadControls = xformsControls.getCurrentControlTree().getUploadControls();
         if (uploadControls != null) {
@@ -301,11 +300,11 @@ public class XFormsSubmissionUtils {
                             // Found one relevant upload control bound to the instance we are submitting
                             // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
                             // will be removed during the next recalculate.
-                            final String fileName = currentControl.getFileName(propertyContext);
+                            final String fileName = currentControl.getFileName();
                             if (fileName != null) {
                                 InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
                             }
-                            final String mediatype = currentControl.getFileMediatype(propertyContext);
+                            final String mediatype = currentControl.getFileMediatype();
                             if (mediatype != null) {
                                 InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
                             }

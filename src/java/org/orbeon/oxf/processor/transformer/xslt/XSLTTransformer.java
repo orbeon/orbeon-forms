@@ -123,7 +123,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         final KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
                         if (stylesheetKeyValidity != null)
                             templatesInfo = (TemplatesInfo) ObjectCache.instance()
-                                    .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
+                                    .findValid(stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
                     }
 
                     // Get transformer attributes if any
@@ -580,7 +580,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             private URIReferences getURIReferences(PipelineContext context, KeyValidity configKeyValidity) {
                 if (configKeyValidity == null)
                     return null;
-                return (URIReferences) ObjectCache.instance().findValid(context, configKeyValidity.key, configKeyValidity.validity);
+                return (URIReferences) ObjectCache.instance().findValid(configKeyValidity.key, configKeyValidity.validity);
             }
 
             private KeyValidity createStyleSheetKeyValidity(PipelineContext context, KeyValidity configKeyValidity, URIReferences uriReferences) {
@@ -667,12 +667,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // Put in cache: configKey -> uriReferences
                         final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
                         if (configKeyValidity != null)
-                            ObjectCache.instance().add(pipelineContext, configKeyValidity.key, configKeyValidity.validity, uriReferences);
+                            ObjectCache.instance().add(configKeyValidity.key, configKeyValidity.validity, uriReferences);
 
                         // Put in cache: (configKey, uriReferences.stylesheetReferences) -> transformer
                         final KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
                         if (stylesheetKeyValidity != null)
-                            ObjectCache.instance().add(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity, templatesInfo);
+                            ObjectCache.instance().add(stylesheetKeyValidity.key, stylesheetKeyValidity.validity, templatesInfo);
                     }
 
                     return templatesInfo;

@@ -151,9 +151,9 @@ public class ProcessorUtils {
         final DOMSerializer domSerializer = new DOMSerializer();
         PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
 
-        final PipelineContext domSerializerPipelineContext = new PipelineContext();
-        domSerializer.start(domSerializerPipelineContext);
-        return domSerializer.getDocument(domSerializerPipelineContext);
+        final PipelineContext pipelineContext = PipelineContext.get();
+        domSerializer.start(pipelineContext);
+        return domSerializer.getDocument(pipelineContext);
     }
 
     private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set<String> alreadyDeclaredPrefixes) {

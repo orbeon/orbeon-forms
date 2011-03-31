@@ -84,7 +84,7 @@ public class XPathProcessor extends ProcessorImpl {
                 PooledXPathExpression xpath = null;
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
-                    xpath = XPathCache.getXPathExpression(context, documentInfo.getConfiguration(), documentInfo,
+                    xpath = XPathCache.getXPathExpression(documentInfo.getConfiguration(), documentInfo,
                             config.getExpression(), config.getNamespaces(), null, PipelineFunctionLibrary.instance(), baseURI, locationData);
                     List results = xpath.evaluate();
                     xmlReceiver.startDocument();

@@ -15,11 +15,9 @@ package org.orbeon.oxf.xforms.event.events;
 
 import org.apache.log4j.Level;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -51,7 +49,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     private final ErrorType errorType;
 
     public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
-        this(containingDocument, null, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
+        this(containingDocument, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
     }
 
     public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String resourceURI, ErrorType errorType, int statusCode) {
@@ -59,7 +57,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         this.errorType = errorType;
     }
 
-    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
         super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
 
@@ -82,7 +80,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                 final String tempURI;
                 try {
                     // NOTE: cast to PipelineContext not desirable. Must rework interfaces?
-                    tempURI = NetUtils.inputStreamToAnyURI((PipelineContext) propertyContext, connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
+                    tempURI = NetUtils.inputStreamToAnyURI(connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
                     connectionResult.getResponseInputStream().close();
                 } catch (Exception e) {
                     // Simply can't read the body

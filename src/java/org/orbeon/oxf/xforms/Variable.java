@@ -72,7 +72,7 @@ public class Variable {
         this.selectAttribute = VariableAnalysis.valueOrSelectAttribute(valueElement);
     }
 
-    private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext) {
+    private void evaluate(String sourceEffectiveId, boolean pushOuterContext) {
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
             variableValue = new StringValue(valueElement.getStringValue());
@@ -84,7 +84,7 @@ public class Variable {
                 // Push binding for evaluation, so that @context and @model are evaluated
                 final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue(XFormsConstants.ID_QNAME);
                 final XBLBindings.Scope variableValueScope = container.getContainingDocument().getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(variableValuePrefixedId);
-                contextStack.pushBinding(pipelineContext, valueElement, sourceEffectiveId, variableValueScope);
+                contextStack.pushBinding(valueElement, sourceEffectiveId, variableValueScope);
             }
             {
                 final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
@@ -93,7 +93,7 @@ public class Variable {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
 
                     final XFormsFunction.Context functionContext = contextStack.getFunctionContext(sourceEffectiveId);
-                    variableValue = XPathCache.evaluateAsExtent(pipelineContext,
+                    variableValue = XPathCache.evaluateAsExtent(
                             currentNodeset, bindingContext.getPosition(),
                             selectAttribute, container.getNamespaceMappings(valueElement), bindingContext.getInScopeVariables(),
                             XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
@@ -112,11 +112,11 @@ public class Variable {
         return variableName;
     }
 
-    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext) {
+    public ValueRepresentation getVariableValue(String sourceEffectiveId, boolean pushOuterContext) {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;
-            evaluate(pipelineContext, sourceEffectiveId, pushOuterContext);
+            evaluate(sourceEffectiveId, pushOuterContext);
         }
 
         // Return value and rewrap if necessary

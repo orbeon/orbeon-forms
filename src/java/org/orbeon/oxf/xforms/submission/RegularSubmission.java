@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -34,15 +35,15 @@ public class RegularSubmission extends BaseSubmission {
         return "regular";
     }
 
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         return true;
     }
 
-    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
-        final URL absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString, submission.isURLNorewrite()));
+        final URL absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission.isURLNorewrite()));
 
         // Gather remaining information to process the request
         final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
@@ -57,9 +58,12 @@ public class RegularSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Evaluate headers if any
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
+        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
 
         final String submissionEffectiveId = submission.getEffectiveId();
+
+        // TODO: Prepare all in the current thread => find solution for cleanup too
+        final ExternalContext externalContext = NetUtils.getExternalContext();
 
         // Pack external call into a Runnable so it can be run:
         // o now and synchronously
@@ -68,14 +72,10 @@ public class RegularSubmission extends BaseSubmission {
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
             public SubmissionResult call() throws Exception {
 
-                // TODO: This refers to PropertyContext, XFormsContainingDocument, and Submission. FIXME!
+                // TODO: This refers to ExternalContext, XFormsContainingDocument, and Submission. FIXME!
 
                 // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
                 // because it may get out of the caches and not be picked up by further incoming Ajax requests.
-
-                // NOTE: If the submission was truly asynchronous, we should not touch ExternalContext either. But
-                // currently, since the submission actually runs within the scope of a request, we do have access to
-                // ExternalContext, so we still use it.
 
                 if (p2.isAsynchronous && timingLogger.isDebugEnabled())
                     timingLogger.startHandleOperation("", "running asynchronous submission", "id", submissionEffectiveId);
@@ -84,19 +84,19 @@ public class RegularSubmission extends BaseSubmission {
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = new Connection().open(NetUtils.getExternalContext(propertyContext), detailsLogger, isLogBody(),
-                        p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
-                        sp.actualRequestMediatype, sp.messageBody,
-                        customHeaderNameValues, newForwardSubmissionHeaders);
+                    connectionResult = new Connection().open(externalContext, detailsLogger, isLogBody(),
+                         p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
+                         sp.actualRequestMediatype, sp.messageBody,
+                         customHeaderNameValues, newForwardSubmissionHeaders);
 
                     // Update status
                     status[0] = true;
 
                     // Obtain replacer
-                    final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+                    final Replacer replacer = submission.getReplacer(connectionResult, p);
                     if (replacer != null) {
                         // Deserialize here so it can run in parallel
-                        replacer.deserialize(propertyContext, connectionResult, p, p2);
+                        replacer.deserialize(connectionResult, p, p2);
 
                         // Update status
                         status[1] = true;
@@ -116,6 +116,6 @@ public class RegularSubmission extends BaseSubmission {
 
         // Submit the callable
         // This returns null if the execution is deferred 
-        return submitCallable(propertyContext, p, p2, callable);
+        return submitCallable(p, p2, callable);
     }
 }

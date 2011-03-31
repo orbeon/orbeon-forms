@@ -40,7 +40,7 @@ public abstract class BaseSubmission implements Submission {
         this.containingDocument = submission.getContainingDocument();
     }
 
-    protected String getAbsoluteSubmissionURL(PropertyContext propertyContext, String resolvedActionOrResource, String queryString, boolean isNorewrite) {
+    protected String getAbsoluteSubmissionURL(String resolvedActionOrResource, String queryString, boolean isNorewrite) {
 
         if ("resource".equals(submission.getUrlType())) {
             // In case, for some reason, author forces a resource URL
@@ -48,7 +48,7 @@ public abstract class BaseSubmission implements Submission {
             // NOTE: Before 2009-10-08, there was some code performing custom rewriting in portlet mode. That code was
             // very unclear and was removed as it seemed like resolveResourceURL() should handle all cases.
 
-            return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
+            return XFormsUtils.resolveResourceURL(containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
                     isNorewrite ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE_NO_CONTEXT : ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         } else {
@@ -63,15 +63,15 @@ public abstract class BaseSubmission implements Submission {
             // o service base: http://services.com/myservices/
             // o resulting service URL: http://services.com/myservices/myapp/my/service
 
-            return XFormsUtils.resolveServiceURL(propertyContext, containingDocument, submission.getSubmissionElement(),
+            return XFormsUtils.resolveServiceURL(containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),
                     isNorewrite ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE_NO_CONTEXT : ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         }
     }
 
-    protected Map<String, String[]> evaluateHeaders(PropertyContext propertyContext, XFormsContextStack contextStack) {
+    protected Map<String, String[]> evaluateHeaders(XFormsContextStack contextStack) {
         try {
-            return Headers.evaluateHeaders(propertyContext, submission.getXBLContainer(containingDocument), contextStack,
+            return Headers.evaluateHeaders(submission.getXBLContainer(containingDocument), contextStack,
                     submission.getEffectiveId(), submission.getSubmissionElement());
         } catch (OXFException e) {
             throw new XFormsSubmissionException(submission, e, e.getMessage(), "processing <header> elements");
@@ -81,21 +81,19 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Submit the Callable for synchronous or asynchronous execution.
      *
-     * @param propertyContext   current context
      * @param p                 parameters
      * @param p2                parameters
      * @param callable          callable performing the submission
      * @return ConnectionResult or null if asynchronous
      * @throws Exception
      */
-    protected SubmissionResult submitCallable(final PropertyContext propertyContext,
-                                              final XFormsModelSubmission.SubmissionParameters p,
+    protected SubmissionResult submitCallable(final XFormsModelSubmission.SubmissionParameters p,
                                               final XFormsModelSubmission.SecondPassParameters p2,
                                               final Callable<SubmissionResult> callable) throws Exception {
         if (p2.isAsynchronous) {
 
             // Tell XFCD that we have one more async submission
-            containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(propertyContext, callable);
+            containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(callable);
 
             // Tell caller he doesn't need to do anything
             return null;
@@ -129,7 +127,7 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Perform a local local submission.
      */
-    protected ConnectionResult openLocalConnection(PropertyContext propertyContext, ExternalContext externalContext,
+    protected ConnectionResult openLocalConnection(ExternalContext externalContext,
                                                    final IndentedLogger indentedLogger,
                                                    ExternalContext.Response response,
                                                    XFormsModelSubmission xformsModelSubmission,
@@ -249,7 +247,7 @@ public abstract class BaseSubmission implements Submission {
             if (isReplaceAll) {
                 // "the event xforms-submit-done is dispatched"
                 if (xformsModelSubmission != null)
-                    xformsModelSubmission.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
+                    xformsModelSubmission.getXBLContainer(containingDocument).dispatchEvent(
                             new XFormsSubmitDoneEvent(containingDocument, xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
 
                 submissionProcess.process(requestAdapter, effectiveResponse);

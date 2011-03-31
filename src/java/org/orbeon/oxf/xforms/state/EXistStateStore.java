@@ -242,7 +242,7 @@ public class EXistStateStore extends EXistStateStoreBase {
         sb.append("</key><value>");
 
         // Store the value and make sure it is encrypted as it will be externalized
-        final String encryptedValue = XFormsUtils.ensureEncrypted(pipelineContext, storeEntry.value);
+        final String encryptedValue = XFormsUtils.ensureEncrypted(storeEntry.value);
 
         sb.append(encryptedValue);
         sb.append("</value>");

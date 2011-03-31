@@ -57,7 +57,7 @@ public class ToXMLConverter extends ProcessorImpl {
 
                 try {
                     // Get FileItem
-                    final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
+                    final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
 
                     // TODO: Can we avoid writing to a FileItem?
 

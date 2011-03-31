@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.*;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -35,7 +34,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
     public static final String CANNOT_DELETE_READONLY_MESSAGE = "Cannot perform deletion in read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -83,7 +82,7 @@ public class XFormsDeleteAction extends XFormsAction {
                     // position is 1."
 
                     // "2. The return value is processed according to the rules of the XPath function round()"
-                    final String insertionIndexString = actionInterpreter.evaluateStringExpression(propertyContext,
+                    final String insertionIndexString = actionInterpreter.evaluateStringExpression(
                             actionElement, collectionToUpdate, 1, "round(" + atAttribute + ")");
 
                     // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
@@ -103,11 +102,11 @@ public class XFormsDeleteAction extends XFormsAction {
                 }
             }
 
-            doDelete(propertyContext, containingDocument, indentedLogger, collectionToUpdate, deleteIndex, true);
+            doDelete(containingDocument, indentedLogger, collectionToUpdate, deleteIndex, true);
         }
     }
 
-    public static List<Item> doDelete(PropertyContext propertyContext, XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
+    public static List<Item> doDelete(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                       List collectionToUpdate, int deleteIndex, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
@@ -157,7 +156,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)
-                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsDeleteEvent(containingDocument, modifiedInstance, deletedNodeInfos, deleteIndex));
+                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(new XFormsDeleteEvent(containingDocument, modifiedInstance, deletedNodeInfos, deleteIndex));
             }
         }
 

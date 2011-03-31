@@ -71,7 +71,7 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     }
 
     @Override
-    public String getLabel(PropertyContext propertyContext) {
+    public String getLabel() {
         // Don't bother letting superclass handle this
         return null;
     }

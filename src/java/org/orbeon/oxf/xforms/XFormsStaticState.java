@@ -140,14 +140,13 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      * Create static state object from a Document. This constructor is used when creating an initial static state upon
      * producing an XForms page.
      *
-     * @param propertyContext       current context
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
      * @param digest                digest of the static state document
      * @param metadata              metadata or null if not available
      */
-    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata) {
+    public XFormsStaticState(Document staticStateDocument, String digest, Metadata metadata) {
         // Set XPath configuration
-        initialize(propertyContext, staticStateDocument, digest, metadata, null);
+        initialize(staticStateDocument, digest, metadata, null);
     }
 
     /**
@@ -161,10 +160,10 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     public XFormsStaticState(PropertyContext propertyContext, String staticStateDigest, String encodedStaticState) {
 
         // Decode encodedStaticState into staticStateDocument
-        final Document staticStateDocument = XFormsUtils.decodeXML(propertyContext, encodedStaticState);
+        final Document staticStateDocument = XFormsUtils.decodeXML(encodedStaticState);
 
         // Initialize
-        initialize(propertyContext, staticStateDocument, staticStateDigest, null, encodedStaticState);
+        initialize(staticStateDocument, staticStateDigest, null, encodedStaticState);
 
         assert (staticStateDigest != null) && isServerStateHandling() || (staticStateDigest == null) && isClientStateHandling();
     }
@@ -187,29 +186,28 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      * o staticStateDocument, topLevelStaticIds, namespaceMap, and optional xhtmlDocument
      * o staticStateDocument and encodedStaticState
      *
-     * @param propertyContext       current context
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
      * @param digest                digest of the static state document
      * @param metadata              metadata or null if not available
      * @param encodedStaticState    existing serialization of static state, null if not available
      */
-    private void initialize(PropertyContext propertyContext, Document staticStateDocument, String digest, Metadata metadata, String encodedStaticState) {
+    private void initialize(Document staticStateDocument, String digest, Metadata metadata, String encodedStaticState) {
 
         // Remember digest
         this.digest = digest;
 
         // Extract static state
-        extract(propertyContext, staticStateDocument, metadata, encodedStaticState);
+        extract(staticStateDocument, metadata, encodedStaticState);
 
         // Analyze
-        analyze(propertyContext);
+        analyze();
 
         // Debug if needed
         if (XFormsProperties.getDebugLogXPathAnalysis())
-            dumpAnalysis(propertyContext);
+            dumpAnalysis();
     }
 
-    private void extract(PropertyContext propertyContext, Document staticStateDocument, Metadata metadata, String encodedStaticState) {
+    private void extract(Document staticStateDocument, Metadata metadata, String encodedStaticState) {
 
         indentedLogger.startHandleOperation("", "extracting static state");
 
@@ -256,7 +254,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         extractProperties(staticStateElement);
 
         // Extract controls, models and components documents
-        extractControlsModelsComponents(propertyContext, staticStateElement, topLevelModelsElements);
+        extractControlsModelsComponents(staticStateElement, topLevelModelsElements);
 
         if (encodedStaticState != null) {
             // Static state is fully initialized
@@ -296,10 +294,9 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     /**
      * Perform static analysis.
      *
-     * @param propertyContext   current context
      * @return                  true iif analysis was just performed in this call
      */
-    private void analyze(final PropertyContext propertyContext) {
+    private void analyze() {
 
         indentedLogger.startHandleOperation("", "performing static analysis");
 
@@ -322,14 +319,14 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         final List<ExternalLHHAAnalysis> externalLHHA = new ArrayList<ExternalLHHAAnalysis>();
 
         // Then analyze controls
-        analyzeComponentTree(propertyContext, xpathConfiguration, rootScope, controlsDocument.getRootElement(),
+        analyzeComponentTree(xpathConfiguration, rootScope, controlsDocument.getRootElement(),
                 rootControlAnalysis, externalLHHA);
 
         // Analyze new global XBL controls introduced above
         // NOTE: should recursively check?
         if (xblBindings != null)
             for (final XBLBindings.Global global : xblBindings.getGlobals().values())
-                analyzeComponentTree(propertyContext, xpathConfiguration, rootScope, global.compactShadowTree.getRootElement(),
+                analyzeComponentTree(xpathConfiguration, rootScope, global.compactShadowTree.getRootElement(),
                         rootControlAnalysis, externalLHHA);
 
         // Process deferred external LHHA elements
@@ -388,8 +385,8 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
             final Document modelDocument = currentEntry.getValue().element().getDocument();
             final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
             // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
-            extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
-            extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
+            extractEventHandlers(xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
+            extractXFormsScripts(modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
         }
 
         // Analyze controls XPath
@@ -431,7 +428,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         return stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE);
     }
 
-    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement, List<Element> topLevelModelsElements) {
+    private void extractControlsModelsComponents(Element staticStateElement, List<Element> topLevelModelsElements) {
 
         // Extract static components information
         // NOTE: Do this here so that xblBindings is available for scope resolution
@@ -481,7 +478,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
-            final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
+            final List<Document> extractedModels = extractNestedModels(controlsDocumentInfo, false, locationData);
             indentedLogger.logDebug("", "created nested model documents", "count", Integer.toString(extractedModels.size()));
             int modelsCount = 0;
             for (final Document currentModelDocument: extractedModels) {
@@ -521,7 +518,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         return modelByInstancePrefixedId.get(prefixedId);
     }
 
-    public void extractXFormsScripts(PropertyContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
+    public void extractXFormsScripts(DocumentWrapper documentInfo, String prefix) {
 
         // TODO: Not sure why we actually extract the scripts: we could just keep pointers on them, right? There is
         // probably not a notable performance if any at all, especially since this is needed at page generation time
@@ -529,7 +526,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance) and exists(@id)]";
 
-        final List scriptNodeInfos = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
+        final List scriptNodeInfos = XPathCache.evaluate(documentInfo, xpathExpression,
                 BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
         if (scriptNodeInfos.size() > 0) {
@@ -558,15 +555,14 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
      * return a serialized static state computed from models, instances, and XHTML documents.
      *
-     * @param propertyContext   current PropertyContext
      * @return                  serialized static sate
      */
-    public String getEncodedStaticState(PropertyContext propertyContext) {
+    public String getEncodedStaticState() {
 
         if (!encodedStaticStateAvailable) {
             // Remember encoded state and discard Document
             // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state)
-            encodedStaticState = XFormsUtils.encodeXML(propertyContext, staticStateDocument, true, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
+            encodedStaticState = XFormsUtils.encodeXML(staticStateDocument, true, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
 
             staticStateDocument = null;
             encodedStaticStateAvailable = true;
@@ -871,7 +867,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         return xblBindings;
     }
 
-    private void extractEventHandlers(PropertyContext propertyContext, Configuration xpathConfiguration, DocumentInfo documentInfo, String prefix, boolean isControls) {
+    private void extractEventHandlers(Configuration xpathConfiguration, DocumentInfo documentInfo, String prefix, boolean isControls) {
 
         // Register event handlers on any element which has an id or an observer attribute. This also allows
         // registering event handlers on XBL components. This follows the semantics of XML Events.
@@ -893,7 +889,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or @ev:observer or /* is ..)]";
 
         // Get all candidate elements
-        final List actionHandlers = XPathCache.evaluate(propertyContext, documentInfo,
+        final List actionHandlers = XPathCache.evaluate(documentInfo,
                 xpathExpression, BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
         final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
@@ -936,7 +932,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
                                 // Extract scripts in the handler
                                 final DocumentWrapper handlerWrapper = new DocumentWrapper(newActionElement.getDocument(), null, xpathConfiguration);
-                                extractXFormsScripts(propertyContext, handlerWrapper, prefix);
+                                extractXFormsScripts(handlerWrapper, prefix);
 
                             } else if (controlAnalysisMap.containsKey(parentPrefixedId)) {
                                 // Parent is a control but not a bound node
@@ -1056,7 +1052,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 control.analyzeXPath();
     }
 
-    public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
+    public void analyzeComponentTree(final Configuration xpathConfiguration,
                                      final XBLBindings.Scope innerScope, Element startElement, final ContainerTrait startControlAnalysis,
                                      final List<ExternalLHHAAnalysis> externalLHHA) {
 
@@ -1065,7 +1061,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         final String prefix = innerScope.getFullPrefix();
 
         // Extract scripts for this tree of controls
-        extractXFormsScripts(propertyContext, controlsDocumentInfo, prefix);
+        extractXFormsScripts(controlsDocumentInfo, prefix);
 
         // Visit tree
         visitAllControlStatic(startElement, startControlAnalysis, new XFormsStaticState.ControlElementVisitorListener() {
@@ -1085,7 +1081,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
-                final XBLBindings.ConcreteBinding newConcreteBinding = xblBindings.processElementIfNeeded(propertyContext,
+                final XBLBindings.ConcreteBinding newConcreteBinding = xblBindings.processElementIfNeeded(
                         indentedLogger, controlElement, controlPrefixedId, locationData, controlsDocumentInfo, xpathConfiguration,
                         innerScope);
 
@@ -1133,7 +1129,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 // Recursively analyze the binding's component tree if any
                 // NOTE: Do this after creating the binding control as the sub-tree must have the binding control as parent
                 if (newConcreteBinding != null) {
-                    analyzeComponentTree(propertyContext, xpathConfiguration, newConcreteBinding.innerScope,
+                    analyzeComponentTree(xpathConfiguration, newConcreteBinding.innerScope,
                             newConcreteBinding.compactShadowTree.getRootElement(),
                             (ContainerTrait) elementAnalysis, externalLHHA);
                 }
@@ -1144,7 +1140,7 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
 
         // Extract event handlers for this tree of controls
         // NOTE: Do this after analysing controls above so that XBL bindings are available for detection of nested event handlers.
-        extractEventHandlers(propertyContext, xpathConfiguration, controlsDocumentInfo, prefix, true);
+        extractEventHandlers(xpathConfiguration, controlsDocumentInfo, prefix, true);
     }
 
     /**
@@ -1185,11 +1181,11 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
         ElementAnalysis startVisitControl(Element controlElement, ContainerTrait containerControlAnalysis, ElementAnalysis previousElementAnalysis, String controlStaticId);
     }
 
-    public static List<Document> extractNestedModels(PropertyContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
+    public static List<Document> extractNestedModels(DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
 
         final List<Document> result = new ArrayList<Document>();
 
-        final List modelElements = XPathCache.evaluate(pipelineContext, compactShadowTreeWrapper,
+        final List modelElements = XPathCache.evaluate(compactShadowTreeWrapper,
                 "//xforms:model[not(ancestor::xforms:instance)]",
                 BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData);
 
@@ -1392,22 +1388,22 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
     }
 
     // This for debug only
-    public void dumpAnalysis(PropertyContext propertyContext) {
+    public void dumpAnalysis() {
         if (isXPathAnalysis()) {
-            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(propertyContext, this)));
+            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(this)));
         }
     }
 
-    public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
-        XMLUtils.wrapWithRequestElement(propertyContext, helper, new XMLUtils.DebugXML() {
-            public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+    public void toXML(ContentHandlerHelper helper) {
+        XMLUtils.wrapWithRequestElement(helper, new XMLUtils.DebugXML() {
+            public void toXML(ContentHandlerHelper helper) {
 
                 for (final ElementAnalysis controlAnalysis: controlAnalysisMap.values())
                     if (!(controlAnalysis instanceof ExternalLHHAAnalysis))// because they are logged as part of their related control
-                        controlAnalysis.javaToXML(propertyContext, helper);
+                        controlAnalysis.javaToXML(helper);
 
                 for (final Model model: modelsByPrefixedId.values())
-                    model.javaToXML(propertyContext, helper);
+                    model.javaToXML(helper);
             }
         });
     }

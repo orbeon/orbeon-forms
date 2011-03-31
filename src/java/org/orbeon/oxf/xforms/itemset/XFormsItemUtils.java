@@ -40,12 +40,12 @@ public class XFormsItemUtils {
 
     public static final QName[] ATTRIBUTES_TO_PROPAGATE = { XFormsConstants.CLASS_QNAME, XFormsConstants.STYLE_QNAME, XFormsConstants.XXFORMS_OPEN_QNAME };
 
-    public static String encryptValue(PropertyContext propertyContext, String value) {
-        return SecureUtils.encrypt(propertyContext, XFormsProperties.getXFormsPassword(), value);
+    public static String encryptValue(String value) {
+        return SecureUtils.encrypt(XFormsProperties.getXFormsPassword(), value);
     }
 
-    public static String decryptValue(PropertyContext propertyContext, String value) {
-        return SecureUtils.decryptAsString(propertyContext, XFormsProperties.getXFormsPassword(), value);
+    public static String decryptValue(String value) {
+        return SecureUtils.decryptAsString(XFormsProperties.getXFormsPassword(), value);
     }
 
     /**
@@ -89,11 +89,10 @@ public class XFormsItemUtils {
     /**
      * Evaluate the itemset for a given xforms:select or xforms:select1 control.
      *
-     * @param propertyContext       current context
      * @param select1Control        control to evaluate
      * @return                      Itemset
      */
-    public static Itemset evaluateItemset(final PropertyContext propertyContext, final XFormsSelect1Control select1Control) {
+    public static Itemset evaluateItemset(final XFormsSelect1Control select1Control) {
 
         final SelectionControl staticControl = (SelectionControl) select1Control.getElementAnalysis();
 
@@ -135,7 +134,7 @@ public class XFormsItemUtils {
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
-                    contextStack.pushBinding(propertyContext, element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
+                    contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
                     {
                         final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
@@ -245,7 +244,7 @@ public class XFormsItemUtils {
                     throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:value element.", select1Control.getLocationData());
                 final XBLBindings.Scope elementScope = select1Control.getChildElementScope(valueElement);
                 final String elementEffectiveId = getElementEffectiveId(valueElement);
-                return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, valueElement, false, null);
+                return XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, valueElement, false, null);
             }
 
             private Label getLabelValue(Element labelElement) {
@@ -255,7 +254,7 @@ public class XFormsItemUtils {
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
                 final boolean supportsHTML = select1Control.isFullAppearance(); // Only support HTML when appearance is "full"
                 final boolean[] containsHTML = new boolean[] { false }; 
-                final String label =  XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, labelElement, supportsHTML, containsHTML);
+                final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, containsHTML);
                 return new Label(StringUtils.defaultString(label), containsHTML[0]);
             }
 
@@ -280,7 +279,7 @@ public class XFormsItemUtils {
                     final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                     final List<org.orbeon.saxon.om.Item> currentNodeset = currentBindingContext.getNodeset();
                     if (currentNodeset != null && currentNodeset.size() > 0) {
-                        final String tempResult = XPathCache.evaluateAsAvt(propertyContext,
+                        final String tempResult = XPathCache.evaluateAsAvt(
                                 currentNodeset, currentBindingContext.getPosition(),
                                 attributeValue, container.getNamespaceMappings(itemChoiceItemsetElement),
                                 contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),

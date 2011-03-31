@@ -20,11 +20,11 @@ import java.io.IOException;
 
 public interface Replacer {
 
-    void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult,
+    void deserialize(ConnectionResult connectionResult,
                      XFormsModelSubmission.SubmissionParameters p,
                      XFormsModelSubmission.SecondPassParameters p2) throws Exception;
 
-    Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult,
+    Runnable replace(ConnectionResult connectionResult,
                      XFormsModelSubmission.SubmissionParameters p,
                      XFormsModelSubmission.SecondPassParameters p2) throws IOException;
 }

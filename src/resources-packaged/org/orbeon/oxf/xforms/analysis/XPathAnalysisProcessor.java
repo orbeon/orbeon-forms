@@ -36,6 +36,6 @@ public class XPathAnalysisProcessor extends SimpleProcessor {
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState(formDocument);
 
         // Output analysis information
-        staticState.toXML(pipelineContext, new ContentHandlerHelper(xmlReceiver));
+        staticState.toXML(new ContentHandlerHelper(xmlReceiver));
     }
 }

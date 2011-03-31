@@ -26,7 +26,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -302,7 +301,7 @@ public class JavaProcessor extends ProcessorImpl {
             InternalCacheKey sourcepathKey = new InternalCacheKey(JavaProcessor.this, "javaFile", config.sourcepath);
             Object sourcepathValidity = new Long(0);
             Sourcepath sourcepath = (Sourcepath) ObjectCache.instance()
-                    .findValid(context, sourcepathKey, sourcepathValidity);
+                    .findValid(sourcepathKey, sourcepathValidity);
 
             // Create classloader
             if (sourcepath == null || (sourcepath.callNameToProcessorClass.containsKey(config.clazz) && !fileUpToDate)) {
@@ -312,7 +311,7 @@ public class JavaProcessor extends ProcessorImpl {
                 sourcepath.classLoader = new URLClassLoader
                         (new URL[]{SystemUtils.getTemporaryDirectory().toURI().toURL(), new File(config.sourcepath).toURI().toURL()},
                                 this.getClass().getClassLoader());
-                ObjectCache.instance().add(context, sourcepathKey, sourcepathValidity, sourcepath);
+                ObjectCache.instance().add(sourcepathKey, sourcepathValidity, sourcepath);
             }
 
             // Get processor class

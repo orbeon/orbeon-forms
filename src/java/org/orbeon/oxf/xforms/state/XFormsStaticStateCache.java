@@ -38,24 +38,23 @@ public class XFormsStaticStateCache {
     /**
      * Add a state to the cache using the state's digest as cache key.
      *
-     * @param propertyContext   current context
      * @param staticState       state to store
      */
-    public void storeDocument(PropertyContext propertyContext, XFormsStaticState staticState) {
+    public void storeDocument(XFormsStaticState staticState) {
         final InternalCacheKey cacheKey = createCacheKey(staticState.getDigest());
-        cache.add(propertyContext, cacheKey, CONSTANT_VALIDITY, staticState);
+        cache.add(cacheKey, CONSTANT_VALIDITY, staticState);
     }
 
     /**
      * Find a document in the cache. If not found, return null.
      *
-     * @param propertyContext   current context
+     *
      * @param digest            digest used to search cache
      * @return                  state or null
      */
-    public XFormsStaticState getDocument(PropertyContext propertyContext, String digest) {
+    public XFormsStaticState getDocument(String digest) {
         final InternalCacheKey cacheKey = createCacheKey(digest);
-        return (XFormsStaticState) cache.findValid(propertyContext, cacheKey, CONSTANT_VALIDITY);
+        return (XFormsStaticState) cache.findValid(cacheKey, CONSTANT_VALIDITY);
     }
 
     private InternalCacheKey createCacheKey(String digest) {

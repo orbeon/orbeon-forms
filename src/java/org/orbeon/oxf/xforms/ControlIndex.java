@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
@@ -109,14 +108,13 @@ public class ControlIndex {
      * Called during initial controls creation and for creation of repeat iterations.
      *
      * @param indentedLogger            logger
-     * @param propertyContext           current context
      * @param controls                  controls to evaluate
      */
-    public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> controls) {
+    public static void evaluateAll(IndentedLogger indentedLogger, Collection<XFormsControl> controls) {
         indentedLogger.startHandleOperation("controls", "evaluating");
         // Evaluate all controls
         for (final XFormsControl control: controls) {
-            control.evaluate(propertyContext);
+            control.evaluate();
         }
         indentedLogger.endHandleOperation();
     }

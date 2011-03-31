@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -97,15 +96,15 @@ public class XFormsContextStack {
     /**
      * Reset the binding context to the root of the first model's first instance, or to the parent binding context.
      */
-    public void resetBindingContext(PropertyContext propertyContext) {
+    public void resetBindingContext() {
         // Reset to default model (can be null)
-        resetBindingContext(propertyContext, container.getDefaultModel());
+        resetBindingContext(container.getDefaultModel());
     }
 
     /**
      * Reset the binding context to the root of the given model's first instance.
      */
-    public void resetBindingContext(PropertyContext propertyContext, XFormsModel xformsModel) {
+    public void resetBindingContext(XFormsModel xformsModel) {
 
         // Clear existing stack
         contextStack.clear();
@@ -125,17 +124,17 @@ public class XFormsContextStack {
 
         // Add model variables for default model
         if (xformsModel != null) {
-            addModelVariables(propertyContext, xformsModel);
+            addModelVariables(xformsModel);
         }
     }
 
-    private void addModelVariables(PropertyContext propertyContext, XFormsModel xformsModel) {
+    private void addModelVariables(XFormsModel xformsModel) {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
         // All variables in the model are in scope for the nested binds and actions.
         final List<Element> elements = xformsModel.getStaticModel().variableElements();
         final List<BindingContext.VariableInfo> variableInfos
-                = addAndScopeVariables(propertyContext, xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
+                = addAndScopeVariables(xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
 
         if (variableInfos != null && variableInfos.size() > 0) {
             // Some variables added
@@ -154,7 +153,7 @@ public class XFormsContextStack {
         }
     }
 
-    public List<BindingContext.VariableInfo> addAndScopeVariables(PropertyContext propertyContext, XBLContainer container, List<Element> elements, String sourceEffectiveId) {
+    public List<BindingContext.VariableInfo> addAndScopeVariables(XBLContainer container, List<Element> elements, String sourceEffectiveId) {
         List<BindingContext.VariableInfo> variableInfos = null;
         final XBLBindings bindings = containingDocument.getStaticState().getXBLBindings();
         for (Element currentElement: elements) {
@@ -177,7 +176,7 @@ public class XFormsContextStack {
                 // further variables values could not be added. The method below temporarily adds more elements on the
                 // stack but it is safer.
                 getFunctionContext(sourceEffectiveId);
-                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true), newScope);
+                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true), newScope);
                 returnFunctionContext();
 
                 // Add VariableInfo created during above pushVariable(). There must be only one!
@@ -230,12 +229,11 @@ public class XFormsContextStack {
     /**
      * Push an element containing either single-node or nodeset binding attributes.
      *
-     * @param propertyContext   current PropertyContext
      * @param bindingElement    current element containing node binding attributes
      * @param sourceEffectiveId effective id of source control for id resolution of models and binds
      * @param scope             XBL scope
      */
-    public void pushBinding(PropertyContext propertyContext, Element bindingElement, String sourceEffectiveId, XBLBindings.Scope scope) {
+    public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindings.Scope scope) {
         // TODO: move away from element and use static analysis information
         final String ref = bindingElement.attributeValue(XFormsConstants.REF_QNAME);
         final String context = bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
@@ -244,7 +242,7 @@ public class XFormsContextStack {
         final String bind = bindingElement.attributeValue(XFormsConstants.BIND_QNAME);
 
         final NamespaceMapping bindingElementNamespaceMapping = container.getNamespaceMappings(bindingElement);
-        pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);
+        pushBinding(ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);
     }
 
     private BindingContext getBindingContext(XBLBindings.Scope scope) {
@@ -265,7 +263,7 @@ public class XFormsContextStack {
         }
     }
 
-    public void pushBinding(PropertyContext propertyContext, String ref, String context, String nodeset, String modelId, String bindId,
+    public void pushBinding(String ref, String context, String nodeset, String modelId, String bindId,
                             Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindings.Scope scope) {
 
         // Get location data for error reporting
@@ -306,7 +304,7 @@ public class XFormsContextStack {
                     if (!(o instanceof XFormsModel)) {
                         // TODO: should be dispatched to element having the @model attribute
                         // Invalid model id
-                        container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
+                        container.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, container));
                     }
                     newModel = (XFormsModel) o;
                     isNewModel = newModel != baseBindingContext.model;// don't say it's a new model unless it has really changed
@@ -345,7 +343,7 @@ public class XFormsContextStack {
                             // The bind attribute did not resolve to a bind: dispatch xforms-binding-exception
 
                             // TODO: should be dispatched to element having the @model attribute
-                            container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
+                            container.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, container));
 
                             newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                             hasOverriddenContext = false;
@@ -370,7 +368,7 @@ public class XFormsContextStack {
                         if (context != null) {
                             // Push model and context
                             pushTemporaryContext(currentBindingContext, baseBindingContext, baseBindingContext.getSingleItem());// provide context information for the context() function
-                            pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
+                            pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
                             hasOverriddenContext = true;
                             final BindingContext newBindingContext = getCurrentBindingContext();
                             contextItem = newBindingContext.getSingleItem();
@@ -378,7 +376,7 @@ public class XFormsContextStack {
                             evaluationContextBinding = newBindingContext;
                         } else if (isNewModel) {
                             // Push model only
-                            pushBinding(propertyContext, null, null, null, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
+                            pushBinding(null, null, null, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
                             hasOverriddenContext = false;
                             final BindingContext newBindingContext = getCurrentBindingContext();
                             contextItem = newBindingContext.getSingleItem();
@@ -433,7 +431,7 @@ public class XFormsContextStack {
                             // Use updated binding context to set model
                             functionContext.setModel(evaluationContextBinding.model);
 
-                            newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationNodeset, evaluationPosition,
+                            newNodeset = XPathCache.evaluateKeepItems(evaluationNodeset, evaluationPosition,
                                     ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                     functionContext, null, locationData);
 
@@ -459,7 +457,7 @@ public class XFormsContextStack {
                                 // Use updated binding context to set model
                                 functionContext.setModel(evaluationContextBinding.model);
 
-                                newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
+                                newNodeset = XPathCache.evaluateKeepItems(evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
                                         ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                         functionContext, null, locationData);
 
@@ -501,7 +499,7 @@ public class XFormsContextStack {
 
                     } else if (context != null) {
                         // Only the context has changed, and possibly the model
-                        pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
+                        pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
                         {
                             newNodeset = getCurrentNodeset();
                             newPosition = getCurrentPosition();
@@ -545,7 +543,7 @@ public class XFormsContextStack {
                     getCurrentBindingContext().setVariables(variableInfo);
                 } else if (isPushModelVariables) {
                     // In this case, only the model just changed and so we gather the variables in scope for the new model
-                    addModelVariables(propertyContext, newModel);
+                    addModelVariables(newModel);
                 }
 
                 // Restore context
@@ -559,7 +557,7 @@ public class XFormsContextStack {
             } catch (Throwable e) {
                 // TODO: should be dispatched to element having the @model attribute
                 // Any other exception occurring within
-                container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container, e));
+                container.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, container, e));
             }
         } catch (ValidationException e) {
             if (bindingElement != null) {

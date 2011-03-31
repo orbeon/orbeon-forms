@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import collection.mutable.Stack
 import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.util.{PropertyContext, XPathCache}
+import org.orbeon.oxf.util.XPathCache
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
@@ -30,7 +30,7 @@ trait SelectionControl extends SimpleElementAnalysis {
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
-    val hasStaticItemset = !XPathCache.evaluateSingle(staticStateContext.propertyContext, staticStateContext.controlsDocument.wrap(element),
+    val hasStaticItemset = !XPathCache.evaluateSingle(staticStateContext.controlsDocument.wrap(element),
             "exists((xforms:choices | xforms:item | xforms:itemset)/(., .//xforms:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
@@ -115,8 +115,8 @@ trait SelectionControl extends SimpleElementAnalysis {
         Some(combinedAnalysis)
     }
 
-    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
-        super.toXML(propertyContext, helper, attributes) {
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+        super.toXML(helper, attributes) {
             // Optional content
             content
 
@@ -124,7 +124,7 @@ trait SelectionControl extends SimpleElementAnalysis {
             getItemsetAnalysis match {
                 case Some(analysis) =>
                     helper.startElement("itemset")
-                    analysis.toXML(propertyContext, helper)
+                    analysis.toXML(helper)
                     helper.endElement()
                 case _ => // NOP
             }

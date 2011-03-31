@@ -111,7 +111,7 @@ class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
         for {
             (controlId, expectedHeaders) <- expected
             control = getValueControl(controlId).asInstanceOf[XFormsOutputControl]
-            actualHeaders = control.testEvaluateHeaders(getPipelineContext)
+            actualHeaders = control.testEvaluateHeaders()
             (expectedHeaderName, expectedHeaderValues) <- expectedHeaders
         } yield
             assert(expectedHeaderValues === actualHeaders(expectedHeaderName).toSeq)

@@ -29,11 +29,11 @@ public class AllReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void deserialize(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // NOP
     }
 
-    public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
 
@@ -45,7 +45,7 @@ public class AllReplacer extends BaseReplacer {
         // "the event xforms-submit-done may be dispatched"
         // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
         if (!p.isDeferredSubmissionSecondPassReplaceAll) {
-            return dispatchSubmitDone(propertyContext, connectionResult);
+            return dispatchSubmitDone(connectionResult);
         } else {
             return null;
         }

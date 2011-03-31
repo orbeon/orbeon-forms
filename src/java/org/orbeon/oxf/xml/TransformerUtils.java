@@ -339,14 +339,22 @@ public class TransformerUtils {
     public static Document readDom4j(InputStream inputStream, String systemId, boolean handleXInclude, boolean handleLexical) {
         final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
         {
+            final TransformerURIResolver resolver;
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN));
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, resolver);
             } else {
+                resolver = null;
                 xmlReceiver = dom4jResult;
             }
-            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+            try {
+                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+            } finally {
+                if (resolver != null)
+                    resolver.destroy();
+            }
         }
         return dom4jResult.getDocument();
 
@@ -358,14 +366,22 @@ public class TransformerUtils {
     public static Document readDom4j(Source source, boolean handleXInclude) {
         final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
         {
+            final TransformerURIResolver resolver;
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN));
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, resolver);
             } else {
+                resolver = null;
                 xmlReceiver = dom4jResult;
             }
-            sourceToSAX(source, xmlReceiver);
+            try {
+                sourceToSAX(source, xmlReceiver);
+            } finally {
+                if (resolver != null)
+                    resolver.destroy();
+            }
         }
         return dom4jResult.getDocument();
 
@@ -379,14 +395,22 @@ public class TransformerUtils {
         {
             final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
             identityHandler.setResult(treeBuilder);
+            final TransformerURIResolver resolver;
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN));
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, resolver);
             } else {
+                resolver = null;
                 xmlReceiver = identityHandler;
             }
-            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+            try {
+                XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, handleLexical);
+            } finally {
+                if (resolver != null)
+                    resolver.destroy();
+            }
         }
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
@@ -397,17 +421,27 @@ public class TransformerUtils {
     public static DocumentInfo readTinyTree(Configuration configuration, Source source, boolean handleXInclude) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
+            final TransformerURIResolver resolver;
             if (handleXInclude) {
-                // Insert XIncludeContentHandler
-                final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
-                identityHandler.setResult(treeBuilder);
-                final XMLReceiver receiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN));
-                TransformerUtils.sourceToSAX(source, receiver);
+                resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
             } else {
-                final Transformer identity = getIdentityTransformer(configuration);
-                identity.transform(source, treeBuilder);
+                resolver = null;
             }
-
+            try {
+                if (handleXInclude) {
+                    // Insert XIncludeContentHandler
+                    final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
+                    identityHandler.setResult(treeBuilder);
+                    final XMLReceiver receiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, resolver);
+                    TransformerUtils.sourceToSAX(source, receiver);
+                } else {
+                    final Transformer identity = getIdentityTransformer(configuration);
+                    identity.transform(source, treeBuilder);
+                }
+            } finally {
+                if (resolver != null)
+                    resolver.destroy();
+            }
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

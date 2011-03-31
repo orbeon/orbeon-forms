@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -26,7 +25,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
 public class XXFormsJoinSubmissions extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement, XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Process all pending async submissions. The action will block until the method returns.
@@ -34,7 +33,7 @@ public class XXFormsJoinSubmissions extends XFormsAction {
             // Only supported in PE version
             final AsynchronousSubmissionManager manager = actionInterpreter.getContainingDocument().getAsynchronousSubmissionManager(false);
             if (manager != null)
-                manager.processAllAsynchronousSubmissions(propertyContext);
+                manager.processAllAsynchronousSubmissions();
         } else {
             // It's better to throw an exception since this action can have an impact on application behavior, not only performance
             throw new OXFException("xxforms:join-submissions extension action is only supported in Orbeon Forms PE.");

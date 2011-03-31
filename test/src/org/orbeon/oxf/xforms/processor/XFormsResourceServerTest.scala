@@ -21,12 +21,12 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     @Test def testProxyURI = {
-        val context = createPipelineContextWithExternalContext
+        createPipelineContextWithExternalContext()
 
         assert("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97" ===
-            XFormsResourceServer.proxyURI(context, "/foo/bar.png", null, null, -1, Collections.emptyMap()));
+            XFormsResourceServer.proxyURI("/foo/bar.png", null, null, -1, Collections.emptyMap()));
 
         assert("/xforms-server/dynamic/674c2ff956348155ff60c01c0c0ec2e0" ===
-            XFormsResourceServer.proxyURI(context, "http://example.org/foo/bar.png", null, null, -1, Collections.emptyMap()));
+            XFormsResourceServer.proxyURI("http://example.org/foo/bar.png", null, null, -1, Collections.emptyMap()));
     }
 }

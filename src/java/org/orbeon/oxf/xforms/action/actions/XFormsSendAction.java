@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -31,7 +30,7 @@ import org.orbeon.saxon.om.Item;
  * 10.1.10 The send Element
  */
 public class XFormsSendAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -45,18 +44,18 @@ public class XFormsSendAction extends XFormsAction {
         final String resolvedSubmissionStaticId;
         {
             // Resolve AVT
-            resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, submissionId);
+            resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, submissionId);
             if (resolvedSubmissionStaticId == null)
                 return;
         }
 
         // Find actual target
-        final Object submission = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedSubmissionStaticId);
+        final Object submission = actionInterpreter.resolveEffectiveObject(actionElement, resolvedSubmissionStaticId);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent(container.getContainingDocument(), (XFormsEventTarget) submission);
-            addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
-            container.dispatchEvent(propertyContext, newEvent);
+            addContextAttributes(actionInterpreter, actionElement, newEvent);
+            container.dispatchEvent(newEvent);
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

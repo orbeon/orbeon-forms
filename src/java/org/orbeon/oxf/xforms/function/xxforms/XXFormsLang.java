@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
@@ -47,7 +46,7 @@ public class XXFormsLang extends XFormsFunction {
             element = containingDocument.getStaticState().getControlElement(elementPrefixedId);
         }
 
-        final String lang = resolveXMLangHandleAVTs(getOrCreatePipelineContext(), getXBLContainer(xpathContext), element);
+        final String lang = resolveXMLangHandleAVTs(getXBLContainer(xpathContext), element);
 
         return (lang == null) ? null : StringValue.makeStringValue(lang);
     }
@@ -79,12 +78,11 @@ public class XXFormsLang extends XFormsFunction {
     /**
      * Resolve an element's dynamic xml:lang value. This resolves top-level AVTs and goes over XBL container boundaries.
      *
-     * @param propertyContext   current context
      * @param xblContainer      current XBL container
      * @param element           element within XBL container
      * @return                  xml:lang value, or null if not found
      */
-    public static String resolveXMLangHandleAVTs(PropertyContext propertyContext, XBLContainer xblContainer, Element element) {
+    public static String resolveXMLangHandleAVTs(XBLContainer xblContainer, Element element) {
 
         // Resolve static value
         final String xmlLang = resolveXMLang(element);
@@ -94,7 +92,7 @@ public class XXFormsLang extends XFormsFunction {
             return null;
         } else if (xmlLang == null) {
             // We are not at the top-level, so try parent container
-            return resolveXMLangHandleAVTs(propertyContext, xblContainer.getParentXBLContainer(),
+            return resolveXMLangHandleAVTs(xblContainer.getParentXBLContainer(),
                     xblContainer.getContainingDocument().getStaticState().getControlElement(xblContainer.getPrefixedId()));
         } else if (!xmlLang.startsWith("#")) {
             // Found static value
@@ -111,7 +109,7 @@ public class XXFormsLang extends XFormsFunction {
             }
 
             final XXFormsAttributeControl attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlStaticId);
-            return attributeControl.getExternalValue(propertyContext);
+            return attributeControl.getExternalValue();
         }
     }
 }

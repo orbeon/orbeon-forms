@@ -53,7 +53,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
     @Override
     public void start(PipelineContext pipelineContext) {
-        final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Request request = externalContext.getRequest();
         final ExternalContext.Response response = externalContext.getResponse();
 
@@ -332,7 +332,6 @@ public class XFormsResourceServer extends ProcessorImpl {
      * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
      * session.
      *
-     * @param propertyContext   context to obtain session
      * @param uri               server URI to transform
      * @param filename          file name
      * @param contentType       type of the content referred to by the URI, or null if unknown
@@ -340,13 +339,13 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param headers           connection headers
      * @return                  client URI
      */
-    public static String proxyURI(PropertyContext propertyContext, String uri, String filename, String contentType, long lastModified, Map<String, String[]> headers) {
+    public static String proxyURI(String uri, String filename, String contentType, long lastModified, Map<String, String[]> headers) {
 
         // Create a digest, so that for a given URI we always get the same key
         final String digest = SecureUtils.digestString(uri, "MD5", "hex");
 
         // Get session
-        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
 
         if (session != null) {

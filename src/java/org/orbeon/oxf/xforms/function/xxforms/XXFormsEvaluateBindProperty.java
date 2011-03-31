@@ -41,8 +41,7 @@ public class XXFormsEvaluateBindProperty extends XFormsFunction {
             // Return empty sequence
             return null;
         } else {
-            final PropertyContext propertyContext = getOrCreatePipelineContext();
-            return binds.evaluateBindByType(propertyContext, bind, 1, mipQName);
+            return binds.evaluateBindByType(bind, 1, mipQName);
         }
     }
 }

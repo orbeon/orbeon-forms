@@ -16,16 +16,22 @@ package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
-import org.junit.{Before, Test}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
+import org.junit._
+import org.orbeon.oxf.pipeline.api.PipelineContext
 
 class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     var response: Response = _
 
     @Before def setup = {
-        response = NetUtils.getExternalContext(createPipelineContextWithExternalContext).getResponse
+        createPipelineContextWithExternalContext()
+        response = NetUtils.getExternalContext.getResponse
+    }
+
+    @After def teardown {
+        PipelineContext.get.destroy(true)
     }
 
     @Test def testURLs {

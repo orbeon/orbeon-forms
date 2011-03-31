@@ -46,7 +46,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -651,20 +650,19 @@ public class XFormsModelSchemaValidator {
     /**
      * Load XForms model schemas.
      *
-     * @param propertyContext       current context
      * @param containingDocument    current document
      */
-    public void loadSchemas(final PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void loadSchemas(XFormsContainingDocument containingDocument) {
 
         // Check for external schema
         if (schemaURIs != null && schemaURIs.length > 0) {
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-            final String resolvedURLString = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, modelElement, schemaURIs[0],
+            final String resolvedURLString = XFormsUtils.resolveServiceURL(containingDocument, modelElement, schemaURIs[0],
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
             // Load associated grammar
-            schemaGrammar = loadCacheGrammar(propertyContext, resolvedURLString);
+            schemaGrammar = loadCacheGrammar(resolvedURLString);
         }
 
         // Check for inline schema
@@ -676,7 +674,7 @@ public class XFormsModelSchemaValidator {
     /**
      * Load and cache a Grammar for a given schema URI.
      */
-    private Grammar loadCacheGrammar(final PropertyContext propertyContext, final String schemaURI) {
+    private Grammar loadCacheGrammar(final String schemaURI) {
         try {
             final URL url = URLFactory.createURL(schemaURI);
             final Long modificationTime = NetUtils.getLastModifiedAsLong(url);
@@ -686,7 +684,7 @@ public class XFormsModelSchemaValidator {
 
             final SchemaInfo schemaInfo;
             {
-                final Object cached = cache.findValid(propertyContext, schemaKey, modificationTime);
+                final Object cached = cache.findValid(schemaKey, modificationTime);
                 schemaInfo = cached == null ? null : (SchemaInfo) cached;
             }
 
@@ -702,7 +700,7 @@ public class XFormsModelSchemaValidator {
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
                 newSchemaInfo.setGrammar(grammar);
-                cache.add(propertyContext, schemaKey, modificationTime, newSchemaInfo);
+                cache.add(schemaKey, modificationTime, newSchemaInfo);
             } else {
                 grammar = schemaInfo.getGrammar();
             }

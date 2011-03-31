@@ -119,7 +119,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
-                    final String outputValue = inputControl.getExternalValue(pipelineContext);
+                    final String outputValue = inputControl.getExternalValue();
                     if (outputValue != null)
                         contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
 
@@ -253,7 +253,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         // Read-only mode
                         if (isConcreteControl) {
                             final String formattedValue = inputControl.getReadonlyValueUseFormat(pipelineContext);
-                            final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue(pipelineContext);
+                            final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue();
 
                             if (handlerContext.isSpanHTMLLayout())
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);

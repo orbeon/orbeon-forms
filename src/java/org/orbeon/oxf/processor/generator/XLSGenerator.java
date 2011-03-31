@@ -23,7 +23,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
@@ -68,7 +67,7 @@ public class XLSGenerator extends ProcessorImpl {
                         final DocumentInfo requestDocument = readInputAsTinyTree(context, XPathCache.getGlobalConfiguration(),
                                 getInputByName(INPUT_REQUEST));
 
-                        final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                        final PooledXPathExpression expr = XPathCache.getXPathExpression(
                                 requestDocument.getConfiguration(), requestDocument,
                                 "/request/parameters/parameter[1]/value", getLocationData());
 

@@ -19,7 +19,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
@@ -52,7 +51,7 @@ public class UnzipProcessor extends ProcessorImpl {
                     // Read input in a temporary file
                     final File temporaryZipFile;
                     {
-                        final FileItem fileItem = NetUtils.prepareFileItem(context, NetUtils.REQUEST_SCOPE);
+                        final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
                         final OutputStream fileOutputStream = fileItem.getOutputStream();
                         readInputAsSAX(context, getInputByName(INPUT_DATA), new BinaryTextXMLReceiver(null, fileOutputStream, true, false, null, false, false, null, false));
                         temporaryZipFile = ((DiskFileItem) fileItem).getStoreLocation();
@@ -71,7 +70,7 @@ public class UnzipProcessor extends ProcessorImpl {
                         String fileTime = ISODateUtils.XS_DATE_TIME.format(new Date(zipEntry.getTime()));
 
                         InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-                        String uri = NetUtils.inputStreamToAnyURI(context, entryInputStream, NetUtils.REQUEST_SCOPE);
+                        String uri = NetUtils.inputStreamToAnyURI(entryInputStream, NetUtils.REQUEST_SCOPE);
                         // <file name="filename.ext">uri</file>
                         AttributesImpl fileAttributes = new AttributesImpl();
                         fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);

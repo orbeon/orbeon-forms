@@ -19,7 +19,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -51,7 +50,7 @@ public class ZipProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Create temporary zip file
-                    final FileItem fileItem = NetUtils.prepareFileItem(context, NetUtils.REQUEST_SCOPE);
+                    final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
                     fileItem.getOutputStream().close();
                     final File temporaryZipFile = ((DiskFileItem) fileItem).getStoreLocation();
                     temporaryZipFile.createNewFile();

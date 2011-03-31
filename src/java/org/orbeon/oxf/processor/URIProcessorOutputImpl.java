@@ -248,7 +248,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
             return null;
 
         // Try to find resource manager key in cache
-        final URIReferences config = (URIReferences) ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+        final URIReferences config = (URIReferences) ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity);
         if (ProcessorImpl.logger.isDebugEnabled()) {
             if (config != null)
                 ProcessorImpl.logger.debug("Config (URIReferences) found: " + config.toString());

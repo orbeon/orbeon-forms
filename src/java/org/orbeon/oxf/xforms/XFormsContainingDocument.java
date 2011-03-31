@@ -167,12 +167,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      *
      * Used by XFormsToXHTML.
      *
-     * @param pipelineContext           current context
      * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      * @param response                  optional response for handling replace="all" during initialization
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, SAXStore annotatedTemplate,
+    public XFormsContainingDocument(XFormsStaticState xformsStaticState, SAXStore annotatedTemplate,
                                     XFormsURIResolver uriResolver, ExternalContext.Response response) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
@@ -184,8 +183,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
         // Initialize request information
         {
-            initializeRequestInformation(pipelineContext);
-            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+            initializeRequestInformation();
+            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
         }
 
         indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
@@ -220,7 +219,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             // Initialize the containing document
             try {
-                initialize(pipelineContext);
+                initialize();
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
             }
@@ -228,8 +227,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         indentedLogger.endHandleOperation();
     }
 
-    private void initializeRequestInformation(PipelineContext pipelineContext) {
-        final ExternalContext.Request request = NetUtils.getExternalContext(pipelineContext).getRequest();
+    private void initializeRequestInformation() {
+        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
 
         // Remember if filter provided separate deployment information
         final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
@@ -271,7 +270,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             final String staticStateDigest = xformsState.getStaticStateDigest();
 
             if (staticStateDigest != null) {
-                final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, staticStateDigest);
+                final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateDigest);
                 if (cachedState != null) {
                     // Found static state in cache
                     indentedLogger.logDebug("", "found static state by digest in cache");
@@ -282,7 +281,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                     this.xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDigest, xformsState.getStaticState());
 
                     // Store in cache
-                    XFormsStaticStateCache.instance().storeDocument(pipelineContext, this.xformsStaticState);
+                    XFormsStaticStateCache.instance().storeDocument(this.xformsStaticState);
                 }
 
                 assert this.xformsStaticState.isServerStateHandling();
@@ -308,10 +307,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             try {
                 if (StringUtils.isEmpty(encodedDynamicState)) {
                     // Just for tests, we allow the dynamic state to be empty
-                    initialize(pipelineContext);
+                    initialize();
                 } else {
                     // Regular case
-                    restoreDynamicState(pipelineContext, encodedDynamicState);
+                    restoreDynamicState(encodedDynamicState);
                 }
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
@@ -624,7 +623,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             eventElement.addAttribute("bubbles", Boolean.toString(bubbles));
             eventElement.addAttribute("cancelable", Boolean.toString(cancelable));
 
-            return XFormsUtils.encodeXML(propertyContext, eventsDocument, false);
+            return XFormsUtils.encodeXML(eventsDocument, false);
         }
 
         public boolean isShowProgress() {
@@ -873,13 +872,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     @Override
-    public void dispatchEvent(PropertyContext propertyContext, XFormsEvent event) {
+    public void dispatchEvent(XFormsEvent event) {
         // Ensure that the event uses the proper container to dispatch the event
         final XBLContainer targetContainer = event.getTargetObject().getXBLContainer(this);
         if (targetContainer == this) {
-            super.dispatchEvent(propertyContext, event);
+            super.dispatchEvent(event);
         } else {
-            targetContainer.dispatchEvent(propertyContext, event);
+            targetContainer.dispatchEvent(event);
         }
     }
 
@@ -917,10 +916,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Prepare the document for a sequence of external events.
      *
-     * @param pipelineContext   current context
      * @param response          ExternalContext.Response for xforms:submission[@replace = 'all'], or null
      */
-    public void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response) {
+    public void beforeExternalEvents(ExternalContext.Response response) {
 
         // Tell dependencies
         xpathDependencies.beforeUpdateResponse();
@@ -929,18 +927,17 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.response = response;
 
         // Process completed asynchronous submissions if any
-        processCompletedAsynchronousSubmissions(pipelineContext, false, false);
+        processCompletedAsynchronousSubmissions(false, false);
     }
 
     /**
      * End a sequence of external events.
      *
-     * @param pipelineContext   current context
      */
-    public void afterExternalEvents(PipelineContext pipelineContext) {
+    public void afterExternalEvents() {
 
         // Process completed asynchronous submissions if any
-        processCompletedAsynchronousSubmissions(pipelineContext, false, true);
+        processCompletedAsynchronousSubmissions(false, true);
 
         this.response = null;
     }
@@ -972,13 +969,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return response;
     }
 
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
 
         final String eventName = event.getName();
         if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
             // Internal load event
             final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;
-            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext();
             try {
                 final String resource = xxformsLoadEvent.getResource();
 
@@ -1001,20 +998,19 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             // Poll event for submissions
             // NOP, as we check for async submission in the client event loop
         } else {
-            super.performDefaultAction(propertyContext, event);
+            super.performDefaultAction(event);
         }
     }
 
     /**
      * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.
      *
-     * @param propertyContext       current context
      * @param compress              whether to compress
      * @param isForceEncryption     whether to force encryption or not
      * @return                      encoded dynamic state
      */
-    public String createEncodedDynamicState(PropertyContext propertyContext, boolean compress, boolean isForceEncryption) {
-        return XFormsUtils.encodeXML(propertyContext, createDynamicStateDocument(), compress,
+    public String createEncodedDynamicState(boolean compress, boolean isForceEncryption) {
+        return XFormsUtils.encodeXML(createDynamicStateDocument(), compress,
             (isForceEncryption || XFormsProperties.isClientStateHandling(this)) ? XFormsProperties.getXFormsPassword() : null, false);
     }
 
@@ -1083,13 +1079,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Restore the document's dynamic state given a serialized version of the dynamic state.
      *
-     * @param pipelineContext       current PipelineContext
      * @param encodedDynamicState   serialized dynamic state
      */
-    private void restoreDynamicState(PipelineContext pipelineContext, String encodedDynamicState) {
+    private void restoreDynamicState(String encodedDynamicState) {
 
         // Get dynamic state document
-        final Element dynamicStateElement = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState).getRootElement();
+        final Element dynamicStateElement = XFormsUtils.decodeXML(encodedDynamicState).getRootElement();
 
         // DEBUG
 //        System.out.println("XXX RESTORE: " + Dom4jUtils.domToPrettyString(dynamicStateElement.getDocument()));
@@ -1113,7 +1108,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else {
             // Use information from the request
             // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
-            initializeRequestInformation(pipelineContext);
+            initializeRequestInformation();
         }
 
         // Restore versioned paths matchers if present
@@ -1144,6 +1139,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
         }
 
+        final PipelineContext pipelineContext = PipelineContext.get();
+
         // Restore models state
         {
             // Store instances state in PipelineContext for use down the line
@@ -1154,7 +1151,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             createControlsAndModels();
 
             // Restore top-level models state, including instances
-            restoreModelsState(pipelineContext);
+            restoreModelsState();
         }
 
         // Restore controls state
@@ -1163,7 +1160,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             final Map<String, Element> serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateElement);
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
 
-            xformsControls.restoreControls(pipelineContext);
+            xformsControls.restoreControls();
 
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
         }
@@ -1185,18 +1182,17 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Whether the containing document is in a phase of restoring the dynamic state.
      *
-     * @param propertyContext   current context
      * @return                  true iif restore is in process
      */
-    public boolean isRestoringDynamicState(PropertyContext propertyContext) {
-        return propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
+    public boolean isRestoringDynamicState() {
+        return PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
     }
 
-    public Map<String, Element> getSerializedControlStatesMap(PropertyContext propertyContext) {
-        return (Map) propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
+    public Map<String, Element> getSerializedControlStatesMap() {
+        return (Map) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
-    private void initialize(PipelineContext pipelineContext) {
+    private void initialize() {
         // This is called upon the first creation of the XForms engine or for testing only
 
         // Create XForms controls and models
@@ -1208,13 +1204,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         startOutermostActionHandler();
         {
             // Initialize models
-            initializeModels(pipelineContext);
+            initializeModels();
 
             // After initialization, some async submissions might be running
-            processCompletedAsynchronousSubmissions(pipelineContext, true, true);
+            processCompletedAsynchronousSubmissions(true, true);
         }
         // End deferred behavior
-        endOutermostActionHandler(pipelineContext);
+        endOutermostActionHandler();
     }
 
     public AsynchronousSubmissionManager getAsynchronousSubmissionManager(boolean create) {
@@ -1223,18 +1219,18 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return asynchronousSubmissionManager;
     }
 
-    private void processCompletedAsynchronousSubmissions(PropertyContext propertyContext, boolean skipDeferredEventHandling, boolean addPollEvent) {
+    private void processCompletedAsynchronousSubmissions(boolean skipDeferredEventHandling, boolean addPollEvent) {
         final AsynchronousSubmissionManager manager = getAsynchronousSubmissionManager(false);
-        if (manager != null && manager.hasPendingAsynchronousSubmissions(propertyContext)) {
+        if (manager != null && manager.hasPendingAsynchronousSubmissions()) {
             if (!skipDeferredEventHandling)
                 startOutermostActionHandler();
-            manager.processCompletedAsynchronousSubmissions(propertyContext);
+            manager.processCompletedAsynchronousSubmissions();
             if (!skipDeferredEventHandling)
-                endOutermostActionHandler(propertyContext);
+                endOutermostActionHandler();
 
             // Remember to send a poll event if needed
             if (addPollEvent)
-                manager.addClientDelayEventIfNeeded(propertyContext);
+                manager.addClientDelayEventIfNeeded();
         }
     }
 
@@ -1253,14 +1249,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         addAllModels();
     }
 
-    protected void initializeNestedControls(PropertyContext propertyContext) {
+    protected void initializeNestedControls() {
         // Call-back from super class models initialization
 
         // This is important because if controls use binds, those must be up to date
-        rebuildRecalculateIfNeeded(propertyContext);
+        rebuildRecalculateIfNeeded();
 
         // Initialize controls
-        xformsControls.initialize(propertyContext);
+        xformsControls.initialize();
     }
 
     private Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();
@@ -1395,21 +1391,21 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Called when this document is added to the document cache.
      */
-    public void added(PropertyContext propertyContext) {
-        XFormsStateManager.instance().onAdd(propertyContext, this);
+    public void added() {
+        XFormsStateManager.instance().onAdd(this);
     }
 
     /**
      * Called when somebody explicitly removes this document from the document cache.
      */
-    public void removed(PropertyContext propertyContext) {
-        XFormsStateManager.instance().onRemove(propertyContext, this);
+    public void removed() {
+        XFormsStateManager.instance().onRemove(this);
     }
 
     /**
      * Called when cache expires this document from the document cache.
      */
-    public void evicted(PropertyContext propertyContext) {
-        XFormsStateManager.instance().onEvict(propertyContext, this);
+    public void evicted() {
+        XFormsStateManager.instance().onEvict(this);
     }
 }

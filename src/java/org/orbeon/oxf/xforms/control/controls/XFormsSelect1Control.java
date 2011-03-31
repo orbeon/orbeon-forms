@@ -68,8 +68,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
 
         @Override
-        protected Itemset evaluateValue(PropertyContext propertyContext) {
-            return XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this);
+        protected Itemset evaluateValue() {
+            return XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this);
         }
 
         @Override
@@ -83,12 +83,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    protected void onCreate(PropertyContext propertyContext) {
-        super.onCreate(propertyContext);
+    protected void onCreate() {
+        super.onCreate();
         // Evaluate itemsets only if restoring dynamic state
         // NOTE: This doesn't sound like it is the right place to do this, does it?
-        if (containingDocument.isRestoringDynamicState(propertyContext))
-            getItemset(propertyContext);
+        if (containingDocument.isRestoringDynamicState())
+            getItemset();
     }
 
     public SelectionControl getSelectionControl() {
@@ -148,7 +148,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
         if (control != null && control.isRelevant()) {
             // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
-            return control.getItemset(pipelineContext);
+            return control.getItemset();
         } else if (isStaticItemset(containingDocument, prefixedId)) {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
@@ -162,10 +162,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
     /**
      * Get this control's itemset.
      *
-     * @param propertyContext   current context
      * @return                  itemset
      */
-    public Itemset getItemset(PropertyContext propertyContext) {
+    public Itemset getItemset() {
         try {
             // Non-relevant control does not return an itemset
             if (!isRelevant())
@@ -176,13 +175,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
                 Itemset constantItemset =  containingDocument.getControls().getConstantItems(getPrefixedId());
                 if (constantItemset == null) {
-                    constantItemset = XFormsItemUtils.evaluateItemset(propertyContext, XFormsSelect1Control.this);
+                    constantItemset = XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this);
                     containingDocument.getControls().setConstantItems(getPrefixedId(), constantItemset);
                 }
                 return constantItemset;
             } else {
                 // Items are stored in the control
-                return itemsetProperty.getValue(propertyContext);
+                return itemsetProperty.getValue();
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
@@ -214,7 +213,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue(PropertyContext propertyContext) {
+    protected void evaluateExternalValue() {
         final String internalValue = getValue();
         final String updatedValue;
 
@@ -226,7 +225,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // NOTE: We could in the future check that the value is in fact part of the itemset first, and send a blank value otherwise..
             if (isEncryptItemValues()) {
                 // For closed selection, values sent to client must be encrypted
-                updatedValue = XFormsItemUtils.encryptValue(propertyContext, internalValue);
+                updatedValue = XFormsItemUtils.encryptValue(internalValue);
             } else {
                 // For open selection, values sent to client are the internal values
                 updatedValue = internalValue;
@@ -236,7 +235,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
+    public void storeExternalValue(String value, String type) {
 
         if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
             // Handle xforms:select1-specific logic
@@ -244,7 +243,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Decrypt incoming value. With open selection, values are sent to the client.
             if (isEncryptItemValues()) {
                 try {
-                    value = XFormsItemUtils.decryptValue(propertyContext, value);
+                    value = XFormsItemUtils.decryptValue(value);
                 } catch (IllegalArgumentException e) {
                     getIndentedLogger().logError("", "exception decrypting value", "control id", getEffectiveId(), "value", value);
                     throw e;
@@ -255,7 +254,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             final String controlValue = getValue();
 
             // Iterate over all the items
-            final Itemset itemset = getItemset(propertyContext);
+            final Itemset itemset = getItemset();
             final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
             final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
             if (itemset != null) {
@@ -284,35 +283,35 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(propertyContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(propertyContext, currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(currentEvent);
                 }
             }
 
             if (hasSelectedItem || isOpenSelection()) {
                 // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
                 // we are a closed selection then we do NOT store the value in instance.
-                super.storeExternalValue(propertyContext, value, type);
+                super.storeExternalValue(value, type);
             }
         } else {
             // Forward to superclass
-            super.storeExternalValue(propertyContext, value, type);
+            super.storeExternalValue(value, type);
         }
     }
 
     @Override
-    public Object getBackCopy(PropertyContext propertyContext) {
-        final XFormsSelect1Control cloned = (XFormsSelect1Control) super.getBackCopy(propertyContext);
+    public Object getBackCopy() {
+        final XFormsSelect1Control cloned = (XFormsSelect1Control) super.getBackCopy();
 
         // If we have an itemset, make sure the computed value is used as basis for comparison
         if (itemsetProperty != null)
-            cloned.itemsetProperty = new ConstantControlProperty<Itemset>(itemsetProperty.getValue(propertyContext));
+            cloned.itemsetProperty = new ConstantControlProperty<Itemset>(itemsetProperty.getValue());
 
         return cloned;
     }
@@ -358,7 +357,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             } else {
                 // If the itemsets changed, then we need to send an update
                 // NOTE: This also covers the case where the control was and is non-relevant
-                return !Itemset.compareItemsets(otherSelect1Control.getItemset(propertyContext), getItemset(propertyContext));
+                return !Itemset.compareItemsets(otherSelect1Control.getItemset(), getItemset());
             }
         }
     }
@@ -373,9 +372,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
         if (mustSendItemsetUpdate(pipelineContext, (XFormsSelect1Control) other)) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", XFormsUtils.namespaceId(containingDocument, getEffectiveId())});
             {
-                final Itemset itemset = getItemset(pipelineContext);
+                final Itemset itemset = getItemset();
                 if (itemset != null) {
-                    final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, getLocationData());
+                    final String result = itemset.getJSONTreeInfo(null, false, getLocationData());
                     if (result.length() > 0)
                         ch.text(result);
                 }

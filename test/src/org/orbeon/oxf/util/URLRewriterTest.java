@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util;
 
 import org.dom4j.Document;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orbeon.oxf.common.Version;
@@ -32,6 +33,10 @@ import static junit.framework.Assert.*;
 
 public class URLRewriterTest extends ResourceManagerTestBase {
 
+    private PipelineContext directPipelineContext;
+    private PipelineContext forwardPipelineContext;
+    private PipelineContext filterPipelineContext;
+
     private ExternalContext.Request directRequest;
     private ExternalContext.Request forwardRequest;
     private ExternalContext.Request filterRequest;
@@ -40,33 +45,40 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void setup() throws Exception {
 
         {
-            final PipelineContext pipelineContext = new PipelineContext();
+            directPipelineContext = new PipelineContext();
             final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request.xml", null);
-            final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
+            final ExternalContext externalContext = new TestExternalContext(directPipelineContext, requestDocument);
             directRequest = externalContext.getRequest();
             // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+            directPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }
         {
-            final PipelineContext pipelineContext = new PipelineContext();
+            forwardPipelineContext = new PipelineContext();
             final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-forward.xml", null);
-            final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
+            final ExternalContext externalContext = new TestExternalContext(forwardPipelineContext, requestDocument);
             forwardRequest = externalContext.getRequest();
             // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+            forwardPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }
         {
-            final PipelineContext pipelineContext = new PipelineContext();
+            filterPipelineContext = new PipelineContext();
             final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-filter.xml", null);
-            final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
+            final ExternalContext externalContext = new TestExternalContext(filterPipelineContext, requestDocument);
             filterRequest = externalContext.getRequest();
             // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+            filterPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }
 
         // Reinitialize properties to enable versioned resources
         Properties.invalidate();
 		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties-versioned-all.xml");
+    }
+
+    @After
+    public void tearDown() {
+        directPipelineContext.destroy(true);
+        forwardPipelineContext.destroy(true);
+        filterPipelineContext.destroy(true);
     }
 
     @Test

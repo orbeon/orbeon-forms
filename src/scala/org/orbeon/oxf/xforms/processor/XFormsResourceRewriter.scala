@@ -45,7 +45,7 @@ object XFormsResourceRewriter {
     }
 
     private def generateCSS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {
-        val externalContext = NetUtils.getExternalContext(propertyContext)
+        val externalContext = NetUtils.getExternalContext()
         val response = externalContext.getResponse
         val containerNamespace = externalContext.getRequest.getContainerNamespace
 

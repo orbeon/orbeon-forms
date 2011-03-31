@@ -431,7 +431,7 @@ public class ImageServer extends ProcessorImpl {
                     if (keyValidity == null)
                         return null;
 
-                    config = (Config) ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+                    config = (Config) ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity);
                     if (config == null)
                         return null;
                 }
@@ -443,7 +443,7 @@ public class ImageServer extends ProcessorImpl {
                     if (keyValidity == null)
                         return null;
 
-                    imageConfig = (ImageConfig) ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+                    imageConfig = (ImageConfig) ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity);
                     if (imageConfig == null)
                         return null;
                 }

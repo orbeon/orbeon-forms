@@ -133,7 +133,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
-        final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsToXHTML.logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
         // ContainingDocument and XFormsState created below
@@ -164,7 +164,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput,
                                 pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                        containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
+                        containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
                         gatherInputDependencies(pipelineContext, containingDocument[0], indentedLogger, stage1CacheableState);
@@ -193,7 +193,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 final XFormsStaticState staticState;
                 {
-                    final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, stage2CacheableState.getStaticStateDigest());
+                    final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(stage2CacheableState.getStaticStateDigest());
                     if (cachedState != null && cachedState.getMetadata().checkBindingsIncludes()) {
                         // Found static state in cache
                         indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
@@ -208,15 +208,15 @@ public class XFormsToXHTML extends ProcessorImpl {
                             indentedLogger.logDebug("", "did not find static state by digest in cache");
 
                         final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
-                        staticState = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
+                        staticState = new XFormsStaticState(staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
 
                         // Store in cache
-                        XFormsStaticStateCache.instance().storeDocument(pipelineContext, staticState);
+                        XFormsStaticStateCache.instance().storeDocument(staticState);
                     }
                 }
 
                 final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                containingDocument[0] = new XFormsContainingDocument(pipelineContext, staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
+                containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
             } else {
                 assert !cachedStatus[0];
                 indentedLogger.logDebug("", "annotated document and static state digest not obtained from cache.");
@@ -233,7 +233,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             // Notify state manager
-            XFormsStateManager.instance().afterInitialResponse(pipelineContext, containingDocument[0]);
+            XFormsStateManager.instance().afterInitialResponse(containingDocument[0]);
 
         } catch (Throwable e) {
             indentedLogger.logDebug("", "throwable caught during initialization.");
@@ -246,7 +246,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger, null);
 
         {
-            final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(pipelineContext, staticStateBits.staticStateDigest);
+            final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateBits.staticStateDigest);
             if (cachedState != null && cachedState.getMetadata().checkBindingsIncludes()) {
                 // Found static state in cache
                 indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
@@ -260,10 +260,10 @@ public class XFormsToXHTML extends ProcessorImpl {
                 else
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
                 
-                staticState[0] = new XFormsStaticState(pipelineContext, staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
+                staticState[0] = new XFormsStaticState(staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
 
                 // Store in cache
-                XFormsStaticStateCache.instance().storeDocument(pipelineContext, staticState[0]);
+                XFormsStaticStateCache.instance().storeDocument(staticState[0]);
             }
         }
 
@@ -373,7 +373,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             for (final Instance instance: model.instancesMap().values()) {
                 if (instance.dependencyURL() != null) {
 
-                    final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(pipelineContext, containingDocument, instance.element(), instance.dependencyURL(),
+                    final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.dependencyURL(),
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                     if (!instance.isCacheHint()) {

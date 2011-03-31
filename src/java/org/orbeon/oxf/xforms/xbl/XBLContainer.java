@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.xbl;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
@@ -181,9 +180,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     /**
      * Remove container and destroy models when a repeat iteration is removed.
      *
-     * @param propertyContext   current context
      */
-    public void destroy(PropertyContext propertyContext) {
+    public void destroy() {
         // Tell parent about it
         if (parentXBLContainer != null) {
             parentXBLContainer.removeChild(this);
@@ -191,7 +189,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Dispatch destruction event to all models
         for (final XFormsModel model: models) {
-            dispatchEvent(propertyContext, new XFormsModelDestructEvent(containingDocument, model));
+            dispatchEvent(new XFormsModelDestructEvent(containingDocument, model));
         }
     }
 
@@ -239,7 +237,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return bindingContext;
     }
 
-    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
         return getBindingContext();
     }
 
@@ -315,25 +313,25 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    protected void initializeModels(PipelineContext pipelineContext) {
+    protected void initializeModels() {
 
         // 4.2 Initialization Events
 
         // 1. Dispatch xforms-model-construct to all models
         // 2. Dispatch xforms-model-construct-done to all models
         // 3. Dispatch xforms-ready to all models
-        initializeModels(pipelineContext, new String[] {
+        initializeModels(new String[] {
                 XFormsEvents.XFORMS_MODEL_CONSTRUCT,
                 XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE,
                 XFormsEvents.XFORMS_READY
         });
     }
 
-    public void initializeModels(PropertyContext propertyContext, String[] eventsToDispatch) {
+    public void initializeModels(String[] eventsToDispatch) {
         for (int i = 0; i < eventsToDispatch.length; i++) {
             if (i == 2) {// before dispatching xforms-ready
                 // Initialize controls after all the xforms-model-construct-done events have been sent
-                initializeNestedControls(propertyContext);
+                initializeNestedControls();
 
                 // Make sure there is at least one refresh
                 requireRefresh();
@@ -341,12 +339,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Iterate over all the models
             for (final XFormsModel model: models) {
-                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(containingDocument, eventsToDispatch[i], model));
+                dispatchEvent(XFormsEventFactory.createEvent(containingDocument, eventsToDispatch[i], model));
             }
         }
     }
 
-    protected void initializeNestedControls(PropertyContext propertyContext) {
+    protected void initializeNestedControls() {
         // NOP by default
     }
 
@@ -644,10 +642,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return (componentControl == null) || componentControl.isRelevant();
     }
 
-    public void restoreModelsState(PropertyContext propertyContext) {
+    public void restoreModelsState() {
         // Handle this container only
         for (final XFormsModel model: models) {
-            model.restoreState(propertyContext);
+            model.restoreState();
         }
     }
 
@@ -666,13 +664,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 //        }
     }
 
-    public void endOutermostActionHandler(PropertyContext propertyContext) {
+    public void endOutermostActionHandler() {
 //        if (isRelevant()) {
-            synchronizeAndRefresh(propertyContext);
+            synchronizeAndRefresh();
 //        }
     }
 
-    public void synchronizeAndRefresh(PropertyContext propertyContext) {
+    public void synchronizeAndRefresh() {
         // Below we split RRR and Refresh in order to reduce the number of refreshes performed
 
         // This is fun. Say you have a single model requiring RRRR and you get here the first time:
@@ -695,9 +693,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         while (needRebuildRecalculateRevalidate() || containingDocument.getControls().isRequireRefresh()) {
             while (needRebuildRecalculateRevalidate())
-                rebuildRecalculateRevalidateIfNeeded(propertyContext);
+                rebuildRecalculateRevalidateIfNeeded();
 
-            refreshIfNeeded(propertyContext);
+            refreshIfNeeded();
         }
     }
 
@@ -718,11 +716,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return false;
     }
 
-    private void rebuildRecalculateRevalidateIfNeeded(PropertyContext propertyContext) {
+    private void rebuildRecalculateRevalidateIfNeeded() {
         if (isRelevant()) {
             // Handle this container
             for (final XFormsModel model: models) {
-                model.rebuildRecalculateRevalidateIfNeeded(propertyContext);
+                model.rebuildRecalculateRevalidateIfNeeded();
             }
             // Recurse into children containers
             if (childrenXBLContainers != null) {
@@ -732,7 +730,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 // might happen!
                 final Map<String, XBLContainer> tempMap = new LinkedHashMap<String, XBLContainer>(childrenXBLContainers);
                 for (final XBLContainer container: tempMap.values()) {
-                    container.rebuildRecalculateRevalidateIfNeeded(propertyContext);
+                    container.rebuildRecalculateRevalidateIfNeeded();
                 }
             }
         }
@@ -747,16 +745,16 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    public void refreshIfNeeded(PropertyContext propertyContext) {
+    public void refreshIfNeeded() {
         // Delegate to controls
-        containingDocument.getControls().refreshIfNeeded(propertyContext, this);
+        containingDocument.getControls().refreshIfNeeded(this);
     }
 
-    public void rebuildRecalculateIfNeeded(PropertyContext propertyContext) {
+    public void rebuildRecalculateIfNeeded() {
         if (isRelevant()) {
             // Handle this container
             for (final XFormsModel model: models) {
-                model.rebuildRecalculateIfNeeded(propertyContext);
+                model.rebuildRecalculateIfNeeded();
             }
             // Recurse into children containers
             if (childrenXBLContainers != null) {
@@ -766,7 +764,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 // might happen!
                 final Map<String, XBLContainer> tempMap = new LinkedHashMap<String, XBLContainer>(childrenXBLContainers);
                 for (final XBLContainer container: tempMap.values()) {
-                    container.rebuildRecalculateIfNeeded(propertyContext);
+                    container.rebuildRecalculateIfNeeded();
                 }
             }
         }
@@ -797,7 +795,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return null;
     }
 
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
 
         // NOTE: This event must be dispatched to elements that support bindings, but at the moment XFormsContextStack
         // doesn't know how to perform such dispatches so it dispatches to the container. This is of minor consequence
@@ -811,7 +809,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XBLContainer container, XFormsEvent event) {
         // NOP
     }
 
@@ -826,7 +824,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     /**
      * Main event dispatching entry.
      */
-    public void dispatchEvent(PropertyContext propertyContext, XFormsEvent originalEvent) {
+    public void dispatchEvent(XFormsEvent originalEvent) {
 
         // XXFormsValueChangeWithFocusChangeEvent is always transformed into DOMFocusIn/Out
         assert !(originalEvent instanceof XXFormsValueChangeWithFocusChangeEvent);
@@ -914,7 +912,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     retargetedEvent.setCurrentPhase(XFormsEvent.Phase.capture);
-                                    eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
+                                    eventHandler.handleEvent(currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
                                     indentedLogger.endHandleOperation();
@@ -999,7 +997,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     // fix event retargeting to make more sense in the first place.
                     final boolean isAtTarget = currentEventObserver == targetObject;
                     if (isAtTarget) {
-                        currentEventObserver.performTargetAction(propertyContext, currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);
+                        currentEventObserver.performTargetAction(currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);
                     }
 
                     // Process event handlers
@@ -1013,7 +1011,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     retargetedEvent.setCurrentPhase(isAtTarget ? XFormsEvent.Phase.target : XFormsEvent.Phase.bubbling);
-                                    eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
+                                    eventHandler.handleEvent(currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
                                     indentedLogger.endHandleOperation();
@@ -1034,7 +1032,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 indentedLogger.startHandleOperation("dispatchEvent", "default action handler");
                 containingDocument.startHandleEvent(originalEvent);
                 try {
-                    targetObject.performDefaultAction(propertyContext, originalEvent);
+                    targetObject.performDefaultAction(originalEvent);
                 } finally {
                     containingDocument.endHandleEvent();
                     indentedLogger.endHandleOperation();

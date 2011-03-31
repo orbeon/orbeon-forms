@@ -122,14 +122,14 @@ public class OrbeonServletDelegate extends HttpServlet {
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             // Filter on supported methods
-            String httpMethod = request.getMethod();
+            final String httpMethod = request.getMethod();
             if (acceptedMethods.get(httpMethod.toLowerCase()) == null)
                 throw new OXFException("HTTP method not accepted: " + httpMethod
                         + ". You can configure methods in your web.xml using the parameter: " + ProcessorService.HTTP_ACCEPT_METHODS_PROPERTY);
 
             // Run service
-            PipelineContext pipelineContext = new PipelineContext();
-            ExternalContext externalContext = new ServletExternalContext(getServletContext(), pipelineContext, webAppContext.getServletInitParametersMap(), request, response);
+            final PipelineContext pipelineContext = new PipelineContext();
+            final ExternalContext externalContext = new ServletExternalContext(getServletContext(), pipelineContext, webAppContext.getServletInitParametersMap(), request, response);
             processorService.service(externalContext, pipelineContext);
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));

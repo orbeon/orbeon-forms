@@ -329,7 +329,7 @@ public class ControlsComparator {
             //
             // So for now, perform simple steps here, and later this can be revisited.
             //
-            final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext();
             controller.setOutput(new DeferredXMLReceiverImpl(new XHTMLRewrite().getRewriteXMLReceiver(externalContext,
                     new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getXmlReceiver()), true), true)));// NOTE: skip the root element
 

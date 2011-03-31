@@ -418,9 +418,13 @@ public class XMLUtils {
     private static void inputSourceToSAX(InputSource inputSource, XMLReceiver xmlReceiver, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical) {
 
         // Insert XInclude processor if needed
+        final TransformerURIResolver resolver;
         if (parserConfiguration.handleXInclude) {
             parserConfiguration =  new XMLUtils.ParserConfiguration(parserConfiguration.validating, false, parserConfiguration.externalEntities, parserConfiguration.uriReferences);
-            xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, xmlReceiver, parserConfiguration.uriReferences, new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN));
+            resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
+            xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, xmlReceiver, parserConfiguration.uriReferences, resolver);
+        } else {
+            resolver = null;
         }
 
         try {
@@ -436,6 +440,9 @@ public class XMLUtils {
             throw new ValidationException(e.getMessage(), new LocationData(e));
         } catch (Exception e) {
             throw new OXFException(e);
+        } finally {
+            if (resolver != null)
+                resolver.destroy();
         }
     }
 
@@ -1093,41 +1100,45 @@ public class XMLUtils {
     }
 
     public static org.dom4j.Document cleanXML(org.dom4j.Document doc, String stylesheetURL) {
-      try {
-        final org.dom4j.Element element = doc.getRootElement();
-        final String systemId = Dom4jUtils.makeSystemId(element);
-        // The date to clean
-        final DOMGenerator dataToClean = new DOMGenerator(doc, "clean xml", DOMGenerator.ZeroValidity, systemId);
-        // The stylesheet
-        URLGenerator stylesheetGenerator = new URLGenerator(stylesheetURL);
-        // The transformation
-        // Define the name of the processor (this is a QName)
-        final QName processorName = new QName("xslt", XMLConstants.OXF_PROCESSORS_NAMESPACE);
-        // Get a factory for this processor
-        final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
-        if (processorFactory == null)
-          throw new OXFException("Cannot find processor factory with name '"
-                                 + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
+        try {
+            final org.dom4j.Element element = doc.getRootElement();
+            final String systemId = Dom4jUtils.makeSystemId(element);
+            // The date to clean
+            final DOMGenerator dataToClean = new DOMGenerator(doc, "clean xml", DOMGenerator.ZeroValidity, systemId);
+            // The stylesheet
+            URLGenerator stylesheetGenerator = new URLGenerator(stylesheetURL);
+            // The transformation
+            // Define the name of the processor (this is a QName)
+            final QName processorName = new QName("xslt", XMLConstants.OXF_PROCESSORS_NAMESPACE);
+            // Get a factory for this processor
+            final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
+            if (processorFactory == null)
+                throw new OXFException("Cannot find processor factory with name '"
+                        + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
 
-        // Create processor
-        final Processor xsltProcessor = processorFactory.createInstance();
-        // Where the result goes
-        DOMSerializer transformationOutput = new DOMSerializer();
+            // Create processor
+            final Processor xsltProcessor = processorFactory.createInstance();
+            // Where the result goes
+            DOMSerializer transformationOutput = new DOMSerializer();
 
-        // Connect
-        PipelineUtils.connect(stylesheetGenerator, "data", xsltProcessor, "config");
-        PipelineUtils.connect(dataToClean, "data", xsltProcessor, "data");
-        PipelineUtils.connect(xsltProcessor, "data", transformationOutput, "data");
+            // Connect
+            PipelineUtils.connect(stylesheetGenerator, "data", xsltProcessor, "config");
+            PipelineUtils.connect(dataToClean, "data", xsltProcessor, "data");
+            PipelineUtils.connect(xsltProcessor, "data", transformationOutput, "data");
 
-        // Run the pipeline
-        PipelineContext pipelineContext = new PipelineContext();
-        transformationOutput.start(pipelineContext);
-        // Get the output
-        return transformationOutput.getDocument(pipelineContext);
-      }
-      catch(Exception e) {
-        throw new OXFException(e);
-      }
+            // Run the pipeline
+            final PipelineContext pipelineContext = new PipelineContext();
+            boolean success = false;
+            try {
+                transformationOutput.start(pipelineContext);
+                success = true;
+                return transformationOutput.getDocument(pipelineContext);
+            } finally {
+                pipelineContext.destroy(success);
+            }
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
     }
 
     public static String toString(final Locator loc) {
@@ -1294,39 +1305,39 @@ public class XMLUtils {
     }
 
     public interface DebugXML {
-        void toXML(PropertyContext propertyContext, ContentHandlerHelper helper);
+        void toXML(ContentHandlerHelper helper);
     }
 
-    public static org.dom4j.Document createDebugRequestDocument(final PropertyContext propertyContext, final DebugXML debugXML) {
-        return createDocument(propertyContext, new DebugXML() {
-            public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
-                wrapWithRequestElement(propertyContext, helper, debugXML);
+    public static org.dom4j.Document createDebugRequestDocument(final DebugXML debugXML) {
+        return createDocument(new DebugXML() {
+            public void toXML(ContentHandlerHelper helper) {
+                wrapWithRequestElement(helper, debugXML);
             }
         });
     }
 
-    public static org.dom4j.Document createDocument(PropertyContext propertyContext, DebugXML debugXML) {
+    public static org.dom4j.Document createDocument(DebugXML debugXML) {
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
         final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
-        debugXML.toXML(propertyContext, helper);
+        debugXML.toXML(helper);
 
         return result.getDocument();
     }
 
-    public static void wrapWithRequestElement(PropertyContext propertyContext, ContentHandlerHelper helper, DebugXML debugXML) {
+    public static void wrapWithRequestElement(ContentHandlerHelper helper, DebugXML debugXML) {
         helper.startDocument();
 
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Request request = (externalContext != null) ? externalContext.getRequest() : null;
         helper.startElement("request", new String[] { "request-uri", (request != null) ? request.getRequestURI() : null,
                 "query-string", (request != null) ? request.getQueryString() : null,
                 "method", (request != null) ? request.getMethod() : null
         });
 
-        debugXML.toXML(propertyContext, helper);
+        debugXML.toXML(helper);
 
         helper.endElement();
 

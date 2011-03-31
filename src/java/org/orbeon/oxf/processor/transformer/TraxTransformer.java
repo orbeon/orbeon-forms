@@ -93,7 +93,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Get templates from cache, or create it
                     Templates templates = (Templates) ObjectCache.instance().findValid
-                            (context, combinedInputCacheKey, combinedInputValidity);
+                            (combinedInputCacheKey, combinedInputValidity);
                     if (templates == null) {
 
                         // Create template handler
@@ -110,7 +110,7 @@ public class TraxTransformer extends ProcessorImpl {
                         templates = templatesHandler.getTemplates();
 
                         // Save template in cache
-                        ObjectCache.instance().add(context, combinedInputCacheKey, combinedInputValidity, templates);
+                        ObjectCache.instance().add(combinedInputCacheKey, combinedInputValidity, templates);
                     }
 
                     // Perform transformation

@@ -65,7 +65,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
         // Use servlet URL rewriter for resources, even in portlet mode, so that resources are served over HTTP by
         // the servlet and not looping back through the portal.
-        final URLRewriter servletRewriter = new ServletURLRewriter(pipelineContext, externalContext.getRequest());
+        final URLRewriter servletRewriter = new ServletURLRewriter(externalContext.getRequest());
 
         final ITextRenderer renderer = new ITextRenderer(DEFAULT_DOTS_PER_POINT, DEFAULT_DOTS_PER_PIXEL);
         try {
@@ -111,7 +111,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
                 public ImageResource getImageResource(String uri) {
                     final InputStream is = resolveAndOpenStream(uri);
-                    final String localURI = NetUtils.inputStreamToAnyURI(pipelineContext, is, NetUtils.REQUEST_SCOPE);
+                    final String localURI = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE);
                     return super.getImageResource(localURI);
                 }
             };

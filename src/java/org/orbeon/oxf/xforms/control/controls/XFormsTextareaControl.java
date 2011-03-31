@@ -17,7 +17,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -64,7 +63,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
      * a stylesheet that removes all unknown or dangerous content.
      */
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
+    public void storeExternalValue(String value, String type) {
         if ("text/html".equals(getMediatype())) {
             final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
@@ -88,6 +87,6 @@ public class XFormsTextareaControl extends XFormsValueControl {
             if (isDebugEnabled)
                 indentedLogger.endHandleOperation("value", value);
         }
-        super.storeExternalValue(propertyContext, value, type);
+        super.storeExternalValue(value, type);
     }
 }

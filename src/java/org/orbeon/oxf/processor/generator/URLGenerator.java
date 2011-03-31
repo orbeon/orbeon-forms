@@ -395,7 +395,7 @@ public class URLGenerator extends ProcessorImpl {
                     ResourceHandler handler = null;
                     try {
                         // We use the same validity as for the output
-                        final Object cachedResource = (localCacheKey == null) ? null : ObjectCache.instance().findValid(pipelineContext, localCacheKey, localCacheValidity);
+                        final Object cachedResource = (localCacheKey == null) ? null : ObjectCache.instance().findValid(localCacheKey, localCacheValidity);
                         if (cachedResource != null) {
                             // Just replay the cached resource
                             ((SAXStore) cachedResource).replay(xmlReceiver);
@@ -469,7 +469,7 @@ public class URLGenerator extends ProcessorImpl {
                                 // Make sure SAXStore loses its reference on its output so that we don't clutter the cache
                                 ((SAXStore) output).setXMLReceiver(null);
                                 // Add to cache
-                                ObjectCache.instance().add(pipelineContext, localCacheKey, localCacheValidity, output);
+                                ObjectCache.instance().add(localCacheKey, localCacheValidity, output);
                             }
                         }
                     } finally {
@@ -612,7 +612,7 @@ public class URLGenerator extends ProcessorImpl {
                 }
 
                 // Try to find resource manager key in cache
-                final ConfigURIReferences config = (ConfigURIReferences) ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity);
+                final ConfigURIReferences config = (ConfigURIReferences) ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity);
                 if (logger.isDebugEnabled()) {
                     if (config != null)
                         logger.debug("Config found: " + config.toString());

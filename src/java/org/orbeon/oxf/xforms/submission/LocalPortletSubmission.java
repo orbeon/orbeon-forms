@@ -18,7 +18,6 @@ import org.orbeon.oxf.portlet.OrbeonPortlet2Delegate;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 
@@ -44,10 +43,10 @@ public class LocalPortletSubmission extends BaseSubmission {
     /**
      * Check whether submission is allowed.
      */
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = NetUtils.getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
@@ -91,7 +90,7 @@ public class LocalPortletSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
         // URI with xml:base resolution
@@ -104,7 +103,7 @@ public class LocalPortletSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Evaluate headers if any
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
+        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
@@ -121,7 +120,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                 final boolean[] status = { false , false };
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openLocalConnection(propertyContext, NetUtils.getExternalContext(propertyContext),
+                    connectionResult = openLocalConnection(NetUtils.getExternalContext(),
                         detailsLogger, containingDocument.getResponse(), p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                         p.actualHttpMethod, resolvedURI.toString(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {
@@ -146,10 +145,10 @@ public class LocalPortletSubmission extends BaseSubmission {
                         return null;
                     } else {
                         // Obtain replacer
-                        final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+                        final Replacer replacer = submission.getReplacer(connectionResult, p);
 
                         // Deserialize
-                        replacer.deserialize(propertyContext, connectionResult, p, p2);
+                        replacer.deserialize(connectionResult, p, p2);
 
                         // Update status
                         status[1] = true;
@@ -170,6 +169,6 @@ public class LocalPortletSubmission extends BaseSubmission {
 
         // Submit the callable
         // This returns null if the execution is deferred
-        return submitCallable(propertyContext, p, p2, callable);
+        return submitCallable(p, p2, callable);
     }
 }

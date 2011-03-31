@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
-import org.orbeon.oxf.util.PropertyContext
 import java.util.{Map => JMap, LinkedHashMap => JLinkedHashMap, Set => JSet, List => JList }
 import org.orbeon.oxf.xforms._
 
@@ -335,20 +334,20 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
                 child.freeTransientState()
         }
 
-        override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = ()) {
-            super.toXML(propertyContext, helper, List("id", staticId, "context", context.orNull, "ref", ref.orNull)) {
+        override def toXML(helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = ()) {
+            super.toXML(helper, List("id", staticId, "context", context.orNull, "ref", ref.orNull)) {
                 // @ref analysis is handled by superclass
 
                 // MIP analysis
                 for (mip <- allMIPNameToXPathMIP.values) {
                     helper.startElement("mip", Array("name", mip.name, "expression", mip.expression))
-                    mip.analysis.toXML(propertyContext, helper)
+                    mip.analysis.toXML(helper)
                     helper.endElement
                 }
 
                 // Children
                 for (child <- children)
-                    child.toXML(propertyContext, helper)()
+                    child.toXML(helper)()
             }
         }
     }
@@ -378,9 +377,9 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         }
     }
 
-    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = ()) {
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: => Unit = ()) {
 
-        super.toXML(propertyContext, helper, List(
+        super.toXML(helper, List(
                 "scope", scope.scopeId,
                 "prefixed-id", prefixedId,
                 "default-instance-prefixed-id", defaultInstancePrefixedId.orNull,
@@ -388,13 +387,13 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         )) {
             // Output variable information
             for (variable <- variablesSeq)
-                variable.toXML(propertyContext, helper, List())({})
+                variable.toXML(helper, List())({})
 
             // Output binds information
             if (topLevelBinds.nonEmpty) {
                 helper.startElement("binds")
                 for (bind <- topLevelBinds)
-                    bind.toXML(propertyContext, helper)()
+                    bind.toXML(helper)()
                 helper.endElement
             }
 

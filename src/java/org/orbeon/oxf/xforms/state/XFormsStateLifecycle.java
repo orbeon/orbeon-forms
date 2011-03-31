@@ -21,17 +21,17 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
  * Represent the lifecycle of an XForms document from the point of view of state handling.
  */
 public interface XFormsStateLifecycle {
-    String getClientEncodedStaticState(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
-    String getClientEncodedDynamicState(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
-    void afterInitialResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
+    String getClientEncodedStaticState(XFormsContainingDocument containingDocument);
+    String getClientEncodedDynamicState(XFormsContainingDocument containingDocument);
+    void afterInitialResponse(XFormsContainingDocument containingDocument);
 
     XFormsContainingDocument findOrRestoreDocument(PipelineContext pipelineContext, String uuid, String encodedClientStaticState,
                                                    String encodedClientDynamicState, boolean isInitialState);
-    void beforeUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean ignoreSequence);
-    void afterUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
-    void onUpdateError(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
+    void beforeUpdateResponse(XFormsContainingDocument containingDocument, boolean ignoreSequence);
+    void afterUpdateResponse(XFormsContainingDocument containingDocument);
+    void onUpdateError(XFormsContainingDocument containingDocument);
 
-    void onAdd(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
-    void onRemove(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
-    void onEvict(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
+    void onAdd(XFormsContainingDocument containingDocument);
+    void onRemove(XFormsContainingDocument containingDocument);
+    void onEvict(XFormsContainingDocument containingDocument);
 }

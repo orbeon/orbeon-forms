@@ -60,7 +60,7 @@ object ClientEvents {
 
         // Decode encrypted server events
         def decodeServerEvents(element: Element) = {
-            val document = XFormsUtils.decodeXML(pipelineContext, element.getStringValue)
+            val document = XFormsUtils.decodeXML(element.getStringValue)
             Dom4jUtils.elements(document.getRootElement, XFormsConstants.XXFORMS_EVENT_QNAME)
         }
 
@@ -113,7 +113,7 @@ object ClientEvents {
 
             // Process all filtered events
             for (event <- filteredEvents)
-                processEvent(pipelineContext, document, event)
+                processEvent(document, event)
         }
 
         hasAllEvents
@@ -344,10 +344,9 @@ object ClientEvents {
      *
      * This handles checking for stale controls, relevance, readonly, and special cases like xf:output.
      *
-     * @param pipelineContext   current context
      * @param event             event to dispatch
      */
-    def processEvent(pipelineContext: PipelineContext, document: XFormsContainingDocument, event: XFormsEvent): Unit = {
+    def processEvent(document: XFormsContainingDocument, event: XFormsEvent): Unit = {
 
         // Check whether an event can be be dispatched to the given object. This only checks:
         // o the the target is still live
@@ -406,7 +405,7 @@ object ClientEvents {
 
         def dispatchEventCheckTarget(event: XFormsEvent) =
             if (checkEventTarget(event))
-                document.dispatchEvent(pipelineContext, event)
+                document.dispatchEvent(event)
 
         val indentedLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
         val eventTarget = event.getTargetObject
@@ -423,7 +422,7 @@ object ClientEvents {
                 val valueChangeWithFocusChangeEvent = event.asInstanceOf[XXFormsValueChangeWithFocusChangeEvent]
                 if (valueChangeWithFocusChangeEvent.getOtherTargetObject eq null) {
                     // We only get a value change with this event
-                    val currentExternalValue = (eventTarget.asInstanceOf[XFormsValueControl]).getExternalValue(pipelineContext)
+                    val currentExternalValue = (eventTarget.asInstanceOf[XFormsValueControl]).getExternalValue
                     if (currentExternalValue ne null) {
                         // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
                         val isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue)
@@ -431,7 +430,7 @@ object ClientEvents {
                             indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring value change event as value is the same", "control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue)
                             // Ensure deferred event handling
                             // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
-                            document.endOutermostActionHandler(pipelineContext)
+                            document.endOutermostActionHandler()
                             return
                         }
                     } else {
@@ -479,7 +478,7 @@ object ClientEvents {
                             if (checkEventTarget(event)) {
                                 // Store value into instance data through the control
                                 val valueXFormsControl = eventTarget.asInstanceOf[XFormsValueControl]
-                                valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue, null)
+                                valueXFormsControl.storeExternalValue(valueChangeWithFocusChangeEvent.getNewValue, null)
                             }
 
                             // NOTE: Recalculate and revalidate are done with the automatic deferred updates
@@ -508,7 +507,7 @@ object ClientEvents {
             }
 
             // Each event is within its own start/end outermost action handler
-            document.endOutermostActionHandler(pipelineContext)
+            document.endOutermostActionHandler()
         } finally {
             indentedLogger.endHandleOperation()
         }

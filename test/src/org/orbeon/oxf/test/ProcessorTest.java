@@ -294,10 +294,10 @@ public class ProcessorTest extends ResourceManagerTestBase {
                     pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
                     // Get ExternalContext
-                    final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
+                    final ExternalContext externalContext = NetUtils.getExternalContext();
 
                     StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
-                    pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+//                    pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
 
                     try {
                         processor.reset(pipelineContext);

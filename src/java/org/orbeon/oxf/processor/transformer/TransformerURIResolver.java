@@ -47,6 +47,7 @@ public class TransformerURIResolver implements URIResolver {
     private String prohibitedInput;
     private XMLUtils.ParserConfiguration parserConfiguration;
     private String mode;
+    private boolean destroyPipelineContext;
 
     /**
      * Create a URI resolver.
@@ -84,6 +85,7 @@ public class TransformerURIResolver implements URIResolver {
      */
     public TransformerURIResolver(XMLUtils.ParserConfiguration parserConfiguration) {
         this(null, new PipelineContext(), null, parserConfiguration);
+        destroyPipelineContext = true;
     }
 
     public Source resolve(String href, String base) throws TransformerException {
@@ -165,6 +167,9 @@ public class TransformerURIResolver implements URIResolver {
      * reference PreparedStylesheet has on the resolver.
      */
     public void destroy() {
+        if (destroyPipelineContext)
+            pipelineContext.destroy(true);
+
         this.processor = null;
         this.pipelineContext = null;
         this.prohibitedInput = null;

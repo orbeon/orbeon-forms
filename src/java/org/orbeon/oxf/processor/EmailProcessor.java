@@ -400,7 +400,7 @@ public class EmailProcessor extends ProcessorImpl {
     public static FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source)
             throws IOException, TransformerException {
 
-        final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
+        final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
         TransformerUtils.sourceToSAX(source, new BinaryTextXMLReceiver(fileItem.getOutputStream()));
 
         return fileItem;

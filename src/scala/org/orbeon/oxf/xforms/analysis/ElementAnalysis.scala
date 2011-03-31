@@ -19,7 +19,6 @@ import org.orbeon.oxf.xml.dom4j.{LocationData, ExtendedLocationData}
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.util.PropertyContext
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -101,9 +100,9 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
     def isWithinRepeat = closestInScopeRepeat.isDefined
 
     // API for Java
-    def javaToXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) = toXML(propertyContext, helper, List())({})
+    def javaToXML(helper: ContentHandlerHelper) = toXML(helper, List())({})
 
-    def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
 
         def getModelPrefixedId = scopeModel.containingModel match { case Some(model) => Some(model.prefixedId); case None => None }
 
@@ -124,14 +123,14 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
         getBindingAnalysis match {
             case Some(bindingAnalysis) if hasNodeBinding => // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
                 helper.startElement("binding")
-                bindingAnalysis.toXML(propertyContext, helper)
+                bindingAnalysis.toXML(helper)
                 helper.endElement()
             case _ => // NOP
         }
         getValueAnalysis match {
             case Some(valueAnalysis) =>
                 helper.startElement("value")
-                valueAnalysis.toXML(propertyContext, helper)
+                valueAnalysis.toXML(helper)
                 helper.endElement()
             case _ => // NOP
         }

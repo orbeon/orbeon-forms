@@ -38,20 +38,20 @@ public class InstanceReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws Exception {
+    public void deserialize(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws Exception {
         // Deserialize here so it can run in parallel
         if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
             // XML media type
             final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
-            resultingDocument = deserializeInstance(propertyContext, detailsLogger, p2.isReadonly, p2.isHandleXInclude, connectionResult);
+            resultingDocument = deserializeInstance(detailsLogger, p2.isReadonly, p2.isHandleXInclude, connectionResult);
         } else {
             // Other media type is not allowed
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
-                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
     }
 
-    private Object deserializeInstance(PropertyContext propertyContext, IndentedLogger indentedLogger, boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
+    private Object deserializeInstance(IndentedLogger indentedLogger, boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
         final Object resultingDocument;
 
         // Create resulting instance whether entire instance is replaced or not, because this:
@@ -79,13 +79,13 @@ public class InstanceReplacer extends BaseReplacer {
             }
         } catch (Exception e) {
             throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
-                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
         }
 
         return resultingDocument;
     }
 
-    public Runnable replace(final PropertyContext propertyContext, final ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public Runnable replace(final ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
 
         // Set new instance document to replace the one submitted
 
@@ -100,11 +100,11 @@ public class InstanceReplacer extends BaseReplacer {
             // case, I think that this should be a (currently non-specified by XForms)
             // xforms-binding-error.
 
-            submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, submission));
+            submission.getXBLContainer(containingDocument).dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, submission));
             return null;
         } else {
 
-            final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(propertyContext,
+            final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(
                     p.xpathContext, replaceInstanceNoTargetref, p.submissionElementContextItem);
 
             if (destinationNodeInfo == null) {
@@ -115,14 +115,14 @@ public class InstanceReplacer extends BaseReplacer {
                 // xforms-submit-error with an error-type of target-error."
 
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
             // This is the instance which is effectively going to be updated
             final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
             if (updatedInstance == null) {
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element in an existing instance for replace=\"instance\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
             // Whether the destination node is the root element of an instance
@@ -130,7 +130,7 @@ public class InstanceReplacer extends BaseReplacer {
             if (p2.isReadonly && !isDestinationRootElement) {
                 // Only support replacing the root element of an instance when using a shared instance
                 throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
             final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
@@ -193,8 +193,8 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Dispatch xforms-insert event
                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-                newInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
-                    new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
+                newInstance.getXBLContainer(containingDocument).dispatchEvent(
+                        new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
                             "after", null, null));
 
             } else {
@@ -206,7 +206,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
-                XFormsInsertAction.doInsert(propertyContext, containingDocument, detailsLogger, "before",
+                XFormsInsertAction.doInsert(containingDocument, detailsLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
@@ -214,7 +214,7 @@ public class InstanceReplacer extends BaseReplacer {
                     // The node to replace is NOT a root element
 
                     // Perform the deletion of the selected node
-                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, detailsLogger, destinationCollection, 1, true);
+                    XFormsDeleteAction.doDelete(containingDocument, detailsLogger, destinationCollection, 1, true);
                 }
 
                 // Update model instance
@@ -227,7 +227,7 @@ public class InstanceReplacer extends BaseReplacer {
             }
 
             // Dispatch xforms-submit-done
-            return dispatchSubmitDone(propertyContext, connectionResult);
+            return dispatchSubmitDone(connectionResult);
         }
     }
 

@@ -33,7 +33,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 
         // Control value
         final XFormsUploadControl uploadControl = (XFormsUploadControl) control;
-        final String value = handlerContext.isTemplate() || uploadControl == null || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
+        final String value = handlerContext.isTemplate() || uploadControl == null || uploadControl.getExternalValue() == null ? "" : uploadControl.getExternalValue();
 
         if (value.equals(""))
             classes.append(" xforms-upload-state-empty");
@@ -87,7 +87,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-filename");
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                             {
-                                final String filename = (uploadControl == null) ? null : uploadControl.getFileName(pipelineContext);
+                                final String filename = (uploadControl == null) ? null : uploadControl.getFileName();
                                 if (filename != null)
                                     contentHandler.characters(filename.toCharArray(), 0, filename.length());
                             }
@@ -98,7 +98,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-mediatype");
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                             {
-                                final String mediatype = (uploadControl == null) ? null : uploadControl.getFileMediatype(pipelineContext);
+                                final String mediatype = (uploadControl == null) ? null : uploadControl.getFileMediatype();
                                 if (mediatype != null)
                                     contentHandler.characters(mediatype.toCharArray(), 0, mediatype.length());
                             }
@@ -109,7 +109,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-size");
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                             {
-                                final String size = (uploadControl == null) ? null : uploadControl.getFileSize(pipelineContext);
+                                final String size = (uploadControl == null) ? null : uploadControl.getFileSize();
                                 if (size != null)
                                     contentHandler.characters(size.toCharArray(), 0, size.length());
                             }

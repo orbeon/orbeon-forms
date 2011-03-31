@@ -307,7 +307,7 @@ public class FileSerializer extends ProcessorImpl {
                     }
 
                     // We use the commons fileupload utilities to write to file
-                    final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, scope);
+                    final FileItem fileItem = NetUtils.prepareFileItem(scope);
                     fileOutputStream = fileItem.getOutputStream();
                     writeToFile(pipelineContext, config, dataInput, fileOutputStream);
 
@@ -320,7 +320,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = XFormsResourceServer.proxyURI(pipelineContext, localURL, null, config.getRequestedContentType(), -1, Collections.<String, String[]>emptyMap());
+                            resultURL = XFormsResourceServer.proxyURI(localURL, null, config.getRequestedContentType(), -1, Collections.<String, String[]>emptyMap());
                         else
                             resultURL = localURL;
                     }

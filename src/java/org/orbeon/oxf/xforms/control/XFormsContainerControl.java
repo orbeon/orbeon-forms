@@ -45,9 +45,8 @@ public interface XFormsContainerControl {
     /**
      * Notify container control that all its children have been added.
      *
-     * @param propertyContext   current context
      */
-    void childrenAdded(PropertyContext propertyContext);
+    void childrenAdded();
 
     /**
      * Update this container control's effective id, e.g. after a change of repeat iteration.

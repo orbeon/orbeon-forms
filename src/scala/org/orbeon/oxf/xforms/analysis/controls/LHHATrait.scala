@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.dom4j.QName
-import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+
 /**
  * Trait representing an element supporting LHHA elements (nested or external).
  */
@@ -54,12 +54,12 @@ trait LHHATrait extends SimpleElementAnalysis {
         getAllLHHA filter (_.isLocal) foreach (_.analyzeXPath())
     }
 
-    override def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
-        super.toXML(propertyContext, helper, attributes) {
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+        super.toXML(helper, attributes) {
             for (analysis <- getAllLHHA) {
                 helper.startElement(analysis.element.getName)
                 if (analysis.getValueAnalysis.isDefined)
-                    analysis.getValueAnalysis.get.toXML(propertyContext, helper)
+                    analysis.getValueAnalysis.get.toXML(helper)
                 helper.endElement()
             }
 

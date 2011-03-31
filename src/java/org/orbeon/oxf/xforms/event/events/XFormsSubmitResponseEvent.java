@@ -99,7 +99,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
                 final Item headersDocument = TransformerUtils.stringToTinyTree(getContainingDocument().getStaticState().getXPathConfiguration(),
                         sb.toString(), false, false);
 
-                return XPathCache.evaluateAsExtent(getPipelineContext(), Collections.singletonList(headersDocument), 1,
+                return XPathCache.evaluateAsExtent(Collections.singletonList(headersDocument), 1,
                         "/headers/header", NamespaceMapping.EMPTY_MAPPING, null, null, null, null, getLocationData()).iterate();
             } else {
                 // No headers

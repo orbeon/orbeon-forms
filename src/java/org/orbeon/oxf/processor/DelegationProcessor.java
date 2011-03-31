@@ -24,7 +24,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
@@ -304,7 +303,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     : DEFAULT_SELECT_BUS;
 
                                             final DocumentInfo documentInfo = new DocumentWrapper(resultEnvelopeDOM4j, null, XPathCache.getGlobalConfiguration());
-                                            final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                                            final PooledXPathExpression expr = XPathCache.getXPathExpression(
                                                     documentInfo.getConfiguration(), documentInfo, xpathString,
                                                     operation != null && operation.select != null
                                                             ? operation.selectNamespaceContext : null, getLocationData());

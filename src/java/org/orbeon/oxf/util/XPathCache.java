@@ -101,22 +101,22 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static List evaluate(PropertyContext propertyContext, Item contextItem, String xpathString,
+    public static List evaluate(Item contextItem, String xpathString,
                                 NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                 FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        return evaluate(propertyContext, Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
+        return evaluate(Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static List evaluate(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, String xpathString,
+    public static List evaluate(List<Item> contextItems, int contextPosition, String xpathString,
                                 NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                 FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(
                 getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
@@ -132,11 +132,11 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document and keep Item objects in the result.
      */
-    public static List<Item> evaluateKeepItems(PropertyContext propertyContext, List<Item> contextItems, int contextPosition,
+    public static List<Item> evaluateKeepItems(List<Item> contextItems, int contextPosition,
                                                String xpathString, NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                                FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(
                 getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
@@ -152,11 +152,11 @@ public class XPathCache {
     /**
      * Evaluate the expression as a variable value usable by Saxon in further XPath expressions.
      */
-    public static SequenceExtent evaluateAsExtent(PropertyContext propertyContext, List<Item> contextItems, int contextPosition,
+    public static SequenceExtent evaluateAsExtent(List<Item> contextItems, int contextPosition,
                                                   String xpathString, NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                                   FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(
                 getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
@@ -172,8 +172,8 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static Object evaluateSingle(PropertyContext propertyContext, XPathCache.XPathContext xpathContext, Item contextItem, String xpathString) {
-        return evaluateSingle(propertyContext, Collections.singletonList(contextItem), 1, xpathString,
+    public static Object evaluateSingle(XPathContext xpathContext, Item contextItem, String xpathString) {
+        return evaluateSingle(Collections.singletonList(contextItem), 1, xpathString,
                 xpathContext.namespaceMapping, xpathContext.variableToValueMap, xpathContext.functionLibrary,
                 xpathContext.functionContext, xpathContext.baseURI, xpathContext.locationData);
     }
@@ -181,22 +181,22 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static Object evaluateSingle(PropertyContext propertyContext, Item contextItem, String xpathString,
-                                 NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
-                                 FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+    public static Object evaluateSingle(Item contextItem, String xpathString,
+                                        NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
+                                        FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        return evaluateSingle(propertyContext, Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
+        return evaluateSingle(Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
      * Evaluate an XPath expression on the document.
      */
-    public static Object evaluateSingle(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, String xpathString,
-                                 NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
-                                 FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+    public static Object evaluateSingle(List<Item> contextItems, int contextPosition, String xpathString,
+                                        NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
+                                        FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(
                 getGlobalConfiguration(), contextItems, contextPosition,
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
@@ -212,30 +212,30 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression on the document as an attribute value template, and return its string value.
      */
-    public static String evaluateAsAvt(PropertyContext propertyContext, XPathCache.XPathContext xpathContext, Item contextItem, String xpathString) {
-        return evaluateAsAvt(propertyContext, Collections.singletonList(contextItem), 1, xpathString, xpathContext.namespaceMapping,
+    public static String evaluateAsAvt(XPathContext xpathContext, Item contextItem, String xpathString) {
+        return evaluateAsAvt(Collections.singletonList(contextItem), 1, xpathString, xpathContext.namespaceMapping,
                 xpathContext.variableToValueMap, xpathContext.functionLibrary, xpathContext.functionContext, xpathContext.baseURI, xpathContext.locationData);
     }
 
     /**
      * Evaluate an XPath expression on the document as an attribute value template, and return its string value.
      */
-    public static String evaluateAsAvt(PropertyContext propertyContext, Item contextItem, String xpathString, NamespaceMapping namespaceMapping,
+    public static String evaluateAsAvt(Item contextItem, String xpathString, NamespaceMapping namespaceMapping,
                                        Map<String, ValueRepresentation> variableToValueMap, FunctionLibrary functionLibrary,
                                        FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        return evaluateAsAvt(propertyContext, Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
+        return evaluateAsAvt(Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
      * Evaluate an XPath expression on the document as an attribute value template, and return its string value.
      */
-    public static String evaluateAsAvt(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, String xpathString,
+    public static String evaluateAsAvt(List<Item> contextItems, int contextPosition, String xpathString,
                                        NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                        FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(propertyContext,
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(
                 getGlobalConfiguration(), contextItems, contextPosition, xpathString,
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, true, locationData);
         try {
@@ -251,22 +251,22 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression and return its string value.
      */
-    public static String evaluateAsString(PropertyContext propertyContext, Item contextItem, String xpathString,
+    public static String evaluateAsString(Item contextItem, String xpathString,
                                           NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                           FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        return evaluateAsString(propertyContext, Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
+        return evaluateAsString(Collections.singletonList(contextItem), 1, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, functionContext, baseURI, locationData);
     }
 
     /**
      * Evaluate an XPath expression and return its string value.
      */
-    public static String evaluateAsString(PropertyContext propertyContext, List<Item> contextItems, int contextPosition,
+    public static String evaluateAsString(List<Item> contextItems, int contextPosition,
                                           String xpathString, NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
                                           FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
 
-        final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(propertyContext,
+        final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(
                 getGlobalConfiguration(), contextItems, contextPosition, "xs:string((" + xpathString + ")[1])",
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
@@ -280,22 +280,22 @@ public class XPathCache {
     }
 
     // NOTE: called from DelegationProcessor and ConcreteForEachProcessor
-    public static PooledXPathExpression getXPathExpression(PropertyContext propertyContext, Configuration configuration,
+    public static PooledXPathExpression getXPathExpression(Configuration configuration,
                                                            Item contextItem,
                                                            String xpathString,
                                                            LocationData locationData) {
-        return getXPathExpression(propertyContext, configuration, contextItem, xpathString, null, null, null, null, locationData);
+        return getXPathExpression(configuration, contextItem, xpathString, null, null, null, null, locationData);
     }
 
-    public static PooledXPathExpression getXPathExpression(PropertyContext propertyContext, Configuration configuration,
+    public static PooledXPathExpression getXPathExpression(Configuration configuration,
                                                            Item contextItem,
                                                            String xpathString,
                                                            NamespaceMapping namespaceMapping,
                                                            LocationData locationData) {
-        return getXPathExpression(propertyContext, configuration, contextItem, xpathString, namespaceMapping, null, null, null, locationData);
+        return getXPathExpression(configuration, contextItem, xpathString, namespaceMapping, null, null, null, locationData);
     }
 
-    public static PooledXPathExpression getXPathExpression(PropertyContext propertyContext, Configuration configuration,
+    public static PooledXPathExpression getXPathExpression(Configuration configuration,
                                                            Item contextItem,
                                                            String xpathString,
                                                            NamespaceMapping namespaceMapping,
@@ -304,7 +304,7 @@ public class XPathCache {
                                                            String baseURI,
                                                            LocationData locationData) {
         final List<Item> contextItems = Collections.singletonList(contextItem);
-        return getXPathExpression(propertyContext, configuration, contextItems, 1, xpathString, namespaceMapping, variableToValueMap,
+        return getXPathExpression(configuration, contextItems, 1, xpathString, namespaceMapping, variableToValueMap,
                 functionLibrary, baseURI, false, locationData);
     }
 
@@ -332,15 +332,15 @@ public class XPathCache {
         }
     }
 
-    private static PooledXPathExpression getXPathExpression(PropertyContext propertyContext, Configuration configuration,
-                                                           List<Item> contextItems, int contextPosition,
-                                                           String xpathString,
-                                                           NamespaceMapping namespaceMapping,
-                                                           Map<String, ValueRepresentation> variableToValueMap,
-                                                           FunctionLibrary functionLibrary,
-                                                           String baseURI,
-                                                           boolean isAvt,
-                                                           LocationData locationData) {
+    private static PooledXPathExpression getXPathExpression(Configuration configuration,
+                                                            List<Item> contextItems, int contextPosition,
+                                                            String xpathString,
+                                                            NamespaceMapping namespaceMapping,
+                                                            Map<String, ValueRepresentation> variableToValueMap,
+                                                            FunctionLibrary functionLibrary,
+                                                            String baseURI,
+                                                            boolean isAvt,
+                                                            LocationData locationData) {
 
         try {
 
@@ -384,10 +384,10 @@ public class XPathCache {
             {
                 // Get or create pool
                 final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString());
-                ObjectPool pool = (ObjectPool) cache.findValid(propertyContext, cacheKey, validity);
+                ObjectPool pool = (ObjectPool) cache.findValid(cacheKey, validity);
                 if (pool == null) {
                     pool = createXPathPool(configuration, xpathString, namespaceMapping, variableNames, functionLibrary, baseURI, isAvt, locationData);
-                    cache.add(propertyContext, cacheKey, validity, pool);
+                    cache.add(cacheKey, validity, pool);
                 }
 
                 // Get object from pool

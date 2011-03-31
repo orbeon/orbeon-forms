@@ -95,19 +95,6 @@ abstract public class XFormsFunction extends SystemFunction {
         return getContext(xpathContext).getContextStack();
     }
 
-    protected PipelineContext getOrCreatePipelineContext() {
-        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-        PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
-
-        // Found existing pipeline context
-        if (pipelineContext != null)
-            return pipelineContext;
-
-        // Create new pipeline context
-        XFormsContainingDocument.logWarningStatic("", "Cannot find pipeline context from static context. Creating new pipeline context.");
-        return new PipelineContext();
-    }
-
     // NOTE: This is always constructed in XFormsContextStack
     public static class Context implements XPathCache.FunctionContext {
 

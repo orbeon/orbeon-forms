@@ -758,7 +758,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest()));
             } else {
                 // Default
-                response.setURLRewriter(new ServletURLRewriter(pipelineContext, getRequest()));
+                response.setURLRewriter(new ServletURLRewriter(getRequest()));
             }
         }
         return response;

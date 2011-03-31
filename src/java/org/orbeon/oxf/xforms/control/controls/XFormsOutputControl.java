@@ -86,13 +86,13 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateImpl(PropertyContext propertyContext) {
-        super.evaluateImpl(propertyContext);
+    protected void evaluateImpl() {
+        super.evaluateImpl();
 
         getState();
-        getFileMediatype(propertyContext);
-        getFileName(propertyContext);
-        getFileSize(propertyContext);
+        getFileMediatype();
+        getFileName();
+        getFileSize();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateValue(PropertyContext propertyContext) {
+    protected void evaluateValue() {
         final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
@@ -110,13 +110,13 @@ public class XFormsOutputControl extends XFormsValueControl {
             value = (tempValue != null) ? tempValue : "";
         } else {
             // Value comes from the XPath expression within the value attribute
-            value = evaluateAsString(propertyContext, valueAttribute, bindingContext.getNodeset(), bindingContext.getPosition());
+            value = evaluateAsString(valueAttribute, bindingContext.getNodeset(), bindingContext.getPosition());
         }
         setValue((value != null) ? value : "");
     }
 
     @Override
-    protected void evaluateExternalValue(PropertyContext propertyContext) {
+    protected void evaluateExternalValue() {
 
         assert isRelevant();
 
@@ -126,13 +126,13 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
             // Download appearance
-            final String dynamicMediatype = fileInfo.getFileMediatype(propertyContext);
+            final String dynamicMediatype = fileInfo.getFileMediatype();
             // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
-            updatedValue = proxyValueIfNeeded(propertyContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
+            updatedValue = proxyValueIfNeeded(internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Image mediatype
             // Use dummy image as default value so that client always has something to load
-            updatedValue = proxyValueIfNeeded(propertyContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
+            updatedValue = proxyValueIfNeeded(internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // HTML mediatype
             updatedValue = internalValue;
@@ -140,7 +140,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Other mediatypes
             if (valueAttribute == null) {
                 // There is a single-node binding, so the format may be used
-                final String formattedValue = getValueUseFormat(propertyContext, format);
+                final String formattedValue = getValueUseFormat(format);
                 updatedValue = (formattedValue != null) ? formattedValue : internalValue;
             } else {
                 // There is a @value attribute, don't use format
@@ -152,17 +152,17 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     // For unit tests
-    public Map<String, String[]> testEvaluateHeaders(PropertyContext propertyContext) {
-        return evaluateHeaders(propertyContext);
+    public Map<String, String[]> testEvaluateHeaders() {
+        return evaluateHeaders();
     }
 
-    private Map<String, String[]> evaluateHeaders(PropertyContext propertyContext) {
+    private Map<String, String[]> evaluateHeaders() {
         getContextStack().setBinding(this); // evaluateHeaders() requires this (bad, but do this until we can pass BindingContext directly)
-        return Headers.evaluateHeaders(propertyContext, getXBLContainer(), getContextStack(),
+        return Headers.evaluateHeaders(getXBLContainer(), getContextStack(),
                 getEffectiveId(), getElementAnalysis().element());
     }
 
-    private String proxyValueIfNeeded(PropertyContext propertyContext, String internalValue, String defaultValue, String mediatype) {
+    private String proxyValueIfNeeded(String internalValue, String defaultValue, String mediatype) {
         String updatedValue;
         final String typeName = getBuiltinTypeName();
         if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
@@ -171,11 +171,11 @@ public class XFormsOutputControl extends XFormsValueControl {
                 if (!urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
                     final URI rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, getControlElement(), internalValue);
-                    final URLRewriter servletRewriter = new ServletURLRewriter(propertyContext, NetUtils.getExternalContext(propertyContext).getRequest());
+                    final URLRewriter servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext().getRequest());
                     final String resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
 
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
-                    updatedValue = XFormsResourceServer.proxyURI(propertyContext, resolvedURI, fileInfo.getFileName(propertyContext), mediatype, lastModified, evaluateHeaders(propertyContext));
+                    updatedValue = XFormsResourceServer.proxyURI(resolvedURI, fileInfo.getFileName(), mediatype, lastModified, evaluateHeaders());
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -183,9 +183,9 @@ public class XFormsOutputControl extends XFormsValueControl {
             } else if ("base64Binary".equals(typeName)) {
                 // xs:base64Binary type
                 // TODO: avoid cast to PipelineContext
-                final String uri = NetUtils.base64BinaryToAnyURI((PipelineContext) propertyContext, internalValue, NetUtils.SESSION_SCOPE);
+                final String uri = NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE);
                 // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
-                updatedValue = XFormsResourceServer.proxyURI(propertyContext, uri, fileInfo.getFileName(propertyContext), mediatype, -1, evaluateHeaders(propertyContext));
+                updatedValue = XFormsResourceServer.proxyURI(uri, fileInfo.getFileName(), mediatype, -1, evaluateHeaders());
 
             } else {
                 // Return dummy image
@@ -201,22 +201,22 @@ public class XFormsOutputControl extends XFormsValueControl {
     @Override
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
-            final String externalValue = getExternalValue(pipelineContext);
+            final String externalValue = getExternalValue();
             if (StringUtils.isNotBlank(externalValue)) {
                 // External value is not blank, rewrite as absolute path. Two cases:
                 // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
                 // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
-                return XFormsUtils.resolveResourceURL(pipelineContext, containingDocument, getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+                return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
             } else {
                 // Empty value, return as is
                 return externalValue;
             }
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // Rewrite the HTML value with resolved @href and @src attributes
-            return XFormsControl.getEscapedHTMLValue(pipelineContext, getLocationData(), getExternalValue(pipelineContext));
+            return XFormsControl.getEscapedHTMLValue(getLocationData(), getExternalValue());
         } else {
             // Return external value as is
-            return getExternalValue(pipelineContext);
+            return getExternalValue();
         }
     }
 
@@ -224,7 +224,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue(propertyContext);
@@ -253,34 +253,34 @@ public class XFormsOutputControl extends XFormsValueControl {
         return fileInfo.getState();
     }
 
-    public String getFileMediatype(PropertyContext propertyContext) {
-        return fileInfo.getFileMediatype(propertyContext);
+    public String getFileMediatype() {
+        return fileInfo.getFileMediatype();
     }
 
-    public String getFileName(PropertyContext propertyContext) {
-        return fileInfo.getFileName(propertyContext);
+    public String getFileName() {
+        return fileInfo.getFileName();
     }
 
-    public String getFileSize(PropertyContext propertyContext) {
-        return fileInfo.getFileSize(propertyContext);
+    public String getFileSize() {
+        return fileInfo.getFileSize();
     }
 
-    public void setMediatype(PropertyContext propertyContext, String mediatype) {
-        fileInfo.setMediatype(propertyContext, mediatype);
+    public void setMediatype(String mediatype) {
+        fileInfo.setMediatype(mediatype);
     }
 
-    public void setFilename(PropertyContext propertyContext, String filename) {
-        fileInfo.setFilename(propertyContext, filename);
+    public void setFilename(String filename) {
+        fileInfo.setFilename(filename);
     }
 
-    public void setSize(PropertyContext propertyContext, String size) {
-        fileInfo.setSize(propertyContext, size);
+    public void setSize(String size) {
+        fileInfo.setSize(size);
     }
 
-    public static String getExternalValue(PipelineContext pipelineContext, XFormsOutputControl control, String mediatypeValue) {
+    public static String getExternalValue(XFormsOutputControl control, String mediatypeValue) {
         if (control != null) {
             // Get control value
-            return control.getExternalValue(pipelineContext);
+            return control.getExternalValue();
         } else if (mediatypeValue != null && mediatypeValue.startsWith("image/")) {
             // Return dummy image
             return XFormsConstants.DUMMY_IMAGE_URI;
@@ -317,9 +317,9 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    public Object getBackCopy(PropertyContext propertyContext) {
-        final XFormsOutputControl cloned = (XFormsOutputControl) super.getBackCopy(propertyContext);
-        cloned.fileInfo = (FileInfo) fileInfo.getBackCopy(propertyContext);
+    public Object getBackCopy() {
+        final XFormsOutputControl cloned = (XFormsOutputControl) super.getBackCopy();
+        cloned.fileInfo = (FileInfo) fileInfo.getBackCopy();
         return cloned;
     }
 

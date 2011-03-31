@@ -69,14 +69,14 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Create document
         final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
 
-        final ExternalContext.Session session = NetUtils.getExternalContext(pipelineContext).getSession(true);
+        final ExternalContext.Session session = NetUtils.getExternalContext().getSession(true);
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml");
-        final XFormsContainingDocument document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null);
+        final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null, null);
 
-        stateManager.afterInitialResponse(pipelineContext, document);
+        stateManager.afterInitialResponse(document);
 
         // Test that the document is in cache
-        assertSame(document, XFormsDocumentCache.instance().getDocument(pipelineContext, document.getUUID()));
+        assertSame(document, XFormsDocumentCache.instance().getDocument(document.getUUID()));
 
         // Check there is a state manager session listener for this document
         assertNotNull(session.getAttributesMap().get(XFormsStateManager.getListenerSessionKey(document)));
@@ -85,7 +85,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         ((TestExternalContext.TestSession) session).expireSession();
 
         // Test that the document is no longer in cache
-        assertNull(XFormsDocumentCache.instance().getDocument(pipelineContext, document.getUUID()));
+        assertNull(XFormsDocumentCache.instance().getDocument(document.getUUID()));
     }
 
     @Test(expected=OXFException.class)
@@ -94,7 +94,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final XFormsState state = createDocumentGetState(pipelineContext);
 
         // This should throw an exception
-        XFormsUtils.decodeXML(pipelineContext, state.getStaticState(), "WrongPassword");
+        XFormsUtils.decodeXML(state.getStaticState(), "WrongPassword");
     }
 
     @Test(expected=OXFException.class)
@@ -103,15 +103,15 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final XFormsState state = createDocumentGetState(pipelineContext);
 
         // This should throw an exception
-        XFormsUtils.decodeXML(pipelineContext, state.getDynamicState(), "WrongPassword");
+        XFormsUtils.decodeXML(state.getDynamicState(), "WrongPassword");
     }
 
     private XFormsState createDocumentGetState(PipelineContext pipelineContext) {
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/client-nocache.xhtml");
-        final XFormsContainingDocument document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null);
+        final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null, null);
 
-        final String staticStateString = stateManager.getClientEncodedDynamicState(pipelineContext, document);
-        final String dynamicStateString = stateManager.getClientEncodedDynamicState(pipelineContext, document);
+        final String staticStateString = stateManager.getClientEncodedDynamicState(document);
+        final String dynamicStateString = stateManager.getClientEncodedDynamicState(document);
 
         // X2 is the prefix saying it's encrypted
         assertTrue(staticStateString.startsWith("X2"));
@@ -141,11 +141,11 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         {
             final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
 
-            state1.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null);
+            state1.document = new XFormsContainingDocument(staticState, null, null, null);
 
             state1.uuid = state1.document.getUUID();
-            state1.staticStateString = stateManager.getClientEncodedStaticState(pipelineContext, state1.document);
-            state1.dynamicStateString = stateManager.getClientEncodedDynamicState(pipelineContext, state1.document);
+            state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
+            state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
 
             assertEquals(state1.uuid.length(), UUIDUtils.UUID_LENGTH);
             assertNotNull(StringUtils.trimToNull(state1.staticStateString));
@@ -153,7 +153,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             // Initial response sent
             state1.document.afterInitialResponse();
-            stateManager.afterInitialResponse(pipelineContext, state1.document);
+            stateManager.afterInitialResponse(state1.document);
         }
 
         assertEquals(1, getSequenceNumber(state1.dynamicStateString));
@@ -207,12 +207,12 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state1 = new State();
         {
             final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-            session = NetUtils.getExternalContext(pipelineContext).getSession(true);
-            state1.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null);
+            session = NetUtils.getExternalContext().getSession(true);
+            state1.document = new XFormsContainingDocument(staticState, null, null, null);
 
             state1.uuid = state1.document.getUUID();
-            state1.staticStateString = stateManager.getClientEncodedStaticState(pipelineContext, state1.document);
-            state1.dynamicStateString = stateManager.getClientEncodedDynamicState(pipelineContext, state1.document);
+            state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
+            state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
 
             assertEquals(state1.uuid.length(), UUIDUtils.UUID_LENGTH);
             assertNull(StringUtils.trimToNull(state1.staticStateString));
@@ -220,9 +220,9 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
             // Initial response sent
             state1.document.afterInitialResponse();
-            stateManager.afterInitialResponse(pipelineContext, state1.document);
+            stateManager.afterInitialResponse(state1.document);
 
-            initialDynamicStateString = state1.document.createEncodedDynamicState(pipelineContext, XFormsProperties.isGZIPState(), false);
+            initialDynamicStateString = state1.document.createEncodedDynamicState(XFormsProperties.isGZIPState(), false);
         }
 
         assertEquals(1, state1.document.getSequence());
@@ -267,7 +267,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // Make sure we found the initial dynamic state
         {
             final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(state4.document.createEncodedDynamicState(pipelineContext, XFormsProperties.isGZIPState(), false)));
+            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(state4.document.createEncodedDynamicState(XFormsProperties.isGZIPState(), false)));
         }
     }
 
@@ -277,7 +277,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
         // Find document
         final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
-        ((TestExternalContext) NetUtils.getExternalContext(pipelineContext)).setSession(session);
+        ((TestExternalContext) NetUtils.getExternalContext()).setSession(session);
 
         state2.document = XFormsStateManager.instance()
                 .findOrRestoreDocument(pipelineContext, state1.uuid, state1.staticStateString, state1.dynamicStateString, false);
@@ -288,22 +288,22 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             assertNotSame(state1.document, state2.document);// can't be the same because cache is disabled
 
         // Run events if any
-        state2.document.beforeExternalEvents(pipelineContext, null);
+        state2.document.beforeExternalEvents(null);
         if (callback != null) {
             for (final XFormsEvent event: callback.createEvents(state2.document)) {
-                ClientEvents.processEvent(pipelineContext, state2.document, event);
+                ClientEvents.processEvent(state2.document, event);
             }
         }
-        state2.document.afterExternalEvents(pipelineContext);
+        state2.document.afterExternalEvents();
 
-        stateManager.beforeUpdateResponse(pipelineContext, state2.document, false);
+        stateManager.beforeUpdateResponse(state2.document, false);
 
         // New state
         state2.uuid = state2.document.getUUID();
-        state2.staticStateString = stateManager.getClientEncodedStaticState(pipelineContext, state2.document);
-        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(pipelineContext, state2.document);
+        state2.staticStateString = stateManager.getClientEncodedStaticState(state2.document);
+        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(state2.document);
 
-        stateManager.afterUpdateResponse(pipelineContext, state2.document);
+        stateManager.afterUpdateResponse(state2.document);
 
         return state2;
     }
@@ -322,24 +322,22 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
         // New state
         state2.uuid = state2.document.getUUID();
-        state2.staticStateString = stateManager.getClientEncodedStaticState(pipelineContext, state2.document);
-        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(pipelineContext, state2.document);
+        state2.staticStateString = stateManager.getClientEncodedStaticState(state2.document);
+        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(state2.document);
 
         return state2;
     }
 
     private String stripSequenceNumber(String serializedState) {
-        final PipelineContext pipelineContext = new PipelineContext();
-        final Document state = XFormsUtils.decodeXML(pipelineContext, serializedState);
+        final Document state = XFormsUtils.decodeXML(serializedState);
         final Attribute sequenceNumber = state.getRootElement().attribute("sequence");
         if (sequenceNumber != null)
             state.getRootElement().remove(sequenceNumber);
-        return XFormsUtils.encodeXML(pipelineContext, state, false);
+        return XFormsUtils.encodeXML(state, false);
     }
 
     private long getSequenceNumber(String serializedState) {
-        final PipelineContext pipelineContext = new PipelineContext();
-        final Document state = XFormsUtils.decodeXML(pipelineContext, serializedState);
+        final Document state = XFormsUtils.decodeXML(serializedState);
         final Attribute sequenceNumber = state.getRootElement().attribute("sequence");
 
         return Long.parseLong(sequenceNumber.getStringValue());

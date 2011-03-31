@@ -276,7 +276,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                                 // Document is read entirely in memory for XPath processing
                                 final DocumentInfo document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(), source, false);
-                                final List result = XPathCache.evaluate(pipelineContext, document, xpath, new NamespaceMapping(getPrefixMappings()),
+                                final List result = XPathCache.evaluate(document, xpath, new NamespaceMapping(getPrefixMappings()),
                                         Collections.<String, ValueRepresentation>emptyMap(), PipelineFunctionLibrary.instance(), null, source.getSystemId(), null);
 
                                 // Each resulting object is output through the next level of processing

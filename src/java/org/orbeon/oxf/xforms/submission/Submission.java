@@ -14,8 +14,6 @@
 
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.util.PropertyContext;
-
 /**
  * Represents a submission mechanism.
  */
@@ -23,13 +21,11 @@ public interface Submission {
 
     public String getType();
 
-    boolean isMatch(PropertyContext propertyContext,
-                    XFormsModelSubmission.SubmissionParameters p,
+    boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                     XFormsModelSubmission.SecondPassParameters p2,
                     XFormsModelSubmission.SerializationParameters sp);
 
-    SubmissionResult connect(PropertyContext propertyContext,
-                     XFormsModelSubmission.SubmissionParameters p,
-                     XFormsModelSubmission.SecondPassParameters p2,
-                     XFormsModelSubmission.SerializationParameters sp) throws Exception;
+    SubmissionResult connect(XFormsModelSubmission.SubmissionParameters p,
+                             XFormsModelSubmission.SecondPassParameters p2,
+                             XFormsModelSubmission.SerializationParameters sp) throws Exception;
 }

@@ -36,10 +36,10 @@ public class FilterPortletSubmission extends BaseSubmission {
     /**
      * Check whether submission is allowed.
      */
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = NetUtils.getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
@@ -86,14 +86,14 @@ public class FilterPortletSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
         // URI with xml:base resolution
 //        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
 
         // Store stuff useful for portlet filter
-        final Map<String, Object> attributes = NetUtils.getExternalContext(propertyContext).getRequest().getAttributesMap();
+        final Map<String, Object> attributes = NetUtils.getExternalContext().getRequest().getAttributesMap();
         attributes.put(OrbeonPortletXFormsFilter.PORTLET_SUBMISSION_METHOD_ATTRIBUTE, p.actualHttpMethod);
         attributes.put(OrbeonPortletXFormsFilter.PORTLET_SUBMISSION_BODY_ATTRIBUTE, sp.messageBody);
         attributes.put(OrbeonPortletXFormsFilter.PORTLET_SUBMISSION_PATH_ATTRIBUTE, p2.actionOrResource

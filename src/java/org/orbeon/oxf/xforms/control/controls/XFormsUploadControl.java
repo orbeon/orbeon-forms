@@ -63,17 +63,17 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateImpl(PropertyContext propertyContext) {
-        super.evaluateImpl(propertyContext);
+    protected void evaluateImpl() {
+        super.evaluateImpl();
 
         getState();
-        getFileMediatype(propertyContext);
-        getFileName(propertyContext);
-        getFileSize(propertyContext);
+        getFileMediatype();
+        getFileName();
+        getFileSize();
 
-        getProgressState(propertyContext);
-        getProgressReceived(propertyContext);
-        getProgressExpected(propertyContext);
+        getProgressState();
+        getProgressReceived();
+        getProgressExpected();
     }
 
     @Override
@@ -83,7 +83,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XBLContainer container, XFormsEvent event) {
 
         // NOTE: Perform all actions at target, so that user event handlers are called after these operations.
 
@@ -93,26 +93,26 @@ public class XFormsUploadControl extends XFormsValueControl {
         } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
             // Upload canceled
             containingDocument.endUpload(getUploadUniqueId());
-            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), this);
+            Multipart.removeUploadProgress(NetUtils.getExternalContext().getRequest(), this);
         } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
             // Upload done: process upload to this control
 
             // Notify that the upload has ended
             containingDocument.endUpload(getUploadUniqueId());
-            Multipart.removeUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(), this);
+            Multipart.removeUploadProgress(NetUtils.getExternalContext().getRequest(), this);
 
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
-            handleUploadedFile(propertyContext, true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+            handleUploadedFile(true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
 
         } else if (XFormsEvents.XXFORMS_UPLOAD_PROGRESS.equals(event.getName())) {
             // NOP: upload progress information will be sent through the diff process
         } else
-            super.performTargetAction(propertyContext, container, event);
+            super.performTargetAction(container, event);
     }
 
     @Override
-    protected void onDestroy(PropertyContext propertyContext) {
-        super.onDestroy(propertyContext);
+    protected void onDestroy() {
+        super.onDestroy();
         // Make sure to consider any upload associated with this control as ended
         containingDocument.endUpload(getUploadUniqueId());
     }
@@ -178,21 +178,21 @@ public class XFormsUploadControl extends XFormsValueControl {
                 } else {
                     // A file was selected in the UI (note that the file may be empty)
                     final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));// TODO: should pass true?
-                    uploadControl.handleUploadedFile(propertyContext, handleTemporaryFiles, value, filename, mediatype, size, paramValueType);
+                    uploadControl.handleUploadedFile(handleTemporaryFiles, value, filename, mediatype, size, paramValueType);
                 }
             }
         }
     }
 
-    private void handleUploadedFile(PropertyContext propertyContext, boolean handleTemporaryFiles, String value, String filename, String mediatype, String size, String paramValueType) {
+    private void handleUploadedFile(boolean handleTemporaryFiles, String value, String filename, String mediatype, String size, String paramValueType) {
         if (!size.equals("0") || !filename.equals("")) {
             // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
-            setExternalValue(propertyContext, value, paramValueType, handleTemporaryFiles);
+            setExternalValue(value, paramValueType, handleTemporaryFiles);
 
             // Handle filename, mediatype and size if necessary
-            setFilename(propertyContext, filename);
-            setMediatype(propertyContext, mediatype);
-            setSize(propertyContext, size);
+            setFilename(filename);
+            setMediatype(mediatype);
+            setSize(size);
         }
     }
 
@@ -224,27 +224,27 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
+    public void storeExternalValue(String value, String type) {
 
         // Set value and handle temporary files
-        setExternalValue(propertyContext, value, type, true);
+        setExternalValue(value, type, true);
 
         // If the value is being cleared, also clear the metadata
         if (value.equals("")) {
-            setFilename(propertyContext, "");
-            setMediatype(propertyContext, "");
-            setSize(propertyContext, "");
+            setFilename("");
+            setMediatype("");
+            setSize("");
         }
     }
 
-    private void setExternalValue(PropertyContext propertyContext, String value, String type, boolean handleTemporaryFiles) {
+    private void setExternalValue(String value, String type, boolean handleTemporaryFiles) {
 
         final String oldValue = getValue();
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
             // Q: Should this event occur during refresh?
-            getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(containingDocument, this));
+            getXBLContainer().dispatchEvent(new XFormsDeselectEvent(containingDocument, this));
         }
 
         final IndentedLogger indentedLogger = getIndentedLogger();
@@ -266,7 +266,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                 }
 
                 if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(type) && value != null && NetUtils.urlHasProtocol(value)) {
-                    final File newFile = NetUtils.renameAndExpireWithSession(propertyContext, value, indentedLogger.getLogger());
+                    final File newFile = NetUtils.renameAndExpireWithSession(value, indentedLogger.getLogger());
                     newValue = newFile.toURI().toString();
                 } else {
                     newValue = value;
@@ -276,7 +276,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             }
 
             // Call the super method
-            super.storeExternalValue(propertyContext, newValue, type);
+            super.storeExternalValue(newValue, type);
 
             // When a value is set, make sure associated file information is cleared, because even though the control might
             // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload
@@ -291,40 +291,40 @@ public class XFormsUploadControl extends XFormsValueControl {
         return fileInfo.getState();
     }
 
-    public String getFileMediatype(PropertyContext propertyContext) {
-        return fileInfo.getFileMediatype(propertyContext);
+    public String getFileMediatype() {
+        return fileInfo.getFileMediatype();
     }
 
-    public String getFileName(PropertyContext propertyContext) {
-        return fileInfo.getFileName(propertyContext);
+    public String getFileName() {
+        return fileInfo.getFileName();
     }
 
-    public String getFileSize(PropertyContext propertyContext) {
-        return fileInfo.getFileSize(propertyContext);
+    public String getFileSize() {
+        return fileInfo.getFileSize();
     }
 
-    public String getProgressState(PropertyContext propertyContext) {
-        return fileInfo.getProgressState(propertyContext);
+    public String getProgressState() {
+        return fileInfo.getProgressState();
     }
 
-    public String getProgressReceived(PropertyContext propertyContext) {
-        return fileInfo.getProgressCurrent(propertyContext);
+    public String getProgressReceived() {
+        return fileInfo.getProgressCurrent();
     }
 
-    public String getProgressExpected(PropertyContext propertyContext) {
-        return fileInfo.getProgressExpected(propertyContext);
+    public String getProgressExpected() {
+        return fileInfo.getProgressExpected();
     }
 
-    private void setMediatype(PropertyContext propertyContext, String mediatype) {
-        fileInfo.setMediatype(propertyContext, mediatype);
+    private void setMediatype(String mediatype) {
+        fileInfo.setMediatype(mediatype);
     }
 
-    private void setFilename(PropertyContext propertyContext, String filename) {
-        fileInfo.setFilename(propertyContext, filename);
+    private void setFilename(String filename) {
+        fileInfo.setFilename(filename);
     }
 
-    private void setSize(PropertyContext propertyContext, String size) {
-        fileInfo.setSize(propertyContext, size);
+    private void setSize(String size) {
+        fileInfo.setSize(size);
     }
 
     @Override
@@ -340,18 +340,18 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if (!XFormsUtils.compareStrings(getState(), otherUploadControl.getState()))
             return false;
-        if (!XFormsUtils.compareStrings(getFileMediatype(propertyContext), otherUploadControl.getFileMediatype(propertyContext)))
+        if (!XFormsUtils.compareStrings(getFileMediatype(), otherUploadControl.getFileMediatype()))
             return false;
-        if (!XFormsUtils.compareStrings(getFileSize(propertyContext), otherUploadControl.getFileSize(propertyContext)))
+        if (!XFormsUtils.compareStrings(getFileSize(), otherUploadControl.getFileSize()))
             return false;
-        if (!XFormsUtils.compareStrings(getFileName(propertyContext), otherUploadControl.getFileName(propertyContext)))
+        if (!XFormsUtils.compareStrings(getFileName(), otherUploadControl.getFileName()))
             return false;
 
-        if (!XFormsUtils.compareStrings(getProgressState(propertyContext), otherUploadControl.getProgressState(propertyContext)))
+        if (!XFormsUtils.compareStrings(getProgressState(), otherUploadControl.getProgressState()))
             return false;
-        if (!XFormsUtils.compareStrings(getProgressReceived(propertyContext), otherUploadControl.getProgressReceived(propertyContext)))
+        if (!XFormsUtils.compareStrings(getProgressReceived(), otherUploadControl.getProgressReceived()))
             return false;
-        if (!XFormsUtils.compareStrings(getProgressExpected(propertyContext), otherUploadControl.getProgressExpected(propertyContext)))
+        if (!XFormsUtils.compareStrings(getProgressExpected(), otherUploadControl.getProgressExpected()))
             return false;
 
         return super.equalsExternal(propertyContext, other);
@@ -376,8 +376,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Mediatype
-            final String mediatypeValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileMediatype(pipelineContext);
-            final String mediatypeValue2 = uploadControl2.getFileMediatype(pipelineContext);
+            final String mediatypeValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileMediatype();
+            final String mediatypeValue2 = uploadControl2.getFileMediatype();
 
             if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
                 final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
@@ -386,8 +386,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Filename
-            final String filenameValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileName(pipelineContext);
-            final String filenameValue2 = uploadControl2.getFileName(pipelineContext);
+            final String filenameValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileName();
+            final String filenameValue2 = uploadControl2.getFileName();
 
             if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
                 final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
@@ -396,8 +396,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Size
-            final String sizeValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileSize(pipelineContext);
-            final String sizeValue2 = uploadControl2.getFileSize(pipelineContext);
+            final String sizeValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileSize();
+            final String sizeValue2 = uploadControl2.getFileSize();
 
             if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
                 final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
@@ -406,8 +406,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Progress state
-            final String value1 = (uploadControl1 == null) ? null : uploadControl1.getProgressState(pipelineContext);
-            final String value2 = uploadControl2.getProgressState(pipelineContext);
+            final String value1 = (uploadControl1 == null) ? null : uploadControl1.getProgressState();
+            final String value2 = uploadControl2.getProgressState();
 
             if (!XFormsUtils.compareStrings(value1, value2)) {
                 final String attributeValue = value2 != null ? value2 : "";
@@ -416,8 +416,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Progress current
-            final String progressReceivedValue1 = (uploadControl1 == null) ? null : uploadControl1.getProgressReceived(pipelineContext);
-            final String progressReceivedValue2 = uploadControl2.getProgressReceived(pipelineContext);
+            final String progressReceivedValue1 = (uploadControl1 == null) ? null : uploadControl1.getProgressReceived();
+            final String progressReceivedValue2 = uploadControl2.getProgressReceived();
 
             if (!XFormsUtils.compareStrings(progressReceivedValue1, progressReceivedValue2)) {
                 final String attributeValue = progressReceivedValue2 != null ? progressReceivedValue2 : "";
@@ -426,8 +426,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Progress total
-            final String progressExpectedValue1 = (uploadControl1 == null) ? null : uploadControl1.getProgressExpected(pipelineContext);
-            final String progressExpectedValue2 = uploadControl2.getProgressExpected(pipelineContext);
+            final String progressExpectedValue1 = (uploadControl1 == null) ? null : uploadControl1.getProgressExpected();
+            final String progressExpectedValue2 = uploadControl2.getProgressExpected();
 
             if (!XFormsUtils.compareStrings(progressExpectedValue1, progressExpectedValue2)) {
                 final String attributeValue = progressExpectedValue2 != null ? progressExpectedValue2 : "";
@@ -439,9 +439,9 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public Object getBackCopy(PropertyContext propertyContext) {
-        final XFormsUploadControl cloned = (XFormsUploadControl) super.getBackCopy(propertyContext);
-        cloned.fileInfo = (FileInfo) fileInfo.getBackCopy(propertyContext);
+    public Object getBackCopy() {
+        final XFormsUploadControl cloned = (XFormsUploadControl) super.getBackCopy();
+        cloned.fileInfo = (FileInfo) fileInfo.getBackCopy();
         return cloned;
     }
 
@@ -522,34 +522,34 @@ class FileInfo implements ExternalCopyable {
         return state;
     }
 
-    public String getFileMediatype(PropertyContext propertyContext) {
+    public String getFileMediatype() {
         if (!isMediatypeEvaluated) {
-            mediatype = (mediatypeElement == null) ? null : getInfoValue(propertyContext, mediatypeElement);
+            mediatype = (mediatypeElement == null) ? null : getInfoValue(mediatypeElement);
             isMediatypeEvaluated = true;
         }
         return mediatype;
     }
 
-    public String getFileName(PropertyContext propertyContext) {
+    public String getFileName() {
         if (!isFilenameEvaluated) {
-            filename = (filenameElement == null) ? null : getInfoValue(propertyContext, filenameElement);
+            filename = (filenameElement == null) ? null : getInfoValue(filenameElement);
             isFilenameEvaluated = true;
         }
         return filename;
     }
 
-    public String getFileSize(PropertyContext propertyContext) {
+    public String getFileSize() {
         if (!isSizeEvaluated) {
-            size = (sizeElement == null) ? null : getInfoValue(propertyContext, sizeElement);
+            size = (sizeElement == null) ? null : getInfoValue(sizeElement);
             isSizeEvaluated = true;
         }
         return size;
     }
 
-    public String getProgressState(PropertyContext propertyContext) {
+    public String getProgressState() {
         if (!isProgressStateEvaluated) {
 
-            final Multipart.UploadProgress progress = getProgress(propertyContext);
+            final Multipart.UploadProgress progress = getProgress();
             if (progress != null)
                 progressState = progress.state().toString().toLowerCase();
             else
@@ -560,10 +560,10 @@ class FileInfo implements ExternalCopyable {
         return progressState;
     }
 
-    public String getProgressCurrent(PropertyContext propertyContext) {
+    public String getProgressCurrent() {
         if (!isProgressReceivedEvaluated) {
 
-            final Multipart.UploadProgress progress = getProgress(propertyContext);
+            final Multipart.UploadProgress progress = getProgress();
             if (progress != null)
                 progressReceived = Long.toString(progress.receivedSize());
             else
@@ -574,10 +574,10 @@ class FileInfo implements ExternalCopyable {
         return progressReceived;
     }
 
-    public String getProgressExpected(PropertyContext propertyContext) {
+    public String getProgressExpected() {
         if (!isProgressExpectedEvaluated) {
 
-            final Multipart.UploadProgress progress = getProgress(propertyContext);
+            final Multipart.UploadProgress progress = getProgress();
             if (progress != null)
                 progressExpected = progress.expectedSize().isDefined() ? ((Long) progress.expectedSize().get()).toString() : null;
             else
@@ -588,9 +588,9 @@ class FileInfo implements ExternalCopyable {
         return progressExpected;
     }
 
-    private Multipart.UploadProgress getProgress(PropertyContext propertyContext) {
+    private Multipart.UploadProgress getProgress() {
         final Option option
-            = Multipart.getUploadProgress(NetUtils.getExternalContext(propertyContext).getRequest(),
+            = Multipart.getUploadProgress(NetUtils.getExternalContext().getRequest(),
                 control.getContainingDocument().getUUID(), control.getEffectiveId());
 
         final Multipart.UploadProgress progress = option.isEmpty() ? null : (Multipart.UploadProgress) option.get();
@@ -601,19 +601,19 @@ class FileInfo implements ExternalCopyable {
             return null;
     }
 
-    private String getInfoValue(PropertyContext propertyContext, Element element) {
+    private String getInfoValue(Element element) {
         contextStack.setBinding(control);
-        contextStack.pushBinding(propertyContext, element, control.getEffectiveId(), control.getChildElementScope(element));
+        contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
         final String tempValue = XFormsUtils.getBoundItemValue(contextStack.getCurrentSingleItem());
         contextStack.popBinding();
         return tempValue;
     }
 
-    public void setMediatype(PropertyContext propertyContext, String mediatype) {
-        setInfoValue(propertyContext, mediatypeElement, mediatype);
+    public void setMediatype(String mediatype) {
+        setInfoValue(mediatypeElement, mediatype);
     }
 
-    public void setFilename(PropertyContext propertyContext, String filename) {
+    public void setFilename(String filename) {
         // Depending on web browsers, the filename may contain a path or not.
 
         // Normalize below to just the file name.
@@ -621,28 +621,28 @@ class FileInfo implements ExternalCopyable {
         final int index = normalized.lastIndexOf('/');
         final String justFileName = (index == -1) ? normalized : normalized.substring(index + 1);
 
-        setInfoValue(propertyContext, filenameElement, justFileName);
+        setInfoValue(filenameElement, justFileName);
     }
 
-    public void setSize(PropertyContext propertyContext, String size) {
-        setInfoValue(propertyContext, sizeElement, size);
+    public void setSize(String size) {
+        setInfoValue(sizeElement, size);
     }
 
-    private void setInfoValue(PropertyContext propertyContext, Element element, String value) {
+    private void setInfoValue(Element element, String value) {
         if (element == null || value == null)
             return;
 
         contextStack.setBinding(control);
-        contextStack.pushBinding(propertyContext, element, control.getEffectiveId(), control.getChildElementScope(element));
+        contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
-            XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
+            XFormsSetvalueAction.doSetValue(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
                     control, (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
             contextStack.popBinding();
         }
     }
 
-    public Object getBackCopy(PropertyContext propertyContext) {
+    public Object getBackCopy() {
         try {
             final FileInfo cloned = (FileInfo) super.clone();
 

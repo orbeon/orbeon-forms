@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.event;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -162,12 +161,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     /**
      * Execute the given event on this event handler.
      *
-     * @param propertyContext       current context
      * @param containerForObserver  XBL container where observer is located
      * @param eventObserver         concrete event observer
      * @param event                 event
      */
-    public void handleEvent(PropertyContext propertyContext, XBLContainer containerForObserver,
+    public void handleEvent(XBLContainer containerForObserver,
                             XFormsEventObserver eventObserver, XFormsEvent event) {
 
         final XBLContainer contextContainer;
@@ -197,8 +195,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         // Create a new top-level action interpreter to handle this event
-        new XFormsActionInterpreter(propertyContext, contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
-                    .runAction(propertyContext, event, eventObserver, eventHandlerElement);
+        new XFormsActionInterpreter(contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
+                    .runAction(event, eventObserver, eventHandlerElement);
     }
 
     public String[] getObserversStaticIds() {

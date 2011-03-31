@@ -63,15 +63,8 @@ public class PipelineContext implements PropertyContext {
     private Trace trace;
     private boolean traceStopped;
 
-//    private boolean keyDebugging;
-//
-//    public boolean isKeyDebugging() {
-//        return keyDebugging;
-//    }
-//
-//    public void setKeyDebugging(boolean keyDebugging) {
-//        this.keyDebugging = keyDebugging;
-//    }
+    private static ThreadLocal<PipelineContext> threadLocal = new ThreadLocal<PipelineContext>();
+    private PipelineContext originalPipelineContext;
 
     /**
      * Create a new pipeline context.
@@ -79,6 +72,14 @@ public class PipelineContext implements PropertyContext {
     public PipelineContext() {
         // Use global property
         startTrace("oxf.pipeline.trace.class");
+
+        // Save and set ThreadLocal
+        originalPipelineContext = threadLocal.get();
+        threadLocal.set(this);
+    }
+
+    public static PipelineContext get() {
+        return threadLocal.get();
     }
 
     /**
@@ -190,6 +191,9 @@ public class PipelineContext implements PropertyContext {
             } finally {
                 destroyed = true;
             }
+
+            // Restore ThreadLocal
+            threadLocal.set(originalPipelineContext);
         }
     }
 

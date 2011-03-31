@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 /**
@@ -26,12 +25,12 @@ public class NoneReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public void deserialize(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // NOP
     }
 
-    public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public Runnable replace(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // Just notify that processing is terminated by dispatching xforms-submit-done
-        return dispatchSubmitDone(propertyContext, connectionResult);
+        return dispatchSubmitDone(connectionResult);
     }
 }

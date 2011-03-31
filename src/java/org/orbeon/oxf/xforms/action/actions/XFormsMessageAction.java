@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -55,7 +54,7 @@ public class XFormsMessageAction extends XFormsAction {
         SUPPORTED_APPEARANCES.putAll(LOG_APPEARANCES);
     }
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -78,7 +77,7 @@ public class XFormsMessageAction extends XFormsAction {
 
             // Get message value
             // TODO: In the future, we should support HTML
-            final String messageValue = XFormsUtils.getElementValue(propertyContext, actionInterpreter.getXBLContainer(),
+            final String messageValue = XFormsUtils.getElementValue(actionInterpreter.getXBLContainer(),
                     actionInterpreter.getContextStack(), actionInterpreter.getSourceEffectiveId(actionElement), actionElement, false, null);
 
             if (LOG_APPEARANCES.get(levelQName) != null) {

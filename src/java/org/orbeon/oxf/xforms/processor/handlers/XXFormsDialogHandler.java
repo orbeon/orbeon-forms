@@ -78,7 +78,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
 
-        final String labelValue = (dialogXFormsControl != null) ? dialogXFormsControl.getLabel(pipelineContext) : null;
+        final String labelValue = (dialogXFormsControl != null) ? dialogXFormsControl.getLabel() : null;
         if (labelValue != null) {
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
         }

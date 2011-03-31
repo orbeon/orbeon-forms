@@ -145,8 +145,8 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
-        super.performTargetAction(propertyContext, container, event);
+    public void performTargetAction(XBLContainer container, XFormsEvent event) {
+        super.performTargetAction(container, event);
 
         if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
             // Open the dialog
@@ -163,17 +163,17 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             // TODO: Issue here: if the dialog is non-relevant, it can't receive xxforms-dialog-open!
             if (isXForms11Switch()) {
                 // Partial refresh
-                containingDocument.getControls().doPartialRefresh(propertyContext, this);
+                containingDocument.getControls().doPartialRefresh(this);
             }
 
             // Automatically set focus on the dialog
             // NOTE: Form author can override this with a setfocus on xxforms-dialog-open
-            getXBLContainer().dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, this));
+            getXBLContainer().dispatchEvent(new XFormsFocusEvent(containingDocument, this));
         }
     }
 
     @Override
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
         if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getName())) {
             // Close the dialog
 
@@ -183,11 +183,11 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
             if (isXForms11Switch()) {
                 // Partial refresh
-                containingDocument.getControls().doPartialRefresh(propertyContext, this);
+                containingDocument.getControls().doPartialRefresh(this);
             }
 
         }
-        super.performDefaultAction(propertyContext, event);
+        super.performDefaultAction(event);
     }
 
     @Override

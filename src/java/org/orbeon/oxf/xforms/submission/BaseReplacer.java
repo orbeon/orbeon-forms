@@ -33,11 +33,11 @@ public abstract class BaseReplacer implements Replacer {
         return submission.getDetailsLogger(p, p2);
     }
 
-    protected Runnable dispatchSubmitDone(final PropertyContext propertyContext, final ConnectionResult connectionResult) {
+    protected Runnable dispatchSubmitDone(final ConnectionResult connectionResult) {
         return new Runnable() {
             public void run() {
                 submission.getXBLContainer(containingDocument)
-                    .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
+                    .dispatchEvent(new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
             }
         };
     }

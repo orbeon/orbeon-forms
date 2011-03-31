@@ -75,11 +75,9 @@ public class XXFormsDocBase64 extends XFormsFunction {
 
     private CharSequence readFile(String href, String baseURI) throws XPathException {
         try {
-            // Obtain a PipelineContext
-            final PipelineContext pipelineContext = getOrCreatePipelineContext();
 
             // Use resolver as it does a series of tasks for us, and use "binary" mode
-            final TransformerURIResolver resolver = new TransformerURIResolver(null, pipelineContext, null, XMLUtils.ParserConfiguration.PLAIN, "binary");
+            final TransformerURIResolver resolver = new TransformerURIResolver(null, PipelineContext.get(), null, XMLUtils.ParserConfiguration.PLAIN, "binary");
 
             final StringBuilder sb = new StringBuilder(1024);
 

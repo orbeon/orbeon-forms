@@ -42,7 +42,7 @@ public class XFormsOutputDefaultHandler extends XFormsOutputHandler {
         {
             if (isConcreteControl) {
                 final String mediatypeValue = attributes.getValue("mediatype");
-                final String textValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
+                final String textValue = XFormsOutputControl.getExternalValue(outputControl, mediatypeValue);
                 if (textValue != null && textValue.length() > 0)
                     contentHandler.characters(textValue.toCharArray(), 0, textValue.length());
             }

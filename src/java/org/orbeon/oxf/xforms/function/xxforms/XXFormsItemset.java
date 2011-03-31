@@ -45,14 +45,13 @@ public class XXFormsItemset extends XFormsFunction {
             final boolean selected = (selectedExpression != null) && ExpressionTool.effectiveBooleanValue(selectedExpression.iterate(xpathContext));
 
             // Obtain itemset
-            final PropertyContext pipelineContext = getOrCreatePipelineContext();
-            final Itemset itemset = select1Control.getItemset(pipelineContext);
+            final Itemset itemset = select1Control.getItemset();
 
             final String controlValueForSelection = selected ? select1Control.getValue() : null;
             final boolean isMultiple = select1Control instanceof XFormsSelectControl;
 
             if ("json".equalsIgnoreCase(format)) {
-                final String json = itemset.getJSONTreeInfo(pipelineContext, controlValueForSelection, isMultiple, select1Control.getLocationData());
+                final String json = itemset.getJSONTreeInfo(controlValueForSelection, isMultiple, select1Control.getLocationData());
                 return StringValue.makeStringValue(json);
             } else {
                 return itemset.getXMLTreeInfo(xpathContext.getConfiguration(), controlValueForSelection, isMultiple, select1Control.getLocationData());

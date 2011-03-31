@@ -382,7 +382,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         if (control != null) {
             // Get actual value from control
             if (isLabel) {
-                labelHintHelpAlertValue = control.getLabel(pipelineContext);
+                labelHintHelpAlertValue = control.getLabel();
                 mustOutputHTMLFragment = control.isHTMLLabel(pipelineContext);
             } else if (isHelp) {
                 // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special

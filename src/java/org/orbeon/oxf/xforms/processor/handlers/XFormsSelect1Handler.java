@@ -389,7 +389,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
                     if (xformsControl != null) {
                         final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
-                        outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(pipelineContext), xhtmlPrefix, mustOutputHTMLFragment);
+                        outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(), xhtmlPrefix, mustOutputHTMLFragment);
                     }
                     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName);
                 }
@@ -436,7 +436,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private void outputJSONTreeInfo(XFormsValueControl valueControl, Itemset itemset, boolean many, ContentHandler contentHandler) throws SAXException {
         if (valueControl != null && !handlerContext.isTemplate()) {
             // Produce a JSON fragment with hierarchical information
-            final String result = itemset.getJSONTreeInfo(pipelineContext, valueControl.getValue(), many, handlerContext.getLocationData());
+            final String result = itemset.getJSONTreeInfo(valueControl.getValue(), many, handlerContext.getLocationData());
             contentHandler.characters(result.toCharArray(), 0, result.length());
         } else {
             // Don't produce any content when generating a template
@@ -481,7 +481,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final String name = (!isMultiple && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : effectiveId;
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, name);
 
-                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
+                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue());
 
                 if (!handlerContext.isTemplate() && xformsControl != null) {
 
@@ -528,7 +528,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final AttributesImpl optionAttributes = getAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to option
         addItemAttributes(item, optionAttributes);
-        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue(pipelineContext));
+        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue());
 
         // Figure out whether what items are selected
         boolean isSelected = isSelected(handlerContext, xformsControl, isMultiple, item);

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 
 /**
@@ -29,16 +28,16 @@ public class ClientGetAllSubmission extends BaseSubmission {
         return "get all";
     }
 
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         return p.isHandlingClientGetAll;
     }
 
-    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(XFormsModelSubmission.SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         final String actionString = (sp.queryString == null) ? p2.actionOrResource : p2.actionOrResource + ((p2.actionOrResource.indexOf('?') == -1) ? "?" : "") + sp.queryString;
-        XFormsLoadAction.resolveStoreLoadValue(containingDocument, propertyContext, submission.getSubmissionElement(), true, actionString, null, null, submission.isURLNorewrite(), submission.isShowProgress());
+        XFormsLoadAction.resolveStoreLoadValue(containingDocument, submission.getSubmissionElement(), true, actionString, null, null, submission.isURLNorewrite(), submission.isShowProgress());
 
         return null;
     }

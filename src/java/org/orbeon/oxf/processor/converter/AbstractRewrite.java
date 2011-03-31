@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Response;
 import org.orbeon.oxf.portlet.Portlet2ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.*;
@@ -846,15 +846,15 @@ abstract class AbstractRewrite extends ProcessorImpl {
              * send them to the contentHandler (the output).
              */
             public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
-                readInputAsSAX(pipelineContext, REWRITE_IN, getRewriteXMLReceiver(pipelineContext, xmlReceiver, false));
+                readInputAsSAX(pipelineContext, REWRITE_IN, getRewriteXMLReceiver(xmlReceiver, false));
             }
         };
         addOutput(name, processorOutput);
         return processorOutput;
     }
 
-    public XMLReceiver getRewriteXMLReceiver(final PropertyContext propertyContext, final XMLReceiver xmlReceiver, final boolean fragment) {
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    public XMLReceiver getRewriteXMLReceiver(final XMLReceiver xmlReceiver, final boolean fragment) {
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         return getRewriteXMLReceiver(externalContext, xmlReceiver, fragment);
     }
 

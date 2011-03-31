@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.util.PropertyContext;
-
 /**
  * Interface that cacheable objects can optionally implement to support callback methods.
  */
@@ -22,22 +20,16 @@ public interface Cacheable {
 
     /**
      * Called when the object is added to the cache.
-     *
-     * @param propertyContext   current context
      */
-    void added(PropertyContext propertyContext);
+    void added();
 
     /**
      * Called when the object is explicitly removed from the cache.
-     *
-     * @param propertyContext   current context
      */
-    void removed(PropertyContext propertyContext);
+    void removed();
 
     /**
      * Called when the object is being evicted from cache.
-     *
-     * @param propertyContext   current context
      */
-    void evicted(PropertyContext propertyContext);
+    void evicted();
 }

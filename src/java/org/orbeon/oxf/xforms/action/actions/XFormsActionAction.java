@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -33,7 +32,7 @@ import java.util.List;
  * 10.1.1 The action Element
  */
 public class XFormsActionAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -53,16 +52,16 @@ public class XFormsActionAction extends XFormsAction {
 
                 // Push previous variables if any
                 if (currentVariableElements.size() > 0) {
-                    contextStack.addAndScopeVariables(propertyContext, actionInterpreter.getXBLContainer(), currentVariableElements, actionInterpreter.getSourceEffectiveId(actionElement));
+                    contextStack.addAndScopeVariables(actionInterpreter.getXBLContainer(), currentVariableElements, actionInterpreter.getSourceEffectiveId(actionElement));
                     variablesCount += currentVariableElements.size();
                 }
 
                 // Set context on action element
                 final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentActionElement);
-                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope);
+                contextStack.pushBinding(currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope);
 
                 // Run action
-                actionInterpreter.runAction(propertyContext, event, eventObserver, currentActionElement);
+                actionInterpreter.runAction(event, eventObserver, currentActionElement);
 
                 // Restore context
                 contextStack.popBinding();

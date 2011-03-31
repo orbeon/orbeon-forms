@@ -39,6 +39,5 @@ public interface XFormsEventHandler {
     String getKeyModifiers();
     String getKeyText();
 
-    void handleEvent(PropertyContext propertyContext, XBLContainer container,
-                     XFormsEventObserver eventObserver, XFormsEvent event);
+    void handleEvent(XBLContainer container, XFormsEventObserver eventObserver, XFormsEvent event);
 }

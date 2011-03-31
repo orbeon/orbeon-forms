@@ -21,7 +21,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.TeeProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
@@ -245,7 +244,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         // Read special "$data" input
         final Document dataInput = readInputAsDOM4J(pipelineContext, getInputByName(AbstractForEachProcessor.FOR_EACH_DATA_INPUT));
         final DocumentInfo document = new DocumentWrapper(dataInput, null, XPathCache.getGlobalConfiguration());
-        return XPathCache.getXPathExpression(pipelineContext,
+        return XPathCache.getXPathExpression(
                 document.getConfiguration(), document,
                 select, namespaceContext, getLocationData());
     }

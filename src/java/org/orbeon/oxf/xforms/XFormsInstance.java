@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -354,15 +353,14 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Set a value on the instance using a NodeInfo and a value.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document (for event dispatch), null if no events requested
      * @param eventTarget           event target (for event dispatch), null if no events requested
      * @param nodeInfo              element or attribute NodeInfo to update
      * @param newValue              value to set
      * @param type                  type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNodeInfo(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
-                                     XFormsEventTarget eventTarget, NodeInfo nodeInfo, String newValue, String type) {
+    public static void setValueForNodeInfo(XFormsContainingDocument containingDocument,
+                                           XFormsEventTarget eventTarget, NodeInfo nodeInfo, String newValue, String type) {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Unable to set value of read-only instance.");
 
@@ -371,22 +369,21 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
             // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
             if (!Dom4jUtils.isSimpleContent(node)) {
-                containingDocument.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, eventTarget));
+                containingDocument.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, eventTarget));
                 return;
             }
         }
-        setValueForNode(propertyContext, node, newValue, type);
+        setValueForNode(node, newValue, type);
     }
 
     /**
      * Set a value on the instance using a Node and a value.
      *
-     * @param propertyContext   current context
      * @param node              element or attribute Node to update
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    private static void setValueForNode(PropertyContext propertyContext, Node node, String newValue, String type) {
+    private static void setValueForNode(Node node, String newValue, String type) {
 
         // Convert value based on types if possible
         if (type != null) {
@@ -395,11 +392,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
             if (nodeType != null && !nodeType.equals(type)) {
                 // There is a different type already, do a conversion
-                newValue = XFormsUtils.convertUploadTypes(propertyContext, newValue, type, nodeType);
+                newValue = XFormsUtils.convertUploadTypes(newValue, type, nodeType);
             } else if (nodeType == null) {
                 // There is no type, convert to default type
                 if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    newValue = XFormsUtils.convertUploadTypes(propertyContext, newValue, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
+                    newValue = XFormsUtils.convertUploadTypes(newValue, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
             }
         }
 
@@ -525,13 +522,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return getModel(container.getContainingDocument());
     }
 
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
         final String eventName = event.getName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
             final IndentedLogger indentedLogger = event.getTargetXBLContainer().getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
             // Invalidate instance if it is cached
             if (cache) {
-                XFormsServerSharedInstancesCache.instance().remove(propertyContext, indentedLogger, sourceURI, null, handleXInclude);
+                XFormsServerSharedInstancesCache.instance().remove(indentedLogger, sourceURI, null, handleXInclude);
             } else {
                 indentedLogger.logWarning("", "XForms - xxforms-instance-invalidate event dispatched to non-cached instance", "instance id", getEffectiveId());
             }
@@ -541,11 +538,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Action run when the event reaches the target.
      *
-     * @param propertyContext       current context
      * @param container             container
      * @param event                 event being dispatched
      */
-    public void performTargetAction(final PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XBLContainer container, XFormsEvent event) {
         final String eventName = event.getName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // New nodes were just inserted
@@ -561,7 +557,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
             // Find affected repeats and update their node-sets and indexes
             final XFormsControls controls = container.getContainingDocument().getControls();
-            updateRepeatNodesets(propertyContext, controls, insertedNodeInfos);
+            updateRepeatNodesets(controls, insertedNodeInfos);
         } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
             // New nodes were just deleted
             final XFormsDeleteEvent deleteEvent = (XFormsDeleteEvent) event;
@@ -571,12 +567,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             if (didDeleteNodes) {
                 // Find affected repeats and update them
                 final XFormsControls controls = container.getContainingDocument().getControls();
-                updateRepeatNodesets(propertyContext, controls, null);
+                updateRepeatNodesets(controls, null);
             }
         }
     }
 
-    private void updateRepeatNodesets(PropertyContext propertyContext, XFormsControls controls, List<Item> insertedNodeInfos) {
+    private void updateRepeatNodesets(XFormsControls controls, List<Item> insertedNodeInfos) {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
 
@@ -594,7 +590,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     // Only update controls within same scope as modified instance
                     // NOTE: This can clearly break with e.g. xxforms:instance()
                     if (newRepeatControl.getResolutionScope() == instanceScope) {
-                        newRepeatControl.updateNodesetForInsertDelete(propertyContext, insertedNodeInfos);
+                        newRepeatControl.updateNodesetForInsertDelete(insertedNodeInfos);
                     }
                 }
             }
@@ -647,9 +643,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         }
     }
 
-    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
         final XFormsModel model = getModel(containingDocument);
-        final XFormsContextStack.BindingContext modelBindingContext = model.getBindingContext(propertyContext, containingDocument);
+        final XFormsContextStack.BindingContext modelBindingContext = model.getBindingContext(containingDocument);
         // TODO: should push root element of this instance, right? But is this used anywhere?
         //final XFormsContextStack contextStack = model.getContextStack();
         return modelBindingContext;

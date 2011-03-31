@@ -80,11 +80,18 @@ public class LoggerFactory {
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
                 final PipelineContext pipelineContext = new PipelineContext();
-                urlGenerator.reset(pipelineContext);
-                domSerializer.reset(pipelineContext);
-                domSerializer.start(pipelineContext);
-                final Object o = domSerializer.getW3CDocument(pipelineContext).getDocumentElement();
-                DOMConfigurator.configure((org.w3c.dom.Element) o);
+                boolean success = false;
+                final org.w3c.dom.Element element;
+                try {
+                    urlGenerator.reset(pipelineContext);
+                    domSerializer.reset(pipelineContext);
+                    domSerializer.start(pipelineContext);
+                    element = domSerializer.getW3CDocument(pipelineContext).getDocumentElement();
+                    success = true;
+                } finally {
+                    pipelineContext.destroy(success);
+                }
+                DOMConfigurator.configure(element);
             } else {
                 logger.info("Property " + LOG4J_DOM_CONFIG_PROPERTY + " not set. Skipping logging initialization.");
             }

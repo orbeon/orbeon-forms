@@ -95,11 +95,11 @@ public class StaticExternalContext {
     }
 
     public static String encodeXML(org.w3c.dom.Node node) {
-        return XFormsUtils.encodeXMLAsDOM(getStaticContext().getPipelineContext(), node);
+        return XFormsUtils.encodeXMLAsDOM(node);
     }
 
     public static Document decodeXML(String encodedXML) {
-        return XFormsUtils.decodeXML(getStaticContext().getPipelineContext(), encodedXML);
+        return XFormsUtils.decodeXML(encodedXML);
     }
 
     public static void putInSession(String key, String value) {

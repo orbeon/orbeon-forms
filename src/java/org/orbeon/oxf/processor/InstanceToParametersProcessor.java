@@ -17,7 +17,6 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -75,7 +74,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         Element paramElement = (Element) i.next();
                         Attribute refAttribute = paramElement.attribute("ref");
                         String excludeRef = refAttribute.getValue();
-                        PooledXPathExpression xpath = XPathCache.getXPathExpression(pipelineContext, instanceWrapper.getConfiguration(),
+                        PooledXPathExpression xpath = XPathCache.getXPathExpression(instanceWrapper.getConfiguration(),
                                 instanceWrapper.wrap(instance), excludeRef,
                                 new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(paramElement)), getLocationData());
                         try {
@@ -106,7 +105,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     xmlReceiver.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
                         // If all the nodes of the instance map to parameters, we don't output the instance parameter
-                        outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance, false), xmlReceiver);
+                        outputParameter("$instance", XFormsUtils.encodeXML(instance, false), xmlReceiver);
                     }
                     xmlReceiver.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
                     xmlReceiver.endDocument();

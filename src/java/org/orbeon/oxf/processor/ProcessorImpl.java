@@ -349,7 +349,7 @@ public abstract class ProcessorImpl implements Processor {
 
         if (keyValidity != null && keyValidity.key != null && keyValidity.validity != null) {
             // We got a key and a validity
-            final Object inputObject = cache.findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+            final Object inputObject = cache.findValid(keyValidity.key, keyValidity.validity);
             if (inputObject != null) {
                 // Return cached object
                 if (logger.isDebugEnabled())
@@ -373,7 +373,7 @@ public abstract class ProcessorImpl implements Processor {
             if (logger.isDebugEnabled())
                 logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
 
-            cache.add(pipelineContext, keyValidity.key, keyValidity.validity, result);
+            cache.add(keyValidity.key, keyValidity.validity, result);
 
             reader.storedInCache();
         }
@@ -496,7 +496,7 @@ public abstract class ProcessorImpl implements Processor {
      */
     public boolean isInputInCache(PipelineContext context, ProcessorInput input) {
         final KeyValidity keyValidity = getInputKeyValidity(context, input);
-        return keyValidity != null && ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
+        return keyValidity != null && ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity) != null;
     }
 
     public boolean isInputInCache(PipelineContext context, String inputName) {
@@ -504,7 +504,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public boolean isInputInCache(PipelineContext context, KeyValidity keyValidity) {
-        return ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
+        return ObjectCache.instance().findValid(keyValidity.key, keyValidity.validity) != null;
     }
 
     /**

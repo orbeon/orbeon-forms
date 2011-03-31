@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.orbeon.oxf.cache.*;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.cache.Cache;
+import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
@@ -53,36 +54,34 @@ public class XFormsDocumentCache {
     /**
      * Add a document to the cache using the document's UUID as cache key.
      *
-     * @param propertyContext       current context
      * @param containingDocument    document to store
      */
-    public void storeDocument(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void storeDocument(XFormsContainingDocument containingDocument) {
         final InternalCacheKey cacheKey = createCacheKey(containingDocument.getUUID());
-        cache.add(propertyContext, cacheKey, CONSTANT_VALIDITY, containingDocument);
+        cache.add(cacheKey, CONSTANT_VALIDITY, containingDocument);
     }
 
     /**
      * Find a document in the cache. If not found, return null.
      *
-     * @param propertyContext       current context
+     *
      * @param uuid                  UUID used to search cache
      * @return                      document or null
      */
-    public XFormsContainingDocument getDocument(PropertyContext propertyContext, String uuid) {
+    public XFormsContainingDocument getDocument(String uuid) {
         final InternalCacheKey cacheKey = createCacheKey(uuid);
         // NOTE: We used to remove the document from the cache, but this is no longer needed now that we store by UUID.
-        return (XFormsContainingDocument) cache.findValid(propertyContext, cacheKey, CONSTANT_VALIDITY);
+        return (XFormsContainingDocument) cache.findValid(cacheKey, CONSTANT_VALIDITY);
     }
 
     /**
      * Remove a document from the cache. This does not cause the document state to be serialized to store.
      *
-     * @param propertyContext       current context
      * @param containingDocument    document to remove
      */
-    public void removeDocument(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void removeDocument(XFormsContainingDocument containingDocument) {
         final InternalCacheKey cacheKey = createCacheKey(containingDocument.getUUID());
-        cache.remove(propertyContext, cacheKey);
+        cache.remove(cacheKey);
     }
 
     private InternalCacheKey createCacheKey(String uuid) {

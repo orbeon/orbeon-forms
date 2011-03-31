@@ -24,7 +24,7 @@ public class XXFormsRootControl extends XFormsNoSingleNodeContainerControl imple
     public XXFormsRootControl(XFormsContainingDocument containingDocument) {
         super(containingDocument, null, null, "root", null);
         // Call this to set initial relevance to true
-        setBindingContext(null, null);
+        setBindingContext(null);
     }
 
     @Override

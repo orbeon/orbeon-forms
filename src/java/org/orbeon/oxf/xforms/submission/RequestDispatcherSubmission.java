@@ -18,7 +18,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -51,10 +50,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     /**
      * Check whether submission is allowed.
      */
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = NetUtils.getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         // Log a lot of stuff for development, as it is not always obvious why we pick this type of submission.
@@ -129,7 +128,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
         // NOTE: Using include() for servlets doesn't allow detecting errors caused by the
@@ -155,7 +154,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Evaluate headers if any
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
+        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
@@ -172,7 +171,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openRequestDispatcherConnection(propertyContext, NetUtils.getExternalContext(propertyContext),
+                    connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
                         containingDocument, detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                         p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
@@ -192,10 +191,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                         return null;
                     } else {
                         // Obtain replacer
-                        final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+                        final Replacer replacer = submission.getReplacer(connectionResult, p);
 
                         // Deserialize
-                        replacer.deserialize(propertyContext, connectionResult, p, p2);
+                        replacer.deserialize(connectionResult, p, p2);
 
                         // Update status
                         status[1] = true;
@@ -216,13 +215,13 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         // Submit the callable
         // This returns null if the execution is deferred
-        return submitCallable(propertyContext, p, p2, callable);
+        return submitCallable(p, p2, callable);
     }
 
     /**
      * Perform a local connection using the Servlet API.
      */
-    public ConnectionResult openRequestDispatcherConnection(PropertyContext propertyContext, ExternalContext externalContext,
+    public ConnectionResult openRequestDispatcherConnection(ExternalContext externalContext,
                                                             XFormsContainingDocument containingDocument,
                                                             IndentedLogger indentedLogger,
                                                             XFormsModelSubmission xformsModelSubmission,
@@ -256,7 +255,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(effectiveResource, isContextRelative);
         final boolean isDefaultContext = requestDispatcher.isDefaultContext();
 
-        return openLocalConnection(propertyContext, externalContext, indentedLogger, containingDocument.getResponse(),
+        return openLocalConnection(externalContext, indentedLogger, containingDocument.getResponse(),
            xformsModelSubmission, httpMethod, effectiveResource, mediatype,
            messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues, new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {

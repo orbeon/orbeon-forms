@@ -33,7 +33,7 @@ public class XXFormsTextHandler extends XFormsBaseHandler {
         final boolean isConcreteControl = textControl != null;
 
         if (isConcreteControl) {
-            final String externalValue = textControl.getExternalValue(pipelineContext);
+            final String externalValue = textControl.getExternalValue();
             if (externalValue != null && externalValue.length() > 0)
                 contentHandler.characters(externalValue.toCharArray(), 0, externalValue.length());
         }

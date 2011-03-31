@@ -19,6 +19,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
@@ -61,6 +62,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // Submissions
     private final Map<String, XFormsModelSubmission> submissions;
+
+    // Variables
+//    private Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
+//    private Map<String, ValueRepresentation> variableValues = new LinkedHashMap<String, ValueRepresentation>();
 
     // Binds
     private final XFormsModelBinds binds;
@@ -135,7 +140,26 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Create context stack
         this.contextStack = new XFormsContextStack(this);
+
+        // Create variables based on static analysis
+//        for (final Map.Entry<String, VariableAnalysisTrait> entry : staticModel.jVariablesMap().entrySet()) {
+//            variables.put(entry.getKey(), new Variable(container, contextStack, entry.getValue().element()));
+//        }
     }
+
+//    public void evaluateVariables(PropertyContext propertyContext, ) {
+//
+//        variableValues.clear();
+//
+//        for (final Variable variable : variables.values()) {
+//            variable.markDirty();
+//            final ValueRepresentation value = variable.getVariableValue(propertyContext, getEffectiveId(), true);
+//            variableValues.put(variable.getVariableName(), value);
+//        }
+//
+//
+//        xxx
+//    }
 
     public void updateEffectiveId(String effectiveId) {
         this.effectiveId = effectiveId;
@@ -346,11 +370,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return binds;
     }
 
-    private void loadSchemasIfNeeded(PropertyContext propertyContext) {
+    private void loadSchemasIfNeeded() {
         if (schemaValidator == null) {
             final Element modelElement = staticModel.element();
             schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
-            schemaValidator.loadSchemas(propertyContext, containingDocument);
+            schemaValidator.loadSchemas(containingDocument);
 
             hasSchema = schemaValidator.hasSchema();
         }
@@ -374,24 +398,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     /**
      * Restore the state of the model when the model object was just recreated.
-     *
-     * @param propertyContext   current context
      */
-    public void restoreState(PropertyContext propertyContext) {
+    public void restoreState() {
         // Ensure schema are loaded
-        loadSchemasIfNeeded(propertyContext);
+        loadSchemasIfNeeded();
 
         // Restore instances
-        restoreInstances(propertyContext);
+        restoreInstances();
 
         // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
         deferredActionContext.rebuild = true;
         deferredActionContext.revalidate = true;
 
-        doRebuild(propertyContext);
+        doRebuild();
         if (binds != null)
-            binds.applyComputedExpressionBinds(propertyContext);
-        doRevalidate(propertyContext);
+            binds.applyComputedExpressionBinds();
+        doRevalidate();
     }
 
     /**
@@ -423,13 +445,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     /**
      * Restore all the instances serialized as children of the given container element.
-     *
-     * @param propertyContext   current context
      */
-    private void restoreInstances(PropertyContext propertyContext) {
+    private void restoreInstances() {
 
         // Find serialized instances from context
-        final Element instancesElement = (Element) propertyContext.getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
+        final Element instancesElement = (Element) PipelineContext.get().getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
 
         // Get instances from dynamic state first
         if (instancesElement != null) {
@@ -441,7 +461,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     final XFormsInstance newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), currentInstanceElement);
                     final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(currentInstanceElement);
                     // NOTE: Here instance must contain document
-                    setInstanceLoadFromCacheIfNecessary(propertyContext, isReadonlyHint, newInstance, null);
+                    setInstanceLoadFromCacheIfNecessary(isReadonlyHint, newInstance, null);
                     indentedLogger.logDebug("restore", "restoring instance from dynamic state", "model effective id", effectiveId, "instance static id", newInstance.getId());
                 }
             }
@@ -472,12 +492,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
     }
 
-    public void performDefaultAction(final PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
         final String eventName = event.getName();
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
-            doModelConstruct(propertyContext);
+            doModelConstruct();
         } else if (XFormsEvents.XXFORMS_READY.equals(eventName)) {
             // This is called after xforms-ready events have been dispatched to all models
             doAfterReady();
@@ -488,24 +508,24 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         } else if (XFormsEvents.XFORMS_REBUILD.equals(eventName)) {
             // 4.3.7 The xforms-rebuild Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            doRebuild(propertyContext);
+            doRebuild();
         } else if (XFormsEvents.XFORMS_RECALCULATE.equals(eventName)) {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             final XFormsRecalculateEvent recalculateEvent = (XFormsRecalculateEvent) event;
-            doRecalculate(propertyContext, recalculateEvent.isApplyInitialValues());
+            doRecalculate(recalculateEvent.isApplyInitialValues());
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            doRevalidate(propertyContext);
+            doRevalidate();
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            doRefresh(propertyContext);
+            doRefresh();
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
             // 4.3.8 The xforms-reset Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            doReset(propertyContext);
+            doReset();
         } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName) || XFormsEvents.XFORMS_LINK_EXCEPTION.equals(eventName)) {
             // 4.5.4 The xforms-compute-exception Event
             // Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
@@ -524,32 +544,32 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
     }
 
-    private void doReset(PropertyContext propertyContext) {
+    private void doReset() {
         // TODO
         // "The instance data is reset to the tree structure and values it had immediately
         // after having processed the xforms-ready event."
 
         // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
         // xforms-refresh are dispatched to the model element in sequence."
-        container.dispatchEvent(propertyContext, new XFormsRebuildEvent(containingDocument, XFormsModel.this));
-        container.dispatchEvent(propertyContext, new XFormsRecalculateEvent(containingDocument, XFormsModel.this));
-        container.dispatchEvent(propertyContext, new XFormsRevalidateEvent(containingDocument, XFormsModel.this));
-        container.dispatchEvent(propertyContext, new XFormsRefreshEvent(containingDocument, XFormsModel.this));
+        container.dispatchEvent(new XFormsRebuildEvent(containingDocument, XFormsModel.this));
+        container.dispatchEvent(new XFormsRecalculateEvent(containingDocument, XFormsModel.this));
+        container.dispatchEvent(new XFormsRevalidateEvent(containingDocument, XFormsModel.this));
+        container.dispatchEvent(new XFormsRefreshEvent(containingDocument, XFormsModel.this));
     }
 
     private void doAfterReady() {
     }
 
-    private void doModelConstruct(PropertyContext propertyContext) {
+    private void doModelConstruct() {
         final Element modelElement = staticModel.element();
 
         // 1. All XML Schema loaded (throws xforms-link-exception)
 
         try {
-            loadSchemasIfNeeded(propertyContext);
+            loadSchemasIfNeeded();
         } catch (Exception e) {
             final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
-            container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this,
+            container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this,
                     schemaAttribute, modelElement, e));
         }
 
@@ -572,7 +592,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         final String instanceStaticId = XFormsInstance.getInstanceStaticId(containerElement);
 
                         // Load instance. This might throw an exception event (and therefore a Java exception) in case of fatal problem.
-                        loadInstance(propertyContext, instanceStaticId);
+                        loadInstance(instanceStaticId);
                     }
                 }
             }
@@ -589,12 +609,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
         deferredActionContext.markStructuralChange();
 
-        doRebuild(propertyContext);
-        doRecalculate(propertyContext, false);
-        doRevalidate(propertyContext);
+        doRebuild();
+        doRecalculate(false);
+        doRevalidate();
     }
 
-    private void setInstanceLoadFromCacheIfNecessary(PropertyContext propertyContext, boolean readonlyHint, XFormsInstance newInstance, Element locationDataElement) {
+    private void setInstanceLoadFromCacheIfNecessary(boolean readonlyHint, XFormsInstance newInstance, Element locationDataElement) {
         if (newInstance.getDocumentInfo() == null && newInstance.getSourceURI() != null) {
             // Instance not initialized yet and must be loaded from URL
 
@@ -610,7 +630,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // NOTE: No XInclude supported to read instances with @src for now
             // TODO: must pass method and request body in case of POST/PUT
             final XFormsInstance cachedInstance
-                    = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, indentedLogger,
+                    = XFormsServerSharedInstancesCache.instance().findConvert(indentedLogger,
                         newInstance.getId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getRequestBodyHash(), readonlyHint, false,
                         XFormsProperties.isExposeXPathTypes(containingDocument), newInstance.getTimeToLive(), newInstance.getValidation(), INSTANCE_LOADER);
 
@@ -631,7 +651,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
     }
 
-    private void loadInstance(PropertyContext propertyContext, String instanceStaticId) {
+    private void loadInstance(String instanceStaticId) {
 
         final Instance instance = staticModel.instancesMap().get(instanceStaticId);
         final Element instanceContainer = instance.element();
@@ -650,11 +670,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     // Got a blank src attribute, just dispatch xforms-link-exception
                     final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Invalid blank URL specified for instance/@src: " + instanceStaticId, extendedLocationData);
-                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.src(), instanceContainer, throwable));
+                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.src(), instanceContainer, throwable));
                 }
 
                 // Load instance
-                loadExternalInstance(propertyContext, instance, instance.src());
+                loadExternalInstance(instance, instance.src());
             } else if (children != null && children.size() >= 1) {
                 // "If the src attribute is omitted, then the data for the instance is obtained from inline content if
                 // it is given or the resource attribute otherwise. If both the resource attribute and inline content
@@ -665,7 +685,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 if (children.size() > 1) {
                     final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", extendedLocationData);
-                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
+                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
                 }
 
                 try {
@@ -680,7 +700,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 } catch (Exception e) {
                     final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
-                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
+                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
                 }
             } else if (instance.resource() != null) {
                 // "the data for the instance is obtained from inline content if it is given or the
@@ -690,22 +710,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     // Got a blank src attribute, just dispatch xforms-link-exception
                     final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Invalid blank URL specified for instance/@resource: " + instanceStaticId, extendedLocationData);
-                    container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.resource(), instanceContainer, throwable));
+                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.resource(), instanceContainer, throwable));
                 }
 
                 // Load instance
-                loadExternalInstance(propertyContext, instance, instance.resource());
+                loadExternalInstance(instance, instance.resource());
             } else {
                 // Everything missing
                 final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                 final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceStaticId, extendedLocationData);
-                container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, "", instanceContainer, throwable));
+                container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, "", instanceContainer, throwable));
             }
         }
         indentedLogger.endHandleOperation();
     }
 
-    private void loadExternalInstance(final PropertyContext propertyContext, Instance instance, String instanceResource) {
+    private void loadExternalInstance(Instance instance, String instanceResource) {
         try {
             if (instance.isCacheHint() && ProcessorImpl.getProcessorInputSchemeInputName(instanceResource) == null) {
                 // Instance 1) has cache hint and 2) is not input:*, so it can be cached
@@ -713,12 +733,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // TODO: This doesn't handle optimized submissions.
 
-                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element(), instance.instanceSource(),
+                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.instanceSource(),
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                 // NOTE: No XInclude supported to read instances with @src for now
                 final XFormsInstance sharedXFormsInstance
-                        = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, indentedLogger,
+                        = XFormsServerSharedInstancesCache.instance().findConvert(indentedLogger,
                             instance.staticId(), effectiveId,
                             resolvedInstanceURL, null, instance.isReadonlyHint(), false, XFormsProperties.isExposeXPathTypes(containingDocument),
                             instance.xxformsTimeToLive(), instance.xxformsValidation(), INSTANCE_LOADER);
@@ -729,7 +749,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // NOTE: Optimizing with include() for servlets has limitations, in particular
                 // the proper split between servlet path and path info is not done.
-                final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+                final ExternalContext externalContext = NetUtils.getExternalContext();
                 final ExternalContext.Request request = externalContext.getRequest();
 
                 // TODO: Temporary. Use XFormsModelSubmission to load instances instead
@@ -739,12 +759,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // Use full resolved resource URL
                 // o absolute URL, e.g. http://example.org/instance.xml
                 // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
-                loadInstance(propertyContext, externalContext, instance);
+                loadInstance(externalContext, instance);
             }
         } catch (Exception e) {
             final ValidationException validationException
                 = ValidationException.wrapException(e, new ExtendedLocationData(instance.locationData(), "reading external instance", instance.element()));
-            container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instanceResource, instance.element(), validationException));
+            container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instanceResource, instance.element(), validationException));
         }
     }
 
@@ -752,7 +772,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // TODO: Use XFormsModelSubmission instead of duplicating code here
     private class InstanceLoader implements XFormsServerSharedInstancesCache.Loader {
-        public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId,
+        public ReadonlyXFormsInstance load(String instanceStaticId, String modelEffectiveId,
                                            String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
             final URL sourceURL;
             try {
@@ -764,7 +784,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "loading instance into cache", "id", instanceStaticId, "URI", instanceSourceURI);
 
-            final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext();
             final ConnectionResult connectionResult = new Connection().open(externalContext,
                     indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
@@ -794,9 +814,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /*
      * Load an external instance using an absolute URL.
      */
-    private void loadInstance(PropertyContext propertyContext, ExternalContext externalContext, Instance instance) {
+    private void loadInstance(ExternalContext externalContext, Instance instance) {
 
-        final String absoluteURLString = XFormsUtils.resolveServiceURL(propertyContext, containingDocument, instance.element(), instance.instanceSource(),
+        final String absoluteURLString = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.instanceSource(),
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
         assert NetUtils.urlHasProtocol(absoluteURLString);
@@ -869,16 +889,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         setInstanceDocument(instanceDocument, effectiveId, instance.staticId(), absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(), false, -1, instance.xxformsValidation(), false);
     }
 
-    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XBLContainer container, XFormsEvent event) {
         // NOP
     }
 
-    public void doRebuild(PropertyContext propertyContext) {
+    public void doRebuild() {
 
         // Rebuild bind tree only if needed
         final boolean mustRebuild = instances.size() > 0 && binds != null && deferredActionContext.rebuild;
         if (mustRebuild) {
-            binds.rebuild(propertyContext);
+            binds.rebuild();
 
             // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
             // TODO: Handle XPathDependencies
@@ -893,13 +913,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         containingDocument.getXPathDependencies().rebuildDone(staticModel);
     }
 
-    public void doRecalculate(PropertyContext propertyContext, boolean applyInitialValues) {
+    public void doRecalculate(boolean applyInitialValues) {
 
         // Recalculate only if needed
         final boolean mustRecalculate = instances.size() > 0 && binds != null && deferredActionContext.recalculate;
         if (mustRecalculate) {
             // Apply calculate binds
-            binds.applyCalculateBinds(propertyContext, applyInitialValues);
+            binds.applyCalculateBinds(applyInitialValues);
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -911,7 +931,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
 
-    public void doRevalidate(final PropertyContext propertyContext) {
+    public void doRevalidate() {
 
         // Validate only if needed, including checking the flags, because if validation state is clean, validation
         // being idempotent, revalidating is not needed.
@@ -954,7 +974,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             // Validate using binds if needed
             if (mustBindValidate)
-                binds.applyValidationBinds(propertyContext, invalidInstances);
+                binds.applyValidationBinds(invalidInstances);
 
             // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
@@ -963,9 +983,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: Must dispatch after marking revalidate = false, right?
             for (final XFormsInstance instance: instances) {
                 if (invalidInstances.contains(instance.getEffectiveId())) {
-                    container.dispatchEvent(propertyContext, new XXFormsInvalidEvent(containingDocument, instance));
+                    container.dispatchEvent(new XXFormsInvalidEvent(containingDocument, instance));
                 } else {
-                    container.dispatchEvent(propertyContext, new XXFormsValidEvent(containingDocument, instance));
+                    container.dispatchEvent(new XXFormsValidEvent(containingDocument, instance));
                 }
             }
 
@@ -981,7 +1001,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         containingDocument.getXPathDependencies().revalidateDone(staticModel);
     }
 
-    private void doRefresh(PropertyContext propertyContext) {
+    private void doRefresh() {
         // This is called in response to dispatching xforms-refresh to this model, whether using the xforms:refresh
         // action or by dispatching the event by hand.
 
@@ -989,7 +1009,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
         // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
         if (containingDocument.getControls().isRequireRefresh()) {
-            getXBLContainer().synchronizeAndRefresh(propertyContext);
+            getXBLContainer().synchronizeAndRefresh();
         }
     }
 
@@ -1063,7 +1083,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return deferredActionContext.rebuild || deferredActionContext.recalculate || deferredActionContext.revalidate;
     }
 
-    public void rebuildRecalculateRevalidateIfNeeded(PropertyContext propertyContext) {
+    public void rebuildRecalculateRevalidateIfNeeded() {
         // Process deferred behavior
         final DeferredActionContext currentDeferredActionContext = deferredActionContext;
         // NOTE: We used to clear deferredActionContext , but this caused events to be dispatched in a different
@@ -1071,24 +1091,24 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         if (currentDeferredActionContext.rebuild) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(propertyContext, new XFormsRebuildEvent(containingDocument, this));
-            containingDocument.endOutermostActionHandler(propertyContext);
+            container.dispatchEvent(new XFormsRebuildEvent(containingDocument, this));
+            containingDocument.endOutermostActionHandler();
         }
         if (currentDeferredActionContext.recalculate) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(propertyContext, new XFormsRecalculateEvent(containingDocument, this));
-            containingDocument.endOutermostActionHandler(propertyContext);
+            container.dispatchEvent(new XFormsRecalculateEvent(containingDocument, this));
+            containingDocument.endOutermostActionHandler();
         }
         if (currentDeferredActionContext.revalidate) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(propertyContext, new XFormsRevalidateEvent(containingDocument, this));
-            containingDocument.endOutermostActionHandler(propertyContext);
+            container.dispatchEvent(new XFormsRevalidateEvent(containingDocument, this));
+            containingDocument.endOutermostActionHandler();
         }
     }
 
-    public void rebuildRecalculateIfNeeded(PropertyContext propertyContext) {
-        doRebuild(propertyContext);
-        doRecalculate(propertyContext, false);
+    public void rebuildRecalculateIfNeeded() {
+        doRebuild();
+        doRecalculate(false);
     }
 
     public XFormsEventObserver getParentEventObserver(XBLContainer container) {
@@ -1104,8 +1124,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
-    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
-        contextStack.resetBindingContext(propertyContext, this);
+    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
+        contextStack.resetBindingContext(this);
         return contextStack.getCurrentBindingContext();
     }
 

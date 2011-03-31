@@ -105,7 +105,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
 object LHHAAnalysis {
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
         // Try to figure out if we have a dynamic LHHA element, including nested xforms:output and AVTs.
-        XPathCache.evaluateSingle(staticStateContext.propertyContext, staticStateContext.controlsDocument.wrap(lhhaElement),
+        XPathCache.evaluateSingle(staticStateContext.controlsDocument.wrap(lhhaElement),
             "not(exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
             XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
     }

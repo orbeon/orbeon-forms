@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -35,7 +34,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
     }
 
     @Override
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
         // Do the default stuff upon receiving a DOMActivate event
         if (XFormsEvents.DOM_ACTIVATE.equals(event.getName())) {
 
@@ -49,7 +48,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             final Object object = getXBLContainer().findResolutionScope(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsSubmitEvent(containingDocument, submission));
+                submission.getXBLContainer(containingDocument).dispatchEvent(new XFormsSubmitEvent(containingDocument, submission));
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
@@ -59,6 +58,6 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                             "submission id", submissionId);
             }
         }
-        super.performDefaultAction(propertyContext, event);
+        super.performDefaultAction(event);
     }
 }

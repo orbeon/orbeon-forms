@@ -13,21 +13,19 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.util.PropertyContext;
-
 import java.util.Iterator;
 
 public interface Cache {
     String getCacheName();
-    void add(PropertyContext propertyContext, CacheKey key, Object validity, Object object);
-    void remove(PropertyContext propertyContext, CacheKey key);
-    int removeAll(PropertyContext propertyContext);
-    Object findValid(PropertyContext propertyContext, CacheKey key, Object validity);
-    CacheEntry findAny(PropertyContext propertyContext, CacheKey key);
-    Iterator iterateCacheKeys(PropertyContext propertyContext);
-    Iterator iterateCacheObjects(PropertyContext propertyContext);
+    void add(CacheKey key, Object validity, Object object);
+    void remove(CacheKey key);
+    int removeAll();
+    Object findValid(CacheKey key, Object validity);
+    CacheEntry findAny( CacheKey key);
+    Iterator iterateCacheKeys();
+    Iterator iterateCacheObjects();
     int getCurrentSize();
     int getMaxSize();
-    void setMaxSize(PropertyContext propertyContext, int maxSize);
-    CacheStatistics getStatistics(PropertyContext propertyContext);
+    void setMaxSize(int maxSize);
+    CacheStatistics getStatistics();
 }

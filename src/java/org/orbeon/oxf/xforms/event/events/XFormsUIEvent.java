@@ -80,7 +80,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('label') is deprecated. Use event('xxforms:label') instead.");
             }
 
-            final String label = targetControl.getLabel(getPipelineContext());
+            final String label = targetControl.getLabel();
             if (label != null)
                 return SingletonIterator.makeIterator(new StringValue(label));
             else

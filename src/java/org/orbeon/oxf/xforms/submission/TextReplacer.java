@@ -33,7 +33,7 @@ public class TextReplacer extends BaseReplacer {
         super(submission, containingDocument);
     }
 
-    public void deserialize(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public void deserialize(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
         responseBody = connectionResult.getTextResponseBody();
         if (responseBody == null) {
             // This is a binary result
@@ -47,11 +47,11 @@ public class TextReplacer extends BaseReplacer {
             // nothing in the document is replaced and submission processing concludes after dispatching
             // xforms-submit-error with appropriate context information, including an error-type of resource-error."
             throw new XFormsSubmissionException(submission, "Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.getResponseMediaType(), "reading response body",
-                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
     }
 
-    public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // XForms 1.1: "If the replace attribute contains the value "text" and the submission response conforms to an
         // XML mediatype (as defined by the content type specifiers in [RFC 3023]) or a text media type (as defined by
@@ -63,7 +63,7 @@ public class TextReplacer extends BaseReplacer {
         if (submission.getTargetref() != null) {
             // Evaluate destination node
             final Object destinationObject
-                    = XPathCache.evaluateSingle(propertyContext, p.xpathContext, p.refNodeInfo, submission.getTargetref());
+                    = XPathCache.evaluateSingle(p.xpathContext, p.refNodeInfo, submission.getTargetref());
 
             if (destinationObject instanceof NodeInfo) {
                 destinationNodeInfo = (NodeInfo) destinationObject;
@@ -74,7 +74,7 @@ public class TextReplacer extends BaseReplacer {
                     // then submission processing ends after dispatching the event
                     // xforms-submit-error with an error-type of target-error."
                     throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element or attribute for replace=\"text\".", "processing targetref attribute",
-                            new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
             } else {
                 // Throw target-error
@@ -84,7 +84,7 @@ public class TextReplacer extends BaseReplacer {
                 // submission processing ends after dispatching the event
                 // xforms-submit-error with an error-type of target-error."
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to a node for replace=\"text\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
         } else {
             // Handle default destination
@@ -93,9 +93,9 @@ public class TextReplacer extends BaseReplacer {
 
         // Set value into the instance
         // NOTE: Here we decided to use the actions logger, by compatibility with xforms:setvalue. Anything we would like to log in "submission" mode?
-        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY), submission, destinationNodeInfo, responseBody, null, "submission", false);
+        XFormsSetvalueAction.doSetValue(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY), submission, destinationNodeInfo, responseBody, null, "submission", false);
 
         // Dispatch xforms-submit-done
-        return dispatchSubmitDone(propertyContext, connectionResult);
+        return dispatchSubmitDone(connectionResult);
     }
 }

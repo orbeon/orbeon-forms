@@ -105,14 +105,13 @@ public class SecureUtils {
      * Encrypt a string of text using the given password. The result is converted to Base64 encoding without line
      * breaks or spaces.
      *
-     * @param propertyContext
      * @param password          encryption password
      * @param text              string to encrypt
      * @return                  string containing the encoding data as Base64
      */
-    public static String encrypt(PropertyContext propertyContext, String password, String text) {
+    public static String encrypt(String password, String text) {
         try {
-            return encrypt(propertyContext, password, text.getBytes("utf-8"));
+            return encrypt(password, text.getBytes("utf-8"));
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
         }
@@ -122,22 +121,21 @@ public class SecureUtils {
      * Encrypt a byte array using the given password. The result is converted to Base64 encoding without line breaks
      * or spaces.
      *
-     * @param propertyContext
      * @param password          encryption password
      * @param bytes             byte array to encrypt
      * @return                  string containing the encoding data as Base64
      */
-    public static String encrypt(PropertyContext propertyContext, String password, byte[] bytes) {
+    public static String encrypt(String password, byte[] bytes) {
         try {
             // Find cipher in cache
             final Cache cache = ObjectCache.instance();
             final Long validity = (long) 0;
             final InternalCacheKey key = new InternalCacheKey("Encryption cipher", password);
-            Cipher cipher = (Cipher) cache.findValid(propertyContext, key, validity);
+            Cipher cipher = (Cipher) cache.findValid(key, validity);
             if (cipher == null) {
                 cipher = Cipher.getInstance(CIPHER_TYPE);
                 cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
-                cache.add(propertyContext, key, validity, cipher);
+                cache.add(key, validity, cipher);
             }
             // Encode with cipher
             // TODO: should probably use pool of cyphers instead of synchronization, which can cause contention here.
@@ -153,14 +151,13 @@ public class SecureUtils {
     /**
      * Decrypt a Base64-encoded string using the given password.
      *
-     * @param propertyContext
      * @param password          encryption password
      * @param text              string to decrypt
      * @return                  string containing the decoded data
      */
-    public static String decryptAsString(PropertyContext propertyContext, String password, String text) {
+    public static String decryptAsString(String password, String text) {
         try {
-            return new String(decrypt(propertyContext, password, text), "utf-8");
+            return new String(decrypt(password, text), "utf-8");
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
         }
@@ -169,21 +166,20 @@ public class SecureUtils {
     /**
      * Decrypt a Base64-encoded string into a byte array using the given password.
      *
-     * @param propertyContext
      * @param password          encryption password
      * @param text              string to decrypt
      * @return                  byte array containing the decoded data
      */
-    public static byte[] decrypt(PropertyContext propertyContext, String password, String text) {
+    public static byte[] decrypt(String password, String text) {
         try {
             Cache cache = ObjectCache.instance();
             Long validity = (long) 0;
             InternalCacheKey key = new InternalCacheKey("Decryption cipher", password);
-                Cipher cipher = (Cipher) cache.findValid(propertyContext, key, validity);
+                Cipher cipher = (Cipher) cache.findValid(key, validity);
             if (cipher == null) {
                 cipher = Cipher.getInstance(CIPHER_TYPE);
                 cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);
-                cache.add(propertyContext, key, validity, cipher);
+                cache.add(key, validity, cipher);
             }
             synchronized(cipher) {
                 return cipher.doFinal(Base64.decode(text));

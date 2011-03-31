@@ -59,7 +59,7 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
         final AttributesImpl imgAttributes = handlerContext.isSpanHTMLLayout() ? newAttributes : new AttributesImpl();
         // @src="..."
         // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
-        final String srcValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
+        final String srcValue = XFormsOutputControl.getExternalValue(outputControl, mediatypeValue);
         imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue != null ? srcValue : XFormsConstants.DUMMY_IMAGE_URI);
         return imgAttributes;
     }

@@ -74,12 +74,12 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 					BufferedImage.TYPE_BYTE_GRAY, false);
 
             // Read text
-            final String messageRef = XPathCache.evaluateAsString(context,
-					configDocumentInfo, "/barcode/@message", null, null, null,
+            final String messageRef = XPathCache.evaluateAsString(
+                    configDocumentInfo, "/barcode/@message", null, null, null,
 					null, null, null);
 
-			final String message = XPathCache.evaluateAsString(context,
-					instanceDocumentInfo, messageRef, null, null, null, null,
+			final String message = XPathCache.evaluateAsString(
+                    instanceDocumentInfo, messageRef, null, null, null, null,
 					null, null);
 
             // Produce barcode

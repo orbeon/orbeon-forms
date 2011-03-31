@@ -18,7 +18,6 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -96,7 +95,7 @@ public class Itemset implements ItemContainer {
      * @param isMultiple    whether multiple selection is allowed (to determine selected item)
      * @return              String representing a JSON tree
      */
-    public String getJSONTreeInfo(final PropertyContext context, final String controlValue, final boolean isMultiple, final LocationData locationData) {
+    public String getJSONTreeInfo(final String controlValue, final boolean isMultiple, final LocationData locationData) {
         // Produce a JSON fragment with hierarchical information
         if (getChildren().size() > 0) {
             final StringBuilder sb = new StringBuilder(100);
@@ -115,9 +114,9 @@ public class Itemset implements ItemContainer {
 
                         // Item label and value
                         sb.append('"');
-                        sb.append(item.getExternalJSLabel(context, locationData));
+                        sb.append(item.getExternalJSLabel(locationData));
                         sb.append("\",\"");
-                        sb.append(item.getExternalJSValue(context));
+                        sb.append(item.getExternalJSValue());
                         sb.append('\"');
 
                         // Item attributes if any

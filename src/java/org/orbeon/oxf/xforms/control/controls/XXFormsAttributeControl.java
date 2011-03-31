@@ -58,9 +58,9 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     }
 
     @Override
-    protected void evaluateValue(final PropertyContext propertyContext) {
+    protected void evaluateValue() {
         // Value comes from the AVT value attribute
-        final String rawValue = evaluateAvt(propertyContext, valueAttribute);
+        final String rawValue = evaluateAvt(valueAttribute);
         super.setValue((rawValue != null) ? rawValue : "");
     }
 
@@ -68,11 +68,11 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         // Rewrite URI attribute if needed
         // This will resolve as a resource or render URL
-        return XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, getXBLContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue(pipelineContext));
+        return XFormsUtils.getEscapedURLAttributeIfNeeded(getXBLContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue());
     }
 
     @Override
-    protected void evaluateExternalValue(PropertyContext propertyContext) {
+    protected void evaluateExternalValue() {
         // Determine attribute value
         setExternalValue(getExternalValueHandleSrc(getValue(), nameAttribute));
     }
@@ -109,7 +109,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         if ("src".equals(nameAttribute)) {
             // TODO: make sure this is on xhtml:img!
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(propertyContext, containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue(propertyContext);

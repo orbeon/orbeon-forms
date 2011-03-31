@@ -47,12 +47,9 @@ public class Index extends XFormsFunction {
             final String message = "Function index uses repeat id '" + repeatStaticId + "' which is not in scope";
             final RuntimeException exception = new ValidationException(message, null);
 
-            // This function is always called from controls so PipelineContext should be present
-            final PipelineContext pipelineContext = getOrCreatePipelineContext();
-
             final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
             final XBLContainer container = currentModel.getXBLContainer();
-            container.dispatchEvent(pipelineContext,
+            container.dispatchEvent(
                     new XFormsComputeExceptionEvent(container.getContainingDocument(), currentModel, message, exception));
 
             // TODO: stop processing!

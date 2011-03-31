@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element
-import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xforms.action.XFormsAction
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.event.XFormsEvent
@@ -22,12 +21,13 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver
 import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms._
+
 /**
  * Extension xxforms:script action.
  */
 class XXFormsScriptAction extends XFormsAction {
 
-    def execute(actionInterpreter: XFormsActionInterpreter, propertyContext: PropertyContext, event: XFormsEvent,
+    def execute(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent,
                 eventObserver: XFormsEventObserver, actionElement: Element,
                 actionScope: XBLBindings#Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
 
@@ -38,7 +38,7 @@ class XXFormsScriptAction extends XFormsAction {
 
         actionElement.attributeValue("runat") match {
             case "server" => // run on server
-                containingDocument.getScriptInterpreter.runScript(propertyContext, actionPrefixedId)
+                containingDocument.getScriptInterpreter.runScript(actionPrefixedId)
             case _ => // run on client
                 containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver)
         }

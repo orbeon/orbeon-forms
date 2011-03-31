@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xforms._
@@ -26,13 +25,12 @@ object Headers {
     /**
      * Evaluate children <xforms:header> elements.
      *
-     * @param propertyContext   pipeline context
      * @param contextStack      context stack set to enclosing <xforms:*> element
      * @param sourceEffectiveId effective id of the enclosing element
      * @param enclosingElement  enclosing element
      * @return map of headers or null if no header elements
      */
-    def evaluateHeaders(propertyContext: PropertyContext, xblContainer: XBLContainer, contextStack: XFormsContextStack,
+    def evaluateHeaders(xblContainer: XBLContainer, contextStack: XFormsContextStack,
                         sourceEffectiveId: String, enclosingElement: Element) = {
 
         val bindings = xblContainer.getContainingDocument.getStaticState.getXBLBindings
@@ -54,8 +52,8 @@ object Headers {
                         throw new OXFException("Missing <" + name.getQualifiedName + "> child element of <header> element")
 
                     val scope = xblBindings.getResolutionScopeByPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementStaticId(element))
-                    contextStack.pushBinding(propertyContext, element, sourceEffectiveId, scope)
-                    val result = XFormsUtils.getElementValue(propertyContext, xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, null)
+                    contextStack.pushBinding(element, sourceEffectiveId, scope)
+                    val result = XFormsUtils.getElementValue(xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, null)
                     contextStack.popBinding
 
                     result
@@ -68,7 +66,7 @@ object Headers {
                 // Evaluate combine attribute as AVT
                 val combine = {
                     val avtCombine = headerElement.attributeValue("combine", defaultCombineValue)
-                    val result = XFormsUtils.resolveAttributeValueTemplates(propertyContext, contextStack.getCurrentBindingContext.getNodeset,
+                    val result = XFormsUtils.resolveAttributeValueTemplates(contextStack.getCurrentBindingContext.getNodeset,
                         contextStack.getCurrentBindingContext.getPosition, contextStack.getCurrentVariables, XFormsContainingDocument.getFunctionLibrary,
                         contextStack.getFunctionContext(sourceEffectiveId), xblContainer.getContainingDocument.getNamespaceMappings(headerElement),
                         headerElement.getData.asInstanceOf[LocationData], avtCombine)
@@ -94,7 +92,7 @@ object Headers {
             // Process all nested <header> elements
             for (headerElement <- headerElements) {
                 val headerScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + XFormsUtils.getElementStaticId(headerElement))
-                contextStack.pushBinding(propertyContext, headerElement, sourceEffectiveId, headerScope)
+                contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 
                 if (contextStack.getCurrentBindingContext.isNewBind) {
                     // There is a binding so a possible iteration

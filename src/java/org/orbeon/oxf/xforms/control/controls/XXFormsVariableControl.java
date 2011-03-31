@@ -47,8 +47,8 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void onCreate(PropertyContext propertyContext) {
-        super.onCreate(propertyContext);
+    protected void onCreate() {
+        super.onCreate();
 
         // Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
         value = null;
@@ -67,16 +67,16 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void evaluateImpl(PropertyContext propertyContext) {
+    protected void evaluateImpl() {
 
         // Evaluate other aspects of the control if necessary
-        super.evaluateImpl(propertyContext);
+        super.evaluateImpl();
 
         // Evaluate control values
         if (isRelevant()) {
             // Control is relevant
             getContextStack().setBinding(this);
-            value = variable.getVariableValue(propertyContext, getEffectiveId(), false);
+            value = variable.getVariableValue(getEffectiveId(), false);
         } else {
             // Control is not relevant
             // NOTE: Nobody should use this variable if it's non-relevant, but right now we still have possible uses
@@ -123,9 +123,8 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     /**
      * Return the control's internal value.
      *
-     * @param propertyContext   current context
      */
-    public final ValueRepresentation getValue(PropertyContext propertyContext) {
+    public final ValueRepresentation getValue() {
         return value;
     }
 
@@ -144,7 +143,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
 
         final XXFormsVariableControl otherValueControl = (XXFormsVariableControl) other;
 
-        if (!compareValues(getValue(propertyContext), otherValueControl.getValue(propertyContext)))
+        if (!compareValues(getValue(), otherValueControl.getValue()))
             return false;
 
         return super.equalsExternal(propertyContext, other);

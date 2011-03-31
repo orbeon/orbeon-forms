@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -69,19 +68,18 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: cache the document and/or store its initial state.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      */
-    public void afterInitialResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void afterInitialResponse(XFormsContainingDocument containingDocument) {
 
         // Remember this UUID in the session
-        addUUIDToSession(propertyContext, containingDocument);
+        addUUIDToSession(containingDocument);
 
-        cacheOrStore(propertyContext, containingDocument, true);
+        cacheOrStore(containingDocument, true);
     }
 
-    private void addUUIDToSession(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
-        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+    private void addUUIDToSession(XFormsContainingDocument containingDocument) {
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
@@ -99,12 +97,11 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: set listener to remove the document from the cache when the session expires.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      */
-    public void onAdd(PropertyContext propertyContext, final XFormsContainingDocument containingDocument) {
+    public void onAdd(final XFormsContainingDocument containingDocument) {
 
-        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
@@ -116,12 +113,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             // Remove from cache when session expires
             final ExternalContext.Session.SessionListener listener = new ExternalContext.Session.SessionListener() {
                 public void sessionDestroyed() {
-                    // NOTE: Don't use PropertyContext provided above here, it must be let go.
                     indentedLogger.logDebug(LOG_TYPE, "Removing document from cache following session expiration.");
-                    final PipelineContext pipelineContext = new PipelineContext();
-                    final XFormsContainingDocument containingDocument = XFormsDocumentCache.instance().getDocument(pipelineContext, uuid);
+                    final XFormsContainingDocument containingDocument = XFormsDocumentCache.instance().getDocument(uuid);
                     if (containingDocument != null)
-                        XFormsDocumentCache.instance().removeDocument(pipelineContext, containingDocument);
+                        XFormsDocumentCache.instance().removeDocument(containingDocument);
                 }
             };
 
@@ -137,12 +132,11 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: remove session listener.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      */
-    public void onRemove(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void onRemove(XFormsContainingDocument containingDocument) {
 
-        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         // Tricky: if onRemove() is called upon session expiration, there might not be an ExternalContext. But it's fine,
         // because the session goes away -> all of its attributes go away so we don't have to remove them below.
         if (externalContext != null) {
@@ -177,55 +171,53 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: remove session listener; if server state, store the document state.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      */
-    public void onEvict(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void onEvict(XFormsContainingDocument containingDocument) {
 
         // Do the same as on remove()
-        onRemove(propertyContext, containingDocument);
+        onRemove(containingDocument);
 
         // Store state to cache if needed
         if (containingDocument.getStaticState().isServerStateHandling())
-            storeDocumentState(propertyContext, containingDocument, false);
+            storeDocumentState(containingDocument, false);
     }
 
-    private void cacheOrStore(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean isInitialState) {
+    private void cacheOrStore(XFormsContainingDocument containingDocument, boolean isInitialState) {
         if (XFormsDocumentCache.instance().isEnabled(containingDocument.getStaticState())) {
             // Cache the document
             indentedLogger.logDebug(LOG_TYPE, "Document cache enabled. Storing document in cache.");
-            XFormsDocumentCache.instance().storeDocument(propertyContext, containingDocument);
+            XFormsDocumentCache.instance().storeDocument(containingDocument);
 
             if (isInitialState && containingDocument.getStaticState().isServerStateHandling()) {
                 // Also store document state (used by browser back and <xforms:reset>)
                 indentedLogger.logDebug(LOG_TYPE, "Storing initial document state.");
-                storeDocumentState(propertyContext, containingDocument, isInitialState);
+                storeDocumentState(containingDocument, isInitialState);
             }
 
         } else if (containingDocument.getStaticState().isServerStateHandling()) {
             // Directly store the document state
             indentedLogger.logDebug(LOG_TYPE, "Document cache disabled. Storing initial document state.");
-            storeDocumentState(propertyContext, containingDocument, isInitialState);
+            storeDocumentState(containingDocument, isInitialState);
         }
     }
 
     /**
      * Store the document state.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      * @param isInitialState        true iif this is the document's initial state
      */
-    private void storeDocumentState(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean isInitialState) {
+    private void storeDocumentState(XFormsContainingDocument containingDocument, boolean isInitialState) {
 
         assert containingDocument.getStaticState().isServerStateHandling();
 
-        final ExternalContext externalContext = NetUtils.getExternalContext(propertyContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final XFormsStateStore stateStore = XFormsStateStoreFactory.instance(externalContext);
 
         final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
-        stateStore.storeDocumentState(propertyContext, containingDocument, session, isInitialState);
+        stateStore.storeDocumentState(containingDocument, session, isInitialState);
     }
 
     /**
@@ -322,7 +314,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 // Try to find the document in cache using the UUID
                 // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
                 // we can't know that the property is set to false before trying.
-                final XFormsContainingDocument cachedDocument = XFormsDocumentCache.instance().getDocument(pipelineContext, uuid);
+                final XFormsContainingDocument cachedDocument = XFormsDocumentCache.instance().getDocument(uuid);
                 if (cachedDocument != null) {
                     // Found in cache
                     indentedLogger.logDebug(LOG_TYPE, "Document cache enabled. Returning document from cache.");
@@ -348,7 +340,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         final XFormsState xformsState;
         if (isServerState) {
             // State must be found by UUID in the store
-            final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
+            final ExternalContext externalContext = NetUtils.getExternalContext();
             final XFormsStateStore stateStore = XFormsStateStoreFactory.instance(externalContext);
 
             if (indentedLogger.isDebugEnabled())
@@ -398,11 +390,11 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     /**
      * Return the static state string to send to the client in the HTML page.
      *
-     * @param propertyContext       current context
+     *
      * @param containingDocument    document
      * @return                      encoded state
      */
-    public String getClientEncodedStaticState(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public String getClientEncodedStaticState(XFormsContainingDocument containingDocument) {
         final String staticStateString;
         {
             if (containingDocument.getStaticState().isServerStateHandling()) {
@@ -410,7 +402,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 staticStateString = null;
             } else {
                 // Return full encoded state
-                staticStateString = containingDocument.getStaticState().getEncodedStaticState(propertyContext);
+                staticStateString = containingDocument.getStaticState().getEncodedStaticState();
             }
         }
         return staticStateString;
@@ -419,11 +411,11 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     /**
      * Return the dynamic state string to send to the client in the HTML page.
      *
-     * @param propertyContext       current context
+     *
      * @param containingDocument    containing document
      * @return                      encoded state
      */
-    public String getClientEncodedDynamicState(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public String getClientEncodedDynamicState(XFormsContainingDocument containingDocument) {
         final String dynamicStateString;
         {
             if (containingDocument.getStaticState().isServerStateHandling()) {
@@ -431,7 +423,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 dynamicStateString = null;
             } else {
                 // Return full encoded state
-                dynamicStateString = containingDocument.createEncodedDynamicState(propertyContext, XFormsProperties.isGZIPState(), true);
+                dynamicStateString = containingDocument.createEncodedDynamicState(XFormsProperties.isGZIPState(), true);
             }
         }
         return dynamicStateString;
@@ -442,11 +434,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: update the document's change sequence.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      * @param ignoreSequence        whether to ignore the sequence number
      */
-    public void beforeUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument, boolean ignoreSequence) {
+    public void beforeUpdateResponse(XFormsContainingDocument containingDocument, boolean ignoreSequence) {
         if (containingDocument.isDirtySinceLastRequest()) {
             // The document is dirty
             indentedLogger.logDebug(LOG_TYPE, "Document is dirty. Generating new dynamic state.");
@@ -465,15 +456,14 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: cache the document and/or store its current state.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      */
-    public void afterUpdateResponse(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void afterUpdateResponse(XFormsContainingDocument containingDocument) {
 
         // Notify document that we are done sending the response
         containingDocument.afterUpdateResponse();
 
-        cacheOrStore(propertyContext, containingDocument, false);
+        cacheOrStore(containingDocument, false);
     }
 
     /**
@@ -481,14 +471,13 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * Implementation: remove the document from the cache.
      *
-     * @param propertyContext       current context
      * @param containingDocument    containing document
      */
-    public void onUpdateError(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public void onUpdateError(XFormsContainingDocument containingDocument) {
         if (XFormsDocumentCache.instance().isEnabled(containingDocument.getStaticState())) {
             // Remove document from the cache
             indentedLogger.logDebug(LOG_TYPE, "Document cache enabled. Removing document from cache following error.");
-            XFormsDocumentCache.instance().removeDocument(propertyContext, containingDocument);
+            XFormsDocumentCache.instance().removeDocument(containingDocument);
         }
     }
 

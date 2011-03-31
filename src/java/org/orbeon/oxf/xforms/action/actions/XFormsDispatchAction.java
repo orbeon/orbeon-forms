@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -32,7 +31,7 @@ import org.orbeon.saxon.om.Item;
  * 10.1.2 The dispatch Element
  */
 public class XFormsDispatchAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -53,14 +52,14 @@ public class XFormsDispatchAction extends XFormsAction {
         final String resolvedNewEventName;
         {
             // Resolve AVT
-            resolvedNewEventName = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventNameAttributeValue);
+            resolvedNewEventName = actionInterpreter.resolveAVTProvideValue(actionElement, newEventNameAttributeValue);
             if (resolvedNewEventName == null)
                 return;
         }
         final String resolvedNewEventTargetStaticId;
         {
             // Resolve AVT
-            resolvedNewEventTargetStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventTargetIdValue);
+            resolvedNewEventTargetStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, newEventTargetIdValue);
             if (resolvedNewEventTargetStaticId == null)
                 return;
         }
@@ -70,20 +69,20 @@ public class XFormsDispatchAction extends XFormsAction {
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventBubblesString = actionInterpreter.resolveAVT(propertyContext, actionElement, "bubbles");
+            final String newEventBubblesString = actionInterpreter.resolveAVT(actionElement, "bubbles");
             newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString);
         }
         final boolean newEventCancelable;
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventCancelableString = actionInterpreter.resolveAVT(propertyContext, actionElement, "cancelable");
+            final String newEventCancelableString = actionInterpreter.resolveAVT(actionElement, "cancelable");
             newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString);
         }
         final int resolvedDelay;
         {
             // Resolve AVT
-            final String delayString = actionInterpreter.resolveAVT(propertyContext, actionElement, "delay");
+            final String delayString = actionInterpreter.resolveAVT(actionElement, "delay");
             resolvedDelay = (delayString == null || delayString.equals("")) ? 0 : Integer.parseInt(delayString);
         }
 
@@ -101,14 +100,14 @@ public class XFormsDispatchAction extends XFormsAction {
                 // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
                 xformsEventTarget = containingDocument.getObjectByEffectiveId(resolvedNewEventTargetStaticId);
             } else {
-                xformsEventTarget = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedNewEventTargetStaticId);
+                xformsEventTarget = actionInterpreter.resolveEffectiveObject(actionElement, resolvedNewEventTargetStaticId);
             }
 
             if (xformsEventTarget instanceof XFormsEventTarget) {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(containingDocument, resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
-                addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
-                actionInterpreter.getXBLContainer().dispatchEvent(propertyContext, newEvent);
+                addContextAttributes(actionInterpreter, actionElement, newEvent);
+                actionInterpreter.getXBLContainer().dispatchEvent(newEvent);
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
@@ -131,12 +130,12 @@ public class XFormsDispatchAction extends XFormsAction {
             // Whether to tell the client to show a progress indicator when sending this event
             final boolean showProgress;
             {
-                final String showProgressString = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME);
+                final String showProgressString = actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME);
                 showProgress = !"false".equals(showProgressString);
             }
             final String progressMessage;
             if (showProgress) {
-                progressMessage = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME);
+                progressMessage = actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME);
             } else {
                 progressMessage = null;
             }

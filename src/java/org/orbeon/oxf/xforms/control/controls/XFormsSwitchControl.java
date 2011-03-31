@@ -64,8 +64,8 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    protected void onCreate(PropertyContext propertyContext) {
-        super.onCreate(propertyContext);
+    protected void onCreate() {
+        super.onCreate();
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
         if (!restoredState) {
@@ -78,7 +78,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    public void childrenAdded(PropertyContext propertyContext) {
+    public void childrenAdded() {
 
         if (getSize() == 0) {
             throw new OXFException("xforms:switch does not contain at least one xforms:case for switch id: " + getEffectiveId());
@@ -104,10 +104,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     /**
      * Set the currently selected case.
      *
-     * @param propertyContext       current context
      * @param caseControlToSelect   case control to select
      */
-    public void setSelectedCase(PropertyContext propertyContext, XFormsCaseControl caseControlToSelect) {
+    public void setSelectedCase(XFormsCaseControl caseControlToSelect) {
 
         if (caseControlToSelect.getParent() != this)
             throw new OXFException("xforms:case is not child of current xforms:switch.");
@@ -118,26 +117,26 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         final boolean isChanging = previouslySelectedCaseControl.getId() != caseControlToSelect.getId();
         localForUpdate.selectedCaseControlId = caseControlToSelect.getId();
 
-        if (isChanging && propertyContext != null) { // Not sure when propertyContext could be null! It shouldn't be!
+        if (isChanging) {
             // "This action adjusts all selected attributes on the affected cases to reflect the new state, and then
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext,
+            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(
                     new XFormsDeselectEvent(containingDocument, previouslySelectedCaseControl));
 
             if (isXForms11Switch()) {
                 // Partial refresh on the case that is being deselected
                 // Do this after xforms-deselect is dispatched
-                containingDocument.getControls().doPartialRefresh(propertyContext, previouslySelectedCaseControl);
+                containingDocument.getControls().doPartialRefresh(previouslySelectedCaseControl);
 
                 // Partial refresh on the case that is being selected
                 // Do this before xforms-select is dispatched
-                containingDocument.getControls().doPartialRefresh(propertyContext, caseControlToSelect);
+                containingDocument.getControls().doPartialRefresh(caseControlToSelect);
             }
 
             // "2. Dispatching an xforms-select event to the case to be selected."
-            caseControlToSelect.getXBLContainer().dispatchEvent(propertyContext,
+            caseControlToSelect.getXBLContainer().dispatchEvent(
                     new XFormsSelectEvent(containingDocument, caseControlToSelect));
         }
     }
@@ -181,7 +180,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    public Object getBackCopy(PropertyContext propertyContext) {
+    public Object getBackCopy() {
 
         final XFormsSwitchControl cloned;
 
@@ -191,7 +190,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         final XFormsSwitchControlLocal initialLocal = (XFormsSwitchControlLocal) getInitialLocal();
 
         // Clone this and children
-        cloned = (XFormsSwitchControl) super.getBackCopy(propertyContext);
+        cloned = (XFormsSwitchControl) super.getBackCopy();
 
         // Update clone's selected case control to point to one of the cloned children
         final XFormsSwitchControlLocal clonedLocal = (XFormsSwitchControlLocal) cloned.getInitialLocal();

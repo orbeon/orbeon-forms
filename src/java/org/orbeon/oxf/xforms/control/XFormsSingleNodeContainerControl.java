@@ -62,16 +62,16 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
     }
 
     @Override
-    public Object getBackCopy(PropertyContext propertyContext) {
+    public Object getBackCopy() {
 
         // Clone this
-        final XFormsSingleNodeContainerControl cloned = (XFormsSingleNodeContainerControl) super.getBackCopy(propertyContext);
+        final XFormsSingleNodeContainerControl cloned = (XFormsSingleNodeContainerControl) super.getBackCopy();
 
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
             for (final XFormsControl currentChildControl: children) {
-                final XFormsControl currentChildClone = (XFormsControl) currentChildControl.getBackCopy(propertyContext);
+                final XFormsControl currentChildClone = (XFormsControl) currentChildControl.getBackCopy();
                 currentChildClone.setParent(cloned);
                 cloned.children.add(currentChildClone);
             }
@@ -80,16 +80,16 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         return cloned;
     }
 
-    public void childrenAdded(PropertyContext propertyContext) {
+    public void childrenAdded() {
         // For subclasses
     }
 
     @Override
-    public void iterationRemoved(PropertyContext propertyContext) {
+    public void iterationRemoved() {
         final List<XFormsControl> children = getChildren();
         if (children != null) {
             for (XFormsControl child: children) {
-                child.iterationRemoved(propertyContext);
+                child.iterationRemoved();
             }
         }
     }

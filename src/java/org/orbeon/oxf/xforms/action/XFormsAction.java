@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
@@ -31,7 +30,7 @@ import org.orbeon.saxon.value.SequenceExtent;
  * Base class for all actions.
  */
 public abstract class XFormsAction {
-    public abstract void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext,
+    public abstract void execute(XFormsActionInterpreter actionInterpreter,
                                  XFormsEvent event, XFormsEventObserver eventObserver, Element actionElement,
                                  XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext);
 
@@ -39,11 +38,10 @@ public abstract class XFormsAction {
      * Add event context attributes based on nested xxforms:context elements.
      *
      * @param actionInterpreter current XFormsActionInterpreter
-     * @param propertyContext   current context
      * @param actionElement     action element
      * @param event             event to add context information to
      */
-    protected void addContextAttributes(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, Element actionElement, XFormsEvent event) {
+    protected void addContextAttributes(XFormsActionInterpreter actionInterpreter, Element actionElement, XFormsEvent event) {
         // Check if there are parameters specified
 
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
@@ -61,10 +59,10 @@ public abstract class XFormsAction {
 
             // Set context on context element
             final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
-            contextStack.pushBinding(propertyContext, currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
+            contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
 
             // Evaluate context parameter
-            final SequenceExtent value = XPathCache.evaluateAsExtent(propertyContext,
+            final SequenceExtent value = XPathCache.evaluateAsExtent(
                     actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
                     valueOrSelect, actionInterpreter.getNamespaceMappings(currentContextInfo),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),

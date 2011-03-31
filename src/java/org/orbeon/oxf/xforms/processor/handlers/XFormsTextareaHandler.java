@@ -63,7 +63,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
                 xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
                 if (isConcreteControl) {
-                    final String value = textareaControl.getExternalValue(pipelineContext);
+                    final String value = textareaControl.getExternalValue();
                     if (value != null)
                         xmlReceiver.characters(value.toCharArray(), 0, value.length());
                 }
@@ -80,7 +80,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
                 xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, containerAttributes);
                 if (isConcreteControl) {
-                    final String value = textareaControl.getExternalValue(pipelineContext);
+                    final String value = textareaControl.getExternalValue();
                     if (value != null) {
                         if (!isHTMLMediaType) {
                             // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases

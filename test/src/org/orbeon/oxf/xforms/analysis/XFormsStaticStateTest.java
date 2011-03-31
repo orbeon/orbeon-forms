@@ -119,8 +119,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
 
-        final PipelineContext pipelineContext = new PipelineContext();
-        staticState.dumpAnalysis(pipelineContext);
+        staticState.dumpAnalysis();
 
         // == Value change to default ==================================================================================
         dependencies.refreshStart();
@@ -439,8 +438,6 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
      */
     public static XFormsStaticState getStaticState(Document formDocument) {
 
-        final PipelineContext pipelineContext = new PipelineContext();
-
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
 
         final LocationDocumentResult documentResult = new LocationDocumentResult();
@@ -457,6 +454,6 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         // Get static state document and create static state object
         final Document staticStateDocument = documentResult.getDocument();
-        return new XFormsStaticState(pipelineContext, staticStateDocument, digest, metadata);
+        return new XFormsStaticState(staticStateDocument, digest, metadata);
     }
 }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.test
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -28,48 +27,45 @@ import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase {
 
-    private var pipelineContext: PipelineContext = _
     private var document: XFormsContainingDocument = _
 
     @After def disposeDocument() {
         if (document ne null) {
-            document.afterExternalEvents(pipelineContext)
+            document.afterExternalEvents()
             document.afterUpdateResponse()
 
             document = null
         }
-        pipelineContext = null
     }
 
     def setupDocument(documentURL: String): Unit = setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
     def getDocument = document
-    def getPipelineContext = pipelineContext
 
     def setupDocument(xhtml: JDocument) {
         ResourceManagerTestBase.staticSetup()
 
-        this.pipelineContext = createPipelineContextWithExternalContext()
+        createPipelineContextWithExternalContext()
 
         val staticState = XFormsStaticStateTest.getStaticState(xhtml)
-        this.document = new XFormsContainingDocument(pipelineContext, staticState, null, null, null)
+        this.document = new XFormsContainingDocument(staticState, null, null, null)
 
         document.afterInitialResponse()
-        document.beforeExternalEvents(pipelineContext, null)
+        document.beforeExternalEvents(null)
     }
 
     def getControlValue(controlId: String) = getValueControl(controlId).getValue
-    def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue(pipelineContext)
+    def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue()
 
     def setControlValue(controlId: String, value: String) {
         // This stores the value without testing for readonly
         document.startOutermostActionHandler()
-        getValueControl(controlId).storeExternalValue(pipelineContext, value, null)
-        document.endOutermostActionHandler(pipelineContext)
+        getValueControl(controlId).storeExternalValue(value, null)
+        document.endOutermostActionHandler()
     }
 
     def setControlValueWithEvent(controlId: String, value: String): Unit =
-        ClientEvents.processEvent(pipelineContext, document, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
+        ClientEvents.processEvent(document, new XXFormsValueChangeWithFocusChangeEvent(document, getObject(controlId).asInstanceOf[XFormsEventTarget], null, value))
 
     def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
@@ -78,7 +74,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def getType(controlId: String) = getSingleNodeControl(controlId).getType
 
     def getItemset(controlId: String) =
-        getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset(pipelineContext).getJSONTreeInfo(pipelineContext, null, false, null)
+        getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, false, null)
 
     // Automatically convert between Scala Elem andDom4j Document/Element
     implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)

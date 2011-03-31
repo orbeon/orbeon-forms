@@ -98,12 +98,12 @@ public abstract class DigestTransformerOutputImpl extends CacheableTransformerOu
                 final OutputCacheKey outputCacheKey = getKeyImpl(pipelineContext);
                 if (outputCacheKey != null) {
                     final Cache cache = ObjectCache.instance();
-                    final DigestValidity digestValidity = (DigestValidity) cache.findValid(pipelineContext, outputCacheKey, DEFAULT_VALIDITY);
+                    final DigestValidity digestValidity = (DigestValidity) cache.findValid(outputCacheKey, DEFAULT_VALIDITY);
                     if (digestValidity != null && Arrays.equals(state.digest, digestValidity.digest)) {
                         state.validity = digestValidity.lastModified;
                     } else {
                         final Long currentValidity = new Long(System.currentTimeMillis());
-                        cache.add(pipelineContext, outputCacheKey, DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity));
+                        cache.add(outputCacheKey, DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity));
                         state.validity = currentValidity;
                     }
                 } else {

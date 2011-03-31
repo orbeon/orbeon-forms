@@ -83,12 +83,19 @@ public class PEVersion extends Version {
         PipelineUtils.connect(verifierProcessor, OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
 
         // Execute pipeline
+        final Document licenceDocument;
+        boolean success = false;
         final PipelineContext pipelineContext = new PipelineContext();
-        serializer.reset(pipelineContext);
-        serializer.start(pipelineContext);
+        try {
+            serializer.reset(pipelineContext);
+            serializer.start(pipelineContext);
 
-        // Gather resulting license information
-        final Document licenceDocument = serializer.getDocument(pipelineContext);
+            // Gather resulting license information
+            licenceDocument = serializer.getDocument(pipelineContext);
+            success = true;
+        } finally {
+            pipelineContext.destroy(success);
+        }
 
         final String licensor = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/licensor");
         final String licensee = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/licensee");

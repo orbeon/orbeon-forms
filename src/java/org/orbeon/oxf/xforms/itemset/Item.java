@@ -117,16 +117,16 @@ public class Item implements ItemContainer {
         return value;
     }
 
-    public String getExternalValue(PropertyContext propertyContext) {
-        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(propertyContext, value) : value;
+    public String getExternalValue() {
+        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(value) : value;
     }
 
-    public String getExternalJSValue(PropertyContext propertyContext) {
-        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(propertyContext, value) : XFormsUtils.escapeJavaScript(value);
+    public String getExternalJSValue() {
+        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(value) : XFormsUtils.escapeJavaScript(value);
     }
 
-    public String getExternalJSLabel(PropertyContext propertyContext, final LocationData locationData) {
-        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? XFormsCaseControl.getEscapedHTMLValue(propertyContext, locationData, label.getLabel()) : XMLUtils.escapeXMLMinimal(label.getLabel())); //TODO check if we need to rewrite URLs?
+    public String getExternalJSLabel(final LocationData locationData) {
+        return label == null? "" : XFormsUtils.escapeJavaScript(label.isHTML() ? XFormsCaseControl.getEscapedHTMLValue(locationData, label.getLabel()) : XMLUtils.escapeXMLMinimal(label.getLabel())); //TODO check if we need to rewrite URLs?
     }
 
     /**

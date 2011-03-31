@@ -86,12 +86,12 @@ public class OrbeonServletFilterDelegate implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         // Add filter chain to the pipeline context for use by the ServletFilterGenerator
-        PipelineContext pipelineContext = new PipelineContext();
+        final PipelineContext pipelineContext = new PipelineContext();
         pipelineContext.setAttribute(ServletFilterGenerator.FILTER_CHAIN, chain);
 
         // Process the regular pipeline
         try {
-            ExternalContext externalContext = new ServletExternalContext(servletContext, pipelineContext, webAppContext.getServletInitParametersMap(), (HttpServletRequest) request, (HttpServletResponse) response);
+            final ExternalContext externalContext = new ServletExternalContext(servletContext, pipelineContext, webAppContext.getServletInitParametersMap(), (HttpServletRequest) request, (HttpServletResponse) response);
             processorService.service(externalContext, pipelineContext);
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));

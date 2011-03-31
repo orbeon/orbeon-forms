@@ -17,7 +17,6 @@ import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -35,7 +34,7 @@ public class XFormsServerSharedInstancesCache {
     private static XFormsServerSharedInstancesCache instance = null;
 
     public interface Loader {
-        public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId,
+        public ReadonlyXFormsInstance load(String instanceStaticId, String modelEffectiveId,
                                            String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation);
     }
 
@@ -50,13 +49,13 @@ public class XFormsServerSharedInstancesCache {
         return instance;
     }
 
-    public XFormsInstance findConvertNoLoad(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceStaticId,
+    public XFormsInstance findConvertNoLoad(IndentedLogger indentedLogger, String instanceStaticId,
                                             String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
                                             boolean handleXInclude, boolean exposeXPathTypes) {
 
         // Try to find in cache
         final ReadonlyXFormsInstance existingInstance
-                = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude, exposeXPathTypes);
+                = findInCache(indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude, exposeXPathTypes);
         if (existingInstance != null) {
             // Found from the cache
 
@@ -66,7 +65,7 @@ public class XFormsServerSharedInstancesCache {
         }
     }
 
-    public XFormsInstance findConvert(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceStaticId,
+    public XFormsInstance findConvert(IndentedLogger indentedLogger, String instanceStaticId,
                                       String modelEffectiveId, String instanceSourceURI, String requestBodyHash, boolean isReadonly,
                                       boolean handleXInclude, boolean exposeXPathTypes, long timeToLive, String validation, Loader loader) {
 
@@ -74,7 +73,7 @@ public class XFormsServerSharedInstancesCache {
         {
             // Try to find in cache
             final ReadonlyXFormsInstance existingInstance
-                    = findInCache(propertyContext, indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude, exposeXPathTypes);
+                    = findInCache(indentedLogger, instanceStaticId, modelEffectiveId, instanceSourceURI, requestBodyHash, handleXInclude, exposeXPathTypes);
             if (existingInstance != null) {
                 // Found from the cache
                 tempReadonlyInstance = existingInstance;
@@ -89,11 +88,11 @@ public class XFormsServerSharedInstancesCache {
                 // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
 
                 // Load instance through callback
-                final ReadonlyXFormsInstance newInstance = loader.load(propertyContext, instanceStaticId, modelEffectiveId,
+                final ReadonlyXFormsInstance newInstance = loader.load(instanceStaticId, modelEffectiveId,
                         instanceSourceURI, handleXInclude, timeToLive, validation);
 
                 // Add result to cache
-                add(propertyContext, indentedLogger, instanceSourceURI, requestBodyHash, newInstance, handleXInclude);
+                add(indentedLogger, instanceSourceURI, requestBodyHash, newInstance, handleXInclude);
 
                 // Return instance
                 tempReadonlyInstance = newInstance;
@@ -121,7 +120,7 @@ public class XFormsServerSharedInstancesCache {
         return newInstance;
     }
 
-    private void add(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceSourceURI,
+    private void add(IndentedLogger indentedLogger, String instanceSourceURI,
                      String requestBodyHash, ReadonlyXFormsInstance readonlyXFormsInstance, boolean handleXInclude) {
 
         if (indentedLogger.isDebugEnabled())
@@ -133,17 +132,17 @@ public class XFormsServerSharedInstancesCache {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
 
-        cache.add(propertyContext, cacheKey, CONSTANT_VALIDITY, new SharedInstanceCacheEntry(readonlyXFormsInstance, System.currentTimeMillis()));
+        cache.add(cacheKey, CONSTANT_VALIDITY, new SharedInstanceCacheEntry(readonlyXFormsInstance, System.currentTimeMillis()));
     }
 
-    private synchronized ReadonlyXFormsInstance findInCache(PropertyContext propertyContext, IndentedLogger indentedLogger,
+    private synchronized ReadonlyXFormsInstance findInCache(IndentedLogger indentedLogger,
                                                             String instanceStaticId, String modelEffectiveId, String instanceSourceURI,
                                                             String requestBodyHash, boolean handleXInclude, boolean exposeXPathTypes) {
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
 
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
-        final SharedInstanceCacheEntry sharedInstanceCacheEntry = (SharedInstanceCacheEntry) cache.findValid(propertyContext, cacheKey, CONSTANT_VALIDITY);
+        final SharedInstanceCacheEntry sharedInstanceCacheEntry = (SharedInstanceCacheEntry) cache.findValid(cacheKey, CONSTANT_VALIDITY);
 
         // Whether there is an entry but it has expired
         boolean isExpired = sharedInstanceCacheEntry != null && sharedInstanceCacheEntry.readonlyInstance.getTimeToLive() >= 0
@@ -156,7 +155,7 @@ public class XFormsServerSharedInstancesCache {
                         "id", instanceStaticId,
                         "URI", instanceSourceURI,
                         "request hash", requestBodyHash);
-            cache.remove(propertyContext, cacheKey);
+            cache.remove(cacheKey);
         }
 
         if (sharedInstanceCacheEntry != null && !isExpired) {
@@ -184,7 +183,7 @@ public class XFormsServerSharedInstancesCache {
         return new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI + "|" + Boolean.toString(handleXInclude) + (requestBodyHash != null ? "|" + requestBodyHash : ""));
     }
 
-    public synchronized void remove(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
+    public synchronized void remove(IndentedLogger indentedLogger, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
 
         if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug(LOG_TYPE, "removing instance", "URI", instanceSourceURI, "request hash", requestBodyHash);
@@ -192,12 +191,12 @@ public class XFormsServerSharedInstancesCache {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
 
-        cache.remove(propertyContext, cacheKey);
+        cache.remove(cacheKey);
     }
 
-    public synchronized void removeAll(PropertyContext propertyContext, IndentedLogger indentedLogger) {
+    public synchronized void removeAll(IndentedLogger indentedLogger) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
-        final int count = cache.removeAll(propertyContext);
+        final int count = cache.removeAll();
 
         if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug(LOG_TYPE, "removed all instances", "count", Integer.toString(count));

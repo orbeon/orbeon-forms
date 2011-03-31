@@ -46,7 +46,7 @@ public class XXFormsFormatMessage extends XFormsFunction {
         final MessageFormat format;
 
         // Find xml:lang and set locale if any
-        final String lang = XXFormsLang.resolveXMLangHandleAVTs(getOrCreatePipelineContext(), getContainingDocument(xpathContext), getSourceElement(xpathContext));
+        final String lang = XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument(xpathContext), getSourceElement(xpathContext));
         if (lang != null) {
             // Really not sure how xml:lang should be parsed, see:
             //

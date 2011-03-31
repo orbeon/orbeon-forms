@@ -39,8 +39,8 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
         if (xformsControl != null && !hasLabel)// CHECK: really need to check on xformsControl != null?
             throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
 
-        return !handlerContext.isTemplate() && xformsControl != null && xformsControl.getLabel(pipelineContext) != null
-                ? xformsControl.getLabel(pipelineContext) : "";
+        return !handlerContext.isTemplate() && xformsControl != null && xformsControl.getLabel() != null
+                ? xformsControl.getLabel() : "";
     }
 
     @Override

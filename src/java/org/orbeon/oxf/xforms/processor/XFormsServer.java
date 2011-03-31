@@ -28,7 +28,6 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -102,7 +101,7 @@ public class XFormsServer extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
-        final ExternalContext externalContext = NetUtils.getExternalContext(pipelineContext);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Request request = externalContext.getRequest();
 
         // Use request input provided by client
@@ -201,7 +200,7 @@ public class XFormsServer extends ProcessorImpl {
                         eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
                         {
                             // Start external events
-                            containingDocument.beforeExternalEvents(pipelineContext, response);
+                            containingDocument.beforeExternalEvents(response);
 
                             // Handle uploaded files for noscript if any
                             if (hasFiles) {
@@ -214,7 +213,7 @@ public class XFormsServer extends ProcessorImpl {
                                     clientEvents, serverEventsElements, valueChangeControlIds);
 
                             // End external events
-                            containingDocument.afterExternalEvents(pipelineContext);
+                            containingDocument.afterExternalEvents();
                         }
                         eventsIndentedLogger.endHandleOperation();
                     } else {
@@ -228,7 +227,7 @@ public class XFormsServer extends ProcessorImpl {
     //                containingDocument.getStaticState().dumpAnalysis();
 
                     // Notify the state manager that we will send the response
-                    XFormsStateManager.instance().beforeUpdateResponse(pipelineContext, containingDocument, isIgnoreSequenceNumber);
+                    XFormsStateManager.instance().beforeUpdateResponse(containingDocument, isIgnoreSequenceNumber);
 
                     if (replaceAllCallable == null) {
                         // Handle response here (if not null, is handled after synchronized block)
@@ -312,11 +311,11 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Notify state manager that we are done sending the response
-                    XFormsStateManager.instance().afterUpdateResponse(pipelineContext, containingDocument);
+                    XFormsStateManager.instance().afterUpdateResponse(containingDocument);
 
                 } catch (Throwable e) {
                     // Notify state manager that an error occurred
-                    XFormsStateManager.instance().onUpdateError(pipelineContext, containingDocument);
+                    XFormsStateManager.instance().onUpdateError(containingDocument);
 
                     // Log body of Ajax request if needed
                     if (XFormsProperties.getErrorLogging().contains("server-body"))
@@ -466,13 +465,13 @@ public class XFormsServer extends ProcessorImpl {
                     }
                     // Encode events so that the client cannot send back arbitrary events
                     if (requireClientSubmission)
-                        submissionServerEvents = XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
+                        submissionServerEvents = XFormsUtils.encodeXML(eventsDocument, false);
                 }
             }
 
             // Output static state when testing
             if (testOutputStaticState) {
-                final String staticState = XFormsStateManager.instance().getClientEncodedStaticState(pipelineContext, containingDocument);
+                final String staticState = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
                 if (staticState != null) {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] {
                             "container-type", externalContext.getRequest().getContainerType()
@@ -484,7 +483,7 @@ public class XFormsServer extends ProcessorImpl {
 
             // Output dynamic state
             {
-                final String dynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(pipelineContext, containingDocument);
+                final String dynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
                 if (dynamicState != null) {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
                     ch.text(dynamicState);

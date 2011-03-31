@@ -53,7 +53,7 @@ public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
         if (handlerContext.isTemplate() || xformsControl == null) {
             return null;
         } else {
-            return xformsControl.getLabel(pipelineContext);
+            return xformsControl.getLabel();
         }
     }
 }

@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.ByteArrayInputStream;
@@ -36,14 +35,14 @@ public class EchoSubmission extends BaseSubmission {
         return "echo";
     }
 
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match for replace="instance|none|all" and the submission resource starts with "test:" or "echo:"
         return (p.isReplaceInstance || p.isReplaceNone || p.isReplaceAll) && (p2.actionOrResource.startsWith("test:") || p2.actionOrResource.startsWith("echo:"));
     }
 
-    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(XFormsModelSubmission.SubmissionParameters p,
                                     XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws Exception {
         if (sp.messageBody == null) {
             // Not sure when this can happen, but it can't be good
@@ -70,10 +69,10 @@ public class EchoSubmission extends BaseSubmission {
         connectionResult.setResponseInputStream(new ByteArrayInputStream(sp.messageBody));
 
         // Obtain replacer
-        final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+        final Replacer replacer = submission.getReplacer(connectionResult, p);
 
         // Deserialize here so it can run in parallel
-        replacer.deserialize(propertyContext, connectionResult, p, p2);
+        replacer.deserialize(connectionResult, p, p2);
 
         return new SubmissionResult(submission.getEffectiveId(), replacer, connectionResult);
     }

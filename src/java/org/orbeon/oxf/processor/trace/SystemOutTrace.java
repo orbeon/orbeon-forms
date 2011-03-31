@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.trace;
 
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -21,8 +20,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 public class SystemOutTrace extends BaseTrace {
     public void contextDestroyed(final boolean success) {
         if (traceEntries != null) {
-            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDebugRequestDocument(pipelineContext, new XMLUtils.DebugXML() {
-                public void toXML(PropertyContext propertyContext, ContentHandlerHelper helper) {
+            System.out.println(Dom4jUtils.domToPrettyString(XMLUtils.createDebugRequestDocument(new XMLUtils.DebugXML() {
+                public void toXML(ContentHandlerHelper helper) {
                     buildTraceNodes(traceEntries.values()).toXML(pipelineContext, helper);
                 }
             })));

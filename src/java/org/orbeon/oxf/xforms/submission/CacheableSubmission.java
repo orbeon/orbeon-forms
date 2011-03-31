@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.submission;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsInstance;
@@ -46,20 +45,20 @@ public class CacheableSubmission extends BaseSubmission {
         return "cacheable";
     }
 
-    public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
+    public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         // Match if the submission has replace="instance" and xxforms:cache="true"
         return p.isReplaceInstance && p2.isCache;
     }
 
-    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+    public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true"
 
         // Convert URL to string
-        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString, submission.isURLNorewrite());
+        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission.isURLNorewrite());
 
         // Compute a hash of the body if needed
         final String requestBodyHash;
@@ -78,7 +77,7 @@ public class CacheableSubmission extends BaseSubmission {
         final String validation;
         {
             // Find and check replacement location
-            final XFormsInstance updatedInstance = checkInstanceToUpdate(propertyContext, detailsLogger, p);
+            final XFormsInstance updatedInstance = checkInstanceToUpdate(detailsLogger, p);
 
             instanceStaticId = updatedInstance.getId();
             modelEffectiveId = updatedInstance.getEffectiveModelId();
@@ -92,10 +91,10 @@ public class CacheableSubmission extends BaseSubmission {
         // Pass a pseudo connection result which contains information used by getReplacer()
         // We know that we will get an InstanceReplacer
         final ConnectionResult connectionResult = createPseudoConnectionResult(absoluteResolvedURLString);
-        final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(propertyContext, connectionResult, p);
+        final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(connectionResult, p);
 
         // Try from cache first
-        final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
+        final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(
                 detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
 
@@ -126,11 +125,11 @@ public class CacheableSubmission extends BaseSubmission {
 
                     final boolean[] status = { false , false};
                     try {
-                        final XFormsInstance newInstance = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext,
+                        final XFormsInstance newInstance = XFormsServerSharedInstancesCache.instance().findConvert(
                                 detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
-                                public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId,
+                                public ReadonlyXFormsInstance load(String instanceStaticId,
                                                                    String modelEffectiveId, String instanceSourceURI,
                                                                    boolean handleXInclude, long timeToLive, String validation) {
 
@@ -142,7 +141,7 @@ public class CacheableSubmission extends BaseSubmission {
                                     try {
                                         // Run regular submission but force synchronous execution and readonly result
                                         final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
-                                        submissionResult = new RegularSubmission(submission).connect(propertyContext, p, updatedP2, sp);
+                                        submissionResult = new RegularSubmission(submission).connect(p, updatedP2, sp);
 
                                         // Check if the connection returned a throwable
                                         final Throwable throwable = submissionResult.getThrowable();
@@ -193,7 +192,7 @@ public class CacheableSubmission extends BaseSubmission {
 
             // Submit the callable
             // This returns null if the execution is deferred
-            return submitCallable(propertyContext, p, p2, callable);
+            return submitCallable(p, p2, callable);
         }
     }
 
@@ -215,9 +214,9 @@ public class CacheableSubmission extends BaseSubmission {
         }
     }
 
-    private XFormsInstance checkInstanceToUpdate(PropertyContext propertyContext, IndentedLogger indentedLogger, XFormsModelSubmission.SubmissionParameters p) {
+    private XFormsInstance checkInstanceToUpdate(IndentedLogger indentedLogger, XFormsModelSubmission.SubmissionParameters p) {
         XFormsInstance updatedInstance;
-        final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(propertyContext, p.xpathContext,
+        final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(p.xpathContext,
                 submission.findReplaceInstanceNoTargetref(p.refInstance), p.submissionElementContextItem);
 
         if (destinationNodeInfo == null) {
@@ -228,7 +227,7 @@ public class CacheableSubmission extends BaseSubmission {
             // xforms-submit-error with an error-type of target-error."
 
             throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
+                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
         }
 
         updatedInstance = submission.getContainingDocument().getInstanceForNode(destinationNodeInfo);
@@ -236,7 +235,7 @@ public class CacheableSubmission extends BaseSubmission {
             // Only support replacing the root element of an instance
             // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
             throw new XFormsSubmissionException(submission, "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
+                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
         }
 
         if (indentedLogger.isDebugEnabled())

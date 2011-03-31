@@ -115,14 +115,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             // o noscript mode: we don't (and can't) retry
             //
             // NOTE: Keep empty static state and dynamic state until client is able to deal without them
-            final String clientEncodedStaticState = XFormsStateManager.instance().getClientEncodedStaticState(pipelineContext, containingDocument);
+            final String clientEncodedStaticState = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
 //            if (clientEncodedStaticState != null) {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                         "type", "hidden", "name", "$static-state",
                         "value", clientEncodedStaticState
                 });
 //            }
-            final String clientEncodedDynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(pipelineContext, containingDocument);
+            final String clientEncodedDynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(containingDocument);
 //            if (clientEncodedDynamicState != null) {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                         "type", "hidden", "name", "$dynamic-state",

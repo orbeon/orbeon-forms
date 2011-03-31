@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
@@ -65,10 +64,9 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
     /**
      * Toggle to this case and dispatch events if this causes a change in selected cases.
      *
-     * @param propertyContext   current context
      */
-    public void toggle(PropertyContext propertyContext) {
-        getSwitch().setSelectedCase(propertyContext, this);
+    public void toggle() {
+        getSwitch().setSelectedCase(this);
     }
 
     private XFormsSwitchControl getSwitch() {

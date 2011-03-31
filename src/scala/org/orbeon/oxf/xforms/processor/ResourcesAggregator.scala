@@ -72,7 +72,7 @@ class ResourcesAggregator extends ProcessorImpl {
                         val preservedJS = Buffer[HeadElement]()
 
                         // Whether we are in separate deployment as in that case we don't combine paths to user resources
-                        val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(NetUtils.getExternalContext(pipelineContext).getRequest)
+                        val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(NetUtils.getExternalContext.getRequest)
 
                         // Whether a path is a user resource in separate deployment
                         def isSeparatePath(path: String) = isSeparateDeployment && !URLRewriterUtils.isPlatformPath(path)

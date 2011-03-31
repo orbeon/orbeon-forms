@@ -257,7 +257,7 @@ public class RequestGenerator extends ProcessorImpl {
                     // File does not exist on disk, must convert
                     // NOTE: Conversion occurs every time this method is called. Not optimal.
                     try {
-                        uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(pipelineContext, fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
+                        uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
                     } catch (IOException e) {
                         throw new OXFException(e);
                     }
@@ -268,7 +268,7 @@ public class RequestGenerator extends ProcessorImpl {
                 if (isSessionScope) {
                     final String tempSessionURI = getContext(pipelineContext).getSessionURIForRequestURI(uriExpiringWithRequest);
                     if (tempSessionURI == null) {
-                        uriExpiringWithScope = NetUtils.renameAndExpireWithSession(pipelineContext, uriExpiringWithRequest, logger).toURI().toString();
+                        uriExpiringWithScope = NetUtils.renameAndExpireWithSession(uriExpiringWithRequest, logger).toURI().toString();
                         getContext(pipelineContext).putSessionURIForRequestURI(uriExpiringWithRequest, uriExpiringWithScope);
                     } else
                         uriExpiringWithScope = tempSessionURI;

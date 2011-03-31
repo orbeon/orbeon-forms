@@ -15,13 +15,5 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xforms.XFormsStaticState
-import org.orbeon.oxf.util.PropertyContext
 
-
-class StaticStateContext(val staticState: XFormsStaticState, val controlsDocument: DocumentWrapper, val index: Int) {
-    // this would just be used by the XPath cache for statistics, just don't care for now
-    val propertyContext = new PropertyContext {
-        def getAttribute(key: Any) = null
-        def setAttribute(key: Any, o: Any) = ()
-    }
-}
+class StaticStateContext(val staticState: XFormsStaticState, val controlsDocument: DocumentWrapper, val index: Int)

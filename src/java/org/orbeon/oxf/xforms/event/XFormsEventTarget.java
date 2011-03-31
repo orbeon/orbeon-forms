@@ -29,8 +29,8 @@ public interface XFormsEventTarget {
     XBLContainer getXBLContainer(XFormsContainingDocument containingDocument);
     LocationData getLocationData();
     XFormsEventObserver getParentEventObserver(XBLContainer container);
-    void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event);
-    void performDefaultAction(PropertyContext propertyContext, XFormsEvent event);
-    XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
+    void performTargetAction(XBLContainer container, XFormsEvent event);
+    void performDefaultAction(XFormsEvent event);
+    XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument);
     boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName);
 }

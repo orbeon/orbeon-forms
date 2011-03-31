@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.xbl;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.NamespaceMapping;
@@ -35,8 +34,7 @@ public class XBLTransformer {
     /**
      * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
      */
-    public static void transform(final PropertyContext propertyContext, final DocumentWrapper documentWrapper,
-                                 final Document shadowTreeDocument, final Element boundElement) {
+    public static void transform(final DocumentWrapper documentWrapper, final Document shadowTreeDocument, final Element boundElement) {
 
         Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
 
@@ -72,7 +70,7 @@ public class XBLTransformer {
                         final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                         // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                        final List elements = XPathCache.evaluate(propertyContext, boundElementInfo, xpathExpression, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
+                        final List elements = XPathCache.evaluate(boundElementInfo, xpathExpression, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
                                 null, null, null, null, null);// TODO: locationData
 
                         if (elements.size() > 0) {
@@ -204,7 +202,7 @@ public class XBLTransformer {
                     final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
                     // TODO: don't use getNamespaceContext() as this is already computed for the bound element
-                    final List nodeInfos = XPathCache.evaluate(propertyContext, boundElementInfo, xxblAttrString, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
+                    final List nodeInfos = XPathCache.evaluate(boundElementInfo, xxblAttrString, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
                             null, null, null, null, null);// TODO: locationData
 
                     if (nodeInfos.size() > 0) {

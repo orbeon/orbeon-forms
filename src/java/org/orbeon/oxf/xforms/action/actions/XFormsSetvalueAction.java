@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -32,7 +31,7 @@ import java.util.List;
  * 10.1.9 The setvalue Element
  */
 public class XFormsSetvalueAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -51,7 +50,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             {
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     // Evaluate
-                    valueToSet = actionInterpreter.evaluateStringExpression(propertyContext, actionElement,
+                    valueToSet = actionInterpreter.evaluateStringExpression(actionElement,
                             currentNodeset, contextStack.getCurrentPosition(), valueExpression);
                 } else {
                     // If @ref doesn't point to anything, don't even try to compute the value
@@ -72,7 +71,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             // have either a single non-empty text node child, or no children string was empty.
 
             // Node exists and value is not null, we can try to set the value
-            doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, "setvalue", false);
+            doSetValue(containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, "setvalue", false);
         } else {
             // Node doesn't exist or value is null: NOP
             if (indentedLogger.isDebugEnabled()) {
@@ -84,7 +83,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         }
     }
 
-    public static boolean doSetValue(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
+    public static boolean doSetValue(XFormsContainingDocument containingDocument,
                                      IndentedLogger indentedLogger, XFormsEventTarget eventTarget, NodeInfo currentNode,
                                      String valueToSet, String type, String source, boolean isCalculate) {
 
@@ -104,7 +103,7 @@ public class XFormsSetvalueAction extends XFormsAction {
         if (changed) {
 
             // Actually set the value
-            XFormsInstance.setValueForNodeInfo(propertyContext, containingDocument, eventTarget, currentNode, valueToSet, type);
+            XFormsInstance.setValueForNodeInfo(containingDocument, eventTarget, currentNode, valueToSet, type);
 
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
             if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
@@ -114,7 +113,7 @@ public class XFormsSetvalueAction extends XFormsAction {
 
                 // Dispatch extension event to instance
                 final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);
-                modifiedContainer.dispatchEvent(propertyContext, new XXFormsValueChanged(containingDocument, modifiedInstance));
+                modifiedContainer.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance));
             } else {
                 // NOTE: Is this the right thing to do if the value modified is not an instance value? Might not be needed!
                 containingDocument.getControls().markDirtySinceLastRequest(true);

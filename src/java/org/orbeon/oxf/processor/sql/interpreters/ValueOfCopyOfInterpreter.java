@@ -99,7 +99,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                                 newList.add(wrapper.wrap(i.next()));
                             }
 
-                            stringValue = XPathCache.evaluateAsString(interpreterContext.getPipelineContext(), newList, 1, "string(.)",
+                            stringValue = XPathCache.evaluateAsString(newList, 1, "string(.)",
                                 null, null, null, null, null, null);
                         } else {
                             // It's just an empty list
@@ -119,7 +119,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                     if ("value-of".equals(localname)) {
                         // Get string value
                         // TODO: use XPathCache.evaluateAsString()
-                        PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
+                        PooledXPathExpression expr = XPathCache.getXPathExpression(
                                 wrapper.getConfiguration(), wrapper.wrap(result), "string(.)", null);
                         String stringValue;
                         try {

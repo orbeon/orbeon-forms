@@ -64,12 +64,11 @@ public abstract class EXistStateStoreBase implements XFormsStateStore {
     /**
      * Store the current state of the given document.
      *
-     * @param propertyContext       current context
      * @param containingDocument    document
      * @param session               current session
      * @param isInitialState        whether this is the document's initial state
      */
-    public synchronized void storeDocumentState(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
+    public synchronized void storeDocumentState(XFormsContainingDocument containingDocument,
                                                 ExternalContext.Session session, boolean isInitialState) {
 
         assert containingDocument.getStaticState().isServerStateHandling();
@@ -89,10 +88,10 @@ public abstract class EXistStateStoreBase implements XFormsStateStore {
         addOrReplaceOne(documentUUID, staticStateUUID + ":" + dynamicStateKey, session.getId());
 
         // Static state
-        addOrReplaceOne(staticStateUUID, containingDocument.getStaticState().getEncodedStaticState(propertyContext), session.getId());
+        addOrReplaceOne(staticStateUUID, containingDocument.getStaticState().getEncodedStaticState(), session.getId());
 
         // Dynamic state
-        addOrReplaceOne(dynamicStateKey, containingDocument.createEncodedDynamicState(propertyContext, XFormsProperties.isGZIPState(), false), session.getId());
+        addOrReplaceOne(dynamicStateKey, containingDocument.createEncodedDynamicState(XFormsProperties.isGZIPState(), false), session.getId());
     }
 
     private String getDynamicStateKey(String documentUUID, boolean isInitialState) {

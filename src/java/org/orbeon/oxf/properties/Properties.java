@@ -117,33 +117,41 @@ public class Properties {
 
                 // Initialize pipeline
                 final PipelineContext pipelineContext = new PipelineContext();
-                urlGenerator.reset(pipelineContext);
-                domSerializer.reset(pipelineContext);
+                boolean success = false;
+                try {
+                    urlGenerator.reset(pipelineContext);
+                    domSerializer.reset(pipelineContext);
 
-                // Find whether we can skip reloading
-                if (propertyStore != null && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Not reloading properties because they have not changed.");
+                    // Find whether we can skip reloading
+                    if (propertyStore != null && domSerializer.findInputLastModified(pipelineContext) <= lastUpdate) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Not reloading properties because they have not changed.");
+                        }
+                        lastUpdate = current;
+                        success = true;
+                        break done;
                     }
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Reloading properties because timestamp indicates they may have changed.");
+                    }
+
+                    // Read updated properties document
+                    domSerializer.start(pipelineContext);
+                    final Document document = domSerializer.getDocument(pipelineContext);
+
+                    if (document == null || document.content() == null || document.content().size() == 0) {
+                        throw new OXFException("Failure to initialize Orbeon Forms properties");
+                    }
+
+                    propertyStore = new PropertyStore(document);
+
                     lastUpdate = current;
-                    break done;
+
+                    success = true;
+                } finally {
+                    pipelineContext.destroy(success);
                 }
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Reloading properties because timestamp indicates they may have changed.");
-                }
-
-                // Read updated properties document
-                domSerializer.start(pipelineContext);
-                final Document document = domSerializer.getDocument(pipelineContext);
-
-                if (document == null || document.content() == null || document.content().size() == 0) {
-                    throw new OXFException("Failure to initialize Orbeon Forms properties");
-                }
-
-                propertyStore = new PropertyStore(document);
-
-                lastUpdate = current;
             } finally {
                 initializing = false;
             }

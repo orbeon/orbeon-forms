@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.junit.Test;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
@@ -86,7 +85,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 
         // Check there is an xxforms:attribute for "html" with correct name
-        List result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
+        List result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -95,7 +94,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxforms:attribute for "span" with correct name
-        result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
+        result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());

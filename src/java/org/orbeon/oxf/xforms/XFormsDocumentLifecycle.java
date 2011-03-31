@@ -21,7 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
  */
 public interface XFormsDocumentLifecycle {
     void afterInitialResponse();
-    void beforeExternalEvents(PipelineContext pipelineContext, ExternalContext.Response response);
-    void afterExternalEvents(PipelineContext pipelineContext);
+    void beforeExternalEvents(ExternalContext.Response response);
+    void afterExternalEvents();
     void afterUpdateResponse();
 }

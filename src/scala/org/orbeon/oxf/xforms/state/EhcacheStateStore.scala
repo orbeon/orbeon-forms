@@ -53,7 +53,7 @@ object EhcacheStateStore extends XFormsStateStore {
                 cache
         }
 
-    def storeDocumentState(propertyContext: PropertyContext, document: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean) = {
+    def storeDocumentState(document: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean) = {
 
         assert(document.getStaticState.isServerStateHandling)
 
@@ -71,8 +71,8 @@ object EhcacheStateStore extends XFormsStateStore {
         addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
         // Static and dynamic states
-        addOrReplaceOne(staticStateDigest, document.getStaticState.getEncodedStaticState(propertyContext))
-        addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(propertyContext, XFormsProperties.isGZIPState, false))
+        addOrReplaceOne(staticStateDigest, document.getStaticState.getEncodedStaticState())
+        addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(XFormsProperties.isGZIPState, false))
     }
 
     def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState = {

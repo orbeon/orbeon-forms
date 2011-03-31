@@ -77,25 +77,18 @@ public class InitUtils {
         }
         // Make the static context available
         StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
-
+        boolean success = false;
         try {
             // Set cache size
             final Integer cacheMaxSize = Properties.instance().getPropertySet().getInteger(CACHE_SIZE_PROPERTY);
             if (cacheMaxSize != null)
-                ObjectCache.instance().setMaxSize(pipelineContext, cacheMaxSize);
+                ObjectCache.instance().setMaxSize(cacheMaxSize);
 
             // Start execution
             processor.reset(pipelineContext);
             processor.start(pipelineContext);
-            if (!pipelineContext.isDestroyed())
-                pipelineContext.destroy(true);
+            success = true;
         } catch (Throwable e) {
-            try {
-                if (!pipelineContext.isDestroyed())
-                    pipelineContext.destroy(false);
-            } catch (Throwable f) {
-                logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
-            }
             final LocationData locationData = ValidationException.getRootLocationData(e);
             final Throwable throwable = OXFException.getRootThrowable(e);
             final String message = locationData == null
@@ -120,24 +113,30 @@ public class InitUtils {
                 if (cacheDisplayStatistics.indexOf(' ') == -1) {
                     // Single token
                     if (cacheDisplayStatistics.length() > 0)
-                        appendCacheStatistics(pipelineContext, ObjectCache.instanceIfExists(cacheDisplayStatistics), sb);
+                        appendCacheStatistics(ObjectCache.instanceIfExists(cacheDisplayStatistics), sb);
                 } else {
                     // Multiple tokens
                     final StringTokenizer st = new StringTokenizer(cacheDisplayStatistics, " ");
                     while (st.hasMoreTokens()) {
                         final String cacheName = st.nextToken().trim();
                         if (cacheName.length() > 0)
-                            appendCacheStatistics(pipelineContext, ObjectCache.instanceIfExists(cacheName), sb);
+                            appendCacheStatistics(ObjectCache.instanceIfExists(cacheName), sb);
                     }
                 }
                 logger.info(sb.toString());
             }
+
+            try {
+                pipelineContext.destroy(success);
+            } catch (Throwable f) {
+                logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
+            }
         }
     }
 
-    private static void appendCacheStatistics(PipelineContext pipelineContext, Cache cache, StringBuilder sb) {
+    private static void appendCacheStatistics(Cache cache, StringBuilder sb) {
         if (cache != null) {
-            final CacheStatistics statistics = cache.getStatistics(pipelineContext);
+            final CacheStatistics statistics = cache.getStatistics();
             final int hitCount = statistics.getHitCount();
             final int missCount = statistics.getMissCount();
             final String successRate;
@@ -272,10 +271,18 @@ public class InitUtils {
                     Processor registry = new XMLProcessorRegistry();
                     PipelineUtils.connect(processorDefinitions, "data", registry, "config");
 
-                    PipelineContext pipelineContext = new PipelineContext();
-                    processorDefinitions.reset(pipelineContext);
-                    registry.reset(pipelineContext);
-                    registry.start(pipelineContext);
+                    {
+                        final PipelineContext pipelineContext = new PipelineContext();
+                        boolean success = false;
+                        try {
+                            processorDefinitions.reset(pipelineContext);
+                            registry.reset(pipelineContext);
+                            registry.start(pipelineContext);
+                            success = true;
+                        } finally {
+                            pipelineContext.destroy(success);
+                        }
+                    }
 
                     // If user defines a PROLOGUE_PROPERTY, overrides the defaults
                     final String prologueSrc = Properties.instance().getPropertySet().getString(PROLOGUE_PROPERTY);
@@ -284,10 +291,16 @@ public class InitUtils {
                         registry = new XMLProcessorRegistry();
                         PipelineUtils.connect(processorDefinitions, "data", registry, "config");
 
-                        pipelineContext = new PipelineContext();
-                        processorDefinitions.reset(pipelineContext);
-                        registry.reset(pipelineContext);
-                        registry.start(pipelineContext);
+                        final PipelineContext pipelineContext = new PipelineContext();
+                        boolean success = false;
+                        try {
+                            processorDefinitions.reset(pipelineContext);
+                            registry.reset(pipelineContext);
+                            registry.start(pipelineContext);
+                            success = true;
+                        } finally {
+                            pipelineContext.destroy(success);
+                        }
                     }
 
                     processorDefinitionsInitialized = true;

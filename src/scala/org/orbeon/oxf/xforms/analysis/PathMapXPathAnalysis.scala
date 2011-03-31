@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.util.{PropertyContext, XPathCache}
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import java.util.{Map => JMap}
@@ -70,7 +70,7 @@ class PathMapXPathAnalysis(val xpathString: String,
             }
     }
 
-    def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) {
+    def toXML(helper: ContentHandlerHelper) {
 
         helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
 

@@ -16,6 +16,6 @@ package org.orbeon.oxf.xforms.control;
 import org.orbeon.oxf.util.PropertyContext;
 
 public interface ExternalCopyable extends Cloneable {
-    Object getBackCopy(PropertyContext propertyContext);
+    Object getBackCopy();
 
 }

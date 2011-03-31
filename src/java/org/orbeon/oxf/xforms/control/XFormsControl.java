@@ -152,7 +152,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return containingDocument.getControls().getIndentedLogger();
     }
 
-    public void iterationRemoved(PropertyContext propertyContext) {
+    public void iterationRemoved() {
         // NOP, can be overridden
     }
 
@@ -194,7 +194,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Set this control's binding context.
      */
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
         final XFormsContextStack.BindingContext oldBinding = this.bindingContext;
         this.bindingContext = bindingContext;
 
@@ -205,13 +205,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!oldRelevant && newRelevant) {
             // Control is created
             this.relevant = newRelevant;
-            onCreate(propertyContext);
+            onCreate();
         } else if (oldRelevant && !newRelevant) {
             // Control is destroyed
-            onDestroy(propertyContext);
+            onDestroy();
             this.relevant = newRelevant;
         } else if (newRelevant) {
-            onBindingUpdate(propertyContext, oldBinding, bindingContext);
+            onBindingUpdate(oldBinding, bindingContext);
         }
     }
 
@@ -219,14 +219,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return relevant;
     }
 
-    protected void onCreate(PropertyContext propertyContext) {
+    protected void onCreate() {
         wasRelevant = false;
     }
 
-    protected void onDestroy(PropertyContext propertyContext) {
+    protected void onDestroy() {
     }
 
-    protected void onBindingUpdate(PropertyContext propertyContext, XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+    protected void onBindingUpdate(XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
     }
 
     protected boolean computeRelevant() {
@@ -302,52 +302,52 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return result;
     }
 
-    public String getLabel(PropertyContext propertyContext) {
-        return getLabelLHHA().getValue(propertyContext);
+    public String getLabel() {
+        return getLabelLHHA().getValue();
     }
 
-    public String getEscapedLabel(PipelineContext pipelineContext) {
-        return getLabelLHHA().getEscapedValue(pipelineContext);
+    public String getEscapedLabel() {
+        return getLabelLHHA().getEscapedValue();
     }
 
     public boolean isHTMLLabel(PropertyContext propertyContext) {
-        return getLabelLHHA().isHTML(propertyContext);
+        return getLabelLHHA().isHTML();
     }
 
     public String getHelp(PropertyContext propertyContext) {
-        return getHelpLHHA().getValue(propertyContext);
+        return getHelpLHHA().getValue();
     }
 
     public String getEscapedHelp(PipelineContext pipelineContext) {
-        return getHelpLHHA().getEscapedValue(pipelineContext);
+        return getHelpLHHA().getEscapedValue();
     }
 
     public boolean isHTMLHelp(PropertyContext propertyContext) {
-        return getHelpLHHA().isHTML(propertyContext);
+        return getHelpLHHA().isHTML();
     }
 
     public String getHint(PropertyContext propertyContext) {
-        return getHintLHHA().getValue(propertyContext);
+        return getHintLHHA().getValue();
     }
 
     public String getEscapedHint(PipelineContext pipelineContext) {
-        return getHintLHHA().getEscapedValue(pipelineContext);
+        return getHintLHHA().getEscapedValue();
     }
 
     public boolean isHTMLHint(PropertyContext propertyContext) {
-        return getHintLHHA().isHTML(propertyContext);
+        return getHintLHHA().isHTML();
     }
 
     public String getAlert(PropertyContext propertyContext) {
-        return getAlertLHHA().getValue(propertyContext);
+        return getAlertLHHA().getValue();
     }
 
     public boolean isHTMLAlert(PropertyContext propertyContext) {
-        return getAlertLHHA().isHTML(propertyContext);
+        return getAlertLHHA().isHTML();
     }
 
     public String getEscapedAlert(PipelineContext pipelineContext) {
-        return getAlertLHHA().getEscapedValue(pipelineContext);
+        return getAlertLHHA().getEscapedValue();
     }
 
     /**
@@ -480,7 +480,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (relevant != other.relevant)
             return false;
 
-        if (!XFormsUtils.compareStrings(getLabel(propertyContext), other.getLabel(propertyContext)))
+        if (!XFormsUtils.compareStrings(getLabel(), other.getLabel()))
             return false;
         if (!XFormsUtils.compareStrings(getHelp(propertyContext), other.getHelp(propertyContext)))
             return false;
@@ -510,27 +510,27 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return bindingContext;
     }
 
-    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
         return getBindingContext();
     }
 
-    public final void evaluate(PropertyContext propertyContext) {
+    public final void evaluate() {
         try {
-            evaluateImpl(propertyContext);
+            evaluateImpl();
         } catch (ValidationException e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating control",
                     getControlElement(), "element", Dom4jUtils.elementToDebugString(getControlElement())));
         }
     }
 
-    private void evaluateExtensionAttributes(PropertyContext propertyContext, QName[] attributeQNames) {
+    private void evaluateExtensionAttributes(QName[] attributeQNames) {
         final Element controlElement = getControlElement();
         for (final QName avtAttributeQName: attributeQNames) {
             final String attributeValue = controlElement.attributeValue(avtAttributeQName);
 
             if (attributeValue != null) {
                 // NOTE: This can return null if there is no context
-                final String resolvedValue = evaluateAvt(propertyContext, attributeValue);
+                final String resolvedValue = evaluateAvt(attributeValue);
 
                 if (extensionAttributesValues == null)
                     extensionAttributesValues = new HashMap<QName, String>();
@@ -563,19 +563,17 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     /**
      * Evaluate this control.
-     *
-     * @param propertyContext   current context
      */
     // TODO: move this method to XFormsValueControl and XFormsValueContainerControl
-    protected void evaluateImpl(PropertyContext propertyContext) {
+    protected void evaluateImpl() {
 
         // TODO: these should be evaluated lazily
         // Evaluate standard extension attributes
-        evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
+        evaluateExtensionAttributes(STANDARD_EXTENSION_ATTRIBUTES);
         // Evaluate custom extension attributes
         final QName[] extensionAttributes = getExtensionAttributes();
         if (extensionAttributes != null) {
-            evaluateExtensionAttributes(propertyContext, extensionAttributes);
+            evaluateExtensionAttributes(extensionAttributes);
         }
     }
 
@@ -597,7 +595,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return containingDocument.getStaticState().getEventHandlers(getPrefixedId());
     }
 
-    public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
+    public void performDefaultAction(XFormsEvent event) {
         if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getName())
                 || XFormsEvents.XFORMS_FOCUS.equals(event.getName())) {
 
@@ -640,7 +638,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                     "new index", Integer.toString(newRepeatIndex));
                         }
 
-                        repeatControl.setIndex(propertyContext, newRepeatIndex);
+                        repeatControl.setIndex(newRepeatIndex);
                     }
                 }
 
@@ -654,7 +652,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XBLContainer container, XFormsEvent event) {
         // NOP
     }
 
@@ -665,11 +663,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Rewrite an HTML value which may contain URLs, for example in @src or @href attributes.
      *
-     * @param propertyContext   current context
+     *
      * @param rawValue          value to rewrite
      * @return                  rewritten value
      */
-    public static String getEscapedHTMLValue(final PropertyContext propertyContext, final LocationData locationData, String rawValue) {
+    public static String getEscapedHTMLValue(final LocationData locationData, String rawValue) {
 
         if (rawValue == null)
             return null;
@@ -681,7 +679,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Rewrite URLs
             final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(propertyContext, new ForwardingXMLReceiver() {
+            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(new ForwardingXMLReceiver() {
 
                 private boolean isStartElement;
 
@@ -730,11 +728,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an attribute of the control as an AVT.
      *
-     * @param propertyContext   current context
      * @param attributeValue    value of the attribute
      * @return                  value of the AVT or null if cannot be computed
      */
-    protected String evaluateAvt(PropertyContext propertyContext, String attributeValue) {
+    protected String evaluateAvt(String attributeValue) {
 
         if (!XFormsUtils.maybeAVT(attributeValue)) {
             // Definitely not an AVT
@@ -757,7 +754,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                 // Evaluate
                 try {
-                    return XPathCache.evaluateAsAvt(propertyContext, contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
+                    return XPathCache.evaluateAsAvt(contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
                         bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), getFunctionContext(), null, getLocationData());
                 } catch (Exception e) {
                     // Don't consider this as fatal
@@ -777,11 +774,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an XPath expression as a string in the context of this control.
      *
-     * @param propertyContext   current context
      * @param xpathString       XPath expression
      * @return                  value, or null if cannot be computed
      */
-    protected String evaluateAsString(PropertyContext propertyContext, String xpathString, List<Item> contextItems, int contextPosition) {
+    protected String evaluateAsString(String xpathString, List<Item> contextItems, int contextPosition) {
 
         // NOTE: the control may or may not be bound, so don't use getBoundNode()
         if (contextItems == null || contextItems.size() == 0) {
@@ -794,7 +790,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             contextStack.setBinding(this);
 
             try {
-                return XPathCache.evaluateAsString(propertyContext, contextItems, contextPosition,
+                return XPathCache.evaluateAsString(contextItems, contextPosition,
                                     xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
                                     XFormsContainingDocument.getFunctionLibrary(),
                                     getFunctionContext(), null, getLocationData());
@@ -815,14 +811,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Evaluate an XPath expression as a string in the context of this control.
      *
-     * @param propertyContext       current context
      * @param contextItem           context item
      * @param xpathString           XPath expression
      * @param namespaceMapping      namespace mappings to use
      * @param variableToValueMap    variables to use
      * @return                      value, or null if cannot be computed
      */
-    protected String evaluateAsString(PropertyContext propertyContext, Item contextItem, String xpathString,
+    protected String evaluateAsString(Item contextItem, String xpathString,
                                       NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap) {
 
         if (contextItem == null) {
@@ -836,7 +831,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
             // Evaluate
             try {
-                return XPathCache.evaluateAsString(propertyContext, contextItem,
+                return XPathCache.evaluateAsString(contextItem,
                                 xpathString, namespaceMapping, variableToValueMap,
                                 XFormsContainingDocument.getFunctionLibrary(),
                                 getFunctionContext(), null, getLocationData());
@@ -926,7 +921,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      *
      * @return  new XFormsControl
      */
-    public Object getBackCopy(PropertyContext propertyContext) {
+    public Object getBackCopy() {
         
         // NOTE: this.parent is handled by subclasses
         final XFormsControl cloned;
@@ -943,7 +938,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final LHHA value = entry.getValue();
 
             // Evaluate lazy value before copying
-            value.getValue(propertyContext);
+            value.getValue();
 
             // Clone
             final LHHA clonedLHHA;
@@ -1085,13 +1080,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         protected abstract boolean requireUpdate();
         protected abstract void notifyCompute();
         protected abstract void notifyOptimized();
-        protected abstract T evaluateValue(PropertyContext propertyContext);
+        protected abstract T evaluateValue();
 
-        final public T getValue(PropertyContext propertyContext) {
+        final public T getValue() {
             if (!isEvaluated) {
                 if (XFormsControl.this.isRelevant()) {
                     notifyCompute();
-                    value = evaluateValue(propertyContext);
+                    value = evaluateValue();
                 } else {
                     // NOTE: if the control is not relevant, nobody should ask about this in the first place
                     value = null;
@@ -1170,7 +1165,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
 
         @Override
-        protected T evaluateValue(PropertyContext propertyContext) {
+        protected T evaluateValue() {
             return value;
         }
     }
@@ -1179,9 +1174,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     protected static final LHHA NULL_LHHA = new NullLHHA();
 
     protected static class NullLHHA implements LHHA {
-        public String getValue(PropertyContext propertyContext) { return null; }
-        public String getEscapedValue(PipelineContext pipelineContext) { return null; }
-        public boolean isHTML(PropertyContext propertyContext) { return false; }
+        public String getValue() { return null; }
+        public String getEscapedValue() { return null; }
+        public boolean isHTML() { return false; }
         public void handleMarkDirty() {}
 
         @Override
@@ -1195,9 +1190,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     protected interface LHHA extends Cloneable {
-        String getValue(PropertyContext propertyContext);
-        String getEscapedValue(PipelineContext pipelineContext);
-        boolean isHTML(PropertyContext propertyContext);
+        String getValue();
+        String getEscapedValue();
+        boolean isHTML();
         void handleMarkDirty();
         LHHA clone();
     }
@@ -1221,19 +1216,19 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
 
         @Override
-        protected String evaluateValue(PropertyContext propertyContext) {
-            final String result = doEvaluateValue(propertyContext);
+        protected String evaluateValue() {
+            final String result = doEvaluateValue();
             isHTML = result != null && tempContainsHTML[0];
             return result;
         }
 
-        public String getEscapedValue(PipelineContext pipelineContext) {
-            final String value = getValue(pipelineContext);
-            return isHTML ? XFormsControl.getEscapedHTMLValue(pipelineContext, getLocationData(), value) : XMLUtils.escapeXMLMinimal(value);
+        public String getEscapedValue() {
+            final String value = getValue();
+            return isHTML ? XFormsControl.getEscapedHTMLValue(getLocationData(), value) : XMLUtils.escapeXMLMinimal(value);
         }
 
-        public boolean isHTML(PropertyContext propertyContext) {
-            getValue(propertyContext);
+        public boolean isHTML() {
+            getValue();
             return isHTML;
         }
 
@@ -1266,10 +1261,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         /**
          * Evaluate the value of a LHHA related to this control.
          *
-         * @param propertyContext       current context
          * @return                      string containing the result of the evaluation, null if evaluation failed
          */
-        private String doEvaluateValue(PropertyContext propertyContext) {
+        private String doEvaluateValue() {
 
             final XFormsControl control = XFormsControl.this;
 
@@ -1278,8 +1272,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             if (lhhaAnalysis.isLocal()) {
                 // LHHA is direct child of control, evaluate within context
                 contextStack.setBinding(control);
-                contextStack.pushBinding(propertyContext, lhhaElement, control.effectiveId, control.getChildElementScope(lhhaElement));
-                value = XFormsUtils.getElementValue(propertyContext, control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
+                contextStack.pushBinding(lhhaElement, control.effectiveId, control.getChildElementScope(lhhaElement));
+                value = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
                 contextStack.popBinding();
             } else {
                 // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
@@ -1290,7 +1284,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 final String contextEffectiveId;
                 if (contextStaticId == null) {
                     // Assume we are at the top-level
-                    contextStack.resetBindingContext(propertyContext);
+                    contextStack.resetBindingContext();
                     contextEffectiveId = control.container.getFirstControlEffectiveId();
                 } else {
                     // Not at top-level, find containing object
@@ -1305,8 +1299,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                 if (contextEffectiveId != null) {
                     // Push binding relative to context established above and evaluate
-                    contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, control.getResolutionScope());
-                    value = XFormsUtils.getElementValue(propertyContext, control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
+                    contextStack.pushBinding(lhhaElement, contextEffectiveId, control.getResolutionScope());
+                    value = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
                     contextStack.popBinding();
                 } else {
                     // Do as if there was no LHHA
@@ -1460,11 +1454,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         boolean added = false;
         {
-            final String labelValue1 = isNewlyVisibleSubtree ? null : control1.getLabel(pipelineContext);
-            final String labelValue2 = control2.getLabel(pipelineContext);
+            final String labelValue1 = isNewlyVisibleSubtree ? null : control1.getLabel();
+            final String labelValue2 = control2.getLabel();
 
             if (!XFormsUtils.compareStrings(labelValue1, labelValue2)) {
-                final String escapedLabelValue2 = control2.getEscapedLabel(pipelineContext);
+                final String escapedLabelValue2 = control2.getEscapedLabel();
                 final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
                 added |= addOrAppendToAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
             }

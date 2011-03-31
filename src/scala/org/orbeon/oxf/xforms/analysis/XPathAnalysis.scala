@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.util.PropertyContext
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xforms.MapSet
 
@@ -48,7 +47,7 @@ abstract class XPathAnalysis {
      */
     def combine(other: XPathAnalysis): XPathAnalysis
 
-    def toXML(propertyContext: PropertyContext , helper: ContentHandlerHelper)
+    def toXML(helper: ContentHandlerHelper)
 
     def freeTransientState() = ()
 }
@@ -70,7 +69,7 @@ object XPathAnalysis {
         val returnablePaths = MapSet.empty[String, String]
         val valueDependentPaths = MapSet.empty[String, String]
 
-        def toXML(propertyContext: PropertyContext, helper: ContentHandlerHelper) =
+        def toXML(helper: ContentHandlerHelper) =
             helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
     }
 

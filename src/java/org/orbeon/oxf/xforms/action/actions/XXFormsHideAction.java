@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -31,26 +30,26 @@ import org.orbeon.saxon.om.Item;
  */
 public class XXFormsHideAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve attribute as AVTs
-        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog");
+        final String dialogStaticId = actionInterpreter.resolveAVT(actionElement, "dialog");
         if (dialogStaticId == null) {
             // TODO: Should we try to find the dialog containing the action, of the dialog containing the observer or the target causing this event?
         }
 
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-close event to dialog
-            final Object controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, dialogStaticId);
+            final Object controlObject = actionInterpreter.resolveEffectiveControl(actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, targetDialog);
-                addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
-                targetDialog.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
+                addContextAttributes(actionInterpreter, actionElement, newEvent);
+                targetDialog.getXBLContainer(containingDocument).dispatchEvent(newEvent);
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())

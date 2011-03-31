@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -38,7 +37,7 @@ public class XFormsInsertAction extends XFormsAction {
 
     public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -51,7 +50,7 @@ public class XFormsInsertAction extends XFormsAction {
         final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
 
         // Extension: allow position to be an AVT
-        final String resolvedPositionAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "position");
+        final String resolvedPositionAttribute = actionInterpreter.resolveAVT(actionElement, "position");
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
@@ -105,7 +104,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                 // origin attribute in the insert context."
 
-                originObjects = actionInterpreter.evaluateExpression(propertyContext, actionElement,
+                originObjects = actionInterpreter.evaluateExpression(actionElement,
                         Collections.singletonList((Item) insertContextItem), 1, originAttribute);
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
@@ -132,7 +131,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // position is 1."
 
                 // "b. The return value is processed according to the rules of the XPath function round()"
-                final String insertionIndexString = actionInterpreter.evaluateStringExpression(propertyContext,
+                final String insertionIndexString = actionInterpreter.evaluateStringExpression(
                         actionElement, collectionToBeUpdated, 1, "round(" + atAttribute + ")");
 
                 // "c. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
@@ -152,11 +151,11 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(propertyContext, containingDocument, indentedLogger, resolvedPositionAttribute, collectionToBeUpdated,
+        doInsert(containingDocument, indentedLogger, resolvedPositionAttribute, collectionToBeUpdated,
                 (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
     }
 
-    public static List doInsert(PropertyContext propertyContext, XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
+    public static List doInsert(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
                                 List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
@@ -412,7 +411,7 @@ public class XFormsInsertAction extends XFormsAction {
                 insertedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
             }
 
-            modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
+            modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(
                     new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
                             positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes));
 

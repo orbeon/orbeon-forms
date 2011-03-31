@@ -14,6 +14,7 @@
 package org.orbeon.oxf.proxy;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
@@ -42,53 +43,59 @@ public class ProxyServiceBean extends SessionBeanAdapter {
 
         try {
             // Create processor
-            Context jndiContext = new InitialContext();
-            org.orbeon.oxf.pipeline.api.PipelineContext pipelineContext = new org.orbeon.oxf.pipeline.api.PipelineContext();
-            pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
-            Processor processor = ProcessorFactoryRegistry.lookup(jndiName).createInstance();
+            final Context jndiContext = new InitialContext();
+            final PipelineContext pipelineContext = new PipelineContext();
+            boolean success = false;
+            try {
+                pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
+                final Processor processor = ProcessorFactoryRegistry.lookup(jndiName).createInstance();
 
-            // Connect inputs
-            for (Iterator i = inputs.keySet().iterator(); i.hasNext();) {
-                String inputName = (String) i.next();
-                List inputsForName = (List) inputs.get(inputName);
-                for (Iterator j = inputsForName.iterator(); j.hasNext();) {
-                    SAXStore saxStore = (SAXStore) j.next();
-                    SAXStoreGenerator generator = new SAXStoreGenerator(saxStore);
-                    PipelineUtils.connect(generator, ProcessorImpl.INPUT_DATA, processor, inputName);
+                // Connect inputs
+                for (Iterator i = inputs.keySet().iterator(); i.hasNext();) {
+                    final String inputName = (String) i.next();
+                    final List inputsForName = (List) inputs.get(inputName);
+                    for (Iterator j = inputsForName.iterator(); j.hasNext();) {
+                        final SAXStore saxStore = (SAXStore) j.next();
+                        final SAXStoreGenerator generator = new SAXStoreGenerator(saxStore);
+                        PipelineUtils.connect(generator, ProcessorImpl.INPUT_DATA, processor, inputName);
+                    }
                 }
-            }
 
-            // Connect outputs
-            Map outputs = new HashMap();
-            List serializers = new ArrayList();
-            for (Iterator i = processor.getOutputsInfo().iterator(); i.hasNext();) {
-                ProcessorInputOutputInfo outputInfo = (ProcessorInputOutputInfo) i.next();
+                // Connect outputs
+                final Map outputs = new HashMap();
+                final List serializers = new ArrayList();
+                for (Iterator i = processor.getOutputsInfo().iterator(); i.hasNext();) {
+                    final ProcessorInputOutputInfo outputInfo = (ProcessorInputOutputInfo) i.next();
 
-                // Save SAX Store in outputs
-                SAXStoreSerializer saxStoreSerializer = new SAXStoreSerializer();
-                List outputsForName = (List) outputs.get(outputInfo.getName());
-                if (outputsForName == null) {
-                    outputsForName = new ArrayList();
-                    outputs.put(outputInfo.getName(), outputsForName);
+                    // Save SAX Store in outputs
+                    final SAXStoreSerializer saxStoreSerializer = new SAXStoreSerializer();
+                    List outputsForName = (List) outputs.get(outputInfo.getName());
+                    if (outputsForName == null) {
+                        outputsForName = new ArrayList();
+                        outputs.put(outputInfo.getName(), outputsForName);
+                    }
+                    outputsForName.add(saxStoreSerializer.getSAXStore());
+
+                    // Connect serializer
+                    PipelineUtils.connect(processor, outputInfo.getName(), saxStoreSerializer, ProcessorImpl.INPUT_DATA);
+                    serializers.add(saxStoreSerializer);
                 }
-                outputsForName.add(saxStoreSerializer.getSAXStore());
 
-                // Connect serializer
-                PipelineUtils.connect(processor, outputInfo.getName(), saxStoreSerializer, ProcessorImpl.INPUT_DATA);
-                serializers.add(saxStoreSerializer);
-            }
-
-            // Run serializers or start processor
-            if (serializers.size() > 0) {
-                for (Iterator i = serializers.iterator(); i.hasNext();) {
-                    SAXStoreSerializer serializer = (SAXStoreSerializer) i.next();
-                    serializer.start(pipelineContext);
+                // Run serializers or start processor
+                if (serializers.size() > 0) {
+                    for (Iterator i = serializers.iterator(); i.hasNext();) {
+                        final SAXStoreSerializer serializer = (SAXStoreSerializer) i.next();
+                        serializer.start(pipelineContext);
+                    }
+                } else {
+                    processor.start(pipelineContext);
                 }
-            } else {
-                processor.start(pipelineContext);
-            }
+                success = true;
 
-            return outputs;
+                return outputs;
+            } finally {
+                pipelineContext.destroy(success);
+            }
 
         } catch (NamingException e) {
             throw new OXFException(e);

@@ -42,7 +42,7 @@ public class EXistStateStoreTest extends ResourceManagerTestBase {
     public void beforeTest() {
 
         pipelineContext = createPipelineContextWithExternalContext();
-        externalContext = (ExtendedTestExternalContext) NetUtils.getExternalContext(pipelineContext);
+        externalContext = (ExtendedTestExternalContext) NetUtils.getExternalContext();
 
         stateStore = EXistStateStore.instance(externalContext);
 

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -32,7 +31,7 @@ import org.orbeon.saxon.om.Item;
  */
 public class XFormsSetfocusAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
+    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -45,13 +44,13 @@ public class XFormsSetfocusAction extends XFormsAction {
         final String resolvedControlStaticOrEffectiveId;
         {
             // Resolve AVT
-            resolvedControlStaticOrEffectiveId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, controlIdAttributeValue);
+            resolvedControlStaticOrEffectiveId = actionInterpreter.resolveAVTProvideValue(actionElement, controlIdAttributeValue);
             if (resolvedControlStaticOrEffectiveId == null)
                 return;
         }
 
         // "This XForms Action begins by invoking the deferred update behavior."
-        containingDocument.synchronizeAndRefresh(propertyContext);
+        containingDocument.synchronizeAndRefresh();
 
         // Find control
         final Object controlObject;
@@ -61,11 +60,11 @@ public class XFormsSetfocusAction extends XFormsAction {
             controlObject = containingDocument.getObjectByEffectiveId(resolvedControlStaticOrEffectiveId);
         } else {
             // Resolve using static id
-            controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, resolvedControlStaticOrEffectiveId);
+            controlObject = actionInterpreter.resolveEffectiveControl(actionElement, resolvedControlStaticOrEffectiveId);
         }
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
-            containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, (XFormsControl) controlObject));
+            containingDocument.dispatchEvent(new XFormsFocusEvent(containingDocument, (XFormsControl) controlObject));
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

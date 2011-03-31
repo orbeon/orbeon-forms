@@ -18,7 +18,6 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -75,7 +74,7 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue(PropertyContext propertyContext) {
+    protected void evaluateExternalValue() {
 
         assert isRelevant();
 
@@ -97,20 +96,20 @@ public class XFormsInputControl extends XFormsValueControl {
             } else {
                 // Other types
                 // For now, format only if the format attribute is present
-                updatedValue = (format != null) ?  getValueUseFormat(propertyContext, format) : internalValue;
+                updatedValue = (format != null) ?  getValueUseFormat(format) : internalValue;
             }
         } else {
             // No type, format if the format attribute is present
-            updatedValue = (format != null) ?  getValueUseFormat(propertyContext, format) : internalValue;
+            updatedValue = (format != null) ?  getValueUseFormat(format) : internalValue;
         }
 
         setExternalValue(updatedValue);
     }
 
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
+    public void storeExternalValue(String value, String type) {
         // Store after converting
-        super.storeExternalValue(propertyContext, convertFromExternalValue(propertyContext, value), type);
+        super.storeExternalValue(convertFromExternalValue(value), type);
 
         // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
         if (format != null) {
@@ -119,7 +118,7 @@ public class XFormsInputControl extends XFormsValueControl {
         }
     }
 
-    private String convertFromExternalValue(PropertyContext propertyContext, String externalValue) {
+    private String convertFromExternalValue(String externalValue) {
         final String typeName = getBuiltinTypeName();
         if (typeName != null) {
             if (typeName.equals("boolean")) {
@@ -165,21 +164,21 @@ public class XFormsInputControl extends XFormsValueControl {
                         externalValue = parse(matcher, DATE_PARSE_PATTERNS, datePart) + 'T' + parse(matcher, TIME_PARSE_PATTERNS, timePart);
                     }
                 } else {
-                    externalValue = convertFromExternalValueUseUnformat(propertyContext, externalValue);
+                    externalValue = convertFromExternalValueUseUnformat(externalValue);
                 }
             } else {
-                externalValue = convertFromExternalValueUseUnformat(propertyContext, externalValue);
+                externalValue = convertFromExternalValueUseUnformat(externalValue);
             }
         } else {
-            externalValue = convertFromExternalValueUseUnformat(propertyContext, externalValue);
+            externalValue = convertFromExternalValueUseUnformat(externalValue);
         }
 
         return externalValue;
     }
 
-    private String convertFromExternalValueUseUnformat(PropertyContext propertyContext, String externalValue) {
+    private String convertFromExternalValueUseUnformat(String externalValue) {
         if (unformat != null) {
-            final String result = evaluateAsString(propertyContext, unformat, Collections.<Item>singletonList(StringValue.makeStringValue(externalValue)), 1);
+            final String result = evaluateAsString(unformat, Collections.<Item>singletonList(StringValue.makeStringValue(externalValue)), 1);
             return (result != null) ? result : externalValue;
         } else {
             return externalValue;
@@ -433,7 +432,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
             } else {
                 // Regular case, use external value
-                result = getExternalValue(pipelineContext);
+                result = getExternalValue();
             }
         } else {
             result = null;
@@ -476,7 +475,7 @@ public class XFormsInputControl extends XFormsValueControl {
      * @return                  formatted value
      */
     public String getReadonlyValueUseFormat(PipelineContext pipelineContext) {
-        return isRelevant() ? getValueUseFormat(pipelineContext, format) : null;
+        return isRelevant() ? getValueUseFormat(format) : null;
     }
 
     private String formatSubValue(PipelineContext pipelineContext, String valueType, String value) {
@@ -495,7 +494,7 @@ public class XFormsInputControl extends XFormsValueControl {
                             + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
                             + "', 'en', (), ()) else $v";
 
-            return evaluateAsString(pipelineContext, boundItem, xpathExpression, FORMAT_NAMESPACE_MAPPING, variables);
+            return evaluateAsString(boundItem, xpathExpression, FORMAT_NAMESPACE_MAPPING, variables);
         }
     }
 

@@ -83,8 +83,6 @@
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml" xxi:omit-xml-base="true"/>
     </xhtml:head>
     <xhtml:body>
-        <xi:include href="oxf:/forms/orbeon/builder/form/dialog-metadata.xml" xxi:omit-xml-base="true"/>
-
         <xhtml:div id="fb-layout">
             <xhtml:div id="top1" class="fb-top">
                 <fr:logo/>
@@ -856,6 +854,9 @@
             </xhtml:div>
         </xhtml:div>
         <fr:dialogs>
+            <!-- Metadata editor -->
+            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-metadata.xml" xxi:omit-xml-base="true"/>
+
             <!-- Dialog to view the source -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-view-source.xml" xxi:omit-xml-base="true"/>
 

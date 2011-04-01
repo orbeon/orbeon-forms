@@ -175,12 +175,7 @@
             <xforms:action ev:event="xforms-submit">
                 <!-- Copy form -->
                 <xforms:insert nodeset="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fr-form-instance')"/>
-                <!-- Insert in-scope components -->
-                <!-- TODO: only insert components which are actually used! -->
-                <xforms:insert nodeset="instance('fr-form-to-publish-instance')/xhtml:head/*"
-                               origin="xxforms:instance('fb-components-instance')/xbl:xbl[xbl:binding]"/>
-                <!-- Remove bindings that don't have a template as those will cause issues if they map to xforms:* -->
-                <xforms:delete nodeset="instance('fr-form-to-publish-instance')/xhtml:head/xbl:xbl/xbl:binding[not(xbl:template)]"/>
+                <!-- NOTE: We used to embed all XBL components here. This is not desirable in most cases so we don't do it anymore. -->
             </xforms:action>
 
             <!-- Clean-up after submission -->

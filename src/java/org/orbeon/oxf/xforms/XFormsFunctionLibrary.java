@@ -393,10 +393,13 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:pending-uploads()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}pending-uploads", XXFormsPendingUploads.class, 0, 0, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}pending-uploads", XXFormsPendingUploads.class, 0, 0, 0, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
 
         // xxforms:document-id()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}document-id", XXFormsDocumentId.class, 0, 0, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}document-id", XXFormsDocumentId.class, 0, 0, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+
+        // xxforms:document
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}create-document", XXFormsCreateDocument.class, 0, 0, 0, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
 
         // === Functions in the xforms namespace
 

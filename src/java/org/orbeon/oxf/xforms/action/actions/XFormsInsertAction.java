@@ -87,7 +87,8 @@ public class XFormsInsertAction extends XFormsAction {
 
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
-        if (contextAttribute != null && isEmptyNodesetBinding && !XFormsUtils.isElement(insertContextItem)) {
+        // NOTE: In addition we support inserting into a context which is a document node
+        if (contextAttribute != null && isEmptyNodesetBinding && !XFormsUtils.isElement(insertContextItem) && !XFormsUtils.isDocument(insertContextItem)) {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;
@@ -106,7 +107,6 @@ public class XFormsInsertAction extends XFormsAction {
 
                 originObjects = actionInterpreter.evaluateExpression(propertyContext, actionElement,
                         Collections.singletonList((Item) insertContextItem), 1, originAttribute);
-                //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originObjects.size() == 0) {
@@ -220,7 +220,6 @@ public class XFormsInsertAction extends XFormsAction {
                         // This is an extension: support sequences containing other items
 
                         // Convert the result to a text node
-//                            final String stringValue = ((Item) currentObject).getStringValue();
                         final String stringValue = currentObject.toString(); // we get String, Long, etc.
                         final Text textNode = Dom4jUtils.createText(stringValue);
 
@@ -301,14 +300,6 @@ public class XFormsInsertAction extends XFormsAction {
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
 
-//                if (insertLocationNode.getNodeType() != clonedNode.getNodeType()) {
-//                    // "2. If the node type of the cloned node does not match the node type of the insert location
-//                    // node, then the target location is before the first child or attribute of the insert location
-//                    // node, based on the node type of the cloned node."
-//
-//                    doInsert(insertLocationNode, clonedNode);
-//                } else {
-
             final Document insertLocationNodeDocument = insertLocationNode.getDocument();
             if (insertLocationNodeDocument != null && insertLocationNodeDocument.getRootElement() == insertLocationNode) {
 
@@ -352,7 +343,6 @@ public class XFormsInsertAction extends XFormsAction {
                             // Attribute has a value which is different from "after"
                             if (indentedLogger.isInfoEnabled())
                                 indentedLogger.logWarning("xforms:insert", "invalid position attribute, defaulting to \"after\"", "value", positionAttribute);
-    //                        throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
                         }
                     }
 
@@ -387,7 +377,6 @@ public class XFormsInsertAction extends XFormsAction {
                         Dom4jUtils.normalizeTextNodes(parentNode);
                 }
             }
-//                }
         }
 
         // Whether some nodes were inserted
@@ -416,15 +405,6 @@ public class XFormsInsertAction extends XFormsAction {
             final List<Item> insertedNodeInfos;
             if (didInsertNodes) {
                 final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
-//                if (modifiedInstance != null) {
-                    // If we have an instance, we also have a wrapper
-//                    documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
-//                } else {
-//                    // Otherwise, hard to get to the wrapper, so create a new one
-//                    final Document insertDocument = ((Node) insertedNodes.get(0)).getDocument();
-//                    documentWrapper = new DocumentWrapper(insertDocument, null, xpathConfiguration);
-//                }
-
                 insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());
                 for (Object insertedNode: insertedNodes)
                     insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
@@ -448,7 +428,6 @@ public class XFormsInsertAction extends XFormsAction {
             // Insert inside an element
             final Element insertContextElement = (Element) insertionNode;
 
-//            int attributeIndex = 0;
             int otherNodeIndex = 0;
             for (Node clonedNode: clonedNodes) {
 

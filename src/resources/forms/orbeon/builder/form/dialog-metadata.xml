@@ -1,0 +1,132 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-editor-metadata-dialog" close="false">
+
+    <xforms:label value="$form-resources/messages/metadata-title"/>
+
+    <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
+    <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
+    <xhtml:div>
+        <xforms:group appearance="xxforms:internal" ref="instance('fb-metadata-instance')">
+
+            <!-- IE warning -->
+            <xforms:group ref=".[xxforms:instance('fr-parameters-instance')/mode = 'new' and instance('fb-user-agent-instance')/is-ie = 'true' and instance('fb-user-agent-instance')/is-supported-ie != 'true']">
+                <xhtml:div class="fb-ie-warning">
+                    It appears that you are using Internet Explorer 6 or earlier. Form Builder is
+                    likely not working properly with this browser. We recommend you upgrade
+                    to Internet Explorer 8 or newer, or use
+                    <a href="http://www.google.com/chrome">Google Chrome</a>,
+                    <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                    <a href="http://www.apple.com/safari/">Safari</a>, or
+                    <a href="http://www.opera.com/">Opera</a>.
+                    If we made a mistake and you are not using Internet Explorer 6 or earlier, please
+                    <a href="mailto:info@orbeon.com?subject=Form Builder Internet Explorer Version">let us know</a>.
+                </xhtml:div>
+            </xforms:group>
+
+            <xhtml:p>
+                <!-- Display message to user -->
+                <xforms:output value="if ($is-new-form)
+                                      then $form-resources/messages/new-metadata-output
+                                      else $form-resources/messages/edit-metadata-output"/>
+            </xhtml:p>
+            <xhtml:img src="/forms/orbeon/builder/images/label_64.png"/>
+            <xhtml:div class="fb-editor-metadata-dialog-fields">
+                <!-- Application name -->
+
+                <!-- Use an input if app name is a wildcard -->
+                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                <xforms:group ref=".[$is-input]">
+                    <xforms:input ref="application-name" id="fb-application-name-input" tabindex="1" xxforms:autocomplete="off">
+                        <xforms:label ref="$form-resources/application-name/label"/>
+                        <xforms:hint ref="$form-resources/application-name/hint"/>
+                        <xforms:alert ref="$form-resources/application-name/alert"/>
+                    </xforms:input>
+                </xforms:group>
+                <!-- Otherwise list apps allowed -->
+                <xforms:group ref=".[not($is-input)]">
+                    <xforms:select1 ref="application-name">
+                        <xforms:label ref="$form-resources/application-name/label"/>
+                        <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
+                            <xforms:label ref="@name"/>
+                            <xforms:value ref="@name"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xforms:group>
+
+                <!-- Form name -->
+                <xforms:input ref="form-name" id="fb-form-name-input" tabindex="2" xxforms:autocomplete="off">
+                    <xforms:label ref="$form-resources/form-name/label"/>
+                    <xforms:hint ref="$form-resources/form-name/hint"/>
+                    <xforms:alert ref="$form-resources/form-name/alert"/>
+                </xforms:input>
+            </xhtml:div>
+            <xhtml:div class="fr-separator"/>
+            <xhtml:div class="fb-editor-metadata-dialog-buttons">
+                <xhtml:div class="fr-buttons">
+                    <fr:button id="fb-metadata-continue-trigger" tabindex="3">
+                        <xforms:label value="$form-resources/continue/label"/>
+                    </fr:button>
+                    <fr:button tabindex="4">
+                        <xforms:label value="$form-resources/cancel/label"/>
+                        <!-- Hide this dialog or go to the summary page -->
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:load if="$is-new-form" resource="summary"/>
+                            <xxforms:hide if="not($is-new-form)" ev:event="DOMActivate" dialog="fb-editor-metadata-dialog"/>
+                        </xforms:action>
+                    </fr:button>
+                </xhtml:div>
+                <xhtml:div class="fr-clear"/>
+            </xhtml:div>
+
+            <!-- Event handler for 2 field and button -->
+            <xforms:action ev:target="fb-application-name-input fb-form-name-input fb-metadata-continue-trigger"
+                           ev:event="DOMActivate" if="xxforms:valid(instance('fb-metadata-instance'), true())">
+                <!-- Copy data to main instance -->
+                <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="instance('fb-metadata-instance')/application-name"/>
+                <xforms:setvalue ref="xxforms:bind('form-name-bind')" value="instance('fb-metadata-instance')/form-name"/>
+                <!-- Update providers -->
+                <xforms:dispatch name="fr-update-persistence-provider" target="fr-persistence-model"/>
+                <!-- Refresh components -->
+                <xforms:send submission="fb-load-components"/>
+                <!-- Hide this dialog -->
+                <xxforms:hide dialog="fb-editor-metadata-dialog"/>
+                <!-- Redo layout -->
+                <xxforms:script>
+                    var layout = YAHOO.widget.Layout.getLayoutById("fb-layout");
+                    layout.set('height', YAHOO.util.Dom.getViewportHeight());
+                    layout.set('width', YAHOO.util.Dom.getViewportWidth());
+                    <!-- This seems necessary w/ IE 7 -->
+                    YAHOO.util.Dom.setStyle("left1", "display", "block");
+                    YAHOO.util.Dom.setStyle("center1", "display", "block");
+                    layout.resize();
+                </xxforms:script>
+            </xforms:action>
+
+            <!-- Stop value change propagation so changes in this section of the form don't cause data
+                 to become dirty in fr-persistence-model -->
+            <xforms:action ev:event="xforms-value-changed" ev:propagate="stop"/>
+        </xforms:group>
+    </xhtml:div>
+</xxforms:dialog>

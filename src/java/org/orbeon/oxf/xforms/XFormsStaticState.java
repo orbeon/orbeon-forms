@@ -971,9 +971,20 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                                 // Specially handle #document static id for top-level handlers
                                 ancestorObserverStaticId = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID;
                             } else {
+                                // Can this happen?
                                 ancestorObserverStaticId = null;
                             }
                         }
+
+                        // ancestorObserverStaticId should not be null! Right now it can be if handlers
+                        // are found within a control with binding (e.g. under fr:tabview/fr:tab). The content has
+                        // not been annotated, so ids are missing. See TODO above.
+                        //
+                        // We might want to check for handlers as we process controls anyway. This would allow
+                        // control over exactly which handlers we look at, and to ignore the content of bound nodes.
+                        //
+                        // See: [ #315922 ] Event handler nested within bound node causes errors
+                        // http://forge.ow2.org/tracker/index.php?func=detail&aid=315922&group_id=168&atid=350207
 
                         // The observers to which this handler is attached might not be in the same scope. Try to find
                         // that scope.

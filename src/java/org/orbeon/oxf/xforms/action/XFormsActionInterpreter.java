@@ -66,8 +66,8 @@ public class XFormsActionInterpreter {
             // Initialize context stack based on container context (based on local models if any)
             container.getContextStack().resetBindingContext();
             actionBlockContextStack = new XFormsContextStack(container, container.getContextStack().getCurrentBindingContext());
-        } else if (eventObserver == containingDocument || containingDocument.getEffectiveId().equals(ancestorObserverStaticId)) {
-            // Observer or ancestor is the containing document itself
+        } else if (containingDocument.getEffectiveId().equals(ancestorObserverStaticId)) {
+            // Ancestor is the containing document itself
 
             // Since we are at the top-level, the effective id of the action is the same as its static id
             outerActionElementEffectiveId = getActionStaticId(outerActionElement);

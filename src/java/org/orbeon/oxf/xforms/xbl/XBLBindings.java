@@ -30,10 +30,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
@@ -357,6 +354,9 @@ public class XBLBindings {
                 topLevelScopeMap.put(id, id);
                 prefixedIdToXBLScopeMap.put(id, TOP_LEVEL_SCOPE);
             }
+
+            // Add top-level
+            prefixedIdToXBLScopeMap.put(XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID, TOP_LEVEL_SCOPE);
 
             // Tell top-level static id generator to stop t check for duplicate ids
             metadata.idGenerator.setCheckDuplicates(false);

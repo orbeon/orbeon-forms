@@ -17,7 +17,6 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:script src="/xbl/orbeon/number/number.js"/>
-    <xbl:script src="/xbl/orbeon/currency/currency.js"/>
     <xbl:binding id="fr-currency" element="fr|currency">
 
         <!-- Orbeon Form Builder Component Metadata -->
@@ -39,7 +38,7 @@
                 </fr:currency>
             </template>
         </metadata>
-        
+
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/currency/currency.css"/>
         </xbl:resources>

@@ -22,7 +22,7 @@
     <xsl:function name="xxbl:parameter">
         <xsl:param name="context" as="element()"/>
         <xsl:param name="property" as="xs:string"/>
-        
+
         <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
         <xsl:variable name="namespace" select="namespace-uri($context)"/>
         <xsl:variable name="component" select="local-name($context)"/>
@@ -40,13 +40,13 @@
                 </xxforms:variable>
                 <xforms:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
                     <xxforms:script ev:event="xforms-value-changed">
-                        <xsl:text>YAHOO.xbl.</xsl:text>
+                        <xsl:text>ORBEON.xforms.XBL.callValueChanged("</xsl:text>
                         <xsl:value-of select="$prefix"/>
-                        <xsl:text>.</xsl:text>
+                        <xsl:text>", "</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($component)"/>
-                        <xsl:text>.instance(this).parameter</xsl:text>
+                        <xsl:text>", "</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($property)"/>
-                        <xsl:text>Changed();</xsl:text>
+                        <xsl:text>");</xsl:text>
                     </xxforms:script>
                 </xforms:input>
             </xsl:when>

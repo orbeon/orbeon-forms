@@ -58,8 +58,8 @@
                             <!-- Clear submission result -->
                             <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
                             <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
-                                <xxforms:context name="fb:app" select="$metadata-instance/application-name"/>
-                                <xxforms:context name="fb:form" select="$metadata-instance/form-name"/>
+                                <xxforms:context name="fb:app" value="$metadata-instance/application-name"/>
+                                <xxforms:context name="fb:form" value="$metadata-instance/form-name"/>
                             </xforms:dispatch>
                         </xforms:action>
                     </fr:button>
@@ -79,7 +79,7 @@
                     <xforms:output value="$form-resources/messages/publish-success"/>
                 </xhtml:p>
                 <!-- Display response content if present -->
-                <xxforms:variable name="response" model="fr-publish-model" select="instance('fr-publish-form-submission-response')" as="element()"/>
+                <xxforms:variable name="response" model="fr-publish-model" value="instance('fr-publish-form-submission-response')" as="element()"/>
                 <xforms:group ref=".[normalize-space($response) != '']">
                     <xhtml:div class="fb-publish-message">
                         <xforms:output value="$response" mediatype="text/html"/>
@@ -141,13 +141,16 @@
 
     <!-- Local model -->
     <xforms:model id="fr-publish-model">
+
+        <xxforms:variable name="body" value="xxforms:instance('fr-form-instance')/xhtml:body/fr:view/fr:body"/>
+        
         <!-- Publish form operation -->
         <xforms:action ev:event="fr-publish-form">
             <!-- TODO: must also publish attachments! and make sure URLs are relative (?) -->
             <!-- Determine the URI of the collection to deploy to -->
             <xforms:send submission="fr-publish-form-submission">
-                <xxforms:context name="fb:app" select="event('fb:app')"/>
-                <xxforms:context name="fb:form" select="event('fb:form')"/>
+                <xxforms:context name="fb:app" value="event('fb:app')"/>
+                <xxforms:context name="fb:form" value="event('fb:form')"/>
             </xforms:send>
         </xforms:action>
 
@@ -174,14 +177,33 @@
             <!-- See also model.xml -->
             <xforms:action ev:event="xforms-submit">
                 <!-- Copy form -->
-                <xforms:insert nodeset="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fr-form-instance')"/>
+                <xforms:insert ref="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fr-form-instance')"/>
+                <!-- Embed only XBL for section templates that are in use -->
                 <!-- NOTE: We used to embed all XBL components here. This is not desirable in most cases so we don't do it anymore. -->
+                <xxforms:variable name="available-section-xbl" as="element(xbl:xbl)*"
+                                  value="xxforms:instance('fb-components-instance')/xbl:xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component']]"/>
+
+                <xxforms:variable name="possible-section-element-qnames" as="xs:Qname*"
+                                  value="for $e in $body/fr:section/* return QName(namespace-uri($e), name($e))"/>
+
+                <xxforms:variable name="xbl-to-insert" as="document-node()" value="xxforms:create-document()"/>
+
+                <xforms:insert context="$xbl-to-insert"
+                               origin="$available-section-xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component'
+                                            and resolve-QName(translate(@element, '|', ':'), .) = $possible-section-element-qnames]]"/>
+
+                <!-- Keep only bindings in use -->
+                <xforms:delete ref="$xbl-to-insert/xbl:xbl/xbl:binding[not(tokenize(@class, '\s+') = 'fr-section-component')
+                                        or not(resolve-QName(translate(@element, '|', ':'), .) = $possible-section-element-qnames)]"/>
+
+                <xforms:insert ref="instance('fr-form-to-publish-instance')/xhtml:head/*" origin="$xbl-to-insert"/>
+
             </xforms:action>
 
             <!-- Clean-up after submission -->
             <xforms:action ev:event="xforms-submit-done xforms-submit-error">
                 <!-- Remove form content in order to save memory -->
-                <xforms:insert nodeset="instance('fr-form-to-publish-instance')" origin="xxforms:element('dummy')"/>
+                <xforms:insert ref="instance('fr-form-to-publish-instance')" origin="xxforms:element('dummy')"/>
             </xforms:action>
 
             <!--<xforms:message ev:event="xforms-submit">-->

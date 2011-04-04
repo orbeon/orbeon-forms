@@ -1029,4 +1029,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         if (!hasState(pipelineContext))
             setState(pipelineContext, new XSLTTransformerState());
     }
+
+    @Override
+    public void reset(PipelineContext pipelineContext) {
+        setState(pipelineContext, new XSLTTransformerState());
+    }
 }

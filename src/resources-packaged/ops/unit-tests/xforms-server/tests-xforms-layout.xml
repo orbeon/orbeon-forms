@@ -327,7 +327,7 @@
             </controls>
         </output>
     </test>
-    
+
     <test description="Old layout for xforms:select1[@appearance = 'minimal']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
@@ -429,7 +429,7 @@
             </controls>
         </output>
     </test>
-    
+
     <test description="Old layout for xforms:output" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
@@ -1907,7 +1907,7 @@
             </controls>
         </output>
     </test>
-    
+
     <test description="Old layout for xforms:select1[@appearance = 'full']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
@@ -2500,7 +2500,6 @@
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/slider/slider-min.js"/>
                 <xh:script src="/xbl/orbeon/number/number.js"/>
-                <xh:script src="/xbl/orbeon/currency/currency.js"/>
             </xh:head>
         </output>
     </test>

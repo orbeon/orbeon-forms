@@ -3909,6 +3909,7 @@ ORBEON.xforms.XBL = {
 
     /**
      * To be documented on Wiki.
+     * TODO: cssClass isn't used anymore and should most likely be removed as a parameter and remove in every call to declareClass().
      */
     declareClass: function(xblClass, cssClass) {
         var doNothingSingleton = null;
@@ -3921,8 +3922,8 @@ ORBEON.xforms.XBL = {
             // Get the top-level element in the HTML DOM corresponding to this control
             var container = target == null || ! YAHOO.util.Dom.inDocument(target, document)
                 ? null
-                : (YAHOO.util.Dom.hasClass(target, cssClass) ? target
-                    : YAHOO.util.Dom.getAncestorByClassName(target, cssClass));
+                : (YAHOO.util.Dom.hasClass(target, "xbl-component") ? target
+                    : YAHOO.util.Dom.getAncestorByClassName(target, "xbl-component"));
 
             // The first time instance() is called for this class, override init() on the class object
             // to make sure that the init method is not called more than once
@@ -3976,6 +3977,15 @@ ORBEON.xforms.XBL = {
                 return instance;
             }
         };
+    },
+
+    callValueChanged: function(prefix, component, property) {
+        var partial = YAHOO.xbl;                                    if (partial == null) return;
+        partial = partial[prefix];                                  if (partial == null) return;
+        partial = partial[component];                               if (partial == null) return;
+        partial = partial.instance(this);                           if (partial == null) return;
+        var method = partial["parameter" + property + "Changed"];   if (method == null) return;
+        partial.method();
     },
 
     componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)

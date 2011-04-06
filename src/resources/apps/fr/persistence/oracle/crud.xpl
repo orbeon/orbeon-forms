@@ -22,6 +22,8 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:f="http//www.orbeon.com/function"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <p:param type="input" name="instance"/>
@@ -94,7 +96,7 @@
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
-        <p:output name="data" id="request-description" debug="request-description"/>
+        <p:output name="data" id="request-description"/>
     </p:processor>
 
     <p:processor name="oxf:null-serializer">
@@ -284,6 +286,7 @@
                 <!-- PUT -->
                 <p:when test="/*/method = 'PUT'">
 
+                    <!-- Store data -->
                     <p:processor name="oxf:sql">
                         <p:input name="data" href="#request-description"/>
                         <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
@@ -374,6 +377,109 @@
                         </p:input>
                     </p:processor>
 
+                    <!-- For form data, create materialized view -->
+                    <p:choose href="#request-description">
+                        <p:when test="/request/type = 'form' and /request/filename = 'form.xhtml'">
+                            <p:processor name="oxf:unsafe-xslt">
+                                <p:input name="data" href="#request-description"/>
+                                <p:input name="config">
+                                    <xsl:stylesheet version="2.0">
+                                        <xsl:import href="sql-utils.xsl"/>
+                                        <xsl:template match="/">
+
+                                            <!-- Compute materialized view name -->
+                                            <!-- NOTE: Max name length is 30. -12 for "orbeon_flat_", leaves 18, or 8 for the app name, 9 for the form name -->
+                                            <xsl:variable name="mv-name" select="concat('orbeon_flat_', f:xml-to-sql-id(/request/app, 8), '_', f:xml-to-sql-id(/request/form, 9))"/>
+
+                                            <!-- SQL to drop possibly existing materialized view -->
+                                            <xsl:result-document href="output:drop-sql">
+                                                <xsl:call-template name="update-wrapper">
+                                                    <xsl:with-param name="sql">
+                                                        begin
+                                                            <!-- Drop table catching exception, as Oracle doesn't have a "create or replace materialized view" -->
+                                                            <!-- NOTE: Use "execute immediate", as Oracle doesn't like DDL in PL/SQL -->
+                                                            execute immediate 'drop materialized view <xsl:value-of select="$mv-name"/>';
+                                                        exception
+                                                            <!-- Ignore code -12003, which means the materialized view didn't exist -->
+                                                            when others then if sqlcode != -12003 then raise; end if;
+                                                        end;
+                                                    </xsl:with-param>
+                                                </xsl:call-template>
+                                            </xsl:result-document>
+
+                                            <!-- SQL to create materialized view -->
+                                            <xsl:result-document href="output:create-sql">
+                                                <xsl:call-template name="update-wrapper">
+                                                    <xsl:with-param name="sql">
+                                                        create materialized view <xsl:value-of select="$mv-name"/> as
+                                                        select
+                                                            <!-- Go over sections -->
+                                                            <xsl:for-each select="/request/document//fr:section">
+                                                                <xsl:variable name="section-position" select="position()"/>
+                                                                <xsl:variable name="section-id" as="xs:string" select="replace(@id, '(.*)-section', '$1')"/>
+                                                                <!-- Go over controls -->
+                                                                <xsl:for-each select=".//*[exists(@bind)]">
+                                                                    <xsl:variable name="control-position" select="position()"/>
+                                                                    <xsl:variable name="control-id" as="xs:string" select="replace(@id, '(.*)-control', '$1')"/>
+                                                                    <!-- Add coma if this is not the first column -->
+                                                                    <xsl:if test="$section-position != 1 or $control-position != 1">, </xsl:if>
+                                                                    <!-- Extract value /*/section/control -->
+                                                                    extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql($section-id)"/>/<xsl:value-of select="($control-id)"/>')
+                                                                    <!-- Name of the resulting column (total must not be longer than 30 characters) -->
+                                                                    <xsl:value-of select="f:xml-to-sql-id($section-id, 14)"/>_<xsl:value-of select="f:xml-to-sql-id($control-id, 14)"/>
+                                                                </xsl:for-each>
+                                                            </xsl:for-each>
+                                                        from orbeon_form_data data,
+                                                            (
+                                                                select max(last_modified) last_modified, app, form, document_id
+                                                                from orbeon_form_data
+                                                                where
+                                                                    <!-- NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations -->
+                                                                    app = '<xsl:value-of select="f:escape-sql(/request/app)"/>'
+                                                                    and form = '<xsl:value-of select="f:escape-sql(/request/form)"/>'
+                                                                group by app, form, document_id
+                                                            ) latest
+                                                        where
+                                                            data.last_modified = latest.last_modified
+                                                            and data.app = latest.app
+                                                            and data.form = latest.form
+                                                            and data.document_id = latest.document_id
+                                                    </xsl:with-param>
+                                                </xsl:call-template>
+                                            </xsl:result-document>
+                                        </xsl:template>
+
+                                        <!-- Wrap an update statement in the SQL processor boilerplate -->
+                                        <xsl:template name="update-wrapper">
+                                            <xsl:param name="sql"/>
+                                            <sql:config>
+                                                <result>
+                                                    <sql:connection>
+                                                        <xsl:copy-of select="/request/sql:datasource"/>
+                                                        <sql:execute>
+                                                            <sql:update>
+                                                                <xsl:copy-of select="$sql"/>
+                                                            </sql:update>
+                                                        </sql:execute>
+                                                    </sql:connection>
+                                                </result>
+                                            </sql:config>
+                                        </xsl:template>
+                                    </xsl:stylesheet>
+                                </p:input>
+                                <p:output name="drop-sql" id="drop-sql"/>
+                                <p:output name="create-sql" id="create-sql"/>
+                            </p:processor>
+                            <p:processor name="oxf:sql">
+                                <p:input name="data"><dummy/></p:input>
+                                <p:input name="config" href="#drop-sql"/>
+                            </p:processor>
+                            <p:processor name="oxf:sql">
+                                <p:input name="data"><dummy/></p:input>
+                                <p:input name="config" href="#create-sql"/>
+                            </p:processor>
+                        </p:when>
+                    </p:choose>
                 </p:when>
             </p:choose>
 

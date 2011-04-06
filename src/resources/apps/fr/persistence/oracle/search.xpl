@@ -81,6 +81,7 @@
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
+                <xsl:import href="sql-utils.xsl"/>
                 <xsl:template match="/">
                     <sql:config>
                         <documents>
@@ -190,25 +191,6 @@
                         </documents>
                     </sql:config>
                 </xsl:template>
-                <xsl:function name="f:escape-lang">
-                    <xsl:param name="text" as="xs:string"/>
-                    <xsl:param name="lang" as="xs:string"/>
-                    <xsl:value-of select="replace($text, '\[@xml:lang = \$fb-lang\]', concat('[@xml:lang = ''', f:escape-sql($lang), ''']'))"/>
-                </xsl:function>
-                <xsl:function name="f:escape-sql">
-                    <xsl:param name="text" as="xs:string"/>
-                    <xsl:value-of select="replace($text, '''', '''''')"/>
-                </xsl:function>
-                <xsl:function name="f:namespaces">
-                    <xsl:param name="query" as="element(query)"/>
-                    <xsl:for-each select="in-scope-prefixes($query)">
-                        <xsl:text>xmlns:</xsl:text>
-                        <xsl:value-of select="."/>
-                        <xsl:text>="</xsl:text>
-                        <xsl:value-of select="namespace-uri-for-prefix(., $query)"/>
-                        <xsl:text>" </xsl:text>
-                    </xsl:for-each>
-                </xsl:function>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="sql-config"/>

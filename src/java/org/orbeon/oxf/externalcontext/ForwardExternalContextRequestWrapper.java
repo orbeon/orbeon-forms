@@ -87,26 +87,28 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
          * the JSESSIONID cookie is enough while in other cases this leads to a 401 is unclear.
          */
         {
+            // NOTE: Make sure header names are normalized to lowercase in headerValuesMap
             this.headerValuesMap = new LinkedHashMap<String, String[]>();
 
             final Map<String, String[]> requestHeaderValuesMap = request.getHeaderValuesMap();
 
             // Handle headers to forward
             if (namesOfHeadersToForward != null) {
-                for (final String currentHeaderName: namesOfHeadersToForward) {
-                    final String[] v2 = requestHeaderValuesMap.get(currentHeaderName);
+                for (final String currentHeaderName : namesOfHeadersToForward) {
+                    final String currentHeaderNameLower = currentHeaderName.toLowerCase();
+                    final String[] v2 = requestHeaderValuesMap.get(currentHeaderNameLower);
                     if (v2 != null)
-                        headerValuesMap.put(currentHeaderName, v2);
+                        headerValuesMap.put(currentHeaderNameLower, v2);
                 }
             }
 
             // Handle custom headers. Those override existing headers if any.
             if (customHeaderNameValues != null) {
-                for (final Map.Entry currentEntry: customHeaderNameValues.entrySet()) {
-                    final String currentHeaderName = (String) currentEntry.getKey();
-                    final String[] currentHeaderValues = (String[]) currentEntry.getValue();
+                for (final Map.Entry<String, String[]> currentEntry : customHeaderNameValues.entrySet()) {
+                    final String currentHeaderNameLower = currentEntry.getKey().toLowerCase();
+                    final String[] currentHeaderValues = currentEntry.getValue();
 
-                    headerValuesMap.put(currentHeaderName, currentHeaderValues);
+                    headerValuesMap.put(currentHeaderNameLower, currentHeaderValues);
                 }
             }
         }

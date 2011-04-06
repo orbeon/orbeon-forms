@@ -182,7 +182,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         state.setFirstXMLReceiver(name, xmlReceiver);
                     }
 
-                    runTransformer(pipelineContext, outputReceiver, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
+                    runTransformer(pipelineContext, state, outputReceiver, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
                 } else {
                     // Transformation has run already, replay output
                     if (state.outputDocuments == null)
@@ -199,7 +199,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 }
             }
 
-            private void runTransformer(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, TemplatesInfo templatesInfo,
+            private void runTransformer(final PipelineContext pipelineContext, final XSLTTransformerState state, final XMLReceiver xmlReceiver, TemplatesInfo templatesInfo,
                                         Map<String, Boolean> attributes, final boolean dumbOutputLocation, final boolean smartOutputLocation) {
 
                 StringBuilderWriter saxonStringBuilderWriter = null;
@@ -236,8 +236,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                     }
                                 } else {
                                     // output:*
-                                    final XSLTTransformerState state = (XSLTTransformerState) getState(pipelineContext);
-
                                     final XMLReceiver outputReceiver;
                                     if (outputName.equals(state.firstOutputName)) {
                                         // Stream through first receiver
@@ -274,7 +272,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                     }
                                 } else {
                                     // output:*
-                                    final XSLTTransformerState state = (XSLTTransformerState) getState(pipelineContext);
                                     if (outputName.equals(state.firstOutputName)) {
                                         state.firstOutputName = null;
                                         state.firstXMLReceiver = null;

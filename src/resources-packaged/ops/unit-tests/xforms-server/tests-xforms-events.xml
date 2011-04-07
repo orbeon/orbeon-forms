@@ -2219,6 +2219,71 @@
         </output>
     </test>
 
+    <!-- TODO: make this pass once bug is fixed -->
+    <test description="[ #315922 ] Event handler nested within bound node causes errors" name="oxf:pipeline" exclude="true">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315922&group_id=168&atid=350207 -->
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="my-model">
+                                    <xforms:dispatch ev:event="xforms-model-construct-done" name="DOMActivate" targetid="my-button"/>
+                                </xforms:model>
+                                <xbl:xbl>
+                                    <xbl:binding element="fr|foo">
+                                        <xbl:template>
+                                            <xbl:content/>
+                                        </xbl:template>
+                                    </xbl:binding>
+                                </xbl:xbl>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <fr:foo id="my-foo">
+                                    <xhtml:div>
+                                        <!-- Handler is nested in XBL bound node and its parent XForms control doesn't have an id -->
+                                        <xforms:group>
+                                            <xforms:message ev:event="DOMActivate" ev:observer="my-button"/>
+                                        </xforms:group>
+                                    </xhtml:div>
+                                </fr:foo>
+
+                                <xforms:trigger id="my-button">
+                                    <xforms:label/>
+                                </xforms:trigger>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="my-model">
+                                <instance>new</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input" label="My Data">new</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

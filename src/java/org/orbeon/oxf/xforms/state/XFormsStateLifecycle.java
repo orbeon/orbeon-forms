@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.state;
 
+import org.dom4j.Document;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -21,17 +23,27 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
  * Represent the lifecycle of an XForms document from the point of view of state handling.
  */
 public interface XFormsStateLifecycle {
+
+    interface RequestParameters {
+        String getUUID();
+        String getEncodedClientStaticState();
+        String getEncodedClientDynamicState();
+    }
+
     String getClientEncodedStaticState(XFormsContainingDocument containingDocument);
     String getClientEncodedDynamicState(XFormsContainingDocument containingDocument);
     void afterInitialResponse(XFormsContainingDocument containingDocument);
 
-    XFormsContainingDocument findOrRestoreDocument(PipelineContext pipelineContext, String uuid, String encodedClientStaticState,
-                                                   String encodedClientDynamicState, boolean isInitialState);
+    RequestParameters extractParameters(Document request, boolean isInitialState);
+
+    XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState);
+
+    XFormsContainingDocument beforeUpdate(RequestParameters parameters);
     void beforeUpdateResponse(XFormsContainingDocument containingDocument, boolean ignoreSequence);
     void afterUpdateResponse(XFormsContainingDocument containingDocument);
-    void onUpdateError(XFormsContainingDocument containingDocument);
+    void afterUpdate(XFormsContainingDocument containingDocument, boolean keepDocument);
 
-    void onAdd(XFormsContainingDocument containingDocument);
-    void onRemove(XFormsContainingDocument containingDocument);
-    void onEvict(XFormsContainingDocument containingDocument);
+    void onAddedToCache(String uuid);
+    void onRemovedFromCache(String uuid);
+    void onEvictedFromCache(XFormsContainingDocument containingDocument);
 }

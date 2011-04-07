@@ -40,7 +40,7 @@
                 <xsl:template match="/">
                     <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                         <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
-                        <xsl:value-of select="context:putInSession(concat('oxf.xforms.state.manager.uuid-key.', $uuid), '')"/>
+                        <xsl:value-of select="manager:addDocumentToSession($uuid)" xmlns:manager="java:org.orbeon.oxf.xforms.state.XFormsStateManager"/>
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:sequence>1</xxforms:sequence>
                         <xxforms:static-state>

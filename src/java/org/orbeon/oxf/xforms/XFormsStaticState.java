@@ -153,11 +153,10 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
      * Create static state object from an encoded version. This constructor is used when restoring a static state from
      * a serialized form.
      *
-     * @param propertyContext       current context
      * @param staticStateDigest     digest of the static state if known
      * @param encodedStaticState    encoded static state (digest + serialized XML)
      */
-    public XFormsStaticState(PropertyContext propertyContext, String staticStateDigest, String encodedStaticState) {
+    public XFormsStaticState(String staticStateDigest, String encodedStaticState) {
 
         // Decode encodedStaticState into staticStateDocument
         final Document staticStateDocument = XFormsUtils.decodeXML(encodedStaticState);

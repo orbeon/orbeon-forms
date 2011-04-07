@@ -122,10 +122,8 @@
                         </xsl:document>
                     </xsl:variable>
 
-                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association.
-                         Set it here. -->
-                    <xsl:value-of select="context:putInSession(concat('oxf.xforms.state.manager.uuid-key.', $uuid), '')"
-                                  xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
+                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
+                    <xsl:value-of select="manager:addDocumentToSession($uuid)" xmlns:manager="java:org.orbeon.oxf.xforms.state.XFormsStateManager"/>
 
                     <xxforms:event-request>
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
@@ -161,9 +159,9 @@
                 <xsl:template match="/">
                     <xsl:variable name="dynamic-state" select="context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))" as="document-node()"/>
 
-                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association.
-                         Remove it here so as to not grow the session each time a submission is called. -->
-                    <xsl:value-of select="context:removeFromSession(concat('oxf.xforms.state.manager.uuid-key.', $dynamic-state/*/@uuid))"/>
+                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
+                    <!-- Remove it here so as to not grow the session each time a submission is called. -->
+                    <xsl:value-of select="manager:removeSessionDocument($dynamic-state/*/@uuid)" xmlns:manager="java:org.orbeon.oxf.xforms.state.XFormsStateManager"/>
                     
                     <!-- Copy out the last instance from the dynamic state -->
                     <xsl:copy-of select="saxon:parse($dynamic-state/dynamic-state/instances/instance[last()])"/>

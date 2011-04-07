@@ -22,7 +22,7 @@ public abstract class AttributesToMap<E> implements Map<String, E> {
 
     private Attributeable<E> attributeable;
 
-    public static interface Attributeable<E> {
+    public interface Attributeable<E> {
         E getAttribute(String key);
         Enumeration<String> getAttributeNames();
         void removeAttribute(String key);

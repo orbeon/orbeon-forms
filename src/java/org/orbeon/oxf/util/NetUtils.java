@@ -955,12 +955,24 @@ public class NetUtils {
     }
 
     /**
-     * Get the external context from the property context.
+     * Get the current external context.
      *
-     * @return                  external context if found, null otherwise
+     * @return  external context if found, null otherwise
      */
     public static ExternalContext getExternalContext() {
         return (ExternalContext) PipelineContext.get().getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    }
+
+    /**
+     * Get the current session.
+     *
+     * Can return null if the external context is not found or if the session doesn't exist and is not forced.
+     *
+     * @return  session if found, null otherwise
+     */
+    public static ExternalContext.Session getSession(boolean create) {
+        final ExternalContext externalContext = NetUtils.getExternalContext();
+        return (externalContext != null) ? NetUtils.getExternalContext().getSession(create) : null;
     }
 
     public static File renameAndExpireWithSession(String existingFileURI, final Logger logger) {

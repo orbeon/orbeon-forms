@@ -62,25 +62,23 @@ public class XFormsDocumentCache {
     }
 
     /**
-     * Find a document in the cache. If not found, return null.
-     *
+     * Find a document in the cache. If found, the document is removed from the cache. If not found, return null.
      *
      * @param uuid                  UUID used to search cache
      * @return                      document or null
      */
-    public XFormsContainingDocument getDocument(String uuid) {
+    public XFormsContainingDocument takeDocument(String uuid) {
         final InternalCacheKey cacheKey = createCacheKey(uuid);
-        // NOTE: We used to remove the document from the cache, but this is no longer needed now that we store by UUID.
-        return (XFormsContainingDocument) cache.findValid(cacheKey, CONSTANT_VALIDITY);
+        return (XFormsContainingDocument) cache.takeValid(cacheKey, CONSTANT_VALIDITY);
     }
 
     /**
      * Remove a document from the cache. This does not cause the document state to be serialized to store.
      *
-     * @param containingDocument    document to remove
+     * @param uuid  UUID used to search cache
      */
-    public void removeDocument(XFormsContainingDocument containingDocument) {
-        final InternalCacheKey cacheKey = createCacheKey(containingDocument.getUUID());
+    public void removeDocument(String uuid) {
+        final InternalCacheKey cacheKey = createCacheKey(uuid);
         cache.remove(cacheKey);
     }
 

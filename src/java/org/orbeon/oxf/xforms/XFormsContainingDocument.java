@@ -54,6 +54,7 @@ import org.orbeon.saxon.om.Item;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Represents an XForms containing document.
@@ -95,7 +96,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             loggersMap.put(category, new IndentedLogger(globalLogger, globalLogger.isDebugEnabled() && debugConfig.contains(category), indentation, category));
         }
     }
-
 
     private String uuid;        // UUID of this document
     private long sequence = 1;  // sequence number of changes to this document
@@ -259,10 +259,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      *
      * Used by XFormsStateManager.
      *
-     * @param pipelineContext   current context
      * @param xformsState       XFormsState containing static and dynamic state
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
+    public XFormsContainingDocument(XFormsState xformsState) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
         // Create static state object
@@ -278,7 +277,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 } else {
                     // Not found static state in cache, create static state from input
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
-                    this.xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDigest, xformsState.getStaticState());
+                    this.xformsStaticState = new XFormsStaticState(staticStateDigest, xformsState.getStaticState());
 
                     // Store in cache
                     XFormsStaticStateCache.instance().storeDocument(this.xformsStaticState);
@@ -288,7 +287,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             } else {
                 // Not digest provided, create static state from input
                 indentedLogger.logDebug("", "did not find static state by digest in cache");
-                this.xformsStaticState = new XFormsStaticState(pipelineContext, null, xformsState.getStaticState());
+                this.xformsStaticState = new XFormsStaticState(null, xformsState.getStaticState());
 
                 assert this.xformsStaticState.isClientStateHandling();
             }
@@ -1392,20 +1391,33 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Called when this document is added to the document cache.
      */
     public void added() {
-        XFormsStateManager.instance().onAdd(this);
+        XFormsStateManager.instance().onAddedToCache(getUUID());
     }
 
     /**
      * Called when somebody explicitly removes this document from the document cache.
      */
     public void removed() {
-        XFormsStateManager.instance().onRemove(this);
+        // WARNING: This can be called while another threads owns this document lock
+        XFormsStateManager.instance().onRemovedFromCache(getUUID());
+    }
+
+    /**
+     * Called by the cache to check that we are ready to be evicted from cache.
+     *
+     * @return lock or null in case session just expired
+     */
+    public Lock getEvictionLock() {
+        return XFormsStateManager.getDocumentLock(getUUID());
     }
 
     /**
      * Called when cache expires this document from the document cache.
      */
     public void evicted() {
-        XFormsStateManager.instance().onEvict(this);
+        // WARNING: This could have been called while another threads owns this document lock, but the cache now obtains
+        // the lock on the document first and will not evict us if we have the lock. This means that this will be called
+        // only if no thread is dealing with this document.
+        XFormsStateManager.instance().onEvictedFromCache(this);
     }
 }

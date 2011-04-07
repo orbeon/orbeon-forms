@@ -20,8 +20,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 
 class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    @Test def testProxyURI = {
-        createPipelineContextWithExternalContext()
+    @Test def testProxyURI() {
 
         assert("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97" ===
             XFormsResourceServer.proxyURI("/foo/bar.png", null, null, -1, Collections.emptyMap()));

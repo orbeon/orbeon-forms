@@ -21,9 +21,10 @@ public interface Cache {
     void remove(CacheKey key);
     int removeAll();
     Object findValid(CacheKey key, Object validity);
+    Object takeValid(CacheKey key, Object validity);
     CacheEntry findAny( CacheKey key);
-    Iterator iterateCacheKeys();
-    Iterator iterateCacheObjects();
+    Iterator<CacheKey> iterateCacheKeys();
+    Iterator<Object> iterateCacheObjects();
     int getCurrentSize();
     int getMaxSize();
     void setMaxSize(int maxSize);

@@ -45,8 +45,6 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def setupDocument(xhtml: JDocument) {
         ResourceManagerTestBase.staticSetup()
 
-        createPipelineContextWithExternalContext()
-
         val staticState = XFormsStaticStateTest.getStaticState(xhtml)
         this.document = new XFormsContainingDocument(staticState, null, null, null)
 
@@ -55,7 +53,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     }
 
     def getControlValue(controlId: String) = getValueControl(controlId).getValue
-    def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue()
+    def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue
 
     def setControlValue(controlId: String, value: String) {
         // This stores the value without testing for readonly

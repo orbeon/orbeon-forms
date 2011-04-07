@@ -13,36 +13,24 @@
  */
 package org.orbeon.oxf.externalcontext;
 
-import org.dom4j.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTestBase {
 
-    private ExternalContext.Request request;
-
     @Before
-    public void setUp() throws Exception {
-
-        final PipelineContext pipelineContext = new PipelineContext();
-
-        final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/test/if-modified-since-request.xml", null);
-        final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
-        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
-        request = externalContext.getRequest();
+    public void setUp() {
+        createPipelineContextWithExternalContext("oxf:/org/orbeon/oxf/test/if-modified-since-request.xml");
     }
 
     @After
@@ -60,7 +48,7 @@ public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTes
             throw new OXFException(e);
         }
 
-        final ForwardExternalContextRequestWrapper wrapper = new ForwardExternalContextRequestWrapper(request,
+        final ForwardExternalContextRequestWrapper wrapper = new ForwardExternalContextRequestWrapper(NetUtils.getExternalContext().getRequest(),
                 "/orbeon", "/foobar?name1=value1a&name2=value2a&name3=value3", "post", "application/x-www-form-urlencoded",
                 messageBody, null, null);
 

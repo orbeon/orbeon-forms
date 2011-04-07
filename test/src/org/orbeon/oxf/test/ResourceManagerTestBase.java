@@ -14,6 +14,8 @@
 package org.orbeon.oxf.test;
 
 import org.dom4j.Document;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -50,6 +52,19 @@ public abstract class ResourceManagerTestBase {
             staticSetupDone  = true;
         }
 	}
+
+    private PipelineContext pipelineContext;
+
+    @Before
+    public void setUp() {
+        this.pipelineContext = createPipelineContextWithExternalContext();
+    }
+
+    @After
+    public void tearDown() {
+        if (pipelineContext != null)
+            pipelineContext.destroy(true);
+    }
  
     protected PipelineContext createPipelineContextWithExternalContext() {
         return createPipelineContextWithExternalContext("oxf:/org/orbeon/oxf/default-request.xml");

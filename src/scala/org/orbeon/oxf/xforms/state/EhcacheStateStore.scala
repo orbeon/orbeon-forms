@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.state
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import net.sf.ehcache.{Element => EhElement, _ }
 import config._
-import org.orbeon.oxf.util.PropertyContext
 import store.MemoryStoreEvictionPolicy
 import org.orbeon.oxf.xforms._
 

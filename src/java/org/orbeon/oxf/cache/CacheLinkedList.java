@@ -99,4 +99,25 @@ public class CacheLinkedList<E> implements Iterable<E> {
             }
         };
     }
+
+    public Iterator<E> reverseIterator() {
+        return new Iterator<E>() {
+
+            private ListEntry<E> currentEntry = listHeader.prev;
+
+            public boolean hasNext() {
+                return currentEntry != null && currentEntry.element != null;
+            }
+
+            public E next() {
+                final E result = currentEntry.element;
+                currentEntry = currentEntry.prev;
+                return result;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
 }

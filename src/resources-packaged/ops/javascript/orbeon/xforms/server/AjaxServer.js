@@ -67,6 +67,7 @@
                 formErrorPanel.errorTitleDiv.innerHTML = title;
                 formErrorPanel.errorDetailsDiv.innerHTML = details;
                 formErrorPanel.show();
+                formErrorPanel.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
                 formErrorPanel.center();
             }
         }

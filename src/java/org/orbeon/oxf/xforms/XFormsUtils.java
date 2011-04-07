@@ -1568,7 +1568,7 @@ public class XFormsUtils {
      * @return          value or null
      */
     public static String getBoundItemValue(Item boundItem) {
-        if (boundItem instanceof NodeInfo && XFormsUtils.isDocument(boundItem)) {
+        if (XFormsUtils.isDocument(boundItem)) {
             // As a special case, we sometimes allow binding to a document node, but consider the value is empty in this case
             return null;
         } else if (boundItem instanceof NodeInfo) {

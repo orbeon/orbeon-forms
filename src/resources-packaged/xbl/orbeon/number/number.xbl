@@ -48,7 +48,7 @@
                 </fr:number>
             </template>
         </metadata>
-        
+
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/number/number.css"/>
         </xbl:resources>
@@ -80,7 +80,7 @@
                             <!-- Access to parameters -->
                             <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'decimal-separator')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/> 
+                            <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/>
 
                             <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
                             <!--<xsl:copy-of select="xxbl:parameter(., 'picture')"/>-->
@@ -90,6 +90,7 @@
                             <!--<xforms:output value="$picture-string"/>-->
 
                             <!-- Access to XForms value and change event -->
+                            <!-- NEXT: Here it seems that if the value doesn't change, the xxforms:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
                             <xforms:input ref="$result" id="number-input" class="xbl-fr-number-xforms-input fr-hidden"
                                     xxforms:format="if (. castable as xs:decimal)
                                           then concat(normalize-space($prefix),

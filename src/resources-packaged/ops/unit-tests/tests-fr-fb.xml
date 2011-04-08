@@ -1,0 +1,98 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group description="Form Runner and Form Builder"
+       xmlns:p="http://www.orbeon.com/oxf/pipeline"
+       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+       xmlns:xforms="http://www.w3.org/2002/xforms"
+       xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <test description="Oracle view column names" name="oxf:xslt">
+        <input name="data">
+            <root>
+                <!-- "Normal" case, where we were right to be optimistic -->
+                <document>
+                    <fr:section id="personal-information">
+                        <xforms:input bind="" id="first-name"/>
+                        <xforms:input bind="" id="last-name"/>
+                        <xforms:input bind="" id="address"/>
+                    </fr:section>
+                    <fr:section id="company">
+                        <xforms:input bind="" id="name"/>
+                        <xforms:input bind="" id="industry"/>
+                    </fr:section>
+                </document>
+                <!-- Conflict because of combination -->
+                <document>
+                    <fr:section id="a">
+                        <xforms:input bind="" id="b-c"/>
+                    </fr:section>
+                    <fr:section id="a-b">
+                        <xforms:input bind="" id="c"/>
+                    </fr:section>
+                </document>
+                <!-- Conflict with metadata -->
+                <document>
+                    <fr:section id="metadata">
+                        <xforms:input bind="" id="document-id"/>
+                    </fr:section>
+                </document>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="2.0" xmlns:f="http//www.orbeon.com/function" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xsl:import href="/apps/fr/persistence/oracle/sql-utils.xsl"/>
+                <xsl:template match="/*">
+                    <xsl:copy><xsl:apply-templates/></xsl:copy>
+                </xsl:template>
+                <xsl:template match="document">
+                    <xsl:copy>
+                        <xsl:variable name="metadata-column" as="xs:string+" select="('document_id', 'created', 'last_modified', 'username')"/>
+                        <xsl:for-each select="f:document-to-paths-ids(., $metadata-column)">
+                            <xsl:element name="{if (position() mod 2 = 1) then 'path' else 'id'}">
+                                <xsl:value-of select="."/>
+                            </xsl:element>
+                        </xsl:for-each>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <root>
+                <document>
+                    <path>personal-information/first-name</path>
+                    <id>PERSONAL_INFOR_FIRST_NAME</id>
+                    <path>personal-information/last-name</path>
+                    <id>PERSONAL_INFOR_LAST_NAME</id>
+                    <path>personal-information/address</path>
+                    <id>PERSONAL_INFOR_ADDRESS</id>
+                    <path>company/name</path>
+                    <id>COMPANY_NAME</id>
+                    <path>company/industry</path>
+                    <id>COMPANY_INDUSTRY</id>
+                </document>
+                <document>
+                    <path>a/b-c</path>
+                    <id>001_A_B_C</id>
+                    <path>a-b/c</path>
+                    <id>002_A_B_C</id>
+                </document>
+                <document>
+                    <path>metadata/document-id</path>
+                    <id>001_METADATA_DOCUMENT_ID</id>
+                </document>
+            </root>
+        </output>
+    </test>
+</group>

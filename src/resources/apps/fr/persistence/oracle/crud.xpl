@@ -412,35 +412,17 @@
                                             <xsl:result-document href="output:create-sql">
                                                 <xsl:call-template name="update-wrapper">
                                                     <xsl:with-param name="sql">
-                                                        <!-- Compute sequence of tuples (path, column name) -->
-                                                        <!-- NOTE: For instance: personal-information/first-name, personal_infor_first_name, company/name, company_name, ... -->
-                                                        <!-- NOTE: Do this first in case (instead of inside the query) we need the column names multiple times -->
-                                                        <xsl:variable name="paths_ids" as="xs:string*">
-                                                            <!-- Go over sections -->
-                                                            <xsl:for-each select="/request/document//fr:section">
-                                                                <xsl:variable name="section-position" select="position()"/>
-                                                                <xsl:variable name="section-id" as="xs:string" select="replace(@id, '(.*)-section', '$1')"/>
-                                                                <!-- Go over controls -->
-                                                                <xsl:for-each select=".//*[exists(@bind)]">
-                                                                    <xsl:variable name="control-position" select="position()"/>
-                                                                    <xsl:variable name="control-id" as="xs:string" select="replace(@id, '(.*)-control', '$1')"/>
-                                                                    <!-- Extract value /*/section/control -->
-                                                                    <xsl:sequence select="concat(f:escape-sql($section-id), '/', $control-id)"/>
-                                                                    <!-- Name of the resulting column (total must not be longer than 30 characters) -->
-                                                                    <xsl:sequence select="concat(f:xml-to-sql-id($section-id, 14), '_', f:xml-to-sql-id($control-id, 14))"/>
-                                                                </xsl:for-each>
-                                                            </xsl:for-each>
-                                                        </xsl:variable>
-
+                                                        <xsl:variable name="metadata-column" as="xs:string+" select="('document_id', 'created', 'last_modified', 'username')"/>
+                                                        <xsl:variable name="paths-ids" as="xs:string*" select="f:document-to-paths-ids(/request/document, $metadata-column)"/>
                                                         create view <xsl:value-of select="$mv-name"/> as
                                                         select
-                                                            <!-- Metadata with -->
-                                                            document_id metadata_document_id, created metadata_created, last_modified metadata_last_modified, username metadata_username
+                                                            <!-- Metadata columns -->
+                                                            <xsl:value-of select="string-join(for $c in $metadata-column return concat($c, ' ', 'metadata_', $c), ', ')"/>
                                                             <!-- Columns corresponding to elements in the XML data -->
-                                                            <xsl:for-each select="1 to count($paths_ids) div 2">
+                                                            <xsl:for-each select="1 to count($paths-ids) div 2">
                                                                 <xsl:variable name="i" select="position()"/>
-                                                                , extractValue(xml, '/*/<xsl:value-of select="$paths_ids[$i * 2 - 1]"/>')
-                                                                "<xsl:value-of select="$paths_ids[$i * 2]"/>"
+                                                                , extractValue(xml, '/*/<xsl:value-of select="$paths-ids[$i * 2 - 1]"/>')
+                                                                "<xsl:value-of select="$paths-ids[$i * 2]"/>"
                                                             </xsl:for-each>
                                                         from (
                                                             select d.*, dense_rank() over (partition by document_id order by last_modified desc) as latest

@@ -54,7 +54,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
 
     @After
     public void tearDown() {
-        PipelineContext.get().destroy(true);
+        pipelineContext.destroy(true);
     }
 
     @Test

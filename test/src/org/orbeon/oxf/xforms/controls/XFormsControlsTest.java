@@ -11,10 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.test;
+package org.orbeon.oxf.xforms.controls;
 
 import org.dom4j.QName;
 import org.junit.Test;
+import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.xml.sax.helpers.AttributesImpl;

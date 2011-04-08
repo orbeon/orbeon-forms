@@ -199,7 +199,6 @@ class MemoryCacheTest extends AssertionsForJUnit {
         cache.add(Key("o1"), VALIDITY, o1)
         cache.add(Key("o2"), VALIDITY, o2)
 
-
         lock.lock()
         try {
             runInSeparateThread(() => cache.add(Key("o3"), VALIDITY, new AnyRef))
@@ -215,9 +214,10 @@ class MemoryCacheTest extends AssertionsForJUnit {
     }
 
     @Test def testIterators {
-        val cache = new MemoryCacheImpl("test", 10)
+        val size = 100
+        val cache = new MemoryCacheImpl("test", size)
 
-        val range = 1 to 3 toSeq
+        val range = 1 to size
         
         for (i <- range.reverse)
             cache.add(Key("o" + i), VALIDITY, i)

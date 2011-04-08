@@ -21,11 +21,12 @@
     <xsl:function name="f:xml-to-sql-id" as="xs:string">
         <xsl:param name="id" as="xs:string"/>
         <xsl:param name="max-length" as="xs:integer"/>
-        <xsl:variable name="r1" as="xs:string" select="substring(replace($id, '-', '_'), 1, $max-length)"/>
         <!-- Replace dash by underscore and truncate at max-length -->
-        <xsl:variable name="r" as="xs:string" select="substring(replace($id, '-', '_'), 1, $max-length)"/>
+        <xsl:variable name="r1" as="xs:string" select="substring(replace($id, '-', '_'), 1, $max-length)"/>
+        <!-- Make name upper case, as non-quoted name are uppercase by default -->
+        <xsl:variable name="r2" as="xs:string" select="upper-case($r1)"/>
         <!-- Remove trailing underscore, if there is one -->
-        <xsl:sequence select="replace($r, '(.*[^_]).*', '$1')"/>
+        <xsl:sequence select="replace($r2, '(.*[^_]).*', '$1')"/>
     </xsl:function>
 
     <xsl:function name="f:escape-lang">

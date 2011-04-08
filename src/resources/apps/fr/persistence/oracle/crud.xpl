@@ -398,10 +398,11 @@
                                                         begin
                                                             <!-- Drop table catching exception, as Oracle doesn't have a "create or replace materialized view" -->
                                                             <!-- NOTE: Use "execute immediate", as Oracle doesn't like DDL in PL/SQL -->
-                                                            execute immediate 'drop materialized view <xsl:value-of select="$mv-name"/>';
+                                                            execute immediate 'drop view <xsl:value-of select="$mv-name"/>';
                                                         exception
                                                             <!-- Ignore code -12003, which means the materialized view didn't exist -->
-                                                            when others then if sqlcode != -12003 then raise; end if;
+                                                            <!-- TODO: Change back code to -942 when we switch from views to materialized views -->
+                                                            when others then if sqlcode != -942 then raise; end if;
                                                         end;
                                                     </xsl:with-param>
                                                 </xsl:call-template>
@@ -411,8 +412,10 @@
                                             <xsl:result-document href="output:create-sql">
                                                 <xsl:call-template name="update-wrapper">
                                                     <xsl:with-param name="sql">
-                                                        create materialized view <xsl:value-of select="$mv-name"/> as
-                                                        select
+                                                        <!-- Compute sequence of tuples (path, column name) -->
+                                                        <!-- NOTE: For instance: personal-information/first-name, personal_infor_first_name, company/name, company_name, ... -->
+                                                        <!-- NOTE: Do this first in case (instead of inside the query) we need the column names multiple times -->
+                                                        <xsl:variable name="paths_ids" as="xs:string*">
                                                             <!-- Go over sections -->
                                                             <xsl:for-each select="/request/document//fr:section">
                                                                 <xsl:variable name="section-position" select="position()"/>
@@ -421,29 +424,33 @@
                                                                 <xsl:for-each select=".//*[exists(@bind)]">
                                                                     <xsl:variable name="control-position" select="position()"/>
                                                                     <xsl:variable name="control-id" as="xs:string" select="replace(@id, '(.*)-control', '$1')"/>
-                                                                    <!-- Add coma if this is not the first column -->
-                                                                    <xsl:if test="$section-position != 1 or $control-position != 1">, </xsl:if>
                                                                     <!-- Extract value /*/section/control -->
-                                                                    extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql($section-id)"/>/<xsl:value-of select="($control-id)"/>')
+                                                                    <xsl:sequence select="concat(f:escape-sql($section-id), '/', $control-id)"/>
                                                                     <!-- Name of the resulting column (total must not be longer than 30 characters) -->
-                                                                    <xsl:value-of select="f:xml-to-sql-id($section-id, 14)"/>_<xsl:value-of select="f:xml-to-sql-id($control-id, 14)"/>
+                                                                    <xsl:sequence select="concat(f:xml-to-sql-id($section-id, 14), '_', f:xml-to-sql-id($control-id, 14))"/>
                                                                 </xsl:for-each>
                                                             </xsl:for-each>
-                                                        from orbeon_form_data data,
-                                                            (
-                                                                select max(last_modified) last_modified, app, form, document_id
-                                                                from orbeon_form_data
-                                                                where
-                                                                    <!-- NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations -->
-                                                                    app = '<xsl:value-of select="f:escape-sql(/request/app)"/>'
-                                                                    and form = '<xsl:value-of select="f:escape-sql(/request/form)"/>'
-                                                                group by app, form, document_id
-                                                            ) latest
-                                                        where
-                                                            data.last_modified = latest.last_modified
-                                                            and data.app = latest.app
-                                                            and data.form = latest.form
-                                                            and data.document_id = latest.document_id
+                                                        </xsl:variable>
+
+                                                        create view <xsl:value-of select="$mv-name"/> as
+                                                        select
+                                                            <!-- Metadata with -->
+                                                            document_id metadata_document_id, created metadata_created, last_modified metadata_last_modified, username metadata_username
+                                                            <!-- Columns corresponding to elements in the XML data -->
+                                                            <xsl:for-each select="1 to count($paths_ids) div 2">
+                                                                <xsl:variable name="i" select="position()"/>
+                                                                , extractValue(xml, '/*/<xsl:value-of select="$paths_ids[$i * 2 - 1]"/>')
+                                                                "<xsl:value-of select="$paths_ids[$i * 2]"/>"
+                                                            </xsl:for-each>
+                                                        from (
+                                                            select d.*, dense_rank() over (partition by document_id order by last_modified desc) as latest
+                                                            from orbeon_form_data d
+                                                            where
+                                                                <!-- NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations -->
+                                                                app = '<xsl:value-of select="f:escape-sql(/request/app)"/>'
+                                                                and form = '<xsl:value-of select="f:escape-sql(/request/form)"/>'
+                                                            )
+                                                        where latest = 1 and deleted = 'N'
                                                     </xsl:with-param>
                                                 </xsl:call-template>
                                             </xsl:result-document>

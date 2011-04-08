@@ -25,6 +25,7 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.exist.exist-uri"                         value="/exist/rest/db/orbeon/fr"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                              value="/fr/service/oracle"/>
     <property as="xs:string"  name="oxf.fr.persistence.oracle.datasource"                       value="oracle"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.oracle.create-flat-view"                 value="false"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                               value="/fr/service/mysql"/>
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
 

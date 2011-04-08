@@ -36,7 +36,7 @@
                 <include>/request/request-path</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
-                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource']</include>
+                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource' or name = 'orbeon-create-flat-view']</include>
                 <include>/request/body</include>
             </config>
         </p:input>
@@ -93,6 +93,7 @@
                 </xsl:if>
                 <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+                <create-flat-view><xsl:value-of select="$request/headers/header[name = 'orbeon-create-flat-view']/value/string() treat as xs:string"/></create-flat-view>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
@@ -379,7 +380,7 @@
 
                     <!-- For form data, create materialized view -->
                     <p:choose href="#request-description">
-                        <p:when test="/request/type = 'form' and /request/filename = 'form.xhtml'">
+                        <p:when test="/request/type = 'form' and /request/filename = 'form.xhtml' and /request/create-flat-view = 'true'">
                             <p:processor name="oxf:unsafe-xslt">
                                 <p:input name="data" href="#request-description"/>
                                 <p:input name="config">

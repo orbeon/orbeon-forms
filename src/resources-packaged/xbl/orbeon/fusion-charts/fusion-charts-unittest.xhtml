@@ -26,27 +26,27 @@
             <xforms:instance id="instance">
                 <charts>
                     <column-3d>
-                        <chart caption="Yearly Sales" xAxisName="Month" yAxisName="Sales" numberPrefix="$">
-                            <set label="2007" value="1000000"/>
-                            <set label="2008" value="1500000"/>
-                            <set label="2009" value="2250000"/>
-                        </chart>
+                        <graph caption="Yearly Sales" xAxisName="Month" yAxisName="Sales" numberPrefix="$">
+                            <set name="2007" value="1000000"/>
+                            <set name="2008" value="1500000"/>
+                            <set name="2009" value="2250000"/>
+                        </graph>
                     </column-3d>
                     <doughnut-3d>
-                        <chart caption='Company Revenue' showPercentageValues='1'>
-                            <set label='Services' value='26' />
-                            <set label='Hardware' value='32' />
-                            <set label='Software' value='42' />
-                        </chart>
+                        <graph caption='Company Revenue' showPercentageValues='1'>
+                            <set name='Services' value='26' />
+                            <set name='Hardware' value='32' />
+                            <set name='Software' value='42' />
+                        </graph>
                     </doughnut-3d>
                 </charts>
             </xforms:instance>
 
-            <xforms:action ev:event="add-month" context="column-3d/chart">
+            <xforms:action ev:event="add-month" context="column-3d/graph">
                 <xforms:insert context="." origin="xxforms:attribute('animation', '0')"/>
                 <xxforms:variable name="current" select="set[last()]"/>
                 <xforms:insert nodeset="set"/>
-                <xforms:setvalue ref="set[last()]/@label" value="$current/@label + 1"/>
+                <xforms:setvalue ref="set[last()]/@name" value="$current/@name + 1"/>
                 <xforms:setvalue ref="set[last()]/@value" value="$current/@value * 1.5"/>
                 <xforms:dispatch if="10 > count(set)" name="add-month" target="my-model" delay="1000"/>
             </xforms:action>
@@ -60,7 +60,7 @@
     <xhtml:body>
         <xhtml:fieldset>
             <xhtml:legend>Column 3D</xhtml:legend>
-            <fr:fusion-charts ref="column-3d/chart" swf="FCF_Column3D" width="600" height="400"/>
+            <fr:fusion-charts ref="column-3d/graph" swf="Column3D" width="600" height="400"/>
             <fr:button>
                 <xforms:label>Show me the future</xforms:label>
                 <xforms:action ev:event="DOMActivate">
@@ -70,7 +70,7 @@
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Doughnut 3D</xhtml:legend>
-            <fr:fusion-charts ref="doughnut-3d/chart" swf="FCF_Doughnut2D" width="400" height="300"/>
+            <fr:fusion-charts ref="doughnut-3d/graph" swf="Doughnut2D" width="400" height="300"/>
         </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

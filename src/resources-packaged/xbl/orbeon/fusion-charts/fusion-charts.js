@@ -18,7 +18,7 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
 
     xmlSpan: null,
     xml: null,
-    fusionChart: null,
+    createChart: null,
 
     init: function() {
         // Get information from the DOM
@@ -34,10 +34,12 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         var height = ORBEON.xforms.Document.getValue(heightElement.id);
         var resourcesBaseURL = ORBEON.xforms.Globals.resourcesBaseURL[ORBEON.xforms.Controls.getForm(this.container).id];
         var pathToSwf = resourcesBaseURL + uriToSwf + "/" + swf + ".swf?registerWithJS=1";
-        this.fusionChart = new FusionCharts(pathToSwf, this.container.id + "-fusion", width, height, "0", "0");
-
+        this.createChart = function() {
+            var fusionChart = new FusionCharts(pathToSwf, this.container.id + "-fusion", width, height, "0", "0");
+            fusionChart.setDataXML(this.xml);
+            fusionChart.render(chartDiv.id);
+        };
         this.updateChart();
-        this.fusionChart.render(chartDiv.id);
         ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() { this.updateChart(); }, this, true);
     },
 
@@ -45,7 +47,8 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         var newXML = ORBEON.xforms.Document.getValue(this.xmlSpan.id);
         if (newXML != this.xml) {
             this.xml = newXML;
-            this.fusionChart.setDataXML(this.xml);
+            // Recreate the chart on every update, as setDataXML() on an existing chart doesn't work on the free version
+            this.createChart();
         }
     }
 };

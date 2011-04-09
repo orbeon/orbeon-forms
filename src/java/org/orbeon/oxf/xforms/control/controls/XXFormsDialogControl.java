@@ -166,9 +166,9 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 containingDocument.getControls().doPartialRefresh(this);
             }
 
-            // Automatically set focus on the dialog
-            // NOTE: Form author can override this with a setfocus on xxforms-dialog-open
-            getXBLContainer().dispatchEvent(new XFormsFocusEvent(containingDocument, this));
+            // NOTE: Focus handling now done in XXFormsShowAction, because upon xxforms-dialog-open the user can change
+            // the visibility of controls, for example with a <toggle>, which means that the control to focus on must
+            // be determined after xxforms-dialog-open has completed.
         }
     }
 

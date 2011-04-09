@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
@@ -56,9 +57,19 @@ public class XXFormsShowAction extends XFormsAction {
             final Object controlObject = actionInterpreter.resolveEffectiveControl(actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
+
+                // Remove focus if any
+                containingDocument.setClientFocusEffectiveControlId(null);
+
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, targetDialog, effectiveNeighborId, constrainToViewport);
                 addContextAttributes(actionInterpreter, actionElement, newEvent);
                 targetDialog.getXBLContainer(containingDocument).dispatchEvent(newEvent);
+
+                // Check if form author has set focus while dialog was opening, and if not focus on dialog
+                final String currentFocusEffectiveId = containingDocument.getClientFocusControlEffectiveId();
+                if (currentFocusEffectiveId == null && targetDialog.isVisible())
+                    targetDialog.getXBLContainer().dispatchEvent(new XFormsFocusEvent(containingDocument, targetDialog));
+
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())

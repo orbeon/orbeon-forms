@@ -57,7 +57,7 @@ class LiferayContext() extends CustomContext {
             override def getProperty(name: String) =
                 headers.get(name) map (_.head) getOrElse portletRequest.getProperty(name)
             override def getProperties(name: String) =
-                headers.get(name) map (_.toIterator: java.util.Enumeration[String]) getOrElse portletRequest.getProperties(name)
+                headers.get(name) map (n => asJavaEnumeration(n.iterator)) getOrElse portletRequest.getProperties(name)
         }
     }
 }

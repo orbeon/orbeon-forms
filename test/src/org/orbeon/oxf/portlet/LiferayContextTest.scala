@@ -26,17 +26,15 @@ class LiferayContextTest extends ResourceManagerTestBase with AssertionsForJUnit
         val request = new MockPortletRequest {
 
             val attributes = collection.mutable.Map[String, AnyRef](("a1" -> "v1"))
-            val properties = collection.mutable.Map(("p1" -> Array("v1a", "v1b")))
+            val properties = collection.mutable.Map(("p1" -> Seq("v1a", "v1b")))
 
             override def getAttribute(name: String) = attributes.get(name) orNull
             override def getAttributeNames = attributes.keysIterator
             override def setAttribute(name: String, value: AnyRef) { attributes += (name -> value) }
 
             override def getProperty(name: String) = properties.get(name) map (_.head) orNull
-            override def getProperties(name: String) = {
-                val result = properties.get(name) map (_.toIterator) getOrElse Iterator.empty
-                result
-            }
+            override def getProperties(name: String) =
+                asJavaEnumeration(properties.get(name) map (_.iterator) getOrElse Iterator.empty)
             override def getPropertyNames = properties.keysIterator
         }
 

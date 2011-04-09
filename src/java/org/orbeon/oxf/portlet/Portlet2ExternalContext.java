@@ -50,15 +50,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
     private class Request implements ExternalContext.Request {
 
-        private Request() {
-            if (customContext != null) {
-                try {
-                    customContext.amendRequest(portletRequest, this);
-                } catch (Exception e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
+        private Request() {}
 
         private String namespace = null;
 
@@ -693,7 +685,18 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest) {
         this(processorService, portletContext, initAttributesMap);
         this.pipelineContext = pipelineContext;
-        this.portletRequest = portletRequest;
+
+        // Wrap PortletRequest if needed
+        if (customContext != null) {
+            try {
+                this.portletRequest = customContext.amendRequest(portletRequest);
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        } else {
+            this.portletRequest = portletRequest;
+        }
+
         if (portletRequest instanceof ClientDataRequest)
             this.clientDataRequest = (ClientDataRequest) portletRequest;
     }

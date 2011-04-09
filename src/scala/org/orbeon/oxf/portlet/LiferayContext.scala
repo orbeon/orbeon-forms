@@ -14,33 +14,50 @@
 package org.orbeon.oxf.portlet
 
 import com.liferay.portal.util.PortalUtil
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import javax.portlet.PortletRequest
+import com.liferay.portal.model.User
+import javax.portlet.filter.PortletRequestWrapper
+import scala.collection.JavaConversions._
 
 /**
  * Custom context for Liferay.
  */
 class LiferayContext() extends CustomContext {
 
-    def amendRequest(portletRequest: PortletRequest, request: ExternalContext.Request) {
+    def amendRequest(portletRequest: PortletRequest): PortletRequest = {
         // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to
         // either userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the
         // user.
-        val user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(portletRequest))
-        if (user ne null) {
-            Map(
+        PortalUtil.getUser(PortalUtil.getHttpServletRequest(portletRequest)) match {
+            case user: User => amendRequest(portletRequest, user)
+            case _ => portletRequest
+        }
+    }
+
+    def amendRequest(portletRequest: PortletRequest, user: User): PortletRequest = {
+
+        val headers: Map[String, Array[String]] = for {
+            (name, value) <- Map(
                 ("email" -> user.getEmailAddress),
                 ("full-name" -> user.getFullName)
-            ) foreach {
-                case (name, value: String) =>
-                    // Store both as request attribute and header for convenience
-                    // Use the "dot" convention for request, and the "dash" convention for headers
-                    // Make sure headers names are in lowercase to facilitate comparisons
-                    val prefix = "orbeon.liferay.user."
-                    request.getAttributesMap.put(prefix + name toLowerCase, value)
-                    request.getHeaderValuesMap.put(prefix + value split "[.-]" mkString "-" toLowerCase, Array(value))
-                case _ =>
-            }
+            )
+            if value ne null
+        } yield {
+            val prefix = "orbeon.liferay.user."
+            // Store as request attribute with the "dot" convention
+            portletRequest.setAttribute(prefix + name toLowerCase, value)
+            // Return header tuple with header name in lowercase and with the "dash" convention
+            (prefix + name split "[.-]" mkString "-" toLowerCase, Array(value))
+        }
+
+        // Wrap incoming request and add to existing properties
+        new PortletRequestWrapper(portletRequest) {
+            override def getPropertyNames =
+                headers.keysIterator ++ portletRequest.getPropertyNames
+            override def getProperty(name: String) =
+                headers.get(name) map (_.head) getOrElse portletRequest.getProperty(name)
+            override def getProperties(name: String) =
+                headers.get(name) map (_.toIterator: java.util.Enumeration[String]) getOrElse portletRequest.getProperties(name)
         }
     }
 }

@@ -13,13 +13,11 @@
  */
 package org.orbeon.oxf.portlet;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-
 import javax.portlet.PortletRequest;
 
 /**
  * Interface for setting custom portlet context information depending on the portal.
  */
 public interface CustomContext {
-    public void amendRequest(PortletRequest portletRequest, ExternalContext.Request request) throws Exception;
+    public PortletRequest amendRequest(PortletRequest portletRequest) throws Exception;
 }

@@ -16,7 +16,7 @@ package org.orbeon.oxf.cache
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import java.util.concurrent.locks.{ReentrantLock, Lock}
-import java.util.concurrent.{Callable, Executors, ExecutorCompletionService}
+import scala.actors.Futures._
 import scala.collection.JavaConversions._
 
 class MemoryCacheTest extends AssertionsForJUnit {
@@ -34,11 +34,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
     case class Key(key: String) extends InternalCacheKey("test", key)
     val VALIDITY = 0L
 
-    implicit def functionToCallable[R](f: () => R): Callable[R] = new Callable[R] {
-        def call: R = f()
-    }
-
-    @Test def testFindKeepsInCache {
+    @Test def testFindKeepsInCache() {
         val cache = new MemoryCacheImpl("test", 1)
 
         val o1 = new MyCacheable(null)
@@ -56,7 +52,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 1)
     }
 
-    @Test def testTakeRemovesFromCache {
+    @Test def testTakeRemovesFromCache() {
         val cache = new MemoryCacheImpl("test", 1)
 
         val o1 = new MyCacheable(null)
@@ -74,7 +70,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testRemoveNotifies {
+    @Test def testRemoveNotifies() {
         val cache = new MemoryCacheImpl("test", 1)
 
         val o1 = new MyCacheable(null)
@@ -91,7 +87,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testRemoveAllNotifies {
+    @Test def testRemoveAllNotifies() {
         val cache = new MemoryCacheImpl("test", 1)
 
         val o1 = new MyCacheable(null)
@@ -108,7 +104,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testReduceSizeEvicts {
+    @Test def testReduceSizeEvicts() {
         val cache = new MemoryCacheImpl("test", 1)
 
         val o1 = new MyCacheable(null)
@@ -125,7 +121,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 0)
     }
 
-    @Test def testReduceSizeWithLock {
+    @Test def testReduceSizeWithLock() {
         val cache = new MemoryCacheImpl("test", 1)
         val lock = new ReentrantLock
 
@@ -138,7 +134,8 @@ class MemoryCacheTest extends AssertionsForJUnit {
         // Reduce size in other thread
         lock.lock()
         try {
-            runInSeparateThread(() => cache.setMaxSize(0))
+            // Run in separate thread and wait
+            future { cache.setMaxSize(0) } apply()
         } finally {
             lock.unlock()
         }
@@ -148,7 +145,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 1)
     }
 
-    @Test def testEvictedIfLockAvailable {
+    @Test def testEvictedIfLockAvailable() {
         val cache = new MemoryCacheImpl("test", 1)
 
         val o1 = new MyCacheable(new ReentrantLock)
@@ -163,7 +160,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 1)
     }
 
-    @Test def testNotEvictedIfLockUnavailable {
+    @Test def testNotEvictedIfLockUnavailable() {
         val cache = new MemoryCacheImpl("test", 1)
         val lock = new ReentrantLock
 
@@ -174,7 +171,8 @@ class MemoryCacheTest extends AssertionsForJUnit {
 
         lock.lock()
         try {
-            runInSeparateThread(() => cache.add(Key("o2"), VALIDITY, new AnyRef))
+            // Run in separate thread and wait
+            future { cache.add(Key("o2"), VALIDITY, new AnyRef) } apply()
         } finally {
             lock.unlock()
         }
@@ -184,7 +182,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 2)
     }
 
-    @Test def testNextToLastEvicted {
+    @Test def testNextToLastEvicted() {
         val cache = new MemoryCacheImpl("test", 2)
         val lock = new ReentrantLock
 
@@ -201,7 +199,8 @@ class MemoryCacheTest extends AssertionsForJUnit {
 
         lock.lock()
         try {
-            runInSeparateThread(() => cache.add(Key("o3"), VALIDITY, new AnyRef))
+            // Run in separate thread and wait
+            future { cache.add(Key("o3"), VALIDITY, new AnyRef) } apply()
         } finally {
             lock.unlock()
         }
@@ -213,7 +212,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
         assert(cache.getCurrentSize === 2)
     }
 
-    @Test def testIterators {
+    @Test def testIterators() {
         val size = 100
         val cache = new MemoryCacheImpl("test", size)
 
@@ -227,16 +226,5 @@ class MemoryCacheTest extends AssertionsForJUnit {
 
         assert(range === keysAsInts)
         assert(range === values)
-    }
-
-    private def runInSeparateThread(f: () => Unit) {
-        val threadPool = Executors.newSingleThreadExecutor
-        try {
-            val completionService = new ExecutorCompletionService[Unit](threadPool)
-            completionService.submit(f)
-            completionService.take
-        } finally {
-            threadPool.shutdown()
-        }
     }
 }

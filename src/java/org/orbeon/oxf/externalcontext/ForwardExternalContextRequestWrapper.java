@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Create an ExternalContext.Request useful for forwarding a request while simulating a server-side redirect.
@@ -126,7 +127,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
             {
                 // SRV.4.1: "Query string data is presented before post body data."
                 final Map<String, String[]> queryParameters = NetUtils.decodeQueryString(getQueryString(), false);
-                this.queryParameters = new HashMap<String, Object[]>(queryParameters.size());
+                this.queryParameters = new TreeMap<String, Object[]>();
                 for (Map.Entry<String, String[]> entry: queryParameters.entrySet()) {
                     this.queryParameters.put(entry.getKey(), StringConversions.stringArrayToObjectArray(entry.getValue()));
                 }

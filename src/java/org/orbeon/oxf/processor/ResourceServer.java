@@ -130,7 +130,7 @@ public class ResourceServer extends ProcessorImpl {
                                     final String coffeeString = NetUtils.readStreamAsString(coffeeReader);
                                     // TODO: do we need to handle compilation errors?
                                     String javascriptString = CoffeeScriptCompiler.compile(coffeeString, coffeePath, 0);
-                                    urlConnectionInputStream = new ByteArrayInputStream(javascriptString.getBytes(Charset.forName("UTF-8")));
+                                    urlConnectionInputStream = new ByteArrayInputStream(javascriptString.getBytes("UTF-8"));
                                 }
                             }
                         }

@@ -463,7 +463,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         {
             final Item.Label itemLabel = item.getLabel();
-            final boolean labelNonEmpty = itemLabel != null && !itemLabel.getLabel().isEmpty();// empty only for xforms|input:xxforms-type(xs:boolean)
+            final boolean labelNonEmpty = itemLabel != null && itemLabel.getLabel().length() != 0;// empty only for xforms|input:xxforms-type(xs:boolean)
             if (labelNonEmpty) {
                 reusableAttributes.clear();
                 outputLabelForStart(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", false);

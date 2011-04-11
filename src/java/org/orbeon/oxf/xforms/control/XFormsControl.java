@@ -1088,7 +1088,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         protected abstract void notifyOptimized();
         protected abstract T evaluateValue(PropertyContext propertyContext);
 
-        final public T getValue(PropertyContext propertyContext) {
+        public T getValue(PropertyContext propertyContext) {// NOTE: making this method final produces an AbstractMethodError with Java 5 (ok with Java 6)
             if (!isEvaluated) {
                 if (XFormsControl.this.isRelevant()) {
                     notifyCompute();

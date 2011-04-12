@@ -259,7 +259,15 @@ public class InitUtils {
             logger.info(logMessagePrefix + " - About to run processor: " +  processorDefinition.toString());
             final Processor processor = createProcessor(processorDefinition);
             final ExternalContext externalContext = (servletContext != null) ? new ServletContextExternalContext(servletContext, session) : null;
-            runProcessor(processor, externalContext, new PipelineContext(), logger);
+
+            boolean success = false;
+            final PipelineContext pipelineContext = new PipelineContext();
+            try {
+                runProcessor(processor, externalContext, pipelineContext, logger);
+                success = true;
+            } finally {
+                pipelineContext.destroy(success);
+            }
         }
         // Otherwise, just don't do anything
     }

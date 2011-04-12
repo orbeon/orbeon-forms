@@ -20,7 +20,6 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
@@ -960,7 +959,8 @@ public class NetUtils {
      * @return  external context if found, null otherwise
      */
     public static ExternalContext getExternalContext() {
-        return (ExternalContext) PipelineContext.get().getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final PipelineContext pipelineContext = PipelineContext.get();
+        return (pipelineContext != null) ? (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT) : null;
     }
 
     /**

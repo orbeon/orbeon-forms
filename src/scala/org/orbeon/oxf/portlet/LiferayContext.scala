@@ -14,10 +14,10 @@
 package org.orbeon.oxf.portlet
 
 import com.liferay.portal.util.PortalUtil
-import javax.portlet.PortletRequest
 import com.liferay.portal.model.User
-import javax.portlet.filter.PortletRequestWrapper
 import scala.collection.JavaConversions._
+import javax.portlet.filter._
+import javax.portlet._
 
 /**
  * Custom context for Liferay.
@@ -50,14 +50,22 @@ class LiferayContext() extends CustomContext {
             (prefix + name split "[.-]" mkString "-" toLowerCase, Array(value))
         }
 
-        // Wrap incoming request and add to existing properties
-        new PortletRequestWrapper(portletRequest) {
+        // Wrap incoming request depending on request type and add to existing properties
+        trait CustomProperties extends PortletRequestWrapper {
             override def getPropertyNames =
-                headers.keysIterator ++ portletRequest.getPropertyNames
+                headers.keysIterator ++ super.getPropertyNames
             override def getProperty(name: String) =
-                headers.get(name) map (_.head) getOrElse portletRequest.getProperty(name)
+                headers.get(name) map (_.head) getOrElse super.getProperty(name)
             override def getProperties(name: String) =
-                headers.get(name) map (n => asJavaEnumeration(n.iterator)) getOrElse portletRequest.getProperties(name)
+                headers.get(name) map (n => asJavaEnumeration(n.iterator)) getOrElse super.getProperties(name)
+        }
+
+        portletRequest match {
+            case r: RenderRequest => new RenderRequestWrapper(r) with CustomProperties
+            case r: ActionRequest => new ActionRequestWrapper(r) with CustomProperties
+            case r: ResourceRequest => new ResourceRequestWrapper(r) with CustomProperties
+            case r: EventRequest => new EventRequestWrapper(r) with CustomProperties
+            case r: PortletRequest => new PortletRequestWrapper(r) with CustomProperties
         }
     }
 }

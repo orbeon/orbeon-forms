@@ -82,7 +82,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     /**
      * Information about a document tied to the session.
      */
-    private static class SessionDocument {
+    private static class SessionDocument implements java.io.Serializable {
         public final Lock lock = new ReentrantLock();
         public final String uuid;
 
@@ -350,7 +350,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         lock.unlock();
     }
 
-    private static class RequestParametersImpl implements RequestParameters {
+    private static class RequestParametersImpl implements RequestParameters, java.io.Serializable {
         private final String uuid;
         private final String encodedClientStaticState;
         private final String encodedClientDynamicState;

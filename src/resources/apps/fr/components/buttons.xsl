@@ -150,7 +150,7 @@
     </xsl:template>
 
     <xsl:template match="fr:save-locally-button">
-        <fr:button id="save-locally-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+        <fr:button id="fr-save-locally-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-locally"/></xhtml:span>

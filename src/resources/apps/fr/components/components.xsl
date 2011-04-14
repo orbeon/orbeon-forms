@@ -267,7 +267,7 @@
         <!-- This model handles navigation functionality -->
         <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles import/export -->
-        <xsl:if test="$view-buttons = ('save-locally')">
+        <xsl:if test="$buttons = ('save-locally')">
             <xi:include href="oxf:/apps/fr/import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
         </xsl:if>
         <xsl:if test="$has-alfresco">

@@ -34,7 +34,7 @@
         <file-name>data</file-name>
     </xforms:instance>
 
-    <xforms:action ev:observer="save-locally-button" ev:event="DOMActivate">
+    <xforms:action ev:observer="fr-save-locally-button" ev:event="DOMActivate">
         <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
 
         <xxforms:variable name="fr-resources" model="fr-resources-model" select="$fr-fr-resources" as="element(resource)?"/>

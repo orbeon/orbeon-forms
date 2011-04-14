@@ -11,7 +11,7 @@
     <xforms:label ref="$fr-resources/import-export/dialog-title"/>
     <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/import-export/dialog-body/*, 'xml')"/>
     <xhtml:div class="fr-dialog-buttons">
-        <xforms:output mediatype="text/html" value="concat('&lt;a href=&quot;../../../service/import-export/serve?uuid=',
+        <xforms:output mediatype="text/html" value="concat('&lt;a href=&quot;../../service/import-export/serve?uuid=',
             xxforms:instance('fr-uuid'), '&amp;filename=',
             encode-for-uri(concat(xxforms:instance('fr-save-locally-file-name'), '.html')),
             '&quot; target=&quot;_blank&quot;&gt;', $fr-resources/import-export/link,'&lt;a&gt;')"/>

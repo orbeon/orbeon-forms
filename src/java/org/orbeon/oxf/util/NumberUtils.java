@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.saxon.om.FastStringBuffer;
-
 public class NumberUtils {
 
     private static final char digits[] = {
@@ -31,7 +29,7 @@ public class NumberUtils {
      * @return       hexadecimal representation
      */
     public static String toHexString(byte[] bytes) {
-        final FastStringBuffer sb = new FastStringBuffer(bytes.length * 2);
+        final StringBuilder sb = new StringBuilder(bytes.length * 2);
         for (int i = 0; i < bytes.length; i++) {
             sb.append(digits[(bytes[i] >> 4) & 0x0f]);
             sb.append(digits[bytes[i] & 0x0f]);
@@ -46,7 +44,7 @@ public class NumberUtils {
      * @return       hexadecimal representation
      */
     public static String toHexString(byte b) {
-        final FastStringBuffer sb = new FastStringBuffer(2);
+        final StringBuilder sb = new StringBuilder(2);
         sb.append(digits[(b >> 4) & 0x0f]);
         sb.append(digits[b & 0x0f]);
         return sb.toString();

@@ -20,7 +20,6 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.NamespaceSupport3;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -91,13 +90,13 @@ public class QNameConverter extends ProcessorImpl {
                                 if (config.replacePrefix == null) {
                                     newQName = qName;
                                 } else if (colonIndex == -1) {
-                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length() + 1);
+                                    final StringBuilder sb= new StringBuilder(config.replacePrefix.length() + qName.length() + 1);
                                     sb.append(config.replacePrefix);
                                     sb.append(':');
                                     sb.append(qName);
                                     newQName = sb.toString();
                                 } else {
-                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length());
+                                    final StringBuilder sb= new StringBuilder(config.replacePrefix.length() + qName.length());
                                     sb.append(config.replacePrefix);
                                     sb.append(qName.substring(colonIndex));
                                     newQName = sb.toString();
@@ -129,13 +128,13 @@ public class QNameConverter extends ProcessorImpl {
                                 if (config.replacePrefix == null) {
                                     newQName = qName;
                                 } else if (colonIndex == -1) {
-                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length() + 1);
+                                    final StringBuilder sb= new StringBuilder(config.replacePrefix.length() + qName.length() + 1);
                                     sb.append(config.replacePrefix);
                                     sb.append(':');
                                     sb.append(qName);
                                     newQName = sb.toString();
                                 } else {
-                                    final FastStringBuffer sb= new FastStringBuffer(config.replacePrefix.length() + qName.length());
+                                    final StringBuilder sb= new StringBuilder(config.replacePrefix.length() + qName.length());
                                     sb.append(config.replacePrefix);
                                     sb.append(qName.substring(colonIndex));
                                     newQName = sb.toString();

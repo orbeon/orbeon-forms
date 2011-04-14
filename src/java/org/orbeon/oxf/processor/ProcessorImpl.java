@@ -35,7 +35,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Document;
 
@@ -614,10 +613,10 @@ public abstract class ProcessorImpl implements Processor {
         }
 
         public String toString() {
-            FastStringBuffer result = null;
+            StringBuilder result = null;
             for (Processor processor: processors) {
                 if (result == null) {
-                    result = new FastStringBuffer(hash + ": [");
+                    result = new StringBuilder(hash + ": [");
                 } else {
                     result.append(", ");
                 }

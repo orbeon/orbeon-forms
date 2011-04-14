@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -430,7 +429,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         if (labelHintHelpAlertAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
 
-            final FastStringBuffer classes = new FastStringBuffer(30);
+            final StringBuilder classes = new StringBuilder(30);
 
             // Put user classes first if any
             if (labelHintHelpAlertAttributes != null) {

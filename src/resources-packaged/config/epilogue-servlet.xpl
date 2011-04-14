@@ -298,7 +298,7 @@
             </p:processor>
         </p:when>
         <!-- XSL-FO detection. Use the XSL-FO serializer -->
-        <p:when test="/fo:root">
+        <p:when test="p:property('oxf.epilogue.process-xslfo') and /fo:root">
             <p:processor name="oxf:xslfo-converter">
                 <p:input name="config"><config/></p:input>
                 <p:input name="data" href="#xformed-data"/>

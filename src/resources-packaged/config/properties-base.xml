@@ -55,6 +55,7 @@
     <property as="xs:anyURI"  name="oxf.epilogue.theme.renderer"                     value="oxf:/config/theme-plain.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.output-xhtml"                       value="false"/>
     <property as="xs:boolean" name="oxf.epilogue.renderer-rewrite"                   value="true"/>
+    <property as="xs:boolean" name="oxf.epilogue.process-xslfo"                      value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.process-svg"                        value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.embeddable"                         value="false"/>
 

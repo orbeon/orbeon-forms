@@ -117,7 +117,7 @@ object XFormsCompressor {
         private var closed = false
 
         // Override because default implementation calls def.close()
-        override def close: Unit =
+        override def close() =
             if (!closed) {
                 finish()
                 out.close()

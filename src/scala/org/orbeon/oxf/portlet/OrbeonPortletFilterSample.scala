@@ -14,7 +14,6 @@
 
 package org.orbeon.oxf.portlet
 
-
 import javax.portlet._
 
 /**

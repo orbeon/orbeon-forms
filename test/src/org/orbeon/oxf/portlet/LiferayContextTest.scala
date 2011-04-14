@@ -31,8 +31,8 @@ class LiferayContextTest extends ResourceManagerTestBase with AssertionsForJUnit
         val mockRequest = new PortletRequestWrapper(mock[PortletRequest]) {
 
             // Simulate existing attributes and properties
-            val attributes = collection.mutable.Map[String, AnyRef](("a1" -> "v1"))
-            val properties = collection.mutable.Map(("p1" -> Seq("v1a", "v1b")))
+            val attributes = collection.mutable.Map[String, AnyRef]("a1" -> "v1")
+            val properties = collection.mutable.Map("p1" -> Seq("v1a", "v1b"))
 
             // Attributes (read-write)
             override def getAttribute(name: String) = attributes.get(name) orNull
@@ -53,19 +53,19 @@ class LiferayContextTest extends ResourceManagerTestBase with AssertionsForJUnit
         val amendedRequest = (new LiferayContext).amendRequest(mockRequest, mockUser)
 
         val expectedAttributes = Map(
-            ("a1" -> "v1"),
-            ("orbeon.liferay.user.email" -> "test@orbeon.com"),
-            ("orbeon.liferay.user.full-name" -> "John Smith")
+            "a1" -> "v1",
+            "orbeon.liferay.user.email" -> "test@orbeon.com",
+            "orbeon.liferay.user.full-name" -> "John Smith"
         )
 
         val expectedProperties = Map(
-            ("p1" -> Seq("v1a", "v1b")),
-            ("orbeon-liferay-user-email" -> Seq("test@orbeon.com")),
-            ("orbeon-liferay-user-full-name" -> Seq("John Smith"))
+            "p1" -> Seq("v1a", "v1b"),
+            "orbeon-liferay-user-email" -> Seq("test@orbeon.com"),
+            "orbeon-liferay-user-full-name" -> Seq("John Smith")
         )
 
-        val actualAttributes = amendedRequest.getAttributeNames map (n => (n -> amendedRequest.getAttribute(n))) toMap
-        val actualProperties = amendedRequest.getPropertyNames map (n => (n -> amendedRequest.getProperties(n).toSeq)) toMap
+        val actualAttributes = amendedRequest.getAttributeNames map (n => n -> amendedRequest.getAttribute(n)) toMap
+        val actualProperties = amendedRequest.getPropertyNames map (n => n -> amendedRequest.getProperties(n).toSeq) toMap
 
         assert(expectedAttributes === actualAttributes)
         assert(expectedProperties === actualProperties)

@@ -1,0 +1,47 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner" >
+
+    <xh:head>
+        <xf:model id="model">
+            <xf:instance id="response" xxf:exclude-result-prefixes="#all">
+                <dummy/>
+            </xf:instance>
+            
+            <xf:instance id="first-uuid">
+                <uuid/>
+            </xf:instance>
+
+            <xf:submission id="request-submission" serialization="none" method="get" resource="/xforms-sandbox/service/uuid"
+                           replace="instance" instance="response" xxf:readonly="true" xxf:cache="true"/>
+
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:send submission="request-submission"/>
+                <xf:setvalue ref="instance('first-uuid')" value="instance('response')"/>
+            </xf:action>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+
+        <xf:submit submission="request-submission">
+            <xf:label>Submit</xf:label>
+        </xf:submit>
+
+        <xf:trigger>
+            <xf:label>Clear</xf:label>
+            <xxf:invalidate-instance ev:event="DOMActivate" resource="/xforms-sandbox/service/uuid"/>
+        </xf:trigger>
+
+        <xf:trigger>
+            <xf:label>Clear All</xf:label>
+            <xxf:invalidate-instances ev:event="DOMActivate" resource="/xforms-sandbox/service/uuid"/>
+        </xf:trigger>
+
+        <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
+
+    </xh:body>
+</xh:html>

@@ -14,9 +14,12 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -39,16 +42,21 @@ public class XXFormsInvalidateInstanceAction extends XFormsAction {
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
         final IndentedLogger indentedLogger = actionInterpreter.getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
 
+        // Resolve as service URL
+        // NOTE: BaseSubmission.getAbsoluteSubmissionURL() supports resource URLs and norewrite. Should we?
+        final String resolvedResourceURI = XFormsUtils.resolveServiceURL(actionInterpreter.getContainingDocument(), actionElement,
+                resourceURI, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+
         if (handleXIncludeString == null) {
             // No @xinclude attribute specified so remove all instances matching @resource
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resourceURI, null, true);
-            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resourceURI, null, false);
+            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resolvedResourceURI, null, true);
+            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resolvedResourceURI, null, false);
         } else {
             // Just remove instances matching both @resource and @xinclude
             final boolean handleXInclude = Boolean.valueOf(handleXIncludeString);
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resourceURI, null, handleXInclude);
+            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resolvedResourceURI, null, handleXInclude);
         }
     }
 }

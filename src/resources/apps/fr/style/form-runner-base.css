@@ -535,6 +535,7 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
     .fr-status-icons { display: none }
     .fr-footer { display: none }
     .fr-section-container .fr-section-open-close { display: none }
+    .xforms-loading-loading { display: none }
     /* Upload remove button */
     .xforms-upload-remove { display: none }
     /* Remove background attachment image */

@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -77,19 +75,19 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     }
 
     @Override
-    public String getHelp(PropertyContext propertyContext) {
+    public String getHelp() {
         // Don't bother letting superclass handle this
         return null;
     }
 
     @Override
-    public String getHint(PropertyContext propertyContext) {
+    public String getHint() {
         // Don't bother letting superclass handle this
         return null;
     }
 
     @Override
-    public String getAlert(PropertyContext propertyContext) {
+    public String getAlert() {
         // Don't bother letting superclass handle this
         return null;
     }
@@ -133,7 +131,7 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XFormsRepeatIterationControl))
             return false;
@@ -160,7 +158,7 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         assert attributesImpl.getLength() == 0;
 

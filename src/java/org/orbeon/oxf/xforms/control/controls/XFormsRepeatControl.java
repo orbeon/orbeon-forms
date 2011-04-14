@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
@@ -183,19 +182,19 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public String getHelp(PropertyContext propertyContext) {
+    public String getHelp() {
         // Don't bother letting superclass handle this
         return null;
     }
 
     @Override
-    public String getHint(PropertyContext propertyContext) {
+    public String getHint() {
         // Don't bother letting superclass handle this
         return null;
     }
 
     @Override
-    public String getAlert(PropertyContext propertyContext) {
+    public String getAlert() {
         // Don't bother letting superclass handle this
         return null;
     }

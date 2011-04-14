@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
@@ -100,7 +101,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         });
     }
 
-    protected synchronized static void ensureDriverRegistered(PipelineContext pipelineContext, Datasource datasource) {
+    protected synchronized static void ensureDriverRegistered(Datasource datasource) {
         String driverClassName = datasource.getDriverClassName();
         if (drivers.get(driverClassName) == null) {
             // Initialize database driver
@@ -111,7 +112,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                 {
                     // This is specific for eXist
                     // TODO: move this to properties?
-                    ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                    ExternalContext externalContext = NetUtils.getExternalContext();
                     String configurationFile = externalContext.getRealPath("WEB-INF/exist-conf.xml");
                     database.setProperty("create-database", "true");
                     database.setProperty("configuration", configurationFile);
@@ -133,8 +134,8 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      *    /db/orbeon/bizdoc-example
      *    xmldb:exist://localhost:9999/exist/xmlrpc/db/orbeon/bizdoc-example
      */
-    protected Collection getCollection(PipelineContext pipelineContext, Datasource datasource, String collection) {
-        ensureDriverRegistered(pipelineContext, datasource);
+    protected Collection getCollection(Datasource datasource, String collection) {
+        ensureDriverRegistered(datasource);
         try {
             String datasourceURI = datasource.getUri();
             if (!datasourceURI.startsWith(XMLDB_URI_PREFIX))
@@ -162,7 +163,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     /**
      * Query resources from the database.
      *
-     * @param pipelineContext   current context
      * @param datasource        the processor configuration
      * @param collectionName    identifies the collection in which resources are searched
      * @param createCollection  if true, create collection if it doesn't exist
@@ -171,12 +171,12 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      * @param namespaceContext  namespace mappings
      * @param xmlReceiver       receiver where the resources are output
      */
-    protected void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
+    protected void query(Datasource datasource, String collectionName, boolean createCollection,
                          String resourceId, String query, Map<String, String> namespaceContext, XMLReceiver xmlReceiver) {
-        ensureDriverRegistered(pipelineContext, datasource);
+        ensureDriverRegistered(datasource);
         try {
             // Execute query
-            ResourceSet result = executeQuery(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext);
+            ResourceSet result = executeQuery(datasource, collectionName, createCollection, resourceId, query, namespaceContext);
 
             // Output resources
             for (ResourceIterator i = result.getIterator(); i.hasMoreResources();) {
@@ -194,16 +194,16 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
     }
 
-    protected void storeResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
+    protected void storeResource(Datasource datasource, String collectionName, boolean createCollection,
                                  String resourceName, String document) {
-        ensureDriverRegistered(pipelineContext, datasource);
+        ensureDriverRegistered(datasource);
         try {
-            Collection collection = getCollection(pipelineContext, datasource, collectionName);
+            Collection collection = getCollection(datasource, collectionName);
             if (collection == null) {
                 if (!createCollection)
                     throw new OXFException("Cannot find collection '" + collectionName + "'.");
                 else
-                    collection = createCollection(pipelineContext, datasource, collectionName);
+                    collection = createCollection(datasource, collectionName);
             }
             final Resource resource = collection.createResource(resourceName, XMLResource.RESOURCE_TYPE);
             resource.setContent(document);
@@ -214,15 +214,15 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
     }
 
-    private ResourceSet executeQuery(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
+    private ResourceSet executeQuery(Datasource datasource, String collectionName, boolean createCollection,
                                      String resourceId, String query, Map<String, String> namespaceContext) throws XMLDBException {
 
-        Collection collection = getCollection(pipelineContext, datasource, collectionName);
+        Collection collection = getCollection(datasource, collectionName);
         if (collection == null) {
             if (!createCollection)
                 throw new OXFException("Cannot find collection '" + collectionName + "'.");
             else
-                collection = createCollection(pipelineContext, datasource, collectionName);
+                collection = createCollection(datasource, collectionName);
         }
         final XPathQueryService xpathQueryService;
         try {
@@ -277,14 +277,14 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      */
     protected void insert(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
                           String resourceId, ProcessorInput input) {
-        ensureDriverRegistered(pipelineContext, datasource);
+        ensureDriverRegistered(datasource);
         try {
-            Collection collection = getCollection(pipelineContext, datasource, collectionName);
+            Collection collection = getCollection(datasource, collectionName);
             if (collection == null) {
                 if (!createCollection)
                     throw new OXFException("Cannot find collection '" + collectionName + "'.");
                 else
-                    collection = createCollection(pipelineContext, datasource, collectionName);
+                    collection = createCollection(datasource, collectionName);
             }
             // Create new XMLResource
             XMLResource xmlResource = (XMLResource) collection.createResource(resourceId, "XMLResource");
@@ -305,8 +305,8 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         return getPropertySet().getBoolean("serialize-xml-11", false);
     }
 
-    protected Collection createCollection(PipelineContext pipelineContext, Datasource datasource, String collectionName) throws XMLDBException {
-        Collection rootCollection = getCollection(pipelineContext, datasource, ROOT_COLLECTION_PATH);
+    protected Collection createCollection(Datasource datasource, String collectionName) throws XMLDBException {
+        Collection rootCollection = getCollection(datasource, ROOT_COLLECTION_PATH);
         if (rootCollection == null)
             throw new OXFException("Cannot find root collection '" + ROOT_COLLECTION_PATH + "'.");
 
@@ -322,23 +322,22 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     /**
      * Update resources in the database.
      *
-     * @param pipelineContext   current context
      * @param datasource        the processor configuration
      * @param collectionName    identifies the collection in which resources are updated
      * @param createCollection  if true, create collection if it doesn't exist
      * @param resourceId        optional resource id on which the query is run
      * @param query             the XUpdate query to run
      */
-    protected void update(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
+    protected void update(Datasource datasource, String collectionName, boolean createCollection,
                           String resourceId, String query) {
-        ensureDriverRegistered(pipelineContext, datasource);
+        ensureDriverRegistered(datasource);
         try {
-            Collection collection = getCollection(pipelineContext, datasource, collectionName);
+            Collection collection = getCollection(datasource, collectionName);
             if (collection == null) {
                 if (!createCollection)
                     throw new OXFException("Cannot find collection '" + collectionName + "'.");
                 else
-                    collection = createCollection(pipelineContext, datasource, collectionName);
+                    collection = createCollection(datasource, collectionName);
             }
             XUpdateQueryService xUpdateQueryService;
             try {
@@ -365,7 +364,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     /**
      * Delete resources from the database.
      *
-     * @param pipelineContext   current context
      * @param datasource        the processor configuration
      * @param collectionName    identifies the collection in which resources are searched
      * @param createCollection  if true, create collection if it doesn't exist
@@ -373,12 +371,12 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      * @param query             selects resources in the collection that must be deleted
      * @param namespaceContext  namespace mappings
      */
-    protected void delete(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
+    protected void delete(Datasource datasource, String collectionName, boolean createCollection,
                           String resourceId, String query, Map<String, String> namespaceContext) {
-        ensureDriverRegistered(pipelineContext, datasource);
+        ensureDriverRegistered(datasource);
         try {
             // Execute query
-            final ResourceSet result = executeQuery(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext);
+            final ResourceSet result = executeQuery(datasource, collectionName, createCollection, resourceId, query, namespaceContext);
 
             if (result.getSize() > 0) {
                 // Delete resources
@@ -389,7 +387,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                 //
                 // So we implement a workaround: we go up to the resource from the root collection.
 
-                final Collection rootCollection = getCollection(pipelineContext, datasource, ROOT_COLLECTION_PATH);
+                final Collection rootCollection = getCollection(datasource, ROOT_COLLECTION_PATH);
                 for (final ResourceIterator i = result.getIterator(); i.hasMoreResources();) {
                     final Resource resource = i.nextResource();
 
@@ -416,13 +414,13 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         final Config config = getConfig(pipelineContext);
 
         if ("query".equals(config.getOperation())) {
-            query(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery(), config.getNamespaceContext(), xmlReceiver);
+            query(datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery(), config.getNamespaceContext(), xmlReceiver);
         } else if ("insert".equals(config.getOperation())) {
             insert(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), getInputByName(INPUT_DATA));
         } else if ("delete".equals(config.getOperation())) {
-            delete(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery(), config.getNamespaceContext());
+            delete(datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery(), config.getNamespaceContext());
         } else if ("update".equals(config.getOperation())) {
-            update(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery());
+            update(datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery());
         } else {
             // TODO: Handle location info
             throw new IllegalArgumentException("Invalid operation: " + config.getOperation());

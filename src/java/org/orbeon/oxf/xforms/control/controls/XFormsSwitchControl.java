@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
@@ -215,7 +213,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XFormsSwitchControl))
             return false;
@@ -228,7 +226,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         if (!compareSelectedCase(otherSwitchControl))
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
     private boolean compareSelectedCase(XFormsSwitchControl otherSwitchControl) {
@@ -236,10 +234,10 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // Output regular diff
-        super.outputAjaxDiff(pipelineContext, ch, other, attributesImpl, isNewlyVisibleSubtree);
+        super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree);
 
         // Output switch-specific diff if needed only
         final XFormsSwitchControl otherSwitchControl = (XFormsSwitchControl) other;

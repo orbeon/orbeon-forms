@@ -543,7 +543,7 @@ public class XFormsServer extends ProcessorImpl {
                     if (delayedEvents != null && delayedEvents.size() > 0) {
                         final long currentTime = System.currentTimeMillis();
                         for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
-                            delayedEvent.toSAX(pipelineContext, ch, currentTime);
+                            delayedEvent.toSAX(ch, currentTime);
                         }
                     }
                 }
@@ -642,7 +642,7 @@ public class XFormsServer extends ProcessorImpl {
 
         indentedLogger.startHandleOperation("", "computing differences");
         {
-            new ControlsComparator(pipelineContext, ch, containingDocument, valueChangeControlIds, isTestMode).diff(state1, state2);
+            new ControlsComparator(ch, containingDocument, valueChangeControlIds, isTestMode).diff(state1, state2);
         }
         indentedLogger.endHandleOperation();
     }

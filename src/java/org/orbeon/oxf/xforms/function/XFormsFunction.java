@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;

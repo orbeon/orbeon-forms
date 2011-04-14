@@ -44,7 +44,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, containerAttributes);
         {
             final String labelValue = getTriggerLabel(triggerControl);
-            final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel(pipelineContext);
+            final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel();
             outputLabelText(xmlReceiver, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
         }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);

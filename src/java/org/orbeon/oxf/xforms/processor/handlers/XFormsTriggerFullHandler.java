@@ -38,7 +38,7 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         final String labelValue = getTriggerLabel(triggerControl);
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true);
 
-        final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel(pipelineContext);
+        final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final String elementName;

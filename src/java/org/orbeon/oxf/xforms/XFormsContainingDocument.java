@@ -612,7 +612,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             this.progressMessage = progressMessage;
         }
 
-        public String getEncodedDocument(PropertyContext propertyContext) {
+        public String getEncodedDocument() {
             final Document eventsDocument = Dom4jUtils.createDocument();
             final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
 
@@ -641,7 +641,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             return isMaxDelay;
         }
 
-        public void toSAX(PropertyContext propertyContext, ContentHandlerHelper ch, long currentTime) {
+        public void toSAX(ContentHandlerHelper ch, long currentTime) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
                     new String[] {
                             "delay", Long.toString(getTime() - currentTime),
@@ -649,11 +649,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                             "show-progress", Boolean.toString(isShowProgress()),
                             "progress-message", isShowProgress() ? getProgressMessage() : null
                     });
-            ch.text(getEncodedDocument(propertyContext));
+            ch.text(getEncodedDocument());
             ch.endElement();
         }
 
-        public void toJSON(PropertyContext propertyContext, StringBuilder sb, long currentTime) {
+        public void toJSON(StringBuilder sb, long currentTime) {
             sb.append('{');
             sb.append("\"delay\":");
             sb.append(getTime() - currentTime);
@@ -668,7 +668,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 sb.append('"');
             }
             sb.append(",\"event\":\"");
-            sb.append(getEncodedDocument(propertyContext));
+            sb.append(getEncodedDocument());
             sb.append('"');
 
             sb.append("}");
@@ -1138,6 +1138,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
         }
 
+        // TODO: don't use PipelineContext: use other ThreadLocal
         final PipelineContext pipelineContext = PipelineContext.get();
 
         // Restore models state
@@ -1184,10 +1185,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @return                  true iif restore is in process
      */
     public boolean isRestoringDynamicState() {
+        // TODO: don't use PipelineContext: use other ThreadLocal
         return PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
     }
 
     public Map<String, Element> getSerializedControlStatesMap() {
+        // TODO: don't use PipelineContext: use other ThreadLocal
         return (Map) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 

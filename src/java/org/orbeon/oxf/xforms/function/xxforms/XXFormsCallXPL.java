@@ -19,7 +19,6 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.DOMSerializer;

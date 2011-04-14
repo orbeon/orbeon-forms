@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -37,7 +36,6 @@ public class HandlerContext {
 
     // Passed from constructor
     private final ElementHandlerController controller;
-    private final PipelineContext pipelineContext;
     private final XFormsContainingDocument containingDocument;
     private final ExternalContext externalContext;
     private final String topLevelControlEffectiveId;
@@ -65,11 +63,10 @@ public class HandlerContext {
 //    private static final int INDEX_INCREMENT = 100;
 //    private int currentTabIndex = 0;
 
-    public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
+    public HandlerContext(ElementHandlerController controller,
                           XFormsContainingDocument containingDocument, ExternalContext externalContext, String topLevelControlEffectiveId) {
 
         this.controller = controller;
-        this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
         this.externalContext = externalContext;
         this.topLevelControlEffectiveId = topLevelControlEffectiveId;
@@ -86,10 +83,6 @@ public class HandlerContext {
 
     final public ElementHandlerController getController() {
         return controller;
-    }
-
-    final public PipelineContext getPipelineContext() {
-        return pipelineContext;
     }
 
     final public XFormsContainingDocument getContainingDocument() {

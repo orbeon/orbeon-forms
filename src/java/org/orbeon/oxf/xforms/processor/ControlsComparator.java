@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.ContentHandlerWriter;
 import org.orbeon.oxf.util.NetUtils;
@@ -32,7 +31,6 @@ import java.util.*;
 
 public class ControlsComparator {
 
-    private final PipelineContext pipelineContext;
     private final XFormsContainingDocument containingDocument;
     private final Set<String> valueChangeControlIds;
     private final boolean isTestMode;
@@ -46,10 +44,9 @@ public class ControlsComparator {
 
     private final int fullUpdateThreshold;
 
-    public ControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
+    public ControlsComparator(ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                               Set<String> valueChangeControlIds, boolean isTestMode) {
 
-        this.pipelineContext = pipelineContext;
         this.ch = ch;
         this.containingDocument = containingDocument;
         this.valueChangeControlIds = valueChangeControlIds;
@@ -102,10 +99,10 @@ public class ControlsComparator {
 
             // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
             final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(control2.getEffectiveId());
-            if (control2.supportAjaxUpdates() && (!control2.equalsExternal(pipelineContext, control1) || isValueChangeControl)) {
+            if (control2.supportAjaxUpdates() && (!control2.equalsExternal(control1) || isValueChangeControl)) {
                 // Output the diff for this control between the old state and the new state
                 attributesImpl.clear();
-                control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
+                control2.outputAjaxDiff(ch, control1, attributesImpl, isNewlyVisibleSubtree);
             }
 
             // Whether at this point we must do a full update
@@ -283,10 +280,10 @@ public class ControlsComparator {
         try {
 
             // 1: Send differences for just this control if needed
-            if (!control2.equalsExternal(pipelineContext, control1)) {
+            if (!control2.equalsExternal(control1)) {
                 final boolean isNewlyVisibleSubtree = control1 == null;
                 attributesImpl.clear();
-                control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
+                control2.outputAjaxDiff(ch, control1, attributesImpl, isNewlyVisibleSubtree);
             }
 
             // 2: Send difference for content of this control
@@ -334,7 +331,7 @@ public class ControlsComparator {
                     new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getXmlReceiver()), true), true)));// NOTE: skip the root element
 
             // Create handler context
-            final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, externalContext, control2.getEffectiveId()) {
+            final HandlerContext handlerContext = new HandlerContext(controller, containingDocument, externalContext, control2.getEffectiveId()) {
                 @Override
                 public String findXHTMLPrefix() {
                     // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix

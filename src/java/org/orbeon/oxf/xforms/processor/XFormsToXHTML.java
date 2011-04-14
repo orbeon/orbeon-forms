@@ -167,7 +167,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
-                        gatherInputDependencies(pipelineContext, containingDocument[0], indentedLogger, stage1CacheableState);
+                        gatherInputDependencies(containingDocument[0], indentedLogger, stage1CacheableState);
 
                         return stage2CacheableState;
                     }
@@ -362,7 +362,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void gatherInputDependencies(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, Stage1CacheableState stage1CacheableState) {
+    private void gatherInputDependencies(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, Stage1CacheableState stage1CacheableState) {
 
         final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
 
@@ -476,7 +476,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Set final output
             controller.setOutput(new DeferredXMLReceiverImpl(xmlReceiver));
             // Set handler context
-            controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, externalContext, null));
+            controller.setElementHandlerContext(new HandlerContext(controller, containingDocument, externalContext, null));
             // Process the entire input
             annotatedDocument.replay(new ExceptionWrapperXMLReceiver(controller, "converting XHTML+XForms document to XHTML"));
         }

@@ -19,9 +19,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.externalcontext.ServletURLRewriter;
 import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
@@ -199,7 +197,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    public String getEscapedExternalValue(PipelineContext pipelineContext) {
+    public String getEscapedExternalValue() {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String externalValue = getExternalValue();
             if (StringUtils.isNotBlank(externalValue)) {
@@ -221,13 +219,13 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
+    public String getNonRelevantEscapedExternalValue() {
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Return rewritten URL of dummy image URL
             return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
-            return super.getNonRelevantEscapedExternalValue(propertyContext);
+            return super.getNonRelevantEscapedExternalValue();
         }
     }
 
@@ -298,7 +296,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected boolean addAjaxCustomAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
+    protected boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final XFormsOutputControl outputControl1 = (XFormsOutputControl) other;
         final XFormsOutputControl outputControl2 = this;

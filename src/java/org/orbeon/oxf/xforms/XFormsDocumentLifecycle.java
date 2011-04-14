@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
  * Represent the lifecycle of an XForms document from the point of view of requests/responses.

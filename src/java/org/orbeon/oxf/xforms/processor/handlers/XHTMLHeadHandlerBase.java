@@ -462,7 +462,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
                     if (!first)
                         sb.append(',');
 
-                    delayedEvent.toJSON(pipelineContext, sb, currentTime);
+                    delayedEvent.toJSON(sb, currentTime);
 
                     first = false;
                 }

@@ -69,7 +69,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('alert') is deprecated. Use event('xxforms:alert') instead.");
             }
 
-            final String alert = targetControl.getAlert(getPipelineContext());
+            final String alert = targetControl.getAlert();
             if (alert != null)
                 return SingletonIterator.makeIterator(new StringValue(alert));
             else
@@ -91,7 +91,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('hint') is deprecated. Use event('xxforms:hint') instead.");
             }
 
-            final String hint = targetControl.getHint(getPipelineContext());
+            final String hint = targetControl.getHint();
             if (hint != null)
                 return SingletonIterator.makeIterator(new StringValue(hint));
             else
@@ -102,7 +102,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('help') is deprecated. Use event('xxforms:help') instead.");
             }
 
-            final String help = targetControl.getHelp(getPipelineContext());
+            final String help = targetControl.getHelp();
             if (help != null)
                 return SingletonIterator.makeIterator(new StringValue(help));
             else

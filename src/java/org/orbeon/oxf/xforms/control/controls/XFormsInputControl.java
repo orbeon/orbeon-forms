@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -414,22 +413,21 @@ public class XFormsInputControl extends XFormsValueControl {
     /**
      * Convenience method for handler: return the value of the first input field.
      *
-     * @param pipelineContext   pipeline context
      * @return                  value to store in the first input field
      */
-    public String getFirstValueUseFormat(PipelineContext pipelineContext) {
+    public String getFirstValueUseFormat() {
         final String result;
 
         if (isRelevant()) {
             final String typeName = getBuiltinTypeName();
             if ("date".equals(typeName) || "time".equals(typeName)) {
                 // Format value specially
-                result = formatSubValue(pipelineContext, getFirstValueType(), getValue());
+                result = formatSubValue(getFirstValueType(), getValue());
             } else if ("dateTime".equals(typeName)) {
                 // Format value specially
                 // Extract date part
                 final String datePart = getDateTimeDatePart(getValue(), 'T');
-                result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
+                result = formatSubValue(getFirstValueType(), datePart);
             } else {
                 // Regular case, use external value
                 result = getExternalValue();
@@ -444,10 +442,9 @@ public class XFormsInputControl extends XFormsValueControl {
     /**
      * Convenience method for handler: return the value of the second input field.
      *
-     * @param pipelineContext   pipeline context
      * @return                  value to store in the second input field
      */
-    public String getSecondValueUseFormat(PipelineContext pipelineContext) {
+    public String getSecondValueUseFormat() {
         final String result;
 
         if (isRelevant()) {
@@ -456,7 +453,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 // Format value specially
                 // Extract time part
                 final String timePart = getDateTimeTimePart(getValue(), 'T');
-                result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
+                result = formatSubValue(getSecondValueType(), timePart);
             } else {
                 // N/A
                 result = null;
@@ -471,14 +468,13 @@ public class XFormsInputControl extends XFormsValueControl {
     /**
      * Convenience method for handler: return a formatted value for read-only output.
      *
-     * @param pipelineContext   pipeline context
      * @return                  formatted value
      */
-    public String getReadonlyValueUseFormat(PipelineContext pipelineContext) {
+    public String getReadonlyValueUseFormat() {
         return isRelevant() ? getValueUseFormat(format) : null;
     }
 
-    private String formatSubValue(PipelineContext pipelineContext, String valueType, String value) {
+    private String formatSubValue(String valueType, String value) {
 
         final Map<String, ValueRepresentation> variables = new HashMap<String, ValueRepresentation>();
         variables.put("v", new StringValue(value));

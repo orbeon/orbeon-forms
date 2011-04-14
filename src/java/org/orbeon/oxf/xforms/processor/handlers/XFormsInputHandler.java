@@ -160,7 +160,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             final StringBuilder inputClasses = new StringBuilder("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
-                                final String formattedValue = inputControl.getFirstValueUseFormat(pipelineContext);
+                                final String formattedValue = inputControl.getFirstValueUseFormat();
                                 if (!isDateMinimal) {
                                     // Regular case, value goes to input control
                                     reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, formattedValue != null ? formattedValue : "");
@@ -223,7 +223,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             final StringBuilder inputClasses = new StringBuilder("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
-                                final String inputValue = inputControl.getSecondValueUseFormat(pipelineContext);
+                                final String inputValue = inputControl.getSecondValueUseFormat();
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue);
 
                                 final String secondType = inputControl.getSecondValueType();
@@ -252,7 +252,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                     } else {
                         // Read-only mode
                         if (isConcreteControl) {
-                            final String formattedValue = inputControl.getReadonlyValueUseFormat(pipelineContext);
+                            final String formattedValue = inputControl.getReadonlyValueUseFormat();
                             final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue();
 
                             if (handlerContext.isSpanHTMLLayout())

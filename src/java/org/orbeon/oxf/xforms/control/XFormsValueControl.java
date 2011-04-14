@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
@@ -208,10 +206,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return the external value ready to be inserted into the client after an Ajax response.
      *
-     * @param pipelineContext   current PipelineContext
      * @return                  external value
      */
-    public String getEscapedExternalValue(PipelineContext pipelineContext) {
+    public String getEscapedExternalValue() {
         return getExternalValue();
     }
 
@@ -223,7 +220,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         this.externalValue = externalValue;
     }
 
-    public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
+    public String getNonRelevantEscapedExternalValue() {
         return "";
     }
 
@@ -237,7 +234,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XFormsValueControl))
             return false;
@@ -251,7 +248,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         if (!XFormsUtils.compareStrings(getExternalValue(), otherValueControl.getExternalValue()))
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();

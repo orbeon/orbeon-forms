@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -312,7 +310,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XFormsSingleNodeControl))
             return false;
@@ -338,7 +336,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         if (!XFormsUtils.compareStrings(type, otherSingleNodeControl.type))
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
     public static boolean compareCustomMIPs(Map mips1, Map mips2) {
@@ -369,7 +367,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         assert attributesImpl.getLength() == 0;
@@ -378,7 +376,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         final XFormsSingleNodeControl control2 = this;
 
         // Add attributes
-        final boolean doOutputElement = addAjaxAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other);
+        final boolean doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other);
 
         // Get current value if possible for this control
         // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
@@ -389,7 +387,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
             // Output element
             final XFormsValueControl xformsValueControl = (XFormsValueControl) control2;
-            outputValueElement(pipelineContext, ch, xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control");
+            outputValueElement(ch, xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control");
         } else {
             // No value, just output element with no content (but there may be attributes)
             if (doOutputElement)
@@ -402,13 +400,13 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected boolean addAjaxAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
+    protected boolean addAjaxAttributes(AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
 
         final XFormsSingleNodeControl control1 = (XFormsSingleNodeControl) other;
         final XFormsSingleNodeControl control2 = this;
 
         // Call base class for the standard stuff
-        boolean added = super.addAjaxAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other);
+        boolean added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other);
 
         // MIPs
         added |= addAjaxMIPs(attributesImpl, isNewlyVisibleSubtree, control1, control2);
@@ -472,17 +470,17 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return added;
     }
 
-    protected void outputValueElement(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsValueControl xformsValueControl,
+    protected void outputValueElement(ContentHandlerHelper ch, XFormsValueControl xformsValueControl,
                                       boolean doOutputElement, boolean isNewlyVisibleSubtree, Attributes attributesImpl, String elementName) {
         // Create element with text value
         final String value;
         if (xformsValueControl.isRelevant()) {
             // NOTE: Not sure if it is still possible to have a null value when the control is relevant
-            final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
+            final String tempValue = xformsValueControl.getEscapedExternalValue();
             value = (tempValue == null) ? "" : tempValue;
         } else {
             // Some controls don't have "" as non-relevant value
-            value = xformsValueControl.getNonRelevantEscapedExternalValue(pipelineContext);
+            value = xformsValueControl.getNonRelevantEscapedExternalValue();
         }
         if (doOutputElement || !isNewlyVisibleSubtree || !value.equals("")) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, elementName, attributesImpl);

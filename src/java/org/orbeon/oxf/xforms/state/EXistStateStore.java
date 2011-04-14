@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.Datasource;
@@ -187,24 +186,22 @@ public class EXistStateStore extends EXistStateStoreBase {
             debug("persisting entry for key: " + storeEntry.key + " (" + (storeEntry.value.length() * 2) + " bytes).");
         }
 
-        final PipelineContext pipelineContext = getPipelineContext();
-
         if (TEMP_PERF_TEST) {
 
             // Do the operation TEMP_PERF_ITERATIONS times to test performance
             final long startTime = System.currentTimeMillis();
             for (int i = 0; i < TEMP_PERF_ITERATIONS; i ++) {
-                persistEntryExistXMLDB(pipelineContext, storeEntry);
+                persistEntryExistXMLDB(storeEntry);
             }
             debug("average write persistence time: " + ((System.currentTimeMillis() - startTime) / TEMP_PERF_ITERATIONS) + " ms." );
 
         } else {
-            persistEntryExistXMLDB(pipelineContext, storeEntry);
+            persistEntryExistXMLDB(storeEntry);
         }
     }
 
-    private void persistEntryExistXMLDB(PipelineContext pipelineContext, StoreEntry storeEntry) {
-        final String messageBody = encodeMessageBody(pipelineContext, storeEntry);
+    private void persistEntryExistXMLDB(StoreEntry storeEntry) {
+        final String messageBody = encodeMessageBody(storeEntry);
         try {
             final StoreEntry existingStoreEntry = findPersistedEntryExistXMLDB(storeEntry.key);
             if (existingStoreEntry != null) {
@@ -214,7 +211,7 @@ public class EXistStateStore extends EXistStateStoreBase {
                 debug("merged session ids for key: " + storeEntry.key + " (" + (storeEntry.sessionIds.size() - currentSessionIdCount) + " ids).");
             }
 
-            XMLDB_ACCESSOR.storeResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+            XMLDB_ACCESSOR.storeResource(new Datasource(EXIST_XMLDB_DRIVER,
                     XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
                     true, storeEntry.key, messageBody);
         } catch (Exception e) {
@@ -228,14 +225,14 @@ public class EXistStateStore extends EXistStateStoreBase {
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         identity.setResult(result);
 
-        XMLDB_ACCESSOR.query(getPipelineContext(), new Datasource(EXIST_XMLDB_DRIVER,
+        XMLDB_ACCESSOR.query(new Datasource(EXIST_XMLDB_DRIVER,
                 XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()), XFormsProperties.getStoreCollection(),
                 true, null, query, null, identity);
 
         return result.getDocument();
     }
 
-    private String encodeMessageBody(PipelineContext pipelineContext, StoreEntry storeEntry) {
+    private String encodeMessageBody(StoreEntry storeEntry) {
 
         final StringBuilder sb = new StringBuilder("<entry><key>");
         sb.append(storeEntry.key);
@@ -290,12 +287,9 @@ public class EXistStateStore extends EXistStateStoreBase {
     }
 
     private StoreEntry findPersistedEntryExistXMLDB(String key) {
-
-        final PipelineContext pipelineContext = getPipelineContext();
-
         final Document document;
         try {
-            document = XMLDB_ACCESSOR.getResource(pipelineContext, new Datasource(EXIST_XMLDB_DRIVER,
+            document = XMLDB_ACCESSOR.getResource(new Datasource(EXIST_XMLDB_DRIVER,
                     XFormsProperties.getStoreURI(), XFormsProperties.getStoreUsername(), XFormsProperties.getStorePassword()),
                     XFormsProperties.getStoreCollection(), true, key);
         } catch (Exception e) {
@@ -324,20 +318,20 @@ public class EXistStateStore extends EXistStateStoreBase {
     private static class XMLDBAccessor extends XMLDBProcessor {
 
         @Override
-        public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, XMLReceiver xmlReceiver) {
-            super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, xmlReceiver);
+        public void query(Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, XMLReceiver xmlReceiver) {
+            super.query(datasource, collectionName, createCollection, resourceId, query, namespaceContext, xmlReceiver);
         }
 
-        protected Document getResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName) {
+        protected Document getResource(Datasource datasource, String collectionName, boolean createCollection, String resourceName) {
 
-            ensureDriverRegistered(pipelineContext, datasource);
+            ensureDriverRegistered(datasource);
             try {
-                Collection collection = getCollection(pipelineContext, datasource, collectionName);
+                Collection collection = getCollection(datasource, collectionName);
                 if (collection == null) {
                     if (!createCollection)
                         throw new OXFException("Cannot find collection '" + collectionName + "'.");
                     else
-                        collection = createCollection(pipelineContext, datasource, collectionName);
+                        collection = createCollection(datasource, collectionName);
                 }
                 final Resource resource = collection.getResource(resourceName);
                 if (resource == null) {
@@ -360,8 +354,8 @@ public class EXistStateStore extends EXistStateStoreBase {
         }
 
         @Override
-        protected void storeResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName, String document) {
-            super.storeResource(pipelineContext, datasource, collectionName, createCollection, resourceName, document);
+        protected void storeResource(Datasource datasource, String collectionName, boolean createCollection, String resourceName, String document) {
+            super.storeResource(datasource, collectionName, createCollection, resourceName, document);
         }
     }
 }

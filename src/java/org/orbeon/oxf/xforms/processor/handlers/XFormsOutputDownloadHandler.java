@@ -55,7 +55,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
             {
                 final String labelValue = (control != null) ? control.getLabel() : null;
-                final boolean mustOutputHTMLFragment = control != null && control.isHTMLLabel(pipelineContext);
+                final boolean mustOutputHTMLFragment = control != null && control.isHTMLLabel();
                 outputLabelText(xmlReceiver, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
             xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);

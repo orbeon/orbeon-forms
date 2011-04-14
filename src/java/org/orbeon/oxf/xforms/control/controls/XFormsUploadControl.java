@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.Multipart;
 import org.orbeon.oxf.util.NetUtils;
@@ -328,7 +327,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XFormsUploadControl))
             return false;
@@ -354,11 +353,11 @@ public class XFormsUploadControl extends XFormsValueControl {
         if (!XFormsUtils.compareStrings(getProgressExpected(), otherUploadControl.getProgressExpected()))
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
     @Override
-    protected boolean addAjaxCustomAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
+    protected boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final XFormsUploadControl uploadControl1 = (XFormsUploadControl) other;
         final XFormsUploadControl uploadControl2 = this;

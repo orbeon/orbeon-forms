@@ -17,8 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -137,14 +135,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
      * lookup by id takes place and the control must have a static itemset or otherwise null is returned.
      *
-     * @param pipelineContext       current pipeline context
      * @param containingDocument    current containing document
      * @param control               control from which to obtain itemset (may be null if control has a static itemset)
      * @param prefixedId            prefixed id of control from which to obtain itemset (if control is null)
      * @return                      itemset or null if it is not possible to obtain it
      */
-    public static Itemset getInitialItemset(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
-                                                            XFormsSelect1Control control, String prefixedId) {
+    public static Itemset getInitialItemset(XFormsContainingDocument containingDocument,
+                                            XFormsSelect1Control control, String prefixedId) {
 
         if (control != null && control.isRelevant()) {
             // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
@@ -317,7 +314,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XFormsSelect1Control))
             return false;
@@ -328,13 +325,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
         final XFormsSelect1Control otherSelect1Control = (XFormsSelect1Control) other;
 
         // Itemset comparison
-        if (mustSendItemsetUpdate(propertyContext, otherSelect1Control))
+        if (mustSendItemsetUpdate(otherSelect1Control))
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
-    private boolean mustSendItemsetUpdate(PropertyContext propertyContext, XFormsSelect1Control otherSelect1Control) {
+    private boolean mustSendItemsetUpdate(XFormsSelect1Control otherSelect1Control) {
         if (getSelectionControl().hasStaticItemset()) {
             // There is no need to send an update:
             //
@@ -363,13 +360,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // Output regular diff
-        super.outputAjaxDiff(pipelineContext, ch, other, attributesImpl, isNewlyVisibleSubtree);
+        super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree);
 
         // Output itemset diff
-        if (mustSendItemsetUpdate(pipelineContext, (XFormsSelect1Control) other)) {
+        if (mustSendItemsetUpdate((XFormsSelect1Control) other)) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", XFormsUtils.namespaceId(containingDocument, getEffectiveId())});
             {
                 final Itemset itemset = getItemset();

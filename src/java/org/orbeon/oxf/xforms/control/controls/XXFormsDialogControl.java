@@ -14,14 +14,11 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -236,7 +233,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null)
             return false;
@@ -248,15 +245,15 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         if (otherDialog.wasVisible() != isVisible())
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         // If needed, output basic diffs such as changes in class or LHHA
-        final boolean doOutputElement = addAjaxAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other);
+        final boolean doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other);
         if (doOutputElement) {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
         }

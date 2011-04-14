@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -246,15 +244,6 @@ public abstract class XFormsEvent implements Cloneable {
 //    protected void setAttributeAsInteger(String name, int value) {
 //        setAttribute(name, new SequenceExtent(new Item[] { new IntegerValue(value) } ));
 //    }
-
-    /**
-     * Attempts to get the current pipeline context using the static context.
-     *
-     * @return  PipelineContext, null if not found
-     */
-    protected PipelineContext getPipelineContext() {
-        return StaticExternalContext.getStaticContext().getPipelineContext();
-    }
 
     public XFormsEvent retarget(XFormsEventTarget newTargetObject) {
         final XFormsEvent newEvent;

@@ -97,7 +97,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
 
         // Add title attribute if not yet present and there is a hint
         if (containerAttributes.getValue("title") == null) {
-            final String hintValue = control != null ? control.getHint(pipelineContext) : null;
+            final String hintValue = control != null ? control.getHint() : null;
             if (hintValue != null)
                 containerAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }

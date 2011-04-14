@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
@@ -310,43 +309,43 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return getLabelLHHA().getEscapedValue();
     }
 
-    public boolean isHTMLLabel(PropertyContext propertyContext) {
+    public boolean isHTMLLabel() {
         return getLabelLHHA().isHTML();
     }
 
-    public String getHelp(PropertyContext propertyContext) {
+    public String getHelp() {
         return getHelpLHHA().getValue();
     }
 
-    public String getEscapedHelp(PipelineContext pipelineContext) {
+    public String getEscapedHelp() {
         return getHelpLHHA().getEscapedValue();
     }
 
-    public boolean isHTMLHelp(PropertyContext propertyContext) {
+    public boolean isHTMLHelp() {
         return getHelpLHHA().isHTML();
     }
 
-    public String getHint(PropertyContext propertyContext) {
+    public String getHint() {
         return getHintLHHA().getValue();
     }
 
-    public String getEscapedHint(PipelineContext pipelineContext) {
+    public String getEscapedHint() {
         return getHintLHHA().getEscapedValue();
     }
 
-    public boolean isHTMLHint(PropertyContext propertyContext) {
+    public boolean isHTMLHint() {
         return getHintLHHA().isHTML();
     }
 
-    public String getAlert(PropertyContext propertyContext) {
+    public String getAlert() {
         return getAlertLHHA().getValue();
     }
 
-    public boolean isHTMLAlert(PropertyContext propertyContext) {
+    public boolean isHTMLAlert() {
         return getAlertLHHA().isHTML();
     }
 
-    public String getEscapedAlert(PipelineContext pipelineContext) {
+    public String getEscapedAlert() {
         return getAlertLHHA().getEscapedValue();
     }
 
@@ -463,11 +462,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Compare this control with another control, as far as the comparison is relevant for the external world.
      *
-     * @param propertyContext   current context
      * @param other             other control
      * @return                  true if the controls are identical for the purpose of an external diff, false otherwise
      */
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null)
             return false;
@@ -482,11 +480,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         if (!XFormsUtils.compareStrings(getLabel(), other.getLabel()))
             return false;
-        if (!XFormsUtils.compareStrings(getHelp(propertyContext), other.getHelp(propertyContext)))
+        if (!XFormsUtils.compareStrings(getHelp(), other.getHelp()))
             return false;
-        if (!XFormsUtils.compareStrings(getHint(propertyContext), other.getHint(propertyContext)))
+        if (!XFormsUtils.compareStrings(getHint(), other.getHint()))
             return false;
-        if (!XFormsUtils.compareStrings(getAlert(propertyContext), other.getAlert(propertyContext)))
+        if (!XFormsUtils.compareStrings(getAlert(), other.getAlert()))
             return false;
 
         // Compare values of extension attributes if any
@@ -1337,7 +1335,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public boolean equalsExternalRecurse(PropertyContext propertyContext, XFormsControl other) {
         // By default there are no children controls
-        return equalsExternal(propertyContext, other);
+        return equalsExternal(other);
     }
 
     /**
@@ -1358,12 +1356,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return true;
     }
 
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // NOP
     }
 
-    protected boolean addAjaxAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
+    protected boolean addAjaxAttributes(AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
 
         boolean added = false;
 
@@ -1374,10 +1372,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         added |= addAjaxClass(attributesImpl, isNewlyVisibleSubtree, other, this);
 
         // Label, help, hint, alert, etc.
-        added |= addAjaxLHHA(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other, this);
+        added |= addAjaxLHHA(attributesImpl, isNewlyVisibleSubtree, other, this);
 
         // Output control-specific attributes
-        added |= addAjaxCustomAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other);
+        added |= addAjaxCustomAttributes(attributesImpl, isNewlyVisibleSubtree, other);
 
         return added;
     }
@@ -1449,8 +1447,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return result;
     }
 
-    private boolean addAjaxLHHA(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree,
-                                  XFormsControl control1, XFormsControl control2) {
+    private boolean addAjaxLHHA(AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree,
+                                XFormsControl control1, XFormsControl control2) {
 
         boolean added = false;
         {
@@ -1465,33 +1463,33 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
 
         {
-            final String helpValue1 = isNewlyVisibleSubtree ? null : control1.getHelp(pipelineContext);
-            final String helpValue2 = control2.getHelp(pipelineContext);
+            final String helpValue1 = isNewlyVisibleSubtree ? null : control1.getHelp();
+            final String helpValue2 = control2.getHelp();
 
             if (!XFormsUtils.compareStrings(helpValue1, helpValue2)) {
-                final String escapedHelpValue2 = control2.getEscapedHelp(pipelineContext);
+                final String escapedHelpValue2 = control2.getEscapedHelp();
                 final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
                 added |= addOrAppendToAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
             }
         }
 
         {
-            final String hintValue1 = isNewlyVisibleSubtree ? null : control1.getHint(pipelineContext);
-            final String hintValue2 = control2.getHint(pipelineContext);
+            final String hintValue1 = isNewlyVisibleSubtree ? null : control1.getHint();
+            final String hintValue2 = control2.getHint();
 
             if (!XFormsUtils.compareStrings(hintValue1, hintValue2)) {
-                final String escapedHintValue2 = control2.getEscapedHint(pipelineContext);
+                final String escapedHintValue2 = control2.getEscapedHint();
                 final String attributeValue = escapedHintValue2 != null ? escapedHintValue2 : "";
                 added |= addOrAppendToAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
             }
         }
 
         {
-            final String alertValue1 = isNewlyVisibleSubtree ? null : control1.getAlert(pipelineContext);
-            final String alertValue2 = control2.getAlert(pipelineContext);
+            final String alertValue1 = isNewlyVisibleSubtree ? null : control1.getAlert();
+            final String alertValue2 = control2.getAlert();
 
             if (!XFormsUtils.compareStrings(alertValue1, alertValue2)) {
-                final String escapedAlertValue2 = control2.getEscapedAlert(pipelineContext);
+                final String escapedAlertValue2 = control2.getEscapedAlert();
                 final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
                 added |= addOrAppendToAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
             }
@@ -1511,13 +1509,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Add attributes differences for custom attributes.
      *
-     * @param pipelineContext       current context
      * @param attributesImpl        attributes to add to
      * @param isNewRepeatIteration  whether the current controls is within a new repeat iteration
      * @param other                 original control, possibly null
      * @return                      true if any attribute was added, false otherwise
      */
-    protected boolean addAjaxCustomAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
+    protected boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final QName[] extensionAttributes = getExtensionAttributes();
         // By default, diff only attributes in the xxforms:* namespace

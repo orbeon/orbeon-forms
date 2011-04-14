@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
@@ -47,7 +46,7 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         assert attributesImpl.getLength() == 0;
 
@@ -68,7 +67,7 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
         }
 
         // Output element
-        outputValueElement(pipelineContext, ch, textControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
+        outputValueElement(ch, textControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
     }
 
     @Override

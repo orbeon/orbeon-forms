@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.Variable;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
@@ -133,7 +132,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+    public boolean equalsExternal(XFormsControl other) {
 
         if (other == null || !(other instanceof XXFormsVariableControl))
             return false;
@@ -146,7 +145,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
         if (!compareValues(getValue(), otherValueControl.getValue()))
             return false;
 
-        return super.equalsExternal(propertyContext, other);
+        return super.equalsExternal(other);
     }
 
     @Override

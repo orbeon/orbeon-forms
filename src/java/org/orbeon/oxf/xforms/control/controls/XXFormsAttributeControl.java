@@ -16,8 +16,6 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.*;
@@ -65,7 +63,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     }
 
     @Override
-    public String getEscapedExternalValue(PipelineContext pipelineContext) {
+    public String getEscapedExternalValue() {
         // Rewrite URI attribute if needed
         // This will resolve as a resource or render URL
         return XFormsUtils.getEscapedURLAttributeIfNeeded(getXBLContainer().getContainingDocument(), getControlElement(), nameAttribute, getExternalValue());
@@ -105,14 +103,14 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     }
 
     @Override
-    public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
+    public String getNonRelevantEscapedExternalValue() {
         if ("src".equals(nameAttribute)) {
             // TODO: make sure this is on xhtml:img!
             // Return rewritten URL of dummy image URL
             return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
-            return super.getNonRelevantEscapedExternalValue(propertyContext);
+            return super.getNonRelevantEscapedExternalValue();
         }
     }
 
@@ -133,7 +131,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         assert attributesImpl.getLength() == 0;
 
@@ -160,7 +158,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         }
 
         // Output element
-        outputValueElement(pipelineContext, ch, attributeControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
+        outputValueElement(ch, attributeControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
     }
 
     @Override

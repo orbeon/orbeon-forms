@@ -32,8 +32,8 @@ class RTE extends Control
         # event is received.
         containerId = @container.id
         registerChangeEvent = () =>
-            @yuiRTE.on "editorKeyUp", () => @changeEvent
-            @yuiRTE.on "afterNodeChange", () => @changeEvent
+            @yuiRTE.on "editorKeyUp", () => @changeEvent()
+            @yuiRTE.on "afterNodeChange", () => @changeEvent()
             @yuiRTE.on "editorWindowFocus", () => Events.focus { target: @container }
             @yuiRTE.on "editorWindowBlur", () => Events.blur { target: @container }
             @yuiRTE.removeListener "afterNodeChange", registerChangeEvent
@@ -64,7 +64,7 @@ class RTE extends Control
 
     # Event handler called by the RTE every time there is an event which can could potentially change the content
     # of the editor.
-    changeEvent = (controlID) ->
+    changeEvent: (controlID) ->
         # Simulate keyup
         currentFocusControlId = ORBEON.xforms.Globals.currentFocusControlId
         Events.keydown { target: OD.get(currentFocusControlId) }

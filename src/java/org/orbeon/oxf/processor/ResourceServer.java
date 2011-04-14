@@ -115,9 +115,8 @@ public class ResourceServer extends ProcessorImpl {
                                 }
                             }
 
-                            // Compile CoffeeScript to JavaScript if we have a .coffee and no .js
-                            if (! (XFormsProperties.isCombinedResources() || XFormsProperties.isMinimalResources())
-                                    && urlPath.endsWith(".js") && ! ResourceManagerWrapper.instance().exists(urlPath)) {
+                            // When no using combined/minimized resources (i.e. typically in development), compile CoffeeScript on the fly, if we find one
+                            if (! XFormsProperties.isCombinedResources() && ! XFormsProperties.isMinimalResources() && urlPath.endsWith(".js")) {
                                 final String coffeePath = urlPath.substring(0, urlPath.length() - 2) + "coffee";
                                 if (ResourceManagerWrapper.instance().exists(coffeePath)) {
                                     // Open URL for CoffeeScript file

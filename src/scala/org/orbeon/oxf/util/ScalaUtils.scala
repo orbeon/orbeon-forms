@@ -20,13 +20,13 @@ object ScalaUtils {
     private val COPY_BUFFER_SIZE = 8192
 
     type Readable[T] = {
-        def close(): Unit
+        def close()
         def read(b: Array[T]): Int
     }
 
     type Writable[T] = {
-        def close(): Unit
-        def write(cbuf: Array[T], off: Int, len: Int): Unit
+        def close()
+        def write(cbuf: Array[T], off: Int, len: Int)
     }
 
     // Copy a stream, with optional progress callback
@@ -80,7 +80,7 @@ object ScalaUtils {
     }
 
     // Use a closable item and make sure an attempt to close it is done after use
-    def useAndClose[T <: {def close() : Unit}](closable: T)(block: T => Unit) =
+    def useAndClose[T <: {def close()}](closable: T)(block: T => Unit) =
         try {
             block(closable)
         } finally {

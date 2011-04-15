@@ -63,7 +63,7 @@ public class ISO9075 {
             return name;
         } else {
             // encode
-            StringBuffer encoded = new StringBuffer();
+            StringBuilder encoded = new StringBuilder();
             for (int i = 0; i < name.length(); i++) {
                 if (i == 0) {
                     // first character of name
@@ -127,10 +127,10 @@ public class ISO9075 {
      * <p/>
      * Example: ' ' (the space character) is encoded to: _x0020_
      * @param c the character to encode
-     * @param b the encoded character is appended to <code>StringBuffer</code>
+     * @param b the encoded character is appended to <code>StringBuilder</code>
      *  <code>b</code>.
      */
-    private static void encode(char c, StringBuffer b) {
+    private static void encode(char c, StringBuilder b) {
         b.append("_x");
         String hex = Integer.toHexString(c);
         b.append(PADDING, 0, 4 - hex.length());

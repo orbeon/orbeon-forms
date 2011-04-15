@@ -25,38 +25,32 @@
     <!-- Orbeon Forms version -->
     <xsl:variable name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
 
-    <!-- - - - - - - Themed page template - - - - - - -->
-    <xsl:template match="/*">
+    <xsl:template match="xhtml:head">
         <xsl:copy>
-            <xsl:apply-templates select="@*"/>
-            <xhtml:head>
-                <!-- Handle head elements except scripts -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)"/>
-                <!-- Title -->
-                <xhtml:title>
-                    <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:title/@*"/>
-                    <xsl:choose>
-                        <xsl:when test="/xhtml:html/xhtml:head/xhtml:title != ''">
-                            <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="(/xhtml:html/xhtml:body/xhtml:h1)[1]"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xhtml:title>
-                <!-- Orbeon Forms version -->
-                <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
-                <!-- Favicon -->
-                <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
-                <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
-                <!-- Handle head scripts if present -->
-                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
-            </xhtml:head>
-            <!-- Body -->
-            <xsl:apply-templates select="/xhtml:html/xhtml:body"/>
-            <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
-            <xsl:apply-templates select="/xhtml:html/xhtml:script"/>
+            <xsl:call-template name="head"/>
         </xsl:copy>
+    </xsl:template>
+
+    <xsl:template name="head">
+        <xsl:apply-templates select="@*"/>
+        <!-- Handle head elements except scripts -->
+        <xsl:apply-templates select="xhtml:meta | xhtml:link | xhtml:style"/>
+        <!-- Title -->
+        <xhtml:title>
+            <xsl:apply-templates select="xhtml:title/@*"/>
+            <xsl:choose>
+                <xsl:when test="xhtml:title != ''">
+                    <xsl:value-of select="xhtml:title"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="(/xhtml:html/xhtml:body/xhtml:h1)[1]"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xhtml:title>
+        <!-- Orbeon Forms version -->
+        <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
+        <!-- Handle head scripts if present -->
+        <xsl:apply-templates select="xhtml:script"/>
     </xsl:template>
 
     <!-- Simply copy everything that's not matched -->

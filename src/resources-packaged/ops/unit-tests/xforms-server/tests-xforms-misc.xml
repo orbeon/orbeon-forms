@@ -939,7 +939,7 @@
                         <xhtml:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
                         <xhtml:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
                         <xhtml:input type="hidden" name="$server-events" value=""/>
-                        <xhtml:input type="hidden" name="$client-state" value=""/>
+                        <xhtml:input type="text" name="$client-state" value="" class="xforms-initially-hidden"/>
                         <xhtml:input type="hidden" name="$repeat-tree" value="xf-1"/>
                         <xhtml:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
                         <xhtml:span class="xforms-loading-loading">Loading...</xhtml:span>

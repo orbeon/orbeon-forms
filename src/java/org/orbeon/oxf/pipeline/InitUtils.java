@@ -108,21 +108,9 @@ public class InitUtils {
                 sb.append(" - Timing: ");
                 sb.append(Long.toString(timing));
 
-                // Add cache statistics
-                final String cacheDisplayStatistics = Properties.instance().getPropertySet().getString(CACHE_DISPLAY_STATISTICS_PROPERTY, DEFAULT_CACHE_DISPLAY_STATISTICS);
-                if (cacheDisplayStatistics.indexOf(' ') == -1) {
-                    // Single token
-                    if (cacheDisplayStatistics.length() > 0)
-                        appendCacheStatistics(ObjectCache.instanceIfExists(cacheDisplayStatistics), sb);
-                } else {
-                    // Multiple tokens
-                    final StringTokenizer st = new StringTokenizer(cacheDisplayStatistics, " ");
-                    while (st.hasMoreTokens()) {
-                        final String cacheName = st.nextToken().trim();
-                        if (cacheName.length() > 0)
-                            appendCacheStatistics(ObjectCache.instanceIfExists(cacheName), sb);
-                    }
-                }
+                // Display cache statistics (not very useful anymore)
+//                appendCacheStatistics(sb);
+
                 logger.info(sb.toString());
             }
 
@@ -130,6 +118,24 @@ public class InitUtils {
                 pipelineContext.destroy(success);
             } catch (Throwable f) {
                 logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
+            }
+        }
+    }
+
+    private static void appendCacheStatistics(StringBuilder sb) {
+        // Add cache statistics
+        final String cacheDisplayStatistics = Properties.instance().getPropertySet().getString(CACHE_DISPLAY_STATISTICS_PROPERTY, DEFAULT_CACHE_DISPLAY_STATISTICS);
+        if (cacheDisplayStatistics.indexOf(' ') == -1) {
+            // Single token
+            if (cacheDisplayStatistics.length() > 0)
+                appendCacheStatistics(ObjectCache.instanceIfExists(cacheDisplayStatistics), sb);
+        } else {
+            // Multiple tokens
+            final StringTokenizer st = new StringTokenizer(cacheDisplayStatistics, " ");
+            while (st.hasMoreTokens()) {
+                final String cacheName = st.nextToken().trim();
+                if (cacheName.length() > 0)
+                    appendCacheStatistics(ObjectCache.instanceIfExists(cacheName), sb);
             }
         }
     }

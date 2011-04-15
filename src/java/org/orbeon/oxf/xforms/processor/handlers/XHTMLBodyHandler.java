@@ -92,7 +92,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         // Create xhtml:form element
         final boolean hasUpload = staticState.hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
-                // Add id so that things work in portals    
+                // Add id so that things work in portals
                 "id", XFormsUtils.getFormId(containingDocument),
                 // Regular classes
                 "class", "xforms-form" + (handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden")
@@ -137,7 +137,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                     "type", "hidden", "name", "$server-events", "value", ""
             });
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$client-state", "value", ""
+                    "type", "text", "name", "$client-state", "value", "", "class", "xforms-initially-hidden"
             });
 
             // Store information about nested repeats hierarchy

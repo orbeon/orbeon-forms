@@ -793,9 +793,7 @@ public class Dom4jUtils {
         final List<Node> content = mutable ? new ArrayList<Node>(content(container)) : content(container);
 
         // Iterate over the content
-        for (Object childObject: content) {
-            final Node childNode = (Node) childObject;
-
+        for (final Node childNode : content) {
             if (childNode instanceof Element) {
                 final Element childElement = (Element) childNode;
                 visitorListener.startElement(childElement);

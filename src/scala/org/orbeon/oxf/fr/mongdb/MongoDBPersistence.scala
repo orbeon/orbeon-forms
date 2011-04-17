@@ -167,7 +167,7 @@ class MongoDBPersistence extends HttpServlet {
         })
 
         builder += (XML_KEY -> Dom4jUtils.domToString(doc))
-        builder += ("_orbeon_keywords" -> keywords.toArray)
+        builder += (KEYWORDS_KEY -> keywords.toArray)
 
         // Create or update
         withCollection(app, form) {
@@ -228,4 +228,4 @@ class MongoDBPersistence extends HttpServlet {
     def withFS(t: (GridFS) => Any) {
         withDB { db => t(GridFS(db))}
     }
-}   
+}

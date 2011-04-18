@@ -14,58 +14,65 @@
 package org.orbeon.oxf.fr.mongdb
 
 import com.mongodb.casbah.Imports._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import java.io.{OutputStreamWriter, InputStream}
 import javax.servlet.ServletException
-import org.orbeon.oxf.util.ScalaUtils
-import org.orbeon.oxf.xml.{TransformerUtils, XMLUtils}
-import org.dom4j.{Document, Text, Element}
-import scala.collection.JavaConversions._
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.value.DateTimeValue
 import java.util.Date
 import com.mongodb.casbah.gridfs.GridFS
+import xml.NodeSeq._
+import xml.{NodeSeq, Node, XML}
 
-/**
- * Experimental: Form Runner MongoDB persistence layer implementation.
- *
- * Supports:
- *
- * o storing and retrieving XML data
- * o storing and retrieving data attachments
- * o searching: all, keyword, and structured
- *
- * Known issues
- *
- * o does not support storing and retrieving forms
- * o does not support storing and retrieving form attachments
- * o reusing connection to MongoDB (opens/closes at each request)
- */
+/*!# Experimental: Form Runner MongoDB persistence layer implementation.
+
+ Supports:
+
+ * storing and retrieving XML data
+ * storing and retrieving data attachments
+ * searching: all, keyword, and structured
+
+ Known issues:
+
+ * does not support storing and retrieving forms
+ * does not support storing and retrieving form attachments
+ * reusing connection to MongoDB (opens/closes at each request)
+*/
 class MongoDBPersistence extends HttpServlet {
 
+    /*! MongoDB keys used for custom Orbeon fields */
     private val DOCUMENT_ID_KEY = "_orbeon_document_id"
     private val LAST_UPDATE_KEY = "_orbeon_last_update"
     private val XML_KEY = "_orbeon_xml"
     private val KEYWORDS_KEY = "_orbeon_keywords"
 
-    private val FormPath = """.*/crud/([^/]+)/([^/]+)/form/([^/]+)""".r
+    /*! Regexp matching a form data path */
     private val DataPath = """.*/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+)""".r
+    /*! Regexp matching a form definition path */
+    private val FormPath = """.*/crud/([^/]+)/([^/]+)/form/([^/]+)""".r
+    /*! Regexp matching a search path */
     private val SearchPath = """.*/search/([^/]+)/([^/]+)/?""".r
 
-    // Put document or attachment
+    /*!## Servlet PUT entry point
+
+      Store form data, form definition, or attachment.
+     */
     override def doPut(req: HttpServletRequest, resp: HttpServletResponse) {
         req.getPathInfo match {
             case DataPath(app, form, documentId, "data.xml") =>
-                putDocument(app, form, documentId, req.getInputStream)
+                storeDocument(app, form, documentId, req.getInputStream)
             case DataPath(app, form, documentId, attachmentName) =>
-                putAttachment(app, form, documentId, attachmentName, req)
+                storeAttachment(app, form, documentId, attachmentName, req)
             case FormPath(app, form, documentId) =>
                 // TODO
             case _ => throw new ServletException
         }
     }
 
-    // Get document or attachment
+    /*!## Servlet GET entry point
+
+      Retrieve form data, form definition, or attachment.
+     */
     override def doGet(req: HttpServletRequest, resp: HttpServletResponse) {
         req.getPathInfo match {
             case DataPath(app, form, documentId, "data.xml") =>
@@ -78,71 +85,20 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
-    // Search
+    /*!## Servlet POST entry point
+
+      Perform a search based on an incoming search specification in XML, and return search results in XML.
+     */
     override def doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         req.getPathInfo match {
             case SearchPath(app, form) =>
-                val searchDoc = TransformerUtils.readDom4j(req.getInputStream, null, false, false)
-                search(app, form, searchDoc, resp)
+                search(app, form, req, resp)
             case _ => throw new ServletException
         }
     }
 
-    def search(app: String, form: String, searchDoc: Document, resp: HttpServletResponse) {
-
-//        println(Dom4jUtils.domToPrettyString(searchDoc))
-
-        // Extract search parameters
-        val root = searchDoc.getRootElement
-
-        val pageSize = root.element("page-size").getText.toInt
-        val pageNumber = root.element("page-number").getText.toInt
-
-        val searchElem = Dom4jUtils.elements(root, "query")
-        val fullQuery = searchElem.head.getText.trim
-
-        // Create search iterator depending on type of search
-        withCollection(app, form) { coll =>
-            val find =
-                if (searchElem forall (_.getText.trim.isEmpty)) {
-                    // Return all
-                    coll.find
-                } else if (fullQuery.nonEmpty) {
-                    // Keyword search
-                    coll.find(MongoDBObject(KEYWORDS_KEY -> fullQuery))
-                } else {
-                    // Structured search
-                    coll.find(MongoDBObject(searchElem.tail filter (_.getText.trim.nonEmpty) map (e => (e.attributeValue("name") -> e.getText)) toList))
-                }
-
-            // Run search with sorting/paging
-            val resultsToSkip = (pageNumber - 1) * pageSize
-            val rows = find.sort(MongoDBObject(LAST_UPDATE_KEY -> -1)).skip(resultsToSkip).limit(pageSize).toSeq
-
-            // Create and output result
-            val result =
-                <documents total={rows.size.toString} page-size={pageSize.toString} page-number={pageNumber.toString} query={fullQuery}>{
-                    rows map { o =>
-                        val created = DateTimeValue.fromJavaDate(new Date(o.get("_id").asInstanceOf[ObjectId].getTime)).getCanonicalLexicalRepresentation.toString
-                        <document created={created} last-modified={o.get(LAST_UPDATE_KEY).toString} name={o.get(DOCUMENT_ID_KEY).toString}>
-                            <details>{
-                                searchElem.tail map { e =>
-                                    <detail>{o.get(e.attributeValue("name"))}</detail>
-                                }
-                            }</details>
-                        </document>
-                    }
-                }</documents>
-
-            resp.setContentType("application/xml")
-            ScalaUtils.useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
-    //            println(result.toString)
-                osw => osw.write(result.toString)
-            }
-        }
-    }
-
-    def putDocument(app: String, form: String, documentId: String, inputStream: InputStream) {
+    /*!## Store an XML document */
+    def storeDocument(app: String, form: String, documentId: String, inputStream: InputStream) {
 
         // Use MongoDB ObjectID as that can serve as timestamp for creation
         val builder = MongoDBObject.newBuilder
@@ -150,23 +106,17 @@ class MongoDBPersistence extends HttpServlet {
         builder += (LAST_UPDATE_KEY -> DateTimeValue.getCurrentDateTime(null).getCanonicalLexicalRepresentation.toString)
 
         // Create one entry per leaf, XML doc and keywords
-        val doc = Dom4jUtils.readDom4j(inputStream, null, XMLUtils.ParserConfiguration.PLAIN)
+        val root = XML.load(inputStream)
         val keywords = collection.mutable.Set[String]()
-        Dom4jUtils.visitSubtree(doc.getRootElement, new Dom4jUtils.VisitorListener {
-            def startElement(element: Element) {
-                if (!element.hasMixedContent) {
-                    val text = element.getText
-                    builder += (element.getName -> text)
-                    if (text.trim.nonEmpty)
-                        keywords ++= text.split("""\s+""")
-                }
-            }
 
-            def endElement(element: Element) {}
-            def text(text: Text) {}
-        })
+        root \\ "_" filter (_ \ "_" isEmpty) map { e =>
+            val text = e.text
+            builder += (e.label -> text)
+            if (text.trim.nonEmpty)
+                keywords ++= text.split("""\s+""")
+        }
 
-        builder += (XML_KEY -> Dom4jUtils.domToString(doc))
+        builder += (XML_KEY -> root.toString)
         builder += (KEYWORDS_KEY -> keywords.toArray)
 
         // Create or update
@@ -175,6 +125,7 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
+    /*!## Retrieve an XML document */
     def retrieveDocument(app: String, form: String, documentId: String, resp: HttpServletResponse) {
         withCollection(app, form) { coll =>
             coll.findOne(MongoDBObject(DOCUMENT_ID_KEY -> documentId)) match {
@@ -182,7 +133,7 @@ class MongoDBPersistence extends HttpServlet {
                     result(XML_KEY) match {
                         case xml: String =>
                             resp.setContentType("application/xml")
-                            ScalaUtils.useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
+                            useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
                                 osw => osw.write(xml)
                             }
                         case _ => resp.setStatus(404)
@@ -192,7 +143,8 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
-    def putAttachment(app: String, form: String, documentId: String, name: String, req: HttpServletRequest) {
+    /*!## Store an attachment */
+    def storeAttachment(app: String, form: String, documentId: String, name: String, req: HttpServletRequest) {
         withFS {
             _(req.getInputStream) { fh =>
                 fh.filename = Seq(app, form, documentId, name) mkString "/"
@@ -201,13 +153,70 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
+    /*!## Retrieve an attachment */
     def retrieveAttachment(app: String, form: String, documentId: String, name: String, resp: HttpServletResponse) {
         withFS {
             _.findOne(Seq(app, form, documentId, name) mkString "/") match {
                 case Some(dbFile) =>
                     resp.setContentType(dbFile.contentType)
-                    ScalaUtils.copyStream(dbFile.inputStream, resp.getOutputStream)
+                    copyStream(dbFile.inputStream, resp.getOutputStream)
                 case _ => resp.setStatus(404)
+            }
+        }
+    }
+
+    /*!## Perform a search */
+    def search(app: String, form: String, req: HttpServletRequest, resp: HttpServletResponse) {
+
+        def elemValue(n: Node) = n.text.trim
+        def attValue(n: Node, name: String) = n.attribute(name).get.text
+        def intValue(n: NodeSeq) = n.head.text.toInt
+
+        // Extract search parameters
+        val root = XML.load(req.getInputStream)
+
+        val pageSize = intValue(root \ "page-size")
+        val pageNumber = intValue(root \ "page-number")
+
+        val searchElem = root \ "query"
+        val fullQuery = elemValue(searchElem.head)
+
+        withCollection(app, form) { coll =>
+            // Create search iterator depending on type of search
+            val find =
+                if (searchElem forall (elemValue(_) isEmpty)) {
+                    // Return all
+                    coll.find
+                } else if (fullQuery.nonEmpty) {
+                    // Keyword search
+                    coll.find(MongoDBObject(KEYWORDS_KEY -> fullQuery))
+                } else {
+                    // Structured search: gather all non-empty <query name="$NAME">$VALUE</query>
+                    coll.find(MongoDBObject(searchElem.tail filter (elemValue(_) nonEmpty) map (e => (attValue(e, "name") -> elemValue(e))) toList))
+                }
+
+            // Run search with sorting/paging
+            val resultsToSkip = (pageNumber - 1) * pageSize
+            val rows = find sort MongoDBObject(LAST_UPDATE_KEY -> -1) skip resultsToSkip limit pageSize
+
+            // Create and output result
+            val result =
+                <documents total={rows.size.toString} page-size={pageSize.toString} page-number={pageNumber.toString} query={fullQuery}>{
+                    rows map { o =>
+                        val created = DateTimeValue.fromJavaDate(new Date(o.get("_id").asInstanceOf[ObjectId].getTime)).getCanonicalLexicalRepresentation.toString
+                        <document created={created} last-modified={o.get(LAST_UPDATE_KEY).toString} name={o.get(DOCUMENT_ID_KEY).toString}>
+                            <details>{
+                                searchElem.tail map { e =>
+                                    <detail>{o.get(attValue(e, "name"))}</detail>
+                                }
+                            }</details>
+                        </document>
+                    }
+                }</documents>
+
+            resp.setContentType("application/xml")
+            useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
+                osw => osw.write(result.toString)
             }
         }
     }

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Etat de Vaud - CSI
 
@@ -30,7 +29,6 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:alf-auth="http://www.alfresco.org/ws/service/authentication/1.0"
         xmlns:alf-content="http://www.alfresco.org/ws/service/content/1.0"
@@ -178,7 +176,7 @@
             <!-- Create SOAP headers for other services -->
             <xforms:setvalue ref="instance('alfresco-auth-headers')//secext:Password" value="instance('alfresco-auth-ws-response')//alf-auth:ticket"/>
             <xforms:setvalue ref="instance('alfresco-auth-headers')//utility:Created" value="current-dateTime()"/>
-            <xforms:setvalue ref="instance('alfresco-auth-headers')//utility:Expires" value="current-dateTime() + xdt:dayTimeDuration('PT5M')"/>
+            <xforms:setvalue ref="instance('alfresco-auth-headers')//utility:Expires" value="current-dateTime() + xs:dayTimeDuration('PT5M')"/>
         </xforms:action>
     </xforms:submission>
 

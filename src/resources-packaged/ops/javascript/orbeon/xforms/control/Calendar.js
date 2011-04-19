@@ -237,8 +237,9 @@ ORBEON.widgets.YUICalendar = function() {
         },
 
         keydown: function(event, target) {
-            // Close calendar when user starts typing
-            closeCalendar();
+            // Close calendar when users start typing, except if they type in the year field
+            var eventTarget = YAHOO.util.Event.getTarget(event);
+            if (eventTarget.className != "yui-cal-nav-yc") closeCalendar();
         }
     };
 }();

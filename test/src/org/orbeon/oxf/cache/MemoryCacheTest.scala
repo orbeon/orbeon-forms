@@ -26,8 +26,8 @@ class MemoryCacheTest extends AssertionsForJUnit {
         var wasEvicted = false
         var wasRemoved = false
 
-        override def evicted() { wasEvicted = true }
-        override def removed() { wasRemoved = true }
+        def evicted() { wasEvicted = true }
+        def removed() { wasRemoved = true }
         def added() {}
     }
 

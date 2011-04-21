@@ -157,8 +157,8 @@
             <template>
                 <xforms:output id="" ref="" xmlns="">
                     <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
                     <xforms:help ref=""/>
-                    <!-- No hint? -->
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                 </xforms:output>
             </template>

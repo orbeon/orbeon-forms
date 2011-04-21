@@ -221,7 +221,7 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
-    def withDB(t: (MongoDB) => Any) {
+    def withDB[T](t: (MongoDB) => T) {
         val mongoConnection = MongoConnection()
         try {
             t(mongoConnection("orbeon"))
@@ -230,11 +230,11 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
-    def withCollection(app: String, form: String)(t: (MongoCollection) => Any) {
+    def withCollection[T](app: String, form: String)(t: (MongoCollection) => T) {
         withDB { db => t(db(app + '.' + form))}
     }
 
-    def withFS(t: (GridFS) => Any) {
+    def withFS[T](t: (GridFS) => T) {
         withDB { db => t(GridFS(db))}
     }
 }

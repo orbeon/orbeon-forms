@@ -35,7 +35,7 @@
     <!-- Variable pointing to the current language -->
     <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
     <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
-    
+
     <xxforms:variable name="is-pe" select="context:isPE()" as="xs:boolean"/>
 
     <!-- Other variables -->
@@ -108,7 +108,7 @@
 
         <!-- Set current language: for new forms, use current FR language;
              for existing form, use language based on first resources available in loaded form -->
-        <xforms:setvalue ref="$fb-lang" value="if (xxforms:instance('fr-parameters-instance')/mode = 'new') 
+        <xforms:setvalue ref="$fb-lang" value="if (xxforms:instance('fr-parameters-instance')/mode = 'new')
                 then xxforms:instance('fr-language-instance')
                 else $resources/resource[1]/@xml:lang"/>
         <!-- For new forms -->
@@ -517,12 +517,14 @@
 
     <!-- Rename bind -->
     <xforms:action ev:event="fb-rename-bind">
-        <xxforms:variable name="old-bind-id" select="concat(event('old-name'), '-bind')"/>
+        <xxforms:variable name="old-name" select="event('old-name') treat as xs:string"/>
+        <xxforms:variable name="new-name" select="event('new-name') treat as xs:string"/>
+        <xxforms:variable name="old-bind-id" select="concat($old-name, '-bind')"/>
         <xxforms:variable name="bind" select="$model//xforms:bind[@id = $old-bind-id]"/>
         <xforms:action context="$bind" if="exists(.)">
-            <xforms:setvalue ref="@id" value="concat(event('new-name'), '-bind')"/>
-            <xforms:insert context="." origin="xxforms:attribute('name', event('new-name'))"/>
-            <xforms:setvalue ref="@nodeset" value="event('new-name')"/>
+            <xforms:setvalue ref="@id" value="concat($new-name, '-bind')"/>
+            <xforms:insert context="." origin="xxforms:attribute('name', $new-name)"/>
+            <xforms:setvalue ref="@nodeset" value="$new-name"/>
         </xforms:action>
     </xforms:action>
 

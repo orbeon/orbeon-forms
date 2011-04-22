@@ -29,18 +29,20 @@
     <xbl:binding id="fb-custom-xml" element="fb|dialog-control-details">
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xforms:setvalue ref="@relevant" value="'true'"/>
+                <xforms:setvalue xxforms:iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <xforms:setvalue ref="relevant" value="'true'"/>
+                <xforms:setvalue ref="original-control-name" value="event('fb-control-name')"/>
+                <xforms:setvalue ref="control-name" value="event('fb-control-name')"/>
+                <xforms:setvalue ref="instance-holder" value="event('fb-instance-holder')/saxon:path()"/>
                 <xforms:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
-                <xxforms:show dialog="dialog">
-                    <xxforms:context name="fb-control-name" select="event('fb-control-name')"/>
-                    <xxforms:context name="fb-instance-holder" select="event('fb-instance-holder')"/>
-                </xxforms:show>
+                <xxforms:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xforms:model id="model">
                 <xforms:instance id="local">
-                    <local relevant="false">
+                    <local>
+                        <relevant/>
                         <original-control-name/>
                         <control-name/>
                         <control-xpath/>
@@ -69,25 +71,25 @@
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
-            <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
+            <xforms:group id="container" ref=".[relevant = 'true']" appearance="xxforms:internal">
 
                 <xxforms:variable name="form"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:variable>
                 <xxforms:variable name="resources"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
+                <xxforms:variable name="local" select="instance('local')"/>
                 <xxforms:variable name="form-resources" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
+                <xxforms:variable name="binds" select="$form/xhtml:head/xforms:model/xforms:bind[@id = 'fr-form-binds'] treat as element()"/> <!-- All the binds -->
+                <xxforms:variable name="bind" select="$binds//xforms:bind[@id = concat($local/control-name, '-bind')] treat as element()"/> <!-- Bind for the current control -->
                 <xxforms:variable name="metadata" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
                 <xxforms:variable name="body" select="$form/xhtml:body/fr:view/fr:body treat as element()"/>
-                <xxforms:variable name="local" select="instance('local')"/>
+                <xxforms:variable name="is-custom-mode" select="$metadata/form-instance-mode = 'custom'"/>
 
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xforms:setvalue xxforms:iterate="$local/*[not(*)]" ref="."/> <!-- Clear all local values -->
-                    <xforms:setvalue ref="$local/original-control-name" value="event('fb-control-name')"/>
-                    <xforms:setvalue ref="$local/control-name" value="event('fb-control-name')"/>
-                    <xforms:setvalue ref="$local/instance-holder" value="event('fb-instance-holder')/saxon:path()"/>
-                    <xforms:setvalue ref="$local/is-custom-mode" value="$metadata/form-instance-mode = 'custom'"/>
+                    <xforms:setvalue ref="$local/control-xpath" value="$bind/@nodeset"/>
+                    <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
                     <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
                     <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
-                    <xxforms:variable name="control" select="$form//*[@id = concat(event('fb-control-name'), '-control')]"/>
+                    <xxforms:variable name="control" select="$form//*[@id = concat($local/control-name, '-control')] treat as element()"/>
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
                 </xforms:action>
 
@@ -121,6 +123,8 @@
                             <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
                         </xforms:dispatch>
                     </xforms:action>
+                    <!-- Update XPath on bind -->
+                    <xforms:setvalue if="$is-custom-mode" ref="$bind/@nodeset treat as attribute()" value="$local/control-xpath"/>
                     <!-- Set proper classes -->
                     <xxforms:variable name="classes" select="tokenize($local/classes, '\s+')"/>
                     <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
@@ -129,7 +133,7 @@
                 </xforms:action>
 
                 <!-- Make ourselves non-relevant when the dialog closes -->
-                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/relevant">false</xforms:setvalue>
 
                 <xxforms:dialog id="dialog" appearance="full" level="modal">
                     <xforms:label ref="$resources/dialog-control-details/dialog-title"/>

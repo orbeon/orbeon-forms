@@ -48,11 +48,38 @@
                     <xs:element ref="xbl:implementation"/>
                     <xs:element ref="xbl:resources"/>
                     <xs:element ref="xbl:template"/>
+                    <xs:element ref="xbl:handlers"/>
                     <xs:any namespace="##other" processContents="lax"/>
                 </xs:choice>
             </xs:sequence>
             <xs:attribute name="id"/>
             <xs:attribute name="element"/>
+            <xs:anyAttribute namespace="##other" processContents="lax"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="handlers">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:element ref="xbl:handler"/>
+                    <xs:any namespace="##other" processContents="lax"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:anyAttribute namespace="##other" processContents="lax"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="handler">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:choice>
+                    <xs:any namespace="##other" processContents="lax"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="event"/>
+            <xs:attribute name="phase"/>
+            <xs:attribute name="defaultAction"/>
             <xs:anyAttribute namespace="##other" processContents="lax"/>
         </xs:complexType>
     </xs:element>

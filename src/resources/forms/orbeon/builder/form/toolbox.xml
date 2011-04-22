@@ -412,6 +412,17 @@
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
                                 </fr:button>
                             </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                                <!-- Custom XML -->
+                                <fb:custom-xml id="fb-custom-xml" form-ref="instance('fr-form-instance')" resources-ref="$form-resources"/>
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="xforms-enabled DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
+                                </fr:button>
+                            </xforms:group>
                         </xhtml:div>
                     </xhtml:div>
                 </xhtml:div>

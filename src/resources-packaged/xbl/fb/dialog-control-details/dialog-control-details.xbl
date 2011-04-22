@@ -1,0 +1,183 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         script-type="application/xhtml+xml">
+    <xbl:binding id="fb-custom-xml" element="fb|dialog-control-details">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xforms:setvalue ref="@relevant" value="'true'"/>
+                <xforms:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
+                <xxforms:show dialog="dialog">
+                    <xxforms:context name="fb-control-name" select="event('fb-control-name')"/>
+                    <xxforms:context name="fb-instance-holder" select="event('fb-instance-holder')"/>
+                </xxforms:show>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xforms:model id="model">
+                <xforms:instance id="local">
+                    <local relevant="false">
+                        <original-control-name/>
+                        <control-name/>
+                        <control-xpath/>
+                        <classes/>
+                        <instance-holder/>
+                        <is-custom-mode/>
+                        <save-trigger/>
+                        <section-ids/>
+                        <control-ids/>
+                    </local>
+                </xforms:instance>
+
+                <!-- Enable/disable trigger -->
+                <xforms:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-invalid">disabled</xforms:setvalue>
+                <xforms:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xforms:setvalue>
+
+                <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
+                <xforms:bind nodeset="control-name"
+                             type="xs:NCName"
+                             calculate="normalize-space()"
+                             readonly="false()"
+                             constraint=". = ../original-control-name or (not(concat(., '-section') = tokenize(../section-ids, ' ')) and not(concat(., '-control') = tokenize(../control-ids, ' ')))"/>
+                <xforms:bind nodeset="control-xpath" relevant="../is-custom-mode = 'true'" type="xxforms:xpath2" required="../is-custom-mode = 'true'"/>
+                <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
+
+                <xxforms:variable name="form"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:variable>
+                <xxforms:variable name="resources"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
+                <xxforms:variable name="form-resources" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
+                <xxforms:variable name="metadata" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
+                <xxforms:variable name="body" select="$form/xhtml:body/fr:view/fr:body treat as element()"/>
+                <xxforms:variable name="local" select="instance('local')"/>
+
+                <!-- Show dialog -->
+                <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
+                    <xforms:setvalue xxforms:iterate="$local/*[not(*)]" ref="."/> <!-- Clear all local values -->
+                    <xforms:setvalue ref="$local/original-control-name" value="event('fb-control-name')"/>
+                    <xforms:setvalue ref="$local/control-name" value="event('fb-control-name')"/>
+                    <xforms:setvalue ref="$local/instance-holder" value="event('fb-instance-holder')/saxon:path()"/>
+                    <xforms:setvalue ref="$local/is-custom-mode" value="$metadata/form-instance-mode = 'custom'"/>
+                    <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
+                    <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
+                    <xxforms:variable name="control" select="$form//*[@id = concat(event('fb-control-name'), '-control')]"/>
+                    <xforms:setvalue ref="$local/classes" value="$control/@class"/>
+                </xforms:action>
+
+                <!-- Close dialog upon cancel -->
+                <xforms:action ev:event="DOMActivate" ev:observer="cancel-trigger">
+                    <xxforms:hide dialog="dialog"/>
+                </xforms:action>
+
+                <!-- Save data upon close -->
+                <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
+                    <xxforms:variable name="instance-holder" select="$form/root()/saxon:evaluate($local/instance-holder)"/>
+                    <xxforms:variable name="old-name" select="name($instance-holder)"/>
+                    <xxforms:variable name="new-name" select="$local/control-name"/>
+                    <!-- Find reference to control -->
+                    <xxforms:variable name="control" select="$body//*[@id = concat($old-name, '-control')]"/>
+                    <!-- Rename if needed -->
+                    <xforms:action if="$old-name != $new-name">
+                        <!-- Rename instance holder and all resources -->
+                        <xforms:dispatch name="fb-rename-holders" target="fr-form-model" xxbl:scope="outer">
+                            <xxforms:context name="holders" select="($instance-holder, $form-resources/resource/*[name() = $old-name])" xxbl:scope="inner"/>
+                            <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
+                        </xforms:dispatch>
+                        <!-- Update control id and bindings -->
+                        <xforms:dispatch name="fb-rename-control" target="fr-form-model" xxbl:scope="outer">
+                            <xxforms:context name="control" select="$control" xxbl:scope="inner"/>
+                            <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
+                        </xforms:dispatch>
+                        <!-- Rename bind if existing -->
+                        <xforms:dispatch name="fb-rename-bind" target="fr-form-model" xxbl:scope="outer">
+                            <xxforms:context name="old-name" select="$old-name" xxbl:scope="inner"/>
+                            <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
+                        </xforms:dispatch>
+                    </xforms:action>
+                    <!-- Set proper classes -->
+                    <xxforms:variable name="classes" select="tokenize($local/classes, '\s+')"/>
+                    <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
+                    <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $local/classes)"/>
+                    <xxforms:hide dialog="dialog"/>
+                </xforms:action>
+
+                <!-- Make ourselves non-relevant when the dialog closes -->
+                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>
+
+                <xxforms:dialog id="dialog" appearance="full" level="modal">
+                    <xforms:label ref="$resources/dialog-control-details/dialog-title"/>
+                    <xhtml:div>
+                        <xhtml:div class="fr-grid">
+                            <xhtml:div class="fr-grid-content">
+                                <!-- Control name -->
+                                <xforms:input ref="$local/control-name" incremental="true" id="fb-edit-details-control-name-input">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
+                                        <xhtml:span><xforms:output value="$resources/dialog-control-details/control-name/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:alert ref="$resources/dialog-control-details/control-name/alert"/>
+                                    <xforms:hint ref="$resources/dialog-control-details/control-name/hint"/>
+                                </xforms:input>
+                                <!-- XPath -->
+                                <xforms:input ref="$local/control-xpath" incremental="true" id="fb-edit-details-control-xpath">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/database.png" alt="" title=""/>
+                                        <xhtml:span><xforms:output value="$resources/dialog-control-details/control-xpath/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:alert ref="$resources/dialog-control-details/control-xpath/alert"/>
+                                    <xforms:hint ref="$resources/dialog-control-details/control-xpath/hint"/>
+                                </xforms:input>
+                                <!-- Classes -->
+                                <xforms:select ref="$local/classes" appearance="full">
+                                    <xforms:label ref="$resources/dialog-control-details/classes/label"/>
+                                    <xforms:itemset nodeset="$resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+                            </xhtml:div>
+                        </xhtml:div>
+                        <xhtml:div class="fr-dialog-buttons">
+                            <xforms:group id="triggers">
+                                <fr:button class="fr-inplace-rename" ref="save-trigger" id="save-trigger">
+                                    <xforms:label ref="$resources/apply/label"/>
+                                </fr:button>
+                                <xforms:output value="$resources/or/label"/>
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xforms:label ref="$resources/cancel/label"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xxforms:dialog>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

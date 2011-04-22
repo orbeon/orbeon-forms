@@ -853,6 +853,7 @@
                 </fr:view>
             </xhtml:div>
         </xhtml:div>
+        <fb:dialog-control-details id="dialog-control-details" form-ref="instance('fr-form-instance')" resources-ref="$form-resources"/>
         <fr:dialogs>
             <!-- Metadata editor -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-metadata.xml" xxi:omit-xml-base="true"/>
@@ -877,9 +878,6 @@
 
             <!-- Dialog to edit itemsets -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>
-
-            <!-- Control details -->
-            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-control-details.xml" xxi:omit-xml-base="true"/>
 
             <!-- Section details -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-section-details.xml" xxi:omit-xml-base="true"/>

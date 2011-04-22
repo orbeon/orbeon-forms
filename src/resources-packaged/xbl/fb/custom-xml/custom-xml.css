@@ -1,0 +1,23 @@
+/**
+ * Copyright (C) 2011 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+
+.fb-custom-xml-dialog textarea.xforms-textarea {
+    width: 50em; height: 20em;                  /* Reasonably large area to view/edit the instance XML */
+    font-family: monospace;                     /* Waiting for CodeMirror to do a better job */
+    font-size: 93%;
+}
+
+.fb-custom-xml-dialog .xforms-select1 {
+    margin:  0.5em 0 1em 0; display: block;     /* Spacing around the checkboxes */
+}

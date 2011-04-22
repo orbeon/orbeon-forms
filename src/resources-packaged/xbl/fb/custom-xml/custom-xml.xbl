@@ -1,0 +1,154 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         script-type="application/xhtml+xml">
+    <xbl:binding id="fb-custom-xml" element="fb|custom-xml">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xxforms:show dialog="custom-xml-dialog"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:resources>
+            <xbl:style src="/xbl/fb/custom-xml/custom-xml.css"/>
+        </xbl:resources>
+        <xbl:implementation>
+            <xforms:model id="custom-xml-model">
+                <xforms:instance id="ui">
+                    <ui>
+                        <mode/>
+                        <xml/>
+                        <save-trigger/>
+                        <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
+                    </ui>
+                </xforms:instance>
+                <xforms:bind nodeset="xml" type="xxforms:xml"/>
+                <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+                <xforms:bind ref="xml" readonly="../mode = 'automatic'"/>
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xforms:group appearance="xxforms:internal" id="container">
+
+                <xxforms:variable name="form"           ><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:variable>
+                <xxforms:variable name="resources"      ><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
+                <xxforms:variable name="ui"             select="instance('ui')"/>
+                <xxforms:variable name="model"          select="$form/xhtml:head/xforms:model"/>
+                <xxforms:variable name="binds"          select="$model/xforms:bind[@id = 'fr-form-binds']"/>
+                <xxforms:variable name="metadata"       select="$model/xforms:instance[@id = 'fr-form-metadata']"/>
+                <xxforms:variable name="form-instance"  select="$model/xforms:instance[@id = 'fr-form-instance']"/>
+
+                <!-- On dialog open, figure out mode, serialized XML -->
+                <xforms:action ev:event="xxforms-dialog-open" ev:observer="custom-xml-dialog">
+                    <xforms:setvalue ref="$ui/mode" value="if ($metadata/metadata/form-instance-mode = 'custom') then 'custom' else 'automatic'"/>
+                    <xxforms:variable name="instance-copy" select="xxforms:create-document()"/>
+                    <!-- Use intermediary document to avoid unnecessary namespaces -->
+                    <xforms:insert context="$instance-copy" origin="$form-instance/*"/>
+                    <xforms:delete nodeset="$instance-copy//text()[normalize-space(.) = '']"/>
+                    <xforms:setvalue ref="$ui/xml" value="saxon:serialize($instance-copy, $ui/xsl:output)"/>
+                </xforms:action>
+
+                <!-- Keep track of whether the XML entered by users is valid -->
+                <xforms:setvalue ev:event="xforms-invalid" ev:observer="instance-textarea" ref="$ui/save-trigger">disabled</xforms:setvalue>
+                <xforms:setvalue ev:event="xforms-valid"   ev:observer="instance-textarea" ref="$ui/save-trigger">enabled</xforms:setvalue>
+
+                <!-- When changing to automatic, regenerate the instance, and populate $ui/xml with the new XML -->
+                <xforms:action ev:event="xforms-select" ev:observer="mode-select1" if="event('xxforms:item-value') = 'automatic'">
+                    <xxforms:variable name="new-xml" select="xxforms:element('form')"/>
+                    <xforms:dispatch name="fb-add-children" target="container">
+                        <xxforms:context name="fb-bind-current" select="$binds"/>
+                        <xxforms:context name="fb-instance-current" select="$new-xml"/>
+                    </xforms:dispatch>
+                    <xforms:setvalue ref="$ui/xml" value="saxon:serialize($new-xml, $ui/xsl:output)"/>
+                </xforms:action>
+                <xforms:action ev:event="fb-add-children">
+                    <xxforms:variable name="bind-current" select="event('fb-bind-current') treat as element(xforms:bind)"/>
+                    <xxforms:variable name="instance-current" select="event('fb-instance-current') treat as element()"/>
+                    <xxforms:variable name="bind-children" select="$bind-current/xforms:bind"/>
+                    <xforms:action xxforms:iterate="$bind-children">
+                        <xxforms:variable name="bind-child" select="."/>
+                        <xforms:insert context="$instance-current" nodeset="*" origin="xxforms:element($bind-child/@name)"/>
+                        <xforms:dispatch name="fb-add-children" target="container">
+                            <xxforms:context name="fb-bind-current" select="$bind-child"/>
+                            <xxforms:context name="fb-instance-current" select="$instance-current/*[last()]"/>
+                        </xforms:dispatch>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- On close dialog -->
+                <xxforms:hide ev:event="DOMActivate" ev:observer="triggers" dialog="custom-xml-dialog"/>
+                <xforms:action ev:event="DOMActivate" ev:observer="save-trigger">
+                    <!-- Parse the XML and replace in form -->
+                    <xforms:delete nodeset="$form-instance/*"/>
+                    <xforms:insert context="$form-instance" origin="saxon:parse($ui/xml)"/>
+                    <!-- If automatic, change the nodeset attribute on the binds -->
+                    <xforms:action if="$ui/mode = 'automatic'">
+                        <xforms:setvalue xxforms:iterate="$binds//xforms:bind" ref="@nodeset" value="@name"/>
+                    </xforms:action>
+                    <!-- Save mode in metadata -->
+                    <xforms:delete nodeset="$metadata/metadata/form-instance-mode"/>
+                    <xforms:insert context="$metadata/metadata" nodeset="*" origin="xxforms:element('form-instance-mode', $ui/mode/text())"/>
+                </xforms:action>
+
+                <xxforms:dialog id="custom-xml-dialog" class="fb-custom-xml-dialog">
+                    <xforms:label ref="$resources/dialog-custom-xml/dialog-title"/>
+                    <!-- Choose mode -->
+                    <xforms:select1 appearance="full" ref="$ui/mode" id="mode-select1">
+                        <xforms:label ref="$resources/dialog-custom-xml/mode-label"/>
+                        <xforms:item>
+                            <xforms:label ref="$resources/dialog-custom-xml/mode-automatic"/>
+                            <xforms:value>automatic</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label ref="$resources/dialog-custom-xml/mode-custom"/>
+                            <xforms:value>custom</xforms:value>
+                        </xforms:item>
+                    </xforms:select1>
+                    <!-- Edit XML -->
+                    <xhtml:div class="fb-xml-dialog-view">
+                        <xforms:textarea ref="$ui/xml" id="instance-textarea" incremental="true">
+                            <xforms:alert ref="$resources/dialog-edit-source/source/alert"/>
+                        </xforms:textarea>
+                    </xhtml:div>
+                    <!-- Buttons -->
+                    <xhtml:div class="fr-dialog-buttons">
+                        <xforms:group appearance="xxforms:internal" id="triggers">
+                            <xhtml:span>
+                                <fr:button class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger">
+                                    <xforms:label ref="$resources/apply/label"/>
+                                </fr:button>
+                                <xforms:output value="$resources/or/label"/>
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                    <xforms:label ref="$resources/cancel/label"/>
+                                </xforms:trigger>
+                            </xhtml:span>
+                        </xforms:group>
+                    </xhtml:div>
+                </xxforms:dialog>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -113,6 +113,9 @@
         <edit-source>
             <label>Edit Source</label>
         </edit-source>
+        <custom-xml>
+            <label>Custom XML</label>
+        </custom-xml>
         <reload-components>
             <label>Reload Controls</label>
         </reload-components>
@@ -230,6 +233,11 @@
                 <alert>Name is already in use or incorrect</alert>
                 <hint>E.g.: "first-name"</hint>
             </control-name>
+            <control-xpath>
+                <label>XPath</label>
+                <alert>Invalid XPath expression</alert>
+                <hint>Points to the node the value for this control is stored</hint>
+            </control-xpath>
             <classes>
                 <label>Summary Page</label>
                 <item>
@@ -276,7 +284,7 @@
             <builtin-type>
                 <label>Built-in Type</label>
                 <hint>Built-in data type</hint>
-                
+
                 <choices>
                     <choices>
                         <label>Common Types</label>
@@ -708,6 +716,12 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-custom-xml>
+            <dialog-title>Custom XML</dialog-title>
+            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
+            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
+            <mode-custom>I will provide a custom XML document</mode-custom>
+        </dialog-custom-xml>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>

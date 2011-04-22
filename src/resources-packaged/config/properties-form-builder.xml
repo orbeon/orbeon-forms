@@ -15,8 +15,9 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <!-- Form Builder properties -->
+    <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb"                       value="http://orbeon.org/oxf/xml/form-builder"/>
 
+    <!-- Form Builder properties -->
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*"               value="oxf:/forms/orbeon/builder/xbl/text-controls.xbl
                                                                                             oxf:/xbl/orbeon/inplace-input/inplace-input.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/typed-controls.xbl

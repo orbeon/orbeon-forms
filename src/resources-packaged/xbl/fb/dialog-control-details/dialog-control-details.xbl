@@ -78,14 +78,14 @@
                 <xxforms:variable name="local" select="instance('local')"/>
                 <xxforms:variable name="form-resources" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
                 <xxforms:variable name="binds" select="$form/xhtml:head/xforms:model/xforms:bind[@id = 'fr-form-binds'] treat as element()"/> <!-- All the binds -->
-                <xxforms:variable name="bind" select="$binds//xforms:bind[@id = concat($local/control-name, '-bind')] treat as element()"/> <!-- Bind for the current control -->
+                <xxforms:variable name="bind-id" select="concat($local/control-name, '-bind')"/> <!-- Id of bind for current control -->
                 <xxforms:variable name="metadata" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
                 <xxforms:variable name="body" select="$form/xhtml:body/fr:view/fr:body treat as element()"/>
                 <xxforms:variable name="is-custom-mode" select="$metadata/form-instance-mode = 'custom'"/>
 
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xforms:setvalue ref="$local/control-xpath" value="$bind/@nodeset"/>
+                    <xforms:setvalue ref="$local/control-xpath" value="$binds//xforms:bind[@id = $bind-id]/@nodeset treat as attribute()"/>
                     <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
                     <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
                     <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
@@ -102,7 +102,7 @@
                 <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
                     <xxforms:variable name="instance-holder" select="$form/root()/saxon:evaluate($local/instance-holder)"/>
                     <xxforms:variable name="old-name" select="name($instance-holder)"/>
-                    <xxforms:variable name="new-name" select="$local/control-name"/>
+                    <xxforms:variable name="new-name" select="$local/control-name/string()"/>
                     <!-- Find reference to control -->
                     <xxforms:variable name="control" select="$body//*[@id = concat($old-name, '-control')]"/>
                     <!-- Rename if needed -->
@@ -124,7 +124,7 @@
                         </xforms:dispatch>
                     </xforms:action>
                     <!-- Update XPath on bind -->
-                    <xforms:setvalue if="$is-custom-mode" ref="$bind/@nodeset treat as attribute()" value="$local/control-xpath"/>
+                    <xforms:setvalue if="$is-custom-mode" ref="$binds//xforms:bind[@id = $bind-id]/@nodeset treat as attribute()" value="$local/control-xpath"/>
                     <!-- Set proper classes -->
                     <xxforms:variable name="classes" select="tokenize($local/classes, '\s+')"/>
                     <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>

@@ -19,5 +19,9 @@
 }
 
 .fb-custom-xml-dialog .xforms-select1 {
-    margin:  0.5em 0 1em 0; display: block;     /* Spacing around the checkboxes */
+    margin:  0.5em 0 1em 0; display: block;     /* Spacing around the radio buttons */
+}
+
+.fb-custom-xml-dialog .xforms-select1 span {
+    margin-bottom: .5em;                        /* Spacing between the radio buttons */
 }

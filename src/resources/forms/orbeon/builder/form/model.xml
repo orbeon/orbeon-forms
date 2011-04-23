@@ -621,25 +621,27 @@
                               select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
             <xxforms:variable name="current-section-name"
                               select="if ($control-name) then $current-control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind')) else $section-name"/>
+            <xxforms:variable name="is-custom-instance" select="$metadata-instance/form-instance-mode = 'custom'"/>
             <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
-                <xforms:action if="not(xforms:bind[@nodeset = $current-section-name])">
+                <xforms:action if="not(xforms:bind[@name = $current-section-name])">
                     <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
                     <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
                     <xforms:setvalue ref="$bind/@id" value="concat($current-section-name, '-bind')"/>
-                    <xforms:setvalue ref="$bind/@nodeset" value="$current-section-name"/>
+                    <xforms:setvalue ref="$bind/@name" value="$current-section-name"/>
+                    <xforms:setvalue ref="$bind/@nodeset" value="if ($is-custom-instance) then '()' else $current-section-name"/>
                 </xforms:action>
             </xforms:action>
 
             <xforms:action if="$control-name">
                 <!-- Insert bind for control if needed -->
                 <xxforms:variable name="current-bind-id" select="concat($control-name, '-bind')"/>
-                <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $current-section-name]">
+                <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@name = $current-section-name]">
                     <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
                         <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
                         <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
                         <xforms:setvalue ref="$bind/@id" value="$current-bind-id"/>
                         <xforms:insert context="$bind" origin="xxforms:attribute('name', $control-name)"/>
-                        <xforms:setvalue ref="$bind/@nodeset" value="$control-name"/>
+                        <xforms:setvalue ref="$bind/@nodeset" value="if ($is-custom-instance) then '()' else $control-name"/>
                     </xforms:action>
                 </xforms:action>
             </xforms:action>
@@ -684,7 +686,7 @@
 
     <!-- Template for outer bind -->
     <xforms:instance id="fb-bind-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms context">
-        <xforms:bind id="fr-form-binds" nodeset="."/>
+        <xforms:bind id="fr-form-binds" nodeset="." name=""/>
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fb-variables')">

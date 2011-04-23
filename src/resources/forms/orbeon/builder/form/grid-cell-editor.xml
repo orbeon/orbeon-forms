@@ -130,10 +130,6 @@
         <xforms:trigger appearance="minimal" id="fb-edit-details-trigger">
             <xforms:label><xhtml:img alt="{$form-resources/control-details-icon/label}" title="{$form-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <!--<xxforms:show dialog="fb-edit-details-dialog" neighbor="fb-edit-details-trigger">-->
-                    <!--<xxforms:context name="control-name" select="$control-name"/>-->
-                    <!--<xxforms:context name="instance-holder" select="$instance-holder"/>-->
-                <!--</xxforms:show>-->
                 <xforms:dispatch name="fb-show-dialog" target="dialog-control-details">
                     <xxforms:context name="fb-control-name" select="$control-name"/>
                     <xxforms:context name="fb-instance-holder" select="$instance-holder"/>

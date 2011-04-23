@@ -62,6 +62,7 @@
                 <xxforms:variable name="resources"      ><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
                 <xxforms:variable name="ui"             select="instance('ui')"/>
                 <xxforms:variable name="model"          select="$form/xhtml:head/xforms:model"/>
+                <xxforms:variable name="body"           select="$form/xhtml:body"/>
                 <xxforms:variable name="binds"          select="$model/xforms:bind[@id = 'fr-form-binds']"/>
                 <xxforms:variable name="metadata"       select="$model/xforms:instance[@id = 'fr-form-metadata']"/>
                 <xxforms:variable name="form-instance"  select="$model/xforms:instance[@id = 'fr-form-instance']"/>
@@ -105,9 +106,16 @@
                     <!-- Parse the XML and replace in form -->
                     <xforms:delete nodeset="$form-instance/*"/>
                     <xforms:insert context="$form-instance" origin="saxon:parse($ui/xml)"/>
-                    <!-- If automatic, change the nodeset attribute on the binds -->
+                    <!-- If automatic, change the nodeset attribute on the binds not for controls -->
                     <xforms:action if="$ui/mode = 'automatic'">
                         <xforms:setvalue xxforms:iterate="$binds//xforms:bind" ref="@nodeset" value="@name"/>
+                    </xforms:action>
+                    <!-- If custom, the binds for sections become "." -->
+                    <xforms:action if="$ui/mode = 'custom'">
+                        <xforms:action xxforms:iterate="$binds//xforms:bind">
+                            <xxforms:variable name="name" select="@name treat as attribute()"/>
+                            <xforms:setvalue if="empty($body//*[@id = concat($name, '-control')])" ref="@nodeset treat as attribute()">.</xforms:setvalue>
+                        </xforms:action>
                     </xforms:action>
                     <!-- Save mode in metadata -->
                     <xforms:delete nodeset="$metadata/metadata/form-instance-mode"/>

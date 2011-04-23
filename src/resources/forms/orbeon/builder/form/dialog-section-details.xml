@@ -45,7 +45,6 @@
                                      name="xxforms-dialog-close" target="fb-section-details-dialog">
                         <xxforms:context name="fb:save" select="true()"/>
                     </xforms:dispatch>
-
                 </xforms:input>
 
                 <xforms:input ref="relevant" incremental="true">
@@ -127,7 +126,7 @@
                 <xxforms:context name="fb:new-name" select="$new-name"/>
             </xforms:dispatch>
 
-        </xforms:action>            
+        </xforms:action>
 
         <!-- Set relevance -->
         <xforms:insert if="normalize-space($instance/relevant) != ''" context="$bind"

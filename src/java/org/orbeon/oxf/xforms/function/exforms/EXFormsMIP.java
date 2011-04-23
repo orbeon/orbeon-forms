@@ -43,7 +43,7 @@ public abstract class EXFormsMIP extends XXFormsMIPFunction {
         if (item == null)
             return BooleanValue.FALSE;
 
-        return BooleanValue.get(getResult((NodeWrapper) item));
+        return BooleanValue.get(getResult((NodeInfo) item));
     }
 
     protected abstract boolean getResult(NodeInfo nodeInfo);

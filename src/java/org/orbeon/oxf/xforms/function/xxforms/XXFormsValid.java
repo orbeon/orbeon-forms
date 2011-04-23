@@ -36,7 +36,7 @@ public class XXFormsValid extends XXFormsMIPFunction {
         if (nodesetExpression == null)
             item = xpathContext.getContextItem();
         else
-            item = nodesetExpression.iterate(xpathContext).next();
+            item = nodesetExpression.evaluateItem(xpathContext);
 
         // Whether to recurse
         final Expression recurseExpression = (argument.length < 2) ? null : argument[1];

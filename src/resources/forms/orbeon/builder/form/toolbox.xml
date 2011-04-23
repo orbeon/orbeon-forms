@@ -277,7 +277,7 @@
                                                     <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
                                                         <xxforms:context name="control-name" select="$new-control-name"/>
                                                     </xforms:dispatch>
-                                                    <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $new-control-name]"/>
+                                                    <xxforms:variable name="bind" select="$model//xforms:bind[@name = $new-control-name] treat as element()"/>
 
                                                     <!-- Make sure there is a @bind instead of a @ref -->
                                                     <xforms:delete nodeset="$control/@ref"/>
@@ -420,7 +420,7 @@
                                         <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
                                     </xforms:label>
-                                    <xforms:dispatch ev:event="xforms-enabled DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
+                                    <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
                                 </fr:button>
                             </xforms:group>
                         </xhtml:div>

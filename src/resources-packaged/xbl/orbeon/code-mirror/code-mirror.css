@@ -16,20 +16,6 @@
     display: none               /* XForms text area we get the text from, write the text to */
 }
 
-.xbl-fr-code-mirror-editor-container {
+.xbl-fr-code-mirror-editor-container .CodeMirror {
     background-color: white;    /* If used in a container which has a background color, we still want the editable area to be white */
-    height: 20em;               /* Default height of the editor */
-    display: inline-block;      /* The height has no effect on inline content */
-}
-
-.CodeMirror-line-numbers {
-    width: 2.2em;
-    color: #aaa;
-    background-color: #F2F2F2;
-    text-align: right;
-    padding-right: .3em;
-    font-size: 10pt;
-    font-family: monospace;
-    padding-top: .4em;
-    line-height: normal;
 }

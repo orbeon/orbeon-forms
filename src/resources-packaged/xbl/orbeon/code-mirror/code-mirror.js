@@ -23,38 +23,30 @@
 
         init: function() {
             var form = ORBEON.xforms.Controls.getForm(this.container);
-            var resourcesBaseURL = ORBEON.xforms.Globals.resourcesBaseURL[form.id];
-            var resourcesPrefix = resourcesBaseURL + "/xbl/orbeon/code-mirror/CodeMirror-0.94/";
             this.textarea = YD.getElementsByClassName("xforms-textarea", null, this.container)[0];
             var editorContainer = YD.getElementsByClassName("xbl-fr-code-mirror-editor-container", null, this.container)[0];
-            this.editor = new CodeMirror(editorContainer, {
-                path: resourcesPrefix + "js/",
-                parserfile: "parsexml.js",
-                stylesheet: resourcesPrefix + "css/xmlcolors.css",
+            this.editor = CodeMirror(editorContainer, {
+                mode: "xml",
                 lineNumbers: true,
                 indentUnit: 4,
-                textWrapping: false,
-                useHTMLKludges: false,
+                value: Document.getValue(this.textarea),
                 onChange: _.bind(this.codeMirrorChange, this),
-                content: Document.getValue(this.textarea),
-                height: "100%",
-                onLoad: _.bind(this.codeMirrorOnLoad, this)
+                onFocus: _.bind(this.codeMirrorFocus, this),
+                onBlur: _.bind(this.codeMirrorBlur, this)
             });
-        },
-
-        codeMirrorOnLoad: function() {
-            YAHOO.util.Event.addListener(this.editor.win.document, "focus", _.bind(this.codeMirrorFocus, this));
-            YAHOO.util.Event.addListener(this.editor.win.document, "blur", _.bind(this.codeMirrorBlur, this));
         },
 
         codeMirrorFocus: function() { this.hasFocus = true; },
         codeMirrorBlur: function() { this.hasFocus = false; },
-        codeMirrorChange: function() { Document.setValue(this.textarea, this.editor.getCode()); },
+        codeMirrorChange: function() {
+            if (this.editor)
+                Document.setValue(this.textarea, this.editor.getValue());
+        },
 
         valueChanged: function() {
             // As a shortcut, don't update the control if the user is typing in it
             if (! this.hasFocus)
-                this.editor.setCode(Document.getValue(this.textarea));
+                this.editor.setValue(Document.getValue(this.textarea));
         }
     };
 })();

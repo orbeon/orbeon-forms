@@ -162,7 +162,7 @@ h1.fr-form-title {
 
 /* TODO: change this to properly dynamically size dialog */
 #fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
-#fb-source-editor-dialog .xbl-fr-code-mirror-editor-container { height: 50em; display: block }
+#fb-source-editor-dialog .CodeMirror { height: 50em }
 #fb-source-editor-dialog .xforms-alert-active { display: block }
 /*#fb-xml-dialog { width: 70em }*/
 

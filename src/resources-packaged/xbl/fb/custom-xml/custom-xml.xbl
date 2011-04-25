@@ -138,9 +138,9 @@
                     </xforms:select1>
                     <!-- Edit XML -->
                     <xhtml:div class="fb-xml-dialog-view">
-                        <xforms:textarea ref="$ui/xml" id="instance-textarea" incremental="true">
+                        <fr:code-mirror ref="$ui/xml" id="instance-textarea" incremental="true">
                             <xforms:alert ref="$resources/dialog-edit-source/source/alert"/>
-                        </xforms:textarea>
+                        </fr:code-mirror>
                     </xhtml:div>
                     <!-- Buttons -->
                     <xhtml:div class="fr-dialog-buttons">

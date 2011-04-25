@@ -25,11 +25,11 @@
         <xforms:model xxforms:ajax.update.full.threshold="1">
             <xforms:instance id="instance">
                 <instance>
-                    <code/>
+                    <code readonly="true"/>
                 </instance>
             </xforms:instance>
             <xforms:instance id="xbl" src="oxf:/xbl/orbeon/code-mirror/code-mirror.xbl"/>
-            <xforms:bind ref="code" constraint=". != ''"/>
+            <xforms:bind ref="code" constraint=". != ''" readonly="@readonly = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -39,6 +39,10 @@
         <fr:button>
             <xforms:label>Reset</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="code" value="saxon:serialize(instance('xbl'), 'xml')"/>
+        </fr:button>
+        <fr:button>
+            <xforms:label>Toggle readonly</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="code/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
         </fr:button>
     </xhtml:body>
 </xhtml:html>

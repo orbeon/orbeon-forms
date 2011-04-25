@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.serializer;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
@@ -137,7 +138,7 @@ public class BinaryTextXMLReceiver extends XMLReceiverAdapter {
 
             // Set last-modified if available
             final String validityAttribute = attributes.getValue("last-modified");
-            if (validityAttribute != null) {
+            if (StringUtils.isNotBlank(validityAttribute)) {
                 // Override caching settings which may have taken place before
                 if (response != null)
                     response.setCaching(ISODateUtils.parseRFC1123Date(validityAttribute), true, true);
@@ -145,14 +146,14 @@ public class BinaryTextXMLReceiver extends XMLReceiverAdapter {
 
             // Set filename if available
             final String fileName = attributes.getValue("filename");
-            if (fileName != null) {
+            if (StringUtils.isNotBlank(fileName)) {
                 if (response != null)
                     response.setHeader("Content-Disposition", "attachment; filename=" + fileName );
             }
 
             // Set status code if available
             final String statusCode = attributes.getValue("status-code");
-            if (statusCode != null) {
+            if (StringUtils.isNotBlank(statusCode)) {
                 if (response != null)
                      response.setStatus(Integer.parseInt(statusCode));
             }

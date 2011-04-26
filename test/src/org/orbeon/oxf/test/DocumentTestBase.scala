@@ -83,6 +83,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]) = seq map (elemToElement(_)) toList
     implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]) = seq map (elementToElem(_)) toList
 
+    protected def getControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl]
     protected def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
     protected def getValueControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsValueControl]
     protected def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)

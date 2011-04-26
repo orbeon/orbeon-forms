@@ -401,6 +401,16 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // xxforms:document
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}create-document", XXFormsCreateDocument.class, 0, 0, 0, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:label, xxforms:help, xxforms:hint, xxforms:alert
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}label", XXFormsLHHA.class, 0, 1, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}help", XXFormsLHHA.class, 1, 1, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}hint", XXFormsLHHA.class, 2, 1, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}alert", XXFormsLHHA.class, 3, 1, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+
         // === Functions in the xforms namespace
 
         // xforms:if()

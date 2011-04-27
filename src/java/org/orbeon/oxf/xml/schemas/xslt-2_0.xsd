@@ -97,6 +97,9 @@
 
         </xs:documentation>
     </xs:annotation>
+
+    <xs:attribute name="version" type="xs:decimal"/>
+
     <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <!--
 

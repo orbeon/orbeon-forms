@@ -201,7 +201,7 @@ class MongoDBPersistence extends HttpServlet {
 
             // Create and output result
             val result =
-                <documents total={rows.size.toString} page-size={pageSize.toString} page-number={pageNumber.toString} query={fullQuery}>{
+                <documents total={rows.size.toString} page-size={pageSize.toString} page-number={pageNumber.toString}>{
                     rows map { o =>
                         val created = DateTimeValue.fromJavaDate(new Date(o.get("_id").asInstanceOf[ObjectId].getTime)).getCanonicalLexicalRepresentation.toString
                         <document created={created} last-modified={o.get(LAST_UPDATE_KEY).toString} name={o.get(DOCUMENT_ID_KEY).toString}>

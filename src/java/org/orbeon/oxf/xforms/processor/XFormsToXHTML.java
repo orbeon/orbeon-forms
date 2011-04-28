@@ -13,6 +13,15 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
@@ -20,7 +29,12 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.CacheableInputReader;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -31,10 +45,26 @@ import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.*;
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XXFormsAttributeHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsCaseHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsDefaultControlHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsGroupHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsRepeatHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsSelectHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.ExceptionWrapperXMLReceiver;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TeeXMLReceiver;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.SAXException;
 
@@ -452,8 +482,25 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // Register handlers on controller (the other handlers are registered by the body handler)
             {
-                controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
-                controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
+            	final boolean isHTMLDocument = containingDocument.getStaticState().isHTMLDocument();
+				if (isHTMLDocument) {
+	                controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
+	                controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
+            	}
+            	else {
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+            		controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
+            		controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
+            		controller.registerHandler(XFormsGroupHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
+            		controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
+            		controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
+            	}
 
                 // Register a handler for AVTs on HTML elements
                 final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
@@ -462,10 +509,12 @@ public class XFormsToXHTML extends ProcessorImpl {
                     controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
                 }
 
-                // Swallow XForms elements that are unknown
-                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
-                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI);
+            	if (isHTMLDocument) {
+	                // Swallow XForms elements that are unknown
+	                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+	                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
+	                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI);
+            	}
             }
 
             // Set final output

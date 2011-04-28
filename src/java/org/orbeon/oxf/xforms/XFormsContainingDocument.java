@@ -427,13 +427,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     public boolean isDirtySinceLastRequest() {
         return xformsControls.isDirtySinceLastRequest();
     }
-
+    
     /**
      * Return the static state of this document.
      */
     public XFormsStaticState getStaticState() {
         return staticState;
     }
+
 
     public StaticStateGlobalOps getStaticOps() {
         return staticOps;

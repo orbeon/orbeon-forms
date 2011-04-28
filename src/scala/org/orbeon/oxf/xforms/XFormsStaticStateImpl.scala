@@ -54,6 +54,7 @@ class XFormsStaticStateImpl(val encodedState: String, val digest: String, val st
     }
     lazy val isNoscript = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.NOSCRIPT_PROPERTY) && getBooleanProperty(P.NOSCRIPT_SUPPORT_PROPERTY), P.NOSCRIPT_PROPERTY)
     lazy val isXPathAnalysis = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
+    lazy val isHTMLDocument = staticStateDocument.isHTMLDocument
 
     def isCacheDocument = staticStateDocument.isCacheDocument
     def isClientStateHandling = staticStateDocument.isClientStateHandling
@@ -252,5 +253,10 @@ object XFormsStaticStateImpl {
         def isCacheDocument = getProperty[Boolean](P.CACHE_DOCUMENT_PROPERTY)
         def isClientStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
         def isServerStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
+        
+        val isHTMLDocument  = staticStateElement.attributeValue("is-html") match {
+            case isHTML: String => isHTML.equals("true")
+            case _ => false
+        }
     }
 }

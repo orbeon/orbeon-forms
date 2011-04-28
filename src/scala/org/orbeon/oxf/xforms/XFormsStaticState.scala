@@ -40,6 +40,7 @@ trait XFormsStaticState extends XMLUtils.DebugXML  {
     def isServerStateHandling: Boolean
     def isNoscript: Boolean
     def isXPathAnalysis: Boolean
+    def isHTMLDocument: Boolean
 
     def getNonDefaultProperties: Map[String, AnyRef]
     def getProperty[T](propertyName: String): T

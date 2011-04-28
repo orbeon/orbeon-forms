@@ -54,7 +54,7 @@ import java.util.*;
  *
  * Structure:
  *
- * <static-state xmlns:xxforms="..." system-id="..." ...>
+ * <static-state xmlns:xxforms="..." system-id="..." is-html="..." ...>
  *   <!-- E.g. AVT on xhtml:html -->
  *   <xxforms:attribute .../>
  *   <!-- E.g. xforms:output within xhtml:title -->
@@ -113,6 +113,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private boolean inPreserve;     // whether we are in a schema, instance, or xbl:xbl
     private boolean inLHHA;         // whether we are in an LHHA element
     private int preserveOrLHHALevel;
+    private boolean isHTMLDocument; // Whether this is an (X)HTML document
 
     /**
      * Constructor for top-level document.
@@ -173,6 +174,9 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 attributesImpl.addAttribute("", "line", "line", ContentHandlerHelper.CDATA, Integer.toString(locationData.getLine()));
                 attributesImpl.addAttribute("", "column", "column", ContentHandlerHelper.CDATA, Integer.toString(locationData.getCol()));
             }
+            
+            // Add is HTML information
+            attributesImpl.addAttribute("", "is-html", "is-html", ContentHandlerHelper.CDATA, isHTMLDocument?"true":"false");
 
             super.startElement("", "static-state", "static-state", attributesImpl);
             mustOutputFirstElement = false;
@@ -296,6 +300,10 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         // Handle properties of the form @xxforms:* when outside of models or controls
         if (!inXFormsOrExtension && !isXFormsOrExtension) {
             handleProperties(attributes);
+        }
+        
+        if (level == 0 && isTopLevel) {
+        	isHTMLDocument = "html".equals(localname) && (uri == null || uri.isEmpty() || XMLConstants.XHTML_NAMESPACE_URI.equals(uri));
         }
 
         if (level > 0 || !ignoreRootElement) {

@@ -37,7 +37,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
     // Output an element
     private def outputElement(helper: ContentHandlerHelper, xhtmlPrefix: String, attributesImpl: AttributesImpl,
                               getElementDetails: (Option[String], Option[String]) => (String, Array[String]))
-                             (resource: Option[String], cssClass: Option[String], content: Option[String]) = {
+                             (resource: Option[String], cssClass: Option[String], content: Option[String]) {
 
         val (elementName, attributes) = getElementDetails(resource, cssClass)
 

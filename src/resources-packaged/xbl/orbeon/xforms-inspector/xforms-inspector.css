@@ -1,0 +1,42 @@
+/**
+ * Copyright (C) 2011 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+.fr-xforms-inspector {
+    display: block;
+    clear: both;
+    background-color:white;
+    border: 1px solid #333366;
+    margin: 1em;
+    padding: .5em;
+
+}
+
+.fr-xforms-inspector .xforms-label {
+    display: inline;
+    font-weight: bold;
+    font-style: italic;
+    margin-right: .5em
+}
+
+.fr-xforms-inspector td {
+    padding: .5em
+}
+
+.fr-xforms-inspector h2 {
+    margin: 0
+}
+
+.fr-xforms-inspector .xforms-mediatype-text-html { text-align: left }
+
+/* Override definition which might be added by Form Runner */
+.xbl-fr-xforms-inspector .xforms-select1-appearance-full span { display: inline }

@@ -455,7 +455,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                             break;
                         } finally {
                             if (indentedLogger.isDebugEnabled())
-                                indentedLogger.endHandleOperation("submitted asynchronously", Boolean.toString(submissionResult == null));
+                                indentedLogger.endHandleOperation();
                         }
                     }
                 }

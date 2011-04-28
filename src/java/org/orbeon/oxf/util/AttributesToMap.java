@@ -61,8 +61,19 @@ public abstract class AttributesToMap<E> implements Map<String, E> {
     }
 
     public Set<Map.Entry<String, E>> entrySet() {
-        // TODO: It's harder than it looks, as changes to the Entry elements must be reflected in the Map.
-        throw new UnsupportedOperationException();
+        final HashSet<Map.Entry<String, E>> result = new HashSet<Map.Entry<String, E>>();
+        for (final String name : Collections.list(attributeable.getAttributeNames())) {
+            result.add(new Map.Entry<String, E>() {
+                public String getKey() { return name; }
+                public E getValue() { return attributeable.getAttribute(name); }
+                public E setValue(E value) {
+                    final E previousValue = getValue();
+                    attributeable.setAttribute(name, value);
+                    return previousValue;
+                }
+            });
+        }
+        return result;
     }
 
     public E get(Object key) {

@@ -152,7 +152,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
         }
     }
 
-    // NOTE: This is borrowed from StringConversions but we don't want the dependency
+    // FIXME: This is borrowed from StringConversions but we don't want the dependency
     public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
         final String[] currentValue = map.get(name);
         if (currentValue == null) {
@@ -227,7 +227,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
     public void destroy() {
     }
 
-    // NOTE: This is borrowed from NetUtils but we don't want the dependency
+    // FIXME: This is borrowed from NetUtils but we don't want the dependency
     public static String getContentTypeCharset(String contentType) {
         if (contentType == null)
             return null;
@@ -243,7 +243,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
         return afterCharset.trim();
     }
 
-    // NOTE: This is borrowed from NetUtils but we don't want the dependency
+    // FIXME: This is borrowed from NetUtils but we don't want the dependency
     public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;

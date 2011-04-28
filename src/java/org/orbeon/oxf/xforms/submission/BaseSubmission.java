@@ -127,9 +127,9 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Perform a local local submission.
      */
-    protected ConnectionResult openLocalConnection(ExternalContext externalContext,
-                                                   final IndentedLogger indentedLogger,
+    protected ConnectionResult openLocalConnection(ExternalContext.Request request,
                                                    ExternalContext.Response response,
+                                                   final IndentedLogger indentedLogger,
                                                    XFormsModelSubmission xformsModelSubmission,
                                                    String httpMethod, final String resource, String mediatype,
                                                    byte[] messageBody, String queryString,
@@ -150,7 +150,7 @@ public abstract class BaseSubmission implements Submission {
                 messageBody = new byte[0];
 
             // Destination context path is the context path of the current request, or the context path implied by the new URI
-            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
+            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? request.getContextPath() : NetUtils.getFirstPathElement(resource);
 
             // Create requestAdapter depending on method
             final ForwardExternalContextRequestWrapper requestAdapter;
@@ -169,27 +169,27 @@ public abstract class BaseSubmission implements Submission {
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
+                    requestAdapter = new ForwardExternalContextRequestWrapper(request, destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames, customHeaderNameValues);
                 } else {
                     // Simulate a GET or DELETE
                     {
-                        final StringBuffer updatedActionStringBuffer = new StringBuffer(resource);
+                        final StringBuilder updatedActionStringBuilder = new StringBuilder(resource);
                         if (queryString != null) {
                             if (resource.indexOf('?') == -1)
-                                updatedActionStringBuffer.append('?');
+                                updatedActionStringBuilder.append('?');
                             else
-                                updatedActionStringBuffer.append('&');
-                            updatedActionStringBuffer.append(queryString);
+                                updatedActionStringBuilder.append('&');
+                            updatedActionStringBuilder.append(queryString);
                         }
-                        effectiveResourceURI = updatedActionStringBuffer.toString();
+                        effectiveResourceURI = updatedActionStringBuilder.toString();
                     }
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(), destinationContextPath,
+                    requestAdapter = new ForwardExternalContextRequestWrapper(request, destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, headerNames, customHeaderNameValues);
                 }
             }
@@ -203,7 +203,7 @@ public abstract class BaseSubmission implements Submission {
                             "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
 
             // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
-            final ExternalContext.Response effectiveResponse = !isReplaceAll ? null : response != null ? response : externalContext.getResponse();
+            final ExternalContext.Response effectiveResponse = !isReplaceAll ? null : response;
 
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 @Override
@@ -254,7 +254,7 @@ public abstract class BaseSubmission implements Submission {
                 connectionResult.dontHandleResponse = true;
             } else {
                 // We must intercept the reply
-                final ResponseAdapter responseAdapter = new ResponseAdapter(externalContext.getNativeResponse());
+                final ResponseAdapter responseAdapter = new ResponseAdapter(response.getNativeResponse());
                 submissionProcess.process(requestAdapter, responseAdapter);
 
                 // Get response information that needs to be forwarded

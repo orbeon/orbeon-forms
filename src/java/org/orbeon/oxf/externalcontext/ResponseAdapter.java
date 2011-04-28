@@ -15,7 +15,9 @@ package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Map;
 
 
@@ -67,7 +69,9 @@ public class ResponseAdapter implements ExternalContext.Response {
     }
 
     public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
-        return false;
+        // Always indicate that the resource has been modified. If needed we could use:
+        // return NetUtils.checkIfModifiedSince(request, lastModified);
+        return true;
     }
 
     public String rewriteActionURL(String urlString) {

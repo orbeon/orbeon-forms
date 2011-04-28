@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -322,7 +321,7 @@
             <fr:body>
                 <xforms:group appearance="xxforms:internal">
                     <!-- Stop value change propagation so changes in this section of the form don't cause data
-                         to become dirty in fr-peristence-model -->
+                         to become dirty in fr-persistence-model -->
                     <xforms:action ev:event="xforms-value-changed" ev:propagate="stop"/>
 
                     <xforms:group class="fr-summary-search">
@@ -841,29 +840,12 @@
                             </xforms:group>
                             <!-- Import button -->
                             <xforms:group ref="if (. = 'import') then instance('fr-summary-triggers-instance')/import else ()">
-
-                                <!-- Create the link so that the URL gets rewritten -->
-                                <xhtml:a style="display:none" class="fr-summary-import-anchor" target="_blank" f:url-type="resource"
-                                         href="/fr/{$app}/{$form}/import"/>
-
-                                <!-- In script mode, intercept client-side click and open window directly -->
-                                <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
-                                    var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
-                                    YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
-                                        var a = YAHOO.util.Dom.getElementsByClassName("fr-summary-import-anchor", null, group)[0];
-                                        window.open(a.href, a.target)
-                                    }, this);
-                                </xxforms:script>
-
                                 <fr:button ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/up_16.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/import-forms"/></xhtml:span>
                                     </xforms:label>
-                                    <!-- Only load directly in noscript mode -->
-                                    <xforms:action ev:event="DOMActivate" if="property('xxforms:noscript')">
-                                        <xforms:load resource="/fr/{$app}/{$form}/import" xxforms:show-progress="false" f:url-type="resource"/>
-                                    </xforms:action>
+                                    <xforms:load ev:event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
                                 </fr:button>
                             </xforms:group>
                         </xhtml:span>

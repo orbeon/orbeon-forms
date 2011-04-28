@@ -76,10 +76,6 @@ public class ServletContextExternalContext implements ExternalContext {
         return attributesMap;
     }
 
-    public RequestDispatcher getNamedDispatcher(String name) {
-        return null;
-    }
-
     public Object getNativeContext() {
         if (servletContext != null)
             return servletContext;
@@ -93,12 +89,6 @@ public class ServletContextExternalContext implements ExternalContext {
 
     public Object getNativeResponse() {
         return null;
-    }
-
-    public Object getNativeSession(boolean flag) {
-        if (session == null)
-            return null;
-        return session;
     }
 
     public String getRealPath(String path) {

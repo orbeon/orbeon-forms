@@ -562,11 +562,6 @@ public class TestExternalContext implements ExternalContext  {
         return null;
     }
 
-    public RequestDispatcher getNamedDispatcher(String name) {
-        // NIY
-        return null;
-    }
-
     public String getStartLoggerString() {
         return "Running test processor";
     }
@@ -580,10 +575,6 @@ public class TestExternalContext implements ExternalContext  {
     }
 
     public Object getNativeResponse() {
-        return null;
-    }
-
-    public Object getNativeSession(boolean flag) {
         return null;
     }
 

@@ -17,7 +17,9 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
@@ -39,7 +41,7 @@ import java.util.*;
  *
  * WARNING: OrbeonPortlet2 must only depend on the Servlet API and the Orbeon Class Loader.
  */
-public class OrbeonPortlet2Delegate extends GenericPortlet {
+public class OrbeonPortlet2DelegateBase extends GenericPortlet {
 
     private static final String INIT_PROCESSOR_PROPERTY_PREFIX = "oxf.portlet-initialized-processor.";
     private static final String INIT_PROCESSOR_INPUT_PROPERTY = "oxf.portlet-initialized-processor.input.";
@@ -48,7 +50,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
 
     private static final String LOG_MESSAGE_PREFIX = "Portlet";
 
-    private ProcessorService processorService;
+    protected ProcessorService processorService;
 
     private static final String OXF_PORTLET_OUTPUT = "org.orbeon.oxf.buffered-response";
     private static final String OXF_PORTLET_OUTPUT_PARAMS = "org.orbeon.oxf.buffered-response-params";
@@ -56,6 +58,14 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
     // Servlet context initialization parameters set in web.xml
     private Map contextInitParameters = null;
     public static final String PORTLET_CONFIG = "portlet-config"; // used only for pipelines called within portlets
+
+    public ProcessorService getProcessorService() {
+        return processorService;
+    }
+
+    public Map<String, String> getContextInitParameters() {
+        return contextInitParameters;
+    }
 
     @Override
     public void init() throws PortletException {
@@ -170,8 +180,13 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
             // Call service
             final PipelineContext pipelineContext = new PipelineContext();
             pipelineContext.setAttribute(PORTLET_CONFIG, getPortletConfig());
-            final Portlet2ExternalContext externalContext = new Portlet2ExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, actionRequest);
-            processorService.service(externalContext, pipelineContext);
+            final Portlet2ExternalContext externalContext = new Portlet2ExternalContext(pipelineContext, getPortletContext(), contextInitParameters, actionRequest);
+            try {
+
+                processorService.service(externalContext, pipelineContext);
+            } finally {
+
+            }
 
             // Check whether a redirect was issued, or some output was generated
             Portlet2ExternalContext.BufferedResponse bufferedResponse = (Portlet2ExternalContext.BufferedResponse) externalContext.getResponse();
@@ -232,7 +247,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
                 final // Call service
                 PipelineContext pipelineContext = new PipelineContext();
                 pipelineContext.setAttribute(PORTLET_CONFIG, getPortletConfig());
-                final ExternalContext externalContext = new Portlet2ExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, request, response);
+                final ExternalContext externalContext = new Portlet2ExternalContext(pipelineContext, getPortletContext(), contextInitParameters, request, response);
                 processorService.service(externalContext, pipelineContext);
                 // TEMP: The response is also buffered, because our
                 // rewriting algorithm only operates on Strings for now.
@@ -255,7 +270,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
             // Call service
             final PipelineContext pipelineContext = new PipelineContext();
             pipelineContext.setAttribute(PORTLET_CONFIG, getPortletConfig());
-            final ExternalContext externalContext = new Portlet2ExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, request, response);
+            final ExternalContext externalContext = new Portlet2ExternalContext(pipelineContext, getPortletContext(), contextInitParameters, request, response);
             processorService.service(externalContext, pipelineContext);
             // TEMP: The response is also buffered, because our
             // rewriting algorithm only operates on Strings for now.
@@ -267,15 +282,6 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
         } catch (Exception e) {
             throw new PortletException(OXFException.getRootThrowable(e));
         }
-    }
-
-    /**
-     * Internally process a servlet request based on request/response objects.
-     */
-    public static void processPortletRequest(ExternalContext.Request request, ExternalContext.Response response) {
-        final PipelineContext pipelineContext = new PipelineContext();
-        final Portlet2ExternalContext externalContext = new Portlet2ExternalContext(pipelineContext, request, response);
-        externalContext.getProcessorService().service(externalContext, externalContext.getPipelineContext());
     }
 
     /**
@@ -360,10 +366,10 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
     /**
      * Present a read-only view of the Portlet initialization parameters as a Map.
      */
-    public class PortletInitMap extends AttributesToMap {
-        public PortletInitMap(final OrbeonPortlet2Delegate portletDelegate) {
-            super(new Attributeable() {
-                public Object getAttribute(String s) {
+    public class PortletInitMap extends AttributesToMap<String> {
+        public PortletInitMap(final OrbeonPortlet2DelegateBase portletDelegate) {
+            super(new Attributeable<String>() {
+                public String getAttribute(String s) {
                     return portletDelegate.getInitParameter(s);
                 }
 
@@ -375,7 +381,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
                     throw new UnsupportedOperationException();
                 }
 
-                public void setAttribute(String s, Object o) {
+                public void setAttribute(String s, String o) {
                     throw new UnsupportedOperationException();
                 }
             });
@@ -385,10 +391,10 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
     /**
      * Present a read-only view of the PortletContext initialization parameters as a Map.
      */
-    public static class PortletContextInitMap extends AttributesToMap {
+    public static class PortletContextInitMap extends AttributesToMap<String> {
         public PortletContextInitMap(final PortletContext portletContext) {
-            super(new Attributeable() {
-                public Object getAttribute(String s) {
+            super(new Attributeable<String>() {
+                public String getAttribute(String s) {
                     return portletContext.getInitParameter(s);
                 }
 
@@ -400,7 +406,7 @@ public class OrbeonPortlet2Delegate extends GenericPortlet {
                     throw new UnsupportedOperationException();
                 }
 
-                public void setAttribute(String s, Object o) {
+                public void setAttribute(String s, String o) {
                     throw new UnsupportedOperationException();
                 }
             });

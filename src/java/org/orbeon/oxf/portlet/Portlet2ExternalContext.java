@@ -22,7 +22,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import javax.portlet.*;
@@ -48,6 +47,54 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
+    private ExternalContext.Request request;
+    private ExternalContext.Response response;
+    private ExternalContext.Session session;
+    private ExternalContext.Application application;
+
+    private PipelineContext pipelineContext;
+    private PortletRequest portletRequest;
+    private ClientDataRequest clientDataRequest;
+    private MimeResponse mimeResponse;
+
+    Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest) {
+        this(portletContext, initAttributesMap);
+        this.pipelineContext = pipelineContext;
+
+        // Wrap PortletRequest if needed
+        if (customContext != null) {
+            try {
+                this.portletRequest = customContext.amendRequest(portletRequest);
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        } else {
+            this.portletRequest = portletRequest;
+        }
+
+        if (portletRequest instanceof ClientDataRequest)
+            this.clientDataRequest = (ClientDataRequest) portletRequest;
+    }
+
+    Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest, MimeResponse mimeResponse) {
+        this(pipelineContext, portletContext, initAttributesMap, portletRequest);
+        this.mimeResponse = mimeResponse;
+    }
+
+    Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, ExternalContext.Request request, ExternalContext.Response response) {
+        this(portletContext, initAttributesMap);
+
+        this.pipelineContext = pipelineContext;
+        this.request = request;
+        this.response = response;
+        this.session = request.getSession(true);
+
+    }
+
+    private Portlet2ExternalContext(PortletContext portletContext, Map<String, String> initAttributesMap) {
+        super(portletContext, initAttributesMap);
+    }
+
     private class Request implements ExternalContext.Request {
 
         private Request() {}
@@ -57,10 +104,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         private Map<String, Object> attributesMap;
         private Map<String, String[]> headerValuesMap;
         private Map<String, Object[]> parameterMap;
-
-        public Portlet2ExternalContext getPortlet2ExternalContext() {
-            return Portlet2ExternalContext.this;
-        }
 
         public String getContainerType() {
             return "portlet";
@@ -627,133 +670,12 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
-//    public class DirectResponse extends BaseResponse {
-//
-//        public DirectResponse() {
-//        }
-//
-//        public OutputStream getOutputStream() throws IOException {
-//            return mimeResponse.getPortletOutputStream();
-//        }
-//
-//        public PrintWriter getWriter() throws IOException {
-//            return mimeResponse.getWriter();
-//        }
-//
-//        public void setContentType(String contentType) {
-//            mimeResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
-//        }
-//
-//        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
-//            throw new IllegalStateException();
-//        }
-//
-//        public String getCharacterEncoding() {
-//            return mimeResponse.getCharacterEncoding();
-//        }
-//
-//        public boolean isCommitted() {
-//            return mimeResponse.isCommitted();
-//        }
-//
-//        public void reset() {
-//            mimeResponse.reset();
-//        }
-//
-//        public void setTitle(String title) {
-//            if (mimeResponse instanceof RenderResponse)
-//                ((RenderResponse) mimeResponse).setTitle(title);
-//        }
-//    }
-
-    private ExternalContext.Request request;
-    private ExternalContext.Response response;
-    private ExternalContext.Session session;
-    private ExternalContext.Application application;
-
-    private ProcessorService processorService;
-    private PipelineContext pipelineContext;
-    private PortletRequest portletRequest;
-    private ClientDataRequest clientDataRequest;
-    private MimeResponse mimeResponse;
-
-    private Portlet2ExternalContext(ProcessorService processorService, PortletContext portletContext, Map<String, String> initAttributesMap) {
-        super(portletContext, initAttributesMap);
-        this.processorService = processorService;
-    }
-
-    Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest) {
-        this(processorService, portletContext, initAttributesMap);
-        this.pipelineContext = pipelineContext;
-
-        // Wrap PortletRequest if needed
-        if (customContext != null) {
-            try {
-                this.portletRequest = customContext.amendRequest(portletRequest);
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
-        } else {
-            this.portletRequest = portletRequest;
-        }
-
-        if (portletRequest instanceof ClientDataRequest)
-            this.clientDataRequest = (ClientDataRequest) portletRequest;
-    }
-
-    Portlet2ExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest, MimeResponse mimeResponse) {
-        this(processorService, pipelineContext, portletContext, initAttributesMap, portletRequest);
-        this.mimeResponse = mimeResponse;
-    }
-
-    private Portlet2ExternalContext(PipelineContext pipelineContext, Request unwrappedRequest) {
-        this(unwrappedRequest.getPortlet2ExternalContext().getProcessorService(),
-                pipelineContext,
-                unwrappedRequest.getPortlet2ExternalContext().getPortletContext(),
-                unwrappedRequest.getPortlet2ExternalContext().getInitAttributesMap(),
-                unwrappedRequest.getPortlet2ExternalContext().getPortletRequest(),
-                unwrappedRequest.getPortlet2ExternalContext().getRenderResponse());
-
-        // Forward portlet config to new pipeline context
-        pipelineContext.setAttribute(OrbeonPortlet2Delegate.PORTLET_CONFIG,
-                unwrappedRequest.getPortlet2ExternalContext().getPipelineContext().getAttribute(OrbeonPortlet2Delegate.PORTLET_CONFIG));
-    }
-
-    Portlet2ExternalContext(PipelineContext pipelineContext, ExternalContext.Request request, ExternalContext.Response response) {
-        this(pipelineContext, unwrapRequest(request));
-
-        this.request = request;
-        this.response = response;
-    }
-
-    private static Request unwrapRequest(ExternalContext.Request request) {
-        while (!(request instanceof Request)) {
-            if (!(request instanceof org.orbeon.oxf.externalcontext.RequestWrapper))
-                throw new OXFException("Request in forward must be original Request or instance of RequestWrapper.");
-            request = ((org.orbeon.oxf.externalcontext.RequestWrapper) request)._getRequest();
-        }
-        return (Request) request;
-    }
-
-//    private static Response unwrapResponse(ExternalContext.Response response) {
-//        while (!(response instanceof BaseResponse)) {
-//            if (!(response instanceof org.orbeon.oxf.externalcontext.ResponseWrapper))
-//                throw new OXFException("Response in forward must be original Response or instance of ResponseWrapper.");
-//            response = ((org.orbeon.oxf.externalcontext.ResponseWrapper) response)._getResponse();
-//        }
-//        return (Response) response;
-//    }
-
     public Object getNativeRequest() {
         return portletRequest;
     }
 
     public Object getNativeResponse() {
         return mimeResponse;
-    }
-
-    public Object getNativeSession(boolean create) {
-        return portletRequest.getPortletSession(create);
     }
 
     public ExternalContext.Request getRequest() {
@@ -798,28 +720,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         return getRequest().getRequestPath();
     }
 
-    public RequestDispatcher getNamedDispatcher(String name) {
-        return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getNamedDispatcher(name));
-    }
-
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getRequestDispatcher(path));
-    }
-
-    public ProcessorService getProcessorService() {
-        return processorService;
-    }
-
-    public PipelineContext getPipelineContext() {
-        return pipelineContext;
-    }
-
-    private PortletRequest getPortletRequest() {
-        return portletRequest;
-    }
-
-    private MimeResponse getRenderResponse() {
-        return mimeResponse;
     }
 
     /**

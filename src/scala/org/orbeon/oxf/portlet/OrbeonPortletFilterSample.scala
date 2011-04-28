@@ -21,7 +21,7 @@ import javax.portlet._
  */
 class OrbeonPortletFilterSample extends GenericPortlet {
     override def render(request: RenderRequest, response: RenderResponse) {
-        response.getWriter write
+         response.getWriter write
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                 <xh:head>
                     <xh:title>XForms Hello</xh:title>

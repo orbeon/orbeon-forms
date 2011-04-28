@@ -540,7 +540,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 }
             }
             // Check whether user is logged-in
-            return NetUtils.checkIfModifiedSince(nativeRequest, lastModified);
+            return NetUtils.checkIfModifiedSince(request, lastModified);
         }
 
         public String getNamespacePrefix() {
@@ -735,10 +735,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         return nativeResponse;
     }
 
-    public Object getNativeSession(boolean create) {
-        return nativeRequest.getSession(create);
-    }
-
     public ExternalContext.Request getRequest() {
         if (request == null)
             request = new Request();
@@ -791,11 +787,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public String getEndLoggerString() {
         return getRequest().getRequestPath();
-    }
-
-    public RequestDispatcher getNamedDispatcher(String name) {
-        final ServletContext slashServletContext = servletContext.getContext("/");
-        return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getNamedDispatcher(name), slashServletContext == servletContext);
     }
 
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {

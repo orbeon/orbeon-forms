@@ -17,18 +17,19 @@ import org.dom4j.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.orbeon.oxf.externalcontext.RequestAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
-import org.orbeon.oxf.util.HttpServletRequestStub;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,9 +37,6 @@ import static org.junit.Assert.assertTrue;
 public class NetUtilsTest extends ResourceManagerTestBase {
 
     private PipelineContext pipelineContext;
-    private ExternalContext externalContext;
-    private ExternalContext.Request request;
-    private ExternalContext.Response response;
 
     @Before
     public void setup() throws Exception {
@@ -46,10 +44,8 @@ public class NetUtilsTest extends ResourceManagerTestBase {
         pipelineContext = new PipelineContext();
 
         final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/test/if-modified-since-request.xml", null);
-        externalContext = new TestExternalContext(pipelineContext, requestDocument);
+        final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
         pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
-        request = externalContext.getRequest();
-        response = externalContext.getResponse();
     }
 
     @After
@@ -64,24 +60,27 @@ public class NetUtilsTest extends ResourceManagerTestBase {
         final String ifModifiedHeaderString = "Thu, 28 Jun 2007 14:17:36 GMT";
         final long ifModifiedHeaderLong = ISODateUtils.parseRFC1123Date(ifModifiedHeaderString);
 
-        final HttpServletRequest httpServletRequest = new HttpServletRequestStub() {
+        final ExternalContext.Request request = new RequestAdapter() {
+            @Override
             public String getMethod() {
                 return "GET";
             }
 
-            public String getHeader(String s) {
-                if (s.equalsIgnoreCase("If-Modified-Since")) {
-                    return ifModifiedHeaderString;
-                } else {
-                    return null;
-                }
+            private final Map<String, String[]> headers = new HashMap<String, String[]>();
+            {
+                headers.put("if-modified-since", new String[] { ifModifiedHeaderString });
+            }
+
+            @Override
+            public Map<String, String[]> getHeaderValuesMap() {
+                return headers;
             }
         };
 
-        assertEquals(NetUtils.checkIfModifiedSince(httpServletRequest, ifModifiedHeaderLong -1), false);
-        assertEquals(NetUtils.checkIfModifiedSince(httpServletRequest, ifModifiedHeaderLong), false);
+        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong -1), false);
+        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong), false);
         // For some reason the code checks that there is more than one second of difference
-        assertEquals(NetUtils.checkIfModifiedSince(httpServletRequest, ifModifiedHeaderLong + 1001), true);
+        assertEquals(NetUtils.checkIfModifiedSince(request, ifModifiedHeaderLong + 1001), true);
     }
 
     @Test

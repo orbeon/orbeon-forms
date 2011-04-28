@@ -375,10 +375,6 @@ public class SimpleExternalContext implements ExternalContext {
         return null;
     }
 
-    public Object getNativeSession(boolean create) {
-        return null;
-    }
-
     public ExternalContext.Request getRequest() {
         return request;
     }
@@ -421,10 +417,6 @@ public class SimpleExternalContext implements ExternalContext {
 
     public void log(String msg) {
         logger.info(msg);
-    }
-
-    public ExternalContext.RequestDispatcher getNamedDispatcher(String name) {
-        return null;
     }
 
     public ExternalContext.RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {

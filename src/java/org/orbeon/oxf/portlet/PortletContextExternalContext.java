@@ -19,9 +19,6 @@ import org.orbeon.oxf.util.URLRewriterUtils;
 
 import javax.portlet.PortletContext;
 
-/**
- *
- */
 public class PortletContextExternalContext extends PortletWebAppExternalContext implements ExternalContext {
     private Application application;
 
@@ -37,15 +34,7 @@ public class PortletContextExternalContext extends PortletWebAppExternalContext 
         throw new UnsupportedOperationException();
     }
 
-    public Object getNativeSession(boolean flag) {
-        throw new UnsupportedOperationException();
-    }
-
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
-        throw new UnsupportedOperationException();
-    }
-
-    public RequestDispatcher getNamedDispatcher(String name) {
         throw new UnsupportedOperationException();
     }
 

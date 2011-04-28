@@ -94,6 +94,10 @@ public class StringConversions {
             return (String) values[0];
     }
 
+    public static String getFirstValueFromStringArray(String[] values) {
+        return (values != null && values.length > 0) ? values[0] : null;
+    }
+
     public static void addValueToObjectArrayMap(Map<String, Object[]> map, String name, Object value) {
         final Object[] currentValue = map.get(name);
         if (currentValue == null) {

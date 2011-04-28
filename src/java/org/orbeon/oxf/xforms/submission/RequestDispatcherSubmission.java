@@ -255,7 +255,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(effectiveResource, isContextRelative);
         final boolean isDefaultContext = requestDispatcher.isDefaultContext();
 
-        return openLocalConnection(externalContext, indentedLogger, containingDocument.getResponse(),
+        final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
+        return openLocalConnection(externalContext.getRequest(), response,indentedLogger,
            xformsModelSubmission, httpMethod, effectiveResource, mediatype,
            messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues, new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {

@@ -285,7 +285,7 @@ public class RequestGenerator extends ProcessorImpl {
         // Get complete request document from pipeline context, or create it if not there
         final Context context = getContext(pipelineContext);
         if (context.wholeRequest == null)
-            context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext);
+            context.wholeRequest = readWholeRequestAsDOM4J(getRequest(pipelineContext), context);
         final Document result = (Document) context.wholeRequest.clone();
 
         // Filter the request based on the config input
@@ -294,13 +294,12 @@ public class RequestGenerator extends ProcessorImpl {
         return result;
     }
 
-    private void addTextElement(Element element, String elementName, String text) {
+    private static void addTextElement(Element element, String elementName, String text) {
         if (text != null)
             element.addElement(elementName).addText(text);
     }
 
-    private Document readWholeRequestAsDOM4J(PipelineContext context) {
-        final ExternalContext.Request request = getRequest(context);
+    public static Document readWholeRequestAsDOM4J(final ExternalContext.Request request, final Context context) {
 
         final Document document = new NonLazyUserDataDocument();
         final Element requestElement = document.addElement("request");
@@ -440,15 +439,17 @@ public class RequestGenerator extends ProcessorImpl {
      * Add parameters to the request element. The parameters are also all stored in the pipeline context if they are not
      * already present. The parameter map supports Object[], which can contain String but also FileItem objects.
      */
-    protected void addParameters(PipelineContext pipelineContext, Element requestElement, final ExternalContext.Request request) {
+    protected static void addParameters(Context context, Element requestElement, final ExternalContext.Request request) {
         // Obtain parameters from external context
         final Map<String, Object[]> parametersMap = request.getParameterMap();
         // Check if there is at least one file upload and set this information in the pipeline context
-        for (final Object[] values : parametersMap.values()) {
-            for (Object value : values) {
-                if (value instanceof FileItem) {
-                    getContext(pipelineContext).hasUpload = true;
-                    break;
+        if (context != null) {
+            for (final Object[] values : parametersMap.values()) {
+                for (Object value : values) {
+                    if (value instanceof FileItem) {
+                        context.hasUpload = true;
+                        break;
+                    }
                 }
             }
         }
@@ -456,16 +457,16 @@ public class RequestGenerator extends ProcessorImpl {
         addElements(requestElement, parametersMap, "parameters", "parameter");
     }
 
-    protected void addAttributes(Element requestElement, final ExternalContext.Request request) {
+    protected static void addAttributes(Element requestElement, final ExternalContext.Request request) {
         // Add attributes elements
         addElements(requestElement, request.getAttributesMap(), "attributes", "attribute");
     }
 
-    protected void addHeaders(Element requestElement, ExternalContext.Request request) {
+    protected static void addHeaders(Element requestElement, ExternalContext.Request request) {
         addElements(requestElement, request.getHeaderValuesMap(), "headers", "header");
     }
 
-    protected void addElements(Element requestElement, Map<String, ?> map, String name1, String name2) {
+    protected static void addElements(Element requestElement, Map<String, ?> map, String name1, String name2) {
         if (map.size() >= 0) {
             final Element parametersElement = requestElement.addElement(name1);
             for (final String name : map.keySet()) {
@@ -520,7 +521,7 @@ public class RequestGenerator extends ProcessorImpl {
         return fileItem.getSize() <= 0 && (fileItem.getName() == null || fileItem.getName().trim().equals(""));
     }
 
-    protected void addBody(Element requestElement) {
+    protected static void addBody(Element requestElement) {
         // This just adds a placeholder element
         requestElement.addElement("body");
     }

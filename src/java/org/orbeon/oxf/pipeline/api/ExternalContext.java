@@ -190,7 +190,6 @@ public interface ExternalContext extends WebAppExternalContext {
      * @return                      RequestDispatcher or null if cannot be found
      */
     RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative);
-    RequestDispatcher getNamedDispatcher(String name);
 
     Request getRequest();
     Response getResponse();
@@ -214,5 +213,4 @@ public interface ExternalContext extends WebAppExternalContext {
 
     Object getNativeRequest();
     Object getNativeResponse();
-    Object getNativeSession(boolean flag);
 }

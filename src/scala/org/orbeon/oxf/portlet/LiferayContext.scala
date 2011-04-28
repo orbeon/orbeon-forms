@@ -38,8 +38,8 @@ class LiferayContext() extends CustomContext {
 
         val headers: Map[String, Array[String]] = for {
             (name, value) <- Map(
-                ("email" -> user.getEmailAddress),
-                ("full-name" -> user.getFullName)
+                "email" -> user.getEmailAddress,
+                "full-name" -> user.getFullName
             )
             if value ne null
         } yield {

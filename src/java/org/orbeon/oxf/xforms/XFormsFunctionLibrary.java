@@ -222,7 +222,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE, null);
 
         // xxforms:get-remote-user()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-remote-user", XXFormsGetRemoteUser.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-remote-user", XXFormsGetRemoteUser.class, 0, 0, 0, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
 
         // xxforms:is-user-in-role(xs:string) as xs:boolean
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}is-user-in-role", XXFormsIsUserInRole.class, 0, 1, 1, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE);

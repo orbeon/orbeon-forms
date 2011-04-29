@@ -225,7 +225,6 @@ textarea.xforms-mediatype-text-html, .xforms-mediatype-text-html textarea { widt
     font-family: Arial, Helvetica, Geneva, sans-serif
 }
 
-.xforms-select1-appearance-full input { vertical-align: middle }
 .xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
 fieldset.xforms-select1-appearance-full { margin: 0; border: none } /* when fieldset is used for full selection controls */
 

@@ -91,27 +91,12 @@
                     </instance>
                 </xforms:instance>
 
-
-                <xxforms:variable name="current-instance" select="xxforms:instance(instance('inspector-instance')/current-instance, true())"/>
                 <xxforms:variable name="xml-indent" select="instance('inspector-instance')/xsl:output"/>
                 <xforms:bind nodeset="instance('inspector-instance')">
                     <xforms:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset') /model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
                     <xforms:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
                     <xforms:bind ref="input" readonly="../function != 'view-console'"/>
-                    <xforms:bind ref="shown-output" readonly="true()" calculate="
-                        if (../function = 'view-instance') then
-                            if (../mode = 'formatted')
-                                then saxon:serialize($current-instance, $xml-indent)
-                                else saxon:serialize($current-instance, 'xml')
-                        else if (../function = 'evaluate-xpath') then
-                            if (exists(../xpath-output/*))
-                                then string-join(
-                                    if (../mode = 'formatted')
-                                        then ../xpath-output/*/saxon:serialize(., $xml-indent)
-                                        else ../xpath-output/*/saxon:serialize(., 'xml')
-                                    , '&#x0a;')
-                                else ../xpath-output
-                        else ."/>
+                    <xforms:bind ref="shown-output" readonly="true()"/>
                 </xforms:bind>
             </xforms:model>
         </xbl:implementation>
@@ -216,7 +201,27 @@
 
                 <!-- Output -->
                 <xhtml:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
-                    <fr:code-mirror ref="instance('inspector-instance')/shown-output"/>
+                    <xforms:group ref="instance('inspector-instance')" appearance="xxforms:internal">
+                        <!-- NOTE: We can't use a calculate for this, as it would only be execute if something in the current model changes -->
+                        <xxforms:variable name="current-instance" select="xxforms:instance(current-instance, true())"/>
+                        <xxforms:variable name="shown-output" select="
+                                if (function = 'view-instance') then
+                                    if (mode = 'formatted')
+                                        then saxon:serialize($current-instance, $xml-indent)
+                                        else saxon:serialize($current-instance, 'xml')
+                                else if (function = 'evaluate-xpath') then
+                                    if (exists(xpath-output/*))
+                                        then string-join(
+                                            if (mode = 'formatted')
+                                                then xpath-output/*/saxon:serialize(., $xml-indent)
+                                                else xpath-output/*/saxon:serialize(., 'xml')
+                                            , '&#x0a;')
+                                        else xpath-output
+                                else .">
+                            <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
+                        </xxforms:variable>
+                        <fr:code-mirror ref="shown-output"/>
+                    </xforms:group>
                 </xhtml:div>
 
                 <!-- Mode for formatting -->

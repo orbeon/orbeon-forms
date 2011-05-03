@@ -103,7 +103,9 @@
                                             <xsl:choose>
                                                 <!-- Static label, just copy content -->
                                                 <xsl:when test="empty($label/(@ref | @bind | @value))">
-                                                    <xsl:copy-of select="$label/node()"/>
+                                                    <xforms:group xxbl:scope="outer" appearance="xxforms:internal">
+                                                        <xsl:copy-of select="$label/node()"/>
+                                                    </xforms:group>
                                                 </xsl:when>
                                                 <!-- Dynamic label, generate xforms:output -->
                                                 <xsl:otherwise>

@@ -29,6 +29,33 @@
          script-type="application/xhtml+xml">
 
     <xbl:binding id="fr-databound-select1" element="fr|databound-select1">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Data Dropdown</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
+            </icon>
+            <datatype>xforms:string</datatype>
+            <template>
+                <fr:databound-select1 id="" appearance="minimal" ref="" resource="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                    <xforms:itemset nodeset="">
+                        <xforms:label ref=""/>
+                        <xforms:value ref=""/>
+                    </xforms:itemset>
+                </fr:databound-select1>
+            </template>
+            <control-details>
+                <xforms:input ref="@resource">
+                    <xforms:label lang="en">Resource URL</xforms:label>
+                    <xforms:hint lang="en">HTTP URL returning data used to populate the dropdown</xforms:hint>
+                    <xforms:help lang="en">In the URL, you can AVTs.</xforms:help>
+                </xforms:input>
+            </control-details>
+        </metadata>
         <xbl:resources>
             <xbl:style>
                 div.xbl-fr-databound-select1 { display: inline; }

@@ -1,0 +1,67 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+
+    <xhtml:head>
+        <xhtml:title>Control Details Dialog</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <xforms:bind type="xforms:string"/>
+                    <fr:databound-select1 appearance="minimal"/>
+                    <xforms:input/>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="fb-components-instance"><dummy/></xforms:instance>
+            <xforms:submission id="fb-load-components" serialization="none"
+                               method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application=orbeon"
+                               replace="instance" instance="fb-components-instance"
+                               xxforms:readonly="true" xxforms:cache="true"/>
+            <xforms:action ev:event="xforms-ready">
+                <xforms:send submission="fb-load-components"/>
+                <xxforms:variable name="binding" select="xxforms:element('binding')"/>
+                <!-- Get binding for xforms:input -->
+                <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
+                    <xxforms:context name="fb-components" select="instance('fb-components-instance')"/>
+                    <xxforms:context name="fb-control" select="instance('instance')/xforms:input"/>
+                    <xxforms:context name="fb-bind" select="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
+                    <xxforms:context name="fb-result" select="$binding"/>
+                </xforms:dispatch>
+                <xforms:insert nodeset="*" origin="$binding"/>
+                <xforms:delete nodeset="$binding/*"/>
+                <!-- Getting binding for databound-select1 -->
+                <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
+                    <xxforms:context name="fb-components" select="instance('fb-components-instance')"/>
+                    <xxforms:context name="fb-control" select="instance('instance')/fr:databound-select1"/>
+                    <xxforms:context name="fb-bind" select="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
+                    <xxforms:context name="fb-result" select="$binding"/>
+                </xforms:dispatch>
+                <xforms:insert nodeset="*" origin="$binding"/>
+                <xforms:delete nodeset="$binding/*"/>
+            </xforms:action>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <!-- Component instance -->
+        <fb:dialog-control-details id="dialog-control-details" form-ref="instance('form')" components-ref="instance('fb-components-instance')"/>
+    </xhtml:body>
+</xhtml:html>

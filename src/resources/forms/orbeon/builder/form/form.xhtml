@@ -846,14 +846,12 @@
                                 </xforms:repeat>
                             </xhtml:div>
                         </xforms:group>
-
-                        <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-
+                        <!--<fr:xforms-inspector id="orbeon-xforms-inspector"/>-->
                     </fr:body>
                 </fr:view>
             </xhtml:div>
         </xhtml:div>
-        <fb:dialog-control-details id="dialog-control-details" form-ref="instance('fr-form-instance')" resources-ref="$form-resources"/>
+        <fb:dialog-control-details id="dialog-control-details" form-ref="instance('fr-form-instance')" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
         <fr:dialogs>
             <!-- Metadata editor -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-metadata.xml" xxi:omit-xml-base="true"/>

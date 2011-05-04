@@ -35,7 +35,7 @@
                 <xforms:instance id="expandable–output-state">
                     <state>
                         <full-value/>
-                        <display-value/>
+                        <short-value/>
                         <open>false</open>
                         <max-characters/>
                         <tolerance/>
@@ -43,13 +43,13 @@
                 </xforms:instance>
                 <xxforms:variable name="max-characters" select="(max-characters, 0)[. castable as xs:integer][1]"/>
                 <xxforms:variable name="tolerance" select="(tolerance, 0)[. castable as xs:integer][1]"/>
-                <xxforms:variable name="display-value" select="if (open = 'true') then full-value                               (: Open case :)
-                    else if (string-length(full-value) le $max-characters + $tolerance) then full-value                         (: Close case, but not too long :)
+                <xxforms:variable name="short-value" select="
+                    if (string-length(full-value) le $max-characters + $tolerance) then full-value                              (: Not too long, just show it :)
                     else for $around-cut-point in substring(full-value, $max-characters, $tolerance) return                     (: Look for space around max-chars with tolerance :)
                     if (contains($around-cut-point, ' '))                                                                       (: If we find a space in the tolerance zone, :)
                     then concat(substring(full-value, 1, $max-characters - 1), substring-before($around-cut-point, ' '), '…')   (: then cut there :)
                     else concat(substring(full-value, 1, $max-characters), '…')                                                 (: Else cut at max-chars and add ellipsis :)"/>
-                <xforms:bind ref="display-value" calculate="$display-value"/>
+                <xforms:bind ref="short-value" calculate="$short-value"/>
             </xforms:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -84,10 +84,15 @@
                             <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$state/full-value" value="$binding"/>
                             <xbl:content includes="xforms|label, xforms|help, xforms|hint, xforms|alert"/>
                             <xhtml:span class="xbl-fr-expandable-output-output">
-                                <xforms:output ref="$state/display-value"/>
-                                <xforms:trigger ref=".[$state/open = 'false' and string-length($state/full-value) gt string-length($state/display-value)]" appearance="minimal">
+                                <xforms:output ref="if ($state/open = 'false') then $state/short-value else $state/full-value"/>
+                                <xxforms:variable name="open-different-than-closed" select="string-length($state/full-value) gt string-length($state/short-value)"/>
+                                <xforms:trigger ref=".[$open-different-than-closed and $state/open = 'false']" appearance="minimal">
                                     <xforms:label>Show more</xforms:label>
                                     <xforms:setvalue ev:event="DOMActivate" ref="$state/open">true</xforms:setvalue>
+                                </xforms:trigger>
+                                <xforms:trigger ref=".[$open-different-than-closed and $state/open = 'true']" appearance="minimal">
+                                    <xforms:label>Show less</xforms:label>
+                                    <xforms:setvalue ev:event="DOMActivate" ref="$state/open">false</xforms:setvalue>
                                 </xforms:trigger>
                             </xhtml:span>
                         </xforms:group>

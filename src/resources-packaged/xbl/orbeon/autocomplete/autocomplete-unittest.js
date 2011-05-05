@@ -21,13 +21,15 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * Runs the function for both the static and dynamic cases.
          *
          * @param f     function(staticDynamic, continuation)
-         *              @param staticDynamic    Either "static" or "dynamic"
-         *              @param continuation     Function with no parameter, but the caller needs to make sure
-         *                                      to keep the this
+         *              @param staticDynamicResource    Either "static", "dynamic", or "resource"
+         *              @param continuation             Function with no parameter, but the caller needs to make sure
+         *                                              to keep the this
          */
-        runForStaticDynamic: function(f) {
+        runForStaticDynamicResource: function(f) {
             f.call(this, "static", function() {
-                f.call(this, "dynamic", function(){});
+                f.call(this, "dynamic", function(){
+                    f.call(this, "resource", function(){});
+                });
             });
         },
 
@@ -37,8 +39,8 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * @param       function(li)
          *              @param li   Active list item
          */
-        runOnLis: function(staticDynamic, f) {
-            var autocompleteDiv = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
+        runOnLis: function(staticDynamicResource, f) {
+            var autocompleteDiv = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
             var autocompleteSuggestions = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-yui-div", null, autocompleteDiv)[0];
             var lis = autocompleteSuggestions.getElementsByTagName("li");
             for (liIndex = 0; liIndex < lis.length; liIndex++) {
@@ -51,16 +53,16 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         /**
          * Simulates the user typing a value in a search field.
          */
-        simulateTypeInField: function(staticDynamic, newValue) {
-            var searchInput = YAHOO.util.Dom.get(staticDynamic + "-autocomplete$search").getElementsByTagName("input")[0];
+        simulateTypeInField: function(staticDynamicResource, newValue) {
+            var searchInput = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete$search").getElementsByTagName("input")[0];
             searchInput.focus();
             searchInput.value = newValue;
             YAHOO.util.UserAction.keyup(searchInput);
         },
 
-        simulateClickItem: function(staticDynamic, position) {
+        simulateClickItem: function(staticDynamicResource, position) {
             var liIndex = 0;
-            this.runOnLis(staticDynamic, function(li) {
+            this.runOnLis(staticDynamicResource, function(li) {
                 if (liIndex == position) {
                     YAHOO.util.UserAction.click(li);
                 }
@@ -71,36 +73,36 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         /**
          * Checks that the external value is what we expect it to be.
          */
-        checkExternalValue: function(staticDynamic, expectedValue, message) {
-            var outputValue = ORBEON.xforms.Document.getValue(staticDynamic + "-output");
-            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamic +
+        checkExternalValue: function(staticDynamicResource, expectedValue, message) {
+            var outputValue = ORBEON.xforms.Document.getValue(staticDynamicResource + "-output");
+            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamicResource +
                 (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
         },
 
         /**
          * Checks that the value in the search field is what we expect it to be.
          */
-        checkSearchValue: function(staticDynamic, expectedValue, message) {
-            var searchValue = ORBEON.xforms.Document.getValue(staticDynamic + "-autocomplete$search");
-            YAHOO.util.Assert.areEqual(expectedValue, searchValue, staticDynamic +
+        checkSearchValue: function(staticDynamicResource, expectedValue, message) {
+            var searchValue = ORBEON.xforms.Document.getValue(staticDynamicResource + "-autocomplete$search");
+            YAHOO.util.Assert.areEqual(expectedValue, searchValue, staticDynamicResource +
                 (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
         },
 
         /**
          * Checks that the items we get in the suggestion list are the one we expect.
          */
-        checkSuggestions: function(staticDynamic, expectedValues) {
-            this.runOnLis(staticDynamic, function(li) {
-                YAHOO.util.Assert.areEqual(expectedValues[liIndex], li.innerHTML, staticDynamic + " at index " + liIndex);
+        checkSuggestions: function(staticDynamicResource, expectedValues) {
+            this.runOnLis(staticDynamicResource, function(li) {
+                YAHOO.util.Assert.areEqual(expectedValues[liIndex], li.innerHTML, staticDynamicResource + " at index " + liIndex);
             });
         },
 
-        checkSuggestionCount: function(staticDynamic, expectedCount) {
+        checkSuggestionCount: function(staticDynamicResource, expectedCount) {
             var actualCount = 0;
-            this.runOnLis(staticDynamic, function(li) {
+            this.runOnLis(staticDynamicResource, function(li) {
                 actualCount++;
             });
-            YAHOO.util.Assert.areEqual(actualCount, expectedCount, staticDynamic + " suggestions shows");
+            YAHOO.util.Assert.areEqual(actualCount, expectedCount, staticDynamicResource + " suggestions shows");
         },
 
         /**
@@ -111,9 +113,9 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 // Nothing is done in JS, but the fr-set-label we dispatch on xforms-ready will create some Ajax traffic
             }, function() {
-                this.runForStaticDynamic(function(staticDynamic, continuation) {
-                    this.checkExternalValue(staticDynamic, "ca");
-                    this.checkSearchValue(staticDynamic, "Canada");
+                this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
+                    this.checkExternalValue(staticDynamicResource, "ca");
+                    this.checkSearchValue(staticDynamicResource, "Canada");
                     continuation.call(this);
                 });
             });
@@ -139,11 +141,11 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * even if it wasn't "clicked on" by the user.
          */
         testTypeFullValue: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    this.simulateTypeInField(staticDynamic, "Switzerland");
+                    this.simulateTypeInField(staticDynamicResource, "Switzerland");
                 }, function() {
-                    this.checkExternalValue(staticDynamic, "sz");
+                    this.checkExternalValue(staticDynamicResource, "sz");
                     continuation.call(this);
                 });
             });
@@ -153,13 +155,13 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * Test that entering a partial match "Sw", we get the expected list of countries in the suggestion list.
          */
         testTypePartialValueSelect: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    this.simulateTypeInField(staticDynamic, "Sw");
+                    this.simulateTypeInField(staticDynamicResource, "Sw");
                 }, function() {
-                    this.checkSuggestions(staticDynamic, ["Swaziland", "Sweden", "Switzerland"]);
+                    this.checkSuggestions(staticDynamicResource, ["Swaziland", "Sweden", "Switzerland"]);
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        this.simulateClickItem(staticDynamic, 1);
+                        this.simulateClickItem(staticDynamicResource, 1);
                     }, function() {
                         continuation.call(this);
                     });
@@ -168,27 +170,27 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         testAlertShown: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     // Set field to be empty
-                    this.simulateTypeInField(staticDynamic, "");
+                    this.simulateTypeInField(staticDynamicResource, "");
                 }, function() {
                     // Check the alert is active
-                    var control = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
+                    var control = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
                     var container = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container", null, control)[0];
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, "xforms-invalid"));
                     var alert = YAHOO.util.Dom.getElementsByClassName("xforms-alert", null, control)[0];
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),
-                        "initially should have xforms-alert-active for " + staticDynamic);
+                        "initially should have xforms-alert-active for " + staticDynamicResource);
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         // Set value to something that will start with the letter "s"
-                        this.simulateTypeInField(staticDynamic, "Switzerland");
+                        this.simulateTypeInField(staticDynamicResource, "Switzerland");
                     }, function() {
                         // Check the alert in inactive
                         YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(container, "xforms-invalid"),
-                            "after setting value, should not have xforms-invalid class for " + staticDynamic);
+                            "after setting value, should not have xforms-invalid class for " + staticDynamicResource);
                         YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),
-                            "after setting value, should not have xforms-alert-active for " + staticDynamic);
+                            "after setting value, should not have xforms-alert-active for " + staticDynamicResource);
                         continuation.call(this);
                     });
                 });
@@ -196,59 +198,63 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         testDuplicateItemLabel: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
-                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    // By typing the full country name, we already check that the suggestion comes and that it is
-                    // not one of the 2 possibilities that is automatically selected
-                    this.simulateTypeInField(staticDynamic, "United States");
-                }, function() {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
+                if (staticDynamicResource == "resource") continuation.call(this); else {
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        // Click on the first US
-                        this.simulateClickItem(staticDynamic, 0);
+                        // By typing the full country name, we already check that the suggestion comes and that it is
+                        // not one of the 2 possibilities that is automatically selected
+                        this.simulateTypeInField(staticDynamicResource, "United States");
                     }, function() {
-                        this.checkExternalValue(staticDynamic, "us");
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            this.simulateTypeInField(staticDynamic, "United States");
+                            // Click on the first US
+                            this.simulateClickItem(staticDynamicResource, 0);
                         }, function() {
+                            this.checkExternalValue(staticDynamicResource, "us");
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                                // Click on the second US
-                                this.simulateClickItem(staticDynamic, 1);
+                                this.simulateTypeInField(staticDynamicResource, "United States");
                             }, function() {
-                                this.checkExternalValue(staticDynamic, "us2");
-                                continuation.call(this);
+                                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                    // Click on the second US
+                                    this.simulateClickItem(staticDynamicResource, 1);
+                                }, function() {
+                                    this.checkExternalValue(staticDynamicResource, "us2");
+                                    continuation.call(this);
+                                });
                             });
                         });
                     });
-                });
+                }
             });
         },
 
         testDoubleSpaceInLabel: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
-                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    // By typing the full country name, we already check that the suggestion comes and that it is
-                    // not one of the 2 possibilities that is automatically selected
-                    this.simulateTypeInField(staticDynamic, "Virgin");
-                }, function() {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
+                if (staticDynamicResource == "resource") continuation.call(this); else {
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        // Click on the first Virgin Island
-                        this.simulateClickItem(staticDynamic, 0);
+                        // By typing the full country name, we already check that the suggestion comes and that it is
+                        // not one of the 2 possibilities that is automatically selected
+                        this.simulateTypeInField(staticDynamicResource, "Virgin");
                     }, function() {
-                        this.checkExternalValue(staticDynamic, "vq", "1st value (vq) selected when clicking on the 1st item in the list");
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            this.simulateTypeInField(staticDynamic, "Virgin");
+                            // Click on the first Virgin Island
+                            this.simulateClickItem(staticDynamicResource, 0);
                         }, function() {
+                            this.checkExternalValue(staticDynamicResource, "vq", "1st value (vq) selected when clicking on the 1st item in the list");
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                                // Click on the second US
-                                this.simulateClickItem(staticDynamic, 1);
+                                this.simulateTypeInField(staticDynamicResource, "Virgin");
                             }, function() {
-                                this.checkExternalValue(staticDynamic, "vq2", "2nd value (vq2) selected when clicking on the 2nd item in the list");
-                                this.checkSearchValue(staticDynamic, "Virgin  Islands");
-                                continuation.call(this);
+                                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                    // Click on the second US
+                                    this.simulateClickItem(staticDynamicResource, 1);
+                                }, function() {
+                                    this.checkExternalValue(staticDynamicResource, "vq2", "2nd value (vq2) selected when clicking on the 2nd item in the list");
+                                    this.checkSearchValue(staticDynamicResource, "Virgin  Islands");
+                                    continuation.call(this);
+                                });
                             });
                         });
                     });
-                });
+                }
             });
         },
 
@@ -257,15 +263,15 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * for the dynamic case.
          */
         testMaxResultsDisplayed: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     // There are more than 4 countries that start with "Ba"
                     // Enter 2 letters, because the dynamic case requires 2 letters before it gives suggestions
-                    this.simulateTypeInField(staticDynamic, "Ba");
+                    this.simulateTypeInField(staticDynamicResource, "Ba");
                 }, function() {
-                    this.checkSuggestionCount(staticDynamic, 4);
+                    this.checkSuggestionCount(staticDynamicResource, 4);
                     // Select one of the items just to close the suggestion list
-                    this.simulateClickItem(staticDynamic, 1);
+                    this.simulateClickItem(staticDynamicResource, 1);
                     continuation.call(this);
                 });
             });
@@ -275,33 +281,33 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * Test that the left border of the suggestion box is aligned with the left border of the text field.
          */
         testAlignment: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     // There are more than 4 countries that start with "Ba"
                     // Enter 2 letters, because the dynamic case requires 2 letters before it gives suggestions
-                    this.simulateTypeInField(staticDynamic, "Ba");
+                    this.simulateTypeInField(staticDynamicResource, "Ba");
                 }, function() {
-                    var container = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
+                    var container = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
                     var suggestions = YAHOO.util.Dom.getElementsByClassName("yui-ac-container", null, container)[0];
                     var input = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-search", null, container)[0];
                     YAHOO.util.Assert.areEqual(YAHOO.util.Dom.getX(suggestions), YAHOO.util.Dom.getX(input));
                     // Select one of the items just to close the suggestion list
-                    this.simulateClickItem(staticDynamic, 1);
+                    this.simulateClickItem(staticDynamicResource, 1);
                     continuation.call(this);
                 });
             });
         },
 
         testSetLabel: function() {
-            this.runForStaticDynamic(function(staticDynamic, continuation) {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamicResource + "-set-to-canada"));
                 }, function() {
-                    this.checkExternalValue(staticDynamic, "ca", "external value is 'ca' because Canada exists in the itemset");
+                    this.checkExternalValue(staticDynamicResource, "ca", "external value is 'ca' because Canada exists in the itemset");
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-utopia"));
+                        YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamicResource + "-set-to-utopia"));
                     }, function() {
-                        this.checkExternalValue(staticDynamic, "", "external value is empty string because Utopia does not exist in the itemset");
+                        this.checkExternalValue(staticDynamicResource, "", "external value is empty string because Utopia does not exist in the itemset");
                         continuation.call(this);
                     });
                 });

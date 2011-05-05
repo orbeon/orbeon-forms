@@ -21,19 +21,32 @@
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/parameters/parameter[name = 'country-name']</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
     <p:processor name="oxf:xslt">
         <p:input name="data" href="countries.xml"/>
-        <p:input name="instance" href="#instance"/>
+        <p:input name="request" href="#request"/>
+        <p:input name="instance" href="#instance" debug="instance"/>
         <p:input name="config">
             <countries xsl:version="2.0">
+                <xsl:variable name="name" select="if (doc('input:instance')/*/@xsi:nil = 'true')            (: No instance was posted to this service :)
+                    then doc('input:request')/request/parameters/parameter[name = 'country-name']/value     (: Try getting request parameter :)
+                    else doc('input:instance')/instance/country-name                                        (: Use name in posted instance :)"/>
                 <xsl:choose>
-                    <xsl:when test="doc('input:instance')/*/@xsi:nil = 'true'">
-                        <!-- Initially just take the first 10 countries -->
+                    <!-- If no name is specified, just take the first 10 countries -->
+                    <xsl:when test="empty($name)">
                         <xsl:copy-of select="/countries/country[10 >= position()]"/>
                     </xsl:when>
+                    <!-- Get first 10 countries that start with provided name -->
                     <xsl:otherwise>
-                        <xsl:copy-of select="/countries/country[starts-with(lower-case(name),
-                            lower-case(doc('input:instance')/instance/country-name))][10 >= position()]"/>
+                        <xsl:copy-of select="/countries/country[starts-with(lower-case(name), lower-case($name))][10 >= position()]"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </countries>

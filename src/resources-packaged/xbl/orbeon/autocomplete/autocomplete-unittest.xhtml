@@ -52,6 +52,7 @@
                 <selected-countries readonly="false">
                     <static effective-target-id="">ca</static>
                     <dynamic effective-target-id=""/>
+                    <resource effective-target-id=""/>
                 </selected-countries>
             </xforms:instance>
             <!-- Constraint on selected country -->
@@ -72,7 +73,11 @@
                 nodeset="instance('all-countries')/country" origin="instance('additional-countries')/*"/>
 
             <xforms:action ev:event="xforms-ready">
+                <!-- NOTE: We don't dispatch fr-set-label to the static-autocomplete since the initial value is already "ca" in the instance -->
                 <xforms:dispatch target="dynamic-autocomplete" name="fr-set-label">
+                    <xxforms:context name="label" select="'Canada'"/>
+                </xforms:dispatch>
+                <xforms:dispatch target="resource-autocomplete" name="fr-set-label">
                     <xxforms:context name="label" select="'Canada'"/>
                 </xforms:dispatch>
             </xforms:action>
@@ -136,7 +141,7 @@
         </xhtml:fieldset>
 
         <xhtml:fieldset>
-            <xhtml:legend>Dynamic itemset</xhtml:legend>
+            <xhtml:legend>Dynamic itemset, custom</xhtml:legend>
             <xhtml:div>
                 <xforms:output value="instance('selected-countries')/dynamic" id="dynamic-output">
                     <xforms:label>Code of selected country: </xforms:label>
@@ -195,6 +200,50 @@
                         </xforms:itemset>
                         <xforms:alert>Value is mandatory</xforms:alert>
                         <fr:max-results-displayed ref="instance('configuration')/max-results-displayed"/>
+                    </fr:autocomplete>
+                </xforms:group>
+            </xhtml:div>
+        </xhtml:fieldset>
+
+        <xhtml:fieldset>
+            <xhtml:legend>Using resource</xhtml:legend>
+            <xhtml:div>
+                <xforms:output value="instance('selected-countries')/resource" id="resource-output">
+                    <xforms:label>Code of selected country: </xforms:label>
+                </xforms:output>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:trigger appearance="minimal" id="resource-set-to-canada">
+                    <xforms:label>Set label to Canada</xforms:label>
+                    <xforms:dispatch ev:event="DOMActivate" target="resource-autocomplete" name="fr-set-label">
+                        <xxforms:context name="label" select="'Canada'"/>
+                    </xforms:dispatch>
+                </xforms:trigger> |
+                <xforms:trigger appearance="minimal" id="resource-set-to-utopia">
+                    <xforms:label>Set label to Utopia</xforms:label>
+                    <xforms:dispatch ev:event="DOMActivate" target="resource-autocomplete" name="fr-set-label">
+                        <xxforms:context name="label" select="'Utopia'"/>
+                    </xforms:dispatch>
+                </xforms:trigger> |
+                <xforms:trigger appearance="minimal" id="resource-setfocus-outer">
+                    <xforms:label>Set focus</xforms:label>
+                    <xforms:setfocus ev:event="DOMActivate" control="resource-autocomplete"/>
+                </xforms:trigger> |
+                <xforms:trigger appearance="minimal" id="resource-setfocus-inner">
+                    <xforms:label>Set focus inner</xforms:label>
+                    <xforms:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/resource/@effective-target-id}"/>
+                </xforms:trigger>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:group ref="instance('selected-countries')/resource">
+                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
+                    <fr:autocomplete ref="." id="resource-autocomplete" show-full-itemset-dropdown="true" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
+                        <xforms:label>Country code: </xforms:label>
+                        <xforms:itemset nodeset="/countries/country">
+                            <xforms:label ref="name"/>
+                            <xforms:value ref="us-code"/>
+                        </xforms:itemset>
+                        <xforms:alert>Value is mandatory</xforms:alert>
                     </fr:autocomplete>
                 </xforms:group>
             </xhtml:div>

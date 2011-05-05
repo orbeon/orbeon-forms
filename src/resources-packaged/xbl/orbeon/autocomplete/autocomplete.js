@@ -45,7 +45,7 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
                 YAHOO.xbl.fr.Autocomplete.instance(container).ajaxResponseProcessed();
             });
         } else {
-            // Simply get
+            // Simply filters on the values in the hidden dropdown
             var autoComplete = this;
             dataSource = new YAHOO.util.FunctionDataSource(function(query) {
                 return autoComplete.getCurrentValues(query);

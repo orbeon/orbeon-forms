@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  *
  * TODO: Subclasses per appearance.
  */
-public class XXFormsDialogHandler extends XFormsBaseHandler {
+public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
     public XXFormsDialogHandler() {
         super(false, true);

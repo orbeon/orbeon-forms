@@ -18,7 +18,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-public class XXFormsTextHandler extends XFormsBaseHandler {
+public class XXFormsTextHandler extends XFormsBaseHandlerXHTML {
 
     public XXFormsTextHandler() {
         super(false, false);

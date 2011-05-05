@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle elements to which custom components are bound.
  */
-public class XXFormsComponentHandler extends XFormsBaseHandler {
+public class XXFormsComponentHandler extends XFormsBaseHandlerXHTML {
 
     private String elementName;
     private String elementQName;

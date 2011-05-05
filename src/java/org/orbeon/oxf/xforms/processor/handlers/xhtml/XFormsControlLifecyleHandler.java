@@ -18,12 +18,9 @@ import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -38,16 +35,11 @@ import org.xml.sax.helpers.AttributesImpl;
  * Outputting the control is split into two parts: handleControlStart() and handleControlEnd(). In most cases, only
  * handleControlStart() is used, but container controls will use handleControlEnd().
  */
-public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
+public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTML {
 
-    private boolean isTemplate;
-
-    private String staticId;
-    private String prefixedId;
-    private String effectiveId;
-
-    private XFormsControl xformsControl;
-    private Attributes attributes;
+	private XFormsControlLifecycleHandlerDelegate xFormsControlLifecycleHandlerDelegate;
+	private Attributes attributes;
+    
     private String[] endConfig;
     private String containingElementQName;
 
@@ -57,18 +49,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected XFormsControlLifecyleHandler(boolean repeating, boolean forwarding) {
         super(repeating, forwarding);
-    }
-
-    protected String getPrefixedId() {
-        return prefixedId;
-    }
-
-    public String getEffectiveId() {
-        return effectiveId;
-    }
-
-    public XFormsControl getControl() {
-        return xformsControl;
     }
 
     protected String getContainingElementName() {
@@ -83,23 +63,37 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         }
         return containingElementQName;
     }
+    
+	protected boolean isTemplate() {
+		return xFormsControlLifecycleHandlerDelegate.isTemplate();
+	}
 
-    @Override
+	protected String getPrefixedId() {
+		return xFormsControlLifecycleHandlerDelegate.getPrefixedId();
+	}
+
+	protected String getEffectiveId() {
+		return xFormsControlLifecycleHandlerDelegate.getEffectiveId();
+	}
+
+	protected XFormsControl getControl() {
+		return xFormsControlLifecycleHandlerDelegate.getControl();
+	}
+	
+	protected String getStaticId() {
+		return xFormsControlLifecycleHandlerDelegate.getStaticId();
+	}
+	
+
+	@Override
     public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        isTemplate = handlerContext.isTemplate();
-
-        staticId = handlerContext.getId(attributes);
-        prefixedId = handlerContext.getIdPrefix() + staticId;
-        effectiveId = handlerContext.getEffectiveId(attributes);
-
-        xformsControl = handlerContext.isTemplate()
-                ? null : (XFormsControl) containingDocument.getObjectByEffectiveId(effectiveId);
+        xFormsControlLifecycleHandlerDelegate = new XFormsControlLifecycleHandlerDelegate(handlerContext, containingDocument, attributes);
     }
 
     @Override
     public final void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (isMustOutputControl(xformsControl)) {
+        if (isMustOutputControl(getControl())) {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -119,12 +113,12 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             // Output named anchor if the control has a help or alert. This is so that a separate help and error
             // sections can link back to the control.
             if (handlerContext.isNoScript()) {
-                if (xformsControl != null
-                        && (XFormsControl.hasHelp(containingDocument, prefixedId)
-                            || XFormsControl.hasAlert(containingDocument, prefixedId))) {
+                if (getControl() != null
+                        && (XFormsControl.hasHelp(containingDocument, getPrefixedId())
+                            || XFormsControl.hasAlert(containingDocument, getPrefixedId()))) {
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, xformsControl.getEffectiveId());
+                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, getControl().getEffectiveId());
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
                 }
@@ -136,7 +130,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
                 if ("control".equals(current)) {
                     // Handle control
-                    handleControlStart(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
+                    handleControlStart(uri, localname, qName, attributes, getStaticId(), getEffectiveId(), getControl());
                     // Do the rest in end() below if needed
                     if (i < config.length - 1) {
                         // There remains stuff to process
@@ -169,14 +163,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     @Override
     public final void end(String uri, String localname, String qName) throws SAXException {
-        if (isMustOutputControl(xformsControl)) {
+        if (isMustOutputControl(getControl())) {
             // Process everything after the control has been shown
             if (endConfig != null) {
 
                 for (final String current: endConfig) {
                     if ("control".equals(current)) {
                         // Handle control
-                        handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
+                        handleControlEnd(uri, localname, qName, attributes, getStaticId(), getEffectiveId(), getControl());
                     } else if ("label".equals(current)) {
                         // xforms:label
                         if (hasLocalLabel())
@@ -250,22 +244,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.LABEL, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.ALERT, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.ALERT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HINT, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HINT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     // Must be overridden by subclasses
@@ -329,6 +323,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         // Default:
         // o new layout: point to foo$bar$$c.1-2-3
         // o old layout: point to foo$bar.1-2-3
-        return handlerContext.isSpanHTMLLayout() ? getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : effectiveId;
+        return handlerContext.isSpanHTMLLayout() ? getLHHACId(containingDocument, getEffectiveId(), LHHAC_CODES.get(LHHAC.CONTROL)) : getEffectiveId();
     }
 }

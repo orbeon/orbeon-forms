@@ -410,7 +410,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // NOTE: Templates for full items are output globally in XHTMLBodyHandler
     }
 
-    public static void outputItemFullTemplate(XFormsBaseHandler baseHandler,
+    public static void outputItemFullTemplate(XFormsBaseHandlerXHTML baseHandler,
                                               ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
                                               XFormsContainingDocument containingDocument,
                                               AttributesImpl reusableAttributes, Attributes attributes, String templateId,
@@ -442,13 +442,13 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    public static void handleItemFull(XFormsBaseHandler baseHandler, ContentHandler contentHandler,
+    public static void handleItemFull(XFormsBaseHandlerXHTML baseHandler, ContentHandler contentHandler,
                                       AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl,
                                       String effectiveId, String itemEffectiveId, boolean isMultiple, String type,
                                       Item item, boolean isFirst) throws SAXException {
 
-        final HandlerContext handlerContext = baseHandler.handlerContext;
+        final HandlerContext handlerContext = baseHandler.getHandlerContext();
 
         // Whether this is selected
         boolean isSelected = isSelected(handlerContext, xformsControl, isMultiple, item);

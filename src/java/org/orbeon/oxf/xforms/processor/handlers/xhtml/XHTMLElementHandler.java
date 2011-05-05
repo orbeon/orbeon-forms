@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 /**
  * Handle xhtml:* for handling AVTs as well as rewriting @id and @for.
  */
-public class XHTMLElementHandler extends XFormsBaseHandler {
+public class XHTMLElementHandler extends XFormsBaseHandlerXHTML {
     public XHTMLElementHandler() {
         super(false, true);
     }

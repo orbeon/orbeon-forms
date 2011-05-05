@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 /**
  * Handler for label, help, hint and alert when those are placed outside controls.
  */
-public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
+public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandlerXHTML {
 
     public XFormsLabelHintHelpAlertHandler() {
         super(false, false);

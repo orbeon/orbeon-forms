@@ -93,7 +93,10 @@
                 </xsl:if>
                 <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
-                <create-flat-view><xsl:value-of select="$request/headers/header[name = 'orbeon-create-flat-view']/value/string() treat as xs:string"/></create-flat-view>
+                <create-flat-view>
+                    <xsl:variable name="create-flat-view-property" as="xs:string?" select="$request/headers/header[name = 'orbeon-create-flat-view']/value/string()"/>
+                    <xsl:value-of select="($create-flat-view-property, 'false')[1]"/>
+                </create-flat-view>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>

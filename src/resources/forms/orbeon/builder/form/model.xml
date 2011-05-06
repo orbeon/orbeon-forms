@@ -623,7 +623,7 @@
                               select="if ($control-name) then $current-control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind')) else $section-name"/>
             <xxforms:variable name="is-custom-instance" select="$metadata-instance/form-instance-mode = 'custom'"/>
             <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
-                <xforms:action if="not(xforms:bind[@name = $current-section-name])">
+                <xforms:action if="empty(xforms:bind[@name = $current-section-name])">
                     <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
                     <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
                     <xforms:setvalue ref="$bind/@id" value="concat($current-section-name, '-bind')"/>

@@ -40,7 +40,7 @@
 
             <!-- Bindings -->
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
-                <xforms:bind id="section-1-bind" nodeset="section-1">
+                <xforms:bind id="section-1-bind" name="section-1" nodeset="section-1">
                     <xforms:bind id="control-1-bind" name="control-1" nodeset="control-1"/>
                 </xforms:bind>
             </xforms:bind>

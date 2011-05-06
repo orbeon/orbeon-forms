@@ -136,12 +136,26 @@
                     <xforms:delete nodeset="$local/fb:control-details"/>
                     <xforms:insert nodeset="$local/*" origin="$binding/xbl:binding/fb:metadata/fb:control-details"/>
 
+                    <!-- Process the LHHR of each details control -->
+                    <xxforms:variable name="current-language" select="$resources/@xml:lang/string() treat as xs:string"/>
+                    <xforms:action xxforms:iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
+                        <xxforms:variable name="lhhr" select="."/>
+                        <!-- If it has a lang attribute, only keep if matches the current language -->
+                        <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" nodeset="$lhhr"/>
+                        <!-- If it has a ref="$resources/...", evaluate it -->
+                        <xforms:action if="starts-with($lhhr/@ref, '$resources/')">
+                            <xxforms:variable name="resource-path" select="substring-after($lhhr/@ref, '$resources/')"/>
+                            <xforms:setvalue ref="$lhhr" value="$resources/saxon:evaluate($resource-path)"/>
+                            <xforms:delete nodeset="$lhhr/@ref"/>
+                        </xforms:action>
+                    </xforms:action>
+
                     <!-- Create elements for additional properties, populating their initial value from the control -->
                     <xforms:delete nodeset="$local/control-details/*"/>
                     <xforms:action xxforms:iterate="$local/fb:control-details/*">
                         <xxforms:variable name="position" select="position()"/>
                         <xxforms:variable name="xforms-control" select="."/>
-                        <xforms:insert context="$local/control-details" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
+                        <xforms:insert context="$local/control-details" nodeset="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
                     </xforms:action>
                 </xforms:action>
 
@@ -233,6 +247,7 @@
                                     <xforms:input ref="if ($xforms-control/self::xforms:input) then $bound-node else ()">
                                         <xforms:label ref="$xforms-control/xforms:label"/>
                                         <xforms:hint ref="$xforms-control/xforms:hint"/>
+                                        <xforms:help ref="$xforms-control/xforms:help"/>
                                         <xforms:alert ref="$xforms-control/xforms:alert"/>
                                     </xforms:input>
                                 </xforms:repeat>

@@ -94,14 +94,15 @@ class ResourcesAggregator extends ProcessorImpl {
                                 lazy val resType = attributes.getValue("type")
                                 lazy val cssClasses = attributes.getValue("class")
                                 lazy val isNorewrite = attributes.getValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME) == "true"
+                                // Ideally different media should be aggregated separately. For now we just preserve != "all".
+                                lazy val media = Option(attributes.getValue("media")) getOrElse "all"
 
-//                                lazy val rel: Set[String] = (Option(attributes.getValue("rel")) map (_.toLowerCase.split("""\s+""")) flatten) toSet
                                 lazy val rel = Option(attributes.getValue("rel")) getOrElse "" toLowerCase
 
                                 // Gather resources that match
                                 localname match {
                                     case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
-                                        if (isSeparatePath(href) || NetUtils.urlHasProtocol(href) || isNorewrite)
+                                        if (isSeparatePath(href) || NetUtils.urlHasProtocol(href) || media != "all" || isNorewrite)
                                             preservedCSS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineCSS else supplementalCSS) += href

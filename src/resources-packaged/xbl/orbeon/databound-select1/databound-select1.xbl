@@ -20,6 +20,7 @@
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:exforms="http://www.exforms.org/exf/1-0"
@@ -29,33 +30,44 @@
          script-type="application/xhtml+xml">
 
     <xbl:binding id="fr-databound-select1" element="fr|databound-select1">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Data Dropdown</display-name>
-            <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
-            </icon>
-            <datatype>xforms:string</datatype>
-            <template>
+        <fb:metadata>
+            <fb:display-name lang="en">Data Dropdown</fb:display-name>
+            <fb:icon lang="en">
+                <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
+                <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
+            </fb:icon>
+            <fb:datatype>xforms:string</fb:datatype>
+            <fb:template>
                 <fr:databound-select1 id="" appearance="minimal" ref="" resource="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref=""/>
                         <xforms:value ref=""/>
                     </xforms:itemset>
                 </fr:databound-select1>
-            </template>
-            <control-details>
+            </fb:template>
+            <fb:control-details>
                 <xforms:input ref="@resource">
-                    <xforms:label lang="en">Resource URL</xforms:label>
-                    <xforms:hint lang="en">HTTP URL returning data used to populate the dropdown</xforms:hint>
-                    <xforms:help lang="en">In the URL, you can AVTs.</xforms:help>
+                    <xforms:label lang="en">Resource URI</xforms:label>
+                    <xforms:hint lang="en">HTTP URI returning data used to populate the dropdown</xforms:hint>
                 </xforms:input>
-            </control-details>
-        </metadata>
+                <xforms:input ref="xforms:itemset/@ref">
+                    <xforms:label ref="$resources/dialog-actions/items/label"/>
+                    <xforms:hint ref="$resources/dialog-actions/items/hint"/>
+                </xforms:input>
+                <xforms:input ref="xforms:itemset/xforms:label/@ref">
+                    <xforms:label ref="$resources/dialog-actions/label/label"/>
+                    <xforms:hint ref="$resources/dialog-actions/label/hint"/>
+                </xforms:input>
+                <xforms:input ref="xforms:itemset/xforms:value/@ref">
+                    <xforms:label ref="$resources/dialog-actions/value/label"/>
+                    <xforms:hint ref="$resources/dialog-actions/value/hint"/>
+                </xforms:input>
+            </fb:control-details>
+        </fb:metadata>
         <xbl:resources>
             <xbl:style>
                 div.xbl-fr-databound-select1 { display: inline; }
@@ -95,7 +107,7 @@
                         <!-- Update itemset based on resource -->
                         <xforms:send submission="get-itemset"/>
                         <!-- Get sequence of values in the new itemset -->
-                        <xxforms:variable name="nodeset"><xsl:value-of select="/*/xforms:itemset/@nodeset"/></xxforms:variable>
+                        <xxforms:variable name="nodeset"><xsl:value-of select="/*/xforms:itemset/(@nodeset, @ref)"/></xxforms:variable>
                         <xxforms:variable name="value"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
                         <xxforms:variable name="new-values" select="instance('itemset')/saxon:evaluate($nodeset)/saxon:evaluate($value)"/>
                         <!-- If the current value is not in the new itemset, set it to blank -->

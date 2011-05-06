@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import sun.plugin2.util.SystemUtil;
 
 import java.util.Map;
 import java.util.concurrent.*;

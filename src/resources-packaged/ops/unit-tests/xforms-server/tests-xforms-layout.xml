@@ -2314,6 +2314,8 @@
                                 <xh:link rel="STYLESHEET" href="/css3.css"/>
                                 <xh:link rel="stylesheet" href="/css4.css"/>
                                 <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
+                                <xh:link rel="stylesheet" href="/css6.css" media="print"/>
+                                <xh:link rel="stylesheet" href="/css7.css" media="all"/>
                                 <xh:style type="text/css">.blue { color: blue }</xh:style>
                                 <xh:link rel="stylesheet" href="/foobar2.foobar" type="text/x-foobar"/>
                                 <xh:script class="xforms-baseline" src="/js1.js" type="text/javascript"/>
@@ -2374,10 +2376,11 @@
                     <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
                     <xh:script src="/cs2.cs" type="text/coffeescript"/>
                     <xh:link rel="stylesheet" href="/xforms-server/orbeon-89574b046e069a16542fbcf0f0e1bb0283ce3b24.css" type="text/css" media="all"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-2fb17e7ab4bac9efa45c11a68a9a4781dcd1e211.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-4c1da45e028aea995bd6d6126c38e8cb376aa195.css" type="text/css" media="all"/>
                     <xh:style>.red { color: red }</xh:style>
                     <xh:link rel="stylesheet" href="http://example.org/style.css"/>
                     <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
+                    <xh:link rel="stylesheet" href="/css6.css" media="print"/>
                     <xh:style type="text/css">.blue { color: blue }</xh:style>
                 </xh:head>
                 <xh:body>
@@ -2388,6 +2391,7 @@
                     <xh:ul>
                         <xh:li>/css3.css</xh:li>
                         <xh:li>/css4.css</xh:li>
+                        <xh:li>/css7.css</xh:li>
                     </xh:ul>
                     <xh:ul>
                         <xh:li>/js1.js</xh:li>

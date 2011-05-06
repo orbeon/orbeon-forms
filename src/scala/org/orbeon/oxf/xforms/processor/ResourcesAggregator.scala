@@ -27,6 +27,7 @@ import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
 import org.orbeon.oxf.xforms._
 import org.dom4j.QName
+import org.apache.commons.lang.StringUtils
 
 /**
  * Aggregate CSS and JS resources under <head>.
@@ -100,13 +101,13 @@ class ResourcesAggregator extends ProcessorImpl {
                                 // Gather resources that match
                                 localname match {
                                     case "link" if (href ne null) && ((resType eq null) || resType == "text/css") && rel == "stylesheet" =>
-                                        if (isSeparatePath(href) || isNorewrite)
+                                        if (isSeparatePath(href) || NetUtils.urlHasProtocol(href) || isNorewrite)
                                             preservedCSS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineCSS else supplementalCSS) += href
                                         filter = true
                                     case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript")  =>
-                                        if (isSeparatePath(src) || isNorewrite)
+                                        if (isSeparatePath(src) || NetUtils.urlHasProtocol(src) || isNorewrite)
                                             preservedJS += ReferenceElement(localname, new AttributesImpl(attributes))
                                         else
                                             (if (cssClasses == "xforms-baseline") baselineJS else supplementalJS) += src
@@ -144,9 +145,10 @@ class ResourcesAggregator extends ProcessorImpl {
                                 if (resources.nonEmpty) {
                                     // If there is at least one non-platform path, we also hash the app version number
                                     val hasAppResource = resources exists (!URLRewriterUtils.isPlatformPath(_))
+                                    val appVersion = URLRewriterUtils.getApplicationResourceVersion
 
                                     // All resource paths are hashed
-                                    val itemsToHash = resources ++ (if (hasAppResource) Set(URLRewriterUtils.getApplicationResourceVersion) else Set())
+                                    val itemsToHash = resources ++ (if (hasAppResource && StringUtils.isNotBlank(appVersion)) Set(appVersion) else Set())
                                     val resourcesHash = ScalaUtils.digest("SHA-1", Seq(itemsToHash mkString "|"))
 
                                     // Cache mapping so that resource can be served by oxf:resource-server

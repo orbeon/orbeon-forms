@@ -41,17 +41,35 @@
             </icon>
             <datatype>xforms:string</datatype>
             <template>
-                <fr:autocomplete id="" appearance="minimal" ref="" xmlns="">
+                <fr:autocomplete id="" appearance="minimal" ref="" xmlns="" resource="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
+                    <xforms:itemset ref="">
+                        <xforms:label ref=""/>
+                        <xforms:value ref=""/>
                     </xforms:itemset>
                 </fr:autocomplete>
             </template>
+            <control-details>
+                <xforms:input ref="@resource">
+                    <xforms:label lang="en">Resource URI</xforms:label>
+                    <xforms:hint lang="en">HTTP URL returning data used for the suggestions</xforms:hint>
+                </xforms:input>
+                <xforms:input ref="xforms:itemset/@ref">
+                    <xforms:label ref="$resources/dialog-actions/items/label"/>
+                    <xforms:hint ref="$resources/dialog-actions/items/hint"/>
+                </xforms:input>
+                <xforms:input ref="xforms:itemset/xforms:label/@ref">
+                    <xforms:label ref="$resources/dialog-actions/label/label"/>
+                    <xforms:hint ref="$resources/dialog-actions/label/hint"/>
+                </xforms:input>
+                <xforms:input ref="xforms:itemset/xforms:value/@ref">
+                    <xforms:label ref="$resources/dialog-actions/value/label"/>
+                    <xforms:hint ref="$resources/dialog-actions/value/hint"/>
+                </xforms:input>
+            </control-details>
         </metadata>
 
         <xbl:resources>

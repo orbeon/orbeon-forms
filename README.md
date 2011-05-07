@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 3.9, March 2011
+Last updated for Orbeon Forms 3.9, May 2011
 
 
 1. What is Orbeon Forms?

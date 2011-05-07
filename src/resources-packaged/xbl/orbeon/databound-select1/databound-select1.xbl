@@ -52,7 +52,9 @@
             <fb:control-details>
                 <xforms:input ref="@resource">
                     <xforms:label lang="en">Resource URI</xforms:label>
+                    <xforms:label lang="fr">URI de la ressource</xforms:label>
                     <xforms:hint lang="en">HTTP URI returning data used to populate the dropdown</xforms:hint>
+                    <xforms:hint lang="fr">URI HTTP auquel réside le service</xforms:hint>
                 </xforms:input>
                 <xforms:input ref="xforms:itemset/@ref">
                     <xforms:label ref="$resources/dialog-actions/items/label"/>

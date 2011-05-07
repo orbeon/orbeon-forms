@@ -19,6 +19,7 @@
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
@@ -40,7 +41,7 @@
                 <large-icon>/forms/orbeon/builder/images/autocomplete.png</large-icon>
             </icon>
             <datatype>xforms:string</datatype>
-            <template>
+            <fb:template>
                 <fr:autocomplete id="" appearance="minimal" ref="" xmlns="" resource="">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
@@ -51,11 +52,13 @@
                         <xforms:value ref=""/>
                     </xforms:itemset>
                 </fr:autocomplete>
-            </template>
+            </fb:template>
             <control-details>
                 <xforms:input ref="@resource">
                     <xforms:label lang="en">Resource URI</xforms:label>
-                    <xforms:hint lang="en">HTTP URL returning data used for the suggestions</xforms:hint>
+                    <xforms:label lang="fr">URI de la ressource</xforms:label>
+                    <xforms:hint lang="en">HTTP URI returning data used for the suggestions</xforms:hint>
+                    <xforms:hint lang="fr">URI HTTP auquel réside le service</xforms:hint>
                 </xforms:input>
                 <xforms:input ref="xforms:itemset/@ref">
                     <xforms:label ref="$resources/dialog-actions/items/label"/>

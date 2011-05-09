@@ -18,10 +18,25 @@ class RTE extends Control
     # Initializes the RTE editor for a particular control.
     init: (container) ->
         super container
-        # Create RTE object
-        textarea = if Utils.isNewXHTMLLayout() then @container.getElementsByTagName("textarea")[0] else @container
+        if Utils.isNewXHTMLLayout()
+            # In span mode, get textarea under container and keep current structure
+            textarea = @container.getElementsByTagName("textarea")[0]
+        else
+            # In nospan mode, insert newly created container
+            textarea = @container
+            @container = document.createElement "span"
+            YD.insertAfter @container, textarea
+            @container.appendChild textarea
+            # Move classes on the container created by YUI
+            @container.className = textarea.className
+            textarea.className = ""
+            # Move the id to the container, and add -textarea to the id of the textarea
+            containerId = textarea.id
+            textarea.id = textarea.id + "-textarea"
+            @container.id = containerId
         # Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
         textarea.disabled = YD.hasClass @container, "xforms-readonly"
+        # Create RTE object
         rteConfig = if typeof YUI_RTE_CUSTOM_CONFIG != "undefined" then YUI_RTE_CUSTOM_CONFIG else RTEConfig
         @yuiRTE = new YAHOO.widget.Editor textarea, rteConfig
 
@@ -46,16 +61,6 @@ class RTE extends Control
             # it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
             # Then in executeNextRequest() we ignore the value change because it is the same the server value.
             ServerValueStore.set @container.id, @getValue()
-
-            if not Utils.isNewXHTMLLayout()
-                # Move classes on the container created by YUI
-                newContainer = @container.parentNode
-                newContainer.className += " " + @container.className
-                @container.className = ""
-                @container.id = containerId + "-textarea"
-                newContainer.id = containerId
-                @container = newContainer
-
             # Fire render event
             @isRendered = true
             @renderedEvent.fire()

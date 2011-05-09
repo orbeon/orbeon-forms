@@ -52,8 +52,8 @@
         var control = this.idToControl[container.id];
         if (control == null || control.container != container) {
             control = new (ORBEON.xforms.Page.getControlConstructor(container));
-            control.init(container);
             this.idToControl[container.id] = control;
+            control.init(container);
         }
         return control;
     };

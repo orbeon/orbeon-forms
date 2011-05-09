@@ -15,9 +15,13 @@ package org.orbeon.oxf.xforms.event;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.*;
@@ -38,7 +42,6 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final boolean isAllEvents;
     private final String[] observerStaticIds;
     private final Set<String> targetStaticIds;
-    //private final String handler;
 
     // Phase filters
     private final boolean isCapturePhase;
@@ -195,8 +198,13 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         // Create a new top-level action interpreter to handle this event
-        new XFormsActionInterpreter(contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
-                    .runAction(event, eventObserver, eventHandlerElement);
+        try {
+            new XFormsActionInterpreter(contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
+                .runAction(event, eventObserver, eventHandlerElement);
+        } catch (Exception e) {
+            // Something bad happened while running the action
+            contextContainer.dispatchEvent(new XXFormsActionErrorEvent(contextContainer.getContainingDocument(), eventObserver, e));
+        }
     }
 
     public String[] getObserversStaticIds() {

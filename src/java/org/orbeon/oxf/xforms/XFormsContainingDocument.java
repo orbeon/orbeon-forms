@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
@@ -996,6 +997,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else if (XFormsEvents.XXFORMS_POLL.equals(eventName)) {
             // Poll event for submissions
             // NOP, as we check for async submission in the client event loop
+        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
+            // Log error
+            final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
+            getIndentedLogger(XFormsActions.LOGGING_CATEGORY).logError("action", "exception while running action", ev.e());
         } else {
             super.performDefaultAction(event);
         }

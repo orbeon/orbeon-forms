@@ -104,6 +104,19 @@
             <xforms:group id="inspector-group" model="inspector-model" class="fr-xforms-inspector">
                 <xhtml:div class="fr-xforms-inspector-title">Orbeon Forms XForms Inspector</xhtml:div>
 
+                <xforms:group xxbl:scope="outer" appearance="xxforms:internal">
+                    <!-- Do this within a group otherwise listening to #document doesn't work -->
+                    <!-- Catch error in action handler and do not let propagation occur -->
+                    <xforms:action ev:event="xxforms-action-error" ev:observer="#document" ev:propagate="stop">
+                        <xforms:dispatch name="fr-log" targetid="fr-xforms-inspector" xxbl:scope="inner">
+                            <xxforms:context name="fr-messages" value="concat('Error: ', normalize-space(event('message')))"/>
+                        </xforms:dispatch>
+                        <xforms:dispatch name="fr-log" targetid="fr-xforms-inspector" xxbl:scope="inner">
+                            <xxforms:context name="fr-messages" value="event('element')"/>
+                        </xforms:dispatch>
+                    </xforms:action>
+                </xforms:group>
+
                 <!-- Function selection-->
                 <xhtml:div class="fr-xforms-inspector-block">
                     <xforms:select1 ref="instance('inspector-instance')/function" appearance="full">
@@ -217,7 +230,7 @@
                                                 else xpath-output/*/saxon:serialize(., 'xml')
                                             , '&#x0a;')
                                         else xpath-output
-                                else .">
+                                else shown-output">
                             <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
                         </xxforms:variable>
                         <fr:code-mirror ref="shown-output"/>

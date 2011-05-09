@@ -137,6 +137,10 @@ public class ExtendedLocationData extends LocationData {
         return (element != null) ? Dom4jUtils.domToString(element) : null;
     }
 
+    public String getElementDebugString() {
+        return (element != null) ? Dom4jUtils.elementToDebugString(element) : null;
+    }
+
     public String[] getParameters() {
         return parameters;
     }

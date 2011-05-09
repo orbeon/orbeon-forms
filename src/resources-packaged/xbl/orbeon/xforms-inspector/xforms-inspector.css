@@ -15,7 +15,7 @@
     display: block; clear: both;                                                                        /* Be tolerant of different surroundings */
     border: 2px solid #aaa;
     padding: .5em 1em;
-    background: url("../../../fr/style/logo-bg.gif")  repeat-x scroll center top #F8F8F8;               /* Background with gradient */
+    background: url("gradient.gif")  repeat-x scroll center top #F8F8F8;               /* Background with gradient */
 }
 
 .xbl-fr-xforms-inspector .fr-xforms-inspector-title { font-size: 146.5%; color: #333;                   /* Use larger font for title with padding */

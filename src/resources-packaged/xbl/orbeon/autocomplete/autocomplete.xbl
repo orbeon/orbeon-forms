@@ -163,6 +163,9 @@
                             <!-- Markup with input for the YUI autocomplete -->
                             <xhtml:div xbl:attr="class style">
                                 <xforms:input id="search" ref="$local/textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
+                                    <!-- Forward focus event -->
+                                    <xforms:dispatch ev:event="DOMFocusIn" name="DOMFocusIn" target="fr-autocomplete"/>
+                                    <xforms:dispatch ev:event="DOMFocusOut" name="DOMFocusOut" target="fr-autocomplete"/>
                                     <xforms:action ev:event="xforms-value-changed">
                                         <!-- If the search value is empty, set the external value to empty as well -->
                                         <xforms:action if=". = ''">

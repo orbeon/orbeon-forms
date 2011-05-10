@@ -2511,4 +2511,72 @@
         </output>
     </test>
 
+    <test description="Nested layout repeat with and without initial data" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315953&group_id=168&atid=350207 -->
+        <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xhtml-layout="span">
+                        <xforms:instance id="instance">
+                            <lists>
+                                <list>
+                                </list>
+                                <list>
+                                    <item name="a"/>
+                                    <item name="b"/>
+                                </list>
+                            </lists>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat ref="list" id="outer-repeat">
+                        <xhtml:div>
+                            <xforms:repeat ref="item" id="inner-repeat">
+                                <xforms:input id="my-input" ref="@name"/>
+                                <xhtml:br class="inner-br"/>
+                            </xforms:repeat>
+                        </xhtml:div>
+                        <xhtml:br class="outer-br"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:div id="repeat-begin-outer-repeat" class="xforms-repeat-begin-end"/>
+                <xhtml:div class="xforms-repeat-delimiter"/>
+                <xhtml:div class="xforms-repeat-selected-item-1">
+                    <xhtml:span id="repeat-begin-inner-repeat·1" class="xforms-repeat-begin-end"/>
+                    <xhtml:span id="repeat-end-inner-repeat·1" class="xforms-repeat-begin-end"/>
+                </xhtml:div>
+                <xhtml:br class="outer-br xforms-repeat-selected-item-1"/>
+                <xhtml:div class="xforms-repeat-delimiter"/>
+                <xhtml:span id="repeat-begin-inner-repeat·2" class="xforms-repeat-begin-end"/>
+                <xhtml:span class="xforms-repeat-delimiter"/>
+                <xhtml:span id="my-input·2-1" class="xforms-control xforms-input">
+                    <xhtml:input id="my-input$xforms-input-1·2-1" type="text" name="my-input$xforms-input-1·2-1" value="a" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span class="xforms-repeat-delimiter"/>
+                <xhtml:span id="my-input·2-2" class="xforms-control xforms-input">
+                    <xhtml:input id="my-input$xforms-input-1·2-2" type="text" name="my-input$xforms-input-1·2-2" value="b" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span id="repeat-end-inner-repeat·2" class="xforms-repeat-begin-end"/>
+                <xhtml:div class="xforms-repeat-delimiter"/>
+                <xhtml:div class="xforms-repeat-template">
+                    <xhtml:span id="repeat-begin-inner-repeat" class="xforms-repeat-begin-end"/>
+                    <xhtml:span class="xforms-repeat-delimiter"/>
+                    <xhtml:span id="my-input" class="xforms-control xforms-input">
+                        <xhtml:input id="my-input$xforms-input-1" type="text" name="my-input$xforms-input-1" value="" class="xforms-input-input"/>
+                    </xhtml:span>
+                    <xhtml:br class="inner-br"/>
+                    <xhtml:span id="repeat-end-inner-repeat" class="xforms-repeat-begin-end"/>
+                </xhtml:div>
+                <xhtml:br class="outer-br xforms-repeat-template"/>
+                <xhtml:div id="repeat-end-outer-repeat" class="xforms-repeat-begin-end"/>
+            </controls>
+        </output>
+    </test>
+
 </group>

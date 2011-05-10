@@ -81,93 +81,87 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI,
                 outputInterceptor.getDelimiterPrefix, outputInterceptor.getDelimiterLocalName, _, _)
 
-        def repeatBody(generateTemplate: Boolean, iteration: Int, repeatSelected: Boolean) = {
+        def appendClasses(sb: StringBuilder, classes: String) {
+            if (classes.nonEmpty) {
+                if (sb.nonEmpty)
+                    sb += ' '
+                sb append classes
+            }
+        }
+
+        def addDnDClasses(sb: StringBuilder) {
+            val dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd")
+            if (Set("vertical", "horizontal")(dndAttribute)) {
+
+                appendClasses(sb, "xforms-dnd")
+                appendClasses(sb, "xforms-dnd-" + dndAttribute)
+
+                if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
+                    appendClasses(sb,"xforms-dnd-over")
+            }
+        }
+        
+        def repeatBody(generateTemplate: Boolean, iteration: Int, repeatSelected: Boolean, classes: StringBuilder) {
+
+            if (isMustGenerateDelimiters) {
+                // User and DnD classes
+                appendClasses(classes, userClasses)
+                addDnDClasses(classes)
+                
+                outputInterceptor.setAddedClasses(classes.toString)
+            }
+
             handlerContext.pushRepeatContext(generateTemplate, iteration, repeatSelected)
             try {
                 handlerContext.getController.repeatBody()
+                if (isMustGenerateDelimiters)
+                    outputInterceptor.flushCharacters(true, true)
             } catch {
                 case e: Exception =>
                     throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xforms:repeat control", repeatControl.getControlElement))
             }
-            if (isMustGenerateDelimiters)
-                outputInterceptor.flushCharacters(true, true)
             handlerContext.popRepeatContext()
-        }
-
-        def addDnDClasses(sb: StringBuilder, attributes: Attributes) {
-            val dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd")
-            if (dndAttribute != null && dndAttribute != "none") {
-                if (sb.nonEmpty)
-                    sb.append(' ')
-
-                sb.append("xforms-dnd")
-
-                dndAttribute match {
-                    case "vertical" => sb.append(" xforms-dnd-vertical")
-                    case "horizontal" => sb.append(" xforms-dnd-horizontal")
-                    case _ =>
-                }
-
-                if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
-                    sb.append(" xforms-dnd-over")
-            }
         }
 
         // TODO: is the use of XFormsElementFilterContentHandler necessary now?
         if (isMustGenerateDelimiters)
             handlerContext.getController.setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(outputInterceptor)))
 
-        // Unroll repeat
+        // 1. Unroll repeat if needed
         if (isConcreteControl) {
 
             val repeatIndex = repeatControl.getIndex
-            val addedClasses = new StringBuilder(200)
             val selectedClass = "xforms-repeat-selected-item-" + ((handlerContext.countParentRepeats % 4) + 1)
+            val isStaticReadonly = super.isStaticReadonly(repeatControl)
 
+            val addedClasses = new StringBuilder(200)
             for (i <- 1 to repeatControl.getSize) {
                 // Delimiter: before repeat entries, except the first one which is output by generateFirstDelimiter()
                 if (isMustGenerateDelimiters && i > 1)
                     outputDelimiter("xforms-repeat-delimiter", null)
 
                 // Is the current iteration selected?
-                val selected = isRepeatSelected && i == repeatIndex
+                val selected = isRepeatSelected && i == repeatIndex && !isStaticReadonly
                 val relevant = repeatControl.getChildren.get(i - 1).isRelevant
 
                 // Determine classes to add on root elements and around root characters
-
                 addedClasses.setLength(0)
 
                 // Selected iteration
-                if (selected && !isStaticReadonly(repeatControl))
-                    addedClasses.append(selectedClass)
-
-                // User classes
-                if (userClasses.nonEmpty) {
-                    if (addedClasses.nonEmpty)
-                        addedClasses.append(' ')
-                    addedClasses.append(userClasses)
-                }
+                if (selected)
+                    addedClasses append selectedClass
 
                 // MIP classes
                 // Q: Could use handleMIPClasses()?
-                if (!relevant) {
-                    if (addedClasses.nonEmpty)
-                        addedClasses.append(' ')
-                    addedClasses.append("xforms-disabled")
-                }
-
-                // DnD classes
-                addDnDClasses(addedClasses, attributes)
-
-                if (isMustGenerateDelimiters)
-                    outputInterceptor.setAddedClasses(addedClasses.toString)
+                if (!relevant)
+                    appendClasses(addedClasses, "xforms-disabled")
 
                 // Apply the content of the body for this iteration
-                repeatBody(false, i, selected)
+                repeatBody(false, i, selected, addedClasses)
             }
         }
 
-        // Generate template
+        // 2. Generate template if needed
         if (isMustGenerateTemplate) {
             if (isMustGenerateDelimiters && !outputInterceptor.isMustGenerateFirstDelimiters) {
                 // Delimiter: before repeat entries
@@ -177,17 +171,11 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             // Determine classes to add on root elements and around root characters
             val addedClasses = new StringBuilder(if (isTopLevelRepeat) "xforms-repeat-template" else "")
 
-            // DnD classes
-            addDnDClasses(addedClasses, attributes)
-
-            if (isMustGenerateDelimiters)
-                outputInterceptor.setAddedClasses(addedClasses.toString)
-
             // Apply the content of the body for this iteration
-            repeatBody(true, 0, false)
+            repeatBody(true, 0, false, addedClasses)
         }
 
-        // Handle case where no delimiter was output by repeat iterations or template
+        // 3. Handle case where no delimiter was output by repeat iterations or template
         if (isMustGenerateDelimiters && outputInterceptor.getDelimiterNamespaceURI == null) {
 
             // This happens if:
@@ -201,13 +189,13 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             // the other delimiters)
             outputInterceptor.setForward(false)
             mustOutputFirstDelimiter = false
-            repeatBody(true, 0, false)
+            repeatBody(true, 0, false, new StringBuilder)
         }
 
         // Restore output
         handlerContext.getController.setOutput(savedOutput)
 
-        // Delimiter: end repeat
+        // 4. Delimiter: end repeat
         if (isMustGenerateBeginEndDelimiters)
             outputDelimiter("xforms-repeat-begin-end", "repeat-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId))
     }

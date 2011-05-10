@@ -321,7 +321,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return sb;
     }
 
-    protected void appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
+    protected StringBuilder appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
         // @class
         {
             final String attributeValue = controlAttributes.getValue("class");
@@ -359,6 +359,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 sb.append(value);
             }
         }
+        return sb;
     }
 
     protected boolean isStaticReadonly(XFormsControl control) {

@@ -107,8 +107,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
 
             currentOutputInterceptor.setAddedClasses(controlClasses);
 
-            // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-            controller.setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(currentOutputInterceptor)));
+            controller.setOutput(new DeferredXMLReceiverImpl(currentOutputInterceptor));
         } else if (!isVisible) {
             // Case not visible, set output to a black hole
             controller.setOutput(new DeferredXMLReceiverAdapter());

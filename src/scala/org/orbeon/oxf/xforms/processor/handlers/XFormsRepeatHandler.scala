@@ -47,11 +47,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
 
         // Compute user classes only once for all iterations
-        val userClasses = {
-            val sb = new JStringBuilder
-            appendControlUserClasses(attributes, control, sb)
-            sb.toString
-        }
+        val userClasses = appendControlUserClasses(attributes, control, new JStringBuilder).toString
 
         // Place interceptor on output
         val savedOutput = handlerContext.getController.getOutput
@@ -93,11 +89,10 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             val dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd")
             if (Set("vertical", "horizontal")(dndAttribute)) {
 
-                appendClasses(sb, "xforms-dnd")
-                appendClasses(sb, "xforms-dnd-" + dndAttribute)
+                appendClasses(sb, "xforms-dnd xforms-dnd-" + dndAttribute)
 
                 if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
-                    appendClasses(sb,"xforms-dnd-over")
+                    appendClasses(sb, "xforms-dnd-over")
             }
         }
         
@@ -123,9 +118,8 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             handlerContext.popRepeatContext()
         }
 
-        // TODO: is the use of XFormsElementFilterContentHandler necessary now?
         if (isMustGenerateDelimiters)
-            handlerContext.getController.setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(outputInterceptor)))
+            handlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
 
         // 1. Unroll repeat if needed
         if (isConcreteControl) {
@@ -140,19 +134,17 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                 if (isMustGenerateDelimiters && i > 1)
                     outputDelimiter("xforms-repeat-delimiter", null)
 
-                // Is the current iteration selected?
-                val selected = isRepeatSelected && i == repeatIndex && !isStaticReadonly
-                val relevant = repeatControl.getChildren.get(i - 1).isRelevant
-
                 // Determine classes to add on root elements and around root characters
                 addedClasses.setLength(0)
 
                 // Selected iteration
+                val selected = isRepeatSelected && i == repeatIndex && !isStaticReadonly
                 if (selected)
                     addedClasses append selectedClass
 
                 // MIP classes
                 // Q: Could use handleMIPClasses()?
+                val relevant = repeatControl.getChildren.get(i - 1).isRelevant
                 if (!relevant)
                     appendClasses(addedClasses, "xforms-disabled")
 
@@ -163,10 +155,9 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
         // 2. Generate template if needed
         if (isMustGenerateTemplate) {
-            if (isMustGenerateDelimiters && !outputInterceptor.isMustGenerateFirstDelimiters) {
-                // Delimiter: before repeat entries
+            // Delimiter: before repeat template
+            if (isMustGenerateDelimiters && !outputInterceptor.isMustGenerateFirstDelimiters)
                 outputDelimiter("xforms-repeat-delimiter", null)
-            }
 
             // Determine classes to add on root elements and around root characters
             val addedClasses = new StringBuilder(if (isTopLevelRepeat) "xforms-repeat-template" else "")

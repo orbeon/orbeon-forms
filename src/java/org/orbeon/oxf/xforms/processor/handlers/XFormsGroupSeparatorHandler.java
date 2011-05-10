@@ -83,8 +83,8 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                     }
                 }
             });
-            // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-            controller.setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(outputInterceptor)));
+            
+            controller.setOutput(new DeferredXMLReceiverImpl(outputInterceptor));
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);

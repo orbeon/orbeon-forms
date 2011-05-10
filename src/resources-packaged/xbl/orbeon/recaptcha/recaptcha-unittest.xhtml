@@ -39,8 +39,6 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-
-
         <xforms:switch>
             <xforms:case id="recaptcha-case">
                 <!-- The reCAPTCHA component -->
@@ -76,13 +74,11 @@
                 <xforms:trigger appearance="minimal">
                     <xforms:label>another shot</xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch target="recaptcha" name="fr-reload"/>
+                        <xforms:dispatch if="instance('ui')/error-code != 'empty'" target="recaptcha" name="fr-reload"/>
                         <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
                     </xforms:action>
                 </xforms:trigger>.
             </xforms:case>
         </xforms:switch>
-
-
     </xhtml:body>
 </xhtml:html>

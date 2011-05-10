@@ -11,47 +11,53 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-YAHOO.namespace("xbl.fr");
-YAHOO.xbl.fr.Recaptcha = function() {};
-ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Recaptcha, "xbl-fr-recaptcha");
-YAHOO.xbl.fr.Recaptcha.prototype = {
 
-    challengeId: null,
-    responseId: null,
-    publicKeyPropertyId: null,
-    publicKeyLocalId: null,
+(function() {
+    var OD = ORBEON.util.Dom;
+    var YD = YAHOO.util.Dom;
 
-    /**
-     * Constructor
-     */
-    init: function() {
-        var recaptchaDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-div", null, this.container)[0];
-        this.challengeId = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-challenge", null, this.container)[0].id;
-        this.responseId = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-response", null, this.container)[0].id;
-        
-        // Public key comes from property
-        var publicKeyElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-public-key", null, this.container)[0];
-        var publicKey = ORBEON.xforms.Document.getValue(publicKeyElement.id);
-        // Other configurations
-        var themeElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-theme", null, this.container)[0];
-        var theme = ORBEON.xforms.Document.getValue(themeElement.id);
-        var langElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-lang", null, this.container)[0];
-        var lang = ORBEON.xforms.Document.getValue(langElement.id);
-        
-        Recaptcha.create(publicKey, recaptchaDiv.id, {
-           theme: theme,
-           lang: lang
-// NOTE: Setting the focus automatically is often not what is desired. Proper support for xf:setfocus would be ideal.
-//           ,callback: Recaptcha.focus_response_field
-        });
-    },
-    
-    getChallengeResponse: function() {
-        ORBEON.xforms.Document.setValue(this.challengeId, Recaptcha.get_challenge());
-        ORBEON.xforms.Document.setValue(this.responseId, Recaptcha.get_response());
-    },
-    
-    reload: function() {
-        Recaptcha.reload();
-    }
-};
+    YAHOO.namespace("xbl.fr");
+    YAHOO.xbl.fr.Recaptcha = function() {};
+    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Recaptcha, "xbl-fr-recaptcha");
+    YAHOO.xbl.fr.Recaptcha.prototype = {
+
+        challengeId: null,
+        responseId: null,
+        publicKeyPropertyId: null,
+        publicKeyLocalId: null,
+
+        /**
+         * Constructor
+         */
+        init: function() {
+            var recaptchaDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-div", null, this.container)[0];
+            this.challengeId = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-challenge", null, this.container)[0].id;
+            this.responseId = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-response", null, this.container)[0].id;
+            this.verifyButton = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-verify", null, this.container)[0];
+
+            // Public key comes from property
+            var publicKeyElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-public-key", null, this.container)[0];
+            var publicKey = ORBEON.xforms.Document.getValue(publicKeyElement.id);
+            // Other configurations
+            var themeElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-theme", null, this.container)[0];
+            var theme = ORBEON.xforms.Document.getValue(themeElement.id);
+            var langElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-lang", null, this.container)[0];
+            var lang = ORBEON.xforms.Document.getValue(langElement.id);
+
+            Recaptcha.create(publicKey, recaptchaDiv.id, {
+               theme: theme,
+               lang: lang
+            });
+        },
+
+        getChallengeResponse: function() {
+            ORBEON.xforms.Document.setValue(this.challengeId, Recaptcha.get_challenge());
+            ORBEON.xforms.Document.setValue(this.responseId, Recaptcha.get_response());
+            OD.getElementByTagName(this.verifyButton, "button").click();
+        },
+
+        reload: function() {
+            Recaptcha.reload();
+        }
+    };
+})();

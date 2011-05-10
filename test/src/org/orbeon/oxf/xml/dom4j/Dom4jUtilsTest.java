@@ -54,6 +54,6 @@ public class Dom4jUtilsTest extends TestCase {
         attributes.addAttribute("", "foo", "foo", ContentHandlerHelper.CDATA, "v1");
         attributes.addAttribute(XMLConstants.XHTML_NAMESPACE_URI, "bar", "xhtml:bar", ContentHandlerHelper.CDATA, "v2");
 
-        assertEquals("<foo:bar foo=\"v1\" xhtml:bar=\"v2\"></foo:bar>", Dom4jUtils.elementToDebugString(Dom4jUtils.saxToDebugElement("foo:bar", attributes)));
+        assertEquals("<foo:bar foo=\"v1\" xhtml:bar=\"v2\"/>", Dom4jUtils.elementToDebugString(Dom4jUtils.saxToDebugElement("foo:bar", attributes)));
     }
 }

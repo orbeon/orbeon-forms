@@ -823,25 +823,32 @@ public class Dom4jUtils {
             sb.append('\"');
         }
 
-        // Close start tag
-        sb.append('>');
-
-        if (!element.elements().isEmpty()) {
-            // Mixed content
-            final Object firstChild = element.content().get(0);
-            if (firstChild instanceof Text) {
-                sb.append(((Text) firstChild).getText());
-            }
-            sb.append("[...]");
+        final boolean isEmptyElement = element.elements().isEmpty() && element.getText().length() == 0;
+        if (isEmptyElement) {
+            // Close empty element
+            sb.append("/>");
         } else {
-            // Not mixed content
-            sb.append(element.getText());
-        }
+            // Close start tag
+            sb.append('>');
 
-        // Close element with end tag
-        sb.append("</");
-        sb.append(element.getQualifiedName());
-        sb.append('>');
+            if (!element.elements().isEmpty()) {
+                // Mixed content
+                final Object firstChild = element.content().get(0);
+                if (firstChild instanceof Text) {
+                    sb.append(((Text) firstChild).getText());
+                }
+                sb.append("[...]");
+            } else {
+                // Not mixed content
+                final String text = element.getText();
+                sb.append(text);
+            }
+
+            // Close element with end tag
+            sb.append("</");
+            sb.append(element.getQualifiedName());
+            sb.append('>');
+        }
 
         return sb.toString();
     }

@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -1000,7 +1001,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
             // Log error
             final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
-            getIndentedLogger(XFormsActions.LOGGING_CATEGORY).logError("action", "exception while running action", ev.e());
+            getIndentedLogger(XFormsActions.LOGGING_CATEGORY).logError("action", "exception while running action", ev.toStringArray());
         } else {
             super.performDefaultAction(event);
         }

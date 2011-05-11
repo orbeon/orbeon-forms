@@ -17,25 +17,36 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvents, XFormsEvent}
 import java.lang.String
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.saxon.om.SingletonIterator
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.saxon.om.SingletonIterator
 
-class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, val e: Throwable)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, targetObject, true, true) {
+class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, val t: Throwable)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, targetObject, true, false) {
 
-    private lazy val rootLocationData = ValidationException.getRootLocationData(e)
-    private def rootMessage = OXFException.getRootThrowable(e).getMessage
+    private lazy val rootLocationData = ValidationException.getRootLocationData(t)
+    private def rootMessage = OXFException.getRootThrowable(t).getMessage
+
+    private val attributes = Map(
+        "element" ->    (() => rootLocationData match {
+                            case rootLocationData: ExtendedLocationData => rootLocationData.getElementDebugString
+                            case _ => null
+                        }),
+        "system-id" ->  (() => rootLocationData.getSystemID),
+        "line" ->       (() => rootLocationData.getLine.toString),
+        "column" ->     (() => rootLocationData.getCol.toString),
+        "message" ->    (() => rootMessage),
+        "throwable" ->  (() => OXFException.throwableToString(t))
+    )
 
     private def string(value: String) = SingletonIterator.makeIterator(StringValue.makeStringValue(value))
 
-    override def getAttribute(name: String) = name match {
-        case "element" if rootLocationData.isInstanceOf[ExtendedLocationData] =>
-            string(rootLocationData.asInstanceOf[ExtendedLocationData].getElementDebugString)
-        case "system-id" => string(rootLocationData.getSystemID)
-        case "line" => string(rootLocationData.getLine.toString)
-        case "column" => string(rootLocationData.getCol.toString)
-        case "message" => string(rootMessage)
-        case _ => super.getAttribute(name)
+    override def getAttribute(name: String) = attributes(name) match {
+        case null => super.getAttribute(name)
+        case getvalue => string(getvalue())
     }
+
+    def toStringArray =
+         attributes.keys.toArray flatMap
+            (name => Array(name, getAttribute(name).next().getStringValue))
 }

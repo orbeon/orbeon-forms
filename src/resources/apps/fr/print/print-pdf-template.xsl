@@ -129,9 +129,11 @@
 
                                     <xsl:choose>
                                         <xsl:when test="local-name($control) = 'select' and $control/@appearance = 'full'">
-                                            <!-- Checkboxes: use control value and match export values in PDF -->
-                                            <!-- TODO: This doesn't work as Acrobat doesn't handle space-separated values -->
-                                            <field acro-field-name="'{$field-name}'" value="'{$control-value}'"/>
+                                            <!-- Checkboxes: we expect to have a PDF field for each value for a name section$control$value, with a value of 'true' -->
+                                            <xsl:for-each select="tokenize($control-value, '\s+')">
+                                                <xsl:variable name="item-value" as="xs:string" select="."/>
+                                                <field acro-field-name="'{$field-name}${$item-value}'" value="'true'"/>
+                                            </xsl:for-each>
                                         </xsl:when>
                                         <xsl:when test="local-name($control) = 'select1' and $control/@appearance = 'full'">
                                             <!-- Radio buttons: use control value and match export values in PDF -->

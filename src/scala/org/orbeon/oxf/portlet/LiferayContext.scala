@@ -24,6 +24,8 @@ import javax.portlet._
  */
 class LiferayContext() extends CustomContext {
 
+    val prefix = "orbeon.liferay.user."
+
     def amendRequest(portletRequest: PortletRequest): PortletRequest = {
         // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to
         // either userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the
@@ -36,19 +38,27 @@ class LiferayContext() extends CustomContext {
 
     def amendRequest(portletRequest: PortletRequest, user: User): PortletRequest = {
 
-        val headers: Map[String, Array[String]] = for {
-            (name, value) <- Map(
-                "email" -> user.getEmailAddress,
-                "full-name" -> user.getFullName
-            )
-            if value ne null
-        } yield {
-            val prefix = "orbeon.liferay.user."
-            // Store as request attribute with the "dot" convention
-            portletRequest.setAttribute(prefix + name toLowerCase, value)
-            // Return header tuple with header name in lowercase and with the "dash" convention
-            (prefix + name split "[.-]" mkString "-" toLowerCase, Array(value))
-        }
+        def mkAttributeName(name: String) = prefix + name toLowerCase
+        def mkHeaderName(name: String) = prefix + name split "[.-]" mkString "-" toLowerCase
+
+        val headers =
+            for {
+                (name, value) <- Map(
+                    "email" -> user.getEmailAddress,
+                    "full-name" -> user.getFullName,
+                    "roles" -> (user.getRoles map (_.getName) toArray)
+                )
+                if value != null
+            } yield {
+                // Store as request attribute with the "dot" convention
+                portletRequest.setAttribute(mkAttributeName(name), value)
+
+                // Return header tuple with header name in lowercase and with the "dash" convention
+                (mkHeaderName(name) -> (value match {
+                    case array: Array[String] => array
+                    case value: String => Array(value)
+                }))
+            }
 
         // Wrap incoming request depending on request type and add to existing properties
         trait CustomProperties extends PortletRequestWrapper {
@@ -69,4 +79,3 @@ class LiferayContext() extends CustomContext {
         }
     }
 }
-

@@ -429,39 +429,7 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
 .fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }
 
-.fr-grid-1-columns .fr-grid-td { width: 100% }
-.fr-grid-2-columns .fr-grid-td { width: 50% }
-.fr-grid-3-columns .fr-grid-td { width: 33.3% }
-.fr-grid-4-columns .fr-grid-td { width: 25% }
-
-/*.fr-grid-content { border: 1px solid red }*/
-
-/* Size images within cells so that they don't impact the sizing of the grid. */
-.fr-grid .fr-grid-content .xforms-mediatype-image { overflow: hidden; display: block }
-#doc .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 29em; *width: 28.3011em }
-#doc .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 18.8em; *width: 18.34692em }
-#doc .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 13.8em; *width: 13.46742em }
-#doc2 .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 34.2em; *width: 33.37578em }
-#doc2 .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 22.2em; *width: 21.66498em }
-#doc2 .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 16.2em; *width: 15.80958em }
-/* NOTE: for now doc3 copies doc4 */
-#doc3 .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 35.2em; *width: 34.35168em }
-#doc3 .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 23em; *width: 22.4457em }
-#doc3 .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 16.8em; *width: 16.39512em }
-#doc4 .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 35.2em; *width: 34.35168em }
-#doc4 .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 23em; *width: 22.4457em }
-#doc4 .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 16.8em; *width: 16.39512em }
-
-/* Hand-tuned control widths for IE <= 7 */
-/* TODO: more controls */
-#doc4 .fr-grid-1-columns .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
-
-#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input,
-    #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-secret { *width: 99.5% }
-#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input,
-    #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-secret { *width: 95% }
-#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content .xforms-input-input,
-    #doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content .xforms-secret { *width: 95% }
+.fr-grid { table-layout: fixed }                            /* All the column must have the same width */
 
 #doc4 .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } /* Undo effect of previous rule for image in minimal date picker */
 

@@ -30,14 +30,14 @@
     <xsl:template match="xhtml:body//fr:grid | xbl:binding/xbl:template//fr:grid">
         <xsl:choose>
             <xsl:when test="$is-noscript and $is-noscript-table">
-                <xhtml:div class="fr-grid fr-grid-{@columns}-columns{ if (@class) then concat(' ', @class) else ()}">
+                <xhtml:div class="fr-grid{ if (@class) then concat(' ', @class) else ()}">
                     <!-- Grid content -->
                     <xsl:apply-templates select="xhtml:* except xforms:label" mode="grid-content"/>
                     <xsl:apply-templates select="(fr:* | xforms:* | xxforms:*) except xforms:label"/>
                 </xhtml:div>
             </xsl:when>
             <xsl:otherwise>
-                <xhtml:table class="fr-grid fr-grid-{@columns}-columns{ if (@class) then concat(' ', @class) else ()}">
+                <xhtml:table class="fr-grid{ if (@class) then concat(' ', @class) else ()}">
                     <!-- Grid content -->
                     <xsl:apply-templates select="xhtml:* except xforms:label" mode="grid-content"/>
                     <xsl:apply-templates select="(fr:* | xforms:* | xxforms:*) except xforms:label"/>
@@ -67,8 +67,8 @@
                 <xhtml:div class="{string-join(('fr-grid-td', @class), ' ')}">
                     <xsl:apply-templates select="@*"/>
                     <xhtml:div class="fr-grid-content">
-                        <xsl:apply-templates select="node()"/>
-                    </xhtml:div>
+                    <xsl:apply-templates select="node()"/>
+                </xhtml:div>
                 </xhtml:div>
             </xsl:when>
             <xsl:otherwise>
@@ -77,7 +77,7 @@
                     <!-- For now don't put div if content is empty. This facilitates styling with IE 6. -->
                     <xsl:if test="exists(*) or normalize-space() != ''">
                         <xhtml:div class="fr-grid-content">
-                            <xsl:apply-templates select="node()"/>
+                        <xsl:apply-templates select="node()"/>
                         </xhtml:div>
                     </xsl:if>
                 </xhtml:td>
@@ -93,8 +93,8 @@
                     <xsl:copy-of select="@*"/>
                     <xsl:attribute name="class" select="string-join(('fr-grid-td', @class), ' ')"/>
                     <xhtml:div class="fr-grid-content">
-                        <xsl:apply-templates/>
-                    </xhtml:div>
+                    <xsl:apply-templates/>
+                </xhtml:div>
                 </xhtml:div>
             </xsl:when>
             <xsl:otherwise>
@@ -104,7 +104,7 @@
                     <!-- For now don't put div if content is empty. This facilitates styling with IE 6. -->
                     <xsl:if test="exists(*) or normalize-space() != ''">
                         <xhtml:div class="fr-grid-content">
-                            <xsl:apply-templates/>
+                        <xsl:apply-templates/>
                         </xhtml:div>
                     </xsl:if>
                 </xsl:copy>

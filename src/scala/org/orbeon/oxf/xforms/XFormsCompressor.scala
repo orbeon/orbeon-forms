@@ -28,6 +28,7 @@ object XFormsCompressor {
     private val deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory)
 
     private val BUFFER_SIZE = 1024 * 8
+    private val TRAILER_SIZE = 8
 
     def compressBytes(bytesToEncode: Array[Byte], level: Int) = {
         val deflater = deflaterPool.borrowObject.asInstanceOf[Deflater]
@@ -40,7 +41,6 @@ object XFormsCompressor {
 
             os.toByteArray
         } finally {
-            deflater.reset()
             deflaterPool.returnObject(deflater)
         }
     }
@@ -102,10 +102,16 @@ object XFormsCompressor {
             new Deflater(Deflater.BEST_SPEED, true)
         }
 
-        def destroyObject(p1: AnyRef) = ()
-        def validateObject(p1: AnyRef) = true
-        def activateObject(p1: AnyRef) = ()
-        def passivateObject(p1: AnyRef) = ()
+        def destroyObject(o: AnyRef) = ()
+        def validateObject(o: AnyRef) = true
+        def activateObject(o: AnyRef) = ()
+        def passivateObject(o: AnyRef) {
+            try {
+                o.asInstanceOf[Deflater].reset()
+            } catch {
+                case e => XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", e)
+            }
+        }
     }
 
     // GZIPOutputStream which uses a custom Deflater
@@ -123,5 +129,47 @@ object XFormsCompressor {
                 out.close()
                 closed = true
             }
+			
+		// Override because IBM implementation calls def.end()
+		override def finish() {
+
+            def writeTrailer(buf: Array[Byte], offset: Int) {
+
+                def writeInt(i: Int, offset: Int) {
+
+                    def writeShort(s: Int, offset: Int) {
+                        buf(offset) =  (s & 0xff).asInstanceOf[Byte]
+                        buf(offset + 1) =  ((s >> 8) & 0xff).asInstanceOf[Byte]
+                    }
+
+                    writeShort(i & 0xffff, offset)
+                    writeShort((i >> 16) & 0xffff, offset + 2)
+                }
+
+                writeInt(crc.getValue.toInt, offset) // CRC-32 of uncompr. data
+                writeInt(deflater.getTotalIn, offset + 4) // Number of uncompr. bytes
+            }
+
+			if (!deflater.finished) {
+				deflater.finish()
+				while (!deflater.finished) {
+					var len = deflater.deflate(buf, 0, buf.length)
+					if (deflater.finished && len <= buf.length - TRAILER_SIZE) {
+						// last deflater buffer. Fit trailer at the end 
+						writeTrailer(buf, len)
+						len = len + TRAILER_SIZE
+						out.write(buf, 0, len)
+						return
+                    }
+					if (len > 0)
+					out.write(buf, 0, len)
+				}
+				// if we can't fit the trailer at the end of the last
+				// deflater buffer, we write it separately
+				val trailer = new Array[Byte](TRAILER_SIZE)
+				writeTrailer(trailer, 0)
+				out.write(trailer)
+			}
+        }
     }
 }

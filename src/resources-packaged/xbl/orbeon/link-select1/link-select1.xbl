@@ -60,31 +60,39 @@
             <!--</xbl:style>-->
         <!--</xbl:resources>-->
         <!-- NOTE: use XSLT so we can fetch attributes from under the itemset -->
-        <xbl:template xxbl:transform="oxf:xslt">
+        <xbl:template>
             <!-- Outer group -->
-            <xforms:group xbl:attr="model context ref bind" xsl:version="2.0" xxbl:scope="outer">
-                <xbl:content includes="fr|link-select1 > xforms|label, fr|link-select1 > xforms|help, fr|link-select1 > xforms|hint, fr|link-select1 > xforms|alert"/>
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                <xbl:content includes="fr:* > xforms|label, fr:* > xforms|help, fr:* > xforms|hint, fr:* > xforms|alert"/>
 
-                <xforms:group  class="fr-component-group">
+                <xforms:group class="fr-component-group" xxbl:scope="inner">
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+                    
+                    <!-- Hidden select to hold itemset -->
+                    <xxforms:variable name="binding"><xxforms:sequence value="." xxbl:scope="outer"/></xxforms:variable>
+                    <xforms:select ref="$binding" appearance="xxforms:internal" id="hidden-select">
+                        <xbl:content includes="fr:* > xforms|itemset, fr:* > xforms|item, fr:* > xforms|choices"/>
+                    </xforms:select>
+                    <xxforms:variable name="items" value="xxforms:itemset('hidden-select', 'xml')//item"/>
 
                     <!-- Variable pointing to external single-node binding -->
                     <xxforms:variable name="result" as="node()?" select="."/>
 
-                    <xforms:repeat nodeset="{/*/xforms:itemset/@nodeset}">
-                        <xxforms:variable name="position" select="position()" as="xs:integer"/>
-                        <xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/(@ref | @value)}" as="xs:string"/>
-                        <xxforms:variable name="value" select="{/*/xforms:itemset/xforms:value/(@ref | @value)}" as="xs:string"/>
+                    <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
+                         repeat nodeset recalculations -->
+                    <xforms:repeat ref="$items/value/string()">
+                            <xxforms:variable name="position" value="position()"/>
+                            <xxforms:variable name="value" value="."/>
+                            <xxforms:variable name="label" value="$items[value = $value]/label/string()"/>
 
                         <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                        <xforms:group ref=".[$value != $result]">
+                        <xforms:group ref=".[$value != $binding]">
                             <xforms:trigger appearance="minimal">
                                 <xforms:label value="$label"/>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="$result" value="$value"/>
-                                </xforms:action>
+                                <xforms:setvalue ev:event="DOMActivate" ref="$binding" value="$value"/>
                             </xforms:trigger>
                         </xforms:group>
-                        <xforms:output ref=".[$value = $result]" value="$label"/>
+                        <xforms:output ref=".[$value = $binding]" value="$label"/>
                     </xforms:repeat>
                 </xforms:group>
             </xforms:group>

@@ -11,10 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xforms:header nodeset="xxforms:instance('fr-provider-instance')/publish/parameters/parameter"
-               xmlns:xforms="http://www.w3.org/2002/xforms"
-               xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-               xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xforms:name value="@name"/>
-    <xforms:value value="@value"/>
-</xforms:header>
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <!-- The proxy does it all -->
+    <p:processor name="fr:persistence-proxy"/>
+
+</p:config>

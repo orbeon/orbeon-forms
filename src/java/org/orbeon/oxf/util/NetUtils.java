@@ -625,6 +625,10 @@ public class NetUtils {
         }
     }
 
+    public static InputStream uriToInputStream(String uri) throws Exception {
+        return new URI(uri).toURL().openStream();
+    }
+
     /**
      * Convert a URI to a FileItem.
      *

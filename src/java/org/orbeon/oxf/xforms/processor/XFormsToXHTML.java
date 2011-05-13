@@ -35,7 +35,6 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamResult;
@@ -491,11 +490,11 @@ public class XFormsToXHTML extends ProcessorImpl {
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, pipelineContext, null, xmlReceiver, false, true);
     }
 
-    public static ExternalContext.Response getResponse(ContentHandler contentHandler, final ExternalContext externalContext) {
+    public static ExternalContext.Response getResponse(XMLReceiver xmlReceiver, final ExternalContext externalContext) {
         ExternalContext.Response response;
-        if (contentHandler != null) {
+        if (xmlReceiver != null) {
             // If a response is written, it will be through a conversion to XML first
-            final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(contentHandler);
+            final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(xmlReceiver);
             response = new ResponseAdapter() {
 
                 private String charset;
@@ -518,13 +517,18 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 @Override
                 public void setContentType(String contentType) {
-                    try {
-                        // Assume that content type is always set, otherwise this won't work
-                        charset = NetUtils.getContentTypeCharset(contentType);
-                        contentHandlerOutputStream.startDocument(contentType);
-                    } catch (SAXException e) {
-                        throw new OXFException(e);
-                    }
+                    setHeader("Content-Type", contentType);
+                }
+
+                @Override
+                public void setContentLength(int len) {
+                    // TODO: should be set on ContentHandlerOutputStream
+                    setHeader("Content-Length", Integer.toString(len));
+                }
+
+                @Override
+                public void setStatus(int status) {
+                    // TODO: should be set on ContentHandlerOutputStream
                 }
 
                 @Override
@@ -534,9 +538,18 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 @Override
                 public void setHeader(String name, String value) {
-                    // TODO: It is not sound that we output headers here as they should be passed to the
-                    // binary document in the pipeline instead.
-                    externalContext.getResponse().setHeader(name, value);
+
+                    // Handle Content-Type
+                    if (name.toLowerCase().equals("content-type")) {
+                        try {
+                            // Assume that content type is always set, otherwise this won't work
+                            charset = NetUtils.getContentTypeCharset(value);
+                            contentHandlerOutputStream.startDocument(value);
+                        } catch (SAXException e) {
+                            throw new OXFException(e);
+                        }
+                    }
+                    // Don't allow other headers
                 }
 
                 @Override

@@ -323,10 +323,7 @@
                 <xforms:group ref="xforms:output[@mediatype = 'image/*']">
                     <!-- Image -->
                     <xforms:group ref="$instance-holder[normalize-space() != '']">
-                        <xforms:output ref="." mediatype="image/*" id="fb-edit-output-image-control">
-                            <!-- Set outgoing headers for persistence layer. -->
-                            <xi:include href="oxf:/apps/fr/includes/persistence/headers-data.xml" fixup-xml-base="false"/>
-                        </xforms:output>
+                        <xforms:output ref="." mediatype="image/*" id="fb-edit-output-image-control"/>
                     </xforms:group>
                     <!-- File chooser -->
                     <!--<xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/image.png"/>-->

@@ -13,20 +13,31 @@
  */
 package org.orbeon.oxf.resources.handler;
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.auth.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.params.*;
-import org.apache.http.conn.scheme.*;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.*;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.*;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParamBean;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.orbeon.oxf.common.OXFException;
@@ -35,10 +46,14 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ProtocolException;
-import java.net.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
@@ -206,13 +221,19 @@ public class HTTPURLConnection extends URLConnection {
             }
 
             // Create request entity with body
-            if (requestBody != null && method instanceof HttpEntityEnclosingRequest) {
-                final Header contentTypeHeader = method.getFirstHeader("Content-Type"); // Header names are case-insensitive for comparison
-                if (contentTypeHeader == null)
-                    throw new ProtocolException("Can't set request entity: Content-Type header is missing");
-                final ByteArrayEntity byteArrayEntity = new ByteArrayEntity(requestBody);
-                byteArrayEntity.setContentType(contentTypeHeader);
-                ((HttpEntityEnclosingRequest) method).setEntity(byteArrayEntity);
+            if (method instanceof HttpEntityEnclosingRequest) {
+
+                // Use the body that was set directly, or the result of writing to the OutputStream
+                final byte[] body = (requestBody != null) ? requestBody : (os != null) ? os.toByteArray() : null;
+
+                if (body != null) {
+                    final Header contentTypeHeader = method.getFirstHeader("Content-Type"); // Header names are case-insensitive for comparison
+                    if (contentTypeHeader == null)
+                        throw new ProtocolException("Can't set request entity: Content-Type header is missing");
+                    final ByteArrayEntity byteArrayEntity = new ByteArrayEntity(body);
+                    byteArrayEntity.setContentType(contentTypeHeader);
+                    ((HttpEntityEnclosingRequest) method).setEntity(byteArrayEntity);
+                }
             }
 
             // Make request
@@ -228,6 +249,16 @@ public class HTTPURLConnection extends URLConnection {
 
     public void setRequestBody(byte[] requestBody) throws IOException {
         this.requestBody = requestBody;
+    }
+
+    private ByteArrayOutputStream os = null;
+
+    @Override
+    public OutputStream getOutputStream() throws IOException {
+        if (os == null)
+            os = new ByteArrayOutputStream();
+
+        return os;
     }
 
     private void initResponseHeaders() {

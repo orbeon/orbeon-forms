@@ -21,11 +21,11 @@ import org.orbeon.oxf.test.DocumentTestBase
 class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
     @Test def testPersistenceHeaders {
 
-        val obf = FormRunner.getHeaders("cities", "form1", "form")
+        val obf = FormRunner.getPersistenceHeadersAsXML("cities", "form1", "form")
         assert(TransformerUtils.tinyTreeToString(obf) ===
             """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/Mexico_City</value></header><header><name>Orbeon-City-Name</name><value>Mexico City</value></header><header><name>Orbeon-Population</name><value>8851080</value></header></headers>""")
 
-        val obd = FormRunner.getHeaders("cities", "form1", "data")
+        val obd = FormRunner.getPersistenceHeadersAsXML("cities", "form1", "data")
         assert(TransformerUtils.tinyTreeToString(obd) ===
             """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/S%C3%A3o_Paulo</value></header><header><name>Orbeon-City-Name</name><value>São Paulo</value></header><header><name>Orbeon-Population</name><value>11244369</value></header></headers>""")
     }

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -38,14 +37,11 @@
                     <xforms:model xxforms:optimize-get-all="false">
                         <xxforms:variable name="app" select="instance('fr-parameters-instance')/app"/>
                         <xxforms:variable name="form" select="instance('fr-parameters-instance')/form"/>
-                        <xi:include href="../includes/persistence/provider.xml" xpointer="xpath(/*/*)"/>
                         <xforms:instance id="fr-parameters-instance" src="input:instance"/>
                         <xforms:submission id="get-source-form-submission" method="get" serialization="none"
-                                resource="{instance('fr-provider-instance')/form/uri}/crud/{$app}/{$form}/form/form.xhtml{
+                                resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml{
                                     if (instance('fr-parameters-instance')/document != '') then concat('?document=', instance('fr-parameters-instance')/document) else ''}"
                                 replace="all" xxforms:xinclude="true">
-                            <xi:include href="../includes/persistence/headers-authentication.xml"/>
-                            <xi:include href="../includes/persistence/headers-form.xml"/>
                         </xforms:submission>
                         <xforms:send ev:event="xforms-model-construct-done" submission="get-source-form-submission"/>
                     </xforms:model>

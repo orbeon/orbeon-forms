@@ -301,10 +301,8 @@
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
             <xforms:submission id="search-submission"
                     ref="instance('fr-search-instance')" validate="false"
-                    method="post" resource="{xxforms:instance('fr-provider-instance')/data/uri}/search/{$app}/{$form}"
+                    method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
                     replace="instance" instance="fr-summary-instance">
-                <xi:include href="../includes/persistence/headers-authentication.xml"/>
-                <xi:include href="../includes/persistence/headers-data.xml"/>
                 <!-- Set language upon submitting -->
                 <xforms:action ev:event="xforms-submit">
                     <xforms:setvalue ref="lang" value="xxforms:instance('fr-language-instance')"/>

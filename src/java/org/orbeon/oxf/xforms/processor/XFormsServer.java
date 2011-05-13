@@ -219,7 +219,7 @@ public class XFormsServer extends ProcessorImpl {
                         // Handle response here (if not null, is handled after synchronized block)
                         if (xmlReceiver != null) {
                             // Create resulting document if there is a receiver
-                            if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
+                            if (containingDocument.isGotSubmissionReplaceAll()) {// not sure why we used to test && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))
                                 // NOP: Response already sent out by a submission
                                 indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
                             } else if (containingDocument.isGotSubmissionRedirect()) {

@@ -137,7 +137,6 @@
                     <xforms:help ref=""/>
                     <!-- No hint? -->
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xi:include href="oxf:/apps/fr/includes/persistence/headers-data.xml" fixup-xml-base="false"/>
                 </xforms:output>
             </template>
         </metadata>

@@ -167,11 +167,8 @@
         <!-- Submission to publish the form -->
         <xforms:submission id="fr-publish-form-submission"
                 ref="instance('fr-form-to-publish-instance')" method="put"
-                resource="{xxforms:instance('fr-provider-instance')/publish/uri}/crud/{event('fb:app')}/{event('fb:form')}/form/form.xhtml"
+                resource="/fr/service/persistence/crud/{event('fb:app')}/{event('fb:form')}/form/form.xhtml"
                 replace="text" target="instance('fr-publish-form-submission-response')">
-            <!-- Headers -->
-            <xi:include href="../../../../apps/fr/includes/persistence/headers-authentication.xml"/>
-            <xi:include href="../../../../apps/fr/includes/persistence/headers-publish.xml"/>
 
             <!-- Prepare submission -->
             <!-- See also model.xml -->

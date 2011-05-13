@@ -12,6 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <processors xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <!-- Include user definitions. By default an empty file is present in packaged resources, and can be overridden. -->
@@ -753,6 +754,11 @@
 
     <processor name="oxf:instance-to-parameters">
         <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor"/>
+    </processor>
+
+    <!-- Form Runner / Form Builder processors -->
+    <processor name="fr:persistence-proxy">
+        <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>
     </processor>
 
     <!-- No longer supported processors -->

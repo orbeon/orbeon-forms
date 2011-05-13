@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -26,8 +25,12 @@
             </result>
         </action>
     </page>
+    
+    <!-- ==== Entry point for persistence services ================================================================= -->
 
-    <!-- ==== Built-in eXist-based Persistence Services ============================================================ -->
+    <page path-info="/fr/service/persistence/.*" matcher="oxf:perl5-matcher" model="persistence/proxy.xpl"/>
+
+    <!-- ==== Built-in eXist-based persistence services ============================================================ -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -47,7 +50,7 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
-    <!-- ==== Built-in Oracle-based Persistence Services =========================================================== -->
+    <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -67,7 +70,7 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
-    <!-- ==== Custom MySQL-based Persistence Services =========================================================== -->
+    <!-- ==== Custom MySQL-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -87,7 +90,7 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
-    <!-- ==== Built-in Resource Manager-Based Persistence Services ================================================= -->
+    <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <page path-info="/fr/service/resource/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
@@ -104,7 +107,7 @@
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
-    <!-- ==== Other Services ======================================================================================= -->
+    <!-- ==== Other services ======================================================================================= -->
 
     <!-- Email document -->
     <page path-info="/fr/service/([^/]+)/([^/]+)/(email)(/([^/]+))?" matcher="oxf:perl5-matcher"
@@ -135,7 +138,7 @@
     <!-- Import a collection of form data -->
     <page path-info="/fr/service/([^/]+)/([^/]+)/(import)" matcher="oxf:perl5-matcher" view="import/import.xpl"/>
 
-    <!-- ==== Custom Services and Pages ============================================================================ -->
+    <!-- ==== Custom services and pages ============================================================================ -->
 
     <!-- Custom persistence implementation provided by the application -->
     <page path-info="/fr/service/custom/([^/]+)/crud/[^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+)" matcher="oxf:perl5-matcher"

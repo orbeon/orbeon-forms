@@ -20,8 +20,12 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.*;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.properties.Properties;
@@ -30,11 +34,18 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.*;
 
 /**
@@ -76,23 +87,15 @@ public class RequestGenerator extends ProcessorImpl {
     private static final int DEFAULT_MAX_UPLOAD_MEMORY_SIZE = 10 * 1024;
     private static final String MAX_UPLOAD_MEMORY_SIZE_PROPERTY = "max-upload-memory-size";
 
-    // Enable saving input stream
-//    private static final boolean DEFAULT_ENABLE_INPUT_STREAM_SAVING = true;
-//    private static final String ENABLE_INPUT_STREAM_SAVING_PROPERTY = "enable-input-stream-saving";
-
     private static final String INCLUDE_ELEMENT = "include";
     private static final String EXCLUDE_ELEMENT = "exclude";
 
     private static final String FILE_ITEM_ELEMENT = "request:file-item";
     private static final String PARAMETER_NAME_ATTRIBUTE = "parameter-name";
     private static final String PARAMETER_POSITION_ATTRIBUTE = "parameter-position";
-    public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context"; // used by RequestGenerator
+    private static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context";
 
-//    private static final Map prefixes = new HashMap();
-//
-//    {
-//        prefixes.put("request", REQUEST_PRIVATE_NAMESPACE_URI);
-//    }
+    private static final String BODY_REQUEST_ATTRIBUTE = "orbeon.request.body.url";
 
     public RequestGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, REQUEST_CONFIG_NAMESPACE_URI));
@@ -142,6 +145,9 @@ public class RequestGenerator extends ProcessorImpl {
                                 // convenient.
                                 final Context context = getContext(pipelineContext);
                                 if (context.bodyFileItem != null || getRequest(pipelineContext).getInputStream() != null) {
+
+                                    final ExternalContext.Request request = getRequest(pipelineContext);
+
                                     if (context.bodyFileItem == null) {
                                         final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
                                         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
@@ -150,7 +156,7 @@ public class RequestGenerator extends ProcessorImpl {
                                             }
                                         });
                                         final OutputStream outputStream = fileItem.getOutputStream();
-                                        NetUtils.copyStream(getRequest(pipelineContext).getInputStream(), outputStream);
+                                        NetUtils.copyStream(request.getInputStream(), outputStream);
                                         outputStream.close();
                                         context.bodyFileItem = fileItem;
                                     }
@@ -161,10 +167,17 @@ public class RequestGenerator extends ProcessorImpl {
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
                                             useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                     super.startElement(uri, localname, qName, newAttributes);
-                                    writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, getXMLReceiver());
+                                    final String uriOrNull = writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, getXMLReceiver());
                                     super.endElement(uri, localname, qName);
                                     super.endPrefixMapping(XMLConstants.XSD_PREFIX);
                                     super.endPrefixMapping(XMLConstants.XSI_PREFIX);
+
+                                    // If the body is available as a URL, store it into the request. This is done so that
+                                    // native code can access the body even if it has been read already. Possibly, this
+                                    // could be handled more transparently by ExternalContext, so that
+                                    // Request.getInputStream() works even upon multiple reads.
+                                    if (uriOrNull != null)
+                                        request.getAttributesMap().put(BODY_REQUEST_ATTRIBUTE, uriOrNull);
                                 }
                             } else {
                                 super.startElement(uri, localname, qName, attributes);
@@ -226,7 +239,7 @@ public class RequestGenerator extends ProcessorImpl {
                 || (state.requestedStreamType != null && state.requestedStreamType.equals(XMLConstants.XS_BASE64BINARY_QNAME));
     }
 
-    private void writeFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
+    private String writeFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
         if (!isFileItemEmpty(fileItem)) {
             if (useBase64(pipelineContext, fileItem)) {
                 // The content of the file is streamed to the output (xs:base64Binary)
@@ -277,8 +290,12 @@ public class RequestGenerator extends ProcessorImpl {
 
                 final char[] chars = uriExpiringWithScope.toCharArray();
                 contentHandler.characters(chars, 0, chars.length);
+
+                return uriExpiringWithRequest;
             }
         }
+
+        return null;
     }
 
     private Document readRequestAsDOM4J(PipelineContext pipelineContext, Node config) {
@@ -581,5 +598,10 @@ public class RequestGenerator extends ProcessorImpl {
         PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
         Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
         return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
+    }
+
+    public static String getRequestBody(ExternalContext.Request request) {
+        final Object result = request.getAttributesMap().get(BODY_REQUEST_ATTRIBUTE);
+        return (result instanceof String) ? ((String) result) : null;
     }
 }

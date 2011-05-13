@@ -27,7 +27,10 @@
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
-    <xi:include href="provider.xml" xpointer="xpath(/*/*)"/>
+    <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
+    <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
+    <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
+    <xxforms:variable name="document" select="$parameters/document"/>
 
     <!-- Model initialization -->
     <!-- TODO: Should not do this on summary page, for example -->
@@ -39,24 +42,6 @@
             <xxforms:variable name="parameter-name" select="."/>
             <xxforms:variable name="parameter-value" select="xxforms:get-request-parameter($parameter-name)"/>
             <xforms:insert context="instance('fr-service-parameters')" origin="xxforms:element($parameter-name, $parameter-value)"/>
-        </xforms:action>
-
-        <!-- Initialize username and roles -->
-        <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'container'">
-            <!-- Case where we get the username and roles from the container -->
-            <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'username']/@value" value="xxforms:get-remote-user()"/>
-            <xforms:message level="xxforms:log-debug">Roles: <xforms:output value="xxforms:property('oxf.fr.authentication.container.roles')"/></xforms:message>
-            <xforms:action xxforms:iterate="tokenize(xxforms:property('oxf.fr.authentication.container.roles'), '\s+')">
-                <xxforms:variable name="role" select="."/>
-                <xforms:action if="xxforms:is-user-in-role($role)">
-                    <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'roles']/@value" value="if (. = '') then $role else concat(., ' ', $role)"/>
-                </xforms:action>
-            </xforms:action>
-        </xforms:action>
-        <xforms:action if="xxforms:property('oxf.fr.authentication.method') = 'header'">
-            <!-- Case where we get the username and roles from headers -->
-            <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'username']/@value" value="xxforms:get-request-header(xxforms:property('oxf.fr.authentication.header.username'))"/>
-            <xforms:setvalue ref="instance('fr-authentication-headers')/header[@name = 'roles']/@value" value="xxforms:get-request-header(xxforms:property('oxf.fr.authentication.header.roles'))"/>
         </xforms:action>
 
         <!-- Load current form configuration -->
@@ -98,7 +83,7 @@
             <xxforms:variable name="is-new-document" select="$parameters/mode = ('new', 'edit')" as="xs:boolean"/>
             <xforms:action if="$is-new-document">
                 <!-- Create random document id -->
-                <xforms:setvalue ref="$document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+                <xforms:setvalue ref="$document" value="digest(string(random(true())), 'MD5', 'hex')"/>
                 <!-- Do we call a service to initialize the instance? -->
                 <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))">
                     <xforms:send submission="fr-get-instance-from-service"/>
@@ -168,11 +153,8 @@
 
     <xforms:submission id="fr-delete-document-submission"
             method="delete" serialization="none"
-            resource="{instance('fr-provider-instance')/data/uri}/crud/{$app}/{$form}/data/{event('document-id')}/data.xml"
-            replace="none">
-        <xi:include href="headers-authentication.xml"/>
-        <xi:include href="headers-data.xml"/>
-    </xforms:submission>
+            resource="/fr/service/persistence/crud/{$app}/{$form}/data/{event('document-id')}/data.xml"
+            replace="none"/>
 
     <!-- Respond to save button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
@@ -305,7 +287,7 @@
                                 <xxforms:variable name="new-filename" select="string-join(($new-id,
                                                                                             if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')" as="xs:string"/>
                                 <xxforms:variable name="resource" as="xs:string"
-                                                  select="concat(instance('fr-provider-instance')/data/uri, '/crud/',
+                                                  select="concat('/fr/service/persistence/crud/',
                                                             $app, '/', $form, '/data/',
                                                             $document, '/', $new-filename)"/>
 
@@ -355,30 +337,21 @@
     <xforms:submission id="fr-create-update-submission"
             validate="false" relevant="false" method="put"
             ref="event('holder')"
-            resource="{instance('fr-provider-instance')/data/uri}/crud/{$app}/{$form}/data/{$document}/{event('resource')}"
-            replace="text" target="instance('fr-create-update-submission-response')">
-        <xi:include href="headers-authentication.xml"/>
-        <xi:include href="headers-data.xml"/>
-    </xforms:submission>
+            resource="/fr/service/persistence/crud/{$app}/{$form}/data/{$document}/{event('resource')}"
+            replace="text" target="instance('fr-create-update-submission-response')"/>
 
     <!-- Submission to create/update an attachment -->
     <xforms:submission id="fr-create-update-attachment-submission"
             method="put" serialization="application/octet-stream"
             ref="event('holder')"
             resource="{event('resource')}"
-            replace="none">
-        <xi:include href="headers-authentication.xml"/>
-        <xi:include href="headers-data.xml"/>
-    </xforms:submission>
+            replace="none"/>
 
     <!-- Get document -->
     <xforms:submission id="fr-get-document-submission"
             method="get" serialization="none"
-            resource="{instance('fr-provider-instance')/data/uri}/crud/{$app}/{$form}/data/{$document}/data.xml"
-            replace="instance" xxforms:instance="fr-form-instance">
-        <xi:include href="headers-authentication.xml"/>
-        <xi:include href="headers-data.xml"/>
-    </xforms:submission>
+            resource="/fr/service/persistence/crud/{$app}/{$form}/data/{$document}/data.xml"
+            replace="instance" xxforms:instance="fr-form-instance"/>
 
     <!-- Source form with metadata -->
     <xforms:instance id="fr-source-form-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
@@ -387,11 +360,8 @@
 
     <xforms:submission id="get-source-form-submission"
             method="get" serialization="none"
-            resource="{instance('fr-provider-instance')/form/uri}/crud/{$app}/{$form}/form/form.xhtml"
-            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="true">
-        <xi:include href="headers-authentication.xml"/>
-        <xi:include href="headers-form.xml"/>
-    </xforms:submission>
+            resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
+            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="true"/>
 
     <xforms:instance id="fr-service-parameters">
         <parameters/>
@@ -400,7 +370,7 @@
     <!-- Calls a service to get the initial instance -->
     <xforms:submission id="fr-get-instance-from-service"
             method="get" separator="&amp;" ref="instance('fr-service-parameters')"
-            resource="{instance('fr-provider-instance')/new-service-uri}"
+            resource="xxforms:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
     <xforms:instance id="fr-persistence-instance">
@@ -454,13 +424,6 @@
             <!-- Other buttons (bind here to make sure they are not read-only) -->
             <other/>
         </triggers>
-    </xforms:instance>
-
-    <xforms:instance id="fr-authentication-headers">
-        <headers>
-            <header name="username" value=""/>
-            <header name="roles" value=""/>
-        </headers>
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-triggers-instance')">

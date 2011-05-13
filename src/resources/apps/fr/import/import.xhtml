@@ -162,10 +162,8 @@
             <!-- Search submission -->
             <xf:submission id="search-submission"
                     ref="instance('fr-search-request')" validate="false"
-                    method="post" resource="{xxf:instance('fr-provider-instance')/data/uri}/search/{$app}/{$form}"
+                    method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
                     replace="instance" instance="fr-search-response">
-                <xi:include href="../includes/persistence/headers-authentication.xml"/>
-                <xi:include href="../includes/persistence/headers-data.xml"/>
                 <!-- Set language upon submitting -->
                 <xf:action ev:event="xforms-submit">
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>

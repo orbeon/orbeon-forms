@@ -31,7 +31,7 @@ object ScalaUtils {
 
     // Copy a stream, with optional progress callback
     // This fails at runtime due to: https://lampsvn.epfl.ch/trac/scala/ticket/2672
-    def genericCopyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: (Long) => Unit = _ => ()) = {
+    def genericCopyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: Long => Unit = _ => ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -47,7 +47,7 @@ object ScalaUtils {
         }
     }
 
-    def copyStream(in: Readable[Byte], out: Writable[Byte], progress: (Long) => Unit = _ => ()) = {
+    def copyStream(in: Readable[Byte], out: Writable[Byte], progress: Long => Unit = _ => ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -63,7 +63,7 @@ object ScalaUtils {
         }
     }
 
-    def copyReader(in: Readable[Char], out: Writable[Char], progress: (Long) => Unit = _ => ()) = {
+    def copyReader(in: Readable[Char], out: Writable[Char], progress: Long => Unit = _ => ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -104,4 +104,8 @@ object ScalaUtils {
         // Format result
         SecureUtils.byteArrayToHex(messageDigest.digest())
     }
+
+    def dropTrailingSlash(s: String) = if (s.isEmpty || s.last != '/') s else s.init
+
+    def capitalizeHeader(s: String) = s split '-' map (_.capitalize) mkString "-"
 }

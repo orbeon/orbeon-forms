@@ -13,12 +13,16 @@
  */
 package org.orbeon.oxf.processor.pdf;
 
-import com.lowagie.text.*;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Image;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.*;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
@@ -29,14 +33,20 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.FloatValue;
 import org.orbeon.saxon.value.Int64Value;
 
-import java.io.*;
-import java.net.URL;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
@@ -398,44 +408,68 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
             } else if (elementName.equals("image")) {
                 // Handle image
 
-                final String leftAttribute = currentElement.attributeValue("left");
-                final String topAttribute = currentElement.attributeValue("top");
-                final String scalePercentAttribute = currentElement.attributeValue("scale-percent");
-                final String dpiAttribute = currentElement.attributeValue("dpi");
-
-                final String leftPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
-                final String topPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
-                final String scalePercent = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, scalePercentAttribute);
-                final String dpi = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, dpiAttribute);
-
-                final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
-                final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
-
-                final String hrefAttribute = currentElement.attributeValue("href");
-
+                // Read image
                 final Image image;
-                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(hrefAttribute);
-                if (inputName != null) {
-                    // Read the input
-                    final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false));
+                {
+                    final String hrefAttribute = currentElement.attributeValue("href");
+                    final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(hrefAttribute);
+                    if (inputName != null) {
+                        // Read the input
+                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false));
 
-                    // Create the image
-                    image = Image.getInstance(os.toByteArray());
+                        // Create the image
+                        image = Image.getInstance(os.toByteArray());
+                    } else {
+                        // Read and create the image
+                        image = Image.getInstance(URLFactory.createURL(hrefAttribute));
+                    }
+                }
+
+
+                final String fieldNameStr = currentElement.attributeValue("acro-field-name");
+                if (fieldNameStr != null) {
+                    // Use field as placeholder
+
+                    final String fieldName = XPathCache.evaluateAsString(groupContext.contextNodeSet, groupContext.contextPosition, fieldNameStr, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
+                    final float[] positions = groupContext.acroFields.getFieldPositions(fieldName);
+
+                    final Rectangle rectangle = new Rectangle(positions[1], positions[2], positions[3], positions[4]);
+
+                    // This scales the image so that it fits in the box (but the aspect ratio is not changed)
+                    image.scaleToFit(rectangle.getWidth(), rectangle.getHeight());
+
+                    final float yPosition = positions[2] + rectangle.getHeight() - image.getScaledHeight();
+
+                    image.setAbsolutePosition(positions[1] + (rectangle.getWidth() - image.getScaledWidth()) / 2, yPosition);
+
                 } else {
-                    // Read and create the image
-                    image = Image.getInstance(new URL(hrefAttribute));
+                    // Use position, etc.
+                    final String leftAttribute = currentElement.attributeValue("left");
+                    final String topAttribute = currentElement.attributeValue("top");
+                    final String scalePercentAttribute = currentElement.attributeValue("scale-percent");
+                    final String dpiAttribute = currentElement.attributeValue("dpi");
+
+                    final String leftPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, leftAttribute);
+                    final String topPosition = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, topAttribute);
+
+                    final float xPosition = Float.parseFloat(leftPosition) + groupContext.offsetX;
+                    final float yPosition = groupContext.pageHeight - (Float.parseFloat(topPosition) + groupContext.offsetY);
+
+                    final String scalePercent = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, scalePercentAttribute);
+                    final String dpi = resolveAttributeValueTemplates(pipelineContext, contextNode, variableToValueMap, null, null, currentElement, dpiAttribute);
+
+                    // Set image parameters
+                    image.setAbsolutePosition(xPosition, yPosition);
+                    if (scalePercent != null) {
+                        image.scalePercent(Float.parseFloat(scalePercent));
+                    }
+                    if (dpi != null) {
+                        final int dpiInt = Integer.parseInt(dpi);
+                        image.setDpi(dpiInt, dpiInt);
+                    }
                 }
 
-                // Set image parameters
-                image.setAbsolutePosition(xPosition, yPosition);
-                if (scalePercent != null) {
-                    image.scalePercent(Float.parseFloat(scalePercent));
-                }
-                if (dpi != null) {
-                    final int dpiInt = Integer.parseInt(dpi);
-                    image.setDpi(dpiInt, dpiInt);
-                }
                 // TODO: Lots of other parameters can be used to configure the image here
                 // Add image
                 groupContext.contentByte.addImage(image);

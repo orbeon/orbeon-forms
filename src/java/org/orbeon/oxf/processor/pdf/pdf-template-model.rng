@@ -44,8 +44,7 @@
                 </attribute>
             </optional>
             <choice>
-            	<attribute>
-            		<name>acro-field-name</name>
+            	<attribute name="acro-field-name">
             		<data type="string"/>
             	</attribute>
             	<group>
@@ -157,28 +156,37 @@
                     </choice>
                 </attribute>
             </optional>
-            <attribute name="left">
-                <choice>
-                    <data type="decimal"/>
-                    <ref name="avt"/>
-                </choice>
-            </attribute>
-            <attribute name="top">
-                <choice>
-                    <data type="decimal"/>
-                    <ref name="avt"/>
-                </choice>
-            </attribute>
-            <optional>
-                <attribute name="scale-percent">
-                    <data type="float"/>
-                </attribute>
-            </optional>
-            <optional>
-                <attribute name="dpi">
-                    <data type="integer"/>
-                </attribute>
-            </optional>
+            <choice>
+                <group>
+                    <attribute name="left">
+                        <choice>
+                            <data type="decimal"/>
+                            <ref name="avt"/>
+                        </choice>
+                    </attribute>
+                    <attribute name="top">
+                        <choice>
+                            <data type="decimal"/>
+                            <ref name="avt"/>
+                        </choice>
+                    </attribute>
+                    <optional>
+                        <attribute name="scale-percent">
+                            <data type="float"/>
+                        </attribute>
+                    </optional>
+                    <optional>
+                        <attribute name="dpi">
+                            <data type="integer"/>
+                        </attribute>
+                    </optional>
+                </group>
+                <group>
+                    <attribute name="acro-field-name">
+                        <data type="string"/>
+                    </attribute>
+                </group>
+            </choice>
             <attribute name="href">
                 <data type="anyURI"/>
             </attribute>

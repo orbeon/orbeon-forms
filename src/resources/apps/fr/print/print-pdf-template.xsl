@@ -42,11 +42,6 @@
     <xsl:variable name="current-resources" select="$resources-instance/resource[@xml:lang = $request-language]" as="element(resource)"/>
 
     <!-- TODO: resources.xml should go through fr-resources.xpl so that overrides work -->
-    <xsl:message>
-        xxx
-        <xsl:value-of select="pipeline:rewriteServiceURI('/fr/service/i18n/fr-resources/orbeon/dmv-14', true())"/>
-        xxx
-    </xsl:message>
     <xsl:variable name="fr-resources" select="doc(pipeline:rewriteServiceURI('/fr/service/i18n/fr-resources/orbeon/dmv-14', true()))/*" as="element(resources)"/>
     <!--<xsl:variable name="fr-resources" select="doc('oxf:/apps/fr/i18n/resources.xml')/*" as="element(resources)"/>-->
     <xsl:variable name="fr-current-resources" select="($fr-resources/resource[@xml:lang = $request-language], $fr-resources/resource[1])[1]" as="element(resource)"/>
@@ -150,6 +145,11 @@
                                                                 return $control-resources/item[value = $v]/label, ' - ')}'"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
+                                </xsl:when>
+                                <xsl:when test="local-name($control) = ('image-attachment') and normalize-space($control-value) != ''">
+                                    <!-- Image attachment -->
+                                    <image acro-field-name="'{$field-name}'"
+                                           href="{pipeline:rewriteServiceURI($control-value, true())}"/>
                                 </xsl:when>
                                 <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'date'">
                                     <!-- Date -->

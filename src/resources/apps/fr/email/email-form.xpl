@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -80,8 +79,6 @@
                 <!-- App and form -->
                 <xsl:variable name="app" select="doc('input:parameters')/*/app" as="xs:string"/>
                 <xsl:variable name="form" select="doc('input:parameters')/*/form" as="xs:string"/>
-
-                <xsl:variable name="data-collection" select="pipeline:property(string-join(('oxf.fr.persistence.app.uri', $app, $form, 'data'), '.'))" as="xs:string"/>
 
                 <!--  NOTE: code below partially duplicated in persistence-model.xml but in XForms! -->
                 <xsl:variable name="attachment-controls" as="element()*"

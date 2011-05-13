@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -59,8 +58,7 @@
 
                     <!-- Create URI based on properties -->
                     <xsl:variable name="resource"
-                                  select="concat(pipeline:property(string-join(('oxf.fr.persistence.app.uri', /*/app, /*/form, 'data'), '.')),
-                                            '/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
+                                  select="concat('/fr/service/persistence/crud/', /*/app, '/', /*/form, '/data/', /*/document, '/data.xml')" as="xs:string"/>
                     <url>
                         <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
                     </url>

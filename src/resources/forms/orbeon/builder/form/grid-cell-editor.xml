@@ -356,7 +356,7 @@
                 </xforms:group>
                 <!-- Button to show items editor if needed -->
                 <!-- TODO: Instead of listing controls that accept an itemset editor, most likely controls should declared when they accept an itemset editor -->
-                <xforms:trigger ref="(xforms:select | xforms:select1 | fr:box-select)[xforms:itemset and $readwrite-grid]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
+                <xforms:trigger ref="*[xforms:itemset and $readwrite-grid]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
                         <xhtml:span><xforms:output value="$form-resources/edit-items/label"/></xhtml:span>

@@ -28,9 +28,12 @@
                     <code readonly="true"/>
                 </instance>
             </xforms:instance>
-            <xforms:instance id="xbl" src="oxf:/xbl/orbeon/code-mirror/code-mirror.xbl"/>
+            <xforms:instance id="xbl" src="oxf:/apps/xforms-controls/services/countries.xml"/>
             <xforms:bind ref="code" constraint=". != ''" readonly="@readonly = 'true'"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xbl-fr-code-mirror .CodeMirror { width: 50em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <fr:code-mirror ref="code">

@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -346,6 +345,7 @@ public class XFormsSubmissionUtils {
 class ResponseAdapter implements ExternalContext.Response {
 
     private Object nativeResponse;
+    private ExternalContext.Response response;
 
     private int status = 200;
     private String contentType;
@@ -356,8 +356,9 @@ class ResponseAdapter implements ExternalContext.Response {
 
     private InputStream inputStream;
 
-    public ResponseAdapter(Object nativeResponse) {
+    public ResponseAdapter(Object nativeResponse, ExternalContext.Response response) {
         this.nativeResponse = nativeResponse;
+        this.response = response;
     }
 
     public int getResponseCode() {
@@ -424,27 +425,27 @@ class ResponseAdapter implements ExternalContext.Response {
     }
 
     public String rewriteActionURL(String urlString) {
-        return null;
+        return response.rewriteActionURL(urlString);
     }
 
     public String rewriteRenderURL(String urlString) {
-        return null;
+        return response.rewriteRenderURL(urlString);
     }
 
     public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-        return null;
+        return response.rewriteActionURL(urlString,  portletMode, windowState);
     }
 
     public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-        return null;
+        return response.rewriteRenderURL(urlString, portletMode, windowState);
     }
 
     public String rewriteResourceURL(String urlString, boolean absolute) {
-        return null;
+        return response.rewriteResourceURL(urlString, absolute);
     }
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {
-        return null;
+        return response.rewriteResourceURL(urlString, rewriteMode);
     }
 
     public void sendError(int sc) throws IOException {

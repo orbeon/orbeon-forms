@@ -16,7 +16,10 @@ package org.orbeon.oxf.xforms.submission;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -254,7 +257,7 @@ public abstract class BaseSubmission implements Submission {
                 connectionResult.dontHandleResponse = true;
             } else {
                 // We must intercept the reply
-                final ResponseAdapter responseAdapter = new ResponseAdapter(response.getNativeResponse());
+                final ResponseAdapter responseAdapter = new ResponseAdapter(response.getNativeResponse(), response);
                 submissionProcess.process(requestAdapter, responseAdapter);
 
                 // Get response information that needs to be forwarded

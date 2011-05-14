@@ -20,7 +20,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringConversions;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -111,6 +110,12 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
                     headerValuesMap.put(currentHeaderNameLower, currentHeaderValues);
                 }
+            }
+
+            // Set Content-Type and Content-Length headers
+            if (mediaType != null && messageBody != null) {
+                headerValuesMap.put("content-type", new String[] { mediaType });
+                headerValuesMap.put("content-length", new String[] { Integer.toString(messageBody.length) });
             }
         }
     }

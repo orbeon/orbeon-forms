@@ -255,7 +255,7 @@ public class XFormsServer extends ProcessorImpl {
                                 responseReceiver = new TeeXMLReceiver(receivers);
 
                                 // Prepare and/or output response
-                                outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext,
+                                outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds,
                                         requestDocument, responseReceiver, allEvents, false);
 
                                 // Store response in to document
@@ -273,7 +273,7 @@ public class XFormsServer extends ProcessorImpl {
                             } else {
                                 // Noscript mode
                                 indentedLogger.startHandleOperation("response", "handling noscript response");
-                                outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, xmlReceiver, externalContext);
+                                outputNoscriptResponse(containingDocument, indentedLogger, xmlReceiver, externalContext);
                                 indentedLogger.endHandleOperation();
                             }
                         } else {
@@ -345,13 +345,12 @@ public class XFormsServer extends ProcessorImpl {
      * Output an XHTML response for the noscript mode.
      *
      * @param containingDocument            containing document
-     * @param pipelineContext               pipeline context
      * @param xmlReceiver                   handler for the XHTML result
      * @param externalContext               external context
      * @throws IOException
      * @throws SAXException
      */
-    private void outputNoscriptResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, PipelineContext pipelineContext,
+    private void outputNoscriptResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                         XMLReceiver xmlReceiver, ExternalContext externalContext) throws IOException, SAXException {
         // This will also cache the containing document if needed
         // QUESTION: Do we actually need to cache if a xforms:submission[@replace = 'all'] happened?
@@ -378,7 +377,7 @@ public class XFormsServer extends ProcessorImpl {
                 throw new OXFException("Missing XHTML document in static state for noscript mode.");// shouldn't happen!
 
             indentedLogger.logDebug("response", "handling noscript response for XHTML output");
-            XFormsToXHTML.outputResponseDocument(pipelineContext, externalContext, indentedLogger, xhtmlDocument,
+            XFormsToXHTML.outputResponseDocument(externalContext, indentedLogger, xhtmlDocument,
                     containingDocument, xmlReceiver);
         }
     }
@@ -389,18 +388,16 @@ public class XFormsServer extends ProcessorImpl {
      * @param containingDocument                containing document
      * @param indentedLogger                    logger
      * @param valueChangeControlIds             control ids for which the client sent a value change
-     * @param pipelineContext                   current context
      * @param requestDocument                   incoming request document (for all events mode)
      * @param xmlReceiver                       handler for the Ajax result
      * @param allEvents                         whether to handle all events
      * @param testOutputAllActions              for testing purposes
      */
     public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
-                                          Set<String> valueChangeControlIds, PipelineContext pipelineContext,
+                                          Set<String> valueChangeControlIds,
                                           Document requestDocument, XMLReceiver xmlReceiver, boolean allEvents,
                                           boolean testOutputAllActions) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final XFormsControls xformsControls = containingDocument.getControls();
 
         final boolean testOutputStaticState = false;
@@ -459,7 +456,7 @@ public class XFormsServer extends ProcessorImpl {
                 final String staticState = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
                 if (staticState != null) {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] {
-                            "container-type", externalContext.getRequest().getContainerType()
+                            "container-type", NetUtils.getExternalContext().getRequest().getContainerType()
                     });
                     ch.text(staticState);
                     ch.endElement();
@@ -498,12 +495,12 @@ public class XFormsServer extends ProcessorImpl {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffControls(pipelineContext, ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
+                        diffControls(ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
                                 currentControlTree.getChildren(), null, testOutputAllActions);
                     } else if (testOutputAllActions || containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                        diffControls(pipelineContext, ch, containingDocument, indentedLogger,
+                        diffControls(ch, containingDocument, indentedLogger,
                                 xformsControls.getInitialControlTree().getChildren(),
                                 currentControlTree.getChildren(), valueChangeControlIds, testOutputAllActions);
                     }
@@ -628,7 +625,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch,
+    public static void diffControls(ContentHandlerHelper ch,
                                     XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                     List<XFormsControl> state1, List<XFormsControl> state2,
                                     Set<String> valueChangeControlIds, boolean isTestMode) {

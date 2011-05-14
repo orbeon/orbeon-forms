@@ -224,11 +224,11 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Output resulting document
             if (outputName.equals("document")) {
                 // Normal case where we output XHTML
-                outputResponseDocument(pipelineContext, externalContext, indentedLogger, stage2CacheableState.getAnnotatedTemplate(),
+                outputResponseDocument(externalContext, indentedLogger, stage2CacheableState.getAnnotatedTemplate(),
                         containingDocument[0], xmlReceiver);
             } else {
                 // Output in test mode
-                testOutputResponseState(pipelineContext, containingDocument[0], indentedLogger, xmlReceiver);
+                testOutputResponseState(containingDocument[0], indentedLogger, xmlReceiver);
             }
 
             // Notify state manager
@@ -422,10 +422,10 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    public static void outputResponseDocument(final PipelineContext pipelineContext, final ExternalContext externalContext,
-                                             final IndentedLogger indentedLogger,
-                                             final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
-                                             final XMLReceiver xmlReceiver) throws SAXException, IOException {
+    public static void outputResponseDocument(final ExternalContext externalContext,
+                                              final IndentedLogger indentedLogger,
+                                              final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
+                                              final XMLReceiver xmlReceiver) throws SAXException, IOException {
 
         final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
         if (containingDocument.isGotSubmissionReplaceAll()) {
@@ -483,11 +483,11 @@ public class XFormsToXHTML extends ProcessorImpl {
         containingDocument.afterInitialResponse();
     }
 
-    private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
-                                         final IndentedLogger indentedLogger, final XMLReceiver xmlReceiver) throws SAXException {
+    private void testOutputResponseState(final XFormsContainingDocument containingDocument, final IndentedLogger indentedLogger,
+                                         final XMLReceiver xmlReceiver) throws SAXException {
         // Output XML response
 
-        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, pipelineContext, null, xmlReceiver, false, true);
+        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, xmlReceiver, false, true);
     }
 
     public static ExternalContext.Response getResponse(XMLReceiver xmlReceiver, final ExternalContext externalContext) {

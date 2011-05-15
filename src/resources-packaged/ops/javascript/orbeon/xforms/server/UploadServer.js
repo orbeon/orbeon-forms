@@ -93,11 +93,12 @@
         // Disabling fields other than the one we want to upload
         var disabledElements = _.filter(this.processingEvent.form.elements, function(element) {
             // Keep in form post the $uuid element and input for this upload
-            // NOTE: Don't compare element id and name, as id might be prefixed in portlet environment
+            // NOTE: Don't compare element id but name, as id might be prefixed in portlet environment
             var keep = element.name == "$uuid" || (YD.hasClass(element, "xforms-upload-select")
                     && element.id == ORBEON.util.Utils.appendToEffectiveId(this.processingEvent.upload.container.id, "$xforms-input"));
             // Disable elements we don't keep and that are not disabled already
-            if (! keep && ! element.disabled) { element.disabled = true; return true; }
+            // NOTE: Skip fieldsets, as disabling them disables all the elements inside the fieldset
+            if (element.type.toLowerCase() != "fieldset" && ! keep && ! element.disabled) { element.disabled = true; return true; }
             else return false;
         }, this);
         // Trigger actual upload through a form POST and start asking server for progress

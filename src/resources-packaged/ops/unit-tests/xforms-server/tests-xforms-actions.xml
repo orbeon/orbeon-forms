@@ -74,4 +74,51 @@
         </output>
     </test>
 
+    <test description="xf:setvalue with empty context vs. empty sequence value" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <value>foo</value>
+                                <value>bar</value>
+                                <value>baz</value>
+                            </values>
+                        </xf:instance>
+                        <!-- Must NOP -->
+                        <xf:setvalue ev:event="xforms-model-construct-done" context="()" ref="value[1]" value="42"/>
+                        <!-- SHOULD set specified value but DOES NOT as of 2011-05-15 because empty context prevents ref to evaluate to non-empty -->
+                        <xf:setvalue ev:event="xforms-model-construct-done" context="()" ref="instance()/value[2]" value="42"/>
+                        <!-- Must set an empty value -->
+                        <xf:setvalue ev:event="xforms-model-construct-done" ref="value[3]" value="()"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>foo</value>
+                                    <value>bar</value>
+                                    <value/>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

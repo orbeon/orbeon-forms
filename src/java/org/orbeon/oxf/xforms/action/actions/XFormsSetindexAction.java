@@ -57,11 +57,11 @@ public class XFormsSetindexAction extends XFormsAction {
         actionInterpreter.getIndentedLogger().logDebug("xforms:setindex", "setting index", "index", indexString);
 
         // Execute
-        executeSetindexAction(actionInterpreter, eventObserver, actionElement, repeatStaticId, indexString);
+        executeSetindexAction(actionInterpreter, actionElement, repeatStaticId, indexString);
     }
 
-    private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, XFormsEventObserver eventObserver,
-                                              Element actionElement, String repeatStaticId, String indexString) {
+    private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                                              String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
             return;

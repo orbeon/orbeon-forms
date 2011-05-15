@@ -15,17 +15,20 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
-
-import java.util.List;
 
 /**
  * 10.1.9 The setvalue Element
@@ -40,26 +43,15 @@ public class XFormsSetvalueAction extends XFormsAction {
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String valueExpression = actionElement.attributeValue(XFormsConstants.VALUE_QNAME);
-        final String content = actionElement.getStringValue();
 
         final String valueToSet;
         if (valueExpression != null) {
             // Value to set is computed with an XPath expression
-
-            final List<Item> currentNodeset = contextStack.getCurrentNodeset();
-            {
-                if (currentNodeset != null && currentNodeset.size() > 0) {
-                    // Evaluate
-                    valueToSet = actionInterpreter.evaluateStringExpression(actionElement,
-                            currentNodeset, contextStack.getCurrentPosition(), valueExpression);
-                } else {
-                    // If @ref doesn't point to anything, don't even try to compute the value
-                    valueToSet = null;
-                }
-            }
+            valueToSet = actionInterpreter.evaluateStringExpression(actionElement,
+                    contextStack.getCurrentNodeset(), contextStack.getCurrentPosition(), valueExpression);
         } else {
             // Value to set is static content
-            valueToSet = content;
+            valueToSet = actionElement.getStringValue();
         }
 
         // Set value on current node
@@ -76,7 +68,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             // Node doesn't exist or value is null: NOP
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("xforms:setvalue", "not setting instance value",
-                        "reason", (valueToSet != null) ? "destination node not found" : "value to set is ()",
+                        "reason", "destination node not found",
                         "value", valueToSet
                 );
             }

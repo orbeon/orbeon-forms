@@ -17,7 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsVariableControl;
@@ -28,7 +29,9 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Collections;
@@ -367,6 +370,9 @@ public class XFormsActionInterpreter {
         return XFormsUtils.getRelatedEffectiveId(outerActionElementEffectiveId, getActionStaticId(actionElement));
     }
 
+    /**
+     * Evaluate an expression as a string. This returns "" if the result is an empty sequence.
+     */
     public String evaluateStringExpression(Element actionElement,
                                            List<Item> nodeset, int position, String xpathExpression) {
 
@@ -376,14 +382,14 @@ public class XFormsActionInterpreter {
         // @ref points to something
         final String result = XPathCache.evaluateAsString(
                 nodeset, position,
-            xpathExpression, getNamespaceMappings(actionElement), actionBlockContextStack.getCurrentVariables(),
-            XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
-            (LocationData) actionElement.getData());
+                xpathExpression, getNamespaceMappings(actionElement), actionBlockContextStack.getCurrentVariables(),
+                XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
+                (LocationData) actionElement.getData());
 
         // Restore function context
         actionBlockContextStack.returnFunctionContext();
 
-        return result;
+        return result != null ? result : "";
     }
 
     public List evaluateExpression(Element actionElement,

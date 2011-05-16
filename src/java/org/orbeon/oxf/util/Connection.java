@@ -691,6 +691,6 @@ public class Connection {
      */
     public static String getForwardHeaders() {
         final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
-        return propertySet.getString(HTTP_FORWARD_HEADERS_PROPERTY, AUTHORIZATION_HEADER);
+        return propertySet.getString(HTTP_FORWARD_HEADERS_PROPERTY, "");
     }
 }

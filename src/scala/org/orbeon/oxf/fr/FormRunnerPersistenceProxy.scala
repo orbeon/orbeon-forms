@@ -70,15 +70,6 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
                 connection.setRequestProperty(capitalizeHeader(name), value)
         }
 
-        def setAuthHeaders(connection: HTTPURLConnection) {
-            val (username, roles) = FormRunner.getUserRoles(request)
-
-            username foreach (connection.setRequestProperty("Orbeon-Username", _))
-
-            if (roles.nonEmpty)
-                connection.setRequestProperty("Orbeon-Roles", roles mkString ",")
-        }
-
         def proxyHeaders(headers: => Traversable[(String, Seq[String])], set: (String, String) => Unit, out: Boolean): Unit =
             for {
                 (name, values) <- headers
@@ -105,7 +96,6 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             connection.setDoOutput(doOutput)
             connection.setRequestMethod(request.getMethod)
 
-            setAuthHeaders(connection)
             setPersistenceHeaders(connection)
             proxyOutgoingHeaders(connection)
 

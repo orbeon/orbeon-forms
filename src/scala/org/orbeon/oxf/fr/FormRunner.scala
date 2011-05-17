@@ -16,8 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xml._
 import scala.collection.JavaConversions._
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.util.{StringConversions, XPathCache}
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 
@@ -30,35 +29,63 @@ object FormRunner {
     val headerUsernamePropertyName = propertyPrefix + "header.username"
     val headerRolesPropertyName = propertyPrefix + "header.roles"
 
-    def getUserRoles(request: Request) = {
+    type UserRoles = {
+        def getRemoteUser(): String
+        def isUserInRole(role: String): Boolean
+    }
+
+    /**
+     * Get the username and roles from the request, based on the Form Runner configuration.
+     */
+    def getUserRoles(userRoles: UserRoles, getHeader: String => Option[Array[String]]): (Option[String], Option[Array[String]]) = {
 
         val propertySet = Properties.instance.getPropertySet
-        propertySet.getString(methodPropertyName) match {
+        propertySet.getString(methodPropertyName, "container") match {
             case "container" =>
 
                 val rolesString = propertySet.getString(containerRolesPropertyName)
 
                 assert(rolesString != null)
 
-                // log debug
-                val roles = (
-                    for {
-                        role <- rolesString.split("""\s+""")
-                        if request.isUserInRole(role)
-                    } yield
-                        role) toSeq
+                val username = Option(userRoles.getRemoteUser)
 
-                (Option(request.getRemoteUser), roles)
+                val rolesArray = (
+                    for {
+                        role <- rolesString.split(""",\s+""")
+                        if userRoles.isUserInRole(role)
+                    } yield
+                        role)
+
+                val roles = rolesArray match {
+                    case Array() => None
+                    case array => Some(array)
+                }
+
+                (username, roles)
 
             case "header" =>
 
-                def getHeader(name: String) =
-                    Option(StringConversions.getFirstValueFromStringArray(request.getHeaderValuesMap.get(propertySet.getString(name))))
+                def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p => getHeader(p.toLowerCase))
 
-                (getHeader(headerUsernamePropertyName), getHeader(headerRolesPropertyName) map (_.split("""\s+""").toSeq) getOrElse Seq.empty)
+                val username = headerOption(headerUsernamePropertyName) map (_.head)
+                val roles = headerOption(headerRolesPropertyName) map (_ flatMap (_.split("""(\s*[,\|]\s*)+""")))
+
+                (username, roles)
 
             case other => throw new OXFException("Unsupported authentication method, check the '" + methodPropertyName + "' property:" + other)
         }
+    }
+
+    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String => Option[Array[String]]) = {
+
+        val (username, roles) = FormRunner.getUserRoles(userRoles, getHeader)
+
+        val result = collection.mutable.Map[String, Array[String]]()
+
+        username foreach (u => result += ("orbeon-username" -> Array(u)))
+        roles foreach (r => result += ("orbeon-roles" -> r))
+
+        result.toMap
     }
 
     def getPersistenceURLHeaders(app: String, form: String, formOrData: String) = {

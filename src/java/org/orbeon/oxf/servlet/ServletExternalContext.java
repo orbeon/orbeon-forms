@@ -49,6 +49,17 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     private final static String REWRITING_STRATEGY_DEFAULT = "servlet";
 
+    private static RequestFilter requestFilter;
+    static {
+        try {
+            final Class<? extends RequestFilter> customContextClass
+                    = (Class<? extends RequestFilter>) Class.forName("org.orbeon.oxf.servlet.FormRunnerRequestFilter");
+            requestFilter = customContextClass.newInstance();
+        } catch (Exception e) {
+            // Silently ignore as this typically means that we are not in Liferay
+        }
+    }
+
     private static String defaultFormCharset;
     public static String getDefaultFormCharset() {
         if (defaultFormCharset == null) {
@@ -723,7 +734,18 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         super(servletContext, initAttributesMap);
 
         this.pipelineContext = pipelineContext;
-        this.nativeRequest = request;
+
+        // Wrap request if needed
+        if (requestFilter != null) {
+            try {
+                this.nativeRequest = requestFilter.amendRequest(request);
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        } else {
+            this.nativeRequest = request;
+        }
+
         this.nativeResponse = response;
     }
 

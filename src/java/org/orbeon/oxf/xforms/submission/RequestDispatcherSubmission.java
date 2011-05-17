@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
@@ -32,10 +33,6 @@ import java.util.concurrent.Callable;
  * Submission which doesn't issue HTTP requests but goes through a Servlet or Portlet API's RequestDispatcher.
  */
 public class RequestDispatcherSubmission extends BaseSubmission {
-
-    // TODO: harmonize with regular HTTP submission headers configuration (property)
-    public static String[] MINIMAL_HEADERS_TO_FORWARD = { "cookie", "authorization" };
-    public static String[] STANDARD_HEADERS_TO_FORWARD = { "cookie", "authorization", "user-agent"};
     
     private static final String SKIPPING_SUBMISSION_DEBUG_MESSAGE = "skipping request dispatcher servlet submission";
 
@@ -131,6 +128,9 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
+        final IndentedLogger timingLogger = getTimingLogger(p, p2);
+        final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
+
         // NOTE: Using include() for servlets doesn't allow detecting errors caused by the
         // included resource. [As of 2009-02-13, not sure if this is the case.]
 
@@ -143,18 +143,9 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
         // in that case
 
-        // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
-        // simulates a request from the browser! Useful in particular when the target URL renders XForms
-        // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
-        // element.
-        final String[] headersToForward = p.isReplaceAll ? STANDARD_HEADERS_TO_FORWARD : MINIMAL_HEADERS_TO_FORWARD;
-        // TODO: Harmonize with HTTP submission handling of headers
-
-        final IndentedLogger timingLogger = getTimingLogger(p, p2);
-        final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
-
-        // Evaluate headers if any
+        // Headers
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
+        final String[] headersToForward = StringUtils.split(getHeadersToForward(containingDocument, p.isReplaceAll));
 
         final String submissionEffectiveId = submission.getEffectiveId();
 

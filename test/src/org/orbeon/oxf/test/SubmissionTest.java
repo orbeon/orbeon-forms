@@ -17,7 +17,6 @@ import junit.framework.TestCase;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.externalcontext.RequestAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.submission.RequestDispatcherSubmission;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class SubmissionTest extends TestCase {
 
         final ForwardExternalContextRequestWrapper request
                 = new ForwardExternalContextRequestWrapper(incomingRequest, "/orbeon", "/foo/bar",
-                "GET", RequestDispatcherSubmission.STANDARD_HEADERS_TO_FORWARD, customHeaderValuesMap);
+                "GET", new String[] { "cookie", "authorization", "user-agent"}, customHeaderValuesMap);
 
         // Test standard headers received
         final Map<String, String[]> headerValuesMap = request.getHeaderValuesMap();

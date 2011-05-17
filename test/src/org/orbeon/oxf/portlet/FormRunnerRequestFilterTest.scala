@@ -26,26 +26,19 @@ import com.liferay.portal.model.{Role, User}
 import java.util.Arrays
 import collection.immutable.TreeMap
 
-class LiferayContextTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
+class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
-    @Test def testAmendRequest() {
+    @Test def testAmendPortletRequest() {
 
+        // Initial properties
+        val initialProperties = Map("p1" -> Seq("v1a", "v1b"))
+
+        // Request with initial properties
         val mockRequest = new PortletRequestWrapper(mock[PortletRequest]) {
-
-            // Simulate existing attributes and properties
-            val attributes = collection.mutable.Map[String, AnyRef]("a1" -> "v1")
-            val properties = collection.mutable.Map("p1" -> Seq("v1a", "v1b"))
-
-            // Attributes (read-write)
-            override def getAttribute(name: String) = attributes.get(name) orNull
-            override def getAttributeNames = attributes.keysIterator
-            override def setAttribute(name: String, value: AnyRef) { attributes += (name -> value) }
-
-            // Properties (read-only)
-            override def getProperty(name: String) = properties.get(name) map (_.head) orNull
+            override def getProperty(name: String) = initialProperties.get(name) map (_.head) orNull
             override def getProperties(name: String) =
-                asJavaEnumeration(properties.get(name) map (_.iterator) getOrElse Iterator.empty)
-            override def getPropertyNames = properties.keysIterator
+                asJavaEnumeration(initialProperties.get(name) map (_.iterator) getOrElse Iterator.empty)
+            override def getPropertyNames = initialProperties.keysIterator
         }
 
         val mockRoleManager = mock[Role]
@@ -59,34 +52,22 @@ class LiferayContextTest extends ResourceManagerTestBase with AssertionsForJUnit
         Mockito when mockUser.getFullName thenReturn "John Smith"
         Mockito when mockUser.getRoles thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
 
-        val amendedRequest = (new LiferayContext).amendRequest(mockRequest, mockUser)
+        val amendedRequest = (new FormRunnerRequestFilter).amendRequest(mockRequest, mockUser)
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
-        val expectedAttributes = Map(
-            "a1" -> "v1",
-            "orbeon.liferay.user.email" -> "test@orbeon.com",
-            "orbeon.liferay.user.full-name" -> "John Smith",
-            "orbeon.liferay.user.roles" -> Seq("manager", "employee")
-        )
-
-        val expectedProperties = Map(
-            "p1" -> Seq("v1a", "v1b"),
+        val expectedProperties = initialProperties ++ Map(
             "orbeon-liferay-user-email" -> Seq("test@orbeon.com"),
             "orbeon-liferay-user-full-name" -> Seq("John Smith"),
-            "orbeon-liferay-user-roles" -> Seq("manager", "employee")
+            "orbeon-liferay-user-roles" -> Seq("manager", "employee"),
+            "orbeon-username" -> Seq("test@orbeon.com"),
+            "orbeon-roles" -> Seq("manager", "employee")
         )
-
-        val actualAttributes = amendedRequest.getAttributeNames map (n => n -> (amendedRequest.getAttribute(n) match {
-            case array: Array[String] => array.toList
-            case value => value
-        })) toMap
 
         val actualProperties = amendedRequest.getPropertyNames map (n => n -> amendedRequest.getProperties(n).toList) toMap
 
         // Compare using TreeMap to get a reliable order
         def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map
 
-        assert(toTreeMap(expectedAttributes) === toTreeMap(actualAttributes))
         assert(toTreeMap(expectedProperties) === toTreeMap(actualProperties))
-    }
+   }
 }

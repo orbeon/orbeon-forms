@@ -13,21 +13,17 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.externalcontext.AsyncExternalContext;
-import org.orbeon.oxf.externalcontext.AsyncRequest;
 import org.orbeon.oxf.externalcontext.ExternalContextWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.portlet.OrbeonPortlet2Delegate;
-import org.orbeon.oxf.portlet.Portlet2ExternalContext;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.om.Validation;
 
 import java.net.URI;
 import java.util.Map;
@@ -101,17 +97,15 @@ public class LocalPortletSubmission extends BaseSubmission {
     public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
-        // URI with xml:base resolution
-        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
-
-        final String[] headersToForward = p.isReplaceAll ? RequestDispatcherSubmission.STANDARD_HEADERS_TO_FORWARD : RequestDispatcherSubmission.MINIMAL_HEADERS_TO_FORWARD;
-        // TODO: Harmonize with HTTP submission handling of headers
-
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
-        // Evaluate headers if any
+        // URI with xml:base resolution
+        final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
+
+        // Headers
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
+        final String[] headersToForward = StringUtils.split(getHeadersToForward(containingDocument, p.isReplaceAll));
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
@@ -143,16 +137,16 @@ public class LocalPortletSubmission extends BaseSubmission {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
                                 currentPortlet.getProcessorService().service(new ExternalContextWrapper(asyncExternalContext) {
-                                    @Override
-                                    public ExternalContext.Request getRequest() {
-                                        return request;
-                                    }
+                                            @Override
+                                            public ExternalContext.Request getRequest() {
+                                                return request;
+                                            }
 
-                                    @Override
-                                    public ExternalContext.Response getResponse() {
-                                        return response;
-                                    }
-                                }, new PipelineContext());
+                                            @Override
+                                            public ExternalContext.Response getResponse() {
+                                                return response;
+                                            }
+                                        }, new PipelineContext());
                             }
                         }, true, false);
 

@@ -105,7 +105,7 @@ public class XFormsProperties {
     public static final String OFFLINE_SUPPORT_PROPERTY = "offline";
     public static final String OFFLINE_REPEAT_COUNT_PROPERTY = "offline-repeat-count";
     public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
-    public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "Authorization";
+    public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "";
 
     private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 

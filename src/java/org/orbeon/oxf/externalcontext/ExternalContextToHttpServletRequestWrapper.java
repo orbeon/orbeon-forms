@@ -241,7 +241,7 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
 
     public Enumeration getHeaders(String name) {
         final String[] values = request.getHeaderValuesMap().get(name);
-        return Collections.enumeration(Arrays.asList(values));
+        return Collections.enumeration(values != null ? Arrays.asList(values) : Collections.<Object>emptyList());
     }
 
     public int getIntHeader(String name) {

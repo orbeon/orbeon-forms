@@ -15,8 +15,10 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
 
 import java.net.URL;
 import java.util.Map;
@@ -45,20 +47,12 @@ public class RegularSubmission extends BaseSubmission {
 
         final URL absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission.isURLNorewrite()));
 
-        // Gather remaining information to process the request
-        final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
-
-        // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
-        // simulates a request from the browser! Useful in particular when the target URL renders XForms
-        // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
-        // element.
-        final String newForwardSubmissionHeaders = p.isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
-
         final IndentedLogger timingLogger = getTimingLogger(p, p2);
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
-        // Evaluate headers if any
+        // Headers
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
+        final String headersToForward = getHeadersToForward(containingDocument, p.isReplaceAll);
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
@@ -87,7 +81,7 @@ public class RegularSubmission extends BaseSubmission {
                     connectionResult = new Connection().open(externalContext, detailsLogger, isLogBody(),
                          p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
                          sp.actualRequestMediatype, sp.messageBody,
-                         customHeaderNameValues, newForwardSubmissionHeaders);
+                         customHeaderNameValues, headersToForward);
 
                     // Update status
                     status[0] = true;

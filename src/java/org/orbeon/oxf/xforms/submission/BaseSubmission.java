@@ -278,4 +278,15 @@ public abstract class BaseSubmission implements Submission {
             throw new OXFException(e);
         }
     }
+
+    public String getHeadersToForward(XFormsContainingDocument containingDocument, boolean isReplaceAll) {
+        // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
+        // simulates a request from the browser! Useful in particular when the target URL renders XForms
+        // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
+        // element.
+        final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument).trim().toLowerCase();
+        return isReplaceAll
+                ? (forwardSubmissionHeaders.length() == 0 ? "" : forwardSubmissionHeaders + " ") + "user-agent"
+                : forwardSubmissionHeaders;
+    }
 }

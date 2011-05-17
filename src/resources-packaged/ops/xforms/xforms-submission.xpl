@@ -79,7 +79,8 @@
                                     </xsl:if>
                                 </xforms:submission>
                             </xforms:model>
-                            <properties xxforms:state-handling="client" xxforms:noscript="false" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
+                            <properties xxforms:state-handling="client" xxforms:noscript="false" xxforms:forward-submission-headers="{pipeline:property('oxf.xforms.forward-submission-headers')}"
+                                        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"/>
                             <last-id id="1000"/>
                         </static-state>
                     </xsl:document>

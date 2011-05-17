@@ -85,7 +85,7 @@
                 <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
                     <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
                     <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
-                </xf:action>:setvalue>
+                </xf:action>
 
                 <!-- Flag indicating we are validating -->
                 <xf:setvalue ev:event="xforms-submit" ref="instance()/upload/validating">true</xf:setvalue>

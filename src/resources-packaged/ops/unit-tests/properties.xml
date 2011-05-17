@@ -49,6 +49,13 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>
 
+    <property as="xs:string"  name="oxf.fr.authentication.method"                           value="header"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.username"                  value="Orbeon-Liferay-User-Email"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.roles"                     value="Orbeon-Liferay-User-Roles"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.roles.property-name"       value=""/>
+
+    <property as="xs:string"  name="oxf.fr.authentication.container.roles"                  value="orbeon admin user"/>
+
     <property as="xs:string"  name="oxf.fr.persistence.provider.cities.*.form"              value="provider1"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.provider1.city-uri"                  value="http://en.wikipedia.org/wiki/Mexico_City"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider1.city-name"                 value="Mexico City"/>

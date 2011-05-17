@@ -11,13 +11,10 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.portlet;
+package org.orbeon.oxf.servlet
 
-import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest
 
-/**
- * Interface for setting custom portlet context information depending on the portal.
- */
-public interface CustomContext {
-    public PortletRequest amendRequest(PortletRequest portletRequest) throws Exception;
+trait RequestFilter {
+    def amendRequest(request: HttpServletRequest): HttpServletRequest
 }

@@ -36,12 +36,12 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
     private static final String OPS_CONTEXT_NAMESPACE_KEY = "org.orbeon.ops.portlet.namespace";
 
-    private static CustomContext customContext;
+    private static RequestFilter requestFilter;
     static {
         try {
-            final Class<? extends CustomContext> customContextClass
-                    = (Class<? extends CustomContext>) Class.forName("org.orbeon.oxf.portlet.LiferayContext");
-            customContext = customContextClass.newInstance();
+            final Class<? extends RequestFilter> customContextClass
+                    = (Class<? extends RequestFilter>) Class.forName("org.orbeon.oxf.portlet.FormRunnerRequestFilter");
+            requestFilter = customContextClass.newInstance();
         } catch (Exception e) {
             // Silently ignore as this typically means that we are not in Liferay
         }
@@ -61,10 +61,10 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         this(portletContext, initAttributesMap);
         this.pipelineContext = pipelineContext;
 
-        // Wrap PortletRequest if needed
-        if (customContext != null) {
+        // Wrap request if needed
+        if (requestFilter != null) {
             try {
-                this.portletRequest = customContext.amendRequest(portletRequest);
+                this.portletRequest = requestFilter.amendRequest(portletRequest);
             } catch (Exception e) {
                 throw new OXFException(e);
             }

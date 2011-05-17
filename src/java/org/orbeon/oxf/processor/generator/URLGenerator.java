@@ -322,11 +322,8 @@ public class URLGenerator extends ProcessorImpl {
 
                                 final String forwardHeaders; {
                                     // Get from configuration first, otherwise use global default
-                                    final String configForwardHeaders = XPathUtils.selectStringValueNormalize(configElement, "/config/forward-headers");
-                                    if (StringUtils.isNotBlank(configForwardHeaders))
-                                        forwardHeaders = configForwardHeaders;
-                                    else
-                                        forwardHeaders = Connection.getForwardHeaders();
+                                    final org.dom4j.Node configForwardHeaders = XPathUtils.selectSingleNode(configElement, "/config/forward-headers");
+                                    forwardHeaders = configForwardHeaders != null ? XPathUtils.selectStringValue(configForwardHeaders, ".") : Connection.getForwardHeaders();
                                 }
 
                                 // Validation setting: local, then properties, then hard-coded default

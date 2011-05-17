@@ -39,34 +39,46 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#request"/>
-        <p:input name="config">
-            <request-description xsl:version="2.0">
-                <exist-uri><xsl:value-of select="/request/headers/header[name = 'orbeon-exist-uri']/value"/></exist-uri>
-            </request-description>
-        </p:input>
-        <p:output name="data" id="request-description"/>
-    </p:processor>
-
-
+    <!-- Matches form definitions, form data and attachments -->
     <p:processor name="oxf:perl5-matcher">
         <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
+    <!-- Matches a form data collection (for DELETE) -->
+    <p:processor name="oxf:perl5-matcher">
+        <p:input name="config"><config>/fr/service/exist/crud/([^/]+/[^/]+/data/)</config></p:input>
+        <p:input name="data" href="#request#xpointer(/request/request-path)"/>
+        <p:output name="data" id="delete-matcher-groups"/>
+    </p:processor>
+
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#request"/>
+        <p:input name="matcher-groups" href="#matcher-groups"/>
+        <p:input name="delete-matcher-groups" href="#delete-matcher-groups"/>
+        <p:input name="config">
+            <request-description xsl:version="2.0">
+                <xsl:copy-of select="/request/*"/>
+                <exist-uri><xsl:value-of select="/request/headers/header[name = 'orbeon-exist-uri']/value"/></exist-uri>
+                <xsl:copy-of select="doc('input:matcher-groups')/*/group"/>
+                <xsl:copy-of select="doc('input:delete-matcher-groups')/*/group"/>
+            </request-description>
+        </p:input>
+        <p:output name="data" id="request-description"/>
+    </p:processor>
+
     <!-- Discriminate based on the HTTP method and content type -->
-    <p:choose href="#request">
+    <p:choose href="#request-description">
         <!-- Handle binary and XML GET -->
         <p:when test="/*/method = 'GET'">
 
             <!-- Read URL -->
             <p:processor name="oxf:url-generator">
-                <p:input name="config" transform="oxf:unsafe-xslt" href="aggregate('root', #request-description, #matcher-groups)">
+                <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
                     <config xsl:version="2.0">
                         <url>
-                            <xsl:value-of select="pipeline:rewriteServiceURI(concat(/root/request-description/exist-uri, '/', /root/result/group[1]), true())"/>
+                            <xsl:value-of select="pipeline:rewriteServiceURI(concat(/*/exist-uri, '/', /*/group[1]), true())"/>
                         </url>
                         <!-- Forward the same headers that the XForms engine forwards -->
                         <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
@@ -102,7 +114,7 @@
                             <!-- NOTE: The <body> element contains the xs:anyURI type -->
                             <xforms:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
-                                    resource="{/root/request-description/exist-uri}/{/root/group[1]}">
+                                    resource="{/*/exist-uri}/{/*/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete nodeset="/*/*"/>
@@ -111,7 +123,7 @@
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
-                        <p:input name="request" href="aggregate('root', #request-description, #request#xpointer(/*/body), #matcher-groups#xpointer(/*/group))"/>
+                        <p:input name="request" href="#request-description"/>
                         <p:output name="response" id="response"/>
                     </p:processor>
 
@@ -122,7 +134,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xforms:submission method="delete" replace="none" serialization="none"
-                                    resource="{/root/request-description/exist-uri}/{/root/group[1]}">
+                                    resource="{/*/exist-uri}/{/*/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete nodeset="/*/*"/>
@@ -131,7 +143,7 @@
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
-                        <p:input name="request" href="aggregate('root', #request-description, #matcher-groups#xpointer(/*/group))"/>
+                        <p:input name="request" href="#request-description"/>
                         <p:output name="response" id="response"/>
                     </p:processor>
 
@@ -142,7 +154,7 @@
                     <p:processor name="oxf:xforms-submission">
                         <p:input name="submission">
                             <xforms:submission ref="/*/*[1]" method="put" replace="none"
-                                    resource="{/root/request-description/exist-uri}/{/root/group[1]}">
+                                    resource="{/root/request-description/exist-uri}/{/root/request-description/group[1]}">
                                 <xforms:action ev:event="xforms-submit-error">
                                     <!-- TODO: Propagate error to caller -->
                                     <xforms:delete nodeset="/*/*"/>
@@ -151,7 +163,7 @@
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
-                        <p:input name="request" href="aggregate('root', #instance, #request-description, #matcher-groups#xpointer(/*/group))"/>
+                        <p:input name="request" href="aggregate('root', #instance, #request-description)"/>
                         <p:output name="response" id="response"/>
                     </p:processor>
                 </p:when>

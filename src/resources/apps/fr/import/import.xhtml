@@ -51,7 +51,6 @@
                     <import>
                         <importing>false</importing>
                     </import>
-                    <confirm tab="" previous=""/>
                 </wizard>
             </xf:instance>
 
@@ -79,6 +78,7 @@
                 <dummy/>
             </xf:instance>
 
+            <!-- Validate data to import -->
             <xf:submission id="fr-import-validate-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
                            action="/fr/service/{$app}/{$form}/validate" replace="instance" instance="fr-validation-result">
                 <!-- Reset stats -->
@@ -95,6 +95,7 @@
                 <xf:send ev:event="xforms-submit-done" context="instance('fr-validation-result')" if="total = processed" submission="search-submission"/>
             </xf:submission>
 
+            <!-- Import data -->
             <xf:submission id="fr-import-import-submission" ref="instance()/upload/file" method="post" mode="asynchronous"
                            action="/fr/service/{$app}/{$form}/import" replace="instance" instance="fr-import-result">
                 <!-- Reset stats -->
@@ -103,10 +104,20 @@
                     <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
                 </xf:action>
 
-                <!-- Flag indicating we are importing -->
+                <!-- Import start/end flag -->
                 <xf:setvalue ev:event="xforms-submit" ref="instance()/import/importing">true</xf:setvalue>
                 <xf:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="instance()/import/importing">false</xf:setvalue>
+
+                <!-- Error -->
                 <xf:message ev:event="xforms-submit-error">An error occurred while importing the data.</xf:message>
+            </xf:submission>
+
+            <!-- Delete all data in the given form -->
+            <xf:submission id="fr-import-delete-data-submission" method="delete" serialization="none"
+                           action="/fr/service/persistence/crud/{$app}/{$form}/data/" replace="none">
+
+                <!-- Flag indicating we are importing -->
+                <xf:message ev:event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
             </xf:submission>
 
             <!-- Statistics gathered upon polling event -->
@@ -132,9 +143,9 @@
             <xf:action context="instance('fr-batch-stats')"
                        if="xs:boolean(instance()/upload/validating) or xs:boolean(instance()/import/importing)"
                        ev:event="xxforms-poll" ev:observer="#document">
-                <xf:setvalue ref="total" value="xxf:get-session-attribute('org.orbeon.fr.import.total')"/>
-                <xf:setvalue ref="processed" value="xxf:get-session-attribute('org.orbeon.fr.import.processed')"/>
-                <xf:setvalue ref="succeeded" value="xxf:get-session-attribute('org.orbeon.fr.import.succeeded')"/>
+                <xf:setvalue ref="total" value="(xxf:get-session-attribute('org.orbeon.fr.import.total'), 0)[1]"/>
+                <xf:setvalue ref="processed" value="(xxf:get-session-attribute('org.orbeon.fr.import.processed'), 0)[1]"/>
+                <xf:setvalue ref="succeeded" value="(xxf:get-session-attribute('org.orbeon.fr.import.succeeded'), 0)[1]"/>
             </xf:action>
 
             <!-- Search request -->
@@ -168,6 +179,7 @@
                 <xf:action ev:event="xforms-submit">
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
+                <xf:message ev:event="xforms-submit-error">An error occurred while retrieving the data.</xf:message>
             </xf:submission>
 
             <!-- Metadata -->
@@ -224,6 +236,7 @@
                         <xf:group ref="$tab/file[not(normalize-space())]">
                             <fr:tr>
                                 <fr:td colspan="3">
+
                                     <xf:upload ref=".">
                                         <xf:label>Select a file to import:</xf:label>
                                         <xf:hint>File can be an Excel 2007 (.xlsx) or a plain zip archive of XML documents</xf:hint>
@@ -327,8 +340,20 @@
                                 <fr:tr>
                                     <fr:td colspan="2">
                                         <xh:span class="fb-import-warning">
-                                            Validation was canceled. You can upload a new file to start over, or cancel the import.
+                                            Validation was canceled.
                                         </xh:span>
+                                        <fr:button>
+                                            <xf:label>Start Over</xf:label>
+                                            <xf:action ev:event="DOMActivate">
+                                                <!-- Clear stats -->
+                                                <xf:action context="instance('fr-batch-stats')">
+                                                    <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
+                                                    <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                                                </xf:action>
+                                                <!-- Reload page (xf:reset would help instead!) -->
+                                                <xf:load resource="import"/>
+                                            </xf:action>
+                                        </fr:button>
                                     </fr:td>
                                 </fr:tr>
                             </xf:group>
@@ -365,16 +390,19 @@
                                     </fr:tr>
                                     <fr:tr>
                                         <fr:td>
-                                            <!-- Start import -->
                                             <fr:button>
                                                 <xf:label>Add</xf:label>
-                                                <xf:action ev:event="DOMActivate">
-                                                    <xf:send submission="fr-import-import-submission"/>
-                                                </xf:action>
+                                                <!-- Start import -->
+                                                <xf:send ev:event="DOMActivate" submission="fr-import-import-submission"/>
                                             </fr:button>
                                             <fr:button>
                                                 <xf:label>Delete</xf:label>
-                                                <!-- TODO -->
+                                                <!-- Delete data first -->
+                                                <xf:send ev:event="DOMActivate" submission="fr-import-delete-data-submission"/>
+                                                <!-- Then start import -->
+                                                <xf:action ev:event="xforms-submit-done" ev:observer="fr-import-delete-data-submission">
+                                                    <xf:send submission="fr-import-import-submission"/>
+                                                </xf:action>
                                             </fr:button>
                                         </fr:td>
                                     </fr:tr>
@@ -449,8 +477,20 @@
                                     <fr:tr>
                                         <fr:td colspan="2">
                                             <xh:span class="fb-import-warning">
-                                                Import was canceled. You can upload a new file to start over.
+                                                Import was canceled.
                                             </xh:span>
+                                            <fr:button>
+                                                <xf:label>Start Over</xf:label>
+                                                <xf:action ev:event="DOMActivate">
+                                                    <!-- Clear stats -->
+                                                    <xf:action context="instance('fr-batch-stats')">
+                                                        <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
+                                                        <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                                                    </xf:action>
+                                                    <!-- Reload page (xf:reset would help instead!) -->
+                                                    <xf:load resource="import"/>
+                                                </xf:action>
+                                            </fr:button>
                                         </fr:td>
                                     </fr:tr>
                                 </xf:group>

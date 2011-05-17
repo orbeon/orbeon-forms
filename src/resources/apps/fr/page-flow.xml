@@ -33,7 +33,7 @@
     <!-- ==== Built-in eXist-based persistence services ============================================================ -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="oxf:perl5-matcher"
           model="persistence/exist/crud.xpl"/>
 
     <!-- Search -->
@@ -53,7 +53,7 @@
     <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="oxf:perl5-matcher"
           model="persistence/oracle/crud.xpl"/>
 
     <!-- Search -->
@@ -73,7 +73,7 @@
     <!-- ==== Custom MySQL-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="oxf:perl5-matcher"
           model="persistence/mysql/crud.xpl"/>
 
     <!-- Search -->

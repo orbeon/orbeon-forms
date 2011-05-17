@@ -34,6 +34,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
     private val FormPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
     private val DataPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+))""".r
+    private val DataCollectionPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
     private val SearchPath = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
 
     // Start the processor
@@ -46,8 +47,9 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     def proxyRequest(request: Request, response: Response) {
         val incomingPath = request.getRequestPath
         incomingPath match {
-            case FormPath(path, app, form, file) => proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, document, file) => proxyRequest(request, response, app, form, "data" ,path)
+            case FormPath(path, app, form, _) => proxyRequest(request, response, app, form, "form", path)
+            case DataPath(path, app, form, _, _) => proxyRequest(request, response, app, form, "data", path)
+            case DataCollectionPath(path, app, form) => proxyRequest(request, response, app, form, "data", path)
             case SearchPath(path, app, form) => proxyRequest(request, response, app, form, "data", path)
             case _ => throw new OXFException("Unsupported path: " + incomingPath)
         }

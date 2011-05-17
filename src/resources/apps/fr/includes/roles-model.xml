@@ -43,9 +43,9 @@
 
                   role1 role2
             -->
-            <xxforms:variable name="header-name" select="xxforms:property('oxf.fr.authentication.header.roles')" as="xs:string?"/>
             <xxforms:variable name="header-property-name" select="normalize-space(xxforms:property('oxf.fr.authentication.header.roles.property-name'))" as="xs:string"/>
-            <xxforms:variable name="tokens" select="for $t in tokenize(xxforms:get-request-header($header-name), '[\s,|]') return normalize-space($t)" as="xs:string*"/>
+            <!-- NOTE: Header specified in oxf.fr.authentication.header.roles is already parsed into 'Orbeon-Roles' at this point -->
+            <xxforms:variable name="tokens" select="for $t in xxforms:get-request-header('Orbeon-Roles') return normalize-space($t)" as="xs:string*"/>
 
             <!--<xxforms:variable name="tokens" select="for $t in tokenize('cn=role1,dc=acme,dc=ch|cn=role2,dc=acme,dc=ch', '[\s,|]') return normalize-space($t)" as="xs:string*"/>-->
 

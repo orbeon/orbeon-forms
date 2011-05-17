@@ -102,7 +102,7 @@
                             </xf:action>
                         </xf:action>
 
-                        <xf:message level="xxf:log-info" value="concat('xxx', $p)"/>
+                        <!--<xf:message level="xxf:log-info" value="concat('xxx', $p)"/>-->
                     </xf:action>
 
                     <xf:action type="xpath">

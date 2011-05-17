@@ -50,6 +50,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
             "orbeon-roles" -> Seq("manager", "employee")
         )
 
+        // NOTE: Use asInstanceOf because servlet API doesn't have generics
         val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[JEnumeration[String]] map
             (n => n -> amendedRequest.getHeaders(n).asInstanceOf[JEnumeration[String]].toList) toMap
 

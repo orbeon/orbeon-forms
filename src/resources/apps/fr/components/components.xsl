@@ -89,10 +89,10 @@
             <!-- Title is used later  -->
             <xsl:variable name="view-label" select="(/xhtml:html/xhtml:body//fr:view)[1]/xforms:label" as="element(xforms:label)?"/>
             <xxforms:variable name="title"
-                              select="(($source-form-metadata/title[@xml:lang = $metadata-lang],
+                              select="((xxforms:instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
+                                        xxforms:instance('fr-form-metadata')/title[1],
+                                        $source-form-metadata/title[@xml:lang = $metadata-lang],
                                         $source-form-metadata/title[1],
-                                        instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
-                                        instance('fr-form-metadata')/title[1],
                                         ({$view-label/@ref}),
                                         ({$view-label/@value}),
                                         '{replace($view-label, '''', '''''')}',

@@ -218,10 +218,10 @@
     <xsl:template match="fr:description">
         <!-- Description in chosen language or first one if not found -->
         <xxforms:variable name="description"
-                          select="($source-form-metadata/description[@xml:lang = $metadata-lang],
-                                   $source-form-metadata/description[1],
-                                   instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
-                                   instance('fr-form-metadata')/description[1])[1]"/>
+                          select="(xxforms:instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
+                                   xxforms:instance('fr-form-metadata')/description[1],
+                                   $source-form-metadata/description[@xml:lang = $metadata-lang],
+                                   $source-form-metadata/description[1])[1]"/>
         <xforms:output class="fr-form-description" value="$description"/>
     </xsl:template>
 

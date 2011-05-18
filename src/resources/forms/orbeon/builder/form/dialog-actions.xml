@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -157,7 +156,7 @@
                     </fr:repeat>
                 </xforms:group>
                 <!-- Only show this section if there are selection controls -->
-                <xxforms:variable name="controls-with-itemset" select="$body//(xforms:*|fr:*)[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
+                <xxforms:variable name="controls-with-itemset" select="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xforms:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">

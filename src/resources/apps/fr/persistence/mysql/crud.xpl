@@ -41,13 +41,13 @@
         <p:output name="data" id="request"/>
     </p:processor>
     <p:processor name="oxf:perl5-matcher">
-        <p:input name="config"><config>/fr/service/mysql/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data)/([^/]+)/([^/]+))</config></p:input>
+        <p:input name="config"><config>/fr/service/mysql/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data)/(([^/]+)/([^/]+))?)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
     <!-- Build a document with a description of the request -->
-    <p:processor name="oxf:unsafe-xslt">
+    <p:processor name="oxf:xslt">
         <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="request" href="#request"/>
@@ -57,9 +57,7 @@
                 <xsl:variable name="matcher-groups" as="element(group)+" select="doc('input:matcher-groups')/result/group"/>
                 <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
                 <content-type><xsl:value-of select="$request/content-type"/></content-type>
-                <document>
-                    <xsl:copy-of select="doc('input:instance')"/>
-                </document>
+                <document><xsl:copy-of select="doc('input:instance')"/></document>
                 <timestamp><xsl:value-of select="current-dateTime()"/></timestamp>
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
@@ -67,11 +65,12 @@
                 <form><xsl:value-of select="$matcher-groups[2]"/></form>
                 <xsl:variable name="type" as="xs:string" select="if ($matcher-groups[4] = 'form') then 'form' else 'data'"/>
                 <type><xsl:value-of select="$type"/></type>
-                <!-- Document ID is only used for data -->
-                <xsl:if test="$type = 'data'">
-                    <document-id><xsl:value-of select="$matcher-groups[7]"/></document-id>
+                <xsl:if test="$type = 'data' and $matcher-groups[8] != ''">                             <!-- Document id is only used for data; might be missing for operations over a collection -->
+                    <document-id><xsl:value-of select="$matcher-groups[8]"/></document-id>
                 </xsl:if>
-                <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
+                <xsl:if test="$type = 'form' or $matcher-groups[9] != ''">                              <!-- Filename isn't present for operations over an app/form collection -->
+                    <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[9] else $matcher-groups[5]"/></filename>
+                </xsl:if>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <xsl:copy-of select="$request/body"/>
             </request>
@@ -226,32 +225,35 @@
                                         <sql:execute>
                                             <sql:update>
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                                <xsl:variable name="has-document-id" as="xs:boolean" select="exists(/request/document-id)"/>
                                                 <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
                                                 insert into <xsl:value-of select="$table-name"/>
+                                                    <!-- TODO: This list of columns only works for the data (not form definition) table -->
                                                     (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
                                                 select
-                                                    created,
+                                                    d.created,
                                                     <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                     <sql:param type="xs:string" select="/request/username"/>,
-                                                    app, form, <xsl:if test="$is-data">document_id,</xsl:if>
-                                                    'Y', xml
-                                                from (
-                                                    select * from <xsl:value-of select="$table-name"/>
-                                                    where
-                                                        (app, form, <xsl:if test="$is-data">document_id,</xsl:if> last_modified) =
-                                                        (
-                                                            select
-                                                                app, form, <xsl:if test="$is-data">document_id,</xsl:if> max(last_modified)
-                                                            from <xsl:value-of select="$table-name"/>
-                                                            where
-                                                                app = <sql:param type="xs:string" select="/request/app"/>
-                                                                and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
-                                                            group by
-                                                                app, form <xsl:if test="$is-data">, document_id</xsl:if>
-                                                        )
-                                                )a
+                                                    d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
+                                                    'Y', d.xml
+                                                from
+                                                    orbeon_form_data d,
+                                                    (
+                                                        select
+                                                            app, form, document_id, max(last_modified) last_modified
+                                                        from orbeon_form_data
+                                                        where
+                                                            app =  <sql:param type="xs:string" select="/request/app"/>
+                                                            and form =  <sql:param type="xs:string" select="/request/form"/>
+                                                            <xsl:if test="$is-data and $has-document-id">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                        group by
+                                                            app, form, document_id
+                                                    ) m
+                                                where
+                                                    d.document_id = m.document_id
+                                                    and d.last_modified = m.last_modified
+                                                    and d.deleted = 'N'
                                             </sql:update>
                                         </sql:execute>
                                     </sql:connection>

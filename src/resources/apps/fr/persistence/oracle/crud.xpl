@@ -43,7 +43,7 @@
         <p:output name="data" id="request"/>
     </p:processor>
     <p:processor name="oxf:perl5-matcher">
-        <p:input name="config"><config>/fr/service/oracle/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data)/([^/]+)/([^/]+))</config></p:input>
+        <p:input name="config"><config>/fr/service/oracle/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data)/(([^/]+)/([^/]+))?)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
@@ -59,27 +59,7 @@
                 <xsl:variable name="matcher-groups" as="element(group)+" select="doc('input:matcher-groups')/result/group"/>
                 <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
                 <content-type><xsl:value-of select="$request/content-type"/></content-type>
-                <document>
-                    <!-- See comments below -->
-                    <!--<xsl:variable name="output" as="element(xsl:output)">-->
-                        <!--<xsl:element name="output">-->
-                            <!--<xsl:attribute name="method">xml</xsl:attribute>-->
-                            <!--<xsl:attribute name="omit-xml-declaration">yes</xsl:attribute>-->
-                        <!--</xsl:element>-->
-                    <!--</xsl:variable>-->
-                    <!--<xsl:value-of select="saxon:serialize(doc('input:instance'), $output)"/>-->
-
-                    <!-- NOTE: This is not a good way because:
-
-                         o the current XSLT stylesheet has some namespaces in scope, e.g. xmlns:sql
-                         o if the form declares xmlns:sql for use in attribute values only, the resulting namespace
-                            declaration might be moved to the document's root element after extraction
-
-                         It would be better to use saxon:serialize() and then saxon:parse() in oxf:sql, but oxf:sql
-                         doesn't support saxon:parse() as of 2009-0422.
-                     -->
-                    <xsl:copy-of select="doc('input:instance')"/>
-                </document>
+                <document><xsl:copy-of select="doc('input:instance')"/></document>
                 <timestamp><xsl:value-of select="current-dateTime()"/></timestamp>
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
@@ -87,11 +67,12 @@
                 <form><xsl:value-of select="$matcher-groups[2]"/></form>
                 <xsl:variable name="type" as="xs:string" select="if ($matcher-groups[4] = 'form') then 'form' else 'data'"/>
                 <type><xsl:value-of select="$type"/></type>
-                <!-- Document ID is only used for data -->
-                <xsl:if test="$type = 'data'">
-                    <document-id><xsl:value-of select="$matcher-groups[7]"/></document-id>
+                <xsl:if test="$type = 'data' and $matcher-groups[8] != ''">                             <!-- Document id is only used for data; might be missing for operations over a collection -->
+                    <document-id><xsl:value-of select="$matcher-groups[8]"/></document-id>
                 </xsl:if>
-                <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
+                <xsl:if test="$type = 'form' or $matcher-groups[9] != ''">                              <!-- Filename isn't present for operations over an app/form collection -->
+                    <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[9] else $matcher-groups[5]"/></filename>
+                </xsl:if>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <create-flat-view>
                     <xsl:variable name="create-flat-view-property" as="xs:string?" select="$request/headers/header[name = 'orbeon-create-flat-view']/value/string()"/>
@@ -251,9 +232,11 @@
                                         <sql:execute>
                                             <sql:update>
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                                <xsl:variable name="has-document-id" as="xs:boolean" select="exists(/request/document-id)"/>
                                                 <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
                                                 insert into <xsl:value-of select="$table-name"/>
+                                                    <!-- TODO: This list of columns only works for the data (not form definition) table -->
                                                     (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
                                                 select
                                                     created,
@@ -261,22 +244,16 @@
                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                     app, form, <xsl:if test="$is-data">document_id,</xsl:if>
                                                     'Y', xml
-                                                from (
-                                                    select * from <xsl:value-of select="$table-name"/>
-                                                    where
-                                                        (app, form, <xsl:if test="$is-data">document_id,</xsl:if> last_modified) =
-                                                        (
-                                                            select
-                                                                app, form, <xsl:if test="$is-data">document_id,</xsl:if> max(last_modified)
-                                                            from <xsl:value-of select="$table-name"/>
-                                                            where
-                                                                app = <sql:param type="xs:string" select="/request/app"/>
-                                                                and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
-                                                            group by
-                                                                app, form <xsl:if test="$is-data">, document_id</xsl:if>
-                                                        )
-                                                )
+                                                from
+                                                    (
+                                                        select t.*, dense_rank() over (partition by <xsl:value-of select="if ($is-data) then 'document_id' else 'app, form'"/> order by last_modified desc) as latest
+                                                        from <xsl:value-of select="$table-name"/> t
+                                                        where
+                                                            app = <sql:param type="xs:string" select="/request/app"/>
+                                                            and form = <sql:param type="xs:string" select="/request/form"/>
+                                                            <xsl:if test="$is-data and $has-document-id">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                    )
+                                                where latest = 1 and deleted = 'N'
                                             </sql:update>
                                         </sql:execute>
                                     </sql:connection>

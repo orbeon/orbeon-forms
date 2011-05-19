@@ -98,7 +98,7 @@
                     && element.id == ORBEON.util.Utils.appendToEffectiveId(this.processingEvent.upload.container.id, "$xforms-input"));
             // Disable elements we don't keep and that are not disabled already
             // NOTE: Skip fieldsets, as disabling them disables all the elements inside the fieldset
-            if (element.type.toLowerCase() != "fieldset" && ! keep && ! element.disabled) { element.disabled = true; return true; }
+            if (element.tagName.toLowerCase() != "fieldset" && ! keep && ! element.disabled) { element.disabled = true; return true; }
             else return false;
         }, this);
         // Trigger actual upload through a form POST and start asking server for progress

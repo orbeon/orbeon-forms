@@ -37,7 +37,7 @@
             <!-- Handle head scripts if present -->
             <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
             <!-- Body -->
-            <xhtml:div class="orbeon-portlet-content">
+            <xhtml:div class="orbeon-portlet-body">
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </xhtml:div>
             <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->

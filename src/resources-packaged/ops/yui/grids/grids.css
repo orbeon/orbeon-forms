@@ -23,10 +23,10 @@ version: 2.8.1
 /**
  * Section: General Rules
  */
-
-body {
-	text-align: center;
-}
+/* ORBEON: removed */
+/*body {*/
+	/*text-align: center;*/
+/*}*/
 
 /**
  * Section: Page Width Rules (#doc, #doc2, #doc3, #doc4)

@@ -39,7 +39,7 @@
             <!-- Handle head scripts if present -->
             <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
             <!-- Body -->
-            <xhtml:div id="orbeon" class="orbeon-portlet-content orbeon">
+            <xhtml:div id="orbeon" class="orbeon-portlet-body orbeon">
                 <xhtml:div class="maincontent">
                     <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
                 </xhtml:div>

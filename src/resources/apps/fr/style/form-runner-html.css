@@ -1,0 +1,46 @@
+/**
+ * Copyright (C) 2011 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+/* ***** Basic HTML settings **************************************************************************************** */
+
+html { overflow: scroll; background-color: #DDD }/* TODO: add comment about why this is useful (if is actually is) */
+
+body {
+    background-color: #DDD;
+    text-align: left /* Not sure why the YUI resets this to center */
+}
+
+td { border: 0; vertical-align: top }
+i { font-style: italic }
+b { font-weight: bold }
+th, td {border: 0; padding: 0 }
+
+body, body table, textarea.xforms-textarea, button {
+    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+}
+
+a { color: #004B92 }
+hr { border: 1px solid #eee }
+
+/* Some definitions from YUI base-min.css */
+strong { font-weight: bold }
+abbr, acronym { border-bottom: 1px dotted #000; cursor: help }
+em { font-style: italic }
+blockquote, ul, ol, dl { margin: 1em }
+ol, ul, dl { margin-left: 2em }
+ol li { list-style: decimal outside }
+ul li { list-style: disc outside }
+dl dd { margin-left: 1em }
+th { font-weight:bold; text-align:center }
+caption { margin-bottom:.5em; text-align:center }
+p, fieldset, table { margin-bottom: 1em }

@@ -24,64 +24,32 @@
 
 /* TODO: repeats and dialogs still have colors and fonts settings in form-runner-base.css */
 
-/* ***** Basic HTML settings **************************************************************************************** */
+/* ***** Headings (titles and sections) ***************************************************************************** */
 
-html { overflow: scroll; background-color: #DDD }/* TODO: add comment about why this is useful (if is actually is) */
-
-body {
-    background-color: #DDD;
-    text-align: left /* Not sure why the YUI resets this to center */
-}
-
-td { border: 0; vertical-align: top }
-i { font-style: italic }
-b { font-weight: bold }
-th, td {border: 0; padding: 0 }
-
-h1, h2, h3 {
+.xforms-form h1, .xforms-form h2, .xforms-form h3 {
 	margin: 1em 0;
     color: #004B92;
 }
 
-h1, h2, h3, h4, h5, h6 {
+.xforms-form h1, .xforms-form h2, .xforms-form h3, .xforms-form h4, .xforms-form h5, .xforms-form h6 {
     text-align: left;
     font-weight: normal;
     clear: left;
     padding: 0;
 }
 
-h1 { font-size: 197% }
+.xforms-form h1 { font-size: 20pt }
 
-h2 {
-    font-size: 130%;
-    margin: 1em 0 .5em 0;/* try smaller margins */
+.xforms-form h2 {
+    font-size: 13pt;
+    margin: 1em 0 .5em 0;
 }
 
-h3, h4 {
+.xforms-form h3, .xforms-form h4 {
     font-size: 110%;
     line-height: 135%;
     margin: 1em 0 1em 0;
 }
-
-body, body table, textarea.xforms-textarea, button {
-    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-}
-
-a { color: #004B92 }
-hr { border: 1px solid #eee }
-
-/* Some definitions from YUI base-min.css */
-strong { font-weight: bold }
-abbr, acronym { border-bottom: 1px dotted #000; cursor: help }
-em { font-style: italic }
-blockquote, ul, ol, dl { margin: 1em }
-ol, ul, dl { margin-left: 2em }
-ol li { list-style: decimal outside }
-ul li { list-style: disc outside }
-dl dd { margin-left: 1em }
-th { font-weight:bold; text-align:center }
-caption { margin-bottom:.5em; text-align:center }
-p, fieldset, table { margin-bottom: 1em }
 
 /* ***** Other ****************************************************************************************************** */
 
@@ -244,6 +212,9 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
 .xbl-fr-error-summary .fr-error-alert { color: #DF731B }
 
 /* Section */
+
+
+
 .fr-section-title { border-bottom: 1px solid #004B92 }
 .fr-section-title a { text-decoration: none }
 .fr-section-title .fr-section-open-close { border-bottom: white }
@@ -284,6 +255,8 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
 /* This is also used for PDF generation */
 @media print {
     html, html body { background-color: white; background-image: none }
+    /*html body #fr-form-group h2 { font-family: "Arial Unicode MS" }*/
+    html { font-family: "Arial Unicode MS" }
     .fr-separator { background-color: black; height: 2px }
     h1, h2, h3 { color: black }
     a, .xforms-trigger-appearance-xxforms-minimal { color: black; text-decoration: none }

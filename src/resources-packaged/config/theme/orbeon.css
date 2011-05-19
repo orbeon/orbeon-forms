@@ -428,7 +428,7 @@ a {
 }
 
 .orbeon-portlet-div { text-align: left; margin: 1em }
-.orbeon-portlet-content { }
+.orbeon-portlet-body { }
 .orbeon-portlet-home { margin-top: 1em; font-style: italic; clear: both }
 
 /* Re-apply YUI rules for RTE that are too weak */

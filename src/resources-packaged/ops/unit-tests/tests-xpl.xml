@@ -1369,4 +1369,44 @@
         </output>
     </test>
 
+    <test description="xsl:result-document to pipeline output" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result-data" type="output"/>
+                <p:param name="result-foo" type="output"/>
+                <p:param name="result-bar" type="output"/>
+
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <result-data>
+                                    <xsl:result-document href="output:foo">
+                                        <result-foo/>
+                                    </xsl:result-document>
+                                    <xsl:result-document href="output:bar">
+                                        <result-bar/>
+                                    </xsl:result-document>
+                                </result-data>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:input name="data"><dummy/></p:input>
+                    <p:output name="data" ref="result-data"/>
+                    <p:output name="foo" ref="result-foo"/>
+                    <p:output name="bar" ref="result-bar"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result-data">
+            <result-data/>
+        </output>
+        <output name="result-foo">
+            <result-foo/>
+        </output>
+        <output name="result-bar">
+            <result-bar/>
+        </output>
+    </test>
+
 </group>

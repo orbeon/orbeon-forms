@@ -18,7 +18,9 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 /**
  * Handle xhtml:* for handling AVTs as well as rewriting @id and @for.
@@ -53,11 +55,11 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                         final String attributeLocalName = attributes.getLocalName(i);
                         final String attributeQName = attributes.getQName(i);// use qualified name so we match on "xml:lang"
 
+                        // Control analysis
+                        final AttributeControl controlAnalysis = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
+
                         // Get static id of attribute control associated with this particular attribute
-                        final String attributeControlStaticId; {
-                            final AttributeControl controlAnalysis = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
-                            attributeControlStaticId = controlAnalysis.element().attributeValue(XFormsConstants.ID_QNAME);
-                        }
+                        final String attributeControlStaticId = controlAnalysis.element().attributeValue(XFormsConstants.ID_QNAME);
 
                         // Find concrete control if possible
                         final XXFormsAttributeControl attributeControl;
@@ -73,7 +75,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
 
                         // Determine attribute value
                         // NOTE: This also handles dummy images for the xhtml:img/@src case
-                        final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValue(attributeControl, attributeQName);
+                        final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValue(attributeControl, controlAnalysis);
 
                         // Set the value of the attribute
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),

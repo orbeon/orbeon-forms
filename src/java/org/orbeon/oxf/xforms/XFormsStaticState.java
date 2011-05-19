@@ -26,7 +26,6 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.*;
@@ -367,13 +366,13 @@ public class XFormsStaticState implements XMLUtils.DebugXML {
                 for (final ElementAnalysis value : values) {
                     final AttributeControl attributeControl = (AttributeControl) value;
                     final String forPrefixedId = attributeControl.forPrefixedId();
-                    final String nameAttribute = attributeControl.name();
+                    final String attributeName = attributeControl.attributeName();
                     Map<String, AttributeControl> mapForId = attributeControls.get(forPrefixedId);
                     if (mapForId == null) {
                         mapForId = new HashMap<String, AttributeControl>();
                         attributeControls.put(forPrefixedId, mapForId);
                     }
-                    mapForId.put(nameAttribute, attributeControl);
+                    mapForId.put(attributeName, attributeControl);
                 }
             }
         }

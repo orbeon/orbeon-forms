@@ -283,6 +283,22 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
                                 newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, attributeValue);
 
+                                newAttributes.addAttribute("", "for-name", "for-name", ContentHandlerHelper.CDATA, localname);
+
+                                // These extra attributes can be used alongside src/href attributes
+                                if ("src".equals(attributeName) || "href".equals(attributeName)) {
+                                    final String urlType = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
+                                    final String portletMode = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
+                                    final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
+
+                                    if (urlType != null)
+                                        newAttributes.addAttribute("", "url-type", "url-type", ContentHandlerHelper.CDATA, urlType);
+                                    if (portletMode != null)
+                                        newAttributes.addAttribute("", "portlet-mode", "portlet-mode", ContentHandlerHelper.CDATA, "portlet-mode");
+                                    if (windowState != null)
+                                        newAttributes.addAttribute("", "window-state", "window-state", ContentHandlerHelper.CDATA, "window-state");
+                                }
+
                                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
                                 startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", newAttributes);
                                 endElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");

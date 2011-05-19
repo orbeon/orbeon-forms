@@ -1730,7 +1730,7 @@
         <input name="controls">
             <controls xmlns:xforms="http://www.w3.org/2002/xforms"
                       xmlns:ev="http://www.w3.org/2001/xml-events">
-                <xxforms:attribute id="my-src-avt" for="my-image" name="src" value="{image}"/>
+                <xxforms:attribute id="my-src-avt" for="my-image" name="src" value="{image}" for-name="img"/>
                 <xforms:trigger id="my-trigger">
                     <xforms:setvalue ev:event="DOMActivate" ref="image" id="setvalue1">    </xforms:setvalue>
                 </xforms:trigger>

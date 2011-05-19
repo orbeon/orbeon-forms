@@ -20,7 +20,6 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
@@ -694,20 +693,32 @@ public class XFormsUtils {
     public static String resolveRenderURL(XFormsContainingDocument containingDocument, Element currentElement, String url, boolean skipRewrite) {
         final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
 
-        final String resolvedURIStringNoPortletFragment;
+        final String resolvedURIStringNoPortletFragment = uriToStringNoFragment(containingDocument, resolvedURI);
+
+        return skipRewrite ? resolvedURIStringNoPortletFragment :
+                NetUtils.getExternalContext().getResponse().rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null);
+    }
+
+    public static String resolveActionURL(XFormsContainingDocument containingDocument, Element currentElement, String url, boolean skipRewrite) {
+        final URI resolvedURI = resolveXMLBase(containingDocument, currentElement, url);
+
+        final String resolvedURIStringNoPortletFragment = uriToStringNoFragment(containingDocument, resolvedURI);
+
+        return skipRewrite ? resolvedURIStringNoPortletFragment :
+                NetUtils.getExternalContext().getResponse().rewriteActionURL(resolvedURIStringNoPortletFragment, null, null);
+    }
+
+    private static String uriToStringNoFragment(XFormsContainingDocument containingDocument, URI resolvedURI) {
         if (containingDocument.isPortletContainer() && resolvedURI.getFragment() != null) {
             // XForms page was loaded from a portlet and there is a fragment, remove it
             try {
-                resolvedURIStringNoPortletFragment = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
+                return new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
             } catch (URISyntaxException e) {
                 throw new OXFException(e);
             }
         } else {
-            resolvedURIStringNoPortletFragment = resolvedURI.toString();
+            return resolvedURI.toString();
         }
-
-        return skipRewrite ? resolvedURIStringNoPortletFragment :
-                NetUtils.getExternalContext().getResponse().rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null);
     }
 
     /**
@@ -741,29 +752,6 @@ public class XFormsUtils {
         final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
         return NetUtils.getExternalContext().rewriteServiceURL(resolvedURI.toString(), rewriteMode);
-    }
-
-    /**
-     * Rewrite an attribute if that attribute contains a URI, e.g. @href or @src.
-     *
-     * @param containingDocument    current containing document
-     * @param element               element used to start resolution (if null, no resolution takes place)
-     * @param attributeName         attribute name
-     * @param attributeValue        attribute value
-     * @return                      rewritten URL
-     */
-    public static String getEscapedURLAttributeIfNeeded(XFormsContainingDocument containingDocument, Element element, String attributeName, String attributeValue) {
-        final String rewrittenValue;
-        if ("src".equals(attributeName)) {
-            rewrittenValue = resolveResourceURL(containingDocument, element, attributeValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        } else if ("href".equals(attributeName)) {
-
-            // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
-            rewrittenValue = resolveRenderURL(containingDocument, element, attributeValue, false);
-        } else {
-            rewrittenValue = attributeValue;
-        }
-        return rewrittenValue;
     }
 
     /**
@@ -1247,7 +1235,7 @@ public class XFormsUtils {
                         if (hostLanguageAVTs && maybeAVT(currentAttributeValue)) {
                             // This is an AVT, use attribute control to produce the output
                             final XXFormsAttributeControl attributeControl
-                                    = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue);
+                                    = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue, element.getName());
 
                             contextStack.pushBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element));
                             {

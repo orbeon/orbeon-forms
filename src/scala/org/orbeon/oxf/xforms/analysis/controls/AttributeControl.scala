@@ -23,9 +23,16 @@ class AttributeControl(staticStateContext: StaticStateContext, element: Element,
         with ValueTrait {
 
     // Attribute control uses an AVT
-    // TODO: Add support for AVT
+    // TODO: Add support for analyzing AVT
     override def computeValueAnalysis = Some(NegativeAnalysis(value.get)) // we must have a value
 
-    val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, element.attributeValue(XFormsConstants.FOR_QNAME))
-    val name = element.attributeValue(XFormsConstants.NAME_QNAME)
+    val forStaticId = element.attributeValue(XFormsConstants.FOR_QNAME)
+    val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, forStaticId)
+    val attributeName = element.attributeValue(XFormsConstants.NAME_QNAME)
+    val attributeValue = element.attributeValue(XFormsConstants.VALUE_QNAME)
+
+    val forName = element.attributeValue("for-name")
+    val urlType = element.attributeValue("url-type")
+    val portletMode = element.attributeValue("portlet-mode")
+    val windowState = element.attributeValue("window-state")
 }

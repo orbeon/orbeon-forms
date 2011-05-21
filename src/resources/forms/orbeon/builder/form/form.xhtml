@@ -474,6 +474,7 @@
                                                                                       else if ($is-repeat) then fr:body[1] else ."/>
                                                             <!-- Columns are either on fr:grid or fr:repeat parent of fr:grid -->
                                                             <xxforms:variable name="columns" select="($grid/@columns, $grid/../@columns)[1]" as="attribute(columns)"/>
+                                                            <xxforms:variable name="max-columns" select="xxforms:property('oxf.fb.grid.max-columns')"/>
 
                                                             <!-- Use AVTs to set the style on the div depending on the number of columns in first row -->
                                                             <xhtml:div class="fb-grid fb-grid-{count($grid/*:tr[1]/*:td)}-columns">
@@ -526,7 +527,7 @@
                                                                                 <xhtml:td class="fb-grid-column-toolbar-td">
                                                                                     <!-- Insert column to the left -->
                                                                                     <xhtml:div class="fb-insert-left">
-                                                                                        <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) lt 4]" id="fb-insert-column-left-trigger">
+                                                                                        <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) lt $max-columns]" id="fb-insert-column-left-trigger">
                                                                                             <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{$form-resources/insert-column-left-icon/label}" title="{$form-resources/insert-column-left-icon/label}"/></xforms:label>
                                                                                             <xforms:action ev:event="DOMActivate">
                                                                                                 <!-- Increment number of columns -->
@@ -552,7 +553,7 @@
                                                                                     </xhtml:div>
                                                                                     <!-- Insert column to the right -->
                                                                                     <xhtml:div class="fb-insert-right">
-                                                                                        <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) lt 4]" id="fb-insert-column-right-trigger">
+                                                                                        <xforms:trigger appearance="minimal" ref=".[$readwrite-grid and xs:integer($columns) lt $max-columns]" id="fb-insert-column-right-trigger">
                                                                                             <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{$form-resources/insert-column-right-icon/label}" title="{$form-resources/insert-column-right-icon/label}"/></xforms:label>
                                                                                             <xforms:action context="$grid" ev:event="DOMActivate">
                                                                                                 <!-- Increment number of columns -->

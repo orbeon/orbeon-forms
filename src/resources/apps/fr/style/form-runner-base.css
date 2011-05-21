@@ -275,6 +275,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-repeat-table td .xforms-help-image { display: none }
 .fr-repeat-table td .xforms-help { display: none }
 .fr-repeat-table td .xforms-hint { display: none }
+.fr-repeat-table .fr-grid-content { margin-top: .5em } /* because we don't show the label, add padding at top */
 /* But if there is a nested table, show those in the label in the column header of that table */
 .fr-repeat-table tr th .xforms-label { display: inline }
 .fr-repeat-table tr th .xforms-help-image { margin-top: 0 }

@@ -62,6 +62,7 @@ public class HTTPURLConnection extends URLConnection {
     public static String SO_TIMEOUT_PROPERTY = "oxf.http.so-timeout";
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
+    public static String PROXY_TLS_PROPERTY = "oxf.http.proxy.use-tls";
 	public static String PROXY_USERNAME_PROPERTY = "oxf.http.proxy.username";
 	public static String PROXY_PASSWORD_PROPERTY = "oxf.http.proxy.password";
 	public static String PROXY_NTLM_HOST_PROPERTY = "oxf.http.proxy.ntlm.host";
@@ -95,7 +96,8 @@ public class HTTPURLConnection extends URLConnection {
         final String proxyHost = Properties.instance().getPropertySet().getString(PROXY_HOST_PROPERTY);
         final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
         if (proxyHost != null && proxyPort != null) {
-            basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort));
+            final boolean useTLS = Properties.instance().getPropertySet().getBoolean(PROXY_TLS_PROPERTY, false);
+            basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
 
             // Proxy authentication
             final String proxyUsername = Properties.instance().getPropertySet().getString(PROXY_USERNAME_PROPERTY);

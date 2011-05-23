@@ -102,7 +102,8 @@ ORBEON.widgets.YUICalendar = function() {
             }
 
             // Try to make sure the calendar appears in front of a dialog; doesn't work automatically as of 2008-12-10
-            YAHOO.util.Dom.setStyle(calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex++);
+            ORBEON.xforms.Globals.lastDialogZIndex += 2;
+            YAHOO.util.Dom.setStyle(calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex);
 
             if (yuiCalendar == null) {
                 // Create YUI calendar

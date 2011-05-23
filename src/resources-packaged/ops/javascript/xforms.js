@@ -2607,14 +2607,16 @@ ORBEON.xforms.Controls = {
                     // Create YUI dialog for help based on template
                     YAHOO.util.Dom.generateId(formChild);
                     YAHOO.util.Dom.removeClass(formChild, "xforms-initially-hidden");
+                    ORBEON.xforms.Globals.lastDialogZIndex += 2;
                     var helpPanel = new YAHOO.widget.Panel(formChild.id, {
-                        modal: false,
+                        modal: true,
                         fixedcenter: false,
                         underlay: "shadow",
                         visible: false,
                         constraintoviewport: true,
                         draggable: true,
-                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.3}
+                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.3},
+                        zIndex: ORBEON.xforms.Globals.lastDialogZIndex
                     });
                     helpPanel.render();
                     helpPanel.element.style.display = "none";
@@ -2669,7 +2671,8 @@ ORBEON.xforms.Controls = {
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
             ORBEON.xforms.Globals.formHelpPanel[form.id].show();
-            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
+            ORBEON.xforms.Globals.lastDialogZIndex += 2;
+            ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex);
         }
 
         // Set focus on close button if visible (we don't want to set the focus on the close button if not

@@ -28,6 +28,7 @@ YAHOO.xbl.fr.Select1Button.prototype = {
         // Get references to HTML elements
         this.htmlButton = YAHOO.util.Dom.getElementsByClassName("fr-select1-button-button", null, this.container)[0];
         this.select1ControlId = YAHOO.util.Dom.getElementsByClassName("fr-select1-button-select1", null, this.container)[0].id;
+        this.xformsSelectTrigger = YAHOO.util.Dom.getElementsByClassName("fr-select1-button-xforms-select", null, this.container)[0];
 
         // Initialize YUI button
         this.yuiButton = new YAHOO.widget.Button(this.htmlButton.id, {
@@ -76,6 +77,7 @@ YAHOO.xbl.fr.Select1Button.prototype = {
     selectionMade: function(name, event, option) {
         this.yuiButton.set("label", option.label);
         ORBEON.xforms.Document.setValue(this.select1ControlId, option.value);
+        ORBEON.util.Dom.getElementByTagName(this.xformsSelectTrigger, "button").click();
     },
 
     /**

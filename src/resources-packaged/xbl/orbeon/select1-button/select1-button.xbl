@@ -66,6 +66,12 @@
                                 <xsl:apply-templates select="xforms:itemset | xforms:item"/>
                             </xforms:select1>
 
+                            <!-- Tell user of this component a value was selected -->
+                            <xforms:trigger class="fr-select1-button-xforms-select" style="display: none">
+                                <xforms:label/>
+                                <xforms:dispatch ev:event="DOMActivate" name="xforms-select" target="fr-select1-button"/>
+                            </xforms:trigger>
+
                             <!-- Detect change in itemset and call JavaScript -->
                             <xxforms:variable id="itemset-value" name="itemset-value" select="xxforms:itemset('hidden-select', 'json')"/>
                             <xxforms:script ev:event="xforms-value-changed" ev:target="itemset-value" id="itemset-changed">YAHOO.xbl.fr.Select1Button.instance(this).itemsetChanged();</xxforms:script>

@@ -196,19 +196,30 @@
                                                 <xforms:setvalue ref="$local/textfield-value" value="$selected-label"/>
                                                 <xxforms:script id="full-arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
                                             </xforms:action>
+                                            <!-- This select1 has the same itemset as the select1-button; it is here just so we can use xxforms:itemset() on it -->
+                                            <xforms:select1 ref="$external-value" id="full-itemset-select1" style="display: none">
+                                                <xsl:apply-templates select="xforms:itemset | xforms:item">
+                                                    <xsl:with-param name="resource-instance" tunnel="yes">full-itemset-instance</xsl:with-param>
+                                                </xsl:apply-templates>
+                                            </xforms:select1>
                                         </xsl:if>
-                                        <fr:select1-button ref="$external-value" id="full-itemset-button">
-                                            <xsl:apply-templates select="xforms:itemset | xforms:item">
-                                                <xsl:with-param name="resource-instance" tunnel="yes">full-itemset-instance</xsl:with-param>
-                                            </xsl:apply-templates>
-                                        </fr:select1-button>
+                                        <xsl:choose>
+                                            <xsl:when test="exists(/*/@resource)">
+                                                <!-- In resource mode, we get the data from the full instance -->
+                                                <fr:select1-button ref="$external-value" id="full-itemset-button">
+                                                    <xsl:apply-templates select="xforms:itemset | xforms:item">
+                                                        <xsl:with-param name="resource-instance" tunnel="yes">full-itemset-instance</xsl:with-param>
+                                                    </xsl:apply-templates>
+                                                </fr:select1-button>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <!-- In static itemset mode, we use the itemset provided by user which needs to be in outer scope -->
+                                                <fr:select1-button ref="." xxbl:scope="outer">
+                                                    <xbl:content includes="xforms|itemset,xforms|item"/>
+                                                </fr:select1-button>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                     </xforms:group>
-                                    <!-- NOTE: This select1 has the same itemset as the select1-button; it is here just so we can use xxforms:itemset() on it -->
-                                    <xforms:select1 ref="$external-value" id="full-itemset-select1" style="display: none">
-                                        <xsl:apply-templates select="xforms:itemset | xforms:item">
-                                            <xsl:with-param name="resource-instance" tunnel="yes">full-itemset-instance</xsl:with-param>
-                                        </xsl:apply-templates>
-                                    </xforms:select1>
                                 </xsl:if>
                                 <xhtml:div class="fr-autocomplete-yui-div"/>
                             </xhtml:div>

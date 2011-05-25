@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -180,8 +179,26 @@
 
     <!-- Respond to workflow preview button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-workflow-review-button">
-        <!-- Just send the submission -->
-        <xforms:send submission="fr-workflow-review-submission"/>
+
+        <!-- TODO: Fix duplication of this code and code in fr-save-action -->
+        <xxforms:variable name="validity-passed" select="xxforms:instance('fr-error-summary-instance')/valid = 'true'"/>
+        <xforms:action if="not($validity-passed)">
+            <!-- Data not valid: display error -->
+            <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
+                             model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
+            <xforms:toggle case="fr-message-validation-error"/>
+            <!-- Mark all active alerts as visited -->
+            <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
+            <!-- Open all sections -->
+            <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
+        </xforms:action>
+
+        <!-- Display message if there is at least one upload in progress -->
+        <xforms:message if="$validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+
+        <!-- Send -->
+        <xforms:send if="$validity-passed and not(xxforms:pending-uploads() > 0)" submission="fr-workflow-review-submission"/>
+
     </xforms:action>
 
     <!-- Respond to workflow edit button activation -->
@@ -211,13 +228,13 @@
         <xforms:action if="$document != ''">
 
             <!-- Check validity of data before trying to save, because 1) we don't want to save attachments if the form
-                 is invalid and 2) submission doesn't check validity anymore -->
-            <!-- NOTE: We use instance('fr-error-summary-instance')/valid and not xxforms:valid() because the instance
+                 is invalid and 2) submission doesn't check validity anymore.
+                 We use instance('fr-error-summary-instance')/valid and not xxforms:valid() because the instance
                  validity may not be reflected with the use of XBL components. -->
-            <xxforms:variable name="save-validity-passed" select="not($check-data-valid) or
+            <xxforms:variable name="validity-passed" select="not($check-data-valid) or
                 (xxforms:instance('fr-error-summary-instance')/valid = 'true')" as="xs:boolean"/>
 
-            <xforms:action if="not($save-validity-passed)">
+            <xforms:action if="not($validity-passed)">
                 <!-- Data not valid: display error -->
                 <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
                                  model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
@@ -229,10 +246,10 @@
             </xforms:action>
 
             <!-- Display message if there is at least one upload in progress -->
-            <xforms:message if="$save-validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+            <xforms:message if="$validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
 
             <!-- Actually save if we passed validation and there is no upload in progress -->
-            <xforms:action if="$save-validity-passed and not(xxforms:pending-uploads() > 0)">
+            <xforms:action if="$validity-passed and not(xxforms:pending-uploads() > 0)">
                 <!-- Data valid: proceed with saving attachments and data -->
 
                 <!-- Handle attachments -->
@@ -560,7 +577,7 @@
     <!-- TODO: possibly: pass app/form name, e.g.: resource="{$workflow-success-uri}?fr-app={$app}&amp;fr-form={$form}" -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{$workflow-success-uri}"
-        relevant="false" method="{$workflow-success-method}"
+        relevant="false" validate="false" method="{$workflow-success-method}"
         serialization="{if ($workflow-success-method = 'get') then 'none' else 'application/xml'}"
         ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
@@ -573,7 +590,7 @@
 
     <xforms:submission id="fr-workflow-error-submission"
         resource="{$workflow-error-uri}"
-        relevant="false" method="{$workflow-error-method}"
+        relevant="false" validate="false" method="{$workflow-error-method}"
         serialization="{if ($workflow-error-method = 'get') then 'none' else 'application/xml'}"
         ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
@@ -581,12 +598,12 @@
     <!-- Call email service -->
     <xforms:submission id="fr-email-service-submission"
         resource="/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        relevant="false" method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
+        relevant="false" validate="false" method="post" ref="xxforms:instance('fr-form-instance')" replace="none"/>
 
     <!-- Call PDF service -->
     <xforms:submission id="fr-pdf-service-submission"
         resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        relevant="false" method="post" ref="xxforms:instance('fr-form-instance')"
+        relevant="false" validate="false" method="post" ref="xxforms:instance('fr-form-instance')"
         replace="instance" instance="fr-workflow-confirmation-instance"/>
 
     <xforms:instance id="fr-workflow-confirmation-instance">

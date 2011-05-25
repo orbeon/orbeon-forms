@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -63,7 +62,7 @@
 
     <!-- Submission to go back to editing the XML form -->
     <xforms:submission id="fr-workflow-edit-submission"
-            validate="true" relevant="false" method="post"
+            relevant="false" validate="false" method="post"
             ref="xxforms:instance('fr-form-instance')"
             resource="/fr/{$parameters/app}/{$parameters/form}/edit/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all">
@@ -75,7 +74,7 @@
 
     <!-- Submission to preview the XML form -->
     <xforms:submission id="fr-workflow-review-submission"
-            validate="true" relevant="false" method="post"
+            relevant="false" validate="false" method="post"
             ref="xxforms:instance('fr-form-instance')"
             resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all">

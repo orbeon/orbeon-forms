@@ -15,16 +15,16 @@ package org.orbeon.oxf.xforms.event;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
-import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
@@ -198,13 +198,20 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         // Create a new top-level action interpreter to handle this event
-        try {
             new XFormsActionInterpreter(contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
                 .runAction(event, eventObserver, eventHandlerElement);
-        } catch (Exception e) {
-            // Something bad happened while running the action
-            contextContainer.dispatchEvent(new XXFormsActionErrorEvent(contextContainer.getContainingDocument(), eventObserver, e));
-        }
+        // NOTE: We would like here ideally to catch exceptions occurring within actions, and to dispatch an event that
+        // can be recovered for example by the XForms inspector. However, this needs to be done properly: logging vs.
+        // fatal, sending an error to the client, etc. Also, some code cannot recover at this time, e.g. a variable
+        // within the control tree throwing a dynamic XPath error currently leaves the tree in a bad state. So either the
+        // tree should be discarded, or XPath dynamic errors should leave the tree in a consistent state. Still, some errors
+        // in the XForms engine will still be fatal.
+//        try {
+//        } catch (Exception e) {
+//            // Something bad happened while running the action
+//            // NOTE: Dispatch directly to the containing document. Ideally it would bubble and a default listener on the document would handle it.
+//            contextContainer.dispatchEvent(new XXFormsActionErrorEvent(contextContainer.getContainingDocument(), contextContainer.getContainingDocument(), e));
+//        }
     }
 
     public String[] getObserversStaticIds() {

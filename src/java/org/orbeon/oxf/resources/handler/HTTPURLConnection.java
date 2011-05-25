@@ -30,6 +30,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -46,6 +47,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
 
+import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +56,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
@@ -62,7 +65,8 @@ public class HTTPURLConnection extends URLConnection {
     public static String SO_TIMEOUT_PROPERTY = "oxf.http.so-timeout";
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
-    public static String PROXY_TLS_PROPERTY = "oxf.http.proxy.use-tls";
+    public static String SSL_HOSTNAME_VERIFIER = "oxf.http.ssl.hostname-verifier";
+    public static String PROXY_SSL_PROPERTY = "oxf.http.proxy.use-ssl";
 	public static String PROXY_USERNAME_PROPERTY = "oxf.http.proxy.username";
 	public static String PROXY_PASSWORD_PROPERTY = "oxf.http.proxy.password";
 	public static String PROXY_NTLM_HOST_PROPERTY = "oxf.http.proxy.ntlm.host";
@@ -73,6 +77,7 @@ public class HTTPURLConnection extends URLConnection {
     private static HttpParams httpParams;
     private static PreemptiveAuthHttpRequestInterceptor preemptiveAuthHttpRequestInterceptor = new PreemptiveAuthHttpRequestInterceptor();
     private static AuthState proxyAuthState = null;
+
     static {
         final BasicHttpParams basicHttpParams = new BasicHttpParams();
         // Remove limit on the number of connections per host
@@ -86,17 +91,26 @@ public class HTTPURLConnection extends URLConnection {
         paramBean.setStaleCheckingEnabled(propertySet.getBoolean(STALE_CHECKING_ENABLED_PROPERTY, true));
         paramBean.setSocketBufferSize(propertySet.getInteger(SO_TIMEOUT_PROPERTY, 0));
 
+        // Create SSL hostname verifier
+        String hostnameVerifierProperty = propertySet.getString(SSL_HOSTNAME_VERIFIER, "strict");
+        X509HostnameVerifier hostnameVerifier =
+                  "browser-compatible".equals(hostnameVerifierProperty) ? SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
+                : "allow-all".equals(hostnameVerifierProperty) ? SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+                : SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+
         // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+        sslSocketFactory.setHostnameVerifier(hostnameVerifier);
+        schemeRegistry.register(new Scheme("https", sslSocketFactory, 443));
         connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);
 
         // Set proxy if defined in properties
         final String proxyHost = Properties.instance().getPropertySet().getString(PROXY_HOST_PROPERTY);
         final Integer proxyPort = Properties.instance().getPropertySet().getInteger(PROXY_PORT_PROPERTY);
         if (proxyHost != null && proxyPort != null) {
-            final boolean useTLS = Properties.instance().getPropertySet().getBoolean(PROXY_TLS_PROPERTY, false);
+            final boolean useTLS = Properties.instance().getPropertySet().getBoolean(PROXY_SSL_PROPERTY, false);
             basicHttpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, new HttpHost(proxyHost, proxyPort, useTLS ? "https" : "http"));
 
             // Proxy authentication

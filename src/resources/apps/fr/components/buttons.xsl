@@ -79,18 +79,10 @@
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="xxforms:instance('errors-state')/submitted">true</xforms:setvalue>
-                <xforms:action if="not(property('xxforms:noscript'))">
-                    <!-- Open confirmation dialog -->
-                    <xxforms:show dialog="fr-clear-confirm-dialog"/>
-                </xforms:action>
-                <xforms:action if="property('xxforms:noscript')">
-                    <!-- Restore directly -->
-                    <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
-                    <!-- Perform refresh (fr-clear sets RRR flags already) so that after that we can clear error summary -->
-                    <xforms:refresh/>
-                    <!-- Clear error summary -->
-                    <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
-                </xforms:action>
+                <!-- Open confirmation dialog -->
+                <xxforms:show if="not(property('xxforms:noscript'))" dialog="fr-clear-confirm-dialog"/>
+                <!-- Restore directly -->
+                <xforms:dispatch if="property('xxforms:noscript')" name="fr-clear" targetid="fr-persistence-model"/>
             </xforms:action>
         </fr:button>
     </xsl:template>

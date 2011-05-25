@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -126,6 +125,11 @@
                         <xsl:copy-of select="$section-data"/>
                     </xforms:instance>
 
+                    <!-- Template -->
+                    <xforms:instance id="fr-form-template">
+                        <xsl:copy-of select="$section-data"/>
+                    </xforms:instance>
+
                     <!-- Section constraints -->
                     <xforms:bind>
                         <xsl:copy-of select="$section-bind/xforms:bind"/>
@@ -167,31 +171,32 @@
                     <!-- Inner group -->
                     <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
                         <!-- Variable pointing to external node -->
-                        <xxforms:variable name="result" as="node()?">
+                        <xxforms:variable id="binding" name="binding" as="node()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
+                        
+                        <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
+                            <!-- Section becomes visible OR binding changes -->
+                            <xforms:action>
+                                <xforms:action if="$binding/*">
+                                    <!-- There are already some nodes, copy them in. This handles the case where existing
+                                         external data must be loaded in, for example when editing a form. -->
+                                    <xforms:delete nodeset="instance()/*"/>
+                                    <xforms:insert context="instance()" origin="$binding/*"/>
+                                </xforms:action>
+                                <xforms:action if="not($binding/*)">
+                                    <!-- No nodes, copy template out. This handles the case where there is not yet existing
+                                         external data. -->
+                                    <xforms:insert context="$binding" origin="instance('fr-form-template')/*"/>
+                                    <xforms:insert context="instance()" origin="instance('fr-form-template')/*"/>
+                                </xforms:action>
+                            </xforms:action>
+                        </xforms:action>
 
                         <!-- Expose internally a variable pointing to Form Runner resources -->
                         <xxforms:variable name="fr-resources" as="element()?">
                             <xxforms:sequence select="$fr-resources" xxbl:scope="outer"/>
                         </xxforms:variable>
-
-                        <xforms:group appearance="xxforms:internal" ref="$result">
-                            <xforms:action ev:event="xforms-enabled">
-                                <!-- Section becomes visible -->
-                                <xforms:action>
-                                    <xforms:action if="$result/*">
-                                        <!-- There are already some nodes, copy them in -->
-                                        <xforms:delete nodeset="instance()/*"/>
-                                        <xforms:insert context="instance()" origin="$result/*"/>
-                                    </xforms:action>
-                                    <xforms:action if="not($result/*)">
-                                        <!-- No nodes, copy template out -->
-                                        <xforms:insert context="$result" origin="instance()/*"/>
-                                    </xforms:action>
-                                </xforms:action>
-                            </xforms:action>
-                        </xforms:group>
 
                         <!-- Try to match the current form language, or use the first language available if not found -->
                         <xxforms:variable name="form-resources"
@@ -201,8 +206,8 @@
                             <!-- Synchronize data with external world upon local value change -->
                             <!-- This assumes the element QName match, or the value is not copied -->
                             <xforms:action ev:event="xforms-value-changed">
-                                <xxforms:variable name="binding" select="event('xxforms:binding')" as="element()"/>
-                                <xforms:setvalue ref="$result/*[resolve-QName(name(), .) = resolve-QName(name($binding), $binding)]" value="$binding"/>
+                                <xxforms:variable name="source-binding" select="event('xxforms:binding')" as="element()"/>
+                                <xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
                             </xforms:action>
 
                             <!-- Copy grids within section -->

@@ -41,12 +41,9 @@
                     <xforms:action ev:event="DOMActivate">
                         <!-- Restore instance -->
                         <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
-                        <!-- Perform refresh (fr-clear sets RRR flags already) so that after that we can clear error summary -->
-                        <xforms:refresh/>
-                        <!-- Clear error summary -->
-                        <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
-
+                        <!-- Close this dialog -->
                         <xxforms:hide dialog="fr-submission-result-dialog"/>
+                        <!-- Make sure a new document id is created -->
                         <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
                     </xforms:action>
                 </fr:button>

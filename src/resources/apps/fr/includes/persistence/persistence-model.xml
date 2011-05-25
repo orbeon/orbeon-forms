@@ -139,6 +139,12 @@
         <xforms:insert if="not($instance-element/@src)" nodeset="xxforms:instance('fr-form-instance')" origin="$instance-element/*"/>
         <!-- Case of @src template -->
         <xforms:insert if="$instance-element/@src" nodeset="xxforms:instance('fr-form-instance')" origin="doc($instance-element/@src)"/>
+
+        <!-- Perform refresh (above sets RRR flags already) so that after that we can clear error summary -->
+        <xforms:refresh/>
+
+        <!-- Clear error summary -->
+        <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
     </xforms:action>
 
     <!-- New document operation -->

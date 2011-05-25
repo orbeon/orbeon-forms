@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -58,6 +58,10 @@
     <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-ajax-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
+    <xsl:variable name="hide-logo" select="pipeline:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/> 
+    <xsl:variable name="hide-header" select="pipeline:property(string-join(('oxf.fr.detail.hide-header', $app, $form), '.'))" as="xs:boolean?"/> 
+    <xsl:variable name="hide-top" select="pipeline:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/> 
+    <xsl:variable name="hide-buttons-bar" select="pipeline:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/> 
     <xsl:variable name="css-uri" select="tokenize(normalize-space(pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s+')" as="xs:string*"/>
@@ -71,6 +75,9 @@
     <xsl:variable name="error-summary-top" select="normalize-space($error-summary) = ('top', 'both')" as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
 
+    <xsl:variable name="is-rendered" select="doc('input:request')/request/request-path = '/xforms-renderer'" as="xs:boolean"/> 
+    <xsl:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(doc('input:request')/request/request-uri, '/xforms-renderer') else ''" as="xs:string"/> 
+    
     <xsl:template match="/xhtml:html">
         <!-- Handle document language -->
         <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
@@ -208,6 +215,8 @@
             <!--</xforms:action>-->
 
         <!--</xforms:model>-->
+        
+        <xxforms:variable name="url-base-for-requests" select="'{$url-base-for-requests}'"/> 
 
         <!-- This model handles roles and permissions -->
         <xi:include href="oxf:/apps/fr/includes/roles-model.xml" xxi:omit-xml-base="true"/>
@@ -274,6 +283,20 @@
             <!-- This model handles Alfresco integration -->
             <xi:include href="oxf:/apps/fr/alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>
         </xsl:if>
+        
+        <!-- This model supports Form Runner rendered through the xforms-renderer --> 
+        <xforms:model id="fr-xforms-renderer-model"> 
+            <xforms:instance id="fr-xforms-renderer-instance"> 
+                <xforms-renderer> 
+                    <is-rendered> 
+                        <xsl:value-of select="$is-rendered"/> 
+                    </is-rendered> 
+                    <url-base-for-requests> 
+                        <xsl:value-of select="$url-base-for-requests"/> 
+                    </url-base-for-requests> 
+                </xforms-renderer> 
+            </xforms:instance> 
+        </xforms:model> 
 
         <!-- Copy and annotate existing main model -->
         <xsl:copy>

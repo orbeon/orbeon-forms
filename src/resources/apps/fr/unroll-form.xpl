@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+    Copyright (C) 2011 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -58,6 +58,8 @@
         <p:input name="config">
             <config>
                 <include>/request/parameters/parameter[starts-with(name, 'fr-noscript')]</include>
+                <include>/request/request-path</include>
+                <include>/request/request-uri</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>

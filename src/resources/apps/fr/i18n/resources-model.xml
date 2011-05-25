@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -40,7 +40,7 @@
     <xforms:instance id="fr-fr-resources"><dummy/></xforms:instance>
     <xforms:submission id="fr-get-fr-resources"
             serialization="none" method="get"
-            resource="/fr/service/i18n/fr-resources/{xxforms:instance('fr-parameters-instance')/app}/{xxforms:instance('fr-parameters-instance')/form}" 
+            resource="{xxforms:instance('fr-xforms-renderer-instance')/url-base-for-requests}/fr/service/i18n/fr-resources/{xxforms:instance('fr-parameters-instance')/app}/{xxforms:instance('fr-parameters-instance')/form}" 
             replace="instance" instance="fr-fr-resources" xxforms:readonly="true" xxforms:cache="true"/>
 
     <!-- Instance containing all the ISO 639-1 languages -->
@@ -113,6 +113,9 @@
                          value="xxforms:property(string-join(('oxf.fr.default-language', xxforms:instance('fr-parameters-instance')/app, xxforms:instance('fr-parameters-instance')/form), '.'))"/>
         <xforms:message level="xxforms:log-debug">Getting default language: <xforms:output value="instance('fr-default-language-instance')"/></xforms:message>
         <!-- Load all FR resources -->
+        <!--    <xxforms:variable name="is-rendered" select="xxforms:get-request-header('request-path') = '/xforms-renderer'" as="xs:boolean"/>
+            <xxforms:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(xxforms:get-request-header('request-uri'), '/xforms-renderer') else ''" as="xs:boolean"/>
+        -->
         <xforms:send submission="fr-get-fr-resources"/>
         <!-- Get initial resources for current language (will also save current language into the session) -->
         <xforms:dispatch name="fr-update-language" target="fr-resources-model"/>

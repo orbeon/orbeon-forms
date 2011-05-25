@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -44,7 +44,9 @@
         </xforms:action>
 
         <!-- Load current form configuration -->
-        <xxforms:variable name="source-form" select="xxforms:get-request-attribute('fr-form-definition')"/>
+        <xxforms:variable name="source-form" select="if (exists(xxforms:get-request-attribute('fr-form-definition'))) 
+                                                        then xxforms:get-request-attribute('fr-form-definition') 
+                                                        else xxforms:get-request-attribute('oxf.xforms.renderer.document')"/> 
         <xforms:action if="exists($source-form)">
             <!-- Got it from the request -->
             <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>

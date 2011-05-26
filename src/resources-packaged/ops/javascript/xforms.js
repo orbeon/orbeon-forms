@@ -3442,7 +3442,7 @@ ORBEON.xforms.Events = {
             for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
                 var position = positions[positionIndex];
                 currentLevel = currentLevel[position + increment];
-                increment = 3;
+                increment = 2;
             }
 
             // Send value change to server

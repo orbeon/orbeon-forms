@@ -62,14 +62,6 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- If the field is a checkbox, add "[]", remove it. This is to support PHP-based proxies, which might add the brackets. -->
-    <xsl:template match="xhtml:input[@type = 'checkbox']">
-        <xsl:copy>
-            <xsl:attribute name="name" select="concat(@name, '[]')"/>
-            <xsl:apply-templates select="@* except @name | node()"/>
-        </xsl:copy>
-    </xsl:template>
-
     <!-- Simply copy everything that's not matched -->
     <xsl:template match="@*|node()" priority="-2">
         <xsl:copy>

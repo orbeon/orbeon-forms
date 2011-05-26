@@ -25,7 +25,9 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -394,7 +396,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final int[] newIndexes = findNodeIndexes(oldRepeatItems, newRepeatNodeset);
 
             // Remove control information for iterations that move or just disappear
-            final List oldChildren = getChildren();
+            final List<XFormsControl> oldChildren = getChildren();
 
             for (int i = 0; i < newIndexes.length; i++) {
                 final int currentNewIndex = newIndexes[i];

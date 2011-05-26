@@ -528,7 +528,7 @@
                     <!-- Send PDF data if requested -->
                     <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
                         <!-- Get URI of PDF data -->
-                        <xxforms:variable name="pdf-uri" select="pipeline:rewriteServiceURI(instance('fr-workflow-confirmation-instance'), true())" as="xs:anyURI"/>
+                        <xxforms:variable name="pdf-uri" select="pipeline:rewriteServiceURI(instance('fr-workflow-send-instance'), true())" as="xs:anyURI"/>
 
                         <!-- Send everything to Alfresco -->
                         <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
@@ -562,7 +562,7 @@
 
             <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
                 <!-- Navigate to the confirmation page -->
-                <xforms:send if="$is-send-navigate" submission="fr-workflow-confirmation-submission"/>
+                <xforms:send if="$is-send-navigate" submission="fr-workflow-send-submission"/>
             </xforms:action>
         </xforms:action>
 
@@ -577,11 +577,12 @@
 
     <!-- NOTE: keep non-relevant fields for now, as this is what's done for save/update. Should probably be configurable by the form author. -->
     <!-- TODO: possibly: pass app/form name, e.g.: resource="{$workflow-success-uri}?fr-app={$app}&amp;fr-form={$form}" -->
-    <xforms:submission id="fr-workflow-confirmation-submission"
+    <xforms:submission id="fr-workflow-send-submission"
         resource="{$workflow-success-uri}"
-        relevant="false" validate="false" method="{$workflow-success-method}"
+        relevant="{xxforms:property(string-join(('oxf.fr.detail.send.success.prune', $app, $form), '.'))}"
+        validate="false" method="{$workflow-success-method}"
         serialization="{if ($workflow-success-method = 'get') then 'none' else 'application/xml'}"
-        ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
+        ref="if (instance('fr-workflow-send-instance') != '') then instance('fr-workflow-send-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
 
     <!-- Send to error page -->
@@ -594,7 +595,7 @@
         resource="{$workflow-error-uri}"
         relevant="false" validate="false" method="{$workflow-error-method}"
         serialization="{if ($workflow-error-method = 'get') then 'none' else 'application/xml'}"
-        ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
+        ref="if (instance('fr-workflow-send-instance') != '') then instance('fr-workflow-send-instance') else xxforms:instance('fr-form-instance')"
         replace="all"/>
 
     <!-- Call email service -->
@@ -606,9 +607,9 @@
     <xforms:submission id="fr-pdf-service-submission"
         resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxforms:instance('fr-language-instance')}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
         relevant="false" validate="false" method="post" ref="xxforms:instance('fr-form-instance')"
-        replace="instance" instance="fr-workflow-confirmation-instance"/>
+        replace="instance" instance="fr-workflow-send-instance"/>
 
-    <xforms:instance id="fr-workflow-confirmation-instance">
+    <xforms:instance id="fr-workflow-send-instance">
         <uri/>
     </xforms:instance>
 

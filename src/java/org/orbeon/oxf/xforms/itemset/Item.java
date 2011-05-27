@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.itemset;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.QName;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -156,10 +155,12 @@ public class Item implements ItemContainer {
     void visit(ContentHandler contentHandler, ItemsetListener listener) throws SAXException {
         if (hasChildren()) {
             listener.startLevel(contentHandler, this);
-            for (final Item item: children) {
-                listener.startItem(contentHandler, item, false);
+            boolean first = true;
+            for (final Item item : children) {
+                listener.startItem(contentHandler, item, first);
                 item.visit(contentHandler, listener);
-                listener.endItem(contentHandler);
+                listener.endItem(contentHandler, item);
+                first = false;
             }
             listener.endLevel(contentHandler);
         }

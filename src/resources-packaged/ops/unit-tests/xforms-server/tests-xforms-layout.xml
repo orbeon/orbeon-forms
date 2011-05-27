@@ -1594,7 +1594,7 @@
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:span id="select-1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-xxforms-tree xforms-initially-hidden">
-                    <xhtml:div id="select-1$$c">[["1","1",{"class":"my-leaf"}],["2","2",{"class":"my-folder"},["2.1","2.1",{"class":"my-leaf"}],["2.2","2.2",{"class":"my-folder"},["2.2.1","2.2.1",{"class":"my-leaf"}],["2.2.2","2.2.2",{"class":"my-folder"},["2.2.2.1","2.2.2.1",{"class":"my-leaf"}],["2.2.2.2","2.2.2.2",{"class":"my-leaf"}]]]]]</xhtml:div>
+                    <xhtml:div id="select-1$$c">[{"label":"1","value":"1","attributes":{"class":"my-leaf"}},{"label":"2","value":"2","attributes":{"class":"my-folder"},"children":[{"label":"2.1","value":"2.1","attributes":{"class":"my-leaf"}},{"label":"2.2","value":"2.2","attributes":{"class":"my-folder"},"children":[{"label":"2.2.1","value":"2.2.1","attributes":{"class":"my-leaf"}},{"label":"2.2.2","value":"2.2.2","attributes":{"class":"my-folder"},"children":[{"label":"2.2.2.1","value":"2.2.2.1","attributes":{"class":"my-leaf"}},{"label":"2.2.2.2","value":"2.2.2.2","attributes":{"class":"my-leaf"}}]}]}]}]</xhtml:div>
                 </xhtml:span>
             </controls>
         </output>

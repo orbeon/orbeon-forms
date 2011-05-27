@@ -112,7 +112,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="select-control" label="Items">1</xxf:control>
-                        <xxf:itemset id="select-control">[["Apple","1"],["Banana","2"],["Orange","3"],["Kiwi","4"]]</xxf:itemset>
+                        <xxf:itemset id="select-control">[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -202,7 +202,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="select-control" label="Items"/>
-                        <xxf:itemset id="select-control">[["Encyclopedia","en1",["Science","sc1"],["Culture","cu1",["Art","ar1"],["Craft","cr1"]]],["Encyclopedia","en2",["Science","sc2"],["Culture","cu2",["Art","ar2"],["Craft","cr2"]]]]</xxf:itemset>
+                        <xxf:itemset id="select-control">[{"label":"Encyclopedia","value":"en1","children":[{"label":"Science","value":"sc1"},{"label":"Culture","value":"cu1","children":[{"label":"Art","value":"ar1"},{"label":"Craft","value":"cr1"}]}]},{"label":"Encyclopedia","value":"en2","children":[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"}]}]}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -384,9 +384,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:itemset id="select-1">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2"],["2.3","2.3",["2.3.1","2.3.1"],["2.3.2","2.3.2",["2.3.3","2.3.3"]]]],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="select-2">[["2","2",["2.1","2.1"],["2.3","2.3",["2.3.1","2.3.1"],["2.3.2","2.3.2",["2.3.3","2.3.3"]]]],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="select-3">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2"],["2.3","",["2.3.2","",["2.three.4","2.three.4"]]]]]</xxf:itemset>
+                        <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:itemset id="select-2">[{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:itemset id="select-3">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","value":"","children":[{"label":"2.3.2","value":"","children":[{"label":"2.three.4","value":"2.three.4"}]}]}]}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -468,7 +468,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:itemset id="select-1">[["1","1"],["2.1","2.1"],["2.2.1","2.2.1"],["2.2.2.1","2.2.2.1"]]</xxf:itemset>
+                        <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2.1","value":"2.1"},{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2.1","value":"2.2.2.1"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -541,7 +541,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:itemset id="select-1">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2",["2.2.1","2.2.1"],["2.2.2","2.2.2",["2.2.2.2","2.2.2.2"]]]]]</xxf:itemset>
+                        <xxf:itemset id="select-1">[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -692,7 +692,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-single" model-id="model">
-                                <result>[["Apple","1"],["Banana","2"],["Orange","3"],["Kiwi","4"]]</result>
+                                <result>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</result>
                             </instance>
                             <instance id="xml-result-multiple" model-id="model">
                                 <itemset>
@@ -717,7 +717,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-multiple" model-id="model">
-                                <result>[["Apple","1"],["Banana","2"],["Orange","3"],["Kiwi","4"]]</result>
+                                <result>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</result>
                             </instance>
                             <instance id="xml-result-single-selected" model-id="model">
                                 <itemset>
@@ -742,7 +742,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-single-selected" model-id="model">
-                                <result>[["Apple","1"],["Banana","2"],["Orange","3",true],["Kiwi","4"]]</result>
+                                <result>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3","selected":true},{"label":"Kiwi","value":"4"}]</result>
                             </instance>
                             <instance id="xml-result-multiple-selected" model-id="model">
                                 <itemset>
@@ -767,7 +767,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-multiple-selected" model-id="model">
-                                <result>[["Apple","1"],["Banana","2",true],["Orange","3"],["Kiwi","4",true]]</result>
+                                <result>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2","selected":true},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4","selected":true}]</result>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -940,7 +940,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-single" model-id="model">
-                                <result>[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2",["2.2.1","2.2.1"],["2.2.2","2.2.2",["2.2.2.1","2.2.2.1"],["2.2.2.2","2.2.2.2"]]]]]</result>
+                                <result>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.1","value":"2.2.2.1"},{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</result>
                             </instance>
                             <instance id="xml-result-multiple" model-id="model">
                                 <itemset>
@@ -987,7 +987,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-multiple" model-id="model">
-                                <result>[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2",["2.2.1","2.2.1"],["2.2.2","2.2.2",["2.2.2.1","2.2.2.1"],["2.2.2.2","2.2.2.2"]]]]]</result>
+                                <result>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.1","value":"2.2.2.1"},{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</result>
                             </instance>
                             <instance id="xml-result-single-selected" model-id="model">
                                 <itemset>
@@ -1034,7 +1034,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-single-selected" model-id="model">
-                                <result>[["1","1"],["2","2",["2.1","2.1",true],["2.2","2.2",["2.2.1","2.2.1"],["2.2.2","2.2.2",["2.2.2.1","2.2.2.1"],["2.2.2.2","2.2.2.2"]]]]]</result>
+                                <result>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1","selected":true},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1"},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.1","value":"2.2.2.1"},{"label":"2.2.2.2","value":"2.2.2.2"}]}]}]}]</result>
                             </instance>
                             <instance id="xml-result-multiple-selected" model-id="model">
                                 <itemset>
@@ -1081,7 +1081,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-multiple-selected" model-id="model">
-                                <result>[["1","1",true],["2","2",["2.1","2.1"],["2.2","2.2",["2.2.1","2.2.1",true],["2.2.2","2.2.2",["2.2.2.1","2.2.2.1"],["2.2.2.2","2.2.2.2",true]]]]]</result>
+                                <result>[{"label":"1","value":"1","selected":true},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2","children":[{"label":"2.2.1","value":"2.2.1","selected":true},{"label":"2.2.2","value":"2.2.2","children":[{"label":"2.2.2.1","value":"2.2.2.1"},{"label":"2.2.2.2","value":"2.2.2.2","selected":true}]}]}]}]</result>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -1214,7 +1214,7 @@
                                 </itemset>
                             </instance>
                             <instance id="json-result-relevant" model-id="model">
-                                <result>[["Apple","1"],["Banana","2"],["Orange","3"],["Kiwi","4"]]</result>
+                                <result>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</result>
                             </instance>
                             <instance id="xml-result-non-relevant" model-id="model">
                                 <result/>
@@ -1275,7 +1275,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:itemset id="my-select">[["foo","foo"],["bar","bar"],["42","42"]]</xxf:itemset>
+                        <xxf:itemset id="my-select">[{"label":"foo","value":"foo"},{"label":"bar","value":"bar"},{"label":"42","value":"42"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1365,7 +1365,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:itemset id="my-select">[["Apple","1",{"xxforms-open":"false"}],["Banana","2",{"xxforms-open":"true"}],["Orange","3",{"xxforms-open":"false"}],["Kiwi","4",{"xxforms-open":"true"}]]</xxf:itemset>
+                        <xxf:itemset id="my-select">[{"label":"Apple","value":"1","attributes":{"xxforms-open":"false"}},{"label":"Banana","value":"2","attributes":{"xxforms-open":"true"}},{"label":"Orange","value":"3","attributes":{"xxforms-open":"false"}},{"label":"Kiwi","value":"4","attributes":{"xxforms-open":"true"}}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

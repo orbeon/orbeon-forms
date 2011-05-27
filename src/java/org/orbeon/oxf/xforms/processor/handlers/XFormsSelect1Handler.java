@@ -238,7 +238,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 }
 
 
-                                public void endItem(ContentHandler contentHandler) throws SAXException {
+                                public void endItem(ContentHandler contentHandler, Item item) throws SAXException {
                                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
 
                                     groupJustStarted = false;
@@ -321,8 +321,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 }
 
 
-                                public void endItem(ContentHandler contentHandler) throws SAXException {
-                                }
+                                public void endItem(ContentHandler contentHandler, Item item) {}
                             });
                         }
                     }

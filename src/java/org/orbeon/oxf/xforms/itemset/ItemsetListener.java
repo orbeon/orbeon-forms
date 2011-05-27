@@ -23,5 +23,5 @@ public interface ItemsetListener {
     void startLevel(ContentHandler contentHandler, Item item) throws SAXException;
     void endLevel(ContentHandler contentHandler) throws SAXException;
     void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException;
-    void endItem(ContentHandler contentHandler) throws SAXException;
+    void endItem(ContentHandler contentHandler, Item item) throws SAXException;
 }

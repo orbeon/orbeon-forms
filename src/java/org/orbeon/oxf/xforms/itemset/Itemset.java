@@ -79,10 +79,10 @@ public class Itemset implements ItemContainer {
     public void visit(ContentHandler contentHandler, ItemsetListener listener) throws SAXException {
         listener.startLevel(contentHandler, null);
         boolean first = true;
-        for (final Item item: children) {
+        for (final Item item : children) {
             listener.startItem(contentHandler, item, first);
             item.visit(contentHandler, listener);
-            listener.endItem(contentHandler);
+            listener.endItem(contentHandler, item);
             first = false;
         }
         listener.endLevel(contentHandler);
@@ -99,23 +99,26 @@ public class Itemset implements ItemContainer {
         // Produce a JSON fragment with hierarchical information
         if (getChildren().size() > 0) {
             final StringBuilder sb = new StringBuilder(100);
+            // Array of top-level items
             sb.append("[");
             try {
                 visit(null, new ItemsetListener() {
 
-                    public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {}
-                    public void endLevel(ContentHandler contentHandler) throws SAXException {}
+                    public void startLevel(ContentHandler contentHandler, Item item) {}
+                    public void endLevel(ContentHandler contentHandler) {}
 
-                    public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
+                    public void startItem(ContentHandler contentHandler, Item item, boolean first) {
 
                         if (!first)
                             sb.append(',');
-                        sb.append("[");
+
+                        // Start object
+                        sb.append("{");
 
                         // Item label and value
-                        sb.append('"');
+                        sb.append("\"label\":\"");
                         sb.append(item.getExternalJSLabel(locationData));
-                        sb.append("\",\"");
+                        sb.append("\",\"value\":\"");
                         sb.append(item.getExternalJSValue());
                         sb.append('\"');
 
@@ -124,7 +127,7 @@ public class Itemset implements ItemContainer {
                         if (attributes != null && attributes.size() > 0) {
                             final int size = attributes.size();
                             int count = 0;
-                            sb.append(",{");// start map attribute name/value
+                            sb.append(",\"attributes\":{");// start map attribute name/value
                             for (final Map.Entry<QName, String> entry : attributes.entrySet()) {
                                 sb.append('"');
 
@@ -132,9 +135,7 @@ public class Itemset implements ItemContainer {
                                 final String attributeName = getAttributeName(key);
 
                                 sb.append(XFormsUtils.escapeJavaScript(attributeName));
-                                sb.append('"');
-                                sb.append(':');
-                                sb.append('"');
+                                sb.append("\":\"");
                                 sb.append(XFormsUtils.escapeJavaScript(entry.getValue()));
                                 sb.append('"');
                                 if (++count != size)
@@ -150,14 +151,24 @@ public class Itemset implements ItemContainer {
 
                             // NOTE: This is useful e.g. for tree/menu initialization
                             if (itemSelected) {
-                                sb.append(',');
+                                sb.append(",\"selected\":");
                                 sb.append(Boolean.toString(itemSelected));
                             }
                         }
+
+                        // Start array of children items
+                        if (item.hasChildren())
+                            sb.append(",\"children\":[");
                     }
 
-                    public void endItem(ContentHandler contentHandler) throws SAXException {
-                        sb.append("]");
+                    public void endItem(ContentHandler contentHandler, Item item) {
+
+                        // End array of children items
+                        if (item.hasChildren())
+                            sb.append(']');
+
+                        // End object
+                        sb.append("}");
                     }
                 });
             } catch (SAXException e) {
@@ -263,7 +274,7 @@ public class Itemset implements ItemContainer {
                         }
                     }
 
-                    public void endItem(ContentHandler contentHandler) throws SAXException {
+                    public void endItem(ContentHandler contentHandler, Item item) throws SAXException {
                         ch.endElement();
                     }
                 });

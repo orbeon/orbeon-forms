@@ -66,11 +66,11 @@ class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
         assert(getControlExternalValue("checkbox") === "1")
         assert(getControlExternalValue("value-selection") === "1")
-        assert(getItemset("checkbox") === """[["","1"]]""")
+        assert(getItemset("checkbox") === """[{"label":"","value":"1"}]""")
 
         setControlValue("value-selection", "2")
 
         assert(getControlExternalValue("checkbox") === "2")
-        assert(getItemset("checkbox") === """[["","2"]]""")
+        assert(getItemset("checkbox") === """[{"label":"","value":"2"}]""")
     }
 }

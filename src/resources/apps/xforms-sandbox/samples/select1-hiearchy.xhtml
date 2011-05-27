@@ -13,6 +13,7 @@
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
@@ -33,17 +34,11 @@
                 <items>
                     <item label="Encyclopedia">
                         <item label="Science" value="sc1"/>
-                        <item label="Culture">
-                            <item label="Art" value="ar1"/>
-                            <item label="Craft" value="cr1"/>
-                        </item>
+                        <item label="Culture" value="cu1"/>
                     </item>
                     <item label="Encyclopedia">
                         <item label="Science" value="sc2"/>
-                        <item label="Culture">
-                            <item label="Art" value="ar2"/>
-                            <item label="Craft" value="cr2"/>
-                        </item>
+                        <item label="Culture" value="cu2"/>
                     </item>
                 </items>
             </xforms:instance>
@@ -76,6 +71,10 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
+        <fr:button>
+            <xforms:label>Remove first culture</xforms:label>
+            <xforms:delete ev:event="DOMActivate" ref="instance('items-instance')//item[@value = 'cu1']"/>
+        </fr:button>
         <xhtml:p>
             <xforms:select1 ref="value1" appearance="minimal">
                 <xforms:label>Select: </xforms:label>

@@ -1083,20 +1083,21 @@
                                         var itemIndex = 0;
                                         for (var k = 0; k < itemsetTree.length; k++) {
                                             var itemElement = itemsetTree[k];
+
                                             var templateClone = template.cloneNode(true);
                                             spanContainer.appendChild(templateClone);
-                                            templateClone.innerHTML = new String(templateClone.innerHTML).replace(new RegExp("\\$xforms-template-label\\$", "g"), itemElement[0].replace(new RegExp("\\$", "g"), "$$$$"));
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
+                                            templateClone.innerHTML = new String(templateClone.innerHTML).replace(new RegExp("\\$xforms-template-label\\$", "g"), itemElement.label.replace(new RegExp("\\$", "g"), "$$$$"));
+                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement.value);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
-                                            if (! YAHOO.lang.isUndefined(itemElement[2]) && ! YAHOO.lang.isUndefined(itemElement[2]["class"])) {
-                                                templateClone.className += " " + itemElement[2]["class"];
+                                            if (! YAHOO.lang.isUndefined(itemElement.attributes) && ! YAHOO.lang.isUndefined(itemElement.attributes["class"])) {
+                                                templateClone.className += " " + itemElement.attributes["class"];
                                             }
 
                                             // Restore checked state after copy
                                             var inputCheckboxOrRadio = templateClone.getElementsByTagName("input")[0];
-                                            if (valueToChecked[itemElement[1]] == true) {
+                                            if (valueToChecked[itemElement.value] == true) {
                                                 inputCheckboxOrRadio.checked = true;
                                             }
 

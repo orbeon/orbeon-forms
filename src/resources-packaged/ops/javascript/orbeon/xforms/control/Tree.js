@@ -96,39 +96,25 @@
         YD.removeClass(ORBEON.util.Utils.isNewXHTMLLayout() ? container.parentNode : container, "xforms-initially-hidden");
     };
 
-    Tree.prototype.addToTree = function (treeDiv, nameValueArray, treeNode, firstPosition) {
-        for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
-            // Extract information from the first 3 position in the array
-            var childArray = nameValueArray[arrayIndex];
-            var name = childArray[0];
-            var value = childArray[1];
-            var nextPosition = 2;
-            var labelStyle = "ygtvlabel";
-            var selected = false;
-            var expanded = false;
-            for (var optionals = [childArray[2], childArray[3]], optionalIndex = 0; optionalIndex < 2; optionalIndex++) {
-                var optional = optionals[optionalIndex];
-                if (! YAHOO.lang.isUndefined(optional) && ! YAHOO.lang.isArray(optional)) {
-                    // We have an optional field
-                    nextPosition++;
-                    if (YAHOO.lang.isBoolean(optional)) {
-                        // Optional field is boolean telling if this node is selected
-                        selected = optional;
-                    } else {
-                        // Optional field can be an object
-                        if (! YAHOO.lang.isUndefined(optional["class"])) labelStyle += " " + optional["class"];
-                        if (! YAHOO.lang.isUndefined(optional["xxforms-open"])) {
-                            this.itemsetHasOpenAnnotation = true;
-                            expanded = optional["xxforms-open"] == "true";
-                        }
-                    }
-                } else {
-                    // No need to check further
-                    break;
-                }
-            }
+    Tree.prototype.addToTree = function (treeDiv, nodeInfoArray, treeNode) {
+        for (var nodeIndex = 0; nodeIndex < nodeInfoArray.length; nodeIndex++) {
+            var nodeInfo = nodeInfoArray[nodeIndex];
+
+            // Normalize nodeInfo
+            if (YAHOO.lang.isUndefined(nodeInfo.attributes)) nodeInfo.attributes = {};
+            if (YAHOO.lang.isUndefined(nodeInfo.selected)) nodeInfo.selected = false;
+            if (YAHOO.lang.isUndefined(nodeInfo.children)) nodeInfo.children = [];
+
             // Create node and add to tree
-            var nodeInformation = { label: name, value: value, labelStyle: labelStyle, renderHidden: true };
+            var nodeInformation = {
+                label: nodeInfo.label,
+                value: nodeInfo.value,
+                labelStyle: "ygtvlabel" + nodeInfo.attributes["class"] ? " " + nodeInfo.attributes["class"] : "",
+                renderHidden: true
+            };
+            // Remember we have seen information about open nodes
+            if (! YAHOO.lang.isUndefined(nodeInfo.attributes["xxforms-open"])) this.itemsetHasOpenAnnotation = true;
+            var expanded = nodeInfo.attributes["xxforms-open"] == "true";
             /** @type {YAHOO.widget.Node} */ var childNode;
             if (treeDiv.xformsAllowMultipleSelection) {
                 childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, expanded);
@@ -136,11 +122,11 @@
             } else {
                 childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, expanded);
             }
-            this.addToTree(treeDiv, childArray, childNode, nextPosition);
+            this.addToTree(treeDiv, nodeInfo.children, childNode);
             // Add this value to the list if selected
-            if (selected) {
+            if (nodeInfo.selected) {
                 if (treeDiv.value != "") treeDiv.value += " ";
-                treeDiv.value += value;
+                treeDiv.value += nodeInfo.value;
             }
         }
     };
@@ -148,7 +134,7 @@
     Tree.prototype.initTreeDivFromArray = function(treeDiv, yuiTree, treeArray) {
         // Populate the tree
         var treeRoot = yuiTree.getRoot();
-        this.addToTree(treeDiv, treeArray, treeRoot, 0);
+        this.addToTree(treeDiv, treeArray, treeRoot);
         // For select tree, check the node that are selected
         if (treeDiv.xformsAllowMultipleSelection) {
             var values = treeDiv.value.split(" ");

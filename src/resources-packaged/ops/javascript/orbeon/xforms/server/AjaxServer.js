@@ -1000,32 +1000,27 @@
                                         var sb = new Array();
                                         for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++) {
                                             var itemElement = itemsetTree[topIndex];
-                                            var itemElementIndex = 0;
-                                            var label = itemElement[itemElementIndex++];
-                                            var value = itemElement[itemElementIndex++];
                                             var clazz = null;
-                                            if (! YAHOO.lang.isUndefined(itemElement[itemElementIndex]) && ! YAHOO.lang.isArray(itemElement[itemElementIndex])) {
-                                                // We have a property object
-                                                properties = itemElement[itemElementIndex++];
-                                                if (! YAHOO.lang.isUndefined(properties["class"]))
-                                                    clazz = properties["class"];
+                                            if (! YAHOO.lang.isUndefined(itemElement.attributes) && ! YAHOO.lang.isUndefined(itemElement.attributes["class"])) {
+                                                // We have a class property
+                                                clazz = itemElement.attributes["class"];
                                             }
-                                            if (itemElement.length > itemElementIndex) {
+                                            if (! YAHOO.lang.isUndefined(itemElement.children)) {
                                                 // This is an item that contains other elements
-                                                sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(label) + '"'
+                                                sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(itemElement.label) + '"'
                                                     + (clazz != null ? ' class="' + ORBEON.util.String.escapeAttribute(clazz) + '"' : '')
                                                     + '">';
                                                 // Go through options in this optgroup
-                                                while (itemElementIndex < itemElement.length) {
-                                                    var itemElementOption = itemElement[itemElementIndex++];
-                                                    var subItemClazz = ! YAHOO.lang.isUndefined(itemElementOption[2]) && ! YAHOO.lang.isUndefined(itemElementOption[2]["class"])
-                                                        ? itemElementOption[2]["class"] : null;
-                                                    sb[sb.length] = generateOption(itemElementOption[0], itemElementOption[1], subItemClazz, selectedValues);
+                                                for (var childItemIndex = 0; childItemIndex < itemElement.children.length; childItemIndex++) {
+                                                    var itemElementOption = itemElement.children[childItemIndex];
+                                                    var subItemClazz = ! YAHOO.lang.isUndefined(itemElementOption.attributes) && ! YAHOO.lang.isUndefined(itemElementOption.attributes["class"])
+                                                        ? itemElementOption.attributes["class"] : null;
+                                                    sb[sb.length] = generateOption(itemElementOption.label, itemElementOption.value, subItemClazz, selectedValues);
                                                 }
                                                 sb[sb.length] = '</optgroup>';
                                             } else {
                                                 // This item is directly an option
-                                                sb[sb.length] = generateOption(label, value, clazz, selectedValues);
+                                                sb[sb.length] = generateOption(itemElement.label, itemElement.value, clazz, selectedValues);
                                             }
                                         }
 

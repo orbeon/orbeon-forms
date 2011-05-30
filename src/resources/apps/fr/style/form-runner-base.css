@@ -444,7 +444,6 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 
 /* Cell widths */
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
-.fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }
 
 .fr-grid { table-layout: fixed }                            /* All the column must have the same width */
 

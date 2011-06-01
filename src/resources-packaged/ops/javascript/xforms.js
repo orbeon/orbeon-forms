@@ -2349,6 +2349,12 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    isLHHA: function (element) {
+        var lhhaClasses = ["xforms-label", "xforms-help", "xforms-hint", "xforms-alert"];
+        return ORBEON.util.Dom.isElement(element) &&
+            _.any(lhhaClasses, function(clazz) { return YAHOO.util.Dom.hasClass(element, clazz); });
+    },
+
     getAlertMessage: function(control) {
         var alertElement = ORBEON.xforms.Controls._getControlLHHA(control, "alert");
         return alertElement.innerHTML;
@@ -3925,8 +3931,8 @@ ORBEON.xforms.XBL = {
             // Get the top-level element in the HTML DOM corresponding to this control
             var container = target == null || ! YAHOO.util.Dom.inDocument(target, document)
                 ? null
-                : (YAHOO.util.Dom.hasClass(target, "xbl-component") ? target
-                    : YAHOO.util.Dom.getAncestorByClassName(target, "xbl-component"));
+                : (YAHOO.util.Dom.hasClass(target, cssClass) ? target
+                    : YAHOO.util.Dom.getAncestorByClassName(target, cssClass));
 
             // The first time instance() is called for this class, override init() on the class object
             // to make sure that the init method is not called more than once

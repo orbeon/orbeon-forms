@@ -717,22 +717,19 @@
                                     <readonly>false</readonly>
                                     <textfield-value/>
                                     <resource/>
-                                    <get-itemset-target-instance>suggestions-instance</get-itemset-target-instance>
-                                </autocomplete>
+                                    </autocomplete>
                             </instance>
                             <instance id="suggestions-instance" model-id="my-autocomplete$autocomplete-model">
                                 <dummy/>
                             </instance>
-                        <instance id="full-itemset-instance" model-id="my-autocomplete$autocomplete-model">
-                    <dummy/>
-                </instance>
-                </instances>
+                        </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-autocomplete$xf-5" class="fr-autocomplete-container"/>
                         <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
+                        <xxf:control id="my-autocomplete$xf-26$container" class="yui-button yui-push-button fr-autocomplete-show-suggestions-button"/>
                         <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
                         <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$xf-29" class="xbl-fr-autocomplete-max-results-displayed"/>
@@ -746,6 +743,7 @@
                         <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
+                    <xxf:script name="my_autocomplete_xf_26_xf_53_xforms_function" target-id="my-autocomplete$xf-26$trigger" observer-id="my-autocomplete$xf-26$trigger"/>
                     <xxf:setfocus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>

@@ -21,8 +21,8 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
     searchControl: null,        // xforms:input control in which users type
     searchField: null,          // Form field in which users type
     externalValueInput : null,  // xforms:input containing the external value
-    lastSuggestionList: [],     // List is saved so we don't show the same when the Ajax response comes back
     justMadeSelection: false,   // Reset to false when an Ajax response arrives
+    suggestionRequested: false, // Whether users requested the suggestion menu to open by clicking on the button
 
     /**
      * Constructor
@@ -35,17 +35,21 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         YAHOO.util.Dom.generateId(yuiDiv); // Generate ID dynamically as our implementation of XBL doesn't rewrite IDs on HTML
         this.externalValueInput = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-external-value", null, this.container)[0];
 
+        // This is mostly useful for the dynamic and resources cases, but this code is also useful in static mode, allowing us
+        // to open the suggestions in static mode when the button is pressed
+        ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
+            // We are not directly calling this.ajaxResponseProcessed() as this might not anymore correspond to the right element in the DOM
+            YAHOO.xbl.fr.Autocomplete.instance(container).ajaxResponseProcessed();
+        });
+
         // Build data source
         var dataSource;
         if (this.isDynamicItemset()) {
             // If the itemset changes dynamically, update list when we have response to an Ajax request
             dataSource = this.buildNullDataSource();
-            ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
-                // We are not directly calling this.ajaxResponseProcessed() as this might not anymore correspond to the right element in the DOM
-                YAHOO.xbl.fr.Autocomplete.instance(container).ajaxResponseProcessed();
-            });
         } else {
-            // Simply filters on the values in the hidden dropdown
+            // Simply filters on the values in the hidden dropdown; we could do this on Ajax response, but using a data source
+            // allows us to show suggestions faster, without having to wait for the result of the Ajax request
             var autoComplete = this;
             dataSource = new YAHOO.util.FunctionDataSource(function(query) {
                 return autoComplete.getCurrentValues(query);
@@ -112,19 +116,22 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
     ajaxResponseProcessed: function() {
         // Get new list of values
         var query = this.searchField.value;
-        var oldList = this.lastSuggestionList;
         var newList = this.getCurrentValues(query);
 
         var doUpdateSuggestionList =
-            // If the user just selected something before which triggered an Ajax query,
-            // don't show the suggestion list
+            this.suggestionRequested || (
+            // If the user just selected something before which triggered an Ajax query, don't show the suggestion list (why?)
             ! this.justMadeSelection
             // Update the list only of the control has the focus, as updating the list will show the suggestion list
             // and we only want to show the suggestion list if the user happens to be in that field
-            && ORBEON.xforms.Globals.currentFocusControlId == this.searchControl.id;
-        if (doUpdateSuggestionList)
+            && ORBEON.xforms.Globals.currentFocusControlId == this.searchControl.id);
+        if (doUpdateSuggestionList) {
+            // Tell YUI this control has the focus; we set the focus on the input, but the YUI focus handler is sometimes called too late
+            this.yuiAutoComplete._bFocused = true;
             this.yuiAutoComplete._populateList(query, { results: newList }, { query: query });
+        }
         this.justMadeSelection = false;
+        this.suggestionRequested = false;
     },
 
     /**
@@ -176,23 +183,18 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         var select1Container = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-select1", null, this.container)[0];
         var select1Element = ORBEON.util.Dom.getElementByTagName(select1Container, "select");
         var options = select1Element.options;
-        var foundExactMatch = false;
-        if (query != "") {
+
+        if (this.suggestionRequested        // Always build result if asked by users by clicking on button
+                || query != "" ) {          // Don't build result if user deleted everything from the field
             var queryLowerCase = query.toLowerCase();
             var itemsCount = options.length / 2;
             for (var optionIndex = 0; optionIndex < itemsCount; optionIndex++) {
                 var option = options[optionIndex];
                 // We only do filtering for the static itemset mode
-                if (this.isDynamicItemset() || option.value.toLowerCase().indexOf(queryLowerCase) == 0)
+                if (this.isDynamicItemset() || option.value.toLowerCase().indexOf(queryLowerCase) == 0 || query == "")
                     result[result.length] = [ option.value, options[itemsCount + optionIndex].value ];
-                if (option.value == query) foundExactMatch = true;
-
             }
         }
-
-        // If the value in the search field is not in the itemset, set the external value to empty string
-        if (! foundExactMatch)
-            ORBEON.xforms.Document.setValue(this.externalValueInput.id, "");
 
         // If the result only contains one item, and its label is equal to the current value
         // Set the external value to the value of this option
@@ -202,7 +204,6 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
             result = [];
         }
 
-        this.lastSuggestionList = result;
         return result;
     }
 };

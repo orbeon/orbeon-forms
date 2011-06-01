@@ -87,7 +87,7 @@
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
+        <!--<xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>-->
     </xhtml:head>
     <xhtml:body>
 
@@ -128,7 +128,7 @@
                 <xforms:group ref="instance('selected-countries')/static">
                     <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
                     <fr:autocomplete ref="." id="static-autocomplete"
-                                     dynamic-itemset="false" max-results-displayed="4" show-full-itemset-dropdown="true" tabindex="1">
+                                     dynamic-itemset="false" max-results-displayed="4" tabindex="1">
                         <xforms:label>Country code: </xforms:label>
                         <xforms:itemset nodeset="instance('all-countries')/country">
                             <xforms:label ref="name"/>
@@ -173,11 +173,11 @@
                 <xforms:group ref="instance('selected-countries')/dynamic">
                     <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
                     <fr:autocomplete ref="." id="dynamic-autocomplete"
-                                     dynamic-itemset="true" show-full-itemset-dropdown="true">
+                                     dynamic-itemset="true">
                         <!-- React to user searching -->
                         <xforms:action ev:event="fr-search-changed">
                             <xxforms:variable name="search-value" select="event('fr-search-value')"/>
-                            <xxforms:variable name="make-suggestion" select="string-length($search-value) >= 2"/>
+                            <xxforms:variable name="make-suggestion" select="for $l in string-length($search-value) return $l >= 2 or $l = 0"/>
                             <xforms:action if="$make-suggestion">
                                 <!-- Update itemset -->
                                 <xxforms:variable name="make-suggestion" select="string-length() >= 2"/>
@@ -237,7 +237,7 @@
             <xhtml:div>
                 <xforms:group ref="instance('selected-countries')/resource">
                     <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
-                    <fr:autocomplete ref="." id="resource-autocomplete" show-full-itemset-dropdown="true" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
+                    <fr:autocomplete ref="." id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
                         <xforms:label>Country code: </xforms:label>
                         <xforms:itemset nodeset="/countries/country">
                             <xforms:label ref="name"/>

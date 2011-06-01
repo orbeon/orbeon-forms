@@ -33,17 +33,17 @@
     vertical-align: middle;
 }
 
-/* Always show the text field and the button for full list on the same line */
+/* Always show the text field and the button on the same line */
 .xbl-fr-autocomplete .yui-ac { white-space: nowrap }
 
-/* Full itemset button inline, next to the text field */
+/* Button inline, next to the text field */
 .xbl-fr-autocomplete .xbl-fr-select1-button { vertical-align: middle; display: inline-block; *display: inline }
 
-/* Get the input field vertically aligned on the full itemset button */
+/* Get the input field vertically aligned on the button */
 .xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button { vertical-align: middle }
 .xbl-fr-autocomplete input { vertical-align: middle }
 
-/* Hide the text that would otherwise in the full itemset button */
+/* Hide the text that would otherwise show in the button */
 .xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button button {
     width: 22px;
     text-indent: -9999px;
@@ -52,4 +52,9 @@
     padding-right: 15px;
     min-height: inherit;
     height: 1.6em
+}
+
+.xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button,
+.xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button:hover {
+    background: url("../../../ops/yui/button/assets/skins/sam/menu-button-arrow.png") no-repeat right center;
 }

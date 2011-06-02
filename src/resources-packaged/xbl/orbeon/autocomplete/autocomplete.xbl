@@ -86,6 +86,9 @@
                 <!--  This case is tested by the unit test testSetLabelOnXFormsReady, and we'll hopefully soon be able to remove this refresh. -->
                 <xforms:refresh/>
                 <xforms:setvalue ref="textfield-value" value="event('label')"/>
+                <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
+                <xforms:dispatch name="xforms-value-changed" target="search"/>
+                <xforms:dispatch name="update-external-value" target="component-inner-group"/>
                 <xxforms:script id="out-arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
             </xbl:handler>
         </xbl:handlers>
@@ -101,13 +104,16 @@
                         <!-- Inner group -->
                         <xforms:group id="component-inner-group" xxbl:scope="inner">
 
-                            <!-- Local model (declared here instead of in xbl:implementation so we can use XSLT) -->
+                            <!-- - - - - - - - - - - - - - - - - - - LOCAL MODEL - - - - - - - - - - - - - - - - - - -->
+
+                            <!-- NOTE: declared here instead of in xbl:implementation so we can use XSLT -->
                             <xforms:model id="autocomplete-model">
                                 <xforms:instance id="local">
                                     <autocomplete>
                                         <readonly>false</readonly>
                                         <textfield-value/>
                                         <resource/>
+                                        <has-focus>false</has-focus>
                                     </autocomplete>
                                 </xforms:instance>
                                 <xforms:bind ref="textfield-value" readonly="../readonly = 'true'"/>
@@ -120,6 +126,8 @@
                                 </xforms:submission>
                             </xforms:model>
 
+                            <!-- - - - - - - - - - - - - - - - - - - VARIABLES - - - - - - - - - - - - - - - - - - -->
+
                             <!-- Variable pointing to external single-node binding -->
                             <xxforms:variable name="external-value"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable>
                             <xxforms:variable name="local" select="instance('local')"/>
@@ -129,64 +137,100 @@
                             <!-- Mode is either: static, dynamic, resource -->
                             <xxforms:variable name="mode" select="if ($resource-avt != '') then 'resource' else if ($dynamic-itemset-attribute = 'true') then 'dynamic' else 'static'"/>
                             <xxforms:variable name="dynamic-itemset" select="$mode = ('dynamic', 'resource')"/>
-
                             <!-- Declare a variable fr-search-value in outer scope so it can be used in the AVT -->
                             <xxforms:variable name="fr-search-value" xxbl:scope="outer">
                                 <xxforms:sequence select="$local/textfield-value" xxbl:scope="inner"/>
                             </xxforms:variable>
-                            <!-- When the component is initialized or when resources changes, update our internal itemset -->
+                            <!-- Evaluate the resource AVT -->
                             <xsl:if test="exists(@resource)">
                                 <xxforms:variable name="resource" xbl:attr="xbl:text=resource" id="resource-variable">
                                     <xxforms:sequence select="xxforms:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
-                                    <xforms:action ev:event="xforms-value-changed">
-                                        <!-- Save resource in model, as it is used as an AVT by the submission -->
-                                        <xforms:setvalue ref="$local/resource" value="$resource"/>
-                                        <!-- Update itemset based on resource -->
-                                        <xforms:send submission="get-itemset"/>
-                                        <!-- Get sequence of values in the new itemset -->
-                                        <xxforms:variable name="nodeset"><xsl:value-of select="/*/xforms:itemset/@nodeset"/></xxforms:variable>
-                                        <xxforms:variable name="value"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
-                                        <xxforms:variable name="new-values" select="instance('itemset')/saxon:evaluate($nodeset)/saxon:evaluate($value)"/>
-                                        <!-- If the current value is not in the new itemset, set it to blank -->
-                                        <xforms:setvalue if="not($external-value = ($new-values, ''))" ref="$external-value"/>
-                                    </xforms:action>
                                 </xxforms:variable>
                             </xsl:if>
+
+                            <!-- - - - - - - - - - - - - - - - - - - FUNCTIONS - - - - - - - - - - - - - - - - - - -->
+
+                            <!-- Look for value based on label and update external value (e.g. on tab out) -->
+                            <xforms:action ev:event="update-external-value">
+                                <xxforms:variable name="value" select="xxforms:element('value')"/>
+                                <xforms:dispatch name="get-value-from-itemset" target="component-inner-group"><xxforms:context name="fr-value" select="$value"/></xforms:dispatch>
+                                <xforms:setvalue ref="$external-value" value="$value"/>
+                                <!-- If no value is found, clear the search field -->
+                                <xforms:setvalue if="$value = ''" ref="$local/textfield-value"/>
+                            </xforms:action>
+                            <xforms:action ev:event="get-label-from-itemset">
+                                <xxforms:variable name="label" select="event('fr-label')"/>
+                                <xxforms:variable name="select1-items" select="xxforms:itemset('select1', 'xml')//item"/>
+                                <xxforms:variable name="select1-labels" select="($select1-items/value)[position() le count($select1-items) div 2]"/>
+                                <xxforms:variable name="select1-values" select="($select1-items/value)[position() gt count($select1-items) div 2]"/>
+                                <xforms:setvalue ref="$label" value="$select1-labels[index-of($select1-values, $external-value)[1]]"/>
+                            </xforms:action>
+                            <xforms:action ev:event="get-value-from-itemset">
+                                <xxforms:variable name="value" select="event('fr-value')"/>
+                                <xforms:refresh/> <!-- So the itemset we get from the select1 is up-to-date -->
+                                <xxforms:variable name="select1-items" select="xxforms:itemset('select1', 'xml')//item"/>
+                                <xxforms:variable name="select1-labels" select="($select1-items/value)[position() le count($select1-items) div 2]"/>
+                                <xxforms:variable name="select1-values" select="($select1-items/value)[position() gt count($select1-items) div 2]"/>
+                                <xforms:setvalue ref="$value" value="$select1-values[index-of($select1-labels, $local/textfield-value)[1]]"/>
+                            </xforms:action>
+
+                            <!-- - - - - - - - - - - - - - - - - - - EVENTS - - - - - - - - - - - - - - - - - - -->
 
                             <!-- Init event -->
                             <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
                                 <xxforms:script id="init">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
                             </xforms:action>
+                            <!-- For resource mode: when the component is initialized or when resources changes, update our internal itemset -->
+                            <xsl:if test="exists(@resource)">
+                                <xforms:action ev:event="xforms-value-changed" ev:observer="resource-variable">
+                                    <!-- Save resource in model, as it is used as an AVT by the submission -->
+                                    <xforms:setvalue ref="$local/resource" value="$resource"/>
+                                    <!-- Update itemset based on resource -->
+                                    <xforms:send submission="get-itemset"/>
+                                </xforms:action>
+                            </xsl:if>
+                            <!-- Forward focus event and keep track of whether we have the focus -->
+                            <xforms:action ev:event="DOMFocusIn" ev:observer="search">
+                                <xforms:dispatch name="DOMFocusIn" target="fr-autocomplete"/>
+                                <xforms:setvalue ref="$local/has-focus">true</xforms:setvalue>
+                            </xforms:action>
+                            <xforms:action ev:event="DOMFocusOut" ev:observer="search">
+                                <xforms:dispatch name="DOMFocusOut" target="fr-autocomplete"/>
+                                <xforms:setvalue ref="$local/has-focus">false</xforms:setvalue>
+                                <xforms:dispatch name="update-external-value" target="component-inner-group"/>
+                            </xforms:action>
+                            <!-- As the user types, dispatch event to notify the external world about the value entered by the user so far -->
+                            <xforms:action ev:event="xforms-value-changed" ev:observer="search" if="$dynamic-itemset">
+                                <xforms:dispatch targetid="fr-autocomplete" name="fr-search-changed">
+                                    <xxforms:context name="fr-search-value" select="$local/textfield-value"/>
+                                </xforms:dispatch>
+                            </xforms:action>
+                            <xsl:if test="not(@show-suggestions-button = 'false')">
+                                <!-- Clicking on the button is a way to open the suggestion list without having to type something -->
+                                <xforms:action ev:event="DOMActivate" ev:observer="show-suggestions-button">
+                                    <xforms:setfocus control="search"/>
+                                    <xforms:dispatch target="resource-variable" name="xforms-value-changed"/>
+                                    <xxforms:script id="sr">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxforms:script>
+                                </xforms:action>
+                            </xsl:if>
+                            <!-- In static mode, when the external value changes, search for an item with that value, and set search value to the item's label -->
+                            <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="external-value" if="not($dynamic-itemset)">
+                                <xxforms:variable name="select1-current-label" select="xxforms:element('label')"/>
+                                <xforms:dispatch name="get-label-from-itemset" target="component-inner-group"><xxforms:context name="fr-label" select="$select1-current-label"/></xforms:dispatch>
+                                <xforms:setvalue ref="$local/textfield-value" value="$select1-current-label"/>
+                            </xforms:action>
+                            <!-- For the dynamic and resource mode, just reset the search field if the external value becomes empty -->
+                            <xforms:setvalue ev:event="xforms-value-changed" ev:observer="external-value" if="$dynamic-itemset and $external-value = ''" ref="$local/textfield-value"/>
+
+                            <!-- - - - - - - - - - - - - - - - - - - MARKUP - - - - - - - - - - - - - - - - - - -->
 
                             <!-- Markup with input for the YUI autocomplete -->
                             <xhtml:div xbl:attr="class style">
-                                <xforms:input id="search" ref="$local/textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
-                                    <!-- Forward focus event -->
-                                    <xforms:dispatch ev:event="DOMFocusIn" name="DOMFocusIn" target="fr-autocomplete"/>
-                                    <xforms:dispatch ev:event="DOMFocusOut" name="DOMFocusOut" target="fr-autocomplete"/>
-                                    <xforms:action ev:event="xforms-value-changed">
-                                        <!-- If the search value is empty, set the external value to empty as well -->
-                                        <xforms:action if=". = ''">
-                                            <xforms:setvalue ref="$external-value"/>
-                                        </xforms:action>
-                                        <!-- As the user types, dispatch event to notify the external world about the value entered by the user so far -->
-                                        <xforms:action if="$dynamic-itemset">
-                                            <xforms:dispatch targetid="fr-autocomplete" name="fr-search-changed">
-                                                <xxforms:context name="fr-search-value" select="."/>
-                                            </xforms:dispatch>
-                                        </xforms:action>
-                                    </xforms:action>
-                                </xforms:input>
+                                <xforms:input id="search" ref="$local/textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey"/>
                                 <!-- Button that opens the list of suggestions -->
                                 <xsl:if test="not(@show-suggestions-button = 'false')">
-                                    <fr:button class="fr-autocomplete-show-suggestions-button">
+                                    <fr:button class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
                                         <xforms:label/>
-                                        <!-- Clicking on the button is a way to open the suggestion list without having to type something -->
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setfocus control="search"/>
-                                            <xforms:dispatch target="resource-variable" name="xforms-value-changed"/>
-                                            <xxforms:script id="sr">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxforms:script>
-                                        </xforms:action>
                                     </fr:button>
                                 </xsl:if>
                                 <xhtml:div class="fr-autocomplete-yui-div"/>
@@ -206,17 +250,11 @@
                                     <xsl:with-param name="resource-instance" tunnel="yes">suggestions-instance</xsl:with-param>
                                 </xsl:apply-templates>
                             </xforms:select1>
+
                             <!-- Input with external value -->
                             <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
                                 <xforms:setvalue ev:event="xforms-readonly" ref="$local/readonly">true</xforms:setvalue>
                                 <xforms:setvalue ev:event="xforms-readwrite" ref="$local/readonly">false</xforms:setvalue>
-                                <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset)">
-                                    <!-- In static mode, when the external value changes, search for an item with that value, and if found set search value to the item's label -->
-                                    <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
-                                    <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]"/>
-                                    <xxforms:variable name="label" select="$select-items[index-of($values, $external-value)]/label"/>
-                                    <xforms:setvalue if="exists($label)" ref="$local/textfield-value" value="$label"/>
-                                </xforms:action>
                             </xforms:input>
                             <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
                             <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none">

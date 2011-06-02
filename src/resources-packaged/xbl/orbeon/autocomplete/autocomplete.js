@@ -83,7 +83,6 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         var itemValue = args[2][1];
         this.justMadeSelection = true;
         ORBEON.xforms.Document.setValue(this.searchControl.id, itemLabel);
-        ORBEON.xforms.Document.setValue(this.externalValueInput.id, itemValue);
     },
 
     /**
@@ -104,9 +103,6 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
                 if (matchingOptionIndex != -1) return;
                 matchingOptionIndex = optionIndex;
             }
-        }
-        if (matchingOptionIndex != -1) {
-            ORBEON.xforms.Document.setValue(this.externalValueInput.id, options[itemsCount + matchingOptionIndex].value);
         }
     },
 
@@ -196,13 +192,10 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
             }
         }
 
-        // If the result only contains one item, and its label is equal to the current value
+        // If the result only contains one item, and its label is equal to the current value, don't show suggestions
         // Set the external value to the value of this option
-        if (result.length == 1 && result[0][0] == query) {
-            ORBEON.xforms.Document.setValue(this.externalValueInput.id, result[0][1]);
-            // Don't return any suggestion
+        if (result.length == 1 && result[0][0] == query)
             result = [];
-        }
 
         return result;
     }

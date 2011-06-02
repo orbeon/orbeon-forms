@@ -87,7 +87,7 @@
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <!--<xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>-->
+        <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
     </xhtml:head>
     <xhtml:body>
 
@@ -110,6 +110,10 @@
                     <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
                         <xxforms:context name="label" select="'Utopia'"/>
                     </xforms:dispatch>
+                </xforms:trigger> |
+                <xforms:trigger appearance="minimal" id="static-reset">
+                    <xforms:label>Reset</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/static"/>
                 </xforms:trigger> |
                 <xforms:trigger appearance="minimal" id="static-set-to-sz">
                     <xforms:label>Set value to sz</xforms:label>
@@ -160,8 +164,12 @@
                         <xxforms:context name="label" select="'Utopia'"/>
                     </xforms:dispatch>
                 </xforms:trigger> |
+                <xforms:trigger appearance="minimal" id="dynamic-reset">
+                    <xforms:label>Reset</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/dynamic"/>
+                </xforms:trigger> |
                 <xforms:trigger appearance="minimal" id="dynamic-setfocus-outer">
-                    <xforms:label>Set focus</xforms:label>
+                    <xforms:label>Set focus outer</xforms:label>
                     <xforms:setfocus ev:event="DOMActivate" control="dynamic-autocomplete"/>
                 </xforms:trigger> |
                 <xforms:trigger appearance="minimal" id="dynamic-setfocus-inner">
@@ -225,8 +233,12 @@
                         <xxforms:context name="label" select="'Utopia'"/>
                     </xforms:dispatch>
                 </xforms:trigger> |
+                <xforms:trigger appearance="minimal" id="resource-reset">
+                    <xforms:label>Reset</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/resource"/>
+                </xforms:trigger> |
                 <xforms:trigger appearance="minimal" id="resource-setfocus-outer">
-                    <xforms:label>Set focus</xforms:label>
+                    <xforms:label>Set focus outer</xforms:label>
                     <xforms:setfocus ev:event="DOMActivate" control="resource-autocomplete"/>
                 </xforms:trigger> |
                 <xforms:trigger appearance="minimal" id="resource-setfocus-inner">
@@ -248,6 +260,11 @@
                 </xforms:group>
             </xhtml:div>
         </xhtml:fieldset>
+
+        <!-- Invisible label we use to trigger focus out events -->
+        <xforms:input id="focus-input" style="height: 1px; width: 1px; overflow: hidden; display: block">
+            <xforms:label/>
+        </xforms:input>
 
     </xhtml:body>
 </xhtml:html>

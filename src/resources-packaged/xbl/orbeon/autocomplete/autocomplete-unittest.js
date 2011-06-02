@@ -71,6 +71,13 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         /**
+         * Users focusing out of the field will update the external value.
+         */
+        simulateFocusOut: function() {
+            document.getElementById("focus-input").getElementsByTagName("input")[0].focus();
+        },
+
+        /**
          * Checks that the external value is what we expect it to be.
          */
         checkExternalValue: function(staticDynamicResource, expectedValue, message) {
@@ -144,6 +151,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     this.simulateTypeInField(staticDynamicResource, "Switzerland");
+                    this.simulateFocusOut();
                 }, function() {
                     this.checkExternalValue(staticDynamicResource, "sz");
                     continuation.call(this);
@@ -174,6 +182,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     // Set field to be empty
                     this.simulateTypeInField(staticDynamicResource, "");
+                    this.simulateFocusOut();
                 }, function() {
                     // Check the alert is active
                     var control = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
@@ -185,6 +194,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         // Set value to something that will start with the letter "s"
                         this.simulateTypeInField(staticDynamicResource, "Switzerland");
+                        this.simulateFocusOut();
                     }, function() {
                         // Check the alert in inactive
                         YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(container, "xforms-invalid"),
@@ -208,6 +218,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                             // Click on the first US
                             this.simulateClickItem(staticDynamicResource, 0);
+                            this.simulateFocusOut();
                         }, function() {
                             this.checkExternalValue(staticDynamicResource, "us");
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -216,8 +227,11 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                                     // Click on the second US
                                     this.simulateClickItem(staticDynamicResource, 1);
+                                    this.simulateFocusOut();
                                 }, function() {
-                                    this.checkExternalValue(staticDynamicResource, "us2");
+                                    // The value is still 'us', not 'us2', since the XForms code that looks the value up
+                                    // in the itemset only knows the label, not the position of the label
+                                    this.checkExternalValue(staticDynamicResource, "us");
                                     continuation.call(this);
                                 });
                             });
@@ -238,6 +252,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                             // Click on the first Virgin Island
                             this.simulateClickItem(staticDynamicResource, 0);
+                            this.simulateFocusOut();
                         }, function() {
                             this.checkExternalValue(staticDynamicResource, "vq", "1st value (vq) selected when clicking on the 1st item in the list");
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -246,6 +261,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                                     // Click on the second US
                                     this.simulateClickItem(staticDynamicResource, 1);
+                                    this.simulateFocusOut();
                                 }, function() {
                                     this.checkExternalValue(staticDynamicResource, "vq2", "2nd value (vq2) selected when clicking on the 2nd item in the list");
                                     this.checkSearchValue(staticDynamicResource, "Virgin  Islands");
@@ -351,13 +367,29 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
          * Test that the full itemset dropdown can be used to make a selection in the static case.
          */
         testFullItemsetDropdown: function() {
-            var autocompleteDiv = YAHOO.util.Dom.get("static-autocomplete");
-            var select1ButtonDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-select1-button", null, autocompleteDiv)[0];
-            var select1ButtonButton = select1ButtonDiv.getElementsByTagName("button")[0];
-            YAHOO.util.UserAction.click(select1ButtonButton);
-            //select1ButtonButton.click();
-            // This test is incomplete as we need to figure out a way to simulate a click action the button
-            // that shows the drop-down.
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // Start by resetting the field, so the suggestion contains the n first results
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamicResource + "-reset"));
+                }, function() {
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        // Click on the button, which may require something to be done on the server
+                        var autocomplete = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
+                        autocomplete.getElementsByTagName("button")[0].click();
+                    }, function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            // Click on the second item in the list; the search field is populated right away
+                            this.simulateClickItem(staticDynamicResource, 2);
+                            this.checkSearchValue(staticDynamicResource, "Albania", "Search field contains value we clicked on");
+                            this.simulateFocusOut();
+                        }, function() {
+                            // And the external value should now be updated as well
+                            this.checkExternalValue(staticDynamicResource, "al", "External value set based on selected item");
+                            continuation.call(this);
+                        });
+                    });
+                });
+            });
         },
 
         EOO: {}

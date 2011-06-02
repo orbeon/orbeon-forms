@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.action;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -25,6 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.StringValue;
 
 /**
  * Base class for all actions.
@@ -46,7 +49,7 @@ public abstract class XFormsAction {
 
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
-        for (final Element currentContextInfo: Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_CONTEXT_QNAME)) {
+        for (final Element currentContextInfo : Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_CONTEXT_QNAME)) {
 
             // Get and check attributes
             final String name = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, XFormsConstants.NAME_QNAME));
@@ -54,25 +57,31 @@ public abstract class XFormsAction {
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
 
             final String valueOrSelect = VariableAnalysis.valueOrSelectAttribute(currentContextInfo);
-            if (valueOrSelect == null)
-                throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"value\" or \"select\" attribute.");
 
-            // Set context on context element
-            final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
-            contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
+            final SequenceExtent value;
+            if (valueOrSelect == null) {
+                // Literal text
+                value = new SequenceExtent(new Item[] { StringValue.makeStringValue(currentContextInfo.getStringValue()) });
+            } else {
+                // XPath expression
 
-            // Evaluate context parameter
-            final SequenceExtent value = XPathCache.evaluateAsExtent(
-                    actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                    valueOrSelect, actionInterpreter.getNamespaceMappings(currentContextInfo),
-                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                    contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)), null,
-                    (LocationData) currentContextInfo.getData());
+                // Set context on context element
+                final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
+                contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
 
-            contextStack.returnFunctionContext();
+                // Evaluate context parameter
+                value = XPathCache.evaluateAsExtent(
+                        actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
+                        valueOrSelect, actionInterpreter.getNamespaceMappings(currentContextInfo),
+                        contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                        contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)), null,
+                        (LocationData) currentContextInfo.getData());
 
-            // Restore context
-            contextStack.popBinding();
+                contextStack.returnFunctionContext();
+
+                // Restore context
+                contextStack.popBinding();
+            }
 
             event.setAttribute(name, value);
         }

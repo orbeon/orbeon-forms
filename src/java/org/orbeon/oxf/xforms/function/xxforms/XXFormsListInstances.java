@@ -13,11 +13,15 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
@@ -34,7 +38,6 @@ public class XXFormsListInstances extends XFormsFunction {
         final Expression modelIdExpression = argument[0];
         final String modelId = modelIdExpression.evaluateAsString(xpathContext).toString();
 
-        // TODO: This only returns top-level model. Need function for all models.
         final Object object = containingDocument.getObjectByEffectiveId(modelId);
 
         if (object instanceof XFormsModel) {

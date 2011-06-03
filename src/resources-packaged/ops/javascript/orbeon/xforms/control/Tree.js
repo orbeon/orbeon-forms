@@ -60,12 +60,9 @@
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         yuiTree.subscribe("enterKeyPressed", ORBEON.xforms.Events.treeLabelClick);
-        // Click on a label selects the node and expands the sub-tree (but doesn't collapse)
-        yuiTree.subscribe("clickEvent", function(object) {
-            // Return false if already expanded, which cancels the default action which is to expand if collapsed
-            // or collapse if expanded
-            if (object.node.expanded) return false;
-        });
+        // By default clicking on an item expends the tree; we just want that to select the item,
+        // so here we return false to disable the default behavior
+        yuiTree.subscribe("clickEvent", function(object) { return false; });
         if (showToolTip) {
             function addTreeToolTip() {
                 var nodes = yuiTree.getNodesByProperty();

@@ -280,7 +280,8 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
         sb[sb.length] = ' class="' + this.labelStyle + '"';
         sb[sb.length] = ' href="' + this.href + '"';
         sb[sb.length] = ' target="' + this.target + '"';
-        sb[sb.length] = ' onclick="return ' + getNode + '.onLabelClick(' + getNode +')"';
+        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+        sb[sb.length] = ' onclick="' + getNode + '.tree.fireEvent(\'labelClick\',' + getNode +'); return false;"';
         if (this.hasChildren(true)) {
             sb[sb.length] = ' onmouseover="document.getElementById(\'';
             sb[sb.length] = this.getToggleElId() + '\').className=';

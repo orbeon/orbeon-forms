@@ -3623,7 +3623,7 @@ ORBEON.xforms.Events = {
     treeClickFocus: function(control) {
         var isIncremental = YAHOO.util.Dom.hasClass(control, "xforms-incremental");
         if (ORBEON.xforms.Globals.currentFocusControlId != control.id) {// not sure we need to do this test here since focus() may do it anyway
-            // We are comming from another control, simulate a focus on this control
+            // We are coming from another control, simulate a focus on this control
             var focusEvent = { target: control };
             ORBEON.xforms.Events.focus(focusEvent);
         }

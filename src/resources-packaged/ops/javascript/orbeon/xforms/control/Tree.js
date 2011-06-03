@@ -109,7 +109,7 @@
             var nodeInformation = {
                 label: nodeInfo.label,
                 value: nodeInfo.value,
-                labelStyle: "ygtvlabel" + nodeInfo.attributes["class"] ? " " + nodeInfo.attributes["class"] : "",
+                labelStyle: "ygtvlabel" + (nodeInfo.attributes["class"] ? " " + nodeInfo.attributes["class"] : ""),
                 renderHidden: true
             };
             // Remember we have seen information about open nodes

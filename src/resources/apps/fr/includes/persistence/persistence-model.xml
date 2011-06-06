@@ -44,9 +44,9 @@
         </xforms:action>
 
         <!-- Load current form configuration -->
-        <xxforms:variable name="source-form" select="if (exists(xxforms:get-request-attribute('fr-form-definition'))) 
-                                                        then xxforms:get-request-attribute('fr-form-definition') 
-                                                        else xxforms:get-request-attribute('oxf.xforms.renderer.document')"/> 
+        <xxforms:variable name="source-form" select="if (exists(xxforms:get-request-attribute('fr-form-definition')))
+                                                        then xxforms:get-request-attribute('fr-form-definition')
+                                                        else xxforms:get-request-attribute('oxf.xforms.renderer.document')"/>
         <xforms:action if="exists($source-form)">
             <!-- Got it from the request -->
             <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>
@@ -76,6 +76,9 @@
                 <!-- Load document with that id from persistence layer -->
                 <xforms:message level="xxforms:log-debug">Loading document by id from submission: <xforms:output value="$document"/></xforms:message>
                 <xforms:send submission="fr-get-document-submission"/>
+                <!-- After we get the document from the persistence layer, recalculate defaults (and rebuild so the refs in the binds are updated) -->
+                <xforms:rebuild model="fr-form-model"/>
+                <xforms:recalculate xxforms:defaults="true" model="fr-form-model"/>
             </xforms:action>
         </xforms:action>
         <xforms:action if="not($is-document-id-provided)">

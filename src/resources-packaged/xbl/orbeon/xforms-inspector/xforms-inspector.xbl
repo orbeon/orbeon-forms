@@ -146,7 +146,7 @@
                         <!-- Model -->
                         <xxforms:variable name="models" select="instance('inspector-itemset')/model"/>
                         <xforms:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
-                            <fr:autocomplete ref="instance('inspector-instance')/current-model" dynamic-itemset="false" show-full-itemset-dropdown="true">
+                            <xforms:select1 ref="instance('inspector-instance')/current-model" appearance="compact">
                                 <xforms:label>Model: </xforms:label>
                                 <xforms:itemset nodeset="$models">
                                     <xforms:label ref="@id"/>
@@ -155,7 +155,7 @@
                                 <xforms:action ev:event="xforms-value-changed">
                                     <xforms:setvalue ref="instance('inspector-instance')/current-instance"/>
                                 </xforms:action>
-                            </fr:autocomplete>
+                            </xforms:select1>
                         </xforms:group>
                         <xforms:group ref=".[count($models) = 1]" class="fr-xforms-inspector-model">
                             <xforms:output value="instance('inspector-instance')/current-model">
@@ -164,13 +164,13 @@
                         </xforms:group>
                         <!-- Instance -->
                         <xforms:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
-                            <fr:autocomplete ref="instance('inspector-instance')/current-instance" dynamic-itemset="false" show-full-itemset-dropdown="true">
+                            <xforms:select1 ref="instance('inspector-instance')/current-instance" appearance="compact">
                                 <xforms:label>Instance: </xforms:label>
                                 <xforms:itemset nodeset="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
                                     <xforms:label ref="@id"/>
                                     <xforms:value ref="@id"/>
                                 </xforms:itemset>
-                            </fr:autocomplete>
+                            </xforms:select1>
                         </xforms:group>
                         <xforms:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) = 1]" class="fr-xforms-inspector-instance">
                             <xforms:output value="instance('inspector-instance')/current-instance">

@@ -57,8 +57,12 @@
 .xbl-fr-autocomplete .xbl-fr-button .fr-autocomplete-show-suggestions-button button,
 .xbl-fr-autocomplete .xbl-fr-button .fr-autocomplete-show-suggestions-button button:hover {
     background: url("../../../ops/yui/button/assets/skins/sam/menu-button-arrow.png") no-repeat right center;
-    min-height: 5px; height: 5px;                                                                                       /* Override the min-height of 2em set in button.css and leave enough space for the arrow */
-    width: 25px;                                                                                                        /* The padding on the button should be enough, but without specifying a width, IE 7/8 shows
-                                                                                                                           the down arrow too much to the left */
-    vertical-align: middle;                                                                                             /* Center button vertically inside its container span */
+    /* Override the min-height of 2em set in button.css. Ideally, we like to make the button exactly the same height
+       as the text field, but this is a fairly decent approximation */
+    min-height: 1.8em;
+    /* The padding on the button should be enough, but without specifying a width, IE 7/8 shows the down arrow too
+       much to the left */
+    width: 25px;
+    /* Center button vertically inside its container span */
+    vertical-align: middle;
 }

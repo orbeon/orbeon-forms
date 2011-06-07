@@ -209,7 +209,8 @@
                                 <!-- Clicking on the button is a way to open the suggestion list without having to type something -->
                                 <xforms:action ev:event="DOMActivate" ev:observer="show-suggestions-button">
                                     <xforms:setfocus control="search"/>
-                                    <xforms:dispatch target="resource-variable" name="xforms-value-changed"/>
+                                    <xforms:dispatch target="resource-variable" name="xforms-value-changed"/>           <!-- For the resource mode, listening on resource AVT changing -->
+                                    <xforms:dispatch target="search" name="xforms-value-changed"/>                      <!-- For the dynamic mode, listening on the search field content changing -->
                                     <xxforms:script id="sr">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxforms:script>
                                 </xforms:action>
                             </xsl:if>

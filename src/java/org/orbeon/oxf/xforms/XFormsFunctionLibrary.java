@@ -429,7 +429,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // xforms:seconds-from-dateTime(), which is incompatible with the XPath 2.0 version
-        e = register("{" + XFormsConstants.XFORMS_NAMESPACE_URI  + "}seconds-from-dateTime", SecondsFromDateTime.class, 0, 1, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XFORMS_NAMESPACE_URI  + "}seconds-from-dateTime", SecondsFromDateTime.class, 0, 1, 1, BuiltInAtomicType.DECIMAL, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // === XSLT 2.0 function
@@ -486,7 +486,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
             entry = functionTable.get(local);
-        } else if (uri.equals(XFormsConstants.XXFORMS_NAMESPACE_URI) || uri.equals(XFormsConstants.EXFORMS_NAMESPACE_URI)) {
+        } else if (uri.equals(XFormsConstants.XXFORMS_NAMESPACE_URI) || uri.equals(XFormsConstants.EXFORMS_NAMESPACE_URI) || uri.equals(XFormsConstants.XFORMS_NAMESPACE_URI)) {
             entry = functionTable.get("{" + uri + "}" + local);
         } else {
             return null;

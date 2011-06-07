@@ -37,6 +37,7 @@ public class Seconds extends XFormsFunction {
         } catch (XPathException e) {
             return NAN;
         }
+        // TODO: should be a decimal, like xf:seconds-from-dateTime
         return new DoubleValue(getLengthInSeconds(value));
     }
 

@@ -416,17 +416,16 @@
                         requestDocumentString.push(ORBEON.xforms.Document.getFromClientState(formID, "uuid"));
                         requestDocumentString.push('</xxforms:uuid>\n');
 
-                        // Add request sequence number
-                        var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
-
+                        // Increment and send sequence number if we have at least one event which is not a request for upload progress or session heartbeat
+                        // NOTE: Still send the element name even if empty as this is what the schema and server-side code expects
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxforms:sequence>');
-                        requestDocumentString.push(currentSequenceNumber);
+                        if (_.detect(eventsToSend, function(event) { return event.eventName != "xxforms-upload-progress" && event.eventName != "xxforms-session-heartbeat"; })) {
+                            var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
+                            requestDocumentString.push(currentSequenceNumber);
+                            ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
+                        }
                         requestDocumentString.push('</xxforms:sequence>\n');
-
-                        // Increment the sequence number if we have at least one event which is not a request for upload progress
-                        var nonProgressEvent = _.detect(eventsToSend, function(event) { return event.eventName != "xxforms-upload-progress"; });
-                        if (nonProgressEvent) ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
 
                         // Add static state
                         var staticState = ORBEON.xforms.Globals.formStaticState[formID].value;

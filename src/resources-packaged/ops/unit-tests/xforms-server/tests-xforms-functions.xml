@@ -1324,7 +1324,7 @@
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.org">
                 <xhtml:head>
-                    <xhtml:title>7.9.6.a seconds-from-dateTime() function</xhtml:title>
+                    <xhtml:title>7.9.6.a seconds-to-dateTime() function</xhtml:title>
                     <xhtml:link rel="stylesheet" href="/apps/xforms-test-suite/TestSuite11.css" type="text/css"/>
                     <xforms:model>
                         <xforms:instance>
@@ -2037,6 +2037,40 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:seconds-from-dateTime() function" name="oxf:pipeline">
+        <!-- See also: http://forge.ow2.org/tracker/index.php?func=detail&aid=316000&group_id=168&atid=350207 -->
+        <input name="config" href="wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.org">
+                <xhtml:head>
+                    <xhtml:link rel="stylesheet" href="/apps/xforms-test-suite/TestSuite11.css" type="text/css"/>
+                    <xforms:model/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output value="xforms:seconds-from-dateTime('1970-01-01T00:00:00Z')" id="xf-output-1"/>
+                    <xforms:output value="xforms:seconds-from-dateTime('foo')" id="xf-output-2"/>
+                    <xforms:output value="xforms:seconds-from-dateTime('2011-06-05T04:03:02') - xforms:seconds-from-dateTime('2011-05-04T03:02:01')" id="xf-output-3"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-output-1">0</xxf:control>
+                        <xxf:control id="xf-output-2">NaN</xxf:control>
+                        <xxf:control id="xf-output-3">2768461</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

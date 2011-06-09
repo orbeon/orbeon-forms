@@ -734,8 +734,8 @@
                         <xxf:control id="my-autocomplete$show-suggestions-button$container" class="yui-button yui-push-button fr-autocomplete-show-suggestions-button"/>
                         <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
                         <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$xf-63" class="xbl-fr-autocomplete-max-results-displayed"/>
-                        <xxf:attribute id="my-autocomplete$xf-63" for="my-autocomplete$xf-63" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$xf-64" class="xbl-fr-autocomplete-max-results-displayed"/>
+                        <xxf:attribute id="my-autocomplete$xf-64" for="my-autocomplete$xf-64" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
                         <xxf:attribute id="my-autocomplete$select1" for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
                         <xxf:itemset id="my-autocomplete$select1">[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
@@ -745,7 +745,7 @@
                         <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
-                    <xxf:script name="my_autocomplete_show_suggestions_button_xf_83_xforms_function" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
+                    <xxf:script name="my_autocomplete_show_suggestions_button_xf_84_xforms_function" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
                     <xxf:setfocus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>

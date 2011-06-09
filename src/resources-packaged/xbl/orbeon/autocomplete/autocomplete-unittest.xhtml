@@ -88,8 +88,16 @@
         <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
+        <xhtml:style type="text/css">
+            fieldset { margin-top: 2em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+
+        <xforms:trigger appearance="minimal" id="toggle-readonly">
+            <xforms:label>Toggle readonly</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
+        </xforms:trigger>
 
         <xhtml:fieldset>
             <xhtml:legend>Static itemset</xhtml:legend>

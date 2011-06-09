@@ -2082,16 +2082,12 @@ ORBEON.xforms.Controls = {
         if (lhhaElement != null) {
             lhhaElement.innerHTML = message;
             if (message == "") {
-                // Hide LHHA with empty content
-                // NOTE: This makes sense for help, but does it make sense for alert, label, and hint?
-                if (!YAHOO.util.Dom.hasClass(lhhaElement, "xforms-disabled"))
+                if (lhhaType == "help" && !YAHOO.util.Dom.hasClass(lhhaElement, "xforms-disabled")) {
+                    // Hide help with empty content
                     YAHOO.util.Dom.addClass(lhhaElement, "xforms-disabled-subsequent");
-                // If this is the help element, also disable help image
-                if (lhhaType == "help") {
+                    // If this is the help element, also disable help image
                     var helpImage = ORBEON.xforms.Controls._getControlLHHA(control, "help-image");
-                    if (!YAHOO.util.Dom.hasClass(helpImage, "xforms-disabled")) {
-                        YAHOO.util.Dom.addClass(helpImage, "xforms-disabled-subsequent");
-                    }
+                    YAHOO.util.Dom.addClass(helpImage, "xforms-disabled-subsequent");
                 }
             } else {
                 // We show LHHA with non-empty content, but ONLY if the control is relevant

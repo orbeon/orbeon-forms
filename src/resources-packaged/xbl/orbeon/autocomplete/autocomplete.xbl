@@ -82,14 +82,17 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-set-label" phase="target">
-                <!--  HACK: Force a refresh so the setvalue will have an effect in the case where the fr-set-value is sent on xforms-ready. -->
-                <!--  This case is tested by the unit test testSetLabelOnXFormsReady, and we'll hopefully soon be able to remove this refresh. -->
-                <xforms:refresh/>
-                <xforms:setvalue ref="textfield-value" value="event('label')"/>
-                <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
-                <xforms:dispatch name="xforms-value-changed" target="search"/>
-                <xforms:dispatch name="update-external-value" target="component-inner-group"/>
-                <xxforms:script id="out-arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
+                <!-- NOTE: This test won't be necessary anymore once this bug is fixed: http://goo.gl/n8wGO -->
+                <xforms:action if="relevant = 'true'">
+                    <!--  HACK: Force a refresh so the setvalue will have an effect in the case where the fr-set-value is sent on xforms-ready. -->
+                    <!--  This case is tested by the unit test testSetLabelOnXFormsReady, and we'll hopefully soon be able to remove this refresh. -->
+                    <xforms:refresh/>
+                    <xforms:setvalue ref="textfield-value" value="event('label')"/>
+                    <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
+                    <xforms:dispatch name="xforms-value-changed" target="search"/>
+                    <xforms:dispatch name="update-external-value" target="component-inner-group"/>
+                    <xxforms:script id="out-arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
+                </xforms:action>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -110,6 +113,7 @@
                             <xforms:model id="autocomplete-model">
                                 <xforms:instance id="local">
                                     <autocomplete>
+                                        <relevant>false</relevant>
                                         <readonly>false</readonly>
                                         <textfield-value/>
                                         <resource/>
@@ -222,6 +226,11 @@
                             </xforms:action>
                             <!-- For the dynamic and resource mode, just reset the search field if the external value becomes empty -->
                             <xforms:setvalue ev:event="xforms-value-changed" ev:observer="external-value" if="$dynamic-itemset and $external-value = ''" ref="$local/textfield-value"/>
+                            <!-- Keep track of readonlyness and relevance -->
+                            <xforms:setvalue ev:observer="external-value" ev:event="xforms-readonly" ref="$local/readonly">true</xforms:setvalue>
+                            <xforms:setvalue ev:observer="external-value" ev:event="xforms-readwrite" ref="$local/readonly">false</xforms:setvalue>
+                            <xforms:setvalue ev:observer="external-value" ev:event="xforms-enabled" ref="$local/relevant">true</xforms:setvalue>
+                            <xforms:setvalue ev:observer="external-value" ev:event="xforms-disabled" ref="$local/relevant">false</xforms:setvalue>
 
                             <!-- - - - - - - - - - - - - - - - - - - MARKUP - - - - - - - - - - - - - - - - - - -->
 
@@ -254,10 +263,7 @@
                             </xforms:select1>
 
                             <!-- Input with external value -->
-                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
-                                <xforms:setvalue ev:event="xforms-readonly" ref="$local/readonly">true</xforms:setvalue>
-                                <xforms:setvalue ev:event="xforms-readwrite" ref="$local/readonly">false</xforms:setvalue>
-                            </xforms:input>
+                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none"/>
                             <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
                             <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none">
                                 <xforms:label/>

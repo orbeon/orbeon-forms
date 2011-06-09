@@ -49,14 +49,14 @@
 
             <!-- Internal state for this test -->
             <xforms:instance id="selected-countries">
-                <selected-countries readonly="false">
+                <selected-countries readonly="false" relevant="true">
                     <static effective-target-id="">ca</static>
                     <dynamic effective-target-id=""/>
                     <resource effective-target-id=""/>
                 </selected-countries>
             </xforms:instance>
             <!-- Constraint on selected country -->
-            <xforms:bind nodeset="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'"/>
+            <xforms:bind nodeset="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'" relevant="../@relevant = 'true'"/>
 
             <xforms:instance id="configuration">
                 <configuration>
@@ -97,6 +97,10 @@
         <xforms:trigger appearance="minimal" id="toggle-readonly">
             <xforms:label>Toggle readonly</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
+        </xforms:trigger> |
+        <xforms:trigger appearance="minimal" id="toggle-relevant">
+            <xforms:label>Toggle relevant</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
         </xforms:trigger>
 
         <xhtml:fieldset>

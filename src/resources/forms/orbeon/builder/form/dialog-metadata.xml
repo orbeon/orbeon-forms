@@ -23,10 +23,14 @@
 
       id="fb-editor-metadata-dialog" close="false">
 
-    <xforms:label value="$form-resources/messages/metadata-title"/>
-
     <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
     <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
+    <xxforms:variable name="is-save-as" select="instance('fb-metadata-instance')/mode = 'save-as'"/>
+
+    <!-- HACK: Copy expression as we can't use the variable $is-save-as above -->
+    <xforms:label value="if (instance('fb-metadata-instance')/mode = 'save-as')
+                         then $fr-resources/detail/labels/save-as-document
+                         else $form-resources/messages/metadata-title"/>
     <xhtml:div>
         <xforms:group appearance="xxforms:internal" ref="instance('fb-metadata-instance')">
 
@@ -47,11 +51,11 @@
 
             <xhtml:p>
                 <!-- Display message to user -->
-                <xforms:output value="if ($is-new-form)
-                                      then $form-resources/messages/new-metadata-output
+                <xforms:output value="if ($is-new-form) then $form-resources/messages/new-metadata-output
+                                      else if ($is-save-as) then $form-resources/messages/save-as-metadata-output
                                       else $form-resources/messages/edit-metadata-output"/>
             </xhtml:p>
-            <xhtml:img src="/forms/orbeon/builder/images/label_64.png"/>
+            <xhtml:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
             <xhtml:div class="fb-editor-metadata-dialog-fields">
                 <!-- Application name -->
 
@@ -110,6 +114,21 @@
                 <xforms:dispatch name="fr-update-persistence-provider" target="fr-persistence-model"/>
                 <!-- Refresh components -->
                 <xforms:send submission="fb-load-components"/>
+                <!-- Additional handling for save as -->
+                <xforms:action if="$is-save-as">
+                    <!-- Create new document id -->
+                    <xforms:setvalue ref="xxforms:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
+                    <!-- Actually save -->
+                    <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
+                        <xxforms:context name="fr:check-data-valid" select="true()"/>
+                    </xforms:dispatch>
+                    <!-- Change URL to have new document id -->
+                    <xxforms:script>
+                        <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
+                        if (history &amp;&amp; history.replaceState)
+                            history.replaceState(null, "", ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
+                    </xxforms:script>
+                </xforms:action>
                 <!-- Hide this dialog -->
                 <xxforms:hide dialog="fb-editor-metadata-dialog"/>
                 <!-- Redo layout -->

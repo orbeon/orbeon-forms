@@ -147,8 +147,25 @@
                             </fr:button>
                         </xforms:group>
 
-                        <!-- Save form -->
+                        <!-- "Save" from Form Runner -->
                         <fr:save-button/>
+
+                        <!-- Save as -->
+                        <fr:button id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
+                            <xforms:label>
+                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>
+                                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-as-document"/></xhtml:span>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <!-- Reset the app/form name -->
+                                <xforms:setvalue ref="instance('fb-metadata-instance')/application-name"/>
+                                <xforms:setvalue ref="instance('fb-metadata-instance')/form-name"/>
+                                <!-- Show and focus -->
+                                <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'save-as'"/>
+                                <xxforms:show dialog="fb-editor-metadata-dialog"/>
+                            </xforms:action>
+                        </fr:button>
+
                     </xhtml:div>
 
                     <div class="fr-clear"/>

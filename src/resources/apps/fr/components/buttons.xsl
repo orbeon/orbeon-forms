@@ -131,13 +131,27 @@
     </xsl:template>
 
     <xsl:template match="fr:save-button">
+        <!-- Expose document id to JavaScript -->
+        <xforms:output id="fr-parameters-instance-document" ref="xxforms:instance('fr-parameters-instance')/document" style="display: none"/>
         <fr:button id="fr-save-button" xxforms:modal="true" model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
-                <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt=""/>-->
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
             </xforms:label>
         </fr:button>
+        <xxforms:variable name="mode-for-save" select="xxforms:instance('fr-parameters-instance')/mode/string()">
+            <!-- When the mode changes to "edit" after a save from /new -->
+            <xforms:action ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
+                <!-- If URI is /new (it should be), change it to /edit/id -->
+                <xxforms:script ev:event="DOMActivate">
+                    <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
+                    if (history &amp;&amp; history.replaceState) {
+                        if (location.href.lastIndexOf("/new") == location.href.length - 4)
+                            history.replaceState(null, "", "edit/" + ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
+                    }
+                </xxforms:script>
+            </xforms:action>
+        </xxforms:variable>
     </xsl:template>
 
     <xsl:template match="fr:save-locally-button">

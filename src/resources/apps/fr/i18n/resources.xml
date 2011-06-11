@@ -21,7 +21,7 @@
                 <section-name>Section Name</section-name>
             </labels>
         </components>
-        <errors>    
+        <errors>
             <summary-title>Your Form Contains the Following Errors</summary-title>
             <some>Errors on Form</some>
             <none>No Errors on Form</none>
@@ -111,7 +111,8 @@
             </messages>
             <labels>
                 <save-document>Save</save-document>
-                <publish>Publish...</publish>
+                <save-as-document>Save as…</save-as-document>
+                <publish>Publish…</publish>
                 <test>Test</test>
                 <save-locally>Save Locally</save-locally>
                 <save-offline>Save Offline</save-offline>
@@ -272,7 +273,8 @@
             </messages>
             <labels>
                 <save-document>Enregistrer</save-document>
-                <publish>Publier...</publish>
+                <save-as-document>Enregistrer sous…</save-as-document>
+                <publish>Publier…</publish>
                 <test>Tester</test>
                 <save-locally>Enregistrement Local</save-locally>
                 <save-offline>Enregistrement Hors-ligne</save-offline>
@@ -311,7 +313,7 @@
             </labels>
             <view>
                 <explanation>
-                    Ceci est une vue en lecture seule de vos données. 
+                    Ceci est une vue en lecture seule de vos données.
                 </explanation>
             </view>
         </detail>
@@ -433,6 +435,7 @@
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>
+                <save-as-document>[Save as…]</save-as-document>
                 <publish>Publicar...</publish>
                 <test>Probar</test>
                 <save-locally>Guardar en su computador</save-locally>
@@ -595,6 +598,7 @@
             </messages>
             <labels>
                 <save-document>Lagre</save-document>
+                <save-as-document>[Save as…]</save-as-document>
                 <publish>Publiser...</publish>
                 <test>Test</test>
                 <save-locally>Lagre lokalt</save-locally>
@@ -671,7 +675,7 @@
                 <section-name>Название раздела</section-name>
             </labels>
         </components>
-        <errors>    
+        <errors>
             <summary-title>Форма содержит следующие ошибки</summary-title>
             <some>Есть ошибки</some>
             <none>Ошибок нет</none>
@@ -761,6 +765,7 @@
             </messages>
             <labels>
                 <save-document>Сохранить</save-document>
+                <save-as-document>[Save as…]</save-as-document>
                 <publish>Публиковать</publish>
                 <test>Тестировать</test>
                 <save-locally>Сохр.на диск</save-locally>

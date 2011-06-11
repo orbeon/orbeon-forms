@@ -137,6 +137,7 @@
         <!-- Show editor case if mode is not new -->
         <xxforms:variable name="is-new" select="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
         <xforms:action if="$is-new">
+            <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'edit'"/>
             <xxforms:show ev:event="show-fb-editor-create-dialog" dialog="fb-editor-metadata-dialog"/>
         </xforms:action>
         <xforms:action if="not($is-new)">
@@ -206,6 +207,22 @@
             <logo mediatype="image/png" filename="orbeon-logo-trimmed-transparent-30.png" size="">/apps/fr/style/orbeon-logo-trimmed-transparent-30.png</logo>
         </metadata>
     </xforms:instance>
+
+    <!-- Similar to fr-triggers-instance, but for FB-specific buttons -->
+    <xforms:instance id="fb-triggers-instance">
+        <triggers>
+            <save-as/>
+        </triggers>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('fb-triggers-instance')">
+        <!-- Condition for disabling Save as… button -->
+        <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
+        <xforms:bind nodeset="save-as" readonly="xxforms:instance('fr-parameters-instance')/mode != 'edit'" calculate="xxforms:instance('fr-parameters-instance')/mode"/>
+    </xforms:bind>
+
+    <!-- HACK: Bind has inter-model dependency -->
+    <xforms:recalculate ev:event="xxforms-value-changed" ev:observer="fr-parameters-instance"/>
 
     <!-- All form resources -->
     <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
@@ -763,7 +780,7 @@
             <application-name/>
             <form-name/>
             <next-trigger/>
-
+            <mode/> <!-- edit | save-as -->
             <toolbox>
                 <schema/>
                 <css/>

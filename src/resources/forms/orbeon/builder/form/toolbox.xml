@@ -339,6 +339,7 @@
                                             <xforms:setvalue ref="instance('fb-metadata-instance')/form-name"
                                                              value="xxforms:bind('form-name-bind')"/>
                                             <!-- Show and focus -->
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'edit'"/>
                                             <xxforms:show dialog="fb-editor-metadata-dialog"/>
                                         </xforms:action>
                                     </xforms:trigger>

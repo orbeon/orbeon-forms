@@ -342,12 +342,17 @@
 
                 </xforms:action>
 
-                <!-- Handle XML document if there was no submission error -->
-                <xforms:send submission="fr-create-update-submission" if="instance('fr-persistence-instance')/is-error = 'false'">
-                    <xxforms:context name="holder" select="xxforms:instance('fr-form-instance')"/>
-                    <!-- We always store form data as "data.xml" -->
-                    <xxforms:context name="resource" select="'data.xml'"/>
-                </xforms:send>
+                <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                    <!-- Handle XML document -->
+                    <xforms:send submission="fr-create-update-submission" >
+                        <xxforms:context name="holder" select="xxforms:instance('fr-form-instance')"/>
+                        <!-- We always store form data as "data.xml" -->
+                        <xxforms:context name="resource" select="'data.xml'"/>
+                    </xforms:send>
+
+                    <!-- If we were in new mode, now we must be in edit mode -->
+                    <xforms:setvalue ref="$parameters/mode" value="'edit'"/>
+                </xforms:action>
             </xforms:action>
         </xforms:action>
     </xforms:action>

@@ -6285,4 +6285,52 @@
         </output>
     </test>
 
+    <test description="NPE in NodeWrapper.getDocumentNumber()" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315919&group_id=168&atid=350207 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="instance">
+                            <instance>
+                                <deleted>
+                                    <inside>b</inside>
+                                    <inside>a</inside>
+                                </deleted>
+                            </instance>
+                        </xf:instance>
+                        <xxf:variable name="deleted" select="deleted"/>
+                        <xf:action ev:event="xforms-ready">
+                            <!-- NOTE: setindex is needed to cause the NPE upon delete -->
+                            <xf:setindex repeat="my-index" index="2"/>
+                            <xf:delete ref="deleted"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="$deleted/inside" id="my-repeat">
+                        <xf:input ref="." id="my-input"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance> </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

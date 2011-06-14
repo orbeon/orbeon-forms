@@ -37,6 +37,7 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         this.createChart = function() {
             var fusionChart = new FusionCharts(pathToSwf, this.container.id + "-fusion", width, height, "0", "0");
             fusionChart.setDataXML(this.xml);
+            fusionChart.setTransparent(false);
             fusionChart.render(chartDiv.id);
         };
         this.updateChart();

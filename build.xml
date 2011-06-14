@@ -177,15 +177,19 @@
 
             Future version numbers:
 
-            3.8.0.beta      => beta for 3.8.0
-            3.8.0.rc1       => release candidate for 3.8.0
-            3.8.0           => final 3.8.0
-            3.8.0.post      => post 3.8.0
-            3.8.0.stable    => stable branch post 3.8.0
+            3.9.0.pre       => version leading to 3.9.0
+            3.9.0.beta      => beta for 3.9.0
+            3.9.0.rc1       => release candidate 1 for 3.9.0
+            3.9.0           => final 3.9.0
+            3.9.0.post      => post 3.9.0
+            3.9.0+          => post 3.9.0
+            3.9.0+.acme     => post 3.9.0 build for organization "acme"
+            3.9.0+.stable   => post 3.9.0 stable branch, before a 3.9.1 maintenance release
+            3.9.1           => 3.9.1 maintenance release
 
-            Full release number example:
+            Full version number includes a timestamp, e.g.:
 
-            3.8.0.201004010558 => final 3.8.0
+            3.9.0.201105152046
 
             Suffix CE or PE is separate from the version number.
          -->

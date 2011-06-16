@@ -198,6 +198,7 @@ public class OPS {
                     ? "Exception with no location data"
                     : "Exception at " + locationData.toString();
             logger.error(message, throwable);
+            System.exit(1);
         }
     }
 
@@ -209,6 +210,7 @@ public class OPS {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             OXFException.getRootThrowable(e).printStackTrace();
+            System.exit(1);
         }
     }
 }

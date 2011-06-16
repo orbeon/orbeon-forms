@@ -56,10 +56,10 @@
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xforms:group appearance="xxforms:internal" xsl:version="2.0">
-                <xxforms:variable name="binding" as="node()?">
-                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
-                </xxforms:variable>
-                <xforms:group ref="$binding" class="yui-button yui-push-button{if (/fr:button/@class) then concat(' ', /fr:button/@class) else ''}" id="container">
+                <xxforms:variable name="binding" as="node()?"><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xxforms:variable>
+                <xxforms:variable name="class-avt" xxbl:scope="outer" xbl:attr="xbl:text=class"/>
+                <xxforms:variable name="class"><xxforms:sequence select="xxforms:evaluate-avt($class-avt)" xxbl:scope="outer"/></xxforms:variable>
+                <xforms:group ref="$binding" class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
                     <xhtml:span class="first-child">
                         <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
                         <xsl:if test="/fr:button/@tabindex">

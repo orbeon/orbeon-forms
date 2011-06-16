@@ -99,16 +99,9 @@
                             <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>
                         </xforms:dispatch>
                         <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
-                        <xforms:group ref=".[not($readonly)]" id="edit-button">
-                            <fr:button id="open-edit" class="fr-dialog-editor-open-edit">
-                                <xforms:label>Edit</xforms:label>
-                            </fr:button>
-                        </xforms:group>
-                        <xforms:group ref=".[$readonly]" id="view-button">
-                            <fr:button id="open-view" class="fr-dialog-editor-open-view">
-                                <xforms:label>View</xforms:label>
-                            </fr:button>
-                        </xforms:group>
+                        <fr:button id="open" class="fr-dialog-editor-open-{if ($readonly) then 'view' else 'edit'}">
+                            <xforms:label value="if ($readonly) then 'View' else 'Edit'"/>
+                        </fr:button>
                     </xforms:group>
                 </xforms:group>
             </xforms:group>

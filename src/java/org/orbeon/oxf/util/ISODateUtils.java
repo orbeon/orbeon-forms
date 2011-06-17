@@ -18,26 +18,22 @@ import org.orbeon.oxf.common.OXFException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class ISODateUtils {
 
     public static final SimpleDateFormat XS_DATE_TIME_LONG = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     public static final SimpleDateFormat XS_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     public static final SimpleDateFormat XS_DATE = new SimpleDateFormat("yyyy-MM-dd");
+
     public static final SimpleDateFormat RFC1123_DATE = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
     public static final TimeZone GMT_TZ = TimeZone.getTimeZone("GMT");
 
     static {
         RFC1123_DATE.setTimeZone(GMT_TZ);
-    }
-
-    public static String getCurrentTime() {
-        return XS_DATE_TIME_LONG.format(new Date());
-    }
-
-    public static String getCurrentDate() {
-        return XS_DATE.format(new Date());
     }
 
     public static Date parseDate(String date) {
@@ -54,19 +50,6 @@ public class ISODateUtils {
         }
     }
 
-    public static boolean checkDate(int year, int month, int day) {
-        try {
-            final GregorianCalendar c = new GregorianCalendar();
-            c.clear();
-            c.setLenient(false);
-            c.set(year, month - 1, day);
-            c.getTime();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public static String formatDate(Date date, DateFormat format) {
         return format.format(date);
     }
@@ -77,7 +60,8 @@ public class ISODateUtils {
 
     public static long parseRFC1123Date(String date) {
         try {
-            return RFC1123_DATE.parse(date).getTime();
+            // Add a trailing space so that parsing in the JDK does not internally throw a costly StringIndexOutOfBoundsException
+            return RFC1123_DATE.parse(date + ' ').getTime();
         } catch (ParseException e) {
             throw new OXFException(e);
         }
@@ -86,5 +70,4 @@ public class ISODateUtils {
     public static long getCurrentTimeMillis() {
         return Calendar.getInstance().getTimeInMillis();
     }
-
 }

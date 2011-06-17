@@ -3914,7 +3914,6 @@ ORBEON.xforms.XBL = {
 
     /**
      * To be documented on Wiki.
-     * TODO: cssClass isn't used anymore and should most likely be removed as a parameter and remove in every call to declareClass().
      */
     declareClass: function(xblClass, cssClass) {
         var doNothingSingleton = null;
@@ -3959,7 +3958,7 @@ ORBEON.xforms.XBL = {
                 // that won't do anything when its methods are called
                 if (doNothingSingleton == null) {
                     doNothingSingleton = {};
-                    for (methodName in xblClass.prototype)
+                    for (var methodName in xblClass.prototype)
                         doNothingSingleton[methodName] = function(){};
                 }
                 return doNothingSingleton;
@@ -3990,7 +3989,7 @@ ORBEON.xforms.XBL = {
         partial = partial[component];                               if (partial == null) return;
         partial = partial.instance(this);                           if (partial == null) return;
         var method = partial["parameter" + property + "Changed"];   if (method == null) return;
-        partial.method();
+        method.call(partial);
     },
 
     componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)

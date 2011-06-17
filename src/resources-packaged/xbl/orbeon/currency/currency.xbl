@@ -12,11 +12,13 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xbl:xbl xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:script src="/xbl/orbeon/number/number.js"/>
+    <xbl:script src="/xbl/orbeon/currency/currency.js"/>
     <xbl:binding id="fr-currency" element="fr|currency">
 
         <!-- Orbeon Form Builder Component Metadata -->
@@ -42,7 +44,13 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/currency/currency.css"/>
         </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
+                <xxforms:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxforms:script>
+            </xbl:handler>
+        </xbl:handlers>
         <!-- Delegate to fr:number -->
-        <xi:include href="/xbl/orbeon/number/number.xbl" xpointer="xpath(/xbl:xbl/xbl:binding/(xbl:handlers | xbl:template))"/>
+        <xi:include href="/xbl/orbeon/number/number.xbl" xpointer="xpath(/xbl:xbl/xbl:binding/xbl:template)"/>
     </xbl:binding>
 </xbl:xbl>
+

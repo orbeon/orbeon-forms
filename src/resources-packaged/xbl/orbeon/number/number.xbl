@@ -61,13 +61,19 @@
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
+                    <!-- Either a number or currency -->
+                    <xsl:variable name="is-currency" as="xs:boolean" select="exists(/fr:currency)"/>
+                    <!-- JavaScript code obtaining the JavaScript companion object -->
+                    <xsl:variable name="js-object" as="xs:string" select="concat('YAHOO.xbl.fr.', if ($is-currency) then 'Currency' else 'Number', '.instance(this)')"/>
+
                     <!-- Outer group -->
                     <xforms:group xbl:attr="model context ref bind" class="{{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}" xxbl:scope="outer">
                         <xbl:content includes="xforms|label"/>
 
                         <!-- Init event -->
-                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.Number.instance(this).init();</xxforms:script>
-                        <xxforms:script ev:event="xforms-disabled" ev:target="#observer">YAHOO.xbl.fr.Number.instance(this).destroy();</xxforms:script>
+                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
+                            <xsl:value-of select="$js-object"/>.init();</xxforms:script>
+                        <xxforms:script ev:event="xforms-disabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xxforms:script>
 
                         <!-- Inner group -->
                         <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
@@ -104,9 +110,9 @@
 
                                 <!-- [\^$.|?*+() -->
 
-                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved">YAHOO.xbl.fr.Number.instance(this).update();</xxforms:script>
-                                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Number.instance(this).readonly();</xxforms:script>
-                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Number.instance(this).readwrite();</xxforms:script>
+                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxforms:script>
+                                <xxforms:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxforms:script>
+                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxforms:script>
                             </xforms:input>
 
                             <!-- The visible HTML input -->

@@ -51,8 +51,6 @@ YAHOO.xbl.fr.Number.prototype = {
             }
         }
 
-        console.log(controlClassPrefix);
-
         this.prefixElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-prefix", null, this.container)[0];
         this.prefix = ORBEON.xforms.Document.getValue(this.prefixElement.id);
         this.decimalSeparatorElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-decimal-separator", null, this.container)[0];
@@ -85,10 +83,6 @@ YAHOO.xbl.fr.Number.prototype = {
                 YAHOO.util.Dom.addClass(self.groupElement, "xforms-invalid-visited");
         });
 
-        console.log("blur");
-        console.log(ORBEON.xforms.Document.getValue(this.xformsInputElement.id));
-        console.log(this.visibleInputElement.value);
-
         var newValue = this.visibleInputElement.value;
         ORBEON.xforms.Document.setValue(this.xformsInputElement.id, newValue);
 
@@ -106,7 +100,7 @@ YAHOO.xbl.fr.Number.prototype = {
 
     numberToEditString: function(number) {
         var cleaned = number;
-        
+
         // Remove spaces and grouping separators
         cleaned = cleaned.replace(new RegExp("[\\s" + this.groupingSeparator + "]", "g"), "");
 

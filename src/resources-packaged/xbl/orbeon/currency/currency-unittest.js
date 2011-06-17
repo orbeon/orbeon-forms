@@ -142,7 +142,6 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.Assert.areEqual("4242", ORBEON.xforms.Controls.getCurrentValue(valueOutput), "1st attempt, value in instance");
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     valueInput.focus();
-                    console.log(valueInput.value);
                     valueInput.value = "$4242";
                     doubleInput.focus();
                 }, function() {

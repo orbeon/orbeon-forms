@@ -141,7 +141,7 @@
 
             <xforms:bind nodeset="instance('fr-search-instance')">
                 <!-- Don't send this to the server -->
-                <xforms:bind nodeset="query/@search-field" relevant=". = 'true'"/>
+                <xforms:bind nodeset="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
                 <!-- Set types so the search fields display the proper controls -->
                 <xforms:bind nodeset="query[ends-with(@type, ':date')]" type="xforms:date"/>
                 <xforms:bind nodeset="query[ends-with(@type, ':time')]" type="xforms:time"/>
@@ -164,7 +164,7 @@
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
-                <query xmlns="" name="" path="" label="" type="" control="" search-field="" match="substring"/>
+                <query xmlns="" name="" path="" label="" type="" control="" search-field="" summary-field="" match="substring"/>
             </xforms:instance>
 
             <!-- Paging information -->
@@ -232,6 +232,7 @@
 
                     <!-- Add whether we must show the search field -->
                     <xforms:setvalue ref="$query/@search-field" value="tokenize($control/@class, '\s+') = ('fr-search')"/>
+                    <xforms:setvalue ref="$query/@summary-field" value="tokenize($control/@class, '\s+') = ('fr-summary')"/>
 
                     <!-- All the control's "ancestor" @ref, @context or @bind -->
                     <xxforms:variable name="all-ancestors" select="$control/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
@@ -606,7 +607,8 @@
                                                 </td>
                                             </xforms:repeat>
                                             <!-- One column for each detail -->
-                                            <xforms:repeat nodeset="details/detail" id="document-details-repeat">
+                                            <xxforms:variable name="positions" select="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+                                            <xforms:repeat nodeset="details/detail[position() = $positions]" id="document-details-repeat">
                                                 <td>
                                                     <xhtml:a href="{$document-href}" target="_blank">
                                                         <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->

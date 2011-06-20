@@ -1,0 +1,38 @@
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>Call a service returning XML with an incorrect content type</xhtml:title>
+        <xforms:model>
+
+            <!-- Instance holding the result from the submission -->
+            <xforms:instance id="countries"><initial/></xforms:instance>
+
+            <!-- Instance with the text from the service, if not returned with an XML content type -->
+            <xforms:instance id="unparsed-xml"><unparsed-xml/></xforms:instance>
+            <xforms:bind ref="instance('unparsed-xml')" type="xxforms:xml"/>
+
+            <!-- Call a service that might return XML with the incorrect content type -->
+            <xforms:submission id="get-countries" ref="instance('countries')"
+                               resource="http://dl.dropbox.com/u/6900/resources/20110620-countries.txt"
+                               serialization="none" method="get" replace="instance"/>
+
+            <xforms:action ev:event="xforms-submit-error" ev:observer="get-countries">
+                <!-- Store text we got back from service -->
+                <xforms:setvalue ref="instance('unparsed-xml')" value="event('response-body')"/>
+                <!-- Revalidate so the 'type' constraint is reapplied -->
+                <xforms:revalidate/>
+                <!-- If we got XML back, parse it and store it in 'countries' -->
+                <xforms:insert if="xxforms:valid(instance('unparsed-xml'))" nodeset="instance('countries')" origin="saxon:parse(instance('unparsed-xml'))"/>
+            </xforms:action>
+
+            <xforms:send ev:event="xforms-model-construct-done" submission="get-countries"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:output value="local-name()"/>
+    </xhtml:body>
+</xhtml:html>

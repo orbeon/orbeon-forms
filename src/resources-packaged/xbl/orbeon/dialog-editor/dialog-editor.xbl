@@ -35,6 +35,7 @@
         <xxbl:global>
             <!-- Dialog to edit the value -->
             <xxforms:dialog id="fr-dialog-editor-dialog" class="fr-dialog-editor-dialog" close="false" model="fr-dialog-editor-model">
+                <xforms:label ref="label"/>
                 <xforms:model id="fr-dialog-editor-model">
                     <xforms:instance id="fr-dialog-editor-instance">
                         <instance>

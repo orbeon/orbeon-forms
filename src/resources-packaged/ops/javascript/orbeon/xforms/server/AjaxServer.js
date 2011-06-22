@@ -593,7 +593,7 @@
         var responseXML = o.responseXML;
         if (!YAHOO.lang.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
 
-            if (dojox && dojox.html && dojox.html.set) {
+            if (window.dojox && dojox.html && dojox.html.set) {
                 // Parse content we receive into a new div we create just for that purpose
                 var temporaryContainer = document.createElement("div");
                 temporaryContainer.innerHTML = o.responseText;

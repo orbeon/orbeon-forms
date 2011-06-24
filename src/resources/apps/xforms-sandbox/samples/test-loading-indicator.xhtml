@@ -95,9 +95,11 @@
             <xforms:instance id="main-instance">
                 <instance>0</instance>
             </xforms:instance>
-            <xforms:submission id="sleep" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none">
+            <xforms:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="none">
                 <xforms:setvalue ev:event="xforms-submit-done" value=". + 1"/>
             </xforms:submission>
+            <xforms:submission id="slow-page" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="all"
+                    xxforms:show-progress="false"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .actions { margin-bottom: 2em }
@@ -110,8 +112,11 @@
                 <xforms:label>Run long submission</xforms:label>
                 <xforms:send ev:event="DOMActivate" submission="sleep"/>
             </fr:button>
+            <fr:button id="go-to-slow-page">
+                <xforms:label>Go to slow page</xforms:label>
+                <xforms:send ev:event="DOMActivate" submission="slow-page"/>
+            </fr:button>
         </xhtml:div>
-
         <xhtml:div>
             <xforms:output ref="." id="counter">
                 <xforms:label>Counter: </xforms:label>

@@ -140,7 +140,7 @@
                         <xxf:control id="my-inplace-input$xf-8" readonly="true">42</xxf:control>
                         <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-15$container" class="yui-button yui-push-button fr-inplace-rename" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-15$container" relevant="false"/>
                         <xxf:control id="my-inplace-input$xf-15$trigger" relevant="false"/>
                         <xxf:control id="my-inplace-input$xf-16" class="fr-inplace-cancel" relevant="false"/>
                     </xxf:control-values>
@@ -745,7 +745,7 @@
                         <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
-                    <xxf:script name="my_autocomplete_show_suggestions_button_xf_84_xforms_function" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
+                    <xxf:script name="my_autocomplete_show_suggestions_button_xf_87_xforms_function" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
                     <xxf:setfocus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>

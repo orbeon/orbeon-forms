@@ -2558,32 +2558,6 @@ ORBEON.xforms.Controls = {
         iframe.className = textarea.className;
     },
 
-    updateLoadingPosition: function(formID) {
-        // Compute new X
-        var x;
-        {
-            var initialRight = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][0];
-            var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
-            x = scrollX + YAHOO.util.Dom.getViewportWidth() - initialRight;
-        }
-        // Compute new Y
-        var y;
-        {
-            // Distance between top of viewport and top of the page. Initially 0 when we are at the top of the page.
-            var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-            var initialTop = ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID][1];
-            y = scrollY + ORBEON.util.Properties.loadingMinTopPadding.get() > initialTop
-                // Place indicator at a few pixels from the top of the viewport
-                    ? scrollY + ORBEON.util.Properties.loadingMinTopPadding.get()
-                // Loading is visible left at its initial position, so leave it there
-                    : initialTop;
-        }
-        // Position overlay
-        var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
-        overlay.cfg.setProperty("x", x);
-        overlay.cfg.setProperty("y", y);
-    },
-
     treeOpenSelectedVisible: function(yuiTree, values) {
         for (var nodeIndex in yuiTree._nodes) {
             var node = yuiTree._nodes[nodeIndex];
@@ -3530,12 +3504,6 @@ ORBEON.xforms.Events = {
      * Called upon scrolling or resizing.
      */
     scrollOrResize: function() {
-        // Adjust position of loading indicators
-        for (var formID in ORBEON.xforms.Globals.formLoadingLoadingOverlay) {
-            var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
-            if (overlay)
-                ORBEON.xforms.Controls.updateLoadingPosition(formID);
-        }
         ORBEON.xforms.Events._resize();
         // Adjust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
         // NOTE: comment this one out for now, as that causes issues like unreachable buttons for large dialogs, and funny scrolling
@@ -4135,13 +4103,10 @@ ORBEON.xforms.Init = {
             isReloading: false,                  // Whether the form is being reloaded from the server
             lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
             // Data relative to a form is stored in an array indexed by form id.
-            formLoadingLoadingOverlay: {},       // Overlay for the loading indicator
-            formLoadingLoadingInitialRightTop:{},// Initial number of pixel between the loading indicator and the top of the page
             formErrorPanel: {},                  // YUI panel used to report errors
             formHelpPanel: {},                   // Help dialog: YUI panel
             formHelpPanelMessageDiv: {},         // Help dialog: div containing the help message
             formHelpPanelCloseButton: {},        // Help dialog: close button
-            formLoadingNone: {},                 // HTML element with the markup displayed when nothing is displayed
             formUUID: {},                        // UUID of the form/containing document
             formStaticState: {},                 // State that does not change for the life of the page
             formDynamicState: {},                // State that changes at every request
@@ -4185,28 +4150,18 @@ ORBEON.xforms.Init = {
                 // interaction with the form before it is initialized
                 YAHOO.util.Dom.removeClass(formElement, "xforms-initially-hidden");
 
+                // Create Orbeon Form object, which give it a change to perform its own initialization
+                ORBEON.xforms.Page.getForm(formID);
+
                 // Initialize D&D
                 ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements(formElement);
 
                 // Initialize loading and error indicator
                 ORBEON.xforms.Globals.formErrorPanel[formID] = null;
-                ORBEON.xforms.Globals.formLoadingNone[formID] = null;
 
-                var xformsLoadingCount = 0;
                 for (var formChildIndex = 0; formChildIndex < formElement.childNodes.length; formChildIndex++) {
-                    if (xformsLoadingCount == 3) break;
                     var formChild = formElement.childNodes[formChildIndex];
-                    if (formChild.className == "xforms-loading-loading") {
-                        formChild.style.display = "block";
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] = new YAHOO.widget.Overlay(formChild, { visible: false, monitorresize: true });
-                        ORBEON.xforms.Globals.formLoadingLoadingInitialRightTop[formID] = [
-                            YAHOO.util.Dom.getViewportWidth() - YAHOO.util.Dom.getX(formChild),
-                            YAHOO.util.Dom.getY(formChild)
-                        ];
-                        ORBEON.util.Utils.overlayUseDisplayHidden(ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID]);
-                        formChild.style.right = "auto";
-                        xformsLoadingCount++;
-                    } else if (ORBEON.util.Dom.isElement(formChild) && YAHOO.util.Dom.hasClass(formChild, "xforms-error-panel")) {
+                    if (ORBEON.util.Dom.isElement(formChild) && YAHOO.util.Dom.hasClass(formChild, "xforms-error-panel")) {
 
                         // Create and store error panel
                         YAHOO.util.Dom.generateId(formChild);
@@ -4254,11 +4209,7 @@ ORBEON.xforms.Init = {
                             YAHOO.util.Dom.generateId(reloadA[0]);
                             YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
                         }
-
-                        xformsLoadingCount++;
-                    } else if (formChild.className == "xforms-loading-none") {
-                        ORBEON.xforms.Globals.formLoadingNone[formID] = formChild;
-                        xformsLoadingCount++;
+                        break;
                     }
                 }
 
@@ -5391,55 +5342,53 @@ ORBEON.xforms.Offline = {
     storeEvents: function(events) {
         function emptyStringIfNull(value) { return value == null ? "" : value; }
 
-        ORBEON.xforms.Offline._runShowingIndicator(function() {
-            ORBEON.xforms.Offline.init();
+        ORBEON.xforms.Offline.init();
 
-            // Compute new events
-            var newEventsString = [];
-            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-                var event = events[eventIndex];
+        // Compute new events
+        var newEventsString = [];
+        for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+            var event = events[eventIndex];
 
-                // Array containing all the properties of the event we are storing the database
-                var eventArray = [
-                    emptyStringIfNull(event.form.id),
-                    emptyStringIfNull(event.targetId),
-                    emptyStringIfNull(event.otherId),
-                    emptyStringIfNull(event.value),
-                    emptyStringIfNull(event.eventName),
-                    event.bubbles ? 1 : 0,
-                    event.cancelable ? 1 : 0,
-                    event.ignoreErrors ? 1 : 0
-                ];
-                // Serialize all the information
-                var eventString = [];
-                for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++) {
-                    if (eventComponentIndex != 0) eventString.push(" ");
-                    eventString.push(escape(eventArray[eventComponentIndex]));
-                }
-                // Add this event to newEventsString
-                if (newEventsString.length > 0) newEventsString.push(" ");
-                newEventsString.push(escape(eventString.join("")));
+            // Array containing all the properties of the event we are storing the database
+            var eventArray = [
+                emptyStringIfNull(event.form.id),
+                emptyStringIfNull(event.targetId),
+                emptyStringIfNull(event.otherId),
+                emptyStringIfNull(event.value),
+                emptyStringIfNull(event.eventName),
+                event.bubbles ? 1 : 0,
+                event.cancelable ? 1 : 0,
+                event.ignoreErrors ? 1 : 0
+            ];
+            // Serialize all the information
+            var eventString = [];
+            for (var eventComponentIndex = 0; eventComponentIndex < eventArray.length; eventComponentIndex++) {
+                if (eventComponentIndex != 0) eventString.push(" ");
+                eventString.push(escape(eventArray[eventComponentIndex]));
             }
+            // Add this event to newEventsString
+            if (newEventsString.length > 0) newEventsString.push(" ");
+            newEventsString.push(escape(eventString.join("")));
+        }
 
 
-            if (newEventsString.length > 0) {
-                var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
-                var currentEventsString = resultSet.fieldByName("offline_events");
-                if (currentEventsString != "") {
-                    currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
-                    currentEventsString += " ";
-                }
-                currentEventsString += newEventsString.join("");
-                currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
-
-                // Compute new values of controls
-                var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
-
-                // Store new events and new value of controls
-                ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
-                        [ controlValuesString, currentEventsString, window.location.href ]).close();
+        if (newEventsString.length > 0) {
+            var resultSet = ORBEON.xforms.Offline.gearsDatabase.execute("select offline_events from Offline_Forms where url = ?", [ window.location.href ]);
+            var currentEventsString = resultSet.fieldByName("offline_events");
+            if (currentEventsString != "") {
+                currentEventsString = ORBEON.xforms.Offline._decrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+                currentEventsString += " ";
             }
-        });
+            currentEventsString += newEventsString.join("");
+            currentEventsString = ORBEON.xforms.Offline._encrypt(currentEventsString, ORBEON.xforms.Offline.getEncryptionKey());
+
+            // Compute new values of controls
+            var controlValuesString = ORBEON.xforms.Offline._serializeControlValues(ORBEON.xforms.Offline.controlValues);
+
+            // Store new events and new value of controls
+            ORBEON.xforms.Offline.gearsDatabase.execute("update Offline_Forms set control_values = ?, offline_events = ? where url = ?",
+                    [ controlValuesString, currentEventsString, window.location.href ]).close();
+        }
     },
 
     loadFormInIframe: function(url, loadListener) {
@@ -5505,81 +5454,78 @@ ORBEON.xforms.Offline = {
             }
         }
 
-        ORBEON.xforms.Offline._runShowingIndicator(function() {
+        // Create context once; we then update it for values that are calculated
+        var xpathNode = document.createElement("dummy"); // Node used as current node to evaluate XPath expression
+        var xpathContext = new ExprContext(xpathNode);
+        for (var variableName in ORBEON.xforms.Offline.variables) {
+            var controlID = ORBEON.xforms.Offline.variables[variableName].value;
+            var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.get(controlID));
+            xpathContext.setVariable(variableName, variableValue);
+        }
 
-            // Create context once; we then update it for values that are calculated
-            var xpathNode = document.createElement("dummy"); // Node used as current node to evaluate XPath expression
-            var xpathContext = new ExprContext(xpathNode);
-            for (var variableName in ORBEON.xforms.Offline.variables) {
-                var controlID = ORBEON.xforms.Offline.variables[variableName].value;
-                var variableValue = ORBEON.xforms.Controls.getCurrentValue(ORBEON.util.Dom.get(controlID));
-                xpathContext.setVariable(variableName, variableValue);
-            }
+        // Go over all controls
+        for (var controlID in ORBEON.xforms.Offline.mips) {
+            var mips = ORBEON.xforms.Offline.mips[controlID];
+            var control = ORBEON.util.Dom.get(controlID);
+            var controlValue = ORBEON.xforms.Controls.getCurrentValue(control);
 
-            // Go over all controls
-            for (var controlID in ORBEON.xforms.Offline.mips) {
-                var mips = ORBEON.xforms.Offline.mips[controlID];
-                var control = ORBEON.util.Dom.get(controlID);
-                var controlValue = ORBEON.xforms.Controls.getCurrentValue(control);
+            // Update xpathContext with the value of the current control
+            ORBEON.util.Dom.setStringValue(xpathNode, controlValue);
 
-                // Update xpathContext with the value of the current control
-                ORBEON.util.Dom.setStringValue(xpathNode, controlValue);
-
-                // Calculate
-                if (mips.calculate) {
-                    var newValue = evaluateXPath(mips.calculate.value, xpathContext);
-                    if (newValue != null) {
-                        // Update value
-                        ORBEON.xforms.Controls.setCurrentValue(control, newValue);
-                        // Change value of variable
-                        var variableName = ORBEON.xforms.Offline.controlIDToVariableName[controlID];
-                        if (variableName != null) {
-                            xpathContext.setVariable(variableName, newValue);
-                        }
+            // Calculate
+            if (mips.calculate) {
+                var newValue = evaluateXPath(mips.calculate.value, xpathContext);
+                if (newValue != null) {
+                    // Update value
+                    ORBEON.xforms.Controls.setCurrentValue(control, newValue);
+                    // Change value of variable
+                    var variableName = ORBEON.xforms.Offline.controlIDToVariableName[controlID];
+                    if (variableName != null) {
+                        xpathContext.setVariable(variableName, newValue);
                     }
                 }
-
-                // Constraint
-                var isValid = true;
-                if (mips.constraint) {
-                    var constraint = evaluateXPath("boolean(" + mips.constraint.value + ")", xpathContext);
-                    if (constraint != null)
-                        isValid = isValid && constraint;
-                }
-
-                // Required
-                if (mips.required) {
-                    var required = evaluateXPath(mips.required.value, xpathContext);
-                    if (required != null)
-                        isValid &= !(controlValue == "" && required);
-                }
-
-                // Relevant
-                if (mips.relevant) {
-                    var isRelevant = evaluateXPath("boolean(" + mips.relevant.value + ")", xpathContext);
-                    if (isRelevant != null)
-                        applyToInherited(control, mips, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant, true);
-                }
-
-                // Readonly
-                if (mips.readonly) {
-                    var isReadonly = evaluateXPath("boolean(" + mips.readonly.value + ")", xpathContext);
-                    if (isReadonly != null)
-                        applyToInherited(control, mips, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly, false);
-                }
-
-                // Type
-                if (mips.type) {
-                    var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type.value];
-                    if (regExp != null) {
-                        if (! controlValue.match(regExp))
-                            isValid = false;
-                    }
-                }
-
-                ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false");
             }
-        });
+
+            // Constraint
+            var isValid = true;
+            if (mips.constraint) {
+                var constraint = evaluateXPath("boolean(" + mips.constraint.value + ")", xpathContext);
+                if (constraint != null)
+                    isValid = isValid && constraint;
+            }
+
+            // Required
+            if (mips.required) {
+                var required = evaluateXPath(mips.required.value, xpathContext);
+                if (required != null)
+                    isValid &= !(controlValue == "" && required);
+            }
+
+            // Relevant
+            if (mips.relevant) {
+                var isRelevant = evaluateXPath("boolean(" + mips.relevant.value + ")", xpathContext);
+                if (isRelevant != null)
+                    applyToInherited(control, mips, ORBEON.xforms.Controls.isRelevant, ORBEON.xforms.Controls.setRelevant, mips.relevant.inherited, isRelevant, true);
+            }
+
+            // Readonly
+            if (mips.readonly) {
+                var isReadonly = evaluateXPath("boolean(" + mips.readonly.value + ")", xpathContext);
+                if (isReadonly != null)
+                    applyToInherited(control, mips, ORBEON.xforms.Controls.isReadonly, ORBEON.xforms.Controls.setReadonly, mips.readonly.inherited, isReadonly, false);
+            }
+
+            // Type
+            if (mips.type) {
+                var regExp = ORBEON.xforms.Offline.typeRegExps[mips.type.value];
+                if (regExp != null) {
+                    if (! controlValue.match(regExp))
+                        isValid = false;
+                }
+            }
+
+            ORBEON.xforms.Controls.setValid(control, isValid ? "true" : "false");
+        }
     },
 
     _serializeControlValues: function(controlValues) {
@@ -5632,18 +5578,6 @@ ORBEON.xforms.Offline = {
         return key == null ? text :
                text == "" ? text :
                byteArrayToString(rijndaelDecrypt(hexToByteArray(text), key, "ECB"));
-    },
-
-    _runShowingIndicator: function(f) {
-        // Show loading indicator
-        xformsDisplayIndicator("loading");
-        // Use timeout function to give a change to the browser to show the loading indicator before we continue with evaluation of the MIPS
-        window.setTimeout(function() {
-            // Run actual code
-            f();
-            // Hide loading indicator
-            xformsDisplayIndicator("none");
-        }, ORBEON.util.Properties.internalShortDelay.get());
     }
 };
 
@@ -5761,39 +5695,6 @@ function xformsLogProperties(object) {
     xformsLog(message);
 }
 
-function xformsDisplayIndicator(state, progressMessage) {
-    var form = ORBEON.xforms.Globals.requestForm;
-    // Form can be null if an incremental event happens around the same time as an non-incremental event. Both were sent
-    // but the incremental run an executeNextRequest after the response arrived. If the response replaces the HTML,
-    // then the form will be null.
-    if (form != null) {
-        var formID = form.id;
-        switch (state) {
-            case "loading":
-                var formLoadingLoadingOverlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
-                if (formLoadingLoadingOverlay != null) {
-                    ORBEON.util.Dom.setStringValue(formLoadingLoadingOverlay.element,
-                        progressMessage == null ? DEFAULT_LOADING_TEXT : progressMessage);
-                    formLoadingLoadingOverlay.show();
-                    ORBEON.xforms.Controls.updateLoadingPosition(formID);
-                }
-                if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
-                    ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
-                break;
-            case "none":
-                if (!ORBEON.xforms.Globals.loadingOtherPage) {
-                    if (ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID] != null) {
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].render(document.body);
-                        ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID].cfg.setProperty("visible", false);
-                    }
-                    if (ORBEON.xforms.Globals.formLoadingNone[formID] != null)
-                        ORBEON.xforms.Globals.formLoadingNone[formID].style.display = "block";
-                }
-                break;
-        }
-    }
-}
-
 /**
  * Value change handling for all the controls. It is assumed that the "value" property of "target"
  * contain the current value for the control.
@@ -5852,10 +5753,6 @@ function getEventTarget(event) {
     }
 }
 
-function xformsDisplayLoading(progressMessage) {
-    if (ORBEON.xforms.Globals.requestInProgress == true)
-        xformsDisplayIndicator("loading", progressMessage);
-}
 // Run xformsPageLoaded when the browser has finished loading the page
 // In case this script is loaded twice, we still want to run the initialization only once
 if (!ORBEON.xforms.Globals.pageLoadedRegistered) {

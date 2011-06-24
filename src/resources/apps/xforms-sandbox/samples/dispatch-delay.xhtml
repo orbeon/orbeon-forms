@@ -29,9 +29,13 @@
                 </instance>
             </xforms:instance>
 
+            <xforms:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
+
             <xforms:action ev:event="my-event" if="started = 'true'">
                 <!-- Increment count -->
                 <xforms:setvalue ref="/instance/count" value=". + 1"/>
+                <!-- Do long "save" -->
+                <xforms:send submission="sleep"/>
                 <!-- Dispatch new event -->
                 <xforms:dispatch name="my-event" target="my-model" delay="1000"
                                  xxforms:show-progress="true" xxforms:progress-message="Autosave"/>
@@ -50,8 +54,9 @@
             <xforms:action ev:event="DOMActivate">
                 <!-- Mark that we have started -->
                 <xforms:setvalue ref="started">true</xforms:setvalue>
-                <!-- Dispatch the event after 2 seconds -->
-                <xforms:dispatch name="my-event" target="my-model" delay="1000"/>
+                <!-- Start dispatching -->
+                <xforms:dispatch name="my-event" target="my-model" delay="1000"
+                                 xxforms:show-progress="true" xxforms:progress-message="Autosave"/>
             </xforms:action>
         </xforms:trigger>
 
@@ -62,5 +67,11 @@
                 <xforms:setvalue ref="started">false</xforms:setvalue>
             </xforms:action>
         </xforms:trigger>
+
+        <xforms:trigger>
+            <xforms:label>Manual save</xforms:label>
+            <xforms:send ev:event="DOMActivate" submission="sleep"/>
+        </xforms:trigger>
+
     </xhtml:body>
 </xhtml:html>

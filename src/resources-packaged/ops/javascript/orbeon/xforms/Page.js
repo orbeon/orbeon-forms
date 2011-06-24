@@ -20,6 +20,7 @@
 
     var Form = ORBEON.xforms.Form;
     var Page = ORBEON.xforms.Page;
+    var YD = YAHOO.util.Dom;
 
     /** @private @type {Object.<string, ORBEON.xforms.Form>*/
     Page.forms = {};
@@ -35,7 +36,7 @@
      * @return  {ORBEON.xforms.Form}
      */
     Page.getForm = function(id) {
-        if (! this.forms[id]) this.forms[id] = new Form();
+        if (! this.forms[id]) this.forms[id] = new Form(YD.get(id));
         return this.forms[id];
     };
 

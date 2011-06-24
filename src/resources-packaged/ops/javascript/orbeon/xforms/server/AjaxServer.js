@@ -391,12 +391,10 @@
                         ORBEON.xforms.Globals.discardableTimerIds[formID] = [];
                     }
 
-                    // Show loading indicator, unless all the events asked us not to display it
-                    if (showProgress) {
-                        var delayBeforeDisplayLoading = ORBEON.util.Properties.delayBeforeDisplayLoading.get();
-                        if (delayBeforeDisplayLoading == 0) xformsDisplayLoading(progressMessage);
-                        else window.setTimeout(function() { xformsDisplayLoading(progressMessage); }, delayBeforeDisplayLoading);
-                    }
+                    // Tell the loading indicator whether to display itself and what the progress message on the next Ajax request
+                    var loadingIndicator = ORBEON.xforms.Page.getForm(formID).getLoadingIndicator();
+                    loadingIndicator.setNextConnectProgressShown(showProgress);
+                    loadingIndicator.setNextConnectProgressMessage(progressMessage);
 
                     // Build request
                     var requestDocumentString = [];
@@ -504,13 +502,6 @@
                     AjaxServer.asyncAjaxRequest();
                 }
             }
-        }
-
-        // Hide loading indicator if we have not started a new request (nothing more to run)
-        // and there are not events in the queue. However make sure not to hide the error message
-        // if the last XHR query returned an error.
-        if (!ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0) {
-            xformsDisplayIndicator("none");
         }
     };
 
@@ -1919,7 +1910,7 @@
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.
                 // Display it even if it was not displayed before as loading the page could take time.
-                xformsDisplayIndicator("loading");
+                ORBEON.xforms.Page.getForm(formID).getLoadingIndicator().show();
                 ORBEON.xforms.Globals.loadingOtherPage = true;
             }
 

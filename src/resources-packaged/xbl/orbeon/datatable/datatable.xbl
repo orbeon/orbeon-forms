@@ -41,6 +41,7 @@
 
     <!-- Our own JavaScript... -->
     <xbl:script type="text/javascript" src="/xbl/orbeon/datatable/datatable.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/datatable/DatatableDisplayed.js"/>
 
     <xbl:binding id="fr.datatable" element="fr|datatable">
 

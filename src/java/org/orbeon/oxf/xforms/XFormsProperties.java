@@ -124,6 +124,8 @@ public class XFormsProperties {
     public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
     private static final boolean CACHE_DOCUMENT_DEFAULT = true;
 
+    private static final String DATATABLE_INIT_IN_VIEWPORT = "xbl.fr.datatable.init-in-viewport";
+
     public static class PropertyDefinition {
 
         private String name;
@@ -256,7 +258,8 @@ public class XFormsProperties {
             new PropertyDefinition(DATEPICKER_TWO_MONTHS_PROPERTY, false, true),
             new PropertyDefinition(SHOW_ERROR_DIALOG_PROPERTY, true, true),
             new PropertyDefinition(CLIENT_EVENTS_MODE_PROPERTY, "default", true),
-            new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true)
+            new PropertyDefinition(CLIENT_EVENTS_FILTER_PROPERTY, "", true),
+            new PropertyDefinition(DATATABLE_INIT_IN_VIEWPORT, false, true)
     };
 
     private static final Map<Object, PropertyDefinition> SUPPORTED_DOCUMENT_PROPERTIES;

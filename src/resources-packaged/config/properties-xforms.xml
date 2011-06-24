@@ -168,6 +168,7 @@
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets.auto-include-fr-widgets"    value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service"                value="https://www.google.com/tbproxy/spell?lang=en&amp;hl=en"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.datatable.init-in-viewport"           value="false"/>
 
     <!--<property as="xs:NCName"  name="oxf.xforms.pipeline.trace.class"                        value="org.orbeon.oxf.processor.trace.StdOutTrace"/>-->
 

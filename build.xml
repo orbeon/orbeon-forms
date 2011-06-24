@@ -626,19 +626,19 @@
         </taskdef>
 
         <!-- Compile CoffeeScript -->
-        <coffee-script fromdir="${resources-packaged.dir}/ops" todir="${build.dir}/js">
+        <coffee-script fromdir="${resources-packaged.dir}" todir="${build.dir}/js">
             <include name="**/*.coffee"/>
         </coffee-script>
 
         <!-- Copy non-minimized CoffeeScript resources -->
-        <copy todir="${war.dir}/WEB-INF/resources/ops">
+        <copy todir="${war.dir}/WEB-INF/resources">
             <fileset dir="${build.dir}/js">
                 <include name="**/*.js"/>
             </fileset>
         </copy>
 
         <!-- Minimize compiled CoffeeScript -->
-        <yui-compressor warn="false" charset="UTF-8" fromdir="${build.dir}/js" todir="${war.dir}/WEB-INF/resources/ops">
+        <yui-compressor warn="false" charset="UTF-8" fromdir="${build.dir}/js" todir="${war.dir}/WEB-INF/resources">
             <include name="**/*.js"/>
         </yui-compressor>
 

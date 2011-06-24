@@ -159,20 +159,13 @@ YAHOO.xbl.fr.Datatable.prototype = {
         // TODO: check if this test is still needed
         if (this.isXformsEnabled()) {
             if (!this.isInitialized) {
-                // We need to postpone the initialization of datatables that are hidden by an xforms:switch
-                if (this.isDisplayed()) {
+                this.whenDisplayed(_.bind(function() {
                     this.initProperties();
                     this.finish();
                     this.isInitialized = true;
                     this.container.fr_dt_initialized = true;
                     this.columnsUpdateUUID = this.getRequestUUID();
-                } else {
-                    // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
-                    // Store a curried version of draw(), to avoid creating a new closure which can't be garbage
-                    // collected every 100 ms
-                    if (this.delayedDraw == null) this.delayedDraw = _.bind(this.draw, this);
-                    setTimeout(this.delayedDraw, 100);
-                }
+                }, this));
             } else {
                 this.updateColumns();
             }
@@ -194,14 +187,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
     isXformsEnabled: function() {
         var xformsGroup = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(this.container, 'span');
         return ! (YAHOO.util.Dom.hasClass(xformsGroup, 'xforms-disabled') || YAHOO.util.Dom.hasClass(xformsGroup, 'xforms-disabled-subsequent'));
-    },
-
-    /**
-     *  Is the component displayed?
-     */
-    isDisplayed: function() {
-        var region = YAHOO.util.Region.getRegion(this.container);
-        return region.left >= 0 && region.top >= 0 && region.left < region.right && region.top < region.bottom;
     },
 
     /**
@@ -742,7 +727,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
         if (! (this.isInitialized && this.isXformsEnabled())) {
             return; // we'll receive a new call when/if needed
         }
-        if (this.isDisplayed()) {
+        this.whenDisplayed(_.bind(function() {
             if (this.columnsUpdateUUID != this.getRequestUUID()) {
                 this.reset();
                 this.isInitialized = false;
@@ -750,14 +735,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 this.draw();
             }
             // Otherwise, we've already done an update for this dynamic state!
-        }
-        else {
-            // The datatable is hidden in a switch, we need to come back later!
-            thiss = this;
-            setTimeout(function() {
-                thiss.updateColumns();
-            }, 100);
-        }
+        }, this));
     },
 
     /**

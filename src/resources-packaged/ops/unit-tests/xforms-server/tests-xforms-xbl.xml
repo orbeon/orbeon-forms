@@ -3456,7 +3456,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-group" relevant="false"/>
-                        <xxf:control id="my-button$container" class="yui-button yui-push-button" relevant="false"/>
+                        <xxf:control id="my-button$container" relevant="false"/>
                         <xxf:control id="my-button$trigger" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>

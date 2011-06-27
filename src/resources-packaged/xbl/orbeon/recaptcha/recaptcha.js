@@ -58,6 +58,10 @@
 
         reload: function() {
             Recaptcha.reload();
+        },
+
+        focus: function() {
+            YD.get(this.container.id + "_response_field").focus();
         }
     };
 })();

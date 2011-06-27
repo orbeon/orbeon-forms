@@ -39,6 +39,9 @@
             <xbl:handler event="fr-reload" phase="target">
                 <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxforms:script>
             </xbl:handler>
+            <xbl:handler event="xforms-focus" phase="target">
+                <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).focus();</xxforms:script>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
@@ -68,8 +71,9 @@
                         <xforms:action id="xf-en" ev:event="xforms-enabled">
                             <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxforms:script>
                             <!-- Copy value of private key to local model -->
+                            <!-- NOTE: We don't use xxbl:parameter() as we don't want the private key to get to the client -->
                             <xxforms:variable name="private-key">
-                                <xxforms:sequence select="{fr:private-key/@ref}" xxbl:scope="outer"/>
+                                <xxforms:sequence select="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxforms:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
                             </xxforms:variable>
                             <xforms:setvalue ref="privatekey" value="$private-key" xxbl:scope="inner"/>
                         </xforms:action>

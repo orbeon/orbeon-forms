@@ -102,7 +102,8 @@
     <property as="xs:boolean" name="oxf.fr.alfresco.send-pdf.*.*"                               value="false"/>
     <property as="xs:boolean" name="oxf.fr.alfresco.send-xml.*.*"                               value="false"/>
 
-    <!-- Configuration of demo forms -->
+    <!-- Configuration of built-in forms -->
+    <property as="xs:boolean" name="oxf.fr.detail.captcha.orbeon.builder"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"            value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="resource"/>

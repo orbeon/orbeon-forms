@@ -121,6 +121,37 @@
                                             <!-- Dialogs are handled later -->
                                             <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
                                         </xsl:apply-templates>
+                                        <!-- Captcha -->
+                                        <xforms:group appearance="xxforms:internal"  model="fr-persistence-model">
+                                            <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
+                                            <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
+                                            <xforms:group ref=".[$has-captcha and $captcha = 'false']" class="fr-captcha">
+                                                <fr:recaptcha id="recaptcha" theme="white">
+                                                    <!-- Success: remember the captcha passed, which also influences validity -->
+                                                    <xforms:action ev:event="fr-verify-done">
+                                                        <xforms:setvalue ref="$captcha">true</xforms:setvalue>
+                                                        <xforms:revalidate model="fr-persistence-model"/>
+                                                        <xforms:refresh/>
+                                                    </xforms:action>
+                                                    <!-- Failure: load another challenge -->
+                                                    <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="recaptcha" name="fr-reload"/>
+                                                    <!-- All cases: try save again -->
+                                                    <xforms:dispatch ev:event="fr-verify-done fr-verify-error" target="fr-persistence-model" name="fr-save-action">
+                                                        <xxforms:context name="fr:check-data-valid" select="true()"/>
+                                                        <xxforms:context name="fr:captcha-checked" select="true()"/>
+                                                    </xforms:dispatch>
+                                                </fr:recaptcha>
+                                                <!-- Non-visible output bound to captcha node to influence form validity -->
+                                                <xhtml:span style="display: none">
+                                                    <xforms:output ref="$captcha">
+                                                        <!-- Focus from error summary proxies to captcha -->
+                                                        <xforms:setfocus ev:event="xforms-focus" control="recaptcha"/>
+                                                        <xforms:label>Captcha</xforms:label>
+                                                        <xforms:alert>The value you entered didn't match the image, please try again</xforms:alert>
+                                                    </xforms:output>
+                                                </xhtml:span>
+                                            </xforms:group>
+                                        </xforms:group>
                                     </xforms:group>
 
                                     <!-- Error summary (if at bottom) -->

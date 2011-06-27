@@ -225,36 +225,48 @@
                                                   case this is called in response to users' actions such as click on a
                                                   Save button).
                                                 * false if this action should be performed even if the data is invalid
-                                                  (e.g. when doing an auto-save).
-        -->
+                                                  (e.g. when doing an auto-save). -->
         <xxforms:variable name="check-data-valid" select="event('fr:check-data-valid')"/>
+        <xxforms:variable name="captcha-checked" select="(event('fr:captcha-checked'), false())[1]"/> <!-- Default to false() -->
 
-        <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
-        <xforms:action if="$document != ''">
+        <!-- See if we need to verify the captcha -->
+        <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
+        <xxforms:variable name="captcha-needs-verification" select="$has-captcha and not($captcha-checked) and instance('fr-persistence-instance')/captcha = 'false'"/>
 
-            <!-- Check validity of data before trying to save, because 1) we don't want to save attachments if the form
-                 is invalid and 2) submission doesn't check validity anymore.
-                 We use instance('fr-error-summary-instance')/valid and not xxforms:valid() because the instance
-                 validity may not be reflected with the use of XBL components. -->
-            <xxforms:variable name="validity-passed" select="not($check-data-valid) or
-                (xxforms:instance('fr-error-summary-instance')/valid = 'true')" as="xs:boolean"/>
+        <!-- If captcha needs verification, do this first -->
+        <xforms:action if="$captcha-needs-verification">
+            <xforms:dispatch target="recaptcha" name="fr-verify"/>
+        </xforms:action>
 
-            <xforms:action if="not($validity-passed)">
-                <!-- Data not valid: display error -->
-                <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
-                                 model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
-                <xforms:toggle case="fr-message-validation-error"/>
-                <!-- Mark all active alerts as visited -->
-                <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
-                <!-- Open all sections -->
-                <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
-            </xforms:action>
+        <!-- Otherwise proceed with save -->
+        <xforms:action if="not($captcha-needs-verification)">
+            <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
+            <xforms:action if="$document != ''">
 
-            <!-- Display message if there is at least one upload in progress -->
-            <xforms:message if="$validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+                <!-- Check validity of data before trying to save, because:
+                     1) We don't want to save attachments if the form is invalid.
+                     2) Submission doesn't check validity anymore. -->
+                <!-- We use instance('fr-error-summary-instance')/valid and not xxforms:valid() because the instance
+                     validity may not be reflected with the use of XBL components. -->
 
-            <!-- Actually save if we passed validation and there is no upload in progress -->
-            <xforms:action if="$validity-passed and not(xxforms:pending-uploads() > 0)">
+                <xxforms:variable name="validity-passed" select="not($check-data-valid) or (xxforms:instance('fr-error-summary-instance')/valid = 'true')" as="xs:boolean"/>
+
+                <xforms:action if="not($validity-passed)">
+                    <!-- Data not valid: display error -->
+                    <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
+                                     model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
+                    <xforms:toggle case="fr-message-validation-error"/>
+                    <!-- Mark all active alerts as visited -->
+                    <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
+                    <!-- Open all sections -->
+                    <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
+                </xforms:action>
+
+                <!-- Display message if there is at least one upload in progress -->
+                <xforms:message if="$validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+
+                <!-- Actually save if we passed validation and there is no upload in progress -->
+                <xforms:action if="$validity-passed and not(xxforms:pending-uploads() > 0)">
                 <!-- Data valid: proceed with saving attachments and data -->
 
                 <!-- Handle attachments -->
@@ -354,6 +366,7 @@
                     <xforms:setvalue ref="$parameters/mode" value="'edit'"/>
                 </xforms:action>
             </xforms:action>
+            </xforms:action>
         </xforms:action>
     </xforms:action>
 
@@ -426,11 +439,14 @@
             <data-safe-override/>
             <!-- Whether data is safe -->
             <data-safe/>
+            <!-- Is the captcha valid: start with false, will set it to true when valid -->
+            <captcha>false</captcha>
         </save>
     </xforms:instance>
 
     <xforms:bind nodeset="instance('fr-persistence-instance')">
         <xforms:bind nodeset="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
+        <xforms:bind nodeset="captcha" constraint=". = 'true'"/>
     </xforms:bind>
 
     <!-- Configuration for Saxon serialization -->

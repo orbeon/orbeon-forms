@@ -322,6 +322,12 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     margin-bottom: .25em;
 }
 
+.fr-captcha {
+    display: block;                             /* By default captcha is inline */
+    margin-left: 22px;                          /* Margin left to be aligned with fr-section-content */
+    margin-top: 1.5em; margin-bottom: 1em;      /* Spacing before and after */
+}
+
 .fr-section-title .xforms-help-image {
     float: none;
     vertical-align: middle

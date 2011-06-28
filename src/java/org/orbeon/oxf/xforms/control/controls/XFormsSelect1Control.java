@@ -39,6 +39,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an xforms:select1 control.
@@ -76,7 +77,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
     };
 
-    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
     }
 
@@ -149,7 +150,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         } else if (isStaticItemset(containingDocument, prefixedId)) {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-            return ((SelectionControl) containingDocument.getStaticState().getControlAnalysis(prefixedId)).evaluateStaticItemset();
+            return ((SelectionControl) containingDocument.getStaticOps().getControlAnalysisOption(prefixedId).get()).evaluateStaticItemset();
         } else {
             // Not possible so return null
             return null;
@@ -193,7 +194,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @return                      true iif control has a static set of items
      */
     public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
-        final SelectionControl analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
+        final SelectionControl analysis = containingDocument.getStaticOps().getSelect1Analysis(prefixedId);
         return analysis.hasStaticItemset();
     }
 

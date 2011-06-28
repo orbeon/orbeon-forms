@@ -23,7 +23,7 @@ class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
     // See: [ #315557 ] XPath analysis: Checkbox with both itemset and value changing ends up in incorrect state
     //      http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=315557&group_id=168
-    @Test def testSelectValueDependingOnItemset {
+    @Test def selectValueDependingOnItemset() {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
         this setupDocument

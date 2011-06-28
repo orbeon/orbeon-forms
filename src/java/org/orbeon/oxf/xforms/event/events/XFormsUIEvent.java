@@ -109,7 +109,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 return EmptyIterator.getInstance();
         } else if (XXFORMS_POSITION_ATTRIBUTE.equals(name)) {
             // Return the control's static position in the document
-            final int controlStaticPosition = getContainingDocument().getStaticState().getControlPosition(targetControl.getPrefixedId());
+            final int controlStaticPosition = targetControl.getXBLContainer().getPartAnalysis().getControlPosition(targetControl.getPrefixedId());
             if (controlStaticPosition >= 0)
                 return SingletonIterator.makeIterator(new Int64Value(controlStaticPosition));
             else

@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -55,7 +56,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     private FileInfo fileInfo;
 
-    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
 
         fileInfo = new FileInfo(this, getContextStack(), element);

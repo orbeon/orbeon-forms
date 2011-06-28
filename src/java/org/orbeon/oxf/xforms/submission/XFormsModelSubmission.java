@@ -22,10 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
@@ -270,10 +267,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     public XFormsModel getModel() {
         return model;
-    }
-
-    public List getEventHandlers(XBLContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public void performDefaultAction(XFormsEvent event) {
@@ -1310,5 +1303,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.logDebug(logType, "ignoring invalid client event on submission", "submission id", getEffectiveId(), "event name", eventName);
         }
+    }
+
+    public void addListener(String eventName, EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeListener(String eventName, EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<EventListener> getListeners(String eventName) {
+        return null;
     }
 }

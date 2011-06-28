@@ -66,7 +66,7 @@ public class XXFormsExtractDocument extends XFormsFunction {
 
         // Return DocumentInfo
         if (result instanceof Document)
-            return new DocumentWrapper((Document) result, null, getContainingDocument(xpathContext).getStaticState().getXPathConfiguration());
+            return new DocumentWrapper((Document) result, null, getContainingDocument(xpathContext).getStaticState().xpathConfiguration());
         else
             return (DocumentInfo) result;
     }

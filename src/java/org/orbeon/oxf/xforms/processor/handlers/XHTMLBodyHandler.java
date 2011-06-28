@@ -20,7 +20,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import scala.collection.Seq;
 
 import java.util.Map;
 
@@ -46,10 +47,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-
         // Register control handlers on controller
-        registerHandlers(handlerContext.getController(), staticState);
+        registerHandlers(handlerContext.getController(), containingDocument);
 
         // Add class for YUI skin
         // TODO: should be configurable somehow
@@ -90,7 +89,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         }
 
         // Create xhtml:form element
-        final boolean hasUpload = staticState.hasControlByName("upload");
+        final boolean hasUpload = containingDocument.getStaticOps().hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getFormId(containingDocument),
@@ -143,14 +142,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             // Store information about nested repeats hierarchy
             {
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                        "type", "hidden", "name", "$repeat-tree", "value", staticState.getRepeatHierarchyString()
+                        "type", "hidden", "name", "$repeat-tree", "value", containingDocument.getStaticOps().getRepeatHierarchyString()
                 });
             }
 
             // Store information about the initial index of each repeat
             {
                 final StringBuilder repeatIndexesBuilder = new StringBuilder();
-                final Map<String, Integer> repeatIdToIndex = xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState);
+                final Map<String, Integer> repeatIdToIndex = xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(containingDocument.getStaticOps());
                 if (repeatIdToIndex.size() != 0) {
                     for (final Map.Entry<String, Integer> currentEntry: repeatIdToIndex.entrySet()) {
                         final String repeatId = currentEntry.getKey();
@@ -221,7 +220,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         }
     }
 
-    public static void registerHandlers(final ElementHandlerController controller, final XFormsStaticState staticState) {
+    public static void registerHandlers(final ElementHandlerController controller, final XFormsContainingDocument containingDocument) {
 
         // xforms:input
         controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
@@ -255,7 +254,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
             public boolean match(Attributes attributes) {
                 final QName appearance = getAppearance(attributes);
-                return appearance != null && !staticState.isNoscript() // is noscript mode, use the full appearance
+                return appearance != null && !containingDocument.getStaticState().isNoscript() // is noscript mode, use the full appearance
                         && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
                             || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
             }
@@ -308,7 +307,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
         // Other controls
         controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
-        if (!staticState.isNoscript())
+        if (!containingDocument.getStaticState().isNoscript())
             controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
         else
             controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
@@ -335,21 +334,22 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
 
         // Add handlers for custom components
-        final Map<QName, XBLBindings.AbstractBinding> componentBindings = staticState.getXBLBindings().getComponentBindings();
-        if (componentBindings != null) {
-            for (final QName currentQName : componentBindings.keySet()) {
-                controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
-            }
+        final Seq<QName> componentBindings = containingDocument.getStaticOps().getBindingQNames();
+        for (final scala.collection.Iterator<QName> i = componentBindings.iterator(); i.hasNext();) {
+            final QName currentQName = i.next();
+            controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
         }
+
+        // xxf:dynamic
+        controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic");
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
         // Add global top-level XBL markup
-        final XBLBindings xblBindings = containingDocument.getStaticState().getXBLBindings();
-        if (xblBindings != null)
-            for (final XBLBindings.Global global : xblBindings.getGlobals().values())
-                XXFormsComponentHandler.processShadowTree(handlerContext.getController(), global.fullShadowTree.getRootElement());
+        final scala.collection.Iterator<XBLBindingsBase.Global> i = containingDocument.getStaticOps().getGlobals().values().iterator();
+        while (i.hasNext())
+            XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().fullShadowTree);
 
         // Close xhtml:form
         helper.endElement();

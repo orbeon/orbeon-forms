@@ -18,10 +18,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -94,7 +91,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private boolean mustOutputFirstElement = true;
 
     private final boolean isTopLevel;
-    private final XFormsStaticState.Metadata metadata;
+    private final Metadata metadata;
     private final boolean ignoreRootElement;
 
     private static class XMLBaseLang {
@@ -123,7 +120,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
      * @param xmlReceiver       resulting static state document
      * @param metadata          metadata
      */
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, XFormsStaticState.Metadata metadata) {
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata) {
         super(xmlReceiver);
 
         this.isTopLevel = true;
@@ -146,7 +143,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
      * @param ignoreRootElement whether root element must just be skipped
      * @param baseURI           base URI
      */
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, XFormsStaticState.Metadata metadata,
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata,
                                          boolean ignoreRootElement, String baseURI) {
         super(xmlReceiver);
 
@@ -232,7 +229,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         if (isTopLevel) {
             // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
             final AttributesImpl newAttributes = new AttributesImpl();
-            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(metadata.idGenerator.getCurrentId()));
+            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(metadata.idGenerator().getCurrentId()));
             final String lastIdName = LAST_ID_QNAME.getName();
             super.startElement("", lastIdName, lastIdName, newAttributes);
             super.endElement("", lastIdName, lastIdName);

@@ -89,7 +89,6 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
             outputConfigurationProperties(helper, xhtmlPrefix, isVersionedResources);
 
             // User-defined (with xxforms:script) and XForms scripts
-            final Map<String, Script> scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusControlEffectiveId();
             final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
             final List<XXFormsDialogControl> dialogsToOpen = new ArrayList<XXFormsDialogControl>(); {
@@ -103,7 +102,8 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
                     }
                 }
             }
-            outputScriptDeclarations(helper, xhtmlPrefix, scriptsToDeclare, focusElementId, messagesToRun, dialogsToOpen);
+
+            outputScriptDeclarations(helper, xhtmlPrefix, focusElementId, messagesToRun, dialogsToOpen);
 
             // Store information about "special" controls that need JavaScript initialization
             // Gather information about appearances of controls which use Script
@@ -171,7 +171,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
                 // Help events
                 {
                     // TODO: Need better way to enable/disable xforms-help event support, probably better static analysis of event handlers/
-                    final boolean hasHandlerForXFormsHelp = containingDocument.getStaticState().hasHandlerForEvent(XFormsEvents.XFORMS_HELP, false);
+                    final boolean hasHandlerForXFormsHelp = containingDocument.getStaticOps().hasHandlerForEvent(XFormsEvents.XFORMS_HELP, false);
                     if (hasHandlerForXFormsHelp) {
                         dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                     }
@@ -245,21 +245,13 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
         }
     }
 
-    private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, Map<String, Script> scriptsToDeclare, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
-        if (scriptsToDeclare != null || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
+    private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
+
+        if (containingDocument.getStaticOps().getScripts().size() > 0 || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript"});
 
-            if (scriptsToDeclare != null) {
-                for (final Script script: scriptsToDeclare.values()) {
-                    // Only output client scripts
-                    if (script.isClient) {
-                        helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(script.prefixedId) + "(event) {\n");
-                        helper.text(script.body);
-                        helper.text("}\n");
-                    }
-                }
-            }
+            XHTMLHeadHandler.outputScripts(helper, containingDocument.getStaticOps().getScripts().values());
 
             final List<XFormsContainingDocument.Script> scriptsToRun = containingDocument.getScriptsToRun();
 
@@ -341,7 +333,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
         // Produce JSON output
         final boolean hasPaths = true;
         final boolean hasInitControls = javaScriptControlsAppearancesMap.size() > 0;
-        final boolean hasKeyListeners = containingDocument.getStaticState().getKeyHandlers().size() > 0;
+        final boolean hasKeyListeners = containingDocument.getStaticOps().getKeyHandlers().size() > 0;
         final boolean hasServerEvents; {
             final List<XFormsContainingDocument.DelayedEvent> delayedEvents = containingDocument.getDelayedEvents();
             hasServerEvents = delayedEvents != null && delayedEvents.size() > 0;
@@ -420,11 +412,11 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
                 sb.append("\"keylisteners\":[");
 
                 boolean first = true;
-                for (XFormsEventHandler handler: containingDocument.getStaticState().getKeyHandlers()) {
+                for (XFormsEventHandler handler: containingDocument.getStaticOps().getKeyHandlers()) {
                     if (!first)
                         sb.append(',');
 
-                    for (final String observer: handler.getObserversStaticIds()) {
+                    for (final String observer: handler.getObserversStaticIds()) {// TODO: should we use prefixed ids?
                         sb.append('{');
                         sb.append("\"observer\":\"");
                         sb.append(observer);

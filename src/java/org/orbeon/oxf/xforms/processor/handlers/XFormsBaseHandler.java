@@ -19,9 +19,17 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
-import org.orbeon.oxf.xforms.control.*;
-import org.orbeon.oxf.xml.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandler;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
@@ -100,7 +108,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
 
         // Output MIP classes only having a binding
-        final boolean hasBinding = containingDocument.getStaticState().hasNodeBinding(controlPrefixedId);
+        final boolean hasBinding = containingDocument.getStaticOps().hasNodeBinding(controlPrefixedId);
         if (hasBinding) {
             if (control != null) {
                 // The case of a concrete control
@@ -405,21 +413,21 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         final Attributes labelHintHelpAlertAttributes;
         {
             // Statically obtain attributes information
-            final XFormsStaticState staticState = containingDocument.getStaticState();
+            final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
             final LHHAAnalysis lhhaAnalysis;
             final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
-                lhhaAnalysis = staticState.getLabel(forPrefixedId);
+                lhhaAnalysis = globalOps.getLabel(forPrefixedId);
             } else if (isHelp) {
                 elementName = handlerContext.getHelpElementName();
-                lhhaAnalysis = staticState.getHelp(forPrefixedId);
+                lhhaAnalysis = globalOps.getHelp(forPrefixedId);
             } else if (isHint) {
                 elementName = handlerContext.getHintElementName();
-                lhhaAnalysis = staticState.getHint(forPrefixedId);
+                lhhaAnalysis = globalOps.getHint(forPrefixedId);
             } else if (isAlert) {
                 elementName = handlerContext.getAlertElementName();
-                lhhaAnalysis = staticState.getAlert(forPrefixedId);
+                lhhaAnalysis = globalOps.getAlert(forPrefixedId);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }

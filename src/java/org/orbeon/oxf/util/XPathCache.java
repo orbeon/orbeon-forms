@@ -58,12 +58,12 @@ public class XPathCache {
     private static Configuration CONFIGURATION = new Configuration() {
         @Override
         public void setAllowExternalFunctions(boolean allowExternalFunctions) {
-            throw new IllegalStateException("Global XPath configuration is be read-only");
+            throw new IllegalStateException("Global XPath configuration is read-only");
         }
 
         @Override
         public void setConfigurationProperty(String name, Object value) {
-            throw new IllegalStateException("Global XPath configuration is be read-only");
+            throw new IllegalStateException("Global XPath configuration is read-only");
         }
     };
     static {
@@ -141,6 +141,26 @@ public class XPathCache {
                 xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
         try {
             return xpathExpression.evaluateKeepItems(functionContext);
+        } catch (Exception e) {
+            throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
+        } finally {
+            if (xpathExpression != null)
+                xpathExpression.returnToPool();
+        }
+    }
+
+    /**
+     * Evaluate an XPath expression on the document and keep Item objects in the result.
+     */
+    public static Item evaluaSingleteKeepItems(List<Item> contextItems, int contextPosition,
+                                               String xpathString, NamespaceMapping namespaceMapping, Map<String, ValueRepresentation> variableToValueMap,
+                                               FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(
+                getGlobalConfiguration(), contextItems, contextPosition,
+                xpathString, namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData);
+        try {
+            return xpathExpression.evaluateSingleKeepItems(functionContext);
         } catch (Exception e) {
             throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
         } finally {

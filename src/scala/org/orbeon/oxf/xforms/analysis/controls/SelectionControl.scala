@@ -21,9 +21,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
 import java.util.{LinkedHashMap => JLinkedHashMap}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
-import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils, XFormsConstants, XFormsStaticState}
 import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
 import org.dom4j.{QName, Text, Element}
+import org.orbeon.oxf.xforms._
 
 trait SelectionControl extends SimpleElementAnalysis {
 
@@ -32,7 +32,7 @@ trait SelectionControl extends SimpleElementAnalysis {
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
     val hasStaticItemset = !XPathCache.evaluateSingle(staticStateContext.controlsDocument.wrap(element),
             "exists((xforms:choices | xforms:item | xforms:itemset)/(., .//xforms:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
-            XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
+            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
     // Remember information
     val isMultiple = element.getName == "select"
@@ -43,7 +43,7 @@ trait SelectionControl extends SimpleElementAnalysis {
     val isEncryptValues = {
         val localEncryptItemValues = element.attributeValue(XFormsConstants.ENCRYPT_ITEM_VALUES)
         !isOpenSelection && (if (localEncryptItemValues ne null)
-            localEncryptItemValues.toBoolean else staticStateContext.staticState.getBooleanProperty(XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY))
+            localEncryptItemValues.toBoolean else staticStateContext.partAnalysis.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY))
     }
 
     private var itemsetAnalysis: Option[XPathAnalysis] = None

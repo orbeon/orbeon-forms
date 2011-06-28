@@ -96,7 +96,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
                 sb.append("</headers>");
 
-                final Item headersDocument = TransformerUtils.stringToTinyTree(getContainingDocument().getStaticState().getXPathConfiguration(),
+                final Item headersDocument = TransformerUtils.stringToTinyTree(getContainingDocument().getStaticState().xpathConfiguration(),
                         sb.toString(), false, false);
 
                 return XPathCache.evaluateAsExtent(Collections.singletonList(headersDocument), 1,

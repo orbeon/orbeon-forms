@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.Cacheable;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -125,7 +124,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private ScriptInterpreter scriptInterpreter;
 
     // A document refers to the static state and controls
-    private XFormsStaticState xformsStaticState;
+    private final XFormsStaticState staticState;
+    private final StaticStateGlobalOps staticOps;
     private XFormsControls xformsControls;
 
     // Request information
@@ -169,16 +169,16 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      *
      * Used by XFormsToXHTML.
      *
-     * @param xformsStaticState         static state object
+     * @param staticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      * @param response                  optional response for handling replace="all" during initialization
      */
-    public XFormsContainingDocument(XFormsStaticState xformsStaticState, SAXStore annotatedTemplate,
+    public XFormsContainingDocument(XFormsStaticState staticState, SAXStore annotatedTemplate,
                                     XFormsURIResolver uriResolver, ExternalContext.Response response) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
         // Remember location data
-        setLocationData(xformsStaticState.getLocationData());
+        setLocationData(staticState.locationData());
 
         // Create UUID for this document instance
         this.uuid = UUIDUtils.createPseudoUUID();
@@ -192,20 +192,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
         {
             // Remember static state
-            this.xformsStaticState = xformsStaticState;
+            this.staticState = staticState;
+            this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
 
             // Remember annotated page template if needed based on static state information
             {
-                if (xformsStaticState.isNoscript()) {
-                    // Use provided template SAXStore if noscript mode is requested
-                    this.annotatedTemplate = annotatedTemplate;
-                } else if (xformsStaticState.getMetadata().hasTopLevelMarks()) {
-                    // Use provided template SAXStore if we have top-level marks
-                    this.annotatedTemplate = annotatedTemplate;
-                } else {
-                    // Otherwise there is no need to keep the template
-                    this.annotatedTemplate = null;
-                }
+                this.annotatedTemplate = staticState.isKeepAnnotatedTemplate() ? annotatedTemplate : null;
 
                 if (this.annotatedTemplate != null && indentedLogger.isDebugEnabled()) {
                     indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.annotatedTemplate.getApproximateSize()));
@@ -275,31 +267,33 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 if (cachedState != null) {
                     // Found static state in cache
                     indentedLogger.logDebug("", "found static state by digest in cache");
-                    this.xformsStaticState = cachedState;
+                    this.staticState = cachedState;
                 } else {
                     // Not found static state in cache, create static state from input
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
-                    this.xformsStaticState = new XFormsStaticState(staticStateDigest, xformsState.getStaticState());
+                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.getStaticState());
 
                     // Store in cache
-                    XFormsStaticStateCache.instance().storeDocument(this.xformsStaticState);
+                    XFormsStaticStateCache.instance().storeDocument(this.staticState);
                 }
 
-                assert this.xformsStaticState.isServerStateHandling();
+                assert this.staticState.isServerStateHandling();
             } else {
                 // Not digest provided, create static state from input
                 indentedLogger.logDebug("", "did not find static state by digest in cache");
-                this.xformsStaticState = new XFormsStaticState(null, xformsState.getStaticState());
+                this.staticState = XFormsStaticStateImpl.restore(null, xformsState.getStaticState());
 
-                assert this.xformsStaticState.isClientStateHandling();
+                assert this.staticState.isClientStateHandling();
             }
+
+            this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
         }
 
         indentedLogger.startHandleOperation("initialization", "restoring containing document");
 
         {
             // Make sure there is location data
-            setLocationData(this.xformsStaticState.getLocationData());
+            setLocationData(this.staticState.locationData());
 
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
@@ -318,6 +312,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
         }
         indentedLogger.endHandleOperation();
+    }
+
+    public PartAnalysis getPartAnalysis() {
+        return staticState.topLevelPart();
     }
 
     public XFormsURIResolver getURIResolver() {
@@ -431,14 +429,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Return the static state of this document.
      */
     public XFormsStaticState getStaticState() {
-        return xformsStaticState;
+        return staticState;
     }
 
-    /**
-     * Return a map of script prefixed id -> script information.
-     */
-    public Map<String, org.orbeon.oxf.xforms.Script> getScripts() {
-        return xformsStaticState.getScripts();
+    public StaticStateGlobalOps getStaticOps() {
+        return staticOps;
     }
 
     /**
@@ -705,7 +700,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
 
         // Warn that scripts won't run in noscript mode (duh)
-        if (xformsStaticState.isNoscript())
+        if (staticState.isNoscript())
             indentedLogger.logWarning("noscript", "script won't run in noscript mode", "script id", scriptId);
 
         if (scriptsToRun == null)
@@ -1282,10 +1277,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public XFormsEvent getCurrentEvent() {
         return (eventStack.size() == 0) ? null : eventStack.peek();
-    }
-
-    public List getEventHandlers(XBLContainer container) {
-        return getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public static void logWarningStatic(String type, String message, String... parameters) {

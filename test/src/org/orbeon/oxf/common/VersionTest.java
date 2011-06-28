@@ -21,7 +21,7 @@ import static junit.framework.Assert.*;
 public class VersionTest extends ResourceManagerTestBase {
 
     @Test
-    public void testProductConfiguration() {
+    public void productConfiguration() {
         if (Version.isPE()) {
             assertEquals("PE", Version.getEdition());
             assertTrue(Version.isPE());
@@ -36,7 +36,7 @@ public class VersionTest extends ResourceManagerTestBase {
     }
 
     @Test
-    public void testVersionExpired() {
+    public void versionExpired() {
         assertFalse(PEVersion.isVersionExpired("3.8", "3.8"));
         assertFalse(PEVersion.isVersionExpired("3.8.1", "3.8"));
         assertFalse(PEVersion.isVersionExpired("3.8.0", "3.8"));

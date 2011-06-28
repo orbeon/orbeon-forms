@@ -15,10 +15,10 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
+import java.lang.IllegalArgumentException
 
-
-class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends ContainerControl(staticStateContext, element, parent, preceding, scope) {
     // TODO: add repeat hierarchy information
 }
@@ -33,5 +33,22 @@ object RepeatControl {
             case _ => None
         }
 
-    def getAncestorRepeatOrNull(elementAnalysis: ElementAnalysis) = getAncestorRepeat(elementAnalysis).orNull
+    // Get the first ancestor repeats across parts
+    def getAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): Option[RepeatControl] = elementAnalysis match {
+        case simpleElementAnalysis: SimpleElementAnalysis =>
+            val currentPart = simpleElementAnalysis.staticStateContext.partAnalysis
+            // First search ancestor local to this part, or else try the ancestor repeat associated with the parent part if any
+            getAncestorRepeat(simpleElementAnalysis) orElse
+                (currentPart.parent map
+                    (_.getControlAnalysis(currentPart.startScope.getFullPrefix.init)) // .init removes the trailing '$'
+                        flatMap (getAncestorRepeatAcrossParts(_))) // recursively search ancestor parts
+        case _ => throw new IllegalArgumentException
+    }
+
+    // Get all ancestor repeats across parts, from leaf to root
+    def getAllAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] =
+        getAncestorRepeatAcrossParts(elementAnalysis) match {
+            case Some(ancestor) => ancestor :: getAllAncestorRepeatAcrossParts(ancestor)
+            case None => Nil
+        }
 }

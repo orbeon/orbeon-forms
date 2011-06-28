@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -24,7 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -33,7 +32,7 @@ import org.orbeon.saxon.om.Item;
 public class XXFormsInvalidateInstanceAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Evaluate AVTs
         final String resourceURI = actionInterpreter.resolveAVT(actionElement, "resource");

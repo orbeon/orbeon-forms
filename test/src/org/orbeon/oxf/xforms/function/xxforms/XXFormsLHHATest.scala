@@ -19,7 +19,7 @@ import org.junit.Test
 
 class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def testLHHAFunctions {
+    @Test def lhhaFunctions {
 
         this setupDocument
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"

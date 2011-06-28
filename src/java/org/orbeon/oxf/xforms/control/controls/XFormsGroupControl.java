@@ -20,6 +20,8 @@ import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
+import java.util.Map;
+
 /**
  * Represents an xforms:group container control.
  */
@@ -27,7 +29,7 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
 
     public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
 
-    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
     }
 

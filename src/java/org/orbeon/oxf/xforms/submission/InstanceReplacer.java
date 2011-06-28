@@ -14,14 +14,19 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Document;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +76,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // TODO: What about configuring validation? And what default to choose?
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                resultingDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                resultingDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
                         connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude, true);
 
                 if (indentedLogger.isDebugEnabled())
@@ -149,7 +154,7 @@ public class InstanceReplacer extends BaseReplacer {
                         detailsLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
-                    newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
+                    newInstance = new XFormsInstance(containingDocument.getStaticState().xpathConfiguration(), updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
                             (Document) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password, p2.domain,
                             p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 } else {
@@ -195,7 +200,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
                 newInstance.getXBLContainer(containingDocument).dispatchEvent(
                         new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
-                            "after", null, null));
+                            "after"));
 
             } else {
                 // Generic insertion

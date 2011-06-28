@@ -14,20 +14,17 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvents, XFormsEvent}
-import java.lang.String
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.saxon.om.SingletonIterator
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
 
 class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, val t: Throwable)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, targetObject, true, false) {
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, targetObject, bubbles = true, cancelable = false) with EventAttributes {
 
     private lazy val rootLocationData = ValidationException.getRootLocationData(t)
     private def rootMessage = OXFException.getRootThrowable(t).getMessage
 
-    private val attributes = Map(
+    override val attributes = Map(
         "element" ->    (() => rootLocationData match {
                             case rootLocationData: ExtendedLocationData => rootLocationData.getElementDebugString
                             case _ => null
@@ -38,15 +35,4 @@ class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targ
         "message" ->    (() => rootMessage),
         "throwable" ->  (() => OXFException.throwableToString(t))
     )
-
-    private def string(value: String) = SingletonIterator.makeIterator(StringValue.makeStringValue(value))
-
-    override def getAttribute(name: String) = attributes(name) match {
-        case null => super.getAttribute(name)
-        case getvalue => string(getvalue())
-    }
-
-    def toStringArray =
-         attributes.keys.toArray flatMap
-            (name => Array(name, getAttribute(name).next().getStringValue))
 }

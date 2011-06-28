@@ -154,6 +154,14 @@ public class PooledXPathExpression {
     }
 
     /**
+     * Evaluate and return a List of Item objects.
+     */
+    public Item evaluateSingleKeepItems(Object functionContext) throws XPathException {
+        final SequenceIterator iter = evaluate(functionContext);
+        return iter.next();
+    }
+
+    /**
      * Evaluate the expression as a variable value usable by Saxon in further XPath expressions.
      */
     public SequenceExtent evaluateAsExtent(Object functionContext) throws XPathException {

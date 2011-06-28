@@ -511,7 +511,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 staticStateString = null;
             } else {
                 // Return full encoded state
-                staticStateString = containingDocument.getStaticState().getEncodedStaticState();
+                staticStateString = containingDocument.getStaticState().encodedState();
             }
         }
         return staticStateString;

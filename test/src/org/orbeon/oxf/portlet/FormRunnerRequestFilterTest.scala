@@ -28,7 +28,7 @@ import collection.immutable.TreeMap
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
-    @Test def testAmendPortletRequest() {
+    @Test def amendPortletRequest() {
 
         // Initial properties
         val initialProperties = Map("p1" -> Seq("v1a", "v1b"))

@@ -14,7 +14,9 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.StringValue;
 
@@ -32,11 +34,7 @@ public class XFormsInsertEvent extends XFormsEvent {
     private List<Item> insertedNodeInfos;
     private List originItems;
     private NodeInfo insertLocationNodeInfo;
-    private String position;
-
-    // Extension attributes
-    private List sourceNodes;
-    private List clonedNodes;
+    private String position; // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
 
     public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
         super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
@@ -44,16 +42,13 @@ public class XFormsInsertEvent extends XFormsEvent {
 
     public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject,
                              List<Item> insertedNodes, List originItems,
-                             NodeInfo insertLocationNodeInfo, String position, List sourceNodes, List clonedNodes) {
+                             NodeInfo insertLocationNodeInfo, String position) {
         super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
         
         this.insertedNodeInfos = insertedNodes;
         this.originItems = originItems;
         this.insertLocationNodeInfo = insertLocationNodeInfo;
         this.position = position;
-
-        this.sourceNodes = sourceNodes;
-        this.clonedNodes = clonedNodes;
     }
 
     public SequenceIterator getAttribute(String name) {
@@ -78,11 +73,15 @@ public class XFormsInsertEvent extends XFormsEvent {
         return insertedNodeInfos;
     }
 
-    public List getSourceNodes() {
-        return sourceNodes;
+    public List getOriginItems() {
+        return originItems;
     }
 
-    public List getClonedNodes() {
-        return clonedNodes;
+    public NodeInfo getInsertLocationNodeInfo() {
+        return insertLocationNodeInfo;
+    }
+
+    public String getPosition() {
+        return position;
     }
 }

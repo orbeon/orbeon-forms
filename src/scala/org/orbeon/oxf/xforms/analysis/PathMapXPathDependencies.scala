@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis
 
 import model.Model
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.om.NodeInfo
 import collection.mutable.{HashSet, HashMap}
 import org.orbeon.saxon.dom4j.NodeWrapper
@@ -26,11 +25,13 @@ import java.util.{Map => JMap}
 import java.lang.String
 import collection.immutable.Nil
 
-class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsStaticState) // Constructor for unit tests
-        extends XPathDependencies {
+class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument) extends XPathDependencies {
 
-    private var containingDocument: XFormsContainingDocument = _
-
+    private val logger = containingDocument.getControls match {
+        case controls: XFormsControls => controls.getIndentedLogger
+        case _ => containingDocument.getIndentedLogger
+    }
+    
     // Represent the state of a model
     private class ModelState(private val modelPrefixedId: String) {
 
@@ -103,12 +104,12 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         }
 
         // Say that for this model, calculate binds are clean and can be checked for modifications based on value changes
-        def recalculateDone(): Unit = {
+        def recalculateDone() {
             useCalculateChangeset = true
             recalculateChangeset = clearChangeset(recalculateChangeset, revalidateChangeset)
         }
         // Say that for this model, validate binds are clean and can be checked for modifications based on value changes
-        def revalidateDone(): Unit = {
+        def revalidateDone() {
             useValidateChangeset = true
             revalidateChangeset = clearChangeset(revalidateChangeset, recalculateChangeset)
         }
@@ -120,7 +121,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             else new MapSet[String, String]
         }
 
-        def refreshDone(): Unit = ()
+        def refreshDone() = ()
 
         def outOfDateChangesetForMip(mip: Model#Bind#MIP) = mip.isValidateMIP && !useValidateChangeset || !mip.isValidateMIP && !useCalculateChangeset
 
@@ -200,18 +201,6 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     private var itemsetMissCount: Int = 0
     private var itemsetHitCount: Int = 0
 
-    def this(containingDocument: XFormsContainingDocument) {
-        // Defer logger initialization as controls might not have been initialized at time this constructor is called.
-        this(null, containingDocument.getStaticState)
-        this.containingDocument = containingDocument
-    }
-
-    def getLogger: IndentedLogger = {
-        if (logger eq null) // none was passed
-            logger = containingDocument.getControls.getIndentedLogger
-        return logger
-    }
-
     def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) {
 
         // Caller must only call this for a mutable node belonging to the given model
@@ -224,7 +213,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     def markStructuralChange(model: XFormsModel, instance: XFormsInstance): Unit =
         getModelState(model.getPrefixedId).markStructuralChange()
 
-    def rebuildDone(model: Model) =  getModelState(model.prefixedId).rebuildDone()
+    def rebuildDone(model: Model) = getModelState(model.prefixedId).rebuildDone()
     def recalculateDone(model: Model) = getModelState(model.prefixedId).recalculateDone()
     def revalidateDone(model: Model) = getModelState(model.prefixedId).revalidateDone()
 
@@ -245,8 +234,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
 
     def refreshDone() {
 
-        if (getLogger.isDebugEnabled)
-            getLogger.logDebug("dependencies", "refresh done",
+        if (logger.isDebugEnabled)
+            logger.logDebug("dependencies", "refresh done",
                 Array("bindings updated", RefreshState.bindingUpdateCount.toString,
                       "values updated", RefreshState.valueUpdateCount.toString,
                       "MIPs updated", mipUpdateCount.toString,
@@ -295,8 +284,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
     def notifyOptimizeItemset: Unit = itemsetOptimizedCount += 1
 
     private def outputLHHAItemsetStats() {
-        if (getLogger.isDebugEnabled)
-            getLogger.logDebug("dependencies", "summary after response",
+        if (logger.isDebugEnabled)
+            logger.logDebug("dependencies", "summary after response",
                 Array("LHHA evaluations", lhhaEvaluationCount.toString,
                       "LHHA optimized", lhhaOptimizedCount.toString,
                       "LHHA unknown dependencies", lhhaUnknownDependencies.toString,
@@ -332,7 +321,7 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
             cached match {
                 case Some(result) => result
                 case None => {
-                    val control = staticState.getControlAnalysis(controlPrefixedId)
+                    val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
                     val tempResult = control.getBindingAnalysis match {
                         case None =>
                             // Control does not have an XPath binding
@@ -347,8 +336,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                                 , control.bindingXPathEvaluations)
                     }
 
-                    if (tempResult.requireUpdate && getLogger.isDebugEnabled)
-                        getLogger.logDebug("dependencies", "binding requires update",
+                    if (tempResult.requireUpdate && logger.isDebugEnabled)
+                        logger.logDebug("dependencies", "binding requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
@@ -373,9 +362,9 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         val cached = RefreshState.modifiedValueCache.get(controlPrefixedId)
         val (updateResult, valueAnalysis) =
             cached match {
-                case Some(result) => (result, if (result.requireUpdate) staticState.getControlAnalysis(controlPrefixedId).getValueAnalysis else null)
+                case Some(result) => (result, if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null)
                 case None => {
-                    val control = staticState.getControlAnalysis(controlPrefixedId)
+                    val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
                     val tempValueAnalysis = control.getValueAnalysis
                     val tempUpdateResult = tempValueAnalysis match {
                         case None =>
@@ -389,8 +378,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                             new UpdateResult(analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 , if (control.value.isDefined) 1 else 0)
                     }
-                    if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && getLogger.isDebugEnabled)
-                        getLogger.logDebug("dependencies", "value requires update",
+                    if (tempUpdateResult.requireUpdate && tempValueAnalysis.isDefined && logger.isDebugEnabled)
+                        logger.logDebug("dependencies", "value requires update",
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
@@ -415,8 +404,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         RefreshState.modifiedLHHACache.get(controlPrefixedId) match {
             case Some(result) => result // cached
             case None => // not cached
-                staticState.getControlAnalysis(controlPrefixedId) match {
-                    case control: LHHATrait => // control found
+                containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
+                    case Some(control: LHHATrait) => // control found
                         val result = control.getLHHAValueAnalysis(lhhaName) match {
                             case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
                                 lhhaUnknownDependencies += 1
@@ -443,8 +432,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
         RefreshState.modifiedItemsetCache.get(controlPrefixedId) match {
             case Some(result) => result // cached
             case None => // not cached
-                staticState.getControlAnalysis(controlPrefixedId) match {
-                    case control: SelectionControl => // control found
+                containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
+                    case Some(control: SelectionControl) => // control found
                         val result = control.getItemsetAnalysis match {
                             case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
                                 itemsetUnknownDependencies += 1
@@ -512,8 +501,8 @@ class PathMapXPathDependencies(var logger: IndentedLogger, staticState: XFormsSt
                             case _ => throw new IllegalStateException("No value analysis found for xf:bind with " + mipName)
                         }
 
-                        if (tempUpdateResult.requireUpdate && getLogger.isDebugEnabled)
-                            getLogger.logDebug("dependencies", "MIP requires update",
+                        if (tempUpdateResult.requireUpdate && logger.isDebugEnabled)
+                            logger.logDebug("dependencies", "MIP requires update",
                                 Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
 
                         tempUpdateResult

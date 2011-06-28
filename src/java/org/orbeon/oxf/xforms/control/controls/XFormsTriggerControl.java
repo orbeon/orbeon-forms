@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,7 +29,7 @@ import java.util.Set;
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
-    public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
     }
 

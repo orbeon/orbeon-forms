@@ -17,18 +17,18 @@ import collection.mutable.LinkedHashMap
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 
 /**
  * Representation of a common XForms element supporting optional context, binding and value.
  */
-class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element: Element, parent: Option[ContainerTrait], preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element: Element, parent: Option[ContainerTrait], preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends ElementAnalysis(element, parent, preceding) with ContainerTrait {
 
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val scopeModel = new ScopeModel(scope, findContainingModel)
-    lazy val namespaceMapping = staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId)
+    lazy val namespaceMapping = staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId)
 
     lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 
@@ -52,7 +52,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
             case localModelStaticId: String =>
                 // Get model prefixed id and verify it belongs to this scope
                 val localModelPrefixedId = scope.getPrefixedIdForStaticId(localModelStaticId)
-                val localModel = staticStateContext.staticState.getModel(localModelPrefixedId)
+                val localModel = staticStateContext.partAnalysis.getModel(localModelPrefixedId)
                 if (localModel eq null)
                     throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
 
@@ -61,7 +61,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
                 // Use inherited model
                 ElementAnalysis.getClosestAncestorInScope(parent, scope) match {
                     case Some(ancestor) => ancestor.scopeModel.containingModel // there is an ancestor control in the same scope, use its model id
-                    case None => Option(staticStateContext.staticState.getDefaultModelForScope(scope)) // top-level control in a new scope, use default model id for scope
+                    case None => Option(staticStateContext.partAnalysis.getDefaultModelForScope(scope)) // top-level control in a new scope, use default model id for scope
                 }
         }
 
@@ -80,7 +80,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
         bind match {
             case Some(bindStaticId) =>
                 // Use @bind analysis directly from model
-                staticStateContext.staticState.getModelByScopeAndBind(scopeModel.scope, bindStaticId).bindsById.get(bindStaticId).getBindingAnalysis
+                staticStateContext.partAnalysis.getModelByScopeAndBind(scopeModel.scope, bindStaticId).bindsById.get(bindStaticId).getBindingAnalysis
             case None =>
                 // No @bind
                 ref match {
@@ -113,7 +113,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
 
     def getChildElementScope(childElement: Element) = {
         val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(childElement))
-        staticStateContext.staticState.getXBLBindings.getResolutionScopeByPrefixedId(childPrefixedId)
+        staticStateContext.partAnalysis.getResolutionScopeByPrefixedId(childPrefixedId)
     }
 
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
@@ -123,7 +123,7 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
 
         def getDefaultInstancePrefixedId = scopeModel.containingModel match { case Some(model) => model.defaultInstancePrefixedId; case None => None }
 
-        PathMapXPathAnalysis(staticStateContext.staticState, xpathString, staticStateContext.staticState.getMetadata.getNamespaceMapping(prefixedId),
+        PathMapXPathAnalysis(staticStateContext.partAnalysis, xpathString, staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId),
             contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, getDefaultInstancePrefixedId, locationData, element)
     }
 

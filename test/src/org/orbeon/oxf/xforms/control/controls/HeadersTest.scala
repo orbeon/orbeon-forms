@@ -11,19 +11,18 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.controls.control
+package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.common.Version
 import org.junit._
 import org.scalatest.junit._
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import collection.mutable.LinkedHashMap
-import scala.collection.JavaConversions._
+import collection.JavaConverters._
 
 class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def testOutputHeaders {
+    @Test def outputHeaders() {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
         this setupDocument
@@ -111,9 +110,9 @@ class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
         for {
             (controlId, expectedHeaders) <- expected
             control = getValueControl(controlId).asInstanceOf[XFormsOutputControl]
-            actualHeaders = control.testEvaluateHeaders()
+            actualHeaders = control.testEvaluateHeaders
             (expectedHeaderName, expectedHeaderValues) <- expectedHeaders
         } yield
-            assert(expectedHeaderValues === actualHeaders(expectedHeaderName).toSeq)
+            assert(expectedHeaderValues === actualHeaders.asScala(expectedHeaderName).toSeq)
     }
 }

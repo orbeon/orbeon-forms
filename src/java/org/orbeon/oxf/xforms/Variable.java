@@ -16,19 +16,21 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.LastPositionFinder;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.EmptySequence;
+import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.List;
@@ -83,7 +85,7 @@ public class Variable {
             if (pushContext) {
                 // Push binding for evaluation, so that @context and @model are evaluated
                 final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue(XFormsConstants.ID_QNAME);
-                final XBLBindings.Scope variableValueScope = container.getContainingDocument().getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(variableValuePrefixedId);
+                final XBLBindingsBase.Scope variableValueScope = container.getPartAnalysis().getResolutionScopeByPrefixedId(variableValuePrefixedId);
                 contextStack.pushBinding(valueElement, sourceEffectiveId, variableValueScope);
             }
             {

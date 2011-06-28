@@ -66,7 +66,7 @@ public class XFormsSubmitSerializeEvent extends XFormsEvent {
             }
 
             // Return document element
-            final Item item = getContainingDocument().getStaticState().getDefaultDocumentWrapper().wrap(submissionBodyElement);
+            final Item item = getContainingDocument().getStaticState().documentWrapper().wrap(submissionBodyElement);
             return SingletonIterator.makeIterator(item);
         } else if (XXFORMS_BINDING_ATTRIBUTE.equals(name)) {
             // Return the node to which the submission is bound if any

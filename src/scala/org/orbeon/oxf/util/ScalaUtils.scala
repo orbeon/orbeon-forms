@@ -106,6 +106,6 @@ object ScalaUtils {
     }
 
     def dropTrailingSlash(s: String) = if (s.isEmpty || s.last != '/') s else s.init
-
+    def dropStartingSlash(s: String) = if (s.isEmpty || s.head != '/') s else s.tail
     def capitalizeHeader(s: String) = s split '-' map (_.capitalize) mkString "-"
 }

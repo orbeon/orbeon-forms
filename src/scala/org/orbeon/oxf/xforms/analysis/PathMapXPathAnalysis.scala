@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.saxon.expr._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
@@ -24,7 +23,6 @@ import org.orbeon.saxon.om.Axis
 import java.util.{Map => JMap}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import collection.mutable.{LinkedHashSet, Stack}
-import org.orbeon.oxf.xforms.{MapSet, XFormsConstants, XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.saxon.trace.ExpressionPresenter
 import java.io.ByteArrayOutputStream
 import org.orbeon.saxon.expr.PathMap.{PathMapNode, PathMapArc}
@@ -32,6 +30,8 @@ import xml._
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.saxon.Configuration
 import scala.collection.JavaConversions._
+import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
+import org.orbeon.oxf.xforms._
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -103,14 +103,14 @@ object PathMapXPathAnalysis {
     /**
      * Create a new XPathAnalysis based on an initial XPath expression.
      */
-    def apply(staticState: XFormsStaticState, xpathString: String, namespaceMapping: NamespaceMapping,
+    def apply(partAnalysis: PartAnalysis, xpathString: String, namespaceMapping: NamespaceMapping,
               baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
-              pathMapContext: AnyRef, scope: XBLBindings#Scope, defaultInstancePrefixedId: Option[String],
+              pathMapContext: AnyRef, scope: XBLBindingsBase.Scope, defaultInstancePrefixedId: Option[String],
               locationData: LocationData, element: Element): XPathAnalysis = {
 
         try {
             // Create expression
-            val expression = XPathCache.createExpression(staticState.getXPathConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
+            val expression = XPathCache.createExpression(XPathCache.getGlobalConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
 
             val stringPathmap = new PathMap(new StringLiteral(""))
 
@@ -186,7 +186,7 @@ object PathMapXPathAnalysis {
                             val expressions = stack.reverse
 
                             // Start with first expression
-                            extractInstancePrefixedId(staticState, scope, expressions.head, defaultInstancePrefixedId) match {
+                            extractInstancePrefixedId(partAnalysis, scope, expressions.head, defaultInstancePrefixedId) match {
                                 // First expression is instance() expression we can handle
                                 case Right(Some(instancePrefixedId)) =>
                                     // Continue with rest of expressions
@@ -211,7 +211,7 @@ object PathMapXPathAnalysis {
 
                                         // Remember dependencies for this path
                                         val instancePrefixedId = instancePath.instancePrefixedId
-                                        val model = staticState.getModelByInstancePrefixedId(instancePrefixedId)
+                                        val model = partAnalysis.getModelByInstancePrefixedId(instancePrefixedId)
                                         if (model eq null)
                                             throw new OXFException("Reference to invalid instance: " + instancePrefixedId)
                                         dependentModels.add(model.prefixedId)
@@ -266,7 +266,7 @@ object PathMapXPathAnalysis {
         }
     }
 
-    private def extractInstancePrefixedId(staticState: XFormsStaticState, scope: XBLBindings#Scope, expression: Expression,
+    private def extractInstancePrefixedId(partAnalysis: PartAnalysis, scope: XBLBindingsBase.Scope, expression: Expression,
                                           defaultInstancePrefixedId: Option[String]): String Either Option[String] = {
 
         // Local class used as marker for a rewritten StringLiteral in an expression
@@ -306,7 +306,7 @@ object PathMapXPathAnalysis {
                                     originalInstanceId
                                 else if (searchAncestors)
                                     // xxf:instance()
-                                    staticState.findInstancePrefixedId(scope, originalInstanceId) // can return null
+                                    partAnalysis.findInstancePrefixedId(scope, originalInstanceId) // can return null
                                 else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
                                     // HACK: datatable e.g. uses instance(prefixedId)!
                                     originalInstanceId // TODO: warn: could be a non-existing instance id

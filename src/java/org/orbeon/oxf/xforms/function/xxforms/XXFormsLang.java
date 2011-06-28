@@ -14,11 +14,13 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.expr.XPathContext;
@@ -32,7 +34,7 @@ public class XXFormsLang extends XFormsFunction {
 
         final String elementId = (argument.length > 0) ? argument[0].evaluateAsString(xpathContext).toString() : null;
 
-        final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
+        final XBLContainer container = getXBLContainer(xpathContext);
 
         final Element element;
         if (elementId == null) {
@@ -40,10 +42,10 @@ public class XXFormsLang extends XFormsFunction {
             element = getSourceElement(xpathContext);
         } else {
             // Do a bit more work to find current scope first
-            final XBLBindings.Scope scope = containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId(xpathContext)));
+            final XBLBindingsBase.Scope scope = container.getPartAnalysis().getResolutionScopeByPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId(xpathContext)));
             final String elementPrefixedId = scope.getPrefixedIdForStaticId(elementId);
 
-            element = containingDocument.getStaticState().getControlElement(elementPrefixedId);
+            element = container.getPartAnalysis().getControlElement(elementPrefixedId);
         }
 
         final String lang = resolveXMLangHandleAVTs(getXBLContainer(xpathContext), element);
@@ -93,7 +95,7 @@ public class XXFormsLang extends XFormsFunction {
         } else if (xmlLang == null) {
             // We are not at the top-level, so try parent container
             return resolveXMLangHandleAVTs(xblContainer.getParentXBLContainer(),
-                    xblContainer.getContainingDocument().getStaticState().getControlElement(xblContainer.getPrefixedId()));
+                    xblContainer.getContainingDocument().getStaticOps().getControlElement(xblContainer.getPrefixedId()));
         } else if (!xmlLang.startsWith("#")) {
             // Found static value
             return xmlLang;
@@ -104,7 +106,7 @@ public class XXFormsLang extends XFormsFunction {
             final XFormsContainingDocument containingDocument = xblContainer.getContainingDocument();
 
             final String attributeControlStaticId; {
-                final AttributeControl controlAnalysis = containingDocument.getStaticState().getAttributeControl(xmlLang.substring(1), "xml:lang");
+                final AttributeControl controlAnalysis = containingDocument.getStaticOps().getAttributeControl(xmlLang.substring(1), "xml:lang");
                 attributeControlStaticId = controlAnalysis.element().attributeValue(XFormsConstants.ID_QNAME);
             }
 

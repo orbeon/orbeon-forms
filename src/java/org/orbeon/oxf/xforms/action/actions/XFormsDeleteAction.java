@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.xforms.action.actions;
 
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -21,11 +24,13 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 9.3.6 The delete Element
@@ -36,7 +41,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -106,46 +111,58 @@ public class XFormsDeleteAction extends XFormsAction {
         }
     }
 
-    public static List<Item> doDelete(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
+    public static class DeleteInfo {
+        public final NodeInfo parent;
+        public final NodeInfo nodeInfo;
+        public final int index;
+
+        private DeleteInfo(NodeInfo parent, NodeInfo nodeInfo, int index) {
+            this.parent = parent;
+            this.nodeInfo = nodeInfo;
+            this.index = index; // only really makes sense for element content, not attribute content
+        }
+    }
+
+    public static List<DeleteInfo> doDelete(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                       List collectionToUpdate, int deleteIndex, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
-        final List<Item> deletedNodeInfos;
+        final List<DeleteInfo> deleteInfos;
         if (isEmptyNodesetBinding) {
-            deletedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
+            deleteInfos = Collections.emptyList();
         } else if (deleteIndex == -1) {
             // Delete the entire collection
 
-            deletedNodeInfos = new ArrayList<Item>(collectionToUpdate.size());
+            deleteInfos = new ArrayList<DeleteInfo>(collectionToUpdate.size());
             for (int i = 1; i <= collectionToUpdate.size(); i++) {
-                final NodeInfo deletedNodeInfo = doDeleteOne(indentedLogger, collectionToUpdate, i);
-                if (deletedNodeInfo != null) {
-                    deletedNodeInfos.add(deletedNodeInfo);
+                final DeleteInfo deletedInfo = doDeleteOne(indentedLogger, collectionToUpdate, i);
+                if (deletedInfo != null) {
+                    deleteInfos.add(deletedInfo);
                 }
             }
         } else {
             // Find actual deletion point
 
-            final NodeInfo deletedNodeInfo = doDeleteOne(indentedLogger, collectionToUpdate, deleteIndex);
-            if (deletedNodeInfo != null) {
-                deletedNodeInfos = Collections.singletonList((Item) deletedNodeInfo);
+            final DeleteInfo deleteInfo = doDeleteOne(indentedLogger, collectionToUpdate, deleteIndex);
+            if (deleteInfo != null) {
+                deleteInfos = Collections.singletonList(deleteInfo);
             } else {
-                deletedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
+                deleteInfos = Collections.emptyList();
             }
         }
 
-        if (deletedNodeInfos.size() == 0) {
+        if (deleteInfos.size() == 0) {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "empty collection, terminating");
         } else {
             // Identify the instance that actually changes
             // NOTE: More than one instance may be modified. For now we look at the first one.
-            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode((NodeInfo) deletedNodeInfos.get(0));
+            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(deleteInfos.get(0).nodeInfo);
 
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "removed nodes",
-                        "count", Integer.toString(deletedNodeInfos.size()), "instance",
+                        "count", Integer.toString(deleteInfos.size()), "instance",
                                 (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
 
             if (modifiedInstance != null) {
@@ -156,32 +173,34 @@ public class XFormsDeleteAction extends XFormsAction {
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)
-                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(new XFormsDeleteEvent(containingDocument, modifiedInstance, deletedNodeInfos, deleteIndex));
+                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(new XFormsDeleteEvent(containingDocument, modifiedInstance, deleteInfos, deleteIndex));
             }
         }
 
-        return deletedNodeInfos;
+        return deleteInfos;
     }
 
-    private static NodeInfo doDeleteOne(IndentedLogger indentedLogger, List collectionToUpdate, int deleteIndex) {
+    private static DeleteInfo doDeleteOne(IndentedLogger indentedLogger, List collectionToUpdate, int deleteIndex) {
         final NodeInfo nodeInfoToRemove = (NodeInfo) collectionToUpdate.get(deleteIndex - 1);
+        final NodeInfo parentNodeInfo = nodeInfoToRemove.getParent();
+
         final Node nodeToRemove = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CANNOT_DELETE_READONLY_MESSAGE);
 
-        final List parentContent;
-        final int actualIndexInParentContentCollection;
+        final List contentToUpdate;
+        final int indexInContentToUpdate;
         final Element parentElement = nodeToRemove.getParent();
         if (parentElement != null) {
             // Regular case
             if (nodeToRemove instanceof Attribute) {
-                parentContent = parentElement.attributes();
+                contentToUpdate = parentElement.attributes();
             } else {
-                parentContent = parentElement.content();
+                contentToUpdate = parentElement.content();
             }
-            actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
+            indexInContentToUpdate = contentToUpdate.indexOf(nodeToRemove);
         } else if (nodeToRemove.getDocument() != null && nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
             // Case of root element where parent is Document
-            parentContent = nodeToRemove.getDocument().content();
-            actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
+            contentToUpdate = nodeToRemove.getDocument().content();
+            indexInContentToUpdate = contentToUpdate.indexOf(nodeToRemove);
         } else if (nodeToRemove instanceof Document) {
             // Case where node to remove is Document
 
@@ -200,9 +219,8 @@ public class XFormsDeleteAction extends XFormsAction {
 
         // Actually perform the deletion
         // "The node at the delete location in the Node Set Binding node-set is deleted"
-        parentContent.remove(actualIndexInParentContentCollection);
-//        nodeToRemove.detach(); // not sure if we should detach or not!
+        contentToUpdate.remove(indexInContentToUpdate);
 
-        return nodeInfoToRemove;
+        return new DeleteInfo(parentNodeInfo, nodeInfoToRemove, indexInContentToUpdate);
     }
 }

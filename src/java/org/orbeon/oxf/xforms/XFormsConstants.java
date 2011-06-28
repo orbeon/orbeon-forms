@@ -51,6 +51,8 @@ public class XFormsConstants {
         ALLOWED_XXFORMS_ELEMENTS.add("context");
         ALLOWED_XXFORMS_ELEMENTS.add("size");//xforms:upload/xxforms:size
 
+        ALLOWED_XXFORMS_ELEMENTS.add("dynamic");
+
         ALLOWED_EXFORMS_ELEMENTS.add("variable");
 
         ALLOWED_XBL_ELEMENTS.add("xbl");
@@ -110,6 +112,7 @@ public class XFormsConstants {
     public static final QName XFORMS_CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
     public static final QName XXFORMS_DIALOG_QNAME = new QName("dialog", XXFORMS_NAMESPACE);
     public static final String XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.getName();
+    public static final QName XXFORMS_DYNAMIC_QNAME = new QName("dynamic", XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_INPUT_QNAME = new QName("input", XFORMS_NAMESPACE);
     public static final QName XFORMS_SECRET_QNAME = new QName("secret", XFORMS_NAMESPACE);
@@ -304,8 +307,6 @@ public class XFormsConstants {
     public static final QName XXFORMS_XINCLUDE = new QName("xinclude", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ORDER_QNAME = new QName("order", XXFORMS_NAMESPACE);
-
-    public static final QName XXFORMS_OFFLINE_QNAME = new QName("offline", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_CALCULATE_QNAME = new QName("calculate", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);

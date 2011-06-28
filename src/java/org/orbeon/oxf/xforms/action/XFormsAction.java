@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -35,7 +35,7 @@ import org.orbeon.saxon.value.StringValue;
 public abstract class XFormsAction {
     public abstract void execute(XFormsActionInterpreter actionInterpreter,
                                  XFormsEvent event, XFormsEventObserver eventObserver, Element actionElement,
-                                 XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext);
+                                 XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext);
 
     /**
      * Add event context attributes based on nested xxforms:context elements.
@@ -66,7 +66,7 @@ public abstract class XFormsAction {
                 // XPath expression
 
                 // Set context on context element
-                final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
+                final XBLBindingsBase.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
                 contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
 
                 // Evaluate context parameter

@@ -64,7 +64,7 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
         }
 
         // Find control element so we know which handler to use
-        final Element controlElement = containingDocument.getStaticState().getControlElement(controlPrefixedId);
+        final Element controlElement = containingDocument.getStaticOps().getControlElement(controlPrefixedId);
         if (controlElement != null) {
             // Get handler
             final ElementHandler handler = handlerContext.getController().getHandler(controlElement);

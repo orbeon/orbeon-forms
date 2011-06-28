@@ -15,19 +15,18 @@ package org.orbeon.oxf.xforms.analysis
 
 import controls._
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.xbl.XBLBindings
-
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 
 object ControlAnalysisFactory {
 
     def create(staticStateContext: StaticStateContext, parent: ContainerTrait, preceding: ElementAnalysis,
-               scope: XBLBindings#Scope, controlElement: Element): ElementAnalysis = {
+               scope: XBLBindingsBase.Scope, controlElement: Element): ElementAnalysis = {
 
         // Tell whether the current element has an XBL binding
-        def hasXBLBinding = staticStateContext.staticState.getXBLBindings.hasBinding(scope.getPrefixedIdForStaticId(XFormsUtils.getElementStaticId(controlElement)))
+        def hasXBLBinding = staticStateContext.partAnalysis.getXBLBindings.hasBinding(scope.getPrefixedIdForStaticId(XFormsUtils.getElementStaticId(controlElement)))
 
         // NOTE: Not all controls need separate classes, so for now we use generic ones like e.g. ValueCoreControl instead of InputControl
         controlElement.getQName match {
@@ -43,6 +42,8 @@ object ControlAnalysisFactory {
                 new AttributeControl(staticStateContext, controlElement, parent, Option(preceding), scope)
             case XFORMS_GROUP_QNAME | XFORMS_SWITCH_QNAME | XFORMS_CASE_QNAME | XXFORMS_DIALOG_QNAME => // no LHHA in spec yet, but will make sense
                 new ContainerControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ContainerLHHATrait
+            case  XXFORMS_DYNAMIC_QNAME =>
+                new ContainerControl(staticStateContext, controlElement, parent, Option(preceding), scope)
             case XFORMS_REPEAT_QNAME =>
                 new RepeatControl(staticStateContext, controlElement, parent, Option(preceding), scope)
             case qName if hasXBLBinding =>

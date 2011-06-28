@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -36,7 +36,7 @@ import org.orbeon.saxon.om.NodeInfo;
 public class XFormsSetvalueAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -105,7 +105,7 @@ public class XFormsSetvalueAction extends XFormsAction {
 
                 // Dispatch extension event to instance
                 final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);
-                modifiedContainer.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance));
+                modifiedContainer.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, currentNode, currentValue, valueToSet));
             } else {
                 // NOTE: Is this the right thing to do if the value modified is not an instance value? Might not be needed!
                 containingDocument.getControls().markDirtySinceLastRequest(true);

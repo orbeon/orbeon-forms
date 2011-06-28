@@ -18,11 +18,13 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import java.util.List;
 
 /**
- * Represents event observer. Implemented in particular by controls, xforms:model, xforms:instance, xforms:submission.
+ * Represents an event observer. Implemented in particular by controls, xforms:model, xforms:instance, xforms:submission.
  */
 public interface XFormsEventObserver extends XFormsEventTarget {
     String getId();
     String getEffectiveId();
-    List getEventHandlers(XBLContainer container);
     XFormsEventObserver getParentEventObserver(XBLContainer container);
+    void addListener(String eventName, EventListener listener);
+    void removeListener(String eventName, EventListener listener);
+    List<EventListener> getListeners(String eventName);
 }

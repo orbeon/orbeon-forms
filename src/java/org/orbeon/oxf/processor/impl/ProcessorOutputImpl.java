@@ -404,6 +404,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
 
             // Delegate
             getRuntimeFilter().read(pipelineContext, xmlReceiver);
+            // NOTE: Not sure why we used to catch and log AbstractMethodError here, but we should not!
         } catch (Exception e) {
             throw ValidationException.wrapException(e, getLocationData());
         } finally {

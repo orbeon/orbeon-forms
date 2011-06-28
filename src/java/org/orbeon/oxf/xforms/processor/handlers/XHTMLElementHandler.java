@@ -39,7 +39,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
         final String prefixedId = handlerContext.getIdPrefix() + staticId;
 
         if (staticId != null) {
-            final boolean hasAVT = containingDocument.getStaticState().hasAttributeControl(prefixedId);
+            final boolean hasAVT = containingDocument.getStaticOps().hasAttributeControl(prefixedId);
             final String effectiveId = handlerContext.getEffectiveId(attributes);
             boolean found = false;
             if (hasAVT) {
@@ -56,7 +56,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
                         final String attributeQName = attributes.getQName(i);// use qualified name so we match on "xml:lang"
 
                         // Control analysis
-                        final AttributeControl controlAnalysis = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
+                        final AttributeControl controlAnalysis = containingDocument.getStaticOps().getAttributeControl(prefixedId, attributeQName);
 
                         // Get static id of attribute control associated with this particular attribute
                         final String attributeControlStaticId = controlAnalysis.element().attributeValue(XFormsConstants.ID_QNAME);

@@ -17,11 +17,11 @@ import org.dom4j._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
+import xbl.{XBLBindingsBase, XBLBindings}
 
-abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) {
 
     require(parent ne null)
@@ -107,6 +107,6 @@ object LHHAAnalysis {
         // Try to figure out if we have a dynamic LHHA element, including nested xforms:output and AVTs.
         XPathCache.evaluateSingle(staticStateContext.controlsDocument.wrap(lhhaElement),
             "not(exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
-            XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
+            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
     }
 }

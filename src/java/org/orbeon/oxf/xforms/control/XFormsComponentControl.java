@@ -31,7 +31,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 
     private XBLContainer nestedContainer;
-    private transient boolean isInitializeModels;
 
     public XFormsComponentControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -41,7 +40,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         nestedContainer.addAllModels();// NOTE: there may or may not be nested models
 
         // Make sure there is location data
-        nestedContainer.setLocationData(XFormsUtils.getNodeLocationData(element));
+        nestedContainer.setLocationData(getLocationData());
     }
 
     @Override
@@ -69,7 +68,6 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
                     XFormsEvents.XFORMS_MODEL_CONSTRUCT,
                     XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
             });
-            isInitializeModels = true;
         }
         nestedContainer.getContextStack().resetBindingContext();
     }
@@ -89,12 +87,9 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
     public void childrenAdded() {
         super.childrenAdded();
 
-        if (isInitializeModels) {
-            // It doesn't seem to make much sense to dispatch xforms-ready to nested models. If we still did want to do
-            // that, we should do it once ALL controls have been initialized. But likely this is not a good idea
-            // either.
-            isInitializeModels = false;
-        }
+        // It doesn't seem to make much sense to dispatch xforms-ready to nested models. If we still did want to do
+        // that, we should do it once ALL controls have been initialized. But likely this is not a good idea
+        // either.
     }
 
     public XBLContainer getNestedContainer() {

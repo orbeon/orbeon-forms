@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsVariableControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -174,7 +174,7 @@ public class XFormsActionInterpreter {
 
         try {
             // Get action scope
-            final XBLBindings.Scope actionScope = getActionScope(actionElement);
+            final XBLBindingsBase.Scope actionScope = getActionScope(actionElement);
 
             // Extract conditional action (@if / @exf:if)
             final String ifConditionAttribute;
@@ -263,7 +263,7 @@ public class XFormsActionInterpreter {
     }
 
     private void runSingleIteration(XFormsEvent event, XFormsEventObserver eventObserver,
-                                    Element actionElement, String actionNamespaceURI, String actionName, XBLBindings.Scope actionScope,
+                                    Element actionElement, String actionNamespaceURI, String actionName, XBLBindingsBase.Scope actionScope,
                                     String ifConditionAttribute, String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
         // The context is now the overridden context
@@ -528,8 +528,8 @@ public class XFormsActionInterpreter {
         return actionElement.attributeValue(XFormsConstants.ID_QNAME);
     }
 
-    public XBLBindings.Scope getActionScope(Element actionElement) {
-        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getActionPrefixedId(actionElement));
+    public XBLBindingsBase.Scope getActionScope(Element actionElement) {
+        return container.getPartAnalysis().getResolutionScopeByPrefixedId(getActionPrefixedId(actionElement));
     }
 
     private XBLContainer findResolutionScopeContainer(Element actionElement) {
@@ -578,5 +578,22 @@ public class XFormsActionInterpreter {
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
         return model;
+    }
+
+    /**
+     * Resolve an object by effective id if the id is not a static id, otherwise try to resolve by static id.
+     */
+    public Object resolveOrFindByEffectiveId(Element actionElement, String staticOrEffectiveId) {
+        if (staticOrEffectiveId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
+            || staticOrEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+            // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
+            return containingDocument.getObjectByEffectiveId(staticOrEffectiveId);
+        } else {
+            return resolveEffectiveObject(actionElement, staticOrEffectiveId);
+        }
+    }
+
+    public XFormsFunction.Context getOuterFunctionContext() {
+        return actionBlockContextStack.getFunctionContext(outerActionElementEffectiveId);
     }
 }

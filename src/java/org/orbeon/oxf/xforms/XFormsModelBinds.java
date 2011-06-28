@@ -18,7 +18,6 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
@@ -828,7 +827,7 @@ public class XFormsModelBinds {
                     typeValid = isOptionalAndEmpty || XMLUtils.isWellFormedXML(nodeValue);
                 } else if (typeLocalname.equals("xpath2")) {
                     // xxforms:xpath2 type
-                    typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(containingDocument.getStaticState().getXPathConfiguration(), nodeValue, bind.staticBind.namespaceMapping());
+                    typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(containingDocument.getStaticState().xpathConfiguration(), nodeValue, bind.staticBind.namespaceMapping());
                 } else {
                     throw new ValidationException("Invalid schema type '" + bind.staticBind.getType() + "'", bind.staticBind.locationData());
 

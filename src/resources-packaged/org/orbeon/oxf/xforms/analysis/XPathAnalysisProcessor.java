@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 
 /**
@@ -33,7 +34,7 @@ public class XPathAnalysisProcessor extends SimpleProcessor {
         final Document formDocument = readInputAsDOM4J(pipelineContext, "form");
 
         // Create static state for form
-        final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState(formDocument);
+        final XFormsStaticState staticState = XFormsStaticStateImpl.create(formDocument);
 
         // Output analysis information
         staticState.toXML(new ContentHandlerHelper(xmlReceiver));

@@ -25,16 +25,21 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
+import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.Value;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -160,6 +165,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 //
 //        xxx
 //    }
+
+    // Return the value of the given model variable
+    public SequenceIterator getVariable(String variableName) throws XPathException {
+        final Map<String, ValueRepresentation> variables = getBindingContext(containingDocument).getInScopeVariables();
+        return Value.asIterator(variables.get(variableName));
+    }
 
     public void updateEffectiveId(String effectiveId) {
         this.effectiveId = effectiveId;
@@ -311,7 +322,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document) {
-                newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
+                newInstance = new XFormsInstance(containingDocument.getStaticState().xpathConfiguration(), modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
                         null, username, password, domain, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } else if (instanceDocument instanceof DocumentInfo) {
                 newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI,
@@ -358,8 +369,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return effectiveId;
     }
 
-    public XBLBindings.Scope getResolutionScope() {
-        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
+    public XBLBindingsBase.Scope getResolutionScope() {
+        return container.getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
     public LocationData getLocationData() {
@@ -458,7 +469,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final String currentModelEffectiveId = currentInstanceElement.attributeValue("model-id");
                 if (effectiveId.equals(currentModelEffectiveId)) {
                     // Create and set instance document on current model
-                    final XFormsInstance newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), currentInstanceElement);
+                    final XFormsInstance newInstance = new XFormsInstance(containingDocument.getStaticState().xpathConfiguration(), currentInstanceElement);
                     final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(currentInstanceElement);
                     // NOTE: Here instance must contain document
                     setInstanceLoadFromCacheIfNecessary(isReadonlyHint, newInstance, null);
@@ -469,7 +480,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Then get instances from static state if necessary
         // This can happen if the instance is inline, readonly, and not replaced
-        for (final Instance instance: containingDocument.getStaticState().getInstances(getPrefixedId())) {
+        for (final Instance instance : getXBLContainer().getPartAnalysis().getInstances(getPrefixedId())) {
             final Element containerElement = instance.element();
             final String instanceStaticId = instance.staticId();
 
@@ -483,7 +494,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final String xxformsValidation = containerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
                 // Extract document
-                final Object instanceDocument = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().getXPathConfiguration(),
+                final Object instanceDocument = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().xpathConfiguration(),
                         children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
                 // Set instance and associated information
@@ -691,7 +702,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 try {
                     // Extract document
                     final Object instanceDocument
-                            = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().getXPathConfiguration(),
+                            = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().xpathConfiguration(),
                             (Element) children.get(0), xxformsExcludeResultPrefixes, instance.isReadonlyHint());
 
                     // Set instance and associated information if everything went well
@@ -798,7 +809,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             try {
                 // Read result as XML and create new shared instance
                 // TODO: Handle validating?
-                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
                         connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude, true);
                 return new ReadonlyXFormsInstance(effectiveId, instanceStaticId, documentInfo, instanceSourceURI,
                         null, null, null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
@@ -858,7 +869,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 if (!instance.isReadonlyHint()) {
                     instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 } else {
-                    instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                    instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
                             connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 }
             } finally {
@@ -878,7 +889,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(containingDocument.getStaticState().xpathConfiguration(),
                         absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
@@ -1117,13 +1128,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return null;
     }
 
-    /**
-     * Return the List of XFormsEventHandler objects within this object.
-     */
-    public List getEventHandlers(XBLContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
-    }
-
     public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
         contextStack.resetBindingContext(this);
         return contextStack.getCurrentBindingContext();
@@ -1132,5 +1136,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Don't allow any external events
     public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
         return false;
+    }
+
+    public void addListener(String eventName, EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeListener(String eventName, EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<EventListener> getListeners(String eventName) {
+        return null;
     }
 }

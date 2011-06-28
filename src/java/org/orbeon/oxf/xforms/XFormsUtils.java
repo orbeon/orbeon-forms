@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -360,7 +360,7 @@ public class XFormsUtils {
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     public static String getChildElementValue(final XBLContainer container, final String sourceEffectiveId,
-                                              final XBLBindings.Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
+                                              final XBLBindingsBase.Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
         if (childElement == null)
@@ -1170,7 +1170,7 @@ public class XFormsUtils {
             if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is an xforms:output nested among other markup
 
-                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, element.getName(), null) {
+                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, element.getName(), null, null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
                     @Override

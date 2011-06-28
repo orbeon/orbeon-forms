@@ -17,7 +17,6 @@ import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventObserver
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.saxon.om.Item
 import java.util.ArrayList
 import java.util.List
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action._
+import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
 
 /**
  * 10.1.1 The action Element
@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.action._
 class XFormsActionAction extends XFormsAction {
 
     def execute(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent, eventObserver: XFormsEventObserver,
-                actionElement: Element, actionScope: XBLBindings#Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
+                actionElement: Element, actionScope: XBLBindingsBase.Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
 
         val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
         if (mediatype eq null) {

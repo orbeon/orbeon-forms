@@ -14,14 +14,13 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.action.XFormsAction
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventObserver
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms._
+import action.{XFormsAPI, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.common.OXFException
+import xbl.XBLBindingsBase
 
 /**
  * Extension xxforms:script action.
@@ -30,7 +29,7 @@ class XXFormsScriptAction extends XFormsAction {
 
     def execute(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent,
                 eventObserver: XFormsEventObserver, actionElement: Element,
-                actionScope: XBLBindings#Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
+                actionScope: XBLBindingsBase.Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
 
         val containingDocument = actionInterpreter.getContainingDocument
 
@@ -47,8 +46,11 @@ class XXFormsScriptAction extends XFormsAction {
                         containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver)
                 }
             case "xpath" | "text/xpath" | "application/xpath" => // "unofficial" type
-                val bindingContext = actionInterpreter.getContextStack.getCurrentBindingContext
-                actionInterpreter.evaluateExpression(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
+                // Run in the scope of the interpreter
+                XFormsAPI.scalaAction(actionInterpreter) {
+                    val bindingContext = actionInterpreter.getContextStack.getCurrentBindingContext
+                    actionInterpreter.evaluateExpression(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
+                }
             case other =>
                 throw new OXFException("Unsupported script type: " + other)
         }

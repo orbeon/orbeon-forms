@@ -15,9 +15,8 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
 
-
-class VariableControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+class VariableControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends CoreControl(staticStateContext, element, parent, preceding, scope)
         with ValueTrait with VariableAnalysisTrait

@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.analysis
 
 import model.Model
-import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 
 /**
  * NOTE: There is always a scope, but the model can be missing if there is no model, e.g. in model-less XBL components.
  */
-case class ScopeModel(scope: XBLBindings#Scope, containingModel: Option[Model])
+case class ScopeModel(scope: XBLBindingsBase.Scope, containingModel: Option[Model])

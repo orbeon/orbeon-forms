@@ -18,16 +18,14 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -43,6 +41,7 @@ import org.orbeon.saxon.om.VirtualNode;
 
 import javax.xml.transform.stream.StreamResult;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -562,7 +561,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // New nodes were just deleted
             final XFormsDeleteEvent deleteEvent = (XFormsDeleteEvent) event;
 
-            final List deletedNodeInfos = deleteEvent.getDeletedNodeInfos();
+            final List<XFormsDeleteAction.DeleteInfo> deletedNodeInfos = deleteEvent.deleteInfos();
             final boolean didDeleteNodes = deletedNodeInfos.size() != 0;
             if (didDeleteNodes) {
                 // Find affected repeats and update them
@@ -576,8 +575,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
 
-            final XBLBindings bindings = controls.getContainingDocument().getStaticState().getXBLBindings();
-            final XBLBindings.Scope instanceScope = bindings.getResolutionScopeByPrefixedId(getPrefixedId());
+            final XBLBindingsBase.Scope instanceScope = getXBLContainer(controls.getContainingDocument()).getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
 
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
             final List<XFormsControl> repeatControls = new ArrayList<XFormsControl>(repeatControlsMap.values());
@@ -630,10 +628,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return (timeToLiveValue != null) ? Long.parseLong(timeToLiveValue) : -1;
     }
 
-    public List getEventHandlers(XBLContainer container) {
-        return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
-    }
-
     public void logInstance(IndentedLogger indentedLogger, String message) {
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.logDebug("", message,
@@ -654,5 +648,50 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     // Don't allow any external events
     public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
         return false;
+    }
+
+    // Event listener handling (should be a trait!)
+
+    private Map<String, List<EventListener>> listeners;
+
+    public void addListener(String eventName, EventListener listener) {
+
+        assert eventName != null;
+        assert listener != null;
+
+        if (listeners == null)
+            listeners = new HashMap<String, List<EventListener>>();
+
+        List<EventListener> currentListeners = listeners.get(eventName);
+
+        if (currentListeners == null) {
+            currentListeners = new ArrayList<EventListener>();
+            listeners.put(eventName, currentListeners);
+        }
+
+        currentListeners.add(listener);
+
+        listeners.put(eventName, currentListeners);
+    }
+
+    public void removeListener(String eventName, EventListener listener) {
+
+        assert eventName != null;
+
+        if (listeners == null)
+            return;
+
+        List<EventListener> currentListeners = listeners.get(eventName);
+        if (currentListeners == null)
+            return;
+
+        if (listener == null)
+            currentListeners.clear(); // remove all listeners
+        else
+            currentListeners.remove(listener); // try to just remove the one provided
+    }
+
+    public List<EventListener> getListeners(String eventName) {
+        return (listeners != null) ? listeners.get(eventName) : null;
     }
 }

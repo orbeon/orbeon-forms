@@ -14,12 +14,16 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
+import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xml.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -202,26 +206,26 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     private boolean hasLocalLabel() {
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        final LHHAAnalysis analysis = staticState.getLabel(prefixedId);
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        final LHHAAnalysis analysis = globalOps.getLabel(prefixedId);
         return analysis != null && analysis.isLocal();
     }
 
     private boolean hasLocalHint() {
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        final LHHAAnalysis analysis = staticState.getHint(prefixedId);
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        final LHHAAnalysis analysis = globalOps.getHint(prefixedId);
         return analysis != null && analysis.isLocal();
     }
 
     private boolean hasLocalHelp() {
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        final LHHAAnalysis analysis = staticState.getHelp(prefixedId);
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        final LHHAAnalysis analysis = globalOps.getHelp(prefixedId);
         return analysis != null && analysis.isLocal();
     }
 
     private boolean hasLocalAlert() {
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        final LHHAAnalysis analysis = staticState.getAlert(prefixedId);
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        final LHHAAnalysis analysis = globalOps.getAlert(prefixedId);
         return analysis != null && analysis.isLocal();
     }
 
@@ -300,8 +304,8 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             classes = getInitialClasses(uri, localname, attributes, xformsControl, getAppearance(attributes), isDefaultIncremental());
             // All MIP-related classes
             handleMIPClasses(classes, prefixedId, xformsControl);
-            // Static classes: xforms-online, xforms-offline, ...
-            containingDocument.getStaticState().appendClasses(classes, prefixedId);
+            // Static classes
+            containingDocument.getStaticOps().appendClasses(classes, prefixedId);
             // Dynamic classes added by the control
             addCustomClasses(classes, xformsControl);
         }

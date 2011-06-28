@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,26 +30,23 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.IdGenerator;
-import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
-import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
+import org.orbeon.oxf.xforms.PartAnalysis;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.*;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
-import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.Attributes;
-import scala.Tuple2;
+import scala.collection.Seq;
 
 import java.util.*;
 
@@ -66,22 +63,22 @@ import java.util.*;
  *   o detect that situation (when is this possible?)
  *   o keep a single DOM
  */
-public class XBLBindings {
+public class XBLBindingsBase {
 
     public static final String XBL_MAPPING_PROPERTY_PREFIX = "oxf.xforms.xbl.mapping.";
+    protected final boolean logShadowTrees;                   // whether to log shadow trees as they are built
 
-    private final XFormsStaticState staticState;            // associated static state
+    protected final PartAnalysisImpl partAnalysis;
 
-    private final boolean logShadowTrees;                   // whether to log shadow trees as they are built
+    // binding QName => control factory
+    protected Map<QName, XFormsControlFactory.Factory> xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
+    // QNames => abstract binding
+    protected Map<QName, AbstractBinding> abstractBindings = new HashMap<QName, AbstractBinding>();
+    // prefixed id => concrete binding
+    protected Map<String, ConcreteBinding> concreteBindings = new HashMap<String, ConcreteBinding>();
 
-    // Static xbl:xbl
-    private Map<QName, XFormsControlFactory.Factory> xblComponentsFactories;    // Map<QName bindingQName, Factory> of QNames to component factory
-    private Map<QName, AbstractBinding> xblComponentBindings;       // Map<QName bindingQName, Element bindingElement> of QNames to bindings
-    private List<Element> allScripts;                       // List<Element scriptElement>
-    private List<Element> allStyles;                        // List<Element styleElement>
-    private Map<QName, Global> allGlobals;
-
-    private Tuple2<scala.collection.Set<String>, scala.collection.Set<String>> baselineResources;
+    protected List<Element> allScripts;                       // List<Element scriptElement>
+    protected List<Element> allStyles;                        // List<Element styleElement>
 
     // Abstract XBL bindings
     public static class AbstractBinding {
@@ -150,21 +147,23 @@ public class XBLBindings {
 
     // Concrete XBL bindings
     public static class ConcreteBinding {
-        public final Scope innerScope;
+        public final XBLBindingsBase.Scope innerScope;  // each binding defines a new scope
         public final Document fullShadowTree;       // with full content, e.g. XHTML
         public final Document compactShadowTree;    // without full content, only the XForms controls
+        public final Seq<Model> models;             // all the models
         public final String bindingId;
         public String containerElementName;
 
-        public ConcreteBinding(AbstractBinding abstractBinding, Scope innerScope, Document fullShadowTree, Document compactShadowTree) {
+        public ConcreteBinding(AbstractBinding abstractBinding, XBLBindingsBase.Scope innerScope, Document fullShadowTree, Document compactShadowTree, Seq<Model> models) {
             this.innerScope = innerScope;
             this.fullShadowTree = fullShadowTree;
             this.compactShadowTree = compactShadowTree;
+            this.models = models;
 
             this.bindingId = abstractBinding.bindingId;
             assert this.bindingId != null : "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement);
 
-            this.containerElementName = abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME);
+            this.containerElementName = (abstractBinding.bindingElement != null) ? abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME) : null;
             if (this.containerElementName == null)
                 this.containerElementName = "div";
         }
@@ -180,25 +179,17 @@ public class XBLBindings {
         }
     }
 
-    private Map<String, ConcreteBinding> concreteBindings;  // indexed by treePrefixedId
-
-    private final Map<String, Scope> prefixedIdToXBLScopeMap = new HashMap<String, Scope>();                // maps element prefixed id => XBL scope
-    private final Map<Scope, Map<String, String>> scopeToIdMap = new HashMap<Scope, Map<String, String>>(); // maps XBL scope => (map static id => prefixed id)
-    private final Map<String, Scope> scopeIds = new HashMap<String, Scope>();                               // all distinct scopes by scope id
-
-    private final Scope TOP_LEVEL_SCOPE = new Scope(null, "");
-
-    public class Scope {
+    public static class Scope {
         public final Scope parent;
         public final String scopeId;
 
-        private Scope(Scope parent, String scopeId) {
+        public final Map<String, String> idMap = new HashMap<String, String>(); // static id => prefixed id
+
+        public Scope(Scope parent, String scopeId) {
             assert parent != null || scopeId.equals("");
-            assert !scopeIds.containsKey(scopeId);
             
             this.parent = parent;
             this.scopeId = scopeId;
-            scopeIds.put(scopeId, this);
         }
 
         public String getFullPrefix() {
@@ -212,13 +203,11 @@ public class XBLBindings {
          * @return          prefixed id corresponding to the static id passed
          */
         public String getPrefixedIdForStaticId(String staticId) {
-            if (scopeToIdMap.size() == 0) {
-                // If there are no XBL controls the map is empty
-                return staticId;
-            } else {
-                // Otherwise use map
-                return scopeToIdMap.get(this).get(staticId);
-            }
+            return idMap.get(staticId);
+        }
+
+        public boolean isTopLevelScope() {
+            return scopeId.length() == 0;
         }
 
         @Override
@@ -234,38 +223,6 @@ public class XBLBindings {
         @Override
         public boolean equals(Object obj) {
             return obj instanceof Scope && (this == obj || scopeId.equals(((Scope) obj).scopeId));
-        }
-    }
-
-    public Scope getTopLevelScope() {
-        return TOP_LEVEL_SCOPE;
-    }
-
-    public Scope getResolutionScopeById(String scopeId) {
-        return scopeIds.get(scopeId);
-    }
-
-    public Scope getResolutionScopeByPrefix(String prefix) {
-        assert prefix.length() == 0 || prefix.charAt(prefix.length() - 1) == XFormsConstants.COMPONENT_SEPARATOR;
-        final String scopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1);
-        return getResolutionScopeById(scopeId);
-    }
-
-    /**
-     * Return the resolution scope id for the given prefixed id.
-     *
-     * @param prefixedId    prefixed id of XForms element
-     * @return              resolution scope
-     */
-    public Scope getResolutionScopeByPrefixedId(String prefixedId) {
-        if (scopeToIdMap.size() == 0) {
-            // If there are no XBL controls the map is empty
-            return TOP_LEVEL_SCOPE;
-        } else {
-            // Otherwise use map
-            final Scope result = prefixedIdToXBLScopeMap.get(prefixedId);
-            assert result != null : "cannot find scope in map for prefixed id: " + prefixedId;
-            return result;
         }
     }
 
@@ -286,12 +243,12 @@ public class XBLBindings {
      *
      * As of 2009-09-14, we use an IdGenerator shared among top-level and all XBL bindings.
      */
-    private XFormsStaticState.Metadata metadata;
+    protected Metadata metadata;
 
-    public XBLBindings(IndentedLogger indentedLogger, XFormsStaticState staticState,
-                       XFormsStaticState.Metadata metadata, Element staticStateElement) {
+    public XBLBindingsBase(IndentedLogger indentedLogger, PartAnalysisImpl partAnalysis,
+                           Metadata metadata, List<Document> inlineXBLDocuments) {
 
-        this.staticState = staticState;
+        this.partAnalysis = partAnalysis;
         this.metadata = metadata;
 
         this.logShadowTrees = XFormsProperties.getDebugLogging().contains("analysis-xbl-tree");
@@ -300,20 +257,12 @@ public class XBLBindings {
         final List<Document> xblDocuments = new ArrayList<Document>();
         {
             // Get inline <xbl:xbl> elements
-            final List<Element> xblElements = Dom4jUtils.elements(staticStateElement, XFormsConstants.XBL_XBL_QNAME);
-            for (Element xblElement: xblElements) {
-                // Copy the element because we may need it in staticStateDocument for encoding
-                xblDocuments.add(Dom4jUtils.createDocumentCopyParentNamespaces(xblElement));
-            }
+            xblDocuments.addAll(inlineXBLDocuments);
 
             // Get automatically-included XBL documents
-            final Set<String> includes = metadata.getBindingsIncludes();
-            if (includes != null) {
-                for (final String include: includes) {
-                    xblDocuments.add(readXBLResource(include));
-//                    System.out.println(Dom4jUtils.domToPrettyString(xblDocuments.get(xblDocuments.size() - 1)));
-                }
-            }
+            final Set<String> includes = metadata.getBingingIncludes();
+            for (final String include : includes)
+                xblDocuments.add(readXBLResource(include));
         }
 
         if (xblDocuments.size() > 0) {
@@ -323,7 +272,7 @@ public class XBLBindings {
 
             int xblBindingCount = 0;
             for (final Document xblDocument: xblDocuments) {
-                xblBindingCount += extractXBLBindings(xblDocument, staticState);
+                xblBindingCount += extractXBLBindings(xblDocument, partAnalysis);
             }
 
             indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(xblDocuments.size()),
@@ -340,30 +289,7 @@ public class XBLBindings {
         return ResourceManagerWrapper.instance().getContentAsDOM4J(include, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false);
     }
 
-    public int extractXBLBindings(Document xblDocument, XFormsStaticState staticState) {
-
-        // Perform initialization for first binding
-        if (concreteBindings == null) {
-              concreteBindings = new HashMap<String, ConcreteBinding>();
-
-           // Add existing ids to scope map so we can check duplicates
-            final Map<String, String> topLevelScopeMap = new HashMap<String, String>();
-            scopeToIdMap.put(TOP_LEVEL_SCOPE, topLevelScopeMap);
-            for (Iterator<String> i = metadata.idGenerator.iterator(); i.hasNext();) {
-                final String id = i.next();
-                topLevelScopeMap.put(id, id);
-                prefixedIdToXBLScopeMap.put(id, TOP_LEVEL_SCOPE);
-            }
-
-            // Add top-level
-            prefixedIdToXBLScopeMap.put(XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID, TOP_LEVEL_SCOPE);
-
-            // Tell top-level static id generator to stop t check for duplicate ids
-            metadata.idGenerator.setCheckDuplicates(false);
-
-            xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
-            xblComponentBindings = new HashMap<QName, AbstractBinding>();
-        }
+    public int extractXBLBindings(Document xblDocument, PartAnalysis partAnalysis) {
 
         // Extract xbl:xbl/xbl:script
         // TODO: should do this differently, in order to include only the scripts and resources actually used
@@ -381,7 +307,7 @@ public class XBLBindings {
 
             if (currentElementAttribute != null) {
 
-                final AbstractBinding abstractBinding = new AbstractBinding(currentBindingElement, staticState.getNamespaceMapping("", currentBindingElement), scriptElements, metadata.idGenerator);
+                final AbstractBinding abstractBinding = new AbstractBinding(currentBindingElement, partAnalysis.getNamespaceMapping("", currentBindingElement), scriptElements, metadata.idGenerator());
 
                 // Create and remember factory for this QName
                 xblComponentsFactories.put(abstractBinding.qNameMatch,
@@ -394,7 +320,7 @@ public class XBLBindings {
                 if (allStyles == null)
                     allStyles = new ArrayList<Element>(abstractBinding.styles.size());
                 allStyles.addAll(abstractBinding.styles);
-                xblComponentBindings.put(abstractBinding.qNameMatch, abstractBinding);
+                abstractBindings.put(abstractBinding.qNameMatch, abstractBinding);
                 
                 xblBindingCount++;
             }
@@ -402,7 +328,7 @@ public class XBLBindings {
         return xblBindingCount;
     }
 
-    private static List<Document> extractChildrenModels(Element parentElement, boolean detach) {
+    protected static List<Document> extractChildrenModels(Element parentElement, boolean detach) {
 
         final List<Document> result = new ArrayList<Document>();
         final List<Element> modelElements = Dom4jUtils.elements(parentElement, XFormsConstants.XFORMS_MODEL_QNAME);
@@ -417,208 +343,14 @@ public class XBLBindings {
         return result;
     }
 
-    public ConcreteBinding processElementIfNeeded(IndentedLogger indentedLogger, Element controlElement,
-                                                  String controlPrefixedId, LocationData locationData,
-                                                  DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope) {
-
-        if (xblComponentBindings != null) {
-            final AbstractBinding abstractBinding = xblComponentBindings.get(controlElement.getQName());
-            if (abstractBinding != null) {
-                // A custom component is bound to this element
-
-                // Find new prefix
-                final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
-
-                // Check how many automatic XBL includes we have so far
-                final int initialIncludesCount; {
-                    final Set<String> includes = metadata.getBindingsIncludes();
-                    initialIncludesCount = includes != null ? includes.size() : 0;
-                }
-
-                // Generate the shadow content for this particular binding
-                final Document fullShadowTreeDocument = generateShadowTree(indentedLogger, controlsDocumentInfo, controlElement, abstractBinding.bindingElement, newPrefix);
-                if (fullShadowTreeDocument != null) { // null if there is no template
-
-                    // Process newly added automatic XBL includes if any
-                    final Set<String> includes = metadata.getBindingsIncludes();
-                    final int finalIncludesCount = includes != null ? includes.size() : 0;
-                    if (finalIncludesCount > initialIncludesCount) {
-                        indentedLogger.startHandleOperation("", "adding XBL bindings");
-                        int xblBindingCount = 0;
-                        final List<String> includesAsList = new ArrayList<String>(includes);
-                        for (final String include: includesAsList.subList(initialIncludesCount, finalIncludesCount)) {
-                            xblBindingCount += extractXBLBindings(readXBLResource(include), staticState);
-                        }
-                        indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(finalIncludesCount - initialIncludesCount),
-                                "xbl:binding count", Integer.toString(xblBindingCount),
-                                "total xbl:binding count", Integer.toString(xblComponentBindings.size()));
-                    }
-
-                    // Generate compact shadow tree for this static id
-                    final Scope newInnerScope = new Scope(scope, controlPrefixedId);
-                    final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
-
-                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newInnerScope, outerScope);
-
-                    // Register models placed under xbl:implementation
-                    if (abstractBinding.implementations.size() > 0) {
-                        // Say we DO annotate because these models are outside the template
-                        addModelDocuments(abstractBinding.implementations, newPrefix, true,
-                                newInnerScope, outerScope, XFormsConstants.XXBLScope.inner);
-                        if (indentedLogger.isDebugEnabled())
-                            indentedLogger.logDebug("", "registered XBL implementation model documents", "count", Integer.toString(abstractBinding.implementations.size()));
-                    }
-
-                    // Extract and register models from within the template
-                    {
-                        final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(compactShadowTreeDocument, null, xpathConfiguration);
-                        final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(compactShadowTreeWrapper, true, locationData);
-                        if (templateModelDocuments.size() > 0) {
-                            // Say we don't annotate documents because already annotated as part as template processing
-                            addModelDocuments(templateModelDocuments, newPrefix, false, newInnerScope, null, null);
-                            if (indentedLogger.isDebugEnabled())
-                                indentedLogger.logDebug("", "created and registered XBL template model documents", "count", Integer.toString(templateModelDocuments.size()));
-                        }
-                    }
-
-                    // Analyze the models first
-                    staticState.analyzeModelsXPathForScope(newInnerScope);
-
-                    // Remember concrete binding information
-                    final ConcreteBinding newConcreteBinding = new ConcreteBinding(abstractBinding, newInnerScope, fullShadowTreeDocument, compactShadowTreeDocument);
-                    concreteBindings.put(controlPrefixedId, newConcreteBinding);
-
-                    // Process globals here as the component is in use
-                    if (abstractBinding.global != null && (allGlobals == null || !allGlobals.containsKey(abstractBinding.qNameMatch))) {
-                        if (allGlobals == null)
-                            allGlobals = new LinkedHashMap<QName, Global>();
-
-                        final Element pseudoBoundElement = Dom4jUtils.NULL_DOCUMENT.getRootElement();
-
-                        final Document globalFullShadowTreeDocument = generateGlobalShadowTree(indentedLogger, abstractBinding.bindingElement, abstractBinding.global);
-                        final Document globalCompactShadowTreeDocument = filterShadowTree(indentedLogger, globalFullShadowTreeDocument, pseudoBoundElement, TOP_LEVEL_SCOPE.getFullPrefix(), TOP_LEVEL_SCOPE, TOP_LEVEL_SCOPE);
-
-                        // Extract and register models from within the template
-                        {
-                            final DocumentWrapper compactShadowTreeWrapper = new DocumentWrapper(globalCompactShadowTreeDocument, null, xpathConfiguration);
-                            final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(compactShadowTreeWrapper, true, locationData);
-                            if (templateModelDocuments.size() > 0) {
-                                // Say we don't annotate documents because already annotated as part as template processing
-                                addModelDocuments(templateModelDocuments, TOP_LEVEL_SCOPE.getFullPrefix(), false, TOP_LEVEL_SCOPE, null, null);
-                                if (indentedLogger.isDebugEnabled())
-                                    indentedLogger.logDebug("", "created and registered XBL global model documents", "count", Integer.toString(templateModelDocuments.size()));
-                            }
-                        }
-
-                        allGlobals.put(abstractBinding.qNameMatch, new Global(globalFullShadowTreeDocument, globalCompactShadowTreeDocument));
-                    }
-
-                    // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
-                    // TODO: should do this here, in order to include only the scripts and resources actually used
-
-                    // Gather xbl:handlers/xbl:handler attached to bound node
-                    for (final Element currentHandlerElement : abstractBinding.handlers) {
-                        // Register xbl:handler as an action handler
-
-                        // Annotate handler and gather scope information
-                        final Element currentHandlerAnnotatedElement
-                                = annotateHandler(currentHandlerElement, newPrefix, newInnerScope, outerScope, XFormsConstants.XXBLScope.inner).getRootElement();
-
-                        // NOTE: <xbl:handler> has similar attributes as XForms actions, in particular @event, @phase, etc.
-                        final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
-                        final String prefix = scope.getFullPrefix();
-                        final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(prefix, currentHandlerAnnotatedElement,
-                                null, controlStaticId, true, controlStaticId,
-                                currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_EVENT_ATTRIBUTE_QNAME),
-                                null, // no target attribute allowed in XBL
-                                currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_PHASE_ATTRIBUTE_QNAME),
-                                currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_PROPAGATE_ATTRIBUTE_QNAME),
-                                currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_DEFAULT_ACTION_ATTRIBUTE_QNAME),
-                                null, null);
-
-                        staticState.registerActionHandler(eventHandler, prefix);
-
-                        // Extract scripts in the handler
-                        final DocumentWrapper handlerWrapper = new DocumentWrapper(currentHandlerAnnotatedElement.getDocument(), null, xpathConfiguration);
-                        staticState.extractXFormsScripts(handlerWrapper, newPrefix);
-                    }
-
-                    return newConcreteBinding;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Document annotateHandler(Element currentHandlerElement, String newPrefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
+    public Document annotateHandler(Element currentHandlerElement, String newPrefix, XBLBindingsBase.Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         final Document handlerDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentHandlerElement, false);// for now, don't detach because element can be processed by multiple bindings
         final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, false);
         gatherScopeMappingsAndTransform(annotatedDocument, newPrefix, innerScope, outerScope, startScope, null, false, "/");
         return annotatedDocument;
     }
 
-    private void addModelDocuments(List<Document> modelDocuments, String prefix, boolean annotate,
-                                   Scope newInnerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
-        for (Document currentModelDocument : modelDocuments) {
-
-            // Annotate if needed, otherwise leave as is
-            if (annotate) {
-                currentModelDocument = annotateShadowTree(currentModelDocument, prefix, false);
-                gatherScopeMappingsAndTransform(currentModelDocument, prefix, newInnerScope, outerScope, startScope, null, false, "/");
-            }
-
-            // Store models by "prefixed id"
-            staticState.addModelDocument(newInnerScope, currentModelDocument);
-        }
-    }
-
-    /**
-     * Generate shadow content for the given control id and XBL binding.
-     *
-     * @param indentedLogger    logger
-     * @param documentWrapper   wrapper around controls document
-     * @param boundElement      element to which the binding applies
-     * @param binding           corresponding <xbl:binding>
-     * @param prefix            prefix of the ids within the new shadow tree, e.g. component1$component2$
-     * @return                  shadow tree document
-     */
-    private Document generateShadowTree(final IndentedLogger indentedLogger, final DocumentWrapper documentWrapper,
-                                        final Element boundElement, Element binding, final String prefix) {
-        final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
-        if (templateElement != null) {
-
-            if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.startHandleOperation("", "generating XBL shadow content",
-                        "bound element", Dom4jUtils.elementToDebugString(boundElement), 
-                        "binding id", XFormsUtils.getElementStaticId(binding));
-            }
-
-            // TODO: in script mode, XHTML elements in template should only be kept during page generation
-
-            // Here we create a completely separate document
-
-            // 1. Apply optional preprocessing step (usually XSLT)
-            // Copy as the template element may be used many times
-            final Document shadowTreeDocument = applyPipelineTransform(templateElement, boundElement);
-
-            // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
-            XBLTransformer.transform(documentWrapper, shadowTreeDocument, boundElement);
-
-            // 3: Annotate tree
-            final boolean hasUpdateFull = hasFullUpdate(shadowTreeDocument);
-            final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, prefix, hasUpdateFull);
-
-            if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.endHandleOperation("document", logShadowTrees ? Dom4jUtils.domToString(annotatedShadowTreeDocument) : null);
-            }
-
-            return annotatedShadowTreeDocument;
-        } else {
-            return null;
-        }
-    }
-
-    private Document generateGlobalShadowTree(final IndentedLogger indentedLogger, Element binding, Document shadowTreeDocument) {
+    protected Document generateGlobalShadowTree(final IndentedLogger indentedLogger, Element binding, Document shadowTreeDocument) {
 
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.startHandleOperation("", "generating global XBL shadow content",
@@ -629,7 +361,7 @@ public class XBLBindings {
 
         // Annotate tree
         final boolean hasUpdateFull = hasFullUpdate(shadowTreeDocument);
-        final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, TOP_LEVEL_SCOPE.getFullPrefix(), hasUpdateFull);
+        final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, partAnalysis.startScope().getFullPrefix(), hasUpdateFull);
 
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.endHandleOperation("document", logShadowTrees ? Dom4jUtils.domToString(annotatedShadowTreeDocument) : null);
@@ -638,7 +370,7 @@ public class XBLBindings {
         return annotatedShadowTreeDocument;
     }
 
-    private boolean hasFullUpdate(Document shadowTreeDocument) {
+    protected boolean hasFullUpdate(Document shadowTreeDocument) {
         if (Version.isPE()) {
             final boolean[] hasUpdateFull = new boolean[1];
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
@@ -702,7 +434,7 @@ public class XBLBindings {
      * @param outerScope            outer scope of the tree
      * @return                      compact shadow tree document
      */
-    private Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement, String prefix,
+    protected Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement, String prefix,
                                       Scope innerScope, Scope outerScope) {
 
         if (indentedLogger.isDebugEnabled()) {
@@ -723,7 +455,7 @@ public class XBLBindings {
         return compactShadowTree;
     }
 
-    private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, Scope outerScope, String baseURI) {
+    protected LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, Scope outerScope, String baseURI) {
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
@@ -734,20 +466,20 @@ public class XBLBindings {
         return result;
     }
 
-    private void gatherScopeMappingsAndTransform(Document document, String prefix, Scope innerScope, Scope outerScope,
+    protected void gatherScopeMappingsAndTransform(Document document, String prefix, Scope innerScope, Scope outerScope,
                                                  XFormsConstants.XXBLScope startScope, XMLReceiver result, boolean ignoreRootElement, String baseURI) {
         // Run transformation which gathers scope information and extracts compact tree into the output ContentHandler
         TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScope, outerScope, ignoreRootElement, startScope, baseURI));
     }
 
-    private static final String scopeURI = XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI();
-    private static final String scopeLocalname = XFormsConstants.XXBL_SCOPE_QNAME.getName();
+    protected static final String scopeURI = XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI();
+    protected static final String scopeLocalname = XFormsConstants.XXBL_SCOPE_QNAME.getName();
 
-    private class ScopeExtractorContentHandler extends XFormsExtractorContentHandler {
+    protected class ScopeExtractorContentHandler extends XFormsExtractorContentHandler {
 
-        private final String prefix;
-        private final Scope innerScope;
-        private final Scope outerScope;
+        protected final String prefix;
+        protected final Scope innerScope;
+        protected final Scope outerScope;
 
         // TODO: Stack is synchronized, what other collection can we use?
         final Stack<XFormsConstants.XXBLScope> scopeStack = new Stack<XFormsConstants.XXBLScope>();
@@ -795,32 +527,17 @@ public class XBLBindings {
             if (staticId != null) {
                 final String prefixedId = prefix + staticId;
                 if (metadata.getNamespaceMapping(prefixedId) != null) {
-                    final Scope scope;
-                    {
-                        if (prefixedIdToXBLScopeMap.containsKey(prefix)) // enforce constraint that mapping must be unique
-                            throw new OXFException("Duplicate id found for effective id: " + prefixedId);
 
-                        if (currentScope == XFormsConstants.XXBLScope.inner) {
-                            scope = innerScope;
-                        } else {
-                            scope = outerScope;
-                        }
-                        prefixedIdToXBLScopeMap.put(prefixedId, scope);
-                    }
+                    final Scope scope = (currentScope == XFormsConstants.XXBLScope.inner) ? innerScope : outerScope;
+
+                    // Index scope by prefixed id
+                    partAnalysis.indexScope(prefixedId, scope);
 
                     // Index static id => prefixed id by scope
-                    {
-                        Map<String, String> staticIdToPrefixedIdMap = scopeToIdMap.get(scope);
-                        if (staticIdToPrefixedIdMap == null) {
-                            staticIdToPrefixedIdMap = new HashMap<String, String>();
-                            scopeToIdMap.put(scope, staticIdToPrefixedIdMap);
-                        }
+                    if (scope.idMap.containsKey(staticId)) // enforce constraint that mapping must be unique
+                        throw new OXFException("Duplicate id found for static id: " + staticId);
 
-                        if (staticIdToPrefixedIdMap.containsKey(staticId)) // enforce constraint that mapping must be unique
-                            throw new OXFException("Duplicate id found for static id: " + staticId);
-
-                        staticIdToPrefixedIdMap.put(staticId, prefixedId);
-                    }
+                    scope.idMap.put(staticId, prefixedId);
                 }
             }
         }
@@ -831,7 +548,7 @@ public class XBLBindings {
         }
     }
 
-    private static Document applyPipelineTransform(Element templateElement, Element boundElement) {
+    protected Document applyPipelineTransform(Element templateElement, Element boundElement) {
         final QName processorName = Dom4jUtils.extractAttributeValueQName(templateElement, XFormsConstants.XXBL_TRANSFORM_QNAME);
         if (processorName == null) {
             // @xxbl:transform is missing or empty: keep the template element alone
@@ -891,20 +608,13 @@ public class XBLBindings {
         }
     }
 
-    /*
-     * Return whether this document has at least one component in use.
-     */
-//    public boolean hasComponentsInUse() {
-//        return xblComponentBindings != null && xblComponentBindings.size() > 0;
-//    }
-
     /**
      * All component bindings.
      *
      * @return Map<QName, Element> of QNames to bindings, or null
      */
     public Map<QName, AbstractBinding> getComponentBindings() {
-        return xblComponentBindings;
+        return abstractBindings;
     }
 
     /**
@@ -914,7 +624,7 @@ public class XBLBindings {
      * @return      true iif there is a binding
      */
     public boolean isComponent(QName qName) {
-        return xblComponentBindings != null && xblComponentBindings.get(qName) != null;
+        return abstractBindings != null && abstractBindings.get(qName) != null;
     }
 
     /**
@@ -928,35 +638,13 @@ public class XBLBindings {
     }
 
     /**
-     * Return the expanded shadow tree for the given prefixed control id.
-     *
-     * @param controlPrefixedId     prefixed control id
-     * @return                      full expanded shadow tree, or null
-     */
-    public Element getFullShadowTree(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
-        return (concreteBinding == null) ? null : concreteBinding.fullShadowTree.getRootElement();
-    }
-
-    /**
-     * Return the expanded shadow tree for the given prefixed control id, with only XForms controls and no markup.
-     *
-     * @param controlPrefixedId     prefixed control id
-     * @return                      compact expanded shadow tree, or null
-     */
-    public Element getCompactShadowTree(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
-        return (concreteBinding == null) ? null : concreteBinding.compactShadowTree.getRootElement();
-    }
-
-    /**
      * Return the id of the <xbl:binding> element associated with the given prefixed control id.
      *
      * @param controlPrefixedId     prefixed control id
      * @return                      binding id or null if not found
      */
     public String getBindingId(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
+        final ConcreteBinding concreteBinding = getBinding(controlPrefixedId);
         return (concreteBinding == null) ? null : concreteBinding.bindingId;
     }
 
@@ -967,13 +655,12 @@ public class XBLBindings {
      * @return                      true iif id has an associated binding
      */
     public boolean hasBinding(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
+        final ConcreteBinding concreteBinding = getBinding(controlPrefixedId);
         return concreteBinding != null && concreteBinding.bindingId != null;
     }
 
-    public String getContainerElementName(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
-        return (concreteBinding == null) ? null : concreteBinding.containerElementName;
+    public ConcreteBinding getBinding(String controlPrefixedId) {
+        return (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
     }
 
     /**
@@ -992,16 +679,6 @@ public class XBLBindings {
      */
     public List<Element> getXBLScripts() {
         return allScripts != null ? allScripts : Collections.<Element>emptyList();
-    }
-
-    public Map<QName, Global> getGlobals() {
-        return allGlobals != null ? allGlobals : Collections.<QName, Global>emptyMap();
-    }
-
-    public Tuple2<scala.collection.Set<String>, scala.collection.Set<String>> getBaselineResources() {
-        if (baselineResources == null)
-            baselineResources = XHTMLHeadHandler.getBaselineResources(staticState);
-        return baselineResources;
     }
 
     public void freeTransientState() {

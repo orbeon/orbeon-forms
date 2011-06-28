@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -33,7 +33,7 @@ import org.orbeon.saxon.om.Item;
 public class XFormsDispatchAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
@@ -94,15 +94,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // action."
 
             // Find actual target
-            final Object xformsEventTarget;
-            if (resolvedNewEventTargetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
-                || resolvedNewEventTargetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
-                // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
-                xformsEventTarget = containingDocument.getObjectByEffectiveId(resolvedNewEventTargetStaticId);
-            } else {
-                xformsEventTarget = actionInterpreter.resolveEffectiveObject(actionElement, resolvedNewEventTargetStaticId);
-            }
-
+            final Object xformsEventTarget = actionInterpreter.resolveOrFindByEffectiveId(actionElement, resolvedNewEventTargetStaticId);
             if (xformsEventTarget instanceof XFormsEventTarget) {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(containingDocument, resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);

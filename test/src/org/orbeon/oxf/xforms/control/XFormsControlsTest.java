@@ -11,19 +11,18 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.controls;
+package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.QName;
 import org.junit.Test;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
 
 public class XFormsControlsTest extends ResourceManagerTestBase {
 
@@ -31,7 +30,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
     public void testDiffCustomMIPsChanges() {
 
         final AttributesImpl attributes = new AttributesImpl();
-        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input", "input-1") {
+        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input", "input-1", null) {
 
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
@@ -47,7 +46,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-2") {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-2", null) {
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
                 // leave as is
@@ -74,7 +73,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
 
         final AttributesImpl attributes = new AttributesImpl();
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-1") {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-1", null) {
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
                 customMIPs.put("name1", "value1");
@@ -97,14 +96,14 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
     public void testDiffClassAVT() {
         final AttributesImpl attributes = new AttributesImpl();
 
-        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input", "input-1") {
+        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input", "input-1", null) {
             @Override
             public String getExtensionAttributeValue(QName attributeName) {
                 return "foo bar gaga";
             }
         };
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-2") {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-2", null) {
             @Override
             public String getExtensionAttributeValue(QName attributeName) {
                 return "bar toto";
@@ -119,7 +118,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
     public void testDiffClassAVTNew() {
         final AttributesImpl attributes = new AttributesImpl();
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-1") {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-1", null) {
             @Override
             public String getExtensionAttributeValue(QName attributeName) {
                 return "foo bar";

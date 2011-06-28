@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.dom4j._
 import org.orbeon.oxf.xforms._
 import analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import xbl.{XBLBindingsBase, XBLBindings}
 
 /**
  * Represent an LHHA element with a "for" attribute. Behaves like a control from the point of view of static analysis.
  */
-class ExternalLHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+class ExternalLHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends LHHAAnalysis(staticStateContext, element, parent, preceding, scope) with ViewTrait {
 
     val isLocal = false
@@ -34,9 +34,9 @@ class ExternalLHHAAnalysis(staticStateContext: StaticStateContext, element: Elem
         assert(forAttribute ne null)
 
         // Try to find associated control
-        staticStateContext.staticState.getControlAnalysis(scope.getPrefixedIdForStaticId(forAttribute)) match {
+        staticStateContext.partAnalysis.getControlAnalysis(scope.getPrefixedIdForStaticId(forAttribute)) match {
             case lhhaControl: LHHATrait => lhhaControl.setExternalLHHA(ExternalLHHAAnalysis.this)
-            case _ => staticStateContext.staticState.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
+            case _ => staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
                 Array("type", element.getName, "element", Dom4jUtils.elementToDebugString(element)): _*)
         }
     }

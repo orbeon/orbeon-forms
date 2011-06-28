@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.Element;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.dom4j.Document;
+import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -43,11 +43,11 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         final String prefixedId = handlerContext.getIdPrefix() + staticId;
         final String effectiveId = handlerContext.getEffectiveId(attributes);
 
-        final XBLBindings xblBindings = containingDocument.getStaticState().getXBLBindings();
+        final StaticStateGlobalOps staticGlobalOps = containingDocument.getStaticOps();
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
-        this.elementName = xblBindings.getContainerElementName(prefixedId);
+        this.elementName = staticGlobalOps.getBinding(prefixedId).containerElementName;
         this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         // Produce class of the form xbl-foo-bar
@@ -60,12 +60,12 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         handlerContext.pushComponentContext(prefixedId);
 
         // Process shadow content if present
-        final Element shadowTree = xblBindings.getFullShadowTree(prefixedId);
+        final Document shadowTree = staticGlobalOps.getBinding(prefixedId).fullShadowTree;
         if (shadowTree != null)
             processShadowTree(controller, shadowTree);
     }
 
-    public static void processShadowTree(final ElementHandlerController controller, Element shadowTree) {
+    public static void processShadowTree(final ElementHandlerController controller, Document shadowTree) {
         // Tell the controller we are providing a new body
         controller.startBody();
 

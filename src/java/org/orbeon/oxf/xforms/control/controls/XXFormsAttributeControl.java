@@ -26,6 +26,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.Map;
+
 /**
  * Represents an extension xxforms:attribute control.
  */
@@ -36,10 +38,10 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     private String attributeValue;
     private String forName;
 
-    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
         super(container, parent, element, name, effectiveId);
 
-        this.attributeControl = (AttributeControl) container.getContainingDocument().getStaticState().getControlAnalysis(getPrefixedId());
+        this.attributeControl = (AttributeControl) container.getPartAnalysis().getControlAnalysis(getPrefixedId());
         this.attributeName = attributeControl.attributeName();
         this.attributeValue = attributeControl.attributeValue();
         this.forName = attributeControl.forName();

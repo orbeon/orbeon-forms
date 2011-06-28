@@ -25,12 +25,14 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
+import java.util.Map;
+
 /**
  * Represents an xforms:submit control.
  */
 public class XFormsSubmitControl extends XFormsTriggerControl {
-    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
-        super(container, parent, element, name, id);
+    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+        super(container, parent, element, name, id, state);
     }
 
     @Override

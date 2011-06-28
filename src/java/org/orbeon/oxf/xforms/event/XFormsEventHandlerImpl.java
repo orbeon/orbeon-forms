@@ -40,7 +40,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
     private final Set<String> eventNames;
     private final boolean isAllEvents;
-    private final String[] observerStaticIds;
+    private final String[] observersStaticIds;
+    private final String[] observersPrefixedIds;
     private final Set<String> targetStaticIds;
 
     // Phase filters
@@ -65,8 +66,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      */
-    public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId) {
-        this(prefix, eventHandlerElement, parentStaticId, ancestorObserverStaticId, false,
+    public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId, String observersPrefix) {
+        this(prefix, eventHandlerElement, parentStaticId, ancestorObserverStaticId, observersPrefix, false,
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME),
@@ -85,7 +86,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      * @param isXBLHandler              whether the handler is an XBL handler (i.e. xbl:handler)
-     * @param observersStaticIds        space-separated list of observers static ids, or null if parent element
+     * @param observersString           space-separated list of observers static ids, or null if parent element
      * @param eventNamesAttribute       space-separated list of event names
      * @param targets                   space-separated list of event targets
      * @param phase                     event phase ("capture" | "default", poss. more later as XBL has "capture" | "target" | "bubble" | "default-action")
@@ -94,8 +95,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param keyModifiers               key modifier for keypress event, or null
      * @param keyText                   key text for keypress event, or null
      */
-    public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId,
-                                  boolean isXBLHandler, String observersStaticIds, String eventNamesAttribute, String targets,
+    public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId, String observersPrefix,
+                                  boolean isXBLHandler, String observersString, String eventNamesAttribute, String targets,
                                   String phase, String propagate, String defaultAction, String keyModifiers, String keyText) {
 
         this.prefix = prefix;
@@ -109,15 +110,26 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
-        if (observersStaticIds != null) {
+        if (observersString != null) {
             // ev:observer attribute specifies observers
-            observerStaticIds = StringUtils.split(observersStaticIds);
+            observersStaticIds = StringUtils.split(observersString);
         } else if (parentStaticId != null) {
             // Observer is parent
-            observerStaticIds = new String[] { parentStaticId };
+            observersStaticIds = new String[] { parentStaticId };
         } else {
             // No observer
-            observerStaticIds = new String[0];
+            observersStaticIds = new String[0];
+        }
+
+        {
+            // Gather observers prefixed ids
+            observersPrefixedIds = new String[observersStaticIds.length];
+            int observerIndex = 0;
+            for (final String observerStaticId : observersStaticIds)
+                // NOTE: Handle special case of global id on containing document
+                observersPrefixedIds[observerIndex++]
+                        = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID.equals(observerStaticId)
+                        ? observerStaticId : observersPrefix + observerStaticId;
         }
 
         // Gather event names
@@ -145,7 +157,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             for (String targetId: targetIds) {
                 if (TARGET_IS_OBSERVER.equals(targetId)) {
                     // Add all observer ids as targets
-                    targetStaticIds.addAll(Arrays.asList(observerStaticIds));
+                    targetStaticIds.addAll(Arrays.asList(observersStaticIds));
                 } else {
                     // Add id as target
                     targetStaticIds.add(targetId);
@@ -215,7 +227,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public String[] getObserversStaticIds() {
-        return observerStaticIds;
+        return observersStaticIds;
+    }
+
+    public String[] getObserversPrefixedIds() {
+        return observersPrefixedIds;
     }
 
     public boolean isCapturePhaseOnly() {

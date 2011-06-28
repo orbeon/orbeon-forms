@@ -13,13 +13,18 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 
@@ -58,39 +63,9 @@ public class XXFormsElement extends XFormsFunction {
             boolean hasNewText = false;
             while (true) {
                 final Item currentItem = content.next();
-                if (currentItem == null) {
+                if (currentItem == null)
                     break;
-                }
-                if (currentItem instanceof AtomicValue) {
-                    // Insert as text
-                    element.addText(currentItem.getStringValue());
-                    hasNewText = true;
-                } else if (currentItem instanceof NodeInfo) {
-                    // Insert nodes
-
-                    if (currentItem instanceof NodeWrapper) {
-                        // dom4j node
-
-                        // Copy node before using it
-                        final Node newNode; {
-                        final Node currentNode = (Node) ((NodeWrapper) currentItem).getUnderlyingNode();
-                            // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
-                            newNode = Dom4jUtils.createCopy(currentNode);
-                        }
-
-                        if (newNode instanceof Attribute) {
-                            // Add attribute
-                            element.add((Attribute) newNode);
-                        } else {
-                            // Append node
-                            element.content().add(newNode);
-                        }
-
-                    } else {
-                        // Other type of node
-                        // TODO: read and convert
-                    }
-                }
+                hasNewText |= addItem(element, currentItem);
             }
 
             // Make sure we are normalized if we added text 
@@ -98,6 +73,41 @@ public class XXFormsElement extends XFormsFunction {
                 Dom4jUtils.normalizeTextNodes(element);
         }
 
-        return getContainingDocument(xpathContext).getStaticState().getDefaultDocumentWrapper().wrap(element);
+        return getContainingDocument(xpathContext).getStaticState().documentWrapper().wrap(element);
+    }
+
+    public static boolean addItem(Element element, Item item) {
+        boolean hasNewText = false;
+        if (item instanceof AtomicValue) {
+            // Insert as text
+            element.addText(item.getStringValue());
+            hasNewText = true;
+        } else if (item instanceof NodeInfo) {
+            // Insert nodes
+
+            if (item instanceof NodeWrapper) {
+                // dom4j node
+
+                // Copy node before using it
+                final Node newNode; {
+                final Node currentNode = (Node) ((NodeWrapper) item).getUnderlyingNode();
+                    // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
+                    newNode = Dom4jUtils.createCopy(currentNode);
+                }
+
+                if (newNode instanceof Attribute) {
+                    // Add attribute
+                    element.add((Attribute) newNode);
+                } else {
+                    // Append node
+                    element.content().add(newNode);
+                }
+
+            } else {
+                // Other type of node
+                // TODO: read and convert
+            }
+        }
+        return hasNewText;
     }
 }

@@ -20,6 +20,8 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
+import java.util.Map;
+
 /**
  * Represents an xforms:case pseudo-control.
  *
@@ -27,7 +29,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
  */
 public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implements XFormsPseudoControl {
 
-    public XFormsCaseControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
+    public XFormsCaseControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
     }
 

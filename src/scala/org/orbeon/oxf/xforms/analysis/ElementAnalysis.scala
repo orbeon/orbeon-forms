@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.analysis
 import controls.RepeatControl
 import org.dom4j.Element
 import org.orbeon.oxf.xml.dom4j.{LocationData, ExtendedLocationData}
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -156,7 +156,7 @@ object ElementAnalysis {
     /**
      * Return a list of preceding elements in the same scope, from root to leaf.
      */
-    def getPrecedingInScope(element: ElementAnalysis)(scope: XBLBindings#Scope = element.scopeModel.scope): List[ElementAnalysis] = element.preceding match {
+    def getPrecedingInScope(element: ElementAnalysis)(scope: XBLBindingsBase.Scope = element.scopeModel.scope): List[ElementAnalysis] = element.preceding match {
         case Some(preceding) if preceding.scopeModel.scope == scope => preceding :: getPrecedingInScope(preceding)(scope)
         case Some(preceding) => getPrecedingInScope(preceding)(scope)
         case None => element.parent match {
@@ -168,7 +168,7 @@ object ElementAnalysis {
     /**
      * Return the closest preceding element in the same scope.
      */
-    def getClosestPrecedingInScope(element: ElementAnalysis)(scope: XBLBindings#Scope = element.scopeModel.scope): Option[ElementAnalysis] = element.preceding match {
+    def getClosestPrecedingInScope(element: ElementAnalysis)(scope: XBLBindingsBase.Scope = element.scopeModel.scope): Option[ElementAnalysis] = element.preceding match {
         case Some(preceding) if preceding.scopeModel.scope == scope => Some(preceding)
         case Some(preceding) => getClosestPrecedingInScope(preceding)(scope)
         case None => element.parent match {
@@ -188,7 +188,7 @@ object ElementAnalysis {
     /**
      * Return a list of ancestors in the same scope from leaf to root.
      */
-    def getAllAncestorsInScope(parent: Option[ContainerTrait], scope: XBLBindings#Scope): List[ElementAnalysis] =
+    def getAllAncestorsInScope(parent: Option[ContainerTrait], scope: XBLBindingsBase.Scope): List[ElementAnalysis] =
         getAllAncestors(parent) filter (_.scopeModel.scope == scope)
 
     /**
@@ -201,7 +201,7 @@ object ElementAnalysis {
     /**
      * Get the closest ancestor in the same scope.
      */
-    def getClosestAncestorInScope(parent: Option[ContainerTrait], scope: XBLBindings#Scope): Option[ElementAnalysis] =
+    def getClosestAncestorInScope(parent: Option[ContainerTrait], scope: XBLBindingsBase.Scope): Option[ElementAnalysis] =
         getAllAncestorsInScope(parent, scope) match {
             case Nil => None
             case ancestorsList => Some(ancestorsList.head)

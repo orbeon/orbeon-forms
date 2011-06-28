@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.test
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.junit.After
@@ -24,6 +22,7 @@ import controls.XFormsSelect1Control
 import org.dom4j.{Element, Document => JDocument}
 import xml.{XML, Elem}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
+import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}
 
 abstract class DocumentTestBase extends ResourceManagerTestBase {
 
@@ -38,14 +37,15 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
         }
     }
 
-    def setupDocument(documentURL: String): Unit = setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
+    def setupDocument(documentURL: String): Unit =
+        setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
     def getDocument = document
 
     def setupDocument(xhtml: JDocument) {
         ResourceManagerTestBase.staticSetup()
 
-        val staticState = XFormsStaticStateTest.getStaticState(xhtml)
+        val staticState = XFormsStaticStateImpl.create(xhtml)
         this.document = new XFormsContainingDocument(staticState, null, null, null)
 
         document.afterInitialResponse()

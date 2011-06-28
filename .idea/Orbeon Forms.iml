@@ -22,10 +22,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Orbeon Forms" level="project" />
-    <orderEntry type="library" name="Scala 2.8.1" level="project" />
     <orderEntry type="library" name="Saxon" level="application" />
     <orderEntry type="library" name="ScalaTest" level="application" />
     <orderEntry type="library" name="Rhino" level="application" />
+    <orderEntry type="library" name="Scala 2.8.1" level="project" />
   </component>
 </module>
 

@@ -26,6 +26,8 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.EmptySequence;
 import org.orbeon.saxon.value.Value;
 
+import java.util.Map;
+
 /**
  * Representation of a variable in a tree of controls.
  *
@@ -40,7 +42,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     // Previous value for refresh
     private ValueRepresentation previousValue;
 
-    public XXFormsVariableControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XXFormsVariableControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
         super(container, parent, element, name, effectiveId);
         variable = new Variable(container, container.getContextStack(), element);
     }

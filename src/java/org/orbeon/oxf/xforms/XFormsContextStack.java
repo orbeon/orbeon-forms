@@ -23,16 +23,20 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.tinytree.TinyBuilder;
+import org.xml.sax.SAXException;
 
+import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -40,6 +44,31 @@ import java.util.*;
  * XBLContainer), models, and actions.
  */
 public class XFormsContextStack {
+
+    private static final NodeInfo DUMMY_CONTEXT;
+    static {
+        try {
+            final TinyBuilder treeBuilder = new TinyBuilder();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(XPathCache.getGlobalConfiguration());
+            identity.setResult(treeBuilder);
+
+            identity.startDocument();
+            identity.endDocument();
+
+            DUMMY_CONTEXT = treeBuilder.getCurrentRoot();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    // If there is no XPath context defined at the root (in the case there is no default XForms model/instance
+    // available), we should use an empty context. However, currently for non-relevance in particular we must not run
+    // expressions with an empty context. To allow running expressions at the root of a container without models, we
+    // create instead a context with an empty document node instead. This way there is a context for evaluation. In the
+    // future, we should allow running expressions with no context, possibly after statically checking that they do not
+    // depend on the context, as well as prevent evaluations within non-relevant content by other means.
+//    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
+    private static final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) DUMMY_CONTEXT);
 
     private XBLContainer container;
     private XFormsContainingDocument containingDocument;
@@ -117,7 +146,7 @@ public class XFormsContextStack {
                     xformsModel.getDefaultInstance().getLocationData(), false, defaultNode, container.getResolutionScope()));
         } else {
             // Push empty context
-            final List<Item> defaultContext = containingDocument.getStaticState().DEFAULT_CONTEXT;
+            final List<Item> defaultContext = DEFAULT_CONTEXT;
             contextStack.push(new BindingContext(parentBindingContext, xformsModel, defaultContext, defaultContext.size(), null, true, null,
                     (xformsModel != null) ? xformsModel.getLocationData() : null, false, null, container.getResolutionScope()));
         }
@@ -155,14 +184,13 @@ public class XFormsContextStack {
 
     public List<BindingContext.VariableInfo> addAndScopeVariables(XBLContainer container, List<Element> elements, String sourceEffectiveId) {
         List<BindingContext.VariableInfo> variableInfos = null;
-        final XBLBindings bindings = containingDocument.getStaticState().getXBLBindings();
-        for (Element currentElement: elements) {
+        for (Element currentElement : elements) {
             if (VariableAnalysis.isVariableElement(currentElement)) {
                 // Create variable object
                 final Variable variable = new Variable(container, this, currentElement);
 
                 // Find variable scope
-                final XBLBindings.Scope newScope = bindings.getResolutionScopeByPrefixedId(container.getFullPrefix() + currentElement.attributeValue(XFormsConstants.ID_QNAME));
+                final XBLBindingsBase.Scope newScope = container.getPartAnalysis().getResolutionScopeByPrefixedId(container.getFullPrefix() + currentElement.attributeValue(XFormsConstants.ID_QNAME));
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the
                 // following controls and variables.
@@ -233,7 +261,7 @@ public class XFormsContextStack {
      * @param sourceEffectiveId effective id of source control for id resolution of models and binds
      * @param scope             XBL scope
      */
-    public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindings.Scope scope) {
+    public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindingsBase.Scope scope) {
         // TODO: move away from element and use static analysis information
         final String ref = bindingElement.attributeValue(XFormsConstants.REF_QNAME);
         final String context = bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
@@ -245,7 +273,7 @@ public class XFormsContextStack {
         pushBinding(ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);
     }
 
-    private BindingContext getBindingContext(XBLBindings.Scope scope) {
+    private BindingContext getBindingContext(XBLBindingsBase.Scope scope) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
         if (scope == null) {
             // Keep existing scope
@@ -264,7 +292,7 @@ public class XFormsContextStack {
     }
 
     public void pushBinding(String ref, String context, String nodeset, String modelId, String bindId,
-                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindings.Scope scope) {
+                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindingsBase.Scope scope) {
 
         // Get location data for error reporting
         final LocationData locationData = (bindingElement == null)
@@ -279,7 +307,7 @@ public class XFormsContextStack {
                 // Handle scope
                 // The new binding evaluates against a base binding context which must be in the same scope
                 final BindingContext baseBindingContext = getBindingContext(scope);
-                final XBLBindings.Scope newScope;
+                final XBLBindingsBase.Scope newScope;
                 if (scope == null) {
                     // Keep existing scope
                     // TODO: remove this once no caller can pass a null scope
@@ -419,7 +447,7 @@ public class XFormsContextStack {
                                 evaluationPosition = evaluationContextBinding.getPosition();
                             } else {
                                 isDefaultContext = true;
-                                evaluationNodeset = containingDocument.getStaticState().DEFAULT_CONTEXT;
+                                evaluationNodeset = DEFAULT_CONTEXT;
                                 evaluationPosition = 1;
                             }
 
@@ -610,7 +638,7 @@ public class XFormsContextStack {
      * @param value             variable value
      * @param scope             XBL scope of the variable visibility
      */
-    public void pushVariable(Element variableElement, String name, ValueRepresentation value, XBLBindings.Scope scope) {
+    public void pushVariable(Element variableElement, String name, ValueRepresentation value, XBLBindingsBase.Scope scope) {
         final LocationData locationData = new ExtendedLocationData((LocationData) variableElement.getData(), "pushing variable binding", variableElement);
         contextStack.push(new BindingContext(getCurrentBindingContext(), getBindingContext(scope), variableElement, locationData, name, value, scope));
     }
@@ -841,13 +869,13 @@ public class XFormsContextStack {
         public final LocationData locationData;
         public final boolean hasOverriddenContext;
         public final Item contextItem;
-        public final XBLBindings.Scope scope;
+        public final XBLBindingsBase.Scope scope;
 
         private List<VariableInfo> variables;
 
         public BindingContext(BindingContext parent, XFormsModel model, List<Item> nodeSet, int position, String elementId,
                               boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext,
-                              Item contextItem, XBLBindings.Scope scope) {
+                              Item contextItem, XBLBindingsBase.Scope scope) {
 
             assert scope != null;
 
@@ -880,7 +908,7 @@ public class XFormsContextStack {
         }
 
         public BindingContext(BindingContext parent, BindingContext base, Element controlElement, LocationData locationData, String variableName,
-                              ValueRepresentation variableValue, XBLBindings.Scope scope) {
+                              ValueRepresentation variableValue, XBLBindingsBase.Scope scope) {
             this(parent, base.model, base.getNodeset(), base.getPosition(), base.elementId, false,
                     controlElement, locationData, false, base.getContextItem(), scope);
 

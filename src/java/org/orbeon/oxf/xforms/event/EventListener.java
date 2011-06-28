@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,15 +11,8 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event.events;
+package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
-
-public class XXFormsValueChanged extends XFormsEvent {
-    public XXFormsValueChanged(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
-        super(containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGED, targetObject, true, true);
-    }
+public interface EventListener {
+    void handleEvent(XFormsEvent event);
 }

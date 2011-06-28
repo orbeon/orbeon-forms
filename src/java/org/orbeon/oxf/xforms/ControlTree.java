@@ -16,15 +16,18 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.*;
-import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
+import scala.Option;
 
 import java.util.*;
 
@@ -63,14 +66,16 @@ public class ControlTree implements ExternalCopyable {
         // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
         // types of events below.
 
-        isAllowSendingValueChangedEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_VALUE_CHANGED);
-        isAllowSendingRequiredEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_REQUIRED) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_OPTIONAL);
-        isAllowSendingRelevantEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_ENABLED) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_DISABLED);
-        isAllowSendingReadonlyEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_READONLY) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_READWRITE);
-        isAllowSendingValidEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_VALID) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_INVALID);
-        isAllowSendingIterationMovedEvents = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_ITERATION_MOVED);
-        final boolean isAllowSendingNodesetChangedEvent = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_NODESET_CHANGED);
-        final boolean isAllowSendingIndexChangedEvent = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_INDEX_CHANGED);
+        final StaticStateGlobalOps ops = containingDocument.getStaticOps();
+        
+        isAllowSendingValueChangedEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_VALUE_CHANGED);
+        isAllowSendingRequiredEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_REQUIRED) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_OPTIONAL);
+        isAllowSendingRelevantEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_ENABLED) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_DISABLED);
+        isAllowSendingReadonlyEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_READONLY) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_READWRITE);
+        isAllowSendingValidEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_VALID) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_INVALID);
+        isAllowSendingIterationMovedEvents = ops.hasHandlerForEvent(XFormsEvents.XXFORMS_ITERATION_MOVED);
+        final boolean isAllowSendingNodesetChangedEvent = ops.hasHandlerForEvent(XFormsEvents.XXFORMS_NODESET_CHANGED);
+        final boolean isAllowSendingIndexChangedEvent = ops.hasHandlerForEvent(XFormsEvents.XXFORMS_INDEX_CHANGED);
 
         isAllowSendingRefreshEvents = isAllowSendingValueChangedEvents
                 || isAllowSendingRequiredEvents
@@ -94,9 +99,9 @@ public class ControlTree implements ExternalCopyable {
 
         // Create temporary root control
         final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
-            public void addChild(XFormsControl XFormsControl) {
+            public void addChild(XFormsControl control) {
                 // Add child to root control
-                super.addChild(XFormsControl);
+                super.addChild(control);
                 // Forward children list to ControlTree. This so that the tree is made available during construction
                 // to XPath functions like index() or xxforms:case()
                 if (ControlTree.this.children == null) {
@@ -210,13 +215,13 @@ public class ControlTree implements ExternalCopyable {
         }
     }
 
-    public void dispatchDestructionEventsForRemovedIteration(XFormsRepeatIterationControl removedIteration) {
+    public void dispatchDestructionEventsForRemovedContainer(XFormsContainerControl removedControl, boolean includeCurrent) {
 
         indentedLogger.startHandleOperation("controls", "dispatching destruction events");
 
         // Gather ids of controls to handle
         final List<String> controlsEffectiveIds = new ArrayList<String>();
-        visitControls(removedIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
+        visitControls(removedControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
                 // Don't handle container controls here
@@ -234,7 +239,7 @@ public class ControlTree implements ExternalCopyable {
         });
 
         // Dispatch events
-        for (final String effectiveId: controlsEffectiveIds) {
+        for (final String effectiveId : controlsEffectiveIds) {
             final XFormsControl control = controlIndex.getControl(effectiveId);
             // Directly call destruction events as we know the iteration is going away
             dispatchDestructionEvents(control);
@@ -285,7 +290,7 @@ public class ControlTree implements ExternalCopyable {
                     // Dispatch moved xxforms-iteration-changed if needed
                     if (isAllowSendingIterationMovedEvents
                             && control.getPreviousEffectiveId() != control.getEffectiveId()
-                            && staticState.observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
+                            && control.getXBLContainer().getPartAnalysis().observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
                         container.dispatchEvent(new XXFormsIterationMovedEvent(containingDocument, control));
                     }
 
@@ -418,13 +423,34 @@ public class ControlTree implements ExternalCopyable {
         dispatchRefreshEvents(effectiveIdsToControls.keySet());
     }
 
-//    public void createSubTree(PropertyContext propertyContext, XFormsContainerControl containerControl) {
-//
-//        // TODO: implement in a way similar to createRepeatIterationTree()
-//        final XFormsControl control = (XFormsControl) containerControl;
-//        XFormsControls.visitControlElementsHandleRepeat(propertyContext, containerControl,
-//                new CreateControlsListener(propertyContext, controlIndex, control, null));
-//    }
+    public void createAndInitializeSubTree(XFormsContainingDocument containingDocument, XXFormsDynamicControl dynamicControl) {
+
+        // Create new index for the controls created in the iteration
+        final ControlIndex index = new ControlIndex(containingDocument.getStaticState().isNoscript());
+
+        // Create the subtree
+        containingDocument.getControls().visitControlElementsHandleRepeat(dynamicControl,
+                new CreateControlsListener(index, (XFormsControl) dynamicControl, null));
+
+        // Update main index before dispatching, so that events can access newly created controls
+        controlIndex.addAll(index);
+
+        // Gather all control ids and controls
+        final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
+        visitControls(dynamicControl, false, new XFormsControls.XFormsControlVisitorAdapter() {
+            @Override
+            public boolean startVisitControl(XFormsControl control) {
+                effectiveIdsToControls.put(control.getEffectiveId(), control);
+                return true;
+            }
+        });
+
+        // Evaluate controls, passing directly all the controls
+        ControlIndex.evaluateAll(indentedLogger, effectiveIdsToControls.values());
+
+        // Dispatch initialization events, passing the ids only
+        dispatchRefreshEvents(effectiveIdsToControls.keySet());
+    }
 
     /**
      * Index a subtree of controls. Also handle special relevance binding events.
@@ -478,7 +504,7 @@ public class ControlTree implements ExternalCopyable {
         return controlIndex.getEffectiveIdsToControls();
     }
 
-    public Map<String, Integer> getInitialMinimalRepeatIdToIndex(XFormsStaticState staticState) {
+    public Map<String, Integer> getInitialMinimalRepeatIdToIndex(StaticStateGlobalOps globalOps) {
 
         // TODO: for now, get the Map all the time, but should be optimized
 
@@ -495,12 +521,12 @@ public class ControlTree implements ExternalCopyable {
             }
         });
 
-        addMissingRepeatIndexes(staticState, repeatIdToIndex);
+        globalOps.addMissingRepeatIndexes(repeatIdToIndex);
 
         return repeatIdToIndex;
     }
 
-    public Map<String, Integer> getMinimalRepeatIdToIndex(XFormsStaticState staticState) {
+    public Map<String, Integer> getMinimalRepeatIdToIndex(StaticStateGlobalOps globalOps) {
 
         // TODO: for now, get the Map all the time, but should be optimized
 
@@ -517,20 +543,9 @@ public class ControlTree implements ExternalCopyable {
             }
         });
 
-        addMissingRepeatIndexes(staticState, repeatIdToIndex);
+        globalOps.addMissingRepeatIndexes(repeatIdToIndex);
 
         return repeatIdToIndex;
-    }
-
-    private void addMissingRepeatIndexes(XFormsStaticState staticState, Map<String, Integer> repeatIdToIndex) {
-        final Map<String, ElementAnalysis> repeats = staticState.getRepeatControlAnalysisMap();
-        if (repeats != null) {
-            for (String repeatPrefixedId: repeats.keySet()) {
-                if (repeatIdToIndex.get(repeatPrefixedId) == null) {
-                    repeatIdToIndex.put(repeatPrefixedId, 0);
-                }
-            }
-        }
     }
 
     /**
@@ -646,7 +661,7 @@ public class ControlTree implements ExternalCopyable {
      * @param targetControlStaticId     reference to target control, e.g. "xf-10"
      * @return                          effective control id, or null if not found
      */
-    public String findEffectiveControlId(String sourceControlEffectiveId, String targetControlStaticId) {
+    public String findEffectiveControlId(StaticStateGlobalOps staticStateGlobalOps, String sourceControlEffectiveId, String targetControlStaticId) {
 
         // NOTE: The implementation tries to do a maximum using the static state. One reason is that the source
         // control's effective id might not yet have an associated control during construction. E.g.:
@@ -669,11 +684,9 @@ public class ControlTree implements ExternalCopyable {
         if (sourceControlEffectiveId == null)
             throw new IllegalArgumentException("Source control effective id is required.");
 
-        final XBLBindings bindings = staticState.getXBLBindings();
-
         // 2: Obtain target prefixed id
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
-        final XBLBindings.Scope scope = bindings.getResolutionScopeByPrefixedId(sourcePrefixedId);
+        final XBLBindingsBase.Scope scope = staticStateGlobalOps.getResolutionScopeByPrefixedId(sourcePrefixedId);
         final String targetPrefixedId = scope.getPrefixedIdForStaticId(targetControlStaticId);
 
         // 3: Implement XForms 1.1 "4.7.1 References to Elements within a repeat Element" algorithm
@@ -682,11 +695,11 @@ public class ControlTree implements ExternalCopyable {
 
         final StringBuilder targetIndexBuilder = new StringBuilder();
 
-        final String closestCommonAncestorRepeatPrefixedId = staticState.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId);
-        if (closestCommonAncestorRepeatPrefixedId != null) {
+        final Option<String> closestCommonAncestorRepeatPrefixedId = staticStateGlobalOps.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId);
+        if (closestCommonAncestorRepeatPrefixedId.isDefined()) {
             // There is a common ancestor repeat, use the current iteration as starting point
 
-            final int ancestorCount = staticState.getAncestorRepeats(closestCommonAncestorRepeatPrefixedId, null).size() + 1;
+            final int ancestorCount = staticStateGlobalOps.getAncestorRepeatsJava(closestCommonAncestorRepeatPrefixedId.get(), null).size() + 1;
             if (ancestorCount > 0) {
                 final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(sourceControlEffectiveId);
                 for (int i = 0; i < ancestorCount; i ++) {
@@ -696,7 +709,9 @@ public class ControlTree implements ExternalCopyable {
         }
 
         // Find list of ancestor repeats for destination WITHOUT including the closest ancestor repeat if any
-        final List<String> targetAncestorRepeats = staticState.getAncestorRepeats(targetPrefixedId, closestCommonAncestorRepeatPrefixedId);
+        // NOTE: make a copy because the source might be an immutable wrapped Scala collection which we can't reverse
+        final List<String> targetAncestorRepeats = new ArrayList(staticStateGlobalOps.getAncestorRepeatsJava(targetPrefixedId,
+                closestCommonAncestorRepeatPrefixedId.isDefined() ? closestCommonAncestorRepeatPrefixedId.get() : null));
         Collections.reverse(targetAncestorRepeats); // go from trunk to leaf
 
         // Follow repeat indexes towards target
@@ -812,7 +827,7 @@ public class ControlTree implements ExternalCopyable {
         }
 
         public boolean pushBinding(XFormsContextStack currentContextStack, Element currentControlElement,
-                                   String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
+                                   String controlPrefixedId, String controlEffectiveId, XBLBindingsBase.Scope newScope) {
 
             // When creating controls, always evaluate the binding
             currentContextStack.pushBinding(currentControlElement, controlEffectiveId, newScope);
@@ -938,7 +953,7 @@ public class ControlTree implements ExternalCopyable {
         }
 
         public boolean pushBinding(XFormsContextStack currentContextStack, Element currentControlElement,
-                                   String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
+                                   String controlPrefixedId, String controlEffectiveId, XBLBindingsBase.Scope newScope) {
 
             // Update is required if:
             //

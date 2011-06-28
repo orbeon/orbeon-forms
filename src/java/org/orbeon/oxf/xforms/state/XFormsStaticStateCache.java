@@ -41,7 +41,7 @@ public class XFormsStaticStateCache {
      * @param staticState       state to store
      */
     public void storeDocument(XFormsStaticState staticState) {
-        final InternalCacheKey cacheKey = createCacheKey(staticState.getDigest());
+        final InternalCacheKey cacheKey = createCacheKey(staticState.digest());
         cache.add(cacheKey, CONSTANT_VALIDITY, staticState);
     }
 

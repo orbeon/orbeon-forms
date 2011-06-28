@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.dom4j.QName;
+import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,29 +30,29 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/calendar/assets/skins/sam/calendar.css", null),
             // Yahoo! UI Library
             new ResourceConfig("/ops/yui/treeview/assets/skins/sam/treeview.css", null) {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isTreeInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isTreeInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/examples/treeview/assets/css/check/tree.css", null) {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isTreeInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isTreeInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/menu/assets/skins/sam/menu.css", null) {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isMenuInUse(staticState) || isYUIRTEInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isMenuInUse(staticStateGlobalOps) || isYUIRTEInUse(staticStateGlobalOps);
                 }
             },
             // HTML area
             new ResourceConfig("/ops/yui/editor/assets/skins/sam/editor.css", null) {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isYUIRTEInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isYUIRTEInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/button/assets/skins/sam/button.css", null) {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isYUIRTEInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isYUIRTEInUse(staticStateGlobalOps);
                 }
             },
             // Other standard stylesheets
@@ -74,34 +74,34 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/examples/container/assets/containerariaplugin.js", "/ops/yui/examples/container/assets/containerariaplugin-min.js"),
             new ResourceConfig("/ops/yui/calendar/calendar.js", "/ops/yui/calendar/calendar-min.js"),
             new ResourceConfig("/ops/yui/slider/slider.js", "/ops/yui/slider/slider-min.js") {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isRangeInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isRangeInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/treeview/treeview.js", "/ops/yui/treeview/treeview-min.js") {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isTreeInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isTreeInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/examples/treeview/assets/js/TaskNode.js", "/ops/yui/examples/treeview/assets/js/TaskNode-min.js") {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isTreeInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isTreeInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/menu/menu.js", "/ops/yui/menu/menu-min.js") {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isMenuInUse(staticState) || isYUIRTEInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isMenuInUse(staticStateGlobalOps) || isYUIRTEInUse(staticStateGlobalOps);
                 }
             },
             // HTML area
             new ResourceConfig("/ops/yui/button/button.js", "/ops/yui/button/button-min.js") {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isYUIRTEInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isYUIRTEInUse(staticStateGlobalOps);
                 }
             },
             new ResourceConfig("/ops/yui/editor/editor.js", "/ops/yui/editor/editor-min.js") {
-                public boolean isInUse(XFormsStaticState staticState) {
-                    return isYUIRTEInUse(staticState);
+                public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
+                    return isYUIRTEInUse(staticStateGlobalOps);
                 }
             },
             // Underscore library
@@ -139,44 +139,44 @@ public class XFormsFeatures {
             return (tryMinimal && minResource != null) ? minResource : fullResource;
         }
 
-        public boolean isInUse(XFormsStaticState staticState) {
+        public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
             // Default to true but can be overridden
             return true;
         }
 
-        public static boolean isInUse(XFormsStaticState staticState, String controlName) {
-            return staticState != null && staticState.hasControlByName(controlName);
+        public static boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName) {
+            return staticStateGlobalOps != null && staticStateGlobalOps.hasControlByName(controlName);
         }
 
-        public static boolean isInUse(XFormsStaticState staticState, String controlName, QName appearanceOrMediatypeName) {
-            return staticState != null && staticState.hasControlAppearance(controlName, appearanceOrMediatypeName);
+        public static boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName, QName appearanceOrMediatypeName) {
+            return staticStateGlobalOps != null && staticStateGlobalOps.hasControlAppearance(controlName, appearanceOrMediatypeName);
         }
 
-        protected boolean isRangeInUse(XFormsStaticState staticState) {
-            return isInUse(staticState, "range");
+        protected boolean isRangeInUse(StaticStateGlobalOps staticStateGlobalOps) {
+            return isInUse(staticStateGlobalOps, "range");
         }
 
-        protected boolean isTreeInUse(XFormsStaticState staticState) {
-            return isInUse(staticState, "select1", XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME) || isInUse(staticState, "select", XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
+        protected boolean isTreeInUse(StaticStateGlobalOps staticStateGlobalOps) {
+            return isInUse(staticStateGlobalOps, "select1", XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME) || isInUse(staticStateGlobalOps, "select", XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
         }
 
-        protected boolean isMenuInUse(XFormsStaticState staticState) {
-            return isInUse(staticState, "select1", XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME) || isInUse(staticState, "select", XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
+        protected boolean isMenuInUse(StaticStateGlobalOps staticStateGlobalOps) {
+            return isInUse(staticStateGlobalOps, "select1", XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME) || isInUse(staticStateGlobalOps, "select", XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
         }
 
-        private boolean isHtmlAreaInUse(XFormsStaticState staticState) {
-            return isInUse(staticState, "textarea", XFormsConstants.XXFORMS_RICH_TEXT_APPEARANCE_QNAME);
+        private boolean isHtmlAreaInUse(StaticStateGlobalOps staticStateGlobalOps) {
+            return isInUse(staticStateGlobalOps, "textarea", XFormsConstants.XXFORMS_RICH_TEXT_APPEARANCE_QNAME);
         }
 
-        protected boolean isYUIRTEInUse(XFormsStaticState staticState) {
-            return isHtmlAreaInUse(staticState);
+        protected boolean isYUIRTEInUse(StaticStateGlobalOps staticStateGlobalOps) {
+            return isHtmlAreaInUse(staticStateGlobalOps);
         }
     }
 
-    public static List<ResourceConfig> getCSSResources(XFormsStaticState staticState) {
+    public static List<ResourceConfig> getCSSResources(StaticStateGlobalOps staticStateGlobalOps) {
         final List<ResourceConfig> result = new ArrayList<ResourceConfig>();
         for (final ResourceConfig resourceConfig: stylesheets) {
-            if (resourceConfig.isInUse(staticState)) {
+            if (resourceConfig.isInUse(staticStateGlobalOps)) {
                 // Only include stylesheet if needed
                 result.add(resourceConfig);
             }
@@ -184,10 +184,10 @@ public class XFormsFeatures {
         return result;
     }
 
-    public static List<ResourceConfig> getJavaScriptResources(XFormsStaticState staticState) {
+    public static List<ResourceConfig> getJavaScriptResources(StaticStateGlobalOps staticStateGlobalOps) {
         final List<ResourceConfig> result = new ArrayList<ResourceConfig>();
         for (final ResourceConfig resourceConfig: scripts) {
-            if (resourceConfig.isInUse(staticState)) {
+            if (resourceConfig.isInUse(staticStateGlobalOps)) {
                 // Only include script if needed
                 result.add(resourceConfig);
             }

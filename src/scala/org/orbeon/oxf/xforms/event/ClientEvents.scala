@@ -136,7 +136,7 @@ object ClientEvents {
                 val sourceControlId = element.attributeValue("source-control-id")
                 element match {
                     // This is a value event
-                    case element if document.getStaticState.isValueControl(sourceControlId) => Category.ValueChange
+                    case element if document.getStaticOps.isValueControl(sourceControlId) => Category.ValueChange
                     // This is most likely a trigger or submit which will translate into a DOMActivate. We will move it
                     // to the end so that value change events are committed to instance data before that.
                     case _ => Category.Activation

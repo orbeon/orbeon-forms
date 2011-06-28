@@ -60,7 +60,7 @@ object EhcacheStateStore extends XFormsStateStore {
             debug("store size before storing: " + getCurrentSize + " entries.")
 
         val documentUUID = document.getUUID
-        val staticStateDigest = document.getStaticState.getDigest
+        val staticStateDigest = document.getStaticState.digest
         val dynamicStateKey = getDynamicStateKey(documentUUID, isInitialState)
 
         def addOrReplaceOne(key: String, value: String) =
@@ -70,7 +70,7 @@ object EhcacheStateStore extends XFormsStateStore {
         addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
         // Static and dynamic states
-        addOrReplaceOne(staticStateDigest, document.getStaticState.getEncodedStaticState)
+        addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState)
         addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(XFormsProperties.isGZIPState, false))
     }
 
@@ -90,7 +90,7 @@ object EhcacheStateStore extends XFormsStateStore {
                 val parts = keyString split ':'
 
                 assert(parts.size == 2)
-                assert(parts(0).length == XFormsStaticState.DIGEST_LENGTH)   // static state key is an hex MD5
+                assert(parts(0).length == XFormsStaticStateImpl.DIGEST_LENGTH)   // static state key is an hex MD5
 
                 // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
                 val dynamicStateKey = if (isInitialState) getDynamicStateKey(documentUUID, true) else parts(1)

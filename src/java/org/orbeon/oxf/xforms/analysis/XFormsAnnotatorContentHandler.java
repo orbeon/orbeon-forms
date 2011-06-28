@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -67,7 +64,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     private Locator documentLocator;
 
 
-    private final XFormsStaticState.Metadata metadata;
+    private final Metadata metadata;
     private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
@@ -100,7 +97,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
      * @param extractorReceiver     extractor output (can be null for XBL for now)
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, XFormsStaticState.Metadata metadata) {
+    public XFormsAnnotatorContentHandler(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata) {
         this.templateReceiver = templateReceiver;
         this.extractorReceiver = extractorReceiver;
 
@@ -116,7 +113,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
      *
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(XFormsStaticState.Metadata metadata) {
+    public XFormsAnnotatorContentHandler(Metadata metadata) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.metadata = metadata;
@@ -179,11 +176,17 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
 
-            if (templateSAXStore != null && Version.isPE()) {
+            // Handle full update annotation
+            if (isXXForms && localname.equals("dynamic")) {
+                // Remember this subtree has a full update
+                addMark(reusableStringArray[0], templateSAXStore.getElementMark());
+                // Add a class to help the client
+                attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
+            } else if (templateSAXStore != null && Version.isPE()) {
                 // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
-                    // Remember this subtree has a full udpate
+                    // Remember this subtree has a full update
                     addMark(reusableStringArray[0], templateSAXStore.getElementMark());
                     // Add a class to help the client
                     attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
@@ -217,7 +220,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             preserveLevel = level;
 
         } else if (isXBL) {
-            // This must be xbl:xbl (otherwise we will have isPreserve == true)
+            // This must be xbl:xbl (otherwise we will have isPreserve == true) or xbl:template
+            assert localname.equals("xbl") || localname.equals("template") || localname.equals("handler");
             // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
             attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
             startElement(true, uri, localname, qName, attributes);
@@ -442,7 +446,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     }
 
     protected void addMark(String id, SAXStore.Mark mark) {
-        metadata.marks.put(id, mark);
+        metadata.marks().put(id, mark);
     }
 
     private void storeXBLBinding(String elementAttribute) {
@@ -473,7 +477,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttribute[0] = metadata.idGenerator.getNextId();
+                newIdAttribute[0] = metadata.idGenerator().getNextId();
                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
                 attributes = newAttributes;
             } else {
@@ -483,7 +487,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
             // Check for duplicate ids
             // TODO: create Element to provide more location info?
-            if (metadata.idGenerator.isDuplicate(newIdAttribute[0]))
+            if (metadata.idGenerator().isDuplicate(newIdAttribute[0]))
                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttribute[0],
                         new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));
 
@@ -498,7 +502,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         }
 
         // Remember that this id was used
-        metadata.idGenerator.add(newIdAttribute[0]);
+        metadata.idGenerator().add(newIdAttribute[0]);
 
         // Gather namespace information if there is an id
         if (isGenerateIds || idIndex != -1) {

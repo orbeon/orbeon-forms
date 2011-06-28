@@ -20,5 +20,5 @@ import org.orbeon.saxon.expr.XPathContext
 class XXFormsCreateDocument extends XFormsFunction  {
 
     override def evaluateItem(xpathContext: XPathContext) =
-        getContainingDocument(xpathContext).getStaticState.getDefaultDocumentWrapper.wrap(Dom4jUtils.createDocument)
+        getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(Dom4jUtils.createDocument)
 }

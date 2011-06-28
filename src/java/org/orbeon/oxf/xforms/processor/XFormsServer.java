@@ -511,18 +511,18 @@ public class XFormsServer extends ProcessorImpl {
                 // Output repeat indexes information
                 {
                     // Output index updates
-                    final XFormsStaticState staticState = containingDocument.getStaticState();
+                    final StaticStateGlobalOps staticGlobalOps = containingDocument.getStaticOps();
                     if (allEvents) {
                         // All events
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffIndexState(ch, containingDocument, initialControlTree.getInitialMinimalRepeatIdToIndex(staticState),
-                                currentControlTree.getMinimalRepeatIdToIndex(staticState));
+                        diffIndexState(ch, containingDocument, initialControlTree.getInitialMinimalRepeatIdToIndex(staticGlobalOps),
+                                currentControlTree.getMinimalRepeatIdToIndex(staticGlobalOps));
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
-                        diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticState),
-                                xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState));
+                        diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticGlobalOps),
+                                xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticGlobalOps));
                     }
                 }
 

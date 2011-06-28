@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
 
-class CoreControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindings#Scope)
+class CoreControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope)
         with ViewTrait with LeafTrait with LHHATrait

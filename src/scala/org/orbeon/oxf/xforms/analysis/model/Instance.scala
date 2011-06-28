@@ -21,13 +21,12 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.dom4j.Element
-import xbl.XBLBindings
-
+import xbl.{XBLBindingsBase, XBLBindings}
 
 /**
  * Static analysis of an XForms instance.
  */
-class Instance(val element: Element, val scope: XBLBindings#Scope) {
+class Instance(val element: Element, val scope: XBLBindingsBase.Scope) {
 
     val locationData = element.getData.asInstanceOf[LocationData]
 

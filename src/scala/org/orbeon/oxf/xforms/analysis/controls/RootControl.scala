@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.XFormsStaticState
 import org.orbeon.oxf.xforms.analysis.ContainerTrait
 
 /**
  * Single root container for the entire controls hierarchy.
  */
-class RootControl(staticState: XFormsStaticState) extends ContainerTrait {
+class RootControl extends ContainerTrait {
     // Root has no parent
     val parent = None
 }

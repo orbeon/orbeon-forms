@@ -162,7 +162,7 @@ public class HandlerContext {
         throw new ValidationException("No prefix found for HTML namespace", new LocationData(controller.getLocator()));
     }
 
-    public String findFormattingPrefix() {
+    private String findFormattingPrefix() {
         final String prefix = controller.getNamespaceSupport().getPrefix(XMLConstants.OPS_FORMATTING_URI);
         if (prefix != null)
             return prefix;

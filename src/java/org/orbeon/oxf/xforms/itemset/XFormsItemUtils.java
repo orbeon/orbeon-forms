@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;

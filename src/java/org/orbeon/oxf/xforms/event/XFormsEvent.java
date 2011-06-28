@@ -186,7 +186,7 @@ public abstract class XFormsEvent implements Cloneable {
             if (XFormsUtils.hasEffectiveIdSuffix( effectiveTargetId)) {
                 // There is a suffix so compute
                 final List<String> ancestorRepeats
-                        = getContainingDocument().getStaticState().getAncestorRepeats(XFormsUtils.getPrefixedId(targetObject.getEffectiveId()), null);
+                        = getContainingDocument().getStaticOps().getAncestorRepeatsJava(XFormsUtils.getPrefixedId(targetObject.getEffectiveId()), null);
 
                 if (ancestorRepeats.size() > 0) {
                     // At least one ancestor repeat

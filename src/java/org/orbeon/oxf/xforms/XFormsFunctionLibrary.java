@@ -420,6 +420,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}alert", XXFormsLHHA.class, 3, 1, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
+        // xxforms:effective-id
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}effective-id", XXFormsId.class, 0, 0, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+
         // === Functions in the xforms namespace
 
         // xforms:if()

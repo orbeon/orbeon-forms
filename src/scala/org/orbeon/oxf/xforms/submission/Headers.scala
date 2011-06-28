@@ -33,7 +33,7 @@ object Headers {
     def evaluateHeaders(xblContainer: XBLContainer, contextStack: XFormsContextStack,
                         sourceEffectiveId: String, enclosingElement: Element) = {
 
-        val bindings = xblContainer.getContainingDocument.getStaticState.getXBLBindings
+        val staticState = xblContainer.getContainingDocument.getStaticState
         val fullPrefix = xblContainer.getFullPrefix
 
         val headerElements = Dom4jUtils.elements(enclosingElement, XFormsConstants.XFORMS_HEADER_QNAME)
@@ -44,14 +44,12 @@ object Headers {
             // Handle a single header element
             def handleHeaderElement(headerElement: Element) = {
 
-                val xblBindings = xblContainer.getContainingDocument.getStaticState.getXBLBindings
-
                 def getElementValue(name: QName) = {
                     val element = headerElement.element(name)
                     if (element eq null)
                         throw new OXFException("Missing <" + name.getQualifiedName + "> child element of <header> element")
 
-                    val scope = xblBindings.getResolutionScopeByPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementStaticId(element))
+                    val scope = xblContainer.getPartAnalysis.getResolutionScopeByPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementStaticId(element))
                     contextStack.pushBinding(element, sourceEffectiveId, scope)
                     val result = XFormsUtils.getElementValue(xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, null)
                     contextStack.popBinding
@@ -91,7 +89,7 @@ object Headers {
 
             // Process all nested <header> elements
             for (headerElement <- headerElements) {
-                val headerScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + XFormsUtils.getElementStaticId(headerElement))
+                val headerScope = xblContainer.getPartAnalysis.getResolutionScopeByPrefixedId(fullPrefix + XFormsUtils.getElementStaticId(headerElement))
                 contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 
                 if (contextStack.getCurrentBindingContext.isNewBind) {

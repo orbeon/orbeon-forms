@@ -31,6 +31,7 @@ public interface XFormsEventHandler {
     boolean isPerformDefaultAction();
 
     String[] getObserversStaticIds();
+    String[] getObserversPrefixedIds();
     Set<String> getEventNames();
     boolean isAllEvents();
 

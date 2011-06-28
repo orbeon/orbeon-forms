@@ -22,13 +22,15 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 9.3.5 The insert Element
@@ -39,7 +41,7 @@ public class XFormsInsertAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -151,7 +153,23 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(containingDocument, indentedLogger, resolvedPositionAttribute, collectionToBeUpdated,
+        final String normalizedPosition; {
+            if (resolvedPositionAttribute == null) {
+                // Default value
+                normalizedPosition = "after";
+            } else if ("after".equals(resolvedPositionAttribute) || "before".equals(resolvedPositionAttribute)) {
+                // Specified value
+                normalizedPosition = resolvedPositionAttribute;
+            } else {
+                // Invalid value
+                if (indentedLogger.isInfoEnabled())
+                    indentedLogger.logWarning("xforms:insert", "invalid position attribute, defaulting to \"after\"", "value", resolvedPositionAttribute);
+
+                normalizedPosition = "after";
+            }
+        }
+
+        doInsert(containingDocument, indentedLogger, normalizedPosition, collectionToBeUpdated,
                 (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
     }
 
@@ -269,7 +287,9 @@ public class XFormsInsertAction extends XFormsAction {
         // Find actual insertion point and insert
         final NodeInfo insertLocationNodeInfo;
         final List<Node> insertedNodes;
+        final String beforeAfterInto;
         if (isEmptyNodesetBinding) {
+            // Insert INTO a node
 
             // "If the Node Set Binding node-set is not specified or empty, the insert location node is the insert
             // context node."
@@ -283,6 +303,7 @@ public class XFormsInsertAction extends XFormsAction {
             insertLocationNodeInfo = insertContextNodeInfo;
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             insertedNodes = doInsert(insertLocationNode, clonedNodes);
+            beforeAfterInto = "into";
 
             // Normalize text nodes if needed to respect XPath 1.0 constraint
             {
@@ -294,7 +315,7 @@ public class XFormsInsertAction extends XFormsAction {
                     Dom4jUtils.normalizeTextNodes(insertLocationNode);
             }
         } else {
-            // One or more nodes were inserted
+            // Insert BEFORE or AFTER a node
             insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
@@ -307,6 +328,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // first node that does not cause a conflict is considered."
 
                 insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes);
+                beforeAfterInto = positionAttribute; // TODO: ideally normalize to "into document node"?
 
                 // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
             } else {
@@ -314,7 +336,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // node, based on the position attribute setting or its default."
 
                 if (insertLocationNode.getNodeType() == Node.ATTRIBUTE_NODE) {
-                    // Special case for attributes
+                    // Special case for "next to an attribute"
 
                     // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but
                     // the XForms spec shouldn't rely on attribute order. We could try to keep the order, but it
@@ -335,14 +357,8 @@ public class XFormsInsertAction extends XFormsAction {
                     if ("before".equals(positionAttribute)) {
                         actualInsertionIndex = actualIndex;
                     } else {
-                        // Default to "after"
+                        // "after"
                         actualInsertionIndex = actualIndex + 1;
-
-                        if (positionAttribute != null && !"after".equals(positionAttribute)) {
-                            // Attribute has a value which is different from "after"
-                            if (indentedLogger.isInfoEnabled())
-                                indentedLogger.logWarning("xforms:insert", "invalid position attribute, defaulting to \"after\"", "value", positionAttribute);
-                        }
                     }
 
                     // "7. The cloned node or nodes are inserted in the order they were cloned at their target
@@ -375,6 +391,8 @@ public class XFormsInsertAction extends XFormsAction {
                     if (hasTextNode)
                         Dom4jUtils.normalizeTextNodes(parentNode);
                 }
+
+                beforeAfterInto = positionAttribute;
             }
         }
 
@@ -397,28 +415,26 @@ public class XFormsInsertAction extends XFormsAction {
             modifiedInstance.getModel(containingDocument).markStructuralChange(modifiedInstance);
         }
 
+        // Gather list of modified nodes
+        final List<Item> insertedNodeInfos;
+        if (didInsertNodes && modifiedInstance != null) {
+            // Can be null if document into which delete is performed is not in an instance, e.g. in a variable
+            final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
+            insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());
+            for (Object insertedNode : insertedNodes)
+                insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
+        } else {
+            insertedNodeInfos = Collections.EMPTY_LIST;
+        }
+
         // "4. If the insert is successful, the event xforms-insert is dispatched."
         // XFormsInstance handles index and repeat items updates 
         if (doDispatch && modifiedInstance != null) {
-            // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
-            final List<Item> insertedNodeInfos;
-            if (didInsertNodes) {
-                final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
-                insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());
-                for (Object insertedNode: insertedNodes)
-                    insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
-            } else {
-                insertedNodeInfos = XFormsConstants.EMPTY_ITEM_LIST;
-            }
-
             modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(
-                    new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
-                            positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes));
-
-            return insertedNodeInfos;
-        } else {
-            return Collections.EMPTY_LIST;
+                    new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo, beforeAfterInto));
         }
+
+        return insertedNodeInfos;
     }
 
     private static List<Node> doInsert(Node insertionNode, List<Node> clonedNodes) {

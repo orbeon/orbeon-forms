@@ -17,18 +17,16 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
+import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -78,6 +76,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private XFormsContextStack.BindingContext bindingContext;
 
     private XFormsContainingDocument containingDocument;
+
     private XBLBindings xblBindings;
     private final XFormsContextStack contextStack;  // for controls under this container
 
@@ -85,24 +84,40 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private Map<String, XFormsModel> modelsMap = new HashMap<String, XFormsModel>();    // Map<String, XFormsModel> of effective model id to model
 
     // Containing control if any
-    private final XFormsComponentControl componentControl;
+    private final XFormsControl associatedControl;
 
     /**
      * Create a new container child of the given control
      *
-     * @param componentControl  containing control
-     * @return                  new XFormsContainer
+     * @param associatedControl  containing control
+     * @return                   new XFormsContainer
      */
-    public XBLContainer createChildContainer(XFormsComponentControl componentControl) {
-        return new XBLContainer(componentControl, this);
+    public XBLContainer createChildContainer(XFormsControl associatedControl) {
+        return new XBLContainer(associatedControl, this);
     }
 
-    protected XBLContainer(XFormsComponentControl componentControl, XBLContainer parentXBLContainer) {
-        this(XFormsUtils.getStaticIdFromId(componentControl.getEffectiveId()), componentControl.getEffectiveId(), XFormsUtils.getPrefixedId(componentControl.getEffectiveId()),
-                XFormsUtils.getPrefixedId(componentControl.getEffectiveId()) + XFormsConstants.COMPONENT_SEPARATOR, parentXBLContainer, componentControl);
+    public XBLContainer createChildContainer(XFormsControl associatedControl, final PartAnalysis partAnalysis) {
+
+        return new XBLContainer(associatedControl, this) {
+            @Override
+            public PartAnalysis getPartAnalysis() {
+                // Start with specific part
+                return partAnalysis;
+            }
+        };
     }
 
-    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsComponentControl componentControl) {
+    protected XBLContainer(XFormsControl associatedControl, XBLContainer parentXBLContainer) {
+        this(XFormsUtils.getStaticIdFromId(associatedControl.getEffectiveId()),
+                associatedControl.getEffectiveId(),
+                XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()),
+                XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()) + XFormsConstants.COMPONENT_SEPARATOR,
+                parentXBLContainer,
+                associatedControl);
+    }
+
+    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsControl associatedControl) {
+
         this.staticId = staticId;
         this.effectiveId = effectiveId;
         this.prefixedId = prefixedId;
@@ -126,17 +141,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         this.contextStack = new XFormsContextStack(this);
 
-        this.componentControl = componentControl;
+        this.associatedControl = associatedControl;
     }
 
-    public XBLBindings.Scope getResolutionScope() {
-        return getXBLBindings().getResolutionScopeByPrefix(fullPrefix);
-    }
-
-    protected XBLBindings getXBLBindings() {
-        if (xblBindings == null)
-            xblBindings = containingDocument.getStaticState().getXBLBindings();
-        return xblBindings;
+    public XBLBindingsBase.Scope getResolutionScope() {
+        return containingDocument.getStaticOps().getResolutionScopeByPrefix(fullPrefix);
     }
 
     /**
@@ -179,7 +188,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     /**
      * Remove container and destroy models when a repeat iteration is removed.
-     *
      */
     public void destroy() {
         // Tell parent about it
@@ -225,7 +233,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @return              mapping
      */
     public NamespaceMapping getNamespaceMappings(Element element) {
-        return containingDocument.getStaticState().getNamespaceMapping(fullPrefix, element);
+        return getPartAnalysis().getNamespaceMapping(fullPrefix, element);
     }
 
     public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
@@ -245,6 +253,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return containingDocument;
     }
 
+    public PartAnalysis getPartAnalysis() {
+        // By default return parent part analysis
+        return (parentXBLContainer != null) ? parentXBLContainer.getPartAnalysis() : null;
+    }
+
     public XFormsContextStack getContextStack() {
         return contextStack;
     }
@@ -257,7 +270,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public XBLContainer findResolutionScope(String prefixedId) {
         final String xblScopeIdFullPrefix; {
-            final XBLBindings.Scope xblScope = getXBLBindings().getResolutionScopeByPrefixedId(prefixedId);
+            final XBLBindingsBase.Scope xblScope = getPartAnalysis().getResolutionScopeByPrefixedId(prefixedId);
+            if (xblScope == null)
+                throw new IllegalArgumentException("Prefixed id not found in current part: " + prefixedId);
             xblScopeIdFullPrefix = xblScope.getFullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
         }
 
@@ -272,7 +287,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         throw new OXFException("XBL resolution scope not found for id: " + prefixedId);
     }
 
-    public XBLContainer findResolutionScope(XBLBindings.Scope scope) {
+    public XBLContainer findResolutionScope(XBLBindingsBase.Scope scope) {
         XBLContainer currentContainer = this;
         do {
             if (currentContainer.getResolutionScope() == scope)
@@ -291,7 +306,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @return
      */
     public boolean containsBind(String bindId) {
-        for (final Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
+        for (final Model model : getPartAnalysis().getModelsForScope(getResolutionScope())) {
             if (model.containsBind(bindId))
                 return true;
         }
@@ -303,7 +318,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void addAllModels() {
         // Iterate through all models and finds the one that apply to this container
-        for (final Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
+        for (final Model model: getPartAnalysis().getModelsForScope(getResolutionScope())) {
             // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
             // my-model => foo$bar$my-model.1-2
             final String modelEffectiveId = model.prefixedId() + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
@@ -311,6 +326,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // Create and add model
             addModel(new XFormsModel(this, modelEffectiveId, model));
         }
+    }
+
+    private void addModel(XFormsModel model) {
+        this.models.add(model);
+        this.modelsMap.put(model.getEffectiveId(), model);
     }
 
     protected void initializeModels() {
@@ -346,11 +366,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     protected void initializeNestedControls() {
         // NOP by default
-    }
-
-    protected void addModel(XFormsModel model) {// move to private once legacy caller is gone
-        this.models.add(model);
-        this.modelsMap.put(model.getEffectiveId(), model);
     }
 
     public XFormsModel getDefaultModel() {
@@ -433,10 +448,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         } else {
 
             final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
-            final XBLBindings.Scope scope = getXBLBindings().getResolutionScopeByPrefixedId(sourcePrefixedId);
+            final XBLBindingsBase.Scope scope = getPartAnalysis().getResolutionScopeByPrefixedId(sourcePrefixedId);
             final String repeatPrefixedId = scope.getPrefixedIdForStaticId(repeatStaticId);
 
-            if (containingDocument.getStaticState().getControlPosition(repeatPrefixedId) >= 0) {
+            if (containingDocument.getStaticOps().getControlPosition(repeatPrefixedId) >= 0) {
                 // 2. Found static control
 
                 // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
@@ -474,7 +489,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // 1. Check if requesting the binding id. If so, we interpret this as requesting the bound element
         //    and return the control associated with the bound element.
         // TODO: should this use sourceControlEffectiveId?
-        final String bindingId = getXBLBindings().getBindingId(prefixedId);
+        final String bindingId = containingDocument.getStaticOps().getBindingId(prefixedId);
         if (targetStaticId.equals(bindingId))
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 
@@ -639,7 +654,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public boolean isRelevant() {
         // componentControl will be null if we are at the top-level
-        return (componentControl == null) || componentControl.isRelevant();
+        return (associatedControl == null) || associatedControl.isRelevant();
     }
 
     public void restoreModelsState() {
@@ -806,15 +821,16 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final XFormsBindingExceptionEvent bindingExceptionEvent = (XFormsBindingExceptionEvent) event;
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(),
                     bindingExceptionEvent.getThrowable(), event.getTargetObject().getLocationData());
+        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
+            // Log error
+            final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
+            indentedLogger.logError("action", "exception while running action", ev.toStringArray());
         }
     }
 
     public void performTargetAction(XBLContainer container, XFormsEvent event) {
         // NOP
-    }
-
-    public List getEventHandlers(XBLContainer container) {
-        return null;
     }
 
     public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
@@ -898,14 +914,15 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Capture phase
             for (XFormsEventObserver currentEventObserver: eventObservers) {
-                final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
+
+                final List<XFormsEventHandler> currentEventHandlers =
+                        currentEventObserver.getXBLContainer(containingDocument).getPartAnalysis().getEventHandlers(XFormsUtils.getPrefixedId(currentEventObserver.getEffectiveId()));
                 if (currentEventHandlers != null) {
                     if (currentEventObserver != targetObject) {
                         // Event listeners on the target are handled separately
 
                         // Process event handlers
-                        for (Object currentEventHandler: currentEventHandlers) {
-                            final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
+                        for (final XFormsEventHandler eventHandler : currentEventHandlers) {
                             if (eventHandler.isCapturePhaseOnly() && eventHandler.isMatch(retargetedEvent)) {
                                 // Capture phase match on event name and target is specified
                                 indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
@@ -966,7 +983,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 }
 
                 for (XFormsEventObserver currentEventObserver: eventObservers) {
-                    final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
+                    final List<XFormsEventHandler> currentEventHandlers =
+                            currentEventObserver.getXBLContainer(containingDocument).getPartAnalysis().getEventHandlers(XFormsUtils.getPrefixedId(currentEventObserver.getEffectiveId()));
 
                     // Handle event retargeting
                     if (currentEventObserver == nextBoundary) {
@@ -1002,8 +1020,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
                     // Process event handlers
                     if (currentEventHandlers != null) {
-                        for (Object currentEventHandler: currentEventHandlers) {
-                            final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
+                        for (final XFormsEventHandler eventHandler : currentEventHandlers) {
                             if ((eventHandler.isTargetPhase() && isAtTarget || eventHandler.isBubblingPhase() && !isAtTarget && originalEvent.isBubbles())
                                     && eventHandler.isMatch(retargetedEvent)) {
                                 // Bubbling phase match on event name and target is specified
@@ -1024,10 +1041,18 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         if (!propagate)
                             break;
                     }
+
+                    // Custom event listeners
+                    // TODO: Would be nice to have all listeners implemented this way
+                    final List<EventListener> customListeners = currentEventObserver.getListeners(originalEvent.getName());
+                    if (customListeners != null) {
+                        for (final EventListener listener : customListeners)
+                            listener.handleEvent(retargetedEvent);
+                    }
                 }
             }
 
-            // Perform default action is allowed to
+            // Perform default action if allowed to
             if (performDefaultAction || !originalEvent.isCancelable()) {
                 indentedLogger.startHandleOperation("dispatchEvent", "default action handler");
                 containingDocument.startHandleEvent(originalEvent);
@@ -1083,5 +1108,17 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
         return false;
+    }
+
+    public void addListener(String eventName, EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeListener(String eventName, EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<EventListener> getListeners(String eventName) {
+        return null;
     }
 }

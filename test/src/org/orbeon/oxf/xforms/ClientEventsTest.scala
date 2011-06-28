@@ -21,7 +21,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def testNoscriptEventReordering = {
+    @Test def noscriptEventReordering = {
 
         // TODO: Disabled for now as XML comparison doesn't work yet (attribute order is changed along the way)
         Assume.assumeTrue(false)

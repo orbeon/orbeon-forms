@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms._
 
 
 import analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindings
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
@@ -27,11 +26,14 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import java.lang.String
 import collection.immutable.List
 import collection.mutable.{LinkedHashSet, LinkedHashMap}
+import xbl.XBLBindingsBase
+import org.orbeon.oxf.util.XPathCache
+import org.orbeon.saxon.dom4j.DocumentWrapper
 
 /**
  * Static analysis of an XForms model <xf:model> element.
  */
-class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope, element: Element)
+class Model(val staticStateContext: StaticStateContext, scope: XBLBindingsBase.Scope, element: Element)
         extends ElementAnalysis(element, None, None) with ContainerTrait { // consider that the model doesn't have a parent
 
     require(staticStateContext != null)
@@ -44,9 +46,20 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
     protected def computeBindingAnalysis = None
     val scopeModel = new ScopeModel(scope, Some(this))
 
+    // Extract event handlers and scripts
+    val eventHandlers = {
+        val modelDocumentInfo = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
+
+        // TODO: info to deregister scripts
+        staticStateContext.partAnalysis.extractXFormsScripts(modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(prefixedId));
+
+        // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
+        staticStateContext.partAnalysis.extractEventHandlers(modelDocumentInfo, scope, false)
+    }
+
     override def getChildrenContext = defaultInstancePrefixedId match {
         case Some(defaultInstancePrefixedId) => // instance('defaultInstanceId')
-            Some(PathMapXPathAnalysis(staticStateContext.staticState, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
+            Some(PathMapXPathAnalysis(staticStateContext.partAnalysis, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
                 null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element))
         case None => None // no instance
     }
@@ -59,7 +72,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
         for {
             instanceElement <- Dom4jUtils.elements(element, XFORMS_INSTANCE_QNAME)
             newInstance = new Instance(instanceElement, scope)
-        } yield (newInstance.staticId -> newInstance)): _*)
+        } yield newInstance.staticId -> newInstance): _*)
 
     val instancesMap: JMap[String, Instance] = instances // JAVA COLLECTION for Java access only
 
@@ -152,8 +165,8 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
         // Represent an individual MIP on an <xf:bind> element
         class MIP(val name: String) {
-            val isCalculateComputedMIP = Model.CALCULATE_MIP_NAMES.contains(name)
-            val isValidateMIP = Model.VALIDATE_MIP_NAMES.contains(name)
+            val isCalculateComputedMIP = Model.calculateMIPNames.contains(name)
+            val isValidateMIP = Model.validateMIPNames.contains(name)
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
         }
 
@@ -166,7 +179,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
             def analyzeXPath() {
 
                 def booleanOrStringExpression =
-                    if (Model.BOOLEAN_XPATH_MIP_NAMES.contains(name)) "xs:boolean((" + expression + ")[1])" else "xs:string((" + expression + ")[1])"
+                    if (Model.booleanXPathMIPNames.contains(name)) "xs:boolean((" + expression + ")[1])" else "xs:string((" + expression + ")[1])"
 
                 // Analyze and remember if figured out
                 Bind.this.analyzeXPath(getChildrenContext, bindsVariablesSeq, booleanOrStringExpression) match {
@@ -190,7 +203,7 @@ class Model(val staticStateContext: StaticStateContext, scope: XBLBindings#Scope
 
         // Built-in XPath MIPs
         val mipNameToXPathMIP =
-            for ((qName, name) <- Model.QNAME_TO_XPATH_MIP_NAME; attributeValue = element.attributeValue(qName); if attributeValue ne null)
+            for ((qName, name) <- Model.qNameToXPathMIPName; attributeValue = element.attributeValue(qName); if attributeValue ne null)
                 yield (name -> new XPathMIP(name, attributeValue))
 
         // Type MIP is special as it is not an XPath expression
@@ -457,25 +470,28 @@ object Model {
     // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
     // "required" MIP, not on the XPath of it. See also what we would need for xxf:valid(), etc. functions.
 
-    val QNAME_TO_XPATH_COMPUTED_MIP_NAME = Predef.Map(
+    val qNameToXPathComputedMIPName = Predef.Map(
         RELEVANT_QNAME -> RELEVANT,
         READONLY_QNAME -> READONLY,
         REQUIRED_QNAME -> REQUIRED,
         CALCULATE_QNAME -> CALCULATE,
         XXFORMS_DEFAULT_QNAME -> INITIAL_VALUE)
 
-    val QNAME_TO_XPATH_VALIDATE_MIP_NAME = Predef.Map(
+    val qNameToXPathValidateMIPName = Predef.Map(
         REQUIRED_QNAME -> REQUIRED,
         CONSTRAINT_QNAME -> CONSTRAINT)
 
-    private val QNAME_TO_VALIDATE_MIP_NAME = QNAME_TO_XPATH_VALIDATE_MIP_NAME + (TYPE_QNAME -> TYPE)
-    val QNAME_TO_XPATH_MIP_NAME = QNAME_TO_XPATH_COMPUTED_MIP_NAME ++ QNAME_TO_XPATH_VALIDATE_MIP_NAME
+    val mipNameToAttributeQName = qNameToXPathComputedMIPName ++ qNameToXPathValidateMIPName + (TYPE_QNAME -> TYPE) map
+            { case (key, value) => (value, key) }
 
-    val CALCULATE_MIP_NAMES = Set(QNAME_TO_XPATH_COMPUTED_MIP_NAME.values.toSeq: _*)
-    val VALIDATE_MIP_NAMES = Set(QNAME_TO_VALIDATE_MIP_NAME.values.toSeq: _*)
+    private val qNameToValidateMIPName = qNameToXPathValidateMIPName + (TYPE_QNAME -> TYPE)
+    val qNameToXPathMIPName = qNameToXPathComputedMIPName ++ qNameToXPathValidateMIPName
 
-    val BOOLEAN_XPATH_MIP_NAMES = Set(RELEVANT, READONLY, REQUIRED, CONSTRAINT)
-    val STRING_XPATH_MIP_NAMES = Set(CALCULATE, INITIAL_VALUE)
+    val calculateMIPNames = Set(qNameToXPathComputedMIPName.values.toSeq: _*)
+    val validateMIPNames = Set(qNameToValidateMIPName.values.toSeq: _*)
+
+    val booleanXPathMIPNames = Set(RELEVANT, READONLY, REQUIRED, CONSTRAINT)
+    val stringXPathMIPNames = Set(CALCULATE, INITIAL_VALUE)
 
     def buildCustomMIPName(qualifiedName: String) = qualifiedName.replace(':', '-')
 }

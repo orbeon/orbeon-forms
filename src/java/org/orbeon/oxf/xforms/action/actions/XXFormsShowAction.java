@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -34,12 +34,12 @@ public class XXFormsShowAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve all attributes as AVTs
-        final String dialogStaticId = actionInterpreter.resolveAVT(actionElement, "dialog");
+        final String dialogStaticOrEffectiveId = actionInterpreter.resolveAVT(actionElement, "dialog");
         final String effectiveNeighborId;
         {
             final String neighborStaticId = actionInterpreter.resolveAVT(actionElement, "neighbor");
@@ -52,9 +52,9 @@ public class XXFormsShowAction extends XFormsAction {
             constrainToViewport = !"false".equals(constrain);
         }
 
-        if (dialogStaticId != null) {
+        if (dialogStaticOrEffectiveId != null) {
             // Dispatch xxforms-dialog-open event to dialog
-            final Object controlObject = actionInterpreter.resolveEffectiveControl(actionElement, dialogStaticId);
+            final Object controlObject = actionInterpreter.resolveOrFindByEffectiveId(actionElement, dialogStaticOrEffectiveId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
 
@@ -74,7 +74,7 @@ public class XXFormsShowAction extends XFormsAction {
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
-                            "dialog id", dialogStaticId);
+                            "dialog id", dialogStaticOrEffectiveId);
             }
         }
     }

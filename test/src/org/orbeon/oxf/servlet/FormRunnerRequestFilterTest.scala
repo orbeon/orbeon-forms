@@ -24,7 +24,7 @@ import java.util.{Enumeration => JEnumeration}
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
-    @Test def testAmendServletRequest() {
+    @Test def amendServletRequest() {
 
         // Initial headers
         val initialHeaders = Map(

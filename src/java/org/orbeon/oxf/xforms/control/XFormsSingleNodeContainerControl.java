@@ -43,10 +43,6 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
         return (children != null) ? children.size() : 0;
     }
 
-    protected void setChildren(List<XFormsControl> children) {
-        this.children = children;
-    }
-
     /**
      * Update this control's effective id and its descendants based on the parent's effective id.
      */

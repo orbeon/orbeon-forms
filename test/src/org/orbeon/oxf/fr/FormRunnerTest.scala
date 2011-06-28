@@ -19,7 +19,8 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.test.DocumentTestBase
 
 class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
-    @Test def testPersistenceHeaders {
+
+    @Test def persistenceHeaders() {
 
         val obf = FormRunner.getPersistenceHeadersAsXML("cities", "form1", "form")
         assert(TransformerUtils.tinyTreeToString(obf) ===

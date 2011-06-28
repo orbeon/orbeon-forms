@@ -17,10 +17,7 @@ import org.orbeon.oxf.cache.CacheLinkedList;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashMap;
@@ -79,14 +76,14 @@ public abstract class EXistStateStoreBase implements XFormsStateStore {
         }
 
         final String documentUUID = containingDocument.getUUID();
-        final String staticStateUUID = containingDocument.getStaticState().getDigest();
+        final String staticStateDigest = containingDocument.getStaticState().digest();
         final String dynamicStateKey = getDynamicStateKey(documentUUID, isInitialState);
 
         // Mapping (UUID -> static state key : dynamic state key)
-        addOrReplaceOne(documentUUID, staticStateUUID + ":" + dynamicStateKey, session.getId());
+        addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey, session.getId());
 
         // Static state
-        addOrReplaceOne(staticStateUUID, containingDocument.getStaticState().getEncodedStaticState(), session.getId());
+        addOrReplaceOne(staticStateDigest, containingDocument.getStaticState().encodedState(), session.getId());
 
         // Dynamic state
         addOrReplaceOne(dynamicStateKey, containingDocument.createEncodedDynamicState(XFormsProperties.isGZIPState(), false), session.getId());
@@ -119,7 +116,7 @@ public abstract class EXistStateStoreBase implements XFormsStateStore {
                 return null;
 
             final int colonIndex = keys.indexOf(':');
-            assert colonIndex == XFormsStaticState.DIGEST_LENGTH;   // static state key is an hex MD5
+            assert colonIndex == XFormsStaticStateImpl.DIGEST_LENGTH();   // static state key is an hex MD5
             staticStateKey = keys.substring(0, colonIndex);
             // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
             dynamicStateKey = isInitialState ? getDynamicStateKey(documentUUID, true) : keys.substring(colonIndex + 1);

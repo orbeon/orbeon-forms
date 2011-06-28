@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
@@ -61,7 +61,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     };
 
     private final XBLContainer container;
-    protected final XFormsContainingDocument containingDocument;
+    public final XFormsContainingDocument containingDocument;
 
     // Static information (never changes for the lifetime of the containing document)
     private final Element controlElement;
@@ -128,7 +128,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public ElementAnalysis getElementAnalysis() {
-        return containingDocument.getStaticState().getControlAnalysis(getPrefixedId());
+        return getXBLContainer().getPartAnalysis().getControlAnalysis(getPrefixedId());
     }
 
     public final XBLContainer getXBLContainer() {
@@ -155,12 +155,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // NOP, can be overridden
     }
 
-    public final XBLBindings.Scope getResolutionScope() {
-        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
+    public final XBLBindingsBase.Scope getResolutionScope() {
+        return container.getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
-    public XBLBindings.Scope getChildElementScope(Element element) {
-        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue(XFormsConstants.ID_QNAME));
+    public XBLBindingsBase.Scope getChildElementScope(Element element) {
+        return container.getPartAnalysis().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue(XFormsConstants.ID_QNAME));
     }
 
     /**
@@ -264,7 +264,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getLabelLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.LABEL);
         if (result == null) {
-            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getLabel(getPrefixedId());
+            final LHHAAnalysis lhhaElement = getXBLContainer().getPartAnalysis().getLabel(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(lhhaElement, isSupportHTMLLabels());
             lhha.put(XFormsConstants.LHHA.LABEL, result);
         }
@@ -274,7 +274,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getHelpLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.HELP);
         if (result == null) {
-            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getHelp(getPrefixedId());
+            final LHHAAnalysis lhhaElement = getXBLContainer().getPartAnalysis().getHelp(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(lhhaElement, true);
             lhha.put(XFormsConstants.LHHA.HELP, result);
         }
@@ -284,7 +284,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getHintLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.HINT);
         if (result == null) {
-            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getHint(getPrefixedId());
+            final LHHAAnalysis lhhaElement = getXBLContainer().getPartAnalysis().getHint(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(lhhaElement, isSupportHTMLHints());
             lhha.put(XFormsConstants.LHHA.HINT, result);
         }
@@ -294,7 +294,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private LHHA getAlertLHHA() {
         LHHA result = lhha.get(XFormsConstants.LHHA.ALERT);
         if (result == null) {
-            final LHHAAnalysis lhhaElement = containingDocument.getStaticState().getAlert(getPrefixedId());
+            final LHHAAnalysis lhhaElement = getXBLContainer().getPartAnalysis().getAlert(getPrefixedId());
             result = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(lhhaElement, true);
             lhha.put(XFormsConstants.LHHA.ALERT, result);
         }
@@ -395,7 +395,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                      true iif there is an xforms:label element
      */
     public static boolean hasLabel(XFormsContainingDocument containingDocument, String prefixedId) {
-        return containingDocument.getStaticState().getLabel(prefixedId) != null;
+        return containingDocument.getStaticOps().getLabel(prefixedId) != null;
     }
 
     /**
@@ -406,7 +406,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                      true iif there is an xforms:hint element
      */
     public static boolean hasHint(XFormsContainingDocument containingDocument, String prefixedId) {
-        return containingDocument.getStaticState().getHint(prefixedId) != null;
+        return containingDocument.getStaticOps().getHint(prefixedId) != null;
     }
 
     /**
@@ -417,7 +417,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                      true iif there is an xforms:help element
      */
     public static boolean hasHelp(XFormsContainingDocument containingDocument, String prefixedId) {
-        return containingDocument.getStaticState().getHelp(prefixedId) != null;
+        return containingDocument.getStaticOps().getHelp(prefixedId) != null;
     }
 
     /**
@@ -428,7 +428,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                      true iif there is an xforms:alert element
      */
     public static boolean hasAlert(XFormsContainingDocument containingDocument, String prefixedId) {
-        return containingDocument.getStaticState().getAlert(prefixedId) != null;
+        return containingDocument.getStaticOps().getAlert(prefixedId) != null;
     }
 
     /**
@@ -587,10 +587,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // Consider that the parent of top-level controls is the containing document. This allows events to propagate to
         // the top-level.
         return parent != null ? parent : containingDocument;
-    }
-
-    public List getEventHandlers(XBLContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(getPrefixedId());
     }
 
     public void performDefaultAction(XFormsEvent event) {
@@ -1313,7 +1309,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final XFormsControl control = XFormsControl.this;
 
             // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
-            final XBLBindings.Scope lhhaScope = control.getResolutionScope();
+            final XBLBindingsBase.Scope lhhaScope = control.getResolutionScope();
             final String lhhaPrefixedId = lhhaScope.getPrefixedIdForStaticId(lhhaStaticId);
 
             // Assume that LHHA element is within same repeat iteration as its related control
@@ -1590,5 +1586,17 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
             return true;
         }
+    }
+
+    public void addListener(String eventName, org.orbeon.oxf.xforms.event.EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void removeListener(String eventName, org.orbeon.oxf.xforms.event.EventListener listener) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<org.orbeon.oxf.xforms.event.EventListener> getListeners(String eventName) {
+        return null;
     }
 }

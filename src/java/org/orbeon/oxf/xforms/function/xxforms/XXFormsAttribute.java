@@ -43,6 +43,6 @@ public class XXFormsAttribute extends XFormsFunction {
         final String value = (item != null) ? item.getStringValue() : "";
 
         final Attribute attribute = Dom4jUtils.createAttribute(qName, value);
-        return getContainingDocument(xpathContext).getStaticState().getDefaultDocumentWrapper().wrap(attribute);
+        return getContainingDocument(xpathContext).getStaticState().documentWrapper().wrap(attribute);
     }
 }

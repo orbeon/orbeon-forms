@@ -18,7 +18,7 @@ import org.junit.Test
 
 class XMLUtilsTest extends AssertionsForJUnit {
 
-    @Test def testMakeNCName() {
+    @Test def makeNCName() {
 
         intercept[IllegalArgumentException] {
             XMLUtils.makeNCName("")

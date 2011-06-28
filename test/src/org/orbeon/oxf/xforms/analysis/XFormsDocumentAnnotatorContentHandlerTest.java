@@ -20,7 +20,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,9 +46,9 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     }
 
     @Test
-    public void testFormNamespaceElements() {
+    public void formNamespaceElements() {
 
-        final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata(new IdGenerator());
+        final Metadata metadata = new Metadata();
         final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(metadata);
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, XMLUtils.ParserConfiguration.PLAIN, false);
 
@@ -76,16 +77,16 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
     // Test that xxforms:attribute elements with @id and @for were created for
     @Test
-    public void testXXFormsAttribute() {
+    public void xxformsAttribute() {
 
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", XMLUtils.ParserConfiguration.PLAIN);
-        final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
-        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata, Dom4jUtils.createElement("dummy"))
+        final Metadata metadata = new Metadata();
+        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata, Collections.<Document>emptyList())
                 .annotateShadowTree(document, "", false);
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 
         // Check there is an xxforms:attribute for "html" with correct name
-        List result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
+        List result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -94,7 +95,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxforms:attribute for "span" with correct name
-        result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticState.BASIC_NAMESPACE_MAPPING, null, null, null, null, null);
+        result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());

@@ -18,16 +18,23 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.ContentHandlerWriter;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class ControlsComparator {
 
@@ -97,16 +104,22 @@ public class ControlsComparator {
 
             // 1: Check current control
 
-            // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
-            final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(control2.getEffectiveId());
-            if (control2.supportAjaxUpdates() && (!control2.equalsExternal(control1) || isValueChangeControl)) {
-                // Output the diff for this control between the old state and the new state
-                attributesImpl.clear();
-                control2.outputAjaxDiff(ch, control1, attributesImpl, isNewlyVisibleSubtree);
-            }
+            boolean mustDoFullUpdate;
+            if (control2 instanceof XXFormsDynamicControl) {
+                // Special case for dynamic control
+                mustDoFullUpdate = !control2.equalsExternal(control1);
+            } else {
+                // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
+                final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(control2.getEffectiveId());
+                if (control2.supportAjaxUpdates() && (!control2.equalsExternal(control1) || isValueChangeControl)) {
+                    // Output the diff for this control between the old state and the new state
+                    attributesImpl.clear();
+                    control2.outputAjaxDiff(ch, control1, attributesImpl, isNewlyVisibleSubtree);
+                }
 
-            // Whether at this point we must do a full update
-            boolean mustDoFullUpdate = mustDoFullUpdate();
+                // Whether at this point we must do a full update
+                mustDoFullUpdate = mustDoFullUpdate();
+            }
 
             // 2: Check children unless we already know we must do a full update
             if (!mustDoFullUpdate) {
@@ -265,12 +278,12 @@ public class ControlsComparator {
         // Conditions:
         //
         // o there is not already a full update in progress
-        // o we are in span layout
+        // o we are in span layout OR we are using XXFormsDynamicControl
         // o the control supports full Ajax updates
         // o there is xxforms:update="full"
         //
-        if (tempCH == null && isSpanHTMLLayout && control.supportFullAjaxUpdates()) {
-            return containingDocument.getStaticState().getElementMark(control.getPrefixedId());
+        if (tempCH == null && (isSpanHTMLLayout || control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
+            return containingDocument.getStaticOps().getElementMark(control.getPrefixedId());
         } else {
             return null;
         }
@@ -291,7 +304,7 @@ public class ControlsComparator {
             final ElementHandlerController controller = new ElementHandlerController();
 
             // Register handlers on controller
-            XHTMLBodyHandler.registerHandlers(controller, containingDocument.getStaticState());
+            XHTMLBodyHandler.registerHandlers(controller, containingDocument);
             {
                 // Register a handler for AVTs on HTML elements
                 // TODO: this should be obtained per document, but we only know about this in the extractor

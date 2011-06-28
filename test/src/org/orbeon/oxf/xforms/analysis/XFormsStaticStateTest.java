@@ -13,22 +13,14 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.dom4j.Document;
 import org.junit.Assume;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
-import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TeeXMLReceiver;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,38 +31,22 @@ import static junit.framework.Assert.assertTrue;
 public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
     @Test
-    public void testLHHAAnalysis() {
-//        if (Version.instance().isPE()) { // only test this feature if we are the PE version
-//            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xhtml");
-//            final Map<String, String> namespaces = new HashMap<String, String>();
-//            namespaces.put("", "");
-//
-//            // Hold the current list of changes
-//            final Set<String> currentChanges = new HashSet<String>();
-//
-//            final PathMapUIDependencies dependencies = new PathMapUIDependencies(staticState.getIndentedLogger(), staticState) {
-//                @Override
-//                protected Set<String> getModifiedPathsTest() {
-//                    return currentChanges;
-//                }
-//            };
-//
-//            staticState.dumpAnalysis();
-//        }
+    public void lhhaAnalysis() {
+        Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
+
+        // TODO
+//        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xhtml");
     }
 
     @Test
-    public void testBindAnalysis() {
+    public void bindAnalysis() {
         Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
 
-        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xhtml");
-
-//            final PipelineContext pipelineContext = new PipelineContext();
-//            staticState.dumpAnalysis(pipelineContext);
+        final PartAnalysis partAnalysis = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xhtml").topLevelPart();
 
         // TODO: test computedBindExpressionsInstances and validationBindInstances
         {
-            final Model model1 = staticState.getModel("model1");
+            final Model model1 = partAnalysis.getModel("model1");
             assertTrue(model1.figuredAllBindRefAnalysis());
 
             assertTrue(model1.bindInstances().contains("instance11"));
@@ -78,27 +54,27 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             assertTrue(model1.bindInstances().contains("instance13"));
         }
         {
-            final Model model2 = staticState.getModel("model2");
+            final Model model2 = partAnalysis.getModel("model2");
             assertTrue(model2.figuredAllBindRefAnalysis());
 
             assertFalse(model2.bindInstances().contains("instance21"));
         }
         {
-            final Model model3 = staticState.getModel("model3");
+            final Model model3 = partAnalysis.getModel("model3");
             assertTrue(model3.figuredAllBindRefAnalysis());
 
             assertFalse(model3.bindInstances().contains("instance31"));
             assertTrue(model3.bindInstances().contains("instance32"));
         }
         {
-            final Model model4 = staticState.getModel("model4");
+            final Model model4 = partAnalysis.getModel("model4");
             assertTrue(model4.figuredAllBindRefAnalysis());
 
             assertTrue(model4.bindInstances().contains("instance41"));
             assertFalse(model4.bindInstances().contains("instance42"));
         }
         {
-            final Model model5 = staticState.getModel("model5");
+            final Model model5 = partAnalysis.getModel("model5");
             assertTrue(model5.figuredAllBindRefAnalysis());
 
             assertTrue(model5.validationBindInstances().contains("instance51"));
@@ -109,15 +85,30 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         }
     }
 
+    // Mock document with just what's required by PathMapXPathDependencies
+    private XFormsContainingDocument mockDocument(XFormsStaticState staticState) {
+        final XFormsContainingDocument mockDocument = Mockito.mock(XFormsContainingDocument.class);
+        final XFormsControls mockControls = Mockito.mock(XFormsControls.class);
+
+        Mockito.when(mockDocument.getIndentedLogger()).thenReturn(staticState.getIndentedLogger());
+
+        final StaticStateGlobalOps ops = new StaticStateGlobalOps(staticState.topLevelPart());
+        Mockito.when(mockDocument.getStaticOps()).thenReturn(ops);
+        Mockito.when(mockDocument.getControls()).thenReturn(mockControls);
+        Mockito.when(mockControls.getIndentedLogger()).thenReturn(staticState.getIndentedLogger());
+
+        return mockDocument;
+    }
+
     @Test
-    public void testXPathAnalysis() {
+    public void xpathAnalysis() {
         Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
 
-        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xhtml");
         final Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("", "");
 
-        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xhtml");
+        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(mockDocument(staticState));
 
         staticState.dumpAnalysis();
 
@@ -132,20 +123,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertTrue(dependencies.requireValueUpdate("select1"));
 
         assertTrue(dependencies.requireBindingUpdate("group2"));
-//        assertTrue(dependencies.requireValueUpdate("group2"));
 
         assertTrue(dependencies.requireBindingUpdate("select2"));
         assertTrue(dependencies.requireValueUpdate("select2"));
 
 
         assertFalse(dependencies.requireBindingUpdate("group3"));
-//        assertFalse(dependencies.requireValueUpdate("group3"));
 
         assertFalse(dependencies.requireBindingUpdate("select3"));
         assertFalse(dependencies.requireValueUpdate("select3"));
 
         assertFalse(dependencies.requireBindingUpdate("group4"));
-//        assertFalse(dependencies.requireValueUpdate("group4"));
 
         assertFalse(dependencies.requireBindingUpdate("select4"));
         assertFalse(dependencies.requireValueUpdate("select4"));
@@ -163,20 +151,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireValueUpdate("select1"));
 
         assertFalse(dependencies.requireBindingUpdate("group2"));
-//        assertFalse(dependencies.requireValueUpdate("group2"));
 
         assertFalse(dependencies.requireBindingUpdate("select2"));
         assertTrue(dependencies.requireValueUpdate("select2"));
 
 
         assertFalse(dependencies.requireBindingUpdate("group3"));
-//        assertFalse(dependencies.requireValueUpdate("group3"));
 
         assertFalse(dependencies.requireBindingUpdate("select3"));
         assertFalse(dependencies.requireValueUpdate("select3"));
 
         assertFalse(dependencies.requireBindingUpdate("group4"));
-//        assertFalse(dependencies.requireValueUpdate("group4"));
 
         assertFalse(dependencies.requireBindingUpdate("select4"));
         assertFalse(dependencies.requireValueUpdate("select4"));
@@ -194,20 +179,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireValueUpdate("select1"));
 
         assertFalse(dependencies.requireBindingUpdate("group2"));
-//        assertFalse(dependencies.requireValueUpdate("group2"));
 
         assertFalse(dependencies.requireBindingUpdate("select2"));
         assertFalse(dependencies.requireValueUpdate("select2"));
 
 
         assertFalse(dependencies.requireBindingUpdate("group3"));
-//        assertFalse(dependencies.requireValueUpdate("group3"));
 
         assertFalse(dependencies.requireBindingUpdate("select3"));
         assertTrue(dependencies.requireValueUpdate("select3"));
 
         assertTrue(dependencies.requireBindingUpdate("group4"));
-//        assertFalse(dependencies.requireValueUpdate("group4"));
 
         assertTrue(dependencies.requireBindingUpdate("select4"));
         assertTrue(dependencies.requireValueUpdate("select4"));
@@ -225,20 +207,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireValueUpdate("select1"));
 
         assertFalse(dependencies.requireBindingUpdate("group2"));
-//        assertFalse(dependencies.requireValueUpdate("group2"));
 
         assertFalse(dependencies.requireBindingUpdate("select2"));
         assertFalse(dependencies.requireValueUpdate("select2"));
 
 
         assertFalse(dependencies.requireBindingUpdate("group3"));
-//        assertFalse(dependencies.requireValueUpdate("group3"));
 
         assertFalse(dependencies.requireBindingUpdate("select3"));
         assertFalse(dependencies.requireValueUpdate("select3"));
 
         assertFalse(dependencies.requireBindingUpdate("group4"));
-//        assertFalse(dependencies.requireValueUpdate("group4"));
 
         assertFalse(dependencies.requireBindingUpdate("select4"));
         assertTrue(dependencies.requireValueUpdate("select4"));
@@ -256,20 +235,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertTrue(dependencies.requireValueUpdate("select1"));
 
         assertTrue(dependencies.requireBindingUpdate("group2"));
-//        assertTrue(dependencies.requireValueUpdate("group2"));
 
         assertTrue(dependencies.requireBindingUpdate("select2"));
         assertTrue(dependencies.requireValueUpdate("select2"));
 
 
         assertFalse(dependencies.requireBindingUpdate("group3"));
-//        assertFalse(dependencies.requireValueUpdate("group3"));
 
         assertFalse(dependencies.requireBindingUpdate("select3"));
         assertFalse(dependencies.requireValueUpdate("select3"));
 
         assertFalse(dependencies.requireBindingUpdate("group4"));
-//        assertFalse(dependencies.requireValueUpdate("group4"));
 
         assertFalse(dependencies.requireBindingUpdate("select4"));
         assertFalse(dependencies.requireValueUpdate("select4"));
@@ -287,20 +263,17 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireValueUpdate("select1"));
 
         assertFalse(dependencies.requireBindingUpdate("group2"));
-//        assertFalse(dependencies.requireValueUpdate("group2"));
 
         assertFalse(dependencies.requireBindingUpdate("select2"));
         assertFalse(dependencies.requireValueUpdate("select2"));
 
 
         assertTrue(dependencies.requireBindingUpdate("group3"));
-//        assertTrue(dependencies.requireValueUpdate("group3"));
 
         assertTrue(dependencies.requireBindingUpdate("select3"));
         assertTrue(dependencies.requireValueUpdate("select3"));
 
         assertTrue(dependencies.requireBindingUpdate("group4"));
-//        assertTrue(dependencies.requireValueUpdate("group4"));
 
         assertTrue(dependencies.requireBindingUpdate("select4"));
         assertTrue(dependencies.requireValueUpdate("select4"));
@@ -309,17 +282,14 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
     }
 
     @Test
-    public void testVariables() {
+    public void variables() {
         Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
 
-        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xhtml");
         final Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("", "");
 
-        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
-
-//            final PipelineContext pipelineContext = new PipelineContext();
-//            staticState.dumpAnalysis(pipelineContext);
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xhtml");
+        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(mockDocument(staticState));
 
         // == Value change to default ==================================================================================
         dependencies.refreshStart();
@@ -339,17 +309,14 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
     }
     
     @Test
-    public void testModelVariables() {
+    public void modelVariables() {
         Assume.assumeTrue(Version.isPE()); // only test this feature if we are the PE version
 
-        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml");
         final Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("", "");
 
-        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState);
-
-//            final PipelineContext pipelineContext = new PipelineContext();
-//            staticState.dumpAnalysis(pipelineContext);
+        final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml");
+        final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(mockDocument(staticState));
 
         // == Value change to instance1 ============================================================================
         dependencies.refreshStart();
@@ -363,10 +330,9 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireBindingUpdate("group3"));
         assertFalse(dependencies.requireBindingUpdate("output3a"));
         assertFalse(dependencies.requireBindingUpdate("output3b"));
-        // TODO: group4 has @context attribute so not analyzed
-//            assertFalse(dependencies.requireBindingUpdate("group4"));
-//            assertFalse(dependencies.requireBindingUpdate("output4a"));
-//            assertFalse(dependencies.requireBindingUpdate("output4b"));
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("output4a"));
+        assertFalse(dependencies.requireBindingUpdate("output4b"));
 
         // $mv pointing to model1 must update their value
         assertTrue(dependencies.requireValueUpdate("output1"));
@@ -397,10 +363,9 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireBindingUpdate("group3"));
         assertFalse(dependencies.requireBindingUpdate("output3a"));
         assertFalse(dependencies.requireBindingUpdate("output3b"));
-        // TODO: group4 has @context attribute so not analyzed
-//            assertFalse(dependencies.requireBindingUpdate("group4"));
-//            assertFalse(dependencies.requireBindingUpdate("output4a"));
-//            assertFalse(dependencies.requireBindingUpdate("output4b"));
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+        assertFalse(dependencies.requireBindingUpdate("output4a"));
+        assertFalse(dependencies.requireBindingUpdate("output4b"));
 
         // $mv pointing to model1 must not update their value
         assertFalse(dependencies.requireValueUpdate("output1"));
@@ -427,33 +392,6 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
      * @return              static state
      */
     public static XFormsStaticState getStaticState(String documentURL) {
-        return getStaticState(ProcessorUtils.createDocumentFromURL(documentURL, null));
-    }
-
-    /**
-     * Return an analyzed static state for the given XForms document.
-     *
-     * @param formDocument  document to analyze
-     * @return              static state
-     */
-    public static XFormsStaticState getStaticState(Document formDocument) {
-
-        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
-
-        final LocationDocumentResult documentResult = new LocationDocumentResult();
-        identity.setResult(documentResult);
-
-        final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
-        final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
-        final SAXStore annotatedTemplate = new SAXStore();
-
-        // Read the input through the annotator and gather namespace mappings
-        TransformerUtils.writeDom4j(formDocument, new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(new TeeXMLReceiver(identity, digestContentHandler), metadata), metadata));
-
-        final String digest = NumberUtils.toHexString(digestContentHandler.getResult());
-
-        // Get static state document and create static state object
-        final Document staticStateDocument = documentResult.getDocument();
-        return new XFormsStaticState(staticStateDocument, digest, metadata);
+        return XFormsStaticStateImpl.create(ProcessorUtils.createDocumentFromURL(documentURL, null));
     }
 }

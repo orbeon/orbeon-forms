@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.XFormsModel
-import org.orbeon.saxon.value.Value
 import org.orbeon.saxon.om.EmptyIterator
 
 class XXFormsGetVariable extends XFormsFunction {
@@ -28,9 +27,7 @@ class XXFormsGetVariable extends XFormsFunction {
         val variableName = argument(1).evaluateAsString(xpathContext).toString
 
         containingDocument.getObjectByEffectiveId(modelId) match {
-            case model: XFormsModel =>
-                val variables = model.getBindingContext(containingDocument).getInScopeVariables
-                Value.asIterator(variables.get(variableName))
+            case model: XFormsModel => model.getVariable(variableName)
             case _ => EmptyIterator.getInstance
         }
     }

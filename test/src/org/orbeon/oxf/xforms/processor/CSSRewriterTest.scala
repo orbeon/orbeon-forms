@@ -28,7 +28,7 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
         response = NetUtils.getExternalContext.getResponse
     }
 
-    @Test def testURLs() {
+    @Test def urls() {
 
         // Relative and absolute paths
         assert("""div { background-image: url(/orbeon/styles/a.png) }""" === rewriteCSS("""div { background-image: url(a.png) }"""))
@@ -45,7 +45,7 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert(rewritten === rewriteCSS("""div { background-image: url('a.png') }"""))
     }
 
-    @Test def testNamespaces() {
+    @Test def namespaces() {
         // Multiple id rewrites
         assert("""div #_ns_foo.bar div #_ns_gaga.toto div {}""" === rewriteCSS("""div #foo.bar div #gaga.toto div {}"""))
 
@@ -53,7 +53,7 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert("""#_ns_foo.bar {} #_ns_gaga.toto {}""" === rewriteCSS("""#foo.bar {} #gaga.toto {}"""))
     }
 
-    @Test def testBoth() {
+    @Test def both() {
         assert("div #_ns_foo.bar { background-image: url(/orbeon/styles/a.png) }" ===
             rewriteCSS("""div #foo.bar { background-image: url(a.png) }"""))
     }

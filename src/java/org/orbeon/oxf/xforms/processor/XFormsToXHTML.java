@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.Metadata;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
@@ -193,7 +194,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final XFormsStaticState staticState;
                 {
                     final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(stage2CacheableState.getStaticStateDigest());
-                    if (cachedState != null && cachedState.getMetadata().checkBindingsIncludes()) {
+                    if (cachedState != null && cachedState.topLevelPart().metadata().checkBindingsIncludes()) {
                         // Found static state in cache
                         indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
 
@@ -207,7 +208,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                             indentedLogger.logDebug("", "did not find static state by digest in cache");
 
                         final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
-                        staticState = new XFormsStaticState(staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
+                        staticState = XFormsStaticStateImpl.create(staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
 
                         // Store in cache
                         XFormsStaticStateCache.instance().storeDocument(staticState);
@@ -246,7 +247,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         {
             final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateBits.staticStateDigest);
-            if (cachedState != null && cachedState.getMetadata().checkBindingsIncludes()) {
+            if (cachedState != null && cachedState.topLevelPart().metadata().checkBindingsIncludes()) {
                 // Found static state in cache
                 indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
 
@@ -259,7 +260,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 else
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
                 
-                staticState[0] = new XFormsStaticState(staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
+                staticState[0] = XFormsStaticStateImpl.create(staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
 
                 // Store in cache
                 XFormsStaticStateCache.instance().storeDocument(staticState[0]);
@@ -274,7 +275,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         private final boolean isLogStaticStateInput = XFormsProperties.getDebugLogging().contains("html-static-state");
 
-        public final XFormsStaticState.Metadata metadata = new XFormsStaticState.Metadata();
+        public final Metadata metadata = new Metadata();
         public final SAXStore annotatedTemplate = new SAXStore();
 
         public final Document staticStateDocument;
@@ -367,8 +368,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Add static instance source dependencies for top-level models
         // TODO: check all models/instances
-        final XFormsStaticState staticState = containingDocument.getStaticState();
-        for (final Model model: staticState.getModelsForScope(staticState.getXBLBindings().getTopLevelScope())) {
+        final PartAnalysis topLevelPart = containingDocument.getStaticState().topLevelPart();
+        for (final Model model : topLevelPart.getModelsForScope(topLevelPart.startScope())) {
             for (final Instance instance: model.instancesMap().values()) {
                 if (instance.dependencyURL() != null) {
 
@@ -412,12 +413,10 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Set caching dependencies for XBL inclusions
         {
-            final XFormsStaticState.Metadata metadata = containingDocument.getStaticState().getMetadata();
-            final Set<String> includes = metadata.getBindingsIncludes();
-            if (includes != null) {
-                for (final String include: includes) {
-                    stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);
-                }
+            final Metadata metadata = containingDocument.getStaticState().topLevelPart().metadata();
+            final Set<String> includes = metadata.getBingingIncludes();
+            for (final String include: includes) {
+                stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);
             }
         }
     }

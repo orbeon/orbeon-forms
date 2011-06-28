@@ -89,3 +89,6 @@
  * [2] http://rowanw.com/bugs/overflow_relative.htm
  */
 .xbl-fr-datatable .yui-dt-scrollable .yui-dt-hd { position: static; *position: relative }
+
+.yui-skin-sam .xbl-fr-datatable thead .yui-dt-sortable { cursor: auto; }    /* Override YUI rule not to lead users to believe they can click anywhere in the th to sort */
+.xbl-fr-datatable .yui-dt-label, .xbl-fr-datatable a { display: block }     /* So the anchor takes all the horizontal space to extend the click area */

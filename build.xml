@@ -465,7 +465,7 @@
                 <exclude name="ops/fckeditor/_testcases/**"/>
                 <include name="config/theme/**/*.*"/>
             </fileset>
-            <zipfileset dir="${war.dir}/WEB-INF/resources/ops" prefix="ops">
+            <zipfileset dir="${war.dir}/WEB-INF/resources">
                 <include name="**/*.js"/>
             </zipfileset>
         </jar>
@@ -753,7 +753,7 @@
         </junit>
     </target>
 
-    <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build">
+    <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build" description="Creates Orbeon Forms war file">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war"/>

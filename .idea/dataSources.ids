@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><component name="dataSourceStorage">
+  <data-source source="LOCAL" name="MySQL" product="MySQL" version="5.1.46" jdbc-version="3.0" driver-version="mysql-connector-java-5.1.12 ( Revision: ${bzr.revision-id} )" uuid="0b547d78-ec58-431f-95bb-fc8f7f8ba974">
+    <extra-name-characters>#@</extra-name-characters>
+    <identifier-quote-string>`</identifier-quote-string>
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://localhost:3306/orbeon</jdbc-url>
+    <user-name>orbeon</user-name>
+    <user-password>dfc5dfd8dfc8dfcfdfc5dfc4</user-password>
+    <libraries>
+      <library>
+        <url>file://$PROJECT_DIR$/../Components/apache-tomcat-5.5.23/common/lib/mysql-connector-java-5.1.12-bin.jar</url>
+      </library>
+    </libraries>
+    <table name="departments" schema="" catalog="orbeon" type="TABLE">
+      <column name="dept_no" sqlType="CHAR" length="4" precision="0" nullable="false" jdbcType="1" />
+      <column name="dept_name" sqlType="VARCHAR" length="40" precision="0" nullable="false" jdbcType="12" />
+      <primary-key name="PRIMARY" columns="dept_no" />
+      <index name="dept_name" unique="true" columns="dept_name" />
+    </table>
+    <table name="dept_emp" schema="" catalog="orbeon" type="TABLE">
+      <column name="emp_no" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="dept_no" sqlType="CHAR" length="4" precision="0" nullable="false" jdbcType="1" />
+      <column name="from_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <column name="to_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <primary-key name="PRIMARY" columns="emp_no,dept_no" />
+      <foreign-key name="dept_emp_ibfk_1" columns="emp_no" ref-table="employees" ref-schema="" ref-catalog="orbeon" ref-columns="emp_no" cascade-remove="true" />
+      <foreign-key name="dept_emp_ibfk_2" columns="dept_no" ref-table="departments" ref-schema="" ref-catalog="orbeon" ref-columns="dept_no" cascade-remove="true" />
+      <index name="emp_no" unique="false" columns="emp_no" />
+      <index name="dept_no" unique="false" columns="dept_no" />
+    </table>
+    <table name="dept_manager" schema="" catalog="orbeon" type="TABLE">
+      <column name="dept_no" sqlType="CHAR" length="4" precision="0" nullable="false" jdbcType="1" />
+      <column name="emp_no" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="from_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <column name="to_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <primary-key name="PRIMARY" columns="emp_no,dept_no" />
+      <foreign-key name="dept_manager_ibfk_1" columns="emp_no" ref-table="employees" ref-schema="" ref-catalog="orbeon" ref-columns="emp_no" cascade-remove="true" />
+      <foreign-key name="dept_manager_ibfk_2" columns="dept_no" ref-table="departments" ref-schema="" ref-catalog="orbeon" ref-columns="dept_no" cascade-remove="true" />
+      <index name="emp_no" unique="false" columns="emp_no" />
+      <index name="dept_no" unique="false" columns="dept_no" />
+    </table>
+    <table name="employees" schema="" catalog="orbeon" type="TABLE">
+      <column name="emp_no" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="birth_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <column name="first_name" sqlType="VARCHAR" length="14" precision="0" nullable="false" jdbcType="12" />
+      <column name="last_name" sqlType="VARCHAR" length="16" precision="0" nullable="false" jdbcType="12" />
+      <column name="gender" sqlType="ENUM" length="2" precision="0" nullable="false" jdbcType="1" />
+      <column name="hire_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <primary-key name="PRIMARY" columns="emp_no" />
+    </table>
+    <table name="orbeon_form_data" schema="" catalog="orbeon" type="TABLE">
+      <column name="created" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="last_modified" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="username" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="app" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="form" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="document_id" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="deleted" sqlType="CHAR" length="1" precision="0" nullable="true" jdbcType="1" />
+      <column name="xml" sqlType="MEDIUMTEXT" length="16777215" precision="0" nullable="true" jdbcType="-1" />
+    </table>
+    <table name="orbeon_form_data_attach" schema="" catalog="orbeon" type="TABLE">
+      <column name="created" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="last_modified" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="username" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="app" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="form" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="document_id" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="deleted" sqlType="CHAR" length="1" precision="0" nullable="true" jdbcType="1" />
+      <column name="file_name" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="file_content" sqlType="LONGBLOB" length="2147483647" precision="0" nullable="true" jdbcType="-4" />
+    </table>
+    <table name="orbeon_form_definition" schema="" catalog="orbeon" type="TABLE">
+      <column name="created" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="last_modified" sqlType="DATETIME" length="19" precision="0" nullable="true" jdbcType="93" />
+      <column name="username" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="app" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="form" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="deleted" sqlType="CHAR" length="1" precision="0" nullable="true" jdbcType="1" />
+      <column name="xml" sqlType="MEDIUMTEXT" length="16777215" precision="0" nullable="true" jdbcType="-1" />
+    </table>
+    <table name="orbeon_form_definition_attach" schema="" catalog="orbeon" type="TABLE">
+      <column name="created" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="last_modified" sqlType="TIMESTAMP" length="19" precision="0" nullable="false" jdbcType="93" />
+      <column name="username" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="app" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="form" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="deleted" sqlType="CHAR" length="1" precision="0" nullable="true" jdbcType="1" />
+      <column name="file_name" sqlType="VARCHAR" length="256" precision="0" nullable="true" jdbcType="12" />
+      <column name="file_content" sqlType="LONGBLOB" length="2147483647" precision="0" nullable="true" jdbcType="-4" />
+    </table>
+    <table name="salaries" schema="" catalog="orbeon" type="TABLE">
+      <column name="emp_no" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="salary" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="from_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <column name="to_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <primary-key name="PRIMARY" columns="emp_no,from_date" />
+      <foreign-key name="salaries_ibfk_1" columns="emp_no" ref-table="employees" ref-schema="" ref-catalog="orbeon" ref-columns="emp_no" cascade-remove="true" />
+      <index name="emp_no" unique="false" columns="emp_no" />
+    </table>
+    <table name="t" schema="" catalog="orbeon" type="TABLE">
+      <column name="col2" sqlType="INT" length="10" precision="0" nullable="true" jdbcType="4" />
+    </table>
+    <table name="t_a" schema="" catalog="orbeon" type="TABLE">
+      <column name="col2" sqlType="INT" length="10" precision="0" nullable="true" jdbcType="4" />
+    </table>
+    <table name="titles" schema="" catalog="orbeon" type="TABLE">
+      <column name="emp_no" sqlType="INT" length="10" precision="0" nullable="false" jdbcType="4" />
+      <column name="title" sqlType="VARCHAR" length="50" precision="0" nullable="false" jdbcType="12" />
+      <column name="from_date" sqlType="DATE" length="10" precision="0" nullable="false" jdbcType="91" />
+      <column name="to_date" sqlType="DATE" length="10" precision="0" nullable="true" jdbcType="91" />
+      <primary-key name="PRIMARY" columns="emp_no,title,from_date" />
+      <foreign-key name="titles_ibfk_1" columns="emp_no" ref-table="employees" ref-schema="" ref-catalog="orbeon" ref-columns="emp_no" cascade-remove="true" />
+      <index name="emp_no" unique="false" columns="emp_no" />
+    </table>
+  </data-source>
+</component>

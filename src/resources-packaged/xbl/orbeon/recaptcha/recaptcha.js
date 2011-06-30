@@ -15,6 +15,8 @@
 (function() {
     var OD = ORBEON.util.Dom;
     var YD = YAHOO.util.Dom;
+    var Document = ORBEON.xforms.Document;
+    var Event = YAHOO.util.Event;
 
     YAHOO.namespace("xbl.fr");
     YAHOO.xbl.fr.Recaptcha = function() {};
@@ -30,33 +32,41 @@
          * Constructor
          */
         init: function() {
-            var recaptchaDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-div", null, this.container)[0];
-            this.challengeId = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-challenge", null, this.container)[0].id;
-            this.responseId = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-response", null, this.container)[0].id;
-            this.verifyButton = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-verify", null, this.container)[0];
+            var recaptchaDiv = YD.getElementsByClassName("xbl-fr-recaptcha-div", null, this.container)[0];
+            this.challengeId = YD.getElementsByClassName("xbl-fr-recaptcha-challenge", null, this.container)[0].id;
+            this.responseId = YD.getElementsByClassName("xbl-fr-recaptcha-response", null, this.container)[0].id;
+            this.verifyButton = YD.getElementsByClassName("xbl-fr-recaptcha-verify", null, this.container)[0];
 
             // Public key comes from property
-            var publicKeyElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-public-key", null, this.container)[0];
-            var publicKey = ORBEON.xforms.Document.getValue(publicKeyElement.id);
+            var publicKeyElement = YD.getElementsByClassName("xbl-fr-recaptcha-public-key", null, this.container)[0];
+            var publicKey = Document.getValue(publicKeyElement.id);
             // Other configurations
-            var themeElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-theme", null, this.container)[0];
-            var theme = ORBEON.xforms.Document.getValue(themeElement.id);
-            var langElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-recaptcha-lang", null, this.container)[0];
-            var lang = ORBEON.xforms.Document.getValue(langElement.id);
+            var themeElement = YD.getElementsByClassName("xbl-fr-recaptcha-theme", null, this.container)[0];
+            var theme = Document.getValue(themeElement.id);
+            var langElement = YD.getElementsByClassName("xbl-fr-recaptcha-lang", null, this.container)[0];
+            var lang = Document.getValue(langElement.id);
 
             Recaptcha.create(publicKey, recaptchaDiv.id, {
                theme: theme,
-               lang: lang
+               lang: lang,
+               callback: _.bind(this.recaptchaInitialized, this)
             });
         },
 
-        getChallengeResponse: function() {
-            ORBEON.xforms.Document.setValue(this.challengeId, Recaptcha.get_challenge());
-            ORBEON.xforms.Document.setValue(this.responseId, Recaptcha.get_response());
-            OD.getElementByTagName(this.verifyButton, "button").click();
+        /**
+         * When the reCAPTCHA initialized, add a listener on the input to store the challenge/response in XForms controls,
+         * so they are ready to be checked.
+         */
+        recaptchaInitialized: function() {
+            var recaptchaInput = YD.get(this.container.id + "_response_field");
+            Event.addListener(recaptchaInput, "change", _.bind(function() {
+                Document.setValue(this.challengeId, Recaptcha.get_challenge());
+                Document.setValue(this.responseId, Recaptcha.get_response());
+            }, this));
         },
 
         reload: function() {
+            Document.setValue(this.responseId, "");
             Recaptcha.reload();
         },
 

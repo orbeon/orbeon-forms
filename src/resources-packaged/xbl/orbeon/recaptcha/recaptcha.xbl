@@ -34,7 +34,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
-                <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).getChallengeResponse();</xxforms:script>
+                <xforms:dispatch name="fr-verify" target="component-inner-group"/>
             </xbl:handler>
             <xbl:handler event="fr-reload" phase="target">
                 <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxforms:script>
@@ -66,7 +66,8 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xforms:group>
+                    <xforms:group id="component-inner-group">
+
                         <!-- Init event -->
                         <xforms:action id="xf-en" ev:event="xforms-enabled">
                             <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxforms:script>
@@ -78,49 +79,47 @@
                             <xforms:setvalue ref="privatekey" value="$private-key" xxbl:scope="inner"/>
                         </xforms:action>
 
+                        <xforms:action ev:event="fr-verify">
+                            <xxforms:variable name="did-entered-value" select="response != ''"/>
+                            <!-- Do verification if user entered a value -->
+                            <xforms:action if="$did-entered-value">
+                                <xforms:message level="xxforms:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
+                                <!-- Call API doing the verification -->
+                                <xforms:send submission="verify-submission"/>
+                                <!-- Reset challenge and response, so the next time they are changed we only run the verification when both new values are updated -->
+                                <xforms:setvalue ref="challenge"/>
+                                <xforms:setvalue ref="response"/>
+                                <!-- Parse the response -->
+                                <xxforms:variable name="lines" select="tokenize(instance('verify-response-text'), '\n')"/>
+                                <xxforms:variable name="is-success" select="$lines[1] = 'true'"/>
+                                <!-- Dispatch success event -->
+                                <xforms:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
+                                <!-- Dispatch failure event -->
+                                <xforms:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
+                                    <xxforms:context name="fr-error-code" select="$lines[2]"/>
+                                </xforms:dispatch>
+                            </xforms:action>
+                            <!-- When no response is provided, just dispatch an error -->
+                            <xforms:action if="not($did-entered-value)">
+                                <xforms:dispatch targetid="fr-recaptcha" name="fr-verify-error">
+                                    <xxforms:context name="fr-error-code" select="'empty'"/>
+                                </xforms:dispatch>
+                            </xforms:action>
+                        </xforms:action>
+
                         <!-- Configuration -->
                         <xsl:copy-of select="xxbl:parameter(., 'public-key')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'theme')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'lang')"/>
 
-                        <xforms:group xxforms:appearance="internal">
-                            <!-- Provides access the reCAPTCHA challenge/response exposed by the JavaScript API
-                                 http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
-                            <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
-                            <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none"/>
-                            <!-- On fr-verify, our JavaScript code populates the two inputs above and dispatches this event -->
-                            <xforms:trigger class="xbl-fr-recaptcha-verify" style="display: none">
-                                <xforms:label/>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xxforms:variable name="did-entered-value" select="response != ''"/>
-                                    <!-- Do verification if user entered a value -->
-                                    <xforms:action if="$did-entered-value">
-                                        <xforms:message level="xxforms:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
-                                        <!-- Call API doing the verification -->
-                                        <xforms:send submission="verify-submission"/>
-                                        <!-- Reset challenge and response, so the next time they are changed we only run the verification when both new values are updated -->
-                                        <xforms:setvalue ref="challenge"/>
-                                        <xforms:setvalue ref="response"/>
-                                        <!-- Parse the response -->
-                                        <xxforms:variable name="lines" select="tokenize(instance('verify-response-text'), '\n')"/>
-                                        <xxforms:variable name="is-success" select="$lines[1] = 'true'"/>
-                                        <!-- Dispatch success event -->
-                                        <xforms:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
-                                        <!-- Dispatch failure event -->
-                                        <xforms:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
-                                            <xxforms:context name="fr-error-code" select="$lines[2]"/>
-                                        </xforms:dispatch>
-                                    </xforms:action>
-                                    <!-- When no response is provided, just dispatch an error -->
-                                    <xforms:action if="not($did-entered-value)">
-                                        <xforms:dispatch targetid="fr-recaptcha" name="fr-verify-error">
-                                            <xxforms:context name="fr-error-code" select="'empty'"/>
-                                        </xforms:dispatch>
-                                    </xforms:action>
-                                </xforms:action>
-                            </xforms:trigger>
-                        </xforms:group>
+                        <!-- Provides access the reCAPTCHA challenge/response exposed by the JavaScript API
+                             http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
+                        <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
+                        <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none"/>
+
+                        <!-- Div in which the reCAPTCHA is rendered-->
                         <xhtml:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
+
                     </xforms:group>
                 </xsl:template>
             </xsl:transform>

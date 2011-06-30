@@ -126,7 +126,7 @@
                                             <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
                                             <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
                                             <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
-                                            <xforms:group ref=".[$has-captcha and $mode = ('new', 'edit') and $captcha = 'false']" class="fr-captcha">
+                                            <xforms:group ref=".[$has-captcha and $mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
                                                 <fr:recaptcha id="recaptcha" theme="clean">
                                                     <!-- Success: remember the captcha passed, which also influences validity -->
                                                     <xforms:action ev:event="fr-verify-done">

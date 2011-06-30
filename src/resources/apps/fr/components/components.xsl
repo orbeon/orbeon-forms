@@ -58,10 +58,10 @@
     <xsl:variable name="is-noscript-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-ajax-section-collapse" select="not(pipeline:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="pipeline:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="hide-logo" select="pipeline:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/> 
-    <xsl:variable name="hide-header" select="pipeline:property(string-join(('oxf.fr.detail.hide-header', $app, $form), '.'))" as="xs:boolean?"/> 
-    <xsl:variable name="hide-top" select="pipeline:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/> 
-    <xsl:variable name="hide-buttons-bar" select="pipeline:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/> 
+    <xsl:variable name="hide-logo" select="pipeline:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-header" select="pipeline:property(string-join(('oxf.fr.detail.hide-header', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-top" select="pipeline:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-buttons-bar" select="pipeline:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="tokenize(normalize-space(pipeline:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="view-buttons" select="tokenize(pipeline:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s+')" as="xs:string*"/>
@@ -75,9 +75,9 @@
     <xsl:variable name="error-summary-top" select="normalize-space($error-summary) = ('top', 'both')" as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
 
-    <xsl:variable name="is-rendered" select="doc('input:request')/request/request-path = '/xforms-renderer'" as="xs:boolean"/> 
-    <xsl:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(doc('input:request')/request/request-uri, '/xforms-renderer') else ''" as="xs:string"/> 
-    
+    <xsl:variable name="is-rendered" select="doc('input:request')/request/request-path = '/xforms-renderer'" as="xs:boolean"/>
+    <xsl:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(doc('input:request')/request/request-uri, '/xforms-renderer') else ''" as="xs:string"/>
+
     <xsl:template match="/xhtml:html">
         <!-- Handle document language -->
         <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
@@ -215,8 +215,8 @@
             <!--</xforms:action>-->
 
         <!--</xforms:model>-->
-        
-        <xxforms:variable name="url-base-for-requests" select="'{$url-base-for-requests}'"/> 
+
+        <xxforms:variable name="url-base-for-requests" select="'{$url-base-for-requests}'"/>
 
         <!-- This model handles roles and permissions -->
         <xi:include href="oxf:/apps/fr/includes/roles-model.xml" xxi:omit-xml-base="true"/>
@@ -252,15 +252,25 @@
             </xforms:instance>
             <xforms:bind nodeset="trigger" readonly="not(../valid = 'true')"/>
 
-            <!-- Mark all controls as visited when certain buttons are activated -->
+            <!-- Verify captcha and mark all controls as visited when certain buttons are activated -->
             <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button fr-submit-button">
-                <!-- Dispatch to the appropriate error summaries -->
-                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
-                <xsl:if test="$error-summary-top">
-                    <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>
-                </xsl:if>
+
+                <!-- Do captcha verification, if needed -->
+                <!-- NOTE: The code would be shorter here if we were to use the XSLT app/form variables, but we want to move away from XSLT for FR -->
+                <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
+                <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
+                <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
+                <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
+                <xforms:action if="$has-captcha and xxforms:instance('fr-persistence-instance')/captcha = 'false'">
+                    <xforms:dispatch target="recaptcha" name="fr-verify"/>
+                </xforms:action>
+
+                <!-- Show all error in error summaries -->
+                <xsl:if test="$error-summary-top"><xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/></xsl:if>
                 <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
+
             </xforms:action>
+
             <!-- Mark all controls as un-visited when certain buttons are activated -->
             <xforms:action ev:event="fr-unvisit-all">
                 <!-- Dispatch to the appropriate error summaries -->
@@ -283,20 +293,20 @@
             <!-- This model handles Alfresco integration -->
             <xi:include href="oxf:/apps/fr/alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>
         </xsl:if>
-        
-        <!-- This model supports Form Runner rendered through the xforms-renderer --> 
-        <xforms:model id="fr-xforms-renderer-model"> 
-            <xforms:instance id="fr-xforms-renderer-instance"> 
-                <xforms-renderer> 
-                    <is-rendered> 
-                        <xsl:value-of select="$is-rendered"/> 
-                    </is-rendered> 
-                    <url-base-for-requests> 
-                        <xsl:value-of select="$url-base-for-requests"/> 
-                    </url-base-for-requests> 
-                </xforms-renderer> 
-            </xforms:instance> 
-        </xforms:model> 
+
+        <!-- This model supports Form Runner rendered through the xforms-renderer -->
+        <xforms:model id="fr-xforms-renderer-model">
+            <xforms:instance id="fr-xforms-renderer-instance">
+                <xforms-renderer>
+                    <is-rendered>
+                        <xsl:value-of select="$is-rendered"/>
+                    </is-rendered>
+                    <url-base-for-requests>
+                        <xsl:value-of select="$url-base-for-requests"/>
+                    </url-base-for-requests>
+                </xforms-renderer>
+            </xforms:instance>
+        </xforms:model>
 
         <!-- Copy and annotate existing main model -->
         <xsl:copy>

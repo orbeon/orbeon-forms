@@ -135,11 +135,6 @@
                                                     </xforms:action>
                                                     <!-- Failure: load another challenge -->
                                                     <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="recaptcha" name="fr-reload"/>
-                                                    <!-- All cases: try save again -->
-                                                    <xforms:dispatch ev:event="fr-verify-done fr-verify-error" target="fr-persistence-model" name="fr-save-action">
-                                                        <xxforms:context name="fr:check-data-valid" select="true()"/>
-                                                        <xxforms:context name="fr:captcha-checked" select="true()"/>
-                                                    </xforms:dispatch>
                                                 </fr:recaptcha>
                                                 <!-- Non-visible output bound to captcha node to influence form validity -->
                                                 <xhtml:span style="display: none">

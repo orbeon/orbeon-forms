@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -56,7 +56,7 @@ public class XFormsMessageAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
@@ -76,9 +76,13 @@ public class XFormsMessageAction extends XFormsAction {
             }
 
             // Get message value
-            // TODO: In the future, we should support HTML
-            final String messageValue = XFormsUtils.getElementValue(actionInterpreter.getXBLContainer(),
+            final String messageValue; {
+                final String elementValue = XFormsUtils.getElementValue(actionInterpreter.getXBLContainer(),
                     actionInterpreter.getContextStack(), actionInterpreter.getSourceEffectiveId(actionElement), actionElement, false, null);
+
+                // If we got a null consider the message to be an empty string
+                messageValue = elementValue != null ? elementValue : "";
+            }
 
             if (LOG_APPEARANCES.get(levelQName) != null) {
                 // Special log appearance
@@ -104,14 +108,12 @@ public class XFormsMessageAction extends XFormsAction {
                     level = "{" + levelQName.getNamespaceURI() + "}" + levelQName.getName();
                 }
 
-                if (messageValue != null) {
-                    // Store message for sending to client
-                    containingDocument.addMessageToRun(messageValue, level);
+                // Store message for sending to client
+                containingDocument.addMessageToRun(messageValue, level);
 
-                    // NOTE: In the future, we *may* want to save and resume the event state before and after
-                    // displaying a message, in order to possibly provide a behavior which is more consistent with what
-                    // users may expect regarding actions executed after xforms:message.
-                }
+                // NOTE: In the future, we *may* want to save and resume the event state before and after
+                // displaying a message, in order to possibly provide a behavior which is more consistent with what
+                // users may expect regarding actions executed after xforms:message.
 
             } else {
                 // Unsupported appearance

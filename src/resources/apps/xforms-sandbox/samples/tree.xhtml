@@ -21,10 +21,6 @@
 
     <xhtml:head>
         <xhtml:title>Tree Widget</xhtml:title>
-        <xhtml:style type="text/css">
-            table td, table th { vertical-align: top }
-            .xforms-label { font-weight: bold; padding-right: 1em }
-        </xhtml:style>
         <xforms:model>
             <xforms:instance id="main-instance">
                 <instance>
@@ -89,11 +85,12 @@
             </xforms:action>
         </xforms:model>
         <xhtml:style type="text/css">
+            table td, table th { vertical-align: top }
+            .xforms-label { font-weight: bold; padding-right: 1em }
             .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { padding: 0 0 2em 2em }
             .tree-table .xforms-label { display: block; }
             .tree-table .green { background-color: #dfd; }
             .tree-table .red { background-color: #fdd; }
-            .tree-table .xforms-tree-label-selected { background-color: #ffa; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>

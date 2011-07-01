@@ -803,15 +803,15 @@
                                                                                 <xxforms:variable name="control" select="*[1]" as="element()"/>
                                                                                 <xxforms:variable name="control-name" select="substring-before($control/@id, '-control')" as="xs:string"/>
                                                                                 <xxforms:variable name="instance-holder" as="element()"
-                                                                                                  select="if ($is-component)
+                                                                                                  select="(if ($is-component)
                                                                                                           then $component-binding//xforms:instance[@id = 'fr-form-instance']/*/*[name() = $control-name]
                                                                                                           else if ($is-repeat)
                                                                                                           then $section-holder/*/*[name() = $control-name]
-                                                                                                          else $section-holder/*[name() = $control-name]"/>
+                                                                                                          else $section-holder/*[name() = $control-name])[1]"/>
                                                                                 <xxforms:variable name="resource-holder" as="element()"
-                                                                                                  select="if ($is-component)
+                                                                                                  select="(if ($is-component)
                                                                                                           then $component-binding//xforms:instance[@id = 'fr-form-resources']/*/resource[1]/*[name() = $control-name]
-                                                                                                          else $current-resources/*[name() = $control-name]"/>
+                                                                                                          else $current-resources/*[name() = $control-name])[1]"/>
 
                                                                                 <!-- Editor for the current cell -->
                                                                                 <xi:include href="oxf:/forms/orbeon/builder/form/grid-cell-editor.xml" xxi:omit-xml-base="true"/>

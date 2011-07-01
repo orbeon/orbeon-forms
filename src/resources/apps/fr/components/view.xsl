@@ -142,8 +142,8 @@
                                                     <xforms:output ref="$captcha">
                                                         <!-- Focus from error summary proxies to captcha -->
                                                         <xforms:setfocus ev:event="xforms-focus" control="recaptcha"/>
-                                                        <xforms:label>Captcha</xforms:label>
-                                                        <xforms:alert>The value you entered didn't match the image, please try again</xforms:alert>
+                                                        <xforms:label ref="$fr-resources/detail/labels/captcha-label"/>
+                                                        <xforms:alert ref="$fr-resources/detail/labels/captcha-help"/>
                                                     </xforms:output>
                                                 </xhtml:span>
                                             </xforms:group>

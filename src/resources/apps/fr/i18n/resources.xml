@@ -148,6 +148,8 @@
                 <expand-all>Expand all</expand-all>
                 <show-content>Show Content</show-content>
                 <hide-content>Hide Content</hide-content>
+                <captcha-label>Captcha</captcha-label>
+                <captcha-help>The value you entered didn't match the image, please try again</captcha-help>
             </labels>
             <view>
                 <explanation>
@@ -310,6 +312,8 @@
                 <expand-all>Ouvrir sections</expand-all>
                 <show-content>Montrer contenu</show-content>
                 <hide-content>Cacher contenu</hide-content>
+                <captcha-label>Captcha</captcha-label>
+                <captcha-help>La valeur entrée ne correspond pas à l'image</captcha-help>
             </labels>
             <view>
                 <explanation>
@@ -472,6 +476,8 @@
                 <expand-all>Abrir Secciones</expand-all>
                 <show-content>[Show Content]</show-content>
                 <hide-content>[Hide Content]</hide-content>
+                <captcha-label>[Captcha]</captcha-label>
+                <captcha-help>[The value you entered didn't match the image, please try again]</captcha-help>
             </labels>
             <view>
                 <explanation>
@@ -640,6 +646,8 @@
                 <show-content>Vis innhold</show-content>
                 <hide-content>Skjul innhold</hide-content>
                 <!--<select>Velg</select>-->
+                <captcha-label>[Captcha]</captcha-label>
+                <captcha-help>[The value you entered didn't match the image, please try again]</captcha-help>
             </labels>
             <view>
                 <explanation>
@@ -802,6 +810,8 @@
                 <expand-all>Развернуть все</expand-all>
                 <show-content>Показать</show-content>
                 <hide-content>Скрыть</hide-content>
+                <captcha-label>[Captcha]</captcha-label>
+                <captcha-help>[The value you entered didn't match the image, please try again]</captcha-help>
             </labels>
             <view>
                 <explanation>

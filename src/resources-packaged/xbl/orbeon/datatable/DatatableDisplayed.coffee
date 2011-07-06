@@ -44,8 +44,9 @@ class InViewportCondition extends Condition
 # Rendering the datatable in that case would produce inaccurate results.
 class OnScreenCondition extends Condition
     isMet: ->
-        not (YD.hasClass @container, "xforms-case-deselected") \
-        and (YD.getAncestorByClassName @container, "xforms-case-deselected") == null
+        _.all ["xforms-case-deselected", "xforms-initially-hidden"], (name) =>
+            firstChild = YD.getFirstChild @container
+            (YD.getAncestorByClassName firstChild, name) == null
     addListener: (listener) -> Events.ajaxResponseProcessedEvent.subscribe listener
     removeListener: (listener) -> Events.ajaxResponseProcessedEvent.unsubscribe listener
 

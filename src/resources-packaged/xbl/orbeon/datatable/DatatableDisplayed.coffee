@@ -75,8 +75,7 @@ YAHOO.xbl.fr.Datatable.prototype.whenDisplayed = (ready) ->
         else
             # Run code doing the real rendering of the database, while showing the loading indicator
             formElement = Controls.getForm @container
-            orbeonForm = Page.getForm formElement
+            orbeonForm = Page.getForm formElement.id
             orbeonForm.getLoadingIndicator().runShowing conditionsMet
-
 
     onConditions @getConditions(), () -> ready()

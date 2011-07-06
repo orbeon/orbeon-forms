@@ -35,7 +35,7 @@ class LoadingIndicator
         Utils.overlayUseDisplayHidden @loadingOverlay
         loadingSpan.style.right = "auto"
 
-        # Listeners on YUI Connect
+        # When an Ajax call starts, we might want to show the indicator
         Connect.startEvent.subscribe =>
             if @nextConnectShow
                 if @shownCounter == 0
@@ -48,6 +48,7 @@ class LoadingIndicator
                     # Indicator already shown, just increment counter
                     @shownCounter++
 
+        # When an Ajax call ends, we might want to hide the indicator
         Events.ajaxResponseProcessedEvent.subscribe =>
             if @nextConnectShow
                 # Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator

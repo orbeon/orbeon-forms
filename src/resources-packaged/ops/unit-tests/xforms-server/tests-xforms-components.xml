@@ -658,7 +658,7 @@
                         <xxf:attribute id="my-currency$xf-19" for="my-currency$xf-19" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-currency$xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
                         <xxf:attribute id="my-currency$xf-22" for="my-currency$xf-22" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$number-input" class="xbl-fr-number-xforms-input fr-hidden">$ 12.34</xxf:control>
+                        <xxf:control id="my-currency$number-input" class="xbl-fr-number-xforms-input">$ 12.34</xxf:control>
                     </xxf:control-values>
                     <xxf:script name="my_currency_xf_6_xforms_function" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
                     <xxf:script name="my_currency_xf_sf_xforms_function" target-id="my-currency" observer-id="my-currency"/>

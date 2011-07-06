@@ -28,9 +28,9 @@
     <xforms:action ev:event="xforms-model-construct-done">
         <!-- Special treatment for Form Builder if roles are configured -->
 
-        <xxforms:variable name="method" select="xxforms:property('oxf.fr.authentication.method')"/>
-        <xforms:action if="$method != '' and doc-available('oxf:/config/form-runner-roles.xml')">
+        <xforms:action if="doc-available('oxf:/config/form-runner-roles.xml')">
 
+            <xxforms:variable name="method" select="xxforms:property('oxf.fr.authentication.method')"/>
             <xforms:action if="$method = 'header'">
                 <xxforms:variable name="header-property-name" select="normalize-space(xxforms:property('oxf.fr.authentication.header.roles.property-name'))" as="xs:string"/>
                 <!-- NOTE: Header specified in oxf.fr.authentication.header.roles is already parsed into 'Orbeon-Roles' at this point -->

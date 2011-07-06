@@ -97,7 +97,7 @@
 
                             <!-- Access to XForms value and change event -->
                             <!-- NEXT: Here it seems that if the value doesn't change, the xxforms:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
-                            <xforms:input ref="$result" id="number-input" class="xbl-fr-number-xforms-input fr-hidden"
+                            <xforms:input ref="$result" id="number-input" class="xbl-fr-number-xforms-input"
                                     xxforms:format="if (. castable as xs:decimal)
                                           then concat(normalize-space($prefix),
                                                       if (normalize-space($prefix)) then ' ' else '',

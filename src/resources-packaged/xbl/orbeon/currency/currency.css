@@ -1,3 +1,14 @@
+/* Unfortunately, this pretty much duplicates number.css, which we'll be able to solve after we switch to SASS. */
+
 .xbl-fr-currency { display: inline; }
 .xbl-fr-currency input { width: 6em }
-.xbl-fr-currency .fr-hidden { display: none } /* for use outside Form Runner */
+.xbl-fr-currency .xbl-fr-number-xforms-input,                                   /* Hidden xf:input providing JavaScript r/w access to the formatted value */
+.fr-grid .fr-grid-content .xbl-fr-currency .xbl-fr-number-xforms-input          /* Stronger rule to override the display: inline in FR (this is not very nice) */
+    { display: none }
+
+@media print {
+    .xbl-fr-currency .xbl-fr-number-xforms-input,                               /* Show xf:input in print mode */
+    .fr-grid .fr-grid-content .xbl-fr-currency .xbl-fr-number-xforms-input
+        { display: inline }
+    .xbl-fr-currency input { display: none }                                    /* Hide the xh:input */
+}

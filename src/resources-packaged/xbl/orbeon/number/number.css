@@ -1,3 +1,12 @@
 .xbl-fr-number { display: inline; }
 .xbl-fr-number input { width: 6em }
-.xbl-fr-number .fr-hidden { display: none } /* for use outside Form Runner */
+.xbl-fr-number .xbl-fr-number-xforms-input,                                   /* Hidden xf:input providing JavaScript r/w access to the formatted value */
+.fr-grid .fr-grid-content .xbl-fr-number .xbl-fr-number-xforms-input          /* Stronger rule to override the display: inline in FR (this is not very nice) */
+    { display: none }
+
+@media print {
+    .xbl-fr-number .xbl-fr-number-xforms-input,                               /* Show xf:input in print mode */
+    .fr-grid .fr-grid-content .xbl-fr-number .xbl-fr-number-xforms-input
+        { display: inline }
+    .xbl-fr-number input { display: none }                                    /* Hide the xh:input */
+}

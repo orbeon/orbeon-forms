@@ -153,14 +153,14 @@ public class XFormsDeleteAction extends XFormsAction {
         }
 
         if (deleteInfos.size() == 0) {
-            if (indentedLogger.isDebugEnabled())
+            if (indentedLogger != null && indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "empty collection, terminating");
-        } else {
+        } else if (containingDocument != null) {
             // Identify the instance that actually changes
             // NOTE: More than one instance may be modified. For now we look at the first one.
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(deleteInfos.get(0).nodeInfo);
 
-            if (indentedLogger.isDebugEnabled())
+            if (indentedLogger != null && indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:delete", "removed nodes",
                         "count", Integer.toString(deleteInfos.size()), "instance",
                                 (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);

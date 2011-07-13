@@ -16,12 +16,10 @@ package org.orbeon.scaxon
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.ExpressionTool
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.saxon.dom4j.NodeWrapper
 import xml.Elem
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.util.XPathCache
 import collection.JavaConverters._
-import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsInstance}
 import java.util.Collections
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -29,8 +27,12 @@ import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
 import org.dom4j.{Attribute, QName, Element}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest, LocalNameTest}
+import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
 
 object XML {
+
+    // TODO: Like for XFSS, this should not be global
+    private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
     // Convenience methods for the XPath API
     def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null) =
@@ -44,22 +46,15 @@ object XML {
     def asNodeInfoSeq(item: Item) = item.asInstanceOf[NodeInfo]
 
     // Element and attribute creation
-    def element(name: String): Element = Dom4jUtils.createElement(name)
     def element(name: QName): Element = Dom4jUtils.createElement(name)
-    def elementInfo(name: String, content: Seq[Item] = Seq()): NodeInfo = addContentAndWrap(element(name), content)
-    // TEMP: different name to help Scala compiler complaining about ambiguous resolution
-    def elementInfoByQname(qName: QName, content: Seq[Item] = Seq()): NodeInfo = addContentAndWrap(element(qName), content)
-
-    private def addContentAndWrap(element: Element, content: Seq[Item]) = {
-        content foreach (XXFormsElement.addItem(element, _))
-        XFormsAPI.actionContext.value.getContainingDocument.getStaticState.documentWrapper.wrap(element)
+    def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
+        val newElement = element(qName)
+        content foreach (XXFormsElement.addItem(newElement, _))
+        wrapper.wrap(newElement)
     }
 
-    def attribute(name: String, value: String = ""): Attribute = Dom4jUtils.createAttribute(new QName(name), value)
-    def attributeByQName(name: QName, value: String = ""): Attribute = Dom4jUtils.createAttribute(name, value)
-    def attributeInfo(name: String, value: String = ""): NodeInfo = XFormsAPI.actionContext.value.getContainingDocument.getStaticState.documentWrapper.wrap(attribute(name, value))
-    // TEMP: different name to help Scala compiler complaining about ambiguous resolution
-    def attributeInfoByQName(name: QName, value: String = ""): NodeInfo = XFormsAPI.actionContext.value.getContainingDocument.getStaticState.documentWrapper.wrap(attributeByQName(name, value))
+    def attribute(name: QName, value: String = ""): Attribute = Dom4jUtils.createAttribute(name, value)
+    def attributeInfo(name: QName, value: String = ""): NodeInfo = wrapper.wrap(attribute(name, value))
 
     // Like XPath resolve-QName()
     def resolveQName(elementInfo: NodeInfo, lexicalQName: String): QName = {
@@ -97,6 +92,7 @@ object XML {
     // Useful predicates
     val hasChildren: NodeInfo => Boolean = element => element \ * nonEmpty
     val hasId: (NodeInfo, String) => Boolean = (element, id) => element \@ "id" === id
+    val exists: (Seq[Item]) => Boolean = (items) => items.nonEmpty
 
     // Get the value of the first attribute passed if any
     def attValueOption(atts: Seq[NodeInfo]) = atts.headOption map (_.getStringValue)
@@ -215,8 +211,6 @@ object XML {
 
     implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 
-    implicit def stringToStringValue(s: String) = StringValue.makeStringValue(s)
-
     implicit def nodeInfoToDom4jElement(nodeInfo: NodeInfo): Element =
         nodeInfo.asInstanceOf[NodeWrapper].getUnderlyingNode.asInstanceOf[Element]
 
@@ -229,6 +223,8 @@ object XML {
 
     implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
 
+    implicit def stringToStringValue(s: String) = StringValue.makeStringValue(s)
+    implicit def stringToQName(s: String) = QName.get(s)
     implicit def stringToItem(s: String) = StringValue.makeStringValue(s)
     implicit def stringToItems(s: String) = Seq(StringValue.makeStringValue(s))
 

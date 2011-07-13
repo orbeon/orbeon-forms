@@ -22,15 +22,16 @@ import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
 import org.dom4j.QName
 import java.lang.IllegalStateException
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 object XFormsAPI {
 
     // Dynamically set action context
-    val actionContext = new DynamicVariable[XFormsActionInterpreter](null)
+    val actionContext = new DynamicVariable[Option[XFormsActionInterpreter]](None)
 
     // Every block of action must be run within this
     def scalaAction(actionInterpreter: XFormsActionInterpreter)(body: => Any) {
-        actionContext.withValue(actionInterpreter) {
+        actionContext.withValue(Some(actionInterpreter)) {
             body
         }
     }
@@ -40,7 +41,7 @@ object XFormsAPI {
     def setvalue(ref: Seq[NodeInfo], value: String) = {
         if (ref nonEmpty) {
             val action = actionContext.value
-            XFormsSetvalueAction.doSetValue(action.getContainingDocument, action.getIndentedLogger,
+            XFormsSetvalueAction.doSetValue(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull,
                 null /* TODO */, ref.head, value, null, "scala setvalue", false)
             Some(ref.head)
         } else
@@ -62,7 +63,7 @@ object XFormsAPI {
                 else
                     ("after", Seq())
 
-            XFormsInsertAction.doInsert(action.getContainingDocument, action.getIndentedLogger, positionAttribute,
+            XFormsInsertAction.doInsert(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull, positionAttribute,
                 collectionToUpdate.asJava, into.headOption.orNull, origin.asJava, collectionToUpdate.size, doClone = true, doDispatch = true).asInstanceOf[JList[T]].asScala
         } else
             Seq()
@@ -73,7 +74,7 @@ object XFormsAPI {
 
         val action = actionContext.value
 
-        val deleteInfos = XFormsDeleteAction.doDelete(action.getContainingDocument, action.getIndentedLogger, ref.asJava, -1, doDispatch = true)
+        val deleteInfos = XFormsDeleteAction.doDelete(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull, ref.asJava, -1, doDispatch = true)
         deleteInfos.asScala map (_.nodeInfo)
     }
 
@@ -111,36 +112,45 @@ object XFormsAPI {
     // Set an attribute value, creating it if missing, updating it if presenty
     // NOTE: This should be implemented as an optimization of the XForms insert action.
     // @return the new or existing attribute node
-    def ensureAttribute(element: NodeInfo, attName: String, value: String): NodeInfo =
+    // NOTE: Would be nice to return attribute (new or existing), but doInsert() is not always able to wrap the inserted
+    // nodes.
+    def ensureAttribute(element: NodeInfo, attName: QName, value: String): Unit =
         element \@ attName match {
-            case Seq() => insert(into = element, origin = attributeInfo(attName, value)).head
-            case Seq(att, _*) => setvalue(att, value).get
+            case Seq() => insert(into = element, origin = attributeInfo(attName, value))
+            case Seq(att, _*) => setvalue(att, value)
         }
 
-    // TODO: don't duplicate code above
-    def ensureAttribute(element: NodeInfo, attName: QName, value: String): NodeInfo =
-        element \@ attName match {
-            case Seq() => insert(into = element, origin = attributeInfoByQName(attName, value)).head
-            case Seq(att, _*) => setvalue(att, value).get
+    // Return an instance's root element in the current action context
+    def instanceRoot(staticId: String, searchAncestors: Boolean = false): Option[NodeInfo] = {
+
+        assert(actionContext.value.isDefined)
+
+        def ancestorXBLContainers = {
+            def recurse(container: XBLContainer): List[XBLContainer] = container :: (container.getParentXBLContainer match {
+                case parent: XBLContainer => recurse(parent)
+                case _ => Nil
+            })
+
+            recurse(actionContext.value.get.getXBLContainer)
         }
 
-    // Return the instance's root element
-    def instanceRoot(id: String): NodeInfo = {
-        val action = actionContext.value
-        val functionContext = action.getOuterFunctionContext
+        val containersToSearch =
+            if (searchAncestors) ancestorXBLContainers else List(actionContext.value.get.getXBLContainer)
 
-        try functionContext.getModel.getInstance(id).getInstanceRootElementInfo
-        finally action.getContextStack.returnFunctionContext()
+        containersToSearch map
+                (_.findInstance(staticId)) find
+                    (_ ne null) map
+                        (_.getInstanceRootElementInfo)
     }
 
     // Return a model
-    def model(modelId: String) = {
-        val action = actionContext.value
-        val document = action.getContainingDocument
-
+    // TODO: This searches only to-level models, find a better way
+    def model(modelId: String) =
         // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
-        document.getModels.asScala.find(_.getId == modelId)
-    }
+        containingDocument.getModels.asScala.find(_.getId == modelId)
+
+    // Return the containing document
+    def containingDocument = { assert(actionContext.value.isDefined); actionContext.value.get.getContainingDocument }
     
     def context[T](xpath: String)(body: => T): T =
         throw new IllegalStateException("NIY")
@@ -150,4 +160,4 @@ object XFormsAPI {
 
     def event[T](attributeName: String): Seq[Item] =
         throw new IllegalStateException("NIY")
-}
+}   

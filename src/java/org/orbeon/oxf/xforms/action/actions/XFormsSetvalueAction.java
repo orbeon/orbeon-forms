@@ -84,8 +84,8 @@ public class XFormsSetvalueAction extends XFormsAction {
         final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         final boolean changed = !currentValue.equals(valueToSet);
 
-        if (indentedLogger.isDebugEnabled()) {
-            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+        if (indentedLogger != null && indentedLogger.isDebugEnabled()) {
+            final XFormsInstance modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(currentNode) : null;
             indentedLogger.logDebug("xforms:setvalue", "setting instance value", "source", source, "value", valueToSet,
                     "changed", Boolean.toString(changed),
                     "instance", (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : "N/A");
@@ -97,18 +97,20 @@ public class XFormsSetvalueAction extends XFormsAction {
             // Actually set the value
             XFormsInstance.setValueForNodeInfo(containingDocument, eventTarget, currentNode, valueToSet, type);
 
-            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-            if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
+            if (containingDocument != null) {
+                final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+                if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
 
-                // Tell the model about the value change
-                modifiedInstance.getModel(containingDocument).markValueChange(currentNode, isCalculate);
+                    // Tell the model about the value change
+                    modifiedInstance.getModel(containingDocument).markValueChange(currentNode, isCalculate);
 
-                // Dispatch extension event to instance
-                final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);
-                modifiedContainer.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, currentNode, currentValue, valueToSet));
-            } else {
-                // NOTE: Is this the right thing to do if the value modified is not an instance value? Might not be needed!
-                containingDocument.getControls().markDirtySinceLastRequest(true);
+                    // Dispatch extension event to instance
+                    final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);
+                    modifiedContainer.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, currentNode, currentValue, valueToSet));
+                } else {
+                    // NOTE: Is this the right thing to do if the value modified is not an instance value? Might not be needed!
+                    containingDocument.getControls().markDirtySinceLastRequest(true);
+                }
             }
 
             return true;

@@ -192,7 +192,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // origin node-set is the empty node-set."
 
                 if (isEmptyNodesetBinding) {
-                    if (indentedLogger.isDebugEnabled())
+                    if (indentedLogger != null && indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xforms:insert", "origin node-set from node-set binding is empty, terminating");
                     return Collections.EMPTY_LIST;
                 }
@@ -212,7 +212,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originItems.size() == 0) {
-                    if (indentedLogger.isDebugEnabled())
+                    if (indentedLogger != null && indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("xforms:insert", "origin node-set is empty, terminating");
                     return Collections.EMPTY_LIST;
                 }
@@ -299,7 +299,7 @@ public class XFormsInsertAction extends XFormsAction {
             // the first attribute of the insert location node. If the cloned node is not an attribute, then the
             // target location is before the first child of the insert location node."
 
-            modifiedInstance = containingDocument.getInstanceForNode(insertContextNodeInfo);
+            modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertContextNodeInfo) : null;
             insertLocationNodeInfo = insertContextNodeInfo;
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
             insertedNodes = doInsert(insertLocationNode, clonedNodes);
@@ -318,7 +318,7 @@ public class XFormsInsertAction extends XFormsAction {
             // Insert BEFORE or AFTER a node
             insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
-            modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
+            modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertLocationNodeInfo) : null;
 
             final Document insertLocationNodeDocument = insertLocationNode.getDocument();
             if (insertLocationNodeDocument != null && insertLocationNodeDocument.getRootElement() == insertLocationNode) {
@@ -378,7 +378,7 @@ public class XFormsInsertAction extends XFormsAction {
                                 addIndex++;
                             } else {
                                 // We never insert attributes or namespace nodes as siblings
-                                if (indentedLogger.isDebugEnabled())
+                                if (indentedLogger != null && indentedLogger.isDebugEnabled())
                                     indentedLogger.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
                                                     "type", clonedNode.getNodeTypeName(),
                                                     "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
@@ -400,7 +400,7 @@ public class XFormsInsertAction extends XFormsAction {
         final boolean didInsertNodes = insertedNodes != null && insertedNodes.size() > 0;
 
         // Log stuff
-        if (indentedLogger.isDebugEnabled()) {
+        if (indentedLogger != null && indentedLogger.isDebugEnabled()) {
             if (didInsertNodes)
                 indentedLogger.logDebug("xforms:insert", "inserted nodes",
                         "count", Integer.toString(insertedNodes.size()), "instance",

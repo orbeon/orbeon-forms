@@ -25,7 +25,7 @@
             </result>
         </action>
     </page>
-    
+
     <!-- ==== Entry point for persistence services ================================================================= -->
 
     <page path-info="/fr/service/persistence/.*" matcher="oxf:perl5-matcher" model="persistence/proxy.xpl"/>
@@ -50,6 +50,9 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
+    <!-- Deployed forms services -->
+    <page path-info="/fr/service/exist/form" view="persistence/exist/form.xpl"/>
+
     <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
@@ -69,6 +72,9 @@
           view="persistence/oracle/list.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
+
+    <!-- Deployed forms services -->
+    <page path-info="/fr/service/oracle/form" view="persistence/oracle/form.xpl"/>
 
     <!-- ==== Custom MySQL-based persistence services =========================================================== -->
 
@@ -90,6 +96,9 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
+    <!-- Deployed forms services -->
+    <page path-info="/fr/service/mysql/form" view="persistence/mysql/form.xpl"/>
+
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
@@ -97,11 +106,14 @@
           model="persistence/resource/crud.xpl">
     </page>
 
+    <!-- Deployed forms services -->
+    <page path-info="/fr/service/resource/form" view="persistence/resource/form.xpl"/>
+
     <!-- ==== Internationalization ================================================================================= -->
 
     <!-- Service putting together Form Runner resources -->
     <page path-info="/fr/service/i18n/fr-resources/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          view="i18n/fr-resources.xpl"  
+          view="i18n/fr-resources.xpl"
           default-submission="request-parameters.xml">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>

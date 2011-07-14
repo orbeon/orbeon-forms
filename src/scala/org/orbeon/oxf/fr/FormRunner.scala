@@ -97,12 +97,16 @@ object FormRunner {
         val propertySet = Properties.instance.getPropertySet
 
         // Find provider
-        def findProvider = {
+        val provider = {
             val providerProperty = Seq("oxf.fr.persistence.provider", app, form, formOrData) mkString "."
             propertySet.getString(providerProperty)
         }
 
-        val provider = findProvider
+        getPersistenceURLHeadersFromProvider(provider)
+    }
+
+    def getPersistenceURLHeadersFromProvider(provider: String) = {
+        val propertySet = Properties.instance.getPropertySet
 
         // Find provider URI
         def findProviderURL = {

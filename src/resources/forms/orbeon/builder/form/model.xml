@@ -785,8 +785,10 @@
                 <schema/>
                 <css/>
                 <pdf/>
-                <view-source/>
                 <edit-source/>
+                <view-source/>
+                <custom-xml/>
+                <permissions/>
                 <services-actions/>
             </toolbox>
         </metadata>
@@ -806,9 +808,10 @@
         <xforms:bind nodeset="toolbox/schema" relevant="xxforms:property('oxf.fb.menu.schema')"/>
         <xforms:bind nodeset="toolbox/css" relevant="xxforms:property('oxf.fb.menu.css')"/>
         <xforms:bind nodeset="toolbox/pdf" relevant="xxforms:property('oxf.fb.menu.pdf')"/>
-        <xforms:bind nodeset="toolbox/view-source" relevant="xxforms:property('oxf.fb.menu.view-source')"/>
         <xforms:bind nodeset="toolbox/edit-source" relevant="xxforms:property('oxf.fb.menu.edit-source')"/>
+        <xforms:bind nodeset="toolbox/view-source" relevant="xxforms:property('oxf.fb.menu.view-source')"/>
+        <xforms:bind nodeset="toolbox/custom-xml" relevant="xxforms:property('oxf.fb.menu.custom-xml')"/>
+        <xforms:bind nodeset="toolbox/permissions" relevant="xxforms:property('oxf.fb.menu.permissions')"/>
     </xforms:bind>
-
 
 </xforms:model>

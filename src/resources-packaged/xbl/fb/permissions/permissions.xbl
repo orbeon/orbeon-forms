@@ -1,0 +1,226 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         script-type="application/xhtml+xml">
+    <xbl:binding id="fb-permissions" element="fb|permissions">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xxforms:show dialog="dialog"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:resources>
+            <xbl:style src="/xbl/fb/permissions/permissions.css"/>
+        </xbl:resources>
+        <xbl:implementation>
+            <xforms:model id="permissions-model">
+                <xforms:instance id="ui">
+                    <ui>
+                        <has-permissions/>
+                        <readonly-checked>create read-update delete</readonly-checked>
+                        <permissions>
+                            <permission>
+                                <operations/>
+                            </permission>
+                        </permissions>
+                    </ui>
+                </xforms:instance>
+                <xforms:bind ref="instance('ui')/readonly-checked" readonly="true()"/>
+                <xforms:instance id="permission-template">
+                    <permission>
+                        <role/>
+                        <operations/>
+                    </permission>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xforms:group appearance="xxforms:internal" id="container">
+
+                <xxforms:variable name="metadata"       ><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref=metadata-ref"/></xxforms:variable>
+                <xxforms:variable name="resources"      ><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
+                <xxforms:variable name="ui"             select="instance('ui')"/>
+
+                <!-- On dialog open, copy permissions from metadata into our UI representation -->
+                <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
+
+                    <xxforms:variable name="has-permissions" value="exists($metadata/permissions)"/>
+                    <xforms:setvalue ref="$ui/has-permissions" value="if ($has-permissions) then 'true' else ''"/>
+
+                    <!-- Clean UI permissions -->
+                    <xforms:delete ref="$ui/permissions/*"/>
+                    <xforms:insert context="$ui/permissions" origin="instance('permission-template')"/>
+                    <xforms:delete ref="$ui/permissions/permission/role"/>
+
+                    <!-- Populate UI permissions based metadata -->
+                    <xforms:action if="$has-permissions">
+                        <!-- Add permissions attached to a role -->
+                        <xxforms:variable name="roles" select="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
+                        <xforms:action xxforms:iterate="$roles">
+                            <!-- Current role -->
+                            <xxforms:variable name="role" select="."/>
+                            <!-- Permissions for the current role -->
+                            <xxforms:variable name="permissions" select="$metadata/permissions/permission[if ($role = '') then position() = 1 else user-role/@any-of/tokenize($role, '\s') = $role]"/>
+                            <!-- Operations for the current role -->
+                            <xxforms:variable name="operations-raw" select="$permissions/@operations/tokenize(., '\s')"/>
+                            <!-- Replace read and update by read-update -->
+                            <xxforms:variable name="operations-read-update" select="distinct-values(for $o in $operations-raw return if ($o = ('read', 'update')) then 'read-update' else $o)"/>
+                            <!-- Insert new permission in UI, and populate it -->
+                            <xforms:insert if="$role != ''" context="$ui/permissions" nodeset="permission" origin="instance('permission-template')"/>
+                            <xxforms:variable name="new-permission" select="$ui/permissions/permission[last()]"/>
+                            <xforms:setvalue if="$role != ''"  ref="$new-permission/role" value="$role"/>
+                            <xforms:setvalue ref="$new-permission/operations" value="string-join($operations-read-update, ' ')"/>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- On save, copy permissions from UI representation to metadata -->
+                <xforms:action ev:event="DOMActivate" ev:observer="save-trigger">
+                    <!-- Reset permissions element -->
+                    <xforms:delete ref="$metadata/permissions"/>
+                    <xforms:action if="$ui/has-permissions = 'true'">
+                        <xforms:insert context="$metadata" nodeset="*" origin="xxforms:element('permissions')"/>
+                        <!-- In UI replace "read-update" by "read update" -->
+                        <xforms:setvalue xxforms:iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
+                        <!-- Add "anyone" permission -->
+                        <xxforms:variable name="anyone-operations" select="$ui/permissions/permission[1]/operations"/>
+                        <xforms:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxforms:element('permission', xxforms:attribute('operations', $anyone-operations))"/>
+                        <!-- For each permission, get the roles that can access it, and store in metadata as a separate permission element -->
+                        <xxforms:variable name="permissions" select="$ui/permissions/permission[position() > 1]"/>
+                        <xforms:action xxforms:iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
+                            <xxforms:variable name="operation" select="."/>
+                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
+                            <xforms:insert context="$metadata/permissions" nodeset="*" origin="xxforms:element('permission', (
+                                xxforms:attribute('operations', $operation),
+                                xxforms:element('user-role', xxforms:attribute('any-of', $roles))))"/>
+                        </xforms:action>
+                        <!-- Optional code to consolidate multiple permission for the same roles -->
+                        <xxforms:variable name="any-ofs" select="distinct-values($metadata/permissions/permission/user-role/@any-of)"/>
+                        <xxforms:variable name="operations" select="for $ao in $any-ofs return string-join($metadata/permissions/permission[user-role/@any-of = $ao]/@operations, ' ')"/>
+                        <xforms:delete ref="$metadata/permissions/permission[user-role]"/>
+                        <xforms:action xxforms:iterate="1 to count($any-ofs)">
+                            <xxforms:variable name="i" select="position()"/>
+                            <xforms:insert context="$metadata/permissions" nodeset="*" origin="xxforms:element('permission', (
+                                xxforms:attribute('operations', saxon:item-at($operations, $i)),
+                                xxforms:element('user-role', xxforms:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- Hide dialog -->
+                <xforms:action ev:event="DOMActivate" ev:observer="save-trigger cancel-trigger">
+                    <xxforms:hide dialog="dialog"/>
+                </xforms:action>
+
+                <xxforms:dialog id="dialog" class="fb-permissions-dialog">
+                    <xforms:label ref="$resources/dialog-permissions/dialog-title"/>
+                    <!-- Choose mode -->
+                    <xforms:select ref="$ui/has-permissions" appearance="full">
+                        <xforms:item>
+                            <xforms:label ref="$resources/dialog-permissions/role-based-permissions"/>
+                            <xforms:value>true</xforms:value>
+                        </xforms:item>
+                        <xforms:action ev:event="xforms-value-changed" if=". = 'true' and empty($ui/permissions/permission)">
+                            <xforms:insert context="$ui/permissions/permission" origin="instance('permission-template')"/>
+                        </xforms:action>
+                    </xforms:select>
+                    <xforms:group ref=".[$ui/has-permissions = 'true']">
+                        <!-- Edit roles -->
+                        <xhtml:table class="fb-permissions-repeat">
+                            <xhtml:tr>
+                                <xhtml:th><xforms:output value="$resources/dialog-permissions/role"/></xhtml:th>
+                                <xhtml:th><xforms:output value="$resources/dialog-permissions/operations"/></xhtml:th>
+                            </xhtml:tr>
+                            <xxforms:variable name="anyone-operations" select="tokenize($ui/permissions/permission[1]/operations, '\s')"/>
+                            <xforms:repeat ref="$ui/permissions/permission">
+                                <xxforms:variable name="is-first" select="position() = 1"/>
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <!-- Role name or "anyone" -->
+                                        <xforms:group ref=".[$is-first]">
+                                            <xforms:output value="$resources/dialog-permissions/anyone"/>
+                                        </xforms:group>
+                                        <xforms:group ref=".[not($is-first)]">
+                                            <xforms:input ref="role"/>
+                                        </xforms:group>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <!-- Checkboxes for operations -->
+                                        <xforms:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations" appearance="full">
+                                            <xforms:item>
+                                                <xforms:label ref="$resources/dialog-permissions/create"/>
+                                                <xforms:value>create</xforms:value>
+                                            </xforms:item>
+                                        </xforms:select>
+                                        <xforms:select ref="if (not($is-first) and $anyone-operations = 'read-update') then $ui/readonly-checked else operations" appearance="full">
+                                            <xforms:item>
+                                                <xforms:label ref="$resources/dialog-permissions/read-update"/>
+                                                <xforms:value>read-update</xforms:value>
+                                            </xforms:item>
+                                        </xforms:select>
+                                        <xforms:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations" appearance="full">
+                                            <xforms:item>
+                                                <xforms:label ref="$resources/dialog-permissions/delete"/>
+                                                <xforms:value>delete</xforms:value>
+                                            </xforms:item>
+                                        </xforms:select>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <!-- Remove -->
+                                        <xforms:trigger appearance="minimal" ref=".[not($is-first)]">
+                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/cross_bw.png" alt="Remove"/></xforms:label>
+                                            <xforms:delete ev:event="DOMActivate" ref="."/>
+                                        </xforms:trigger>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:table>
+                        <!-- Add -->
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add"/></xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="$ui/permissions/permission" origin="instance('permission-template')"/>
+                        </xforms:trigger>
+                    </xforms:group>
+
+                    <!-- Buttons -->
+                    <xhtml:div class="fr-dialog-buttons">
+                        <xforms:group appearance="xxforms:internal" id="triggers">
+                            <xhtml:span>
+                                <fr:button class="fr-inplace-rename" id="save-trigger">
+                                    <xforms:label ref="$resources/apply/label"/>
+                                </fr:button>
+                                <xforms:output value="$resources/or/label"/>
+                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xforms:label ref="$resources/cancel/label"/>
+                                </xforms:trigger>
+                            </xhtml:span>
+                        </xforms:group>
+                    </xhtml:div>
+                </xxforms:dialog>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

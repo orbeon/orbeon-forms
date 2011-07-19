@@ -413,7 +413,7 @@
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
                                 </fr:button>
                             </xforms:group>
-                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
                                 <!-- Custom XML -->
                                 <fb:custom-xml id="fb-custom-xml" form-ref="instance('fr-form-instance')" resources-ref="$form-resources"/>
                                 <fr:button>
@@ -422,6 +422,18 @@
                                         <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/permissions">
+                                <!-- Permissions -->
+                                <fb:permissions id="fb-permissions" resources-ref="$form-resources"
+                                    metadata-ref="instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata"/>
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/permissions/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-permissions"/>
                                 </fr:button>
                             </xforms:group>
                         </xhtml:div>

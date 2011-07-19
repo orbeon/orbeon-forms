@@ -114,8 +114,11 @@
             <label>Edit Source</label>
         </edit-source>
         <custom-xml>
-            <label>Custom XML</label>
+            <label>Customize XML</label>
         </custom-xml>
+        <permissions>
+            <label>Set permissions</label>
+        </permissions>
         <reload-components>
             <label>Reload Controls</label>
         </reload-components>
@@ -722,6 +725,17 @@
             <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
             <mode-custom>I will provide a custom XML document</mode-custom>
         </dialog-custom-xml>
+        <dialog-permissions>
+            <dialog-title>Permissions</dialog-title>
+            <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
+            <role>Role</role>
+            <permissions>Permissions</permissions>
+            <operations>Operations</operations>
+            <anyone>Anyone</anyone>
+            <create>Create</create>
+            <read-update>Read and update</read-update>
+            <delete>Delete</delete>
+        </dialog-permissions>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -845,6 +859,12 @@
         <edit-source>
             <label>Editer source</label>
         </edit-source>
+        <custom-xml>
+            <label>Spécifier le XML</label>
+        </custom-xml>
+        <permissions>
+            <label>Définir les permissions</label>
+        </permissions>
         <reload-components>
             <label>Recharger les contrôles</label>
         </reload-components>
@@ -1440,6 +1460,23 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-custom-xml>
+            <dialog-title>XML spécifique</dialog-title>
+            <mode-label>Les informations saisies par les utilisateurs dans le formulaire sont stockées dans un document XML:</mode-label>
+            <mode-automatic>Laissez Form Builder génèrer le code XML</mode-automatic>
+            <mode-custom>Je vais fournir un document XML spécifique</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <dialog-title>Permissions</dialog-title>
+            <role-based-permissions>Activer les permissions basées sur les rôles pour ce formulaire</role-based-permissions>
+            <role>Rôle</role>
+            <permissions>Permissions</permissions>
+            <operations>Opérations</operations>
+            <anyone>Toute personne</anyone>
+            <create>Créer</create>
+            <read-update>Lire et mettre à jour</read-update>
+            <delete>Supprimer</delete>
+        </dialog-permissions>
         <!-- Messages -->
         <messages>
             <delete-section>Etes-vous sûr de vouloir supprimer la section courante ?</delete-section>
@@ -1565,6 +1602,12 @@
         <edit-source>
             <label>Rediger kildekode</label>
         </edit-source>
+        <custom-xml>
+            <label>Customize XML</label>
+        </custom-xml>
+        <permissions>
+            <label>Set permissions</label>
+        </permissions>
         <reload-components>
             <label>Last skjemakomponenter på nytt</label>
         </reload-components>
@@ -2160,6 +2203,23 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-custom-xml>
+            <dialog-title>Custom XML</dialog-title>
+            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
+            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
+            <mode-custom>I will provide a custom XML document</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <dialog-title>Permissions</dialog-title>
+            <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
+            <role>Role</role>
+            <permissions>Permissions</permissions>
+            <operations>Operations</operations>
+            <anyone>Anyone</anyone>
+            <create>Create</create>
+            <read-update>Read and update</read-update>
+            <delete>Delete</delete>
+        </dialog-permissions>
         <!-- Messages -->
         <messages>
             <delete-section>Er du sikker på at du ønsker å slette denne seksjonen?</delete-section>
@@ -2284,6 +2344,12 @@
         <edit-source>
             <label>Редактировать код</label>
         </edit-source>
+        <custom-xml>
+            <label>Customize XML</label>
+        </custom-xml>
+        <permissions>
+            <label>Set permissions</label>
+        </permissions>
         <reload-components>
             <label>Перезагрузить элементы</label>
         </reload-components>
@@ -2879,6 +2945,23 @@
                 </div>
             </message>
         </dialog-pe>
+        <dialog-custom-xml>
+            <dialog-title>Custom XML</dialog-title>
+            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
+            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
+            <mode-custom>I will provide a custom XML document</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <dialog-title>Permissions</dialog-title>
+            <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
+            <role>Role</role>
+            <permissions>Permissions</permissions>
+            <operations>Operations</operations>
+            <anyone>Anyone</anyone>
+            <create>Create</create>
+            <read-update>Read and update</read-update>
+            <delete>Delete</delete>
+        </dialog-permissions>
         <!-- Messages -->
         <messages>
             <delete-section>Вы уверены, что хотите удалить текущий раздел?</delete-section>

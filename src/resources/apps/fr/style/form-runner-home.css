@@ -1,0 +1,19 @@
+/**
+ * Copyright (C) 2011 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+.fr-container tr.yui-dt-selected td { background-color: transparent; color: black; }        /* Override default datatable style not to highlight current row */
+.xbl-fr-datatable { margin: 2em .5em; }                                                     /* Margin around datatable */
+.fr-bottom { display: none; }                                                               /* Hide section that normally contains buttons */
+.fr-separator { display: none; }                                                            /* Hide blue lines after title and before buttons */
+.xbl-fr-datatable a { text-decoration: none }
+.xbl-fr-datatable a img { vertical-align: middle }

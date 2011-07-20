@@ -176,6 +176,9 @@
             </dialog-body>
             <link>Save</link>
         </import-export>
+        <home>
+            <title>Forms Home</title>
+        </home>
     </resource>
     <resource xml:lang="fr">
         <components>

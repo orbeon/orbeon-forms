@@ -1,0 +1,108 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:widget="http://orbeon.org/oxf/xml/widget">
+
+    <xhtml:head>
+        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
+        <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
+            <!-- NOTE: Necessary as referenced in view.xsl -->
+            <xforms:instance id="fr-form-instance">
+                <ui>
+                    <user-roles/>
+                </ui>
+            </xforms:instance>
+            <xforms:instance id="fr-forms"><forms/></xforms:instance>       <!-- Forms metadata returned by service -->
+
+            <xforms:submission id="get-forms" method="get" resource="/fr/service/persistence/form" replace="instance" instance="fr-forms"/>
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xforms:send submission="get-forms"/>
+                <!-- Compute user roles based on all roles listed in forms -->
+                <xxforms:variable name="user-roles" select="for $r
+                    in instance('fr-forms')/form/permissions/permission/user-role/@any-of/tokenize(., '\s')
+                    return if (xxforms:is-user-in-role($r)) then $r else ()"/>
+                <!-- Add attributes operations="..." with a space separated list of permissions the current user has on that form, * if any -->
+                <xforms:action xxforms:iterate="instance('fr-forms')/form">
+                    <xxforms:variable name="form" select="."/>
+                    <xxforms:variable name="has-permissions" select="exists($form/permissions)"/>
+                    <xforms:action if="$has-permissions">
+                        <!-- Get all the operations the user could have access to on this form -->
+                        <xxforms:variable name="all-operations" select="distinct-values($form/permissions/permission/@operations/tokenize(., '\s'))"/>
+                        <!-- Filter operations user has access to based on their roles -->
+                        <xxforms:variable name="user-operations" select="distinct-values(
+                                for $o in $all-operations, $p in $form/permissions/permission[tokenize(@operations, '\s') = $o] return
+                                if (empty($p/user-role) or tokenize($p/user-role/@any-of, '\s') = $user-roles) then $o else ())"/>
+                        <!-- Store operations in form -->
+                        <xforms:insert context="$form" origin="xxforms:attribute('operations', string-join($user-operations, ' '))"/>
+                    </xforms:action>
+                    <xforms:action if="not($has-permissions)">
+                        <!-- If there is permissions element, we can do any operation -->
+                        <xforms:insert context="$form" origin="xxforms:attribute('operations', '*')"/>
+                    </xforms:action>
+                </xforms:action>
+            </xforms:action>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view>
+            <xforms:label ref="$fr-resources/home/title"/>
+            <fr:body>
+                <fr:datatable width="100%">
+                    <xforms:repeat nodeset="instance('fr-forms')/form">
+                        <xhtml:tr>
+                            <xhtml:td fr:sortable="true" fr:sortType="text">
+                                <xforms:output value="application-name">
+                                    <xforms:label>Application</xforms:label>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td fr:sortable="true" fr:sortType="text">
+                                <xforms:output value="form-name">
+                                    <xforms:label>Form</xforms:label>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td fr:sortable="true" fr:sortType="text">
+                                <xforms:output value="title">
+                                    <xforms:label>Title</xforms:label>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xhtml:a href="/fr/{application-name}/{form-name}/summary">
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
+                                    View form data
+                                </xhtml:a>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xhtml:a href="/fr/{application-name}/{form-name}/new">
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
+                                    Fill new form
+                                </xhtml:a>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xforms:repeat>
+                </fr:datatable>
+            </fr:body>
+            <fr:bottom/>
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

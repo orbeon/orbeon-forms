@@ -14,18 +14,6 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Home redirects to Form Builder summary page -->
-    <page path-info="/fr/?" matcher="oxf:perl5-matcher">
-        <action>
-            <result page="summary" transform="oxf:xinclude">
-                <request xmlns="">
-                    <app>orbeon</app>
-                    <form>builder</form>
-                </request>
-            </result>
-        </action>
-    </page>
-
     <!-- ==== Entry point for persistence services ================================================================= -->
 
     <page path-info="/fr/service/persistence/.*" matcher="oxf:perl5-matcher" model="persistence/proxy.xpl"/>
@@ -185,6 +173,12 @@
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->
+
+    <!-- Home page -->
+    <page path-info="/fr/?" matcher="oxf:perl5-matcher" model="home/home.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+        <setvalue ref="/*/app">*</setvalue>
+        <setvalue ref="/*/form">*</setvalue>
+    </page>
 
     <!-- Summary -->
     <page id="summary"

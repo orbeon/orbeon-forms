@@ -25,9 +25,9 @@ class XXFormsListVariables extends XFormsFunction {
     override def iterate(xpathContext: XPathContext) = {
 
         val containingDocument = getContainingDocument(xpathContext)
-        val modelId = argument(0).evaluateAsString(xpathContext).toString
+        val modelEffectiveId = argument(0).evaluateAsString(xpathContext).toString
 
-        containingDocument.getObjectByEffectiveId(modelId) match {
+        containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
             case model: XFormsModel =>
                 val variables = model.getBindingContext(containingDocument).getInScopeVariables
 

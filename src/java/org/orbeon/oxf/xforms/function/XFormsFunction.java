@@ -13,13 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.dom4j.*;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.saxon.expr.*;
@@ -32,7 +35,9 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.QNameValue;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Base class for all XForms functions.
@@ -60,20 +65,20 @@ abstract public class XFormsFunction extends SystemFunction {
         return (Context) PooledXPathExpression.getFunctionContext(xpathContext);
     }
 
-    protected XFormsControls getControls(XPathContext xpathContext) {
+    public XFormsControls getControls(XPathContext xpathContext) {
         return getContext(xpathContext).getControls();
     }
 
-    protected XBLContainer getXBLContainer(XPathContext xpathContext) {
+    public XBLContainer getXBLContainer(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
         return functionContext.getXBLContainer();
     }
 
-    protected Element getSourceElement(XPathContext xpathContext) {
+    public Element getSourceElement(XPathContext xpathContext) {
         return getContext(xpathContext).getSourceElement();
     }
 
-    protected String getSourceEffectiveId(XPathContext xpathContext) {
+    public String getSourceEffectiveId(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
         final String sourceEffectiveId = functionContext.getSourceEffectiveId();
         if (sourceEffectiveId == null)
@@ -81,12 +86,12 @@ abstract public class XFormsFunction extends SystemFunction {
         return sourceEffectiveId;
     }
 
-    protected XFormsModel getModel(XPathContext xpathContext) {
+    public XFormsModel getModel(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
         return functionContext.getModel();
     }
 
-    protected XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
+    public XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
         final Context context = getContext(xpathContext);
         return (context != null) ? context.getXBLContainer().getContainingDocument() : null;
     }
@@ -211,7 +216,7 @@ abstract public class XFormsFunction extends SystemFunction {
             return new QName(qNameString.substring(colonIndex + 1), new Namespace(prefix, qNameURI));
         }
     }
-    
+
     // The following is inspired by saxon:evaluate()
     protected PooledXPathExpression prepareExpression(XPathContext initialXPathContext, Expression parameterExpression, boolean isAVT) throws XPathException {
 

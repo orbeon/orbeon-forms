@@ -421,8 +421,12 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:effective-id
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}effective-id", XXFormsId.class, 0, 0, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}effective-id", XXFormsEffectiveId.class, 0, 0, 1, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+
+        // xxforms:control-element
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}control-element", XXFormsControlElement.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE, null);
 
         // === Functions in the xforms namespace
 

@@ -18,7 +18,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 
-class XXFormsId extends XFormsFunction {
+class XXFormsEffectiveId extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext) = argument match {
         case Array() =>
             // If no argument is supplied, return the closest id (source id)

@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -210,8 +211,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         // Create a new top-level action interpreter to handle this event
-            new XFormsActionInterpreter(contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
-                .runAction(event, eventObserver, eventHandlerElement);
+        final XFormsActionInterpreter actionInterpreter = new XFormsActionInterpreter(contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler);
+        XFormsAPI.scalaActionJava(actionInterpreter, event, eventObserver, eventHandlerElement);
+
         // NOTE: We would like here ideally to catch exceptions occurring within actions, and to dispatch an event that
         // can be recovered for example by the XForms inspector. However, this needs to be done properly: logging vs.
         // fatal, sending an error to the client, etc. Also, some code cannot recover at this time, e.g. a variable

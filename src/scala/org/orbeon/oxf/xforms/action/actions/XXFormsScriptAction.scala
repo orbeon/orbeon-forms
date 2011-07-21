@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventObserver
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms._
-import action.{XFormsAPI, XFormsAction, XFormsActionInterpreter}
+import action.{XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.common.OXFException
 import xbl.XBLBindingsBase
 
@@ -31,26 +31,24 @@ class XXFormsScriptAction extends XFormsAction {
                 eventObserver: XFormsEventObserver, actionElement: Element,
                 actionScope: XBLBindingsBase.Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
 
-        val containingDocument = actionInterpreter.getContainingDocument
-
         val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
         mediatype match {
             case "javascript" | "text/javascript" | "application/javascript" | null =>
                 // Get prefixed id of the xxforms:script element based on its location
                 val actionPrefixedId = actionInterpreter.getXBLContainer.getFullPrefix + actionElement.attributeValue(XFormsConstants.ID_QNAME)
+                val containingDocument = actionInterpreter.getContainingDocument
 
+                // Run Script on server or client
                 actionElement.attributeValue("runat") match {
-                    case "server" => // run on server
+                    case "server" =>
                         containingDocument.getScriptInterpreter.runScript(actionPrefixedId)
-                    case _ => // run on client
+                    case _ =>
                         containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver)
                 }
             case "xpath" | "text/xpath" | "application/xpath" => // "unofficial" type
-                // Run in the scope of the interpreter
-                XFormsAPI.scalaAction(actionInterpreter) {
-                    val bindingContext = actionInterpreter.getContextStack.getCurrentBindingContext
-                    actionInterpreter.evaluateExpression(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
-                }
+                // Evaluate XPath expression for its side effects only
+                val bindingContext = actionInterpreter.getContextStack.getCurrentBindingContext
+                actionInterpreter.evaluateExpression(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
             case other =>
                 throw new OXFException("Unsupported script type: " + other)
         }

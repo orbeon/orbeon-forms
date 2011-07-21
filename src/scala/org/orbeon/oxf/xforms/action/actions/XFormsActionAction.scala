@@ -19,12 +19,11 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventObserver
 import org.orbeon.saxon.om.Item
 import java.util.ArrayList
-import java.util.List
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action._
-import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 
 /**
  * 10.1.1 The action Element
@@ -41,7 +40,7 @@ class XFormsActionAction extends XFormsAction {
 
             // Iterate over child actions
             var variablesCount = 0
-            val currentVariableElements: List[Element] = new ArrayList[Element]
+            val currentVariableElements = new ArrayList[Element]
             for (currentActionElement <- Dom4jUtils.elements(actionElement)) {
                 if (VariableAnalysis.isVariableElement(currentActionElement)) {
                     // Remember variable element

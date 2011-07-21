@@ -20,14 +20,21 @@ import org.orbeon.saxon.om._
 import java.util.{List => JList}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
-import org.dom4j.QName
 import java.lang.IllegalStateException
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEvent}
+import org.dom4j.{Element, QName}
 
 object XFormsAPI {
 
     // Dynamically set action context
     val actionContext = new DynamicVariable[Option[XFormsActionInterpreter]](None)
+
+    // Helper for Java side of things
+    def scalaActionJava(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent, eventObserver: XFormsEventObserver, eventHandlerElement: Element) =
+        scalaAction(actionInterpreter) {
+            actionInterpreter.runAction(event, eventObserver, eventHandlerElement)
+        }
 
     // Every block of action must be run within this
     def scalaAction(actionInterpreter: XFormsActionInterpreter)(body: => Any) {

@@ -55,6 +55,7 @@ import java.util.*;
 public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObserver, ExternalCopyable {
 
     // List of standard extension attributes
+    // TODO: standard and non-standard extension attributes should be partly handled in the ControlAnalysis hierarchy
     private static final QName[] STANDARD_EXTENSION_ATTRIBUTES = {
             XFormsConstants.STYLE_QNAME,
             XFormsConstants.CLASS_QNAME

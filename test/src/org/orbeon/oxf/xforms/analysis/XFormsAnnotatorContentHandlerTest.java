@@ -35,7 +35,7 @@ import java.util.List;
 
 import static junit.framework.Assert.*;
 
-public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTestBase {
+public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
 
     public static final HashMap<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
     static {

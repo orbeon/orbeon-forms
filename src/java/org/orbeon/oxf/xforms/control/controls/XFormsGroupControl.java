@@ -14,7 +14,9 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.analysis.controls.ContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -27,10 +29,31 @@ import java.util.Map;
  */
 public class XFormsGroupControl extends XFormsValueContainerControl {
 
+    private ContainerControl containerControl;
+
+    // List of attributes to handle as AVTs
+    private static final QName[] TD_EXTENSION_ATTRIBUTES = {
+        QName.get("rowspan"),
+        QName.get("colspan")
+    };
+
+    @Override
+    protected QName[] getExtensionAttributes() {
+        // Extension attributes depend on the name of the element
+        final QName elementQName = containerControl.elementQName();
+        if (elementQName != null && "td".equals(elementQName.getName()))
+            return TD_EXTENSION_ATTRIBUTES;
+        else
+            return null;
+    }
+
     public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
 
     public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
+
+        // TODO: every control should point to its static analysis
+        this.containerControl = (ContainerControl) container.getPartAnalysis().getControlAnalysis(getPrefixedId());
     }
 
     @Override

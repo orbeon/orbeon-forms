@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.QName;
+import org.orbeon.oxf.xforms.analysis.controls.ContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -27,16 +28,39 @@ import org.xml.sax.SAXException;
  */
 public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
 
+    private String elementName;
+    private String elementQName;
+
+    @Override
+    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        super.init(uri, localname, qName, attributes);
+
+        // Use explicit container element name if present, otherwise use default
+        final QName explicitQName = ((ContainerControl) containingDocument.getStaticOps().getControlAnalysis(getPrefixedId())).elementQName();
+        if (explicitQName != null) {
+            elementName = explicitQName.getName();
+            elementQName = explicitQName.getQualifiedName();
+        } else {
+            elementName = super.getContainingElementName();
+            elementQName = super.getContainingElementQName();// NOTE: this calls back getContainingElementName()
+        }
+    }
+
+    @Override
+    protected String getContainingElementName() {
+        return elementName;
+    }
+
+    @Override
+    protected String getContainingElementQName() {
+        return elementQName;
+    }
+
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
-            // Start xhtml:span
-            final String groupElementName = getContainingElementName();
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
-
+            // Open containing element
             final ElementHandlerController controller = handlerContext.getController();
-
-            controller.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
+            controller.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(),
                     getContainerAttributes(uri, localname, attributes, effectiveId, control, false));
         }
     }
@@ -44,14 +68,9 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     @Override
     public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
-            // Close xhtml:span
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String groupElementName = getContainingElementName();
-            final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
-
+            // Close containing element
             final ElementHandlerController controller = handlerContext.getController();
-
-            controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
+            controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
         }
     }
 

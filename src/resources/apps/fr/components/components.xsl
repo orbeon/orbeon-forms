@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2011 Orbeon, Inc.
 
@@ -31,10 +30,9 @@
     <!-- Import components -->
     <xsl:import href="view.xsl"/>
     <xsl:import href="buttons.xsl"/>
-    <xsl:import href="grid.xsl"/>
-    <xsl:import href="repeat.xsl"/>
     <xsl:import href="inplace.xsl"/>
     <xsl:import href="section.xsl"/>
+    <xsl:import href="repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
     <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>

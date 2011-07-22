@@ -21,7 +21,8 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:widget="http://orbeon.org/oxf/xml/widget">
+      xmlns:widget="http://orbeon.org/oxf/xml/widget"
+      xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <xhtml:head>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
@@ -37,31 +38,10 @@
             <xforms:submission id="get-forms" method="get" resource="/fr/service/persistence/form" replace="instance" instance="fr-forms"/>
             <xforms:action ev:event="xforms-model-construct-done">
                 <xforms:send submission="get-forms"/>
-                <!-- Compute user roles based on all roles listed in forms -->
-                <xxforms:variable name="user-roles" select="for $r
-                    in instance('fr-forms')/form/permissions/permission/user-role/@any-of/tokenize(., '\s')
-                    return if (xxforms:is-user-in-role($r)) then $r else ()"/>
-                <!-- Add attributes operations="..." with a space separated list of permissions the current user has on that form, * if any -->
                 <xforms:action xxforms:iterate="instance('fr-forms')/form">
-                    <xxforms:variable name="form" select="."/>
-                    <xxforms:variable name="has-permissions" select="exists($form/permissions)"/>
-                    <xforms:action if="$has-permissions">
-                        <!-- Get all the operations the user could have access to on this form -->
-                        <xxforms:variable name="all-operations" select="distinct-values($form/permissions/permission/@operations/tokenize(., '\s'))"/>
-                        <!-- Filter operations user has access to based on their roles -->
-                        <xxforms:variable name="user-operations" select="distinct-values(
-                                for $o in $all-operations, $p in $form/permissions/permission[tokenize(@operations, '\s') = $o] return
-                                if (empty($p/user-role) or tokenize($p/user-role/@any-of, '\s') = $user-roles) then $o else ())"/>
-                        <!-- Store operations in form -->
-                        <xforms:insert context="$form" origin="xxforms:attribute('operations', string-join($user-operations, ' '))"/>
-                    </xforms:action>
-                    <xforms:action if="not($has-permissions)">
-                        <!-- If there is permissions element, we can do any operation -->
-                        <xforms:insert context="$form" origin="xxforms:attribute('operations', '*')"/>
-                    </xforms:action>
+                    <xforms:insert context="." origin="xxforms:attribute('operations', string-join(form-runner:authorizedOperationsOnForm(.), ' '))"/>
                 </xforms:action>
             </xforms:action>
-
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -69,7 +49,7 @@
             <xforms:label ref="$fr-resources/home/title"/>
             <fr:body>
                 <fr:datatable width="100%">
-                    <xforms:repeat nodeset="instance('fr-forms')/form">
+                    <xforms:repeat nodeset="instance('fr-forms')/form[@operations != '']">
                         <xhtml:tr>
                             <xhtml:td fr:sortable="true" fr:sortType="text">
                                 <xforms:output value="application-name">
@@ -87,16 +67,20 @@
                                 </xforms:output>
                             </xhtml:td>
                             <xhtml:td>
-                                <xhtml:a href="/fr/{application-name}/{form-name}/summary">
-                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
-                                    View form data
-                                </xhtml:a>
+                                <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
+                                    <xhtml:a href="/fr/{application-name}/{form-name}/summary">
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
+                                        View form data
+                                    </xhtml:a>
+                                </xforms:group>
                             </xhtml:td>
                             <xhtml:td>
-                                <xhtml:a href="/fr/{application-name}/{form-name}/new">
-                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
-                                    Fill new form
-                                </xhtml:a>
+                                <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
+                                    <xhtml:a href="/fr/{application-name}/{form-name}/new">
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
+                                        Fill new form
+                                    </xhtml:a>
+                                </xforms:group>
                             </xhtml:td>
                         </xhtml:tr>
                     </xforms:repeat>

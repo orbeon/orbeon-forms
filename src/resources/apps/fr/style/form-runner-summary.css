@@ -27,8 +27,9 @@
 }
 
 .fr-summary-table-div tbody tr:hover td { background-color: #426FD9 }               /* Cursor over row: background is darker blue color from YUI */
-.fr-summary-table-div tbody tr:hover td a { color: #FFFFFF }                        /* Cursor over row: text color is white */
+.fr-summary-table-div tbody tr:hover td span { color: #FFFFFF }                     /* Cursor over row: text color is white */
 .fr-summary-table-div tbody a { text-decoration: none; color: black; outline: 0 }   /* Links in table must appear as normal text */
+.fr-summary-table-div tbody span { color: black;  }                                 /* When there is no link (delete-only), override YUI CSS that shows current row text in white */
 .fr-summary-table-div tr.yui-dt-selected td { background-color: transparent }       /* Override YUI class that highlights selected row */
 .fr-summary-table-div td { white-space: nowrap }                                    /* Mainly to prevent dates to wrap */
 .fr-summary-table-div td a {                                                        /* Link to take as much space as possible in the cell */

@@ -88,12 +88,19 @@
             <xforms:action if="$is-new-document">
                 <!-- Create random document id -->
                 <xforms:setvalue ref="$document" value="digest(string(random(true())), 'MD5', 'hex')"/>
+
+                <xxforms:var name="switch"
+                             value="if (xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))) then 'try-service'
+                                    else if (xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))) then 'try-post'
+                                    else 'other'"/>
+
                 <!-- Do we call a service to initialize the instance? -->
-                <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))">
+                <xforms:action if="$switch = 'try-service'">
+                    <xforms:message level="xxforms:log-debug">Loading document from service</xforms:message>
                     <xforms:send submission="fr-get-instance-from-service"/>
                 </xforms:action>
                 <!-- Do we accept data posted to this page? -->
-                <xforms:action if="xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))">
+                <xforms:action if="$switch = 'try-post'">
                     <xxforms:variable name="mediatype" select="xxforms:get-request-header('Content-Type')" as="xs:string?"/>
                     <xxforms:variable name="is-xml-mediatype" select="starts-with($mediatype, 'application/xml') or starts-with($mediatype, 'text/xml')" as="xs:boolean"/>
                     <!-- Do we have data posted to this form as XML? -->
@@ -114,8 +121,10 @@
                 </xforms:action>
             </xforms:action>
         </xforms:action>
-        <!-- Now that we loaded the document, update the providers, as the document impact the provide used for publishing -->
-        <xforms:dispatch name="fr-update-persistence-provider" target="fr-persistence-model"/>
+
+        <!-- Notify that the data is ready -->
+        <xforms:dispatch targetid="fr-form-model" name="fr-data-ready"/>
+
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">
@@ -143,6 +152,9 @@
         <xforms:insert if="not($instance-element/@src)" nodeset="xxforms:instance('fr-form-instance')" origin="$instance-element/*"/>
         <!-- Case of @src template -->
         <xforms:insert if="$instance-element/@src" nodeset="xxforms:instance('fr-form-instance')" origin="doc($instance-element/@src)"/>
+
+        <!-- Notify that the data is reset -->
+        <xforms:dispatch targetid="fr-form-model" name="fr-data-reset"/>
 
         <!-- Perform refresh (above sets RRR flags already) so that after that we can clear error summary -->
         <xforms:refresh/>
@@ -288,16 +300,15 @@
                         -->
 
                         <xxforms:variable name="expression" as="xs:string"
-                                          select="string-join($bind/ancestor-or-self::xforms:bind/@nodeset, '/')"/>
+                                          select="string-join($bind/ancestor-or-self::xforms:bind/((@ref, @nodeset)[1]), '/')"/>
 
                         <xxforms:variable name="holders" model="fr-form-model" select="instance('fr-form-instance')/saxon:evaluate($expression)"/>
-
                         <!--<xxforms:variable name="binds" select="($bind/ancestor-or-self::xforms:bind)[position() gt 1]" as="element(xforms:bind)+"/>-->
                         <!--<xforms:message level="xxforms:log-debug">-->
                             <!--xxx Expression: <xforms:output value="$expression"/> xxx-->
-                            <!--xxx Straight: <xforms:output value="string-join($binds/@nodeset, '/')"/> xxx-->
-                            <!--xxx Combined straight: <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
-                            <!--xxx Combined reversed: <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/@nodeset), '/')"/> xxx-->
+                            <!--xxx Straight: <xforms:output value="string-join($binds/(@ref, @nodeset), '/')"/> xxx-->
+                            <!--xxx Combined straight: <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)), '/')"/> xxx-->
+                            <!--xxx Combined reversed: <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)), '/')"/> xxx-->
                             <!--xxx Count holders: <xforms:output value="count($holders)"/> xxx-->
                             <!--xxx Holders content: <xforms:output value="string-join($holders, ' - ')"/> xxx-->
                         <!--</xforms:message>-->
@@ -343,6 +354,9 @@
                 </xforms:action>
 
                 <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                    <!-- Notify that the data is about to be saved -->
+                    <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
+
                     <!-- Handle XML document -->
                     <xforms:send submission="fr-create-update-submission" >
                         <xxforms:context name="holder" select="xxforms:instance('fr-form-instance')"/>

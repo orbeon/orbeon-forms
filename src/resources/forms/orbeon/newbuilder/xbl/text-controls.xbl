@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<!--
+    This is the standard Form Builder standard controls library.
+ -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+        <display-name lang="en">Text Controls</display-name>
+        <display-name lang="fr">Contrôles texte</display-name>
+        <display-name lang="ru">Элементы ввода текста</display-name>
+        <!--<icon lang="en">-->
+            <!--<small-icon>/forms/orbeon/newbuilder/images/input.png</small-icon>-->
+            <!--<large-icon>/forms/orbeon/newbuilder/images/input.png</large-icon>-->
+        <!--</icon>-->
+    </metadata>
+
+    <xbl:binding id="fb-input" element="xforms|input">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Single-Line Text</display-name>
+            <display-name lang="fr">Ligne de texte</display-name>
+            <display-name lang="ru">Однострочное поле</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/newbuilder/images/input.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/input.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:input id="" ref="" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:input>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-secret" element="xforms|secret">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Password Field</display-name>
+            <display-name lang="fr">Champ mot de passe</display-name>
+            <display-name lang="ru">Пароль</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/newbuilder/images/input.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/input.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:secret id="" ref="" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:secret>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-textarea" element="xforms|textarea">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Multi-Line Text</display-name>
+            <display-name lang="fr">Zone de texte</display-name>
+            <display-name lang="ru">Многострочное поле</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/newbuilder/images/textarea.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/textarea.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:textarea id="" ref="" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:textarea>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <!--
+    <xbl:binding id="fb-textarea" element="xforms|textarea">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Autosize Text</display-name>
+            BETTER LABEL
+            <display-name lang="fr">Texte "autosize"</display-name>
+            <icon lang="en">
+                ICONS
+                <small-icon>/forms/orbeon/newbuilder/images/textarea.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/textarea.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:textarea id="" ref="" appearance="xxforms:autosize" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:textarea>
+            </template>
+        </metadata>
+    </xbl:binding>
+    -->
+
+    <xbl:binding id="fb-htmlarea" element="xforms|textarea">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">HTML Text</display-name>
+            <display-name lang="fr">Zone texte HTML</display-name>
+            <display-name lang="ru">Текст в формате HTML</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/newbuilder/images/html.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/html.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:textarea id="" ref="" mediatype="text/html" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:textarea>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-output" element="xforms|output">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Text Output</display-name>
+            <display-name lang="fr">Sortie texte</display-name>
+            <display-name lang="ru">Неизменяемый текст</display-name>
+            <icon lang="en">
+                <small-icon>/apps/fr/style/images/silk/text_align_left.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/text_align_left.png</large-icon>
+            </icon>
+            <datatype>xs:string</datatype>
+            <template>
+                <xforms:output id="" ref="" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:output>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+</xbl:xbl>

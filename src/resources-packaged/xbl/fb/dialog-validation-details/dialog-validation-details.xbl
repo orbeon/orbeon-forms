@@ -1,0 +1,304 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
+         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+
+    <xbl:binding id="fb-dialog-validation-details" element="fb|dialog-validation-details">
+        <xbl:handlers>
+            <!-- Handler to open dialog -->
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xforms:setvalue xxforms:iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <xforms:setvalue ref="@relevant" value="'true'"/>
+                <xforms:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>
+                <xforms:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
+                <xxforms:show dialog="dialog"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xforms:model id="model">
+
+                <xforms:instance id="local">
+                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+
+                        <control-name/>
+
+                        <builtin-type/>
+                        <required/>     <!-- TODO: currently a plain boolean; allow for XPath expression as well? -->
+
+                        <constraint/>
+                        <relevant/>
+                        <readonly/>
+
+                        <initial-value/>
+                        <calculate/>
+                        <schema-type/>
+                        <alert/>
+
+                        <save-trigger/>
+                    </local>
+                </xforms:instance>
+
+                <!-- Enable/disable trigger -->
+                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="save-trigger">disabled</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-valid" ev:observer="local" ref="save-trigger">enabled</xforms:setvalue>
+                
+                <xforms:bind nodeset="required" readonly="../schema-type != ''"/>
+                <xforms:bind nodeset="relevant | readonly | constraint | initial-value | calculate" type="xxforms:xpath2" required="false()"/>
+                <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
+
+                <!-- Bindings specified on control -->
+                <xxforms:variable name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:variable>
+                <xxforms:variable name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
+                <xxforms:variable name="components"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xxforms:variable>
+                
+                <xxforms:variable name="local" value="instance('local')"/>
+                <xxforms:variable name="form-resources" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
+
+                <xxforms:variable name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
+                <xxforms:variable name="current-resources" value="$form-resources/resource[@xml:lang = $current-language]"/>
+
+                <!-- When the dialog opens, get type information from the form -->
+                <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
+                    <!-- Read alert -->
+                    <xforms:setvalue ref="$local/alert" value="controlOps:getControlAlertOrEmpty(fbf:controlId($local/control-name))"/>
+
+                    <!-- Read bind information -->
+
+                    <!-- Set type information if there is a type specified -->
+                    <xxforms:variable name="type-bind" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'type')"/>
+
+                    <xforms:setvalue if="empty($type-bind)" ref="$local/builtin-type">string</xforms:setvalue>
+                    <xforms:setvalue ref="$local/schema-type"/>
+                    <xforms:setvalue ref="$local/required">false</xforms:setvalue>
+
+                    <!-- TODO: more in Scala here -->
+                    <xforms:action if="exists($type-bind)">
+                        <!-- TODO: must not use hardcoded prefixes for xs: and xforms: -->
+                        <xxforms:variable name="is-builtin-type" value="starts-with($type-bind, 'xs:') or starts-with($type-bind, 'xforms:')"/>
+                        <xforms:setvalue if="$is-builtin-type" ref="$local/builtin-type" value="substring-after($type-bind, ':')"/>
+                        <!-- TODO: Handle namespace and prefix for namespace -->
+                        <xforms:setvalue if="not($is-builtin-type)"
+                                         ref="$local/schema-type" value="$type-bind"/>
+                        <xforms:setvalue ref="$local/required" value="starts-with($type-bind, 'xs:')"/>
+                    </xforms:action>
+
+                    <!-- Read all other built-in MIPs -->
+                    <xforms:setvalue ref="$local/constraint" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'constraint')"/>
+                    <xforms:setvalue ref="$local/relevant"   value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'relevant')"/>
+                    <xforms:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'readonly')"/>
+                    <xforms:setvalue ref="$local/calculate"  value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'calculate')"/>
+                    <xforms:setvalue ref="$local/initial-value"    value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'initial-value')"/>
+
+                </xforms:action>
+
+                <!-- Save data upon close unless the sub-form is not valid -->
+                <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
+                     an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
+                <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/save-trigger = 'enabled'" ev:observer="dialog">
+                    <xxforms:variable name="current-control" value="if ($local/control-name != '') then controlOps:findControlElementOrEmpty($form, $local/control-name) else ()"/>
+
+                    <!-- Copy back the alert -->
+                    <xforms:action type="xpath">
+                        controlOps:setControlAlert(fbf:controlId($local/control-name), $local/alert)
+                    </xforms:action>
+
+                    <!-- Switch between default alert message and user-specified alert message as needed -->
+                    <xforms:setvalue if="normalize-space($local/alert) != ''" ref="$current-control/xforms:alert/@ref" value="concat('$form-resources/', $local/control-name, '/alert')"/>
+                    <xforms:setvalue if="normalize-space($local/alert) = ''" ref="$current-control/xforms:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
+
+                    <!-- Insert bind if needed -->
+                    <xforms:action type="xpath">
+                        (: Set built-in type if needed :)
+                        if ($local/builtin-type != '') then
+                            controlOps:updateMip($form, fbf:controlId($local/control-name), 'type',
+                                concat(if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number'))) then 'xs:' else 'xforms:', $local/builtin-type)) else (),
+                        (: Set schema type if needed :)
+                        (: TODO: Handle namespace and prefix for namespace :)
+                        if ($local/schema-type != '') then
+                            controlOps:updateMip($form, fbf:controlId($local/control-name), 'type', $local/schema-type) else (),
+                        (: "required" MIP :)
+                        controlOps:updateMip($form, fbf:controlId($local/control-name), 'required', for $v in $local/required/string return if ($v = 'true') then 'true()' else ''),
+                        (: All other MIPs :)
+                        for $mip in ('constraint', 'relevant', 'readonly', 'calculate', 'initial-value') return
+                            controlOps:updateMip($form, fbf:controlId($local/control-name), $mip, $local/*[name() = $mip])
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- Make ourselves non-relevant when the dialog closes -->
+                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>
+
+                <xxforms:dialog id="dialog" level="modal">
+                    <xforms:label ref="$resources/dialog-validation-details/dialog-title"/>
+
+                    <xhtml:div>
+                        <xhtml:div class="fr-grid">
+                            <xhtml:div class="fr-grid-content">
+
+                                <xxforms:variable name="model" value="$form/xhtml:head/xforms:model[@id = 'fr-form-model'] treat as element()"/>
+
+                                <xxforms:variable name="schema" value="$model/xs:schema[1]" as="element(xs:schema)?"/>
+                                <xxforms:variable name="schema-namespace" value="$schema/@targetNamespace" as="xs:string?"/>
+                                <xxforms:variable name="schema-prefixes" value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
+                                <xxforms:variable name="schema-namespaces" value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
+                                <xxforms:variable name="schema-prefix" value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
+
+                                <xforms:group appearance="xxforms:fieldset">
+                                    <xforms:label ref="$resources/dialog-validation-details/types/label"/>
+
+                                    <!-- Built-in type -->
+                                    <xforms:select1 ref="$local/builtin-type">
+                                        <xforms:label ref="$resources/dialog-validation-details/builtin-type/label"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/builtin-type/hint"/>
+                                        <xforms:itemset nodeset="$resources/dialog-validation-details/builtin-type/choices//(choices | type)" xxforms:refresh-items="false">
+                                            <xforms:label value="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
+                                            <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
+                                        </xforms:itemset>
+                                        <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                    </xforms:select1>
+
+                                    <!-- Schema type selection if applicable -->
+                                    <xforms:select1 ref="schema-type[exists($schema)]">
+                                        <xforms:label>
+                                            <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/schema-type/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xforms:hint ref="$resources/dialog-validation-details/types/hint"/>
+                                        <xforms:item>
+                                            <xforms:label ref="$resources/select/label"/>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
+                                        <xforms:itemset nodeset="$schema/xs:simpleType" xxforms:refresh-items="true">
+                                            <xforms:label value="string-join(($schema-prefix, @name), ':')"/>
+                                            <xforms:value value="string-join(($schema-prefix, @name), ':')"/>
+                                        </xforms:itemset>
+                                        <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                    </xforms:select1>
+
+                                    <xforms:select1 ref="required" appearance="full">
+                                        <xforms:label ref="$resources/dialog-validation-details/required/label"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/required/hint"/>
+                                        <xforms:itemset nodeset="$resources/dialog-validation-details/required//item" xxforms:refresh-items="false">
+                                            <xforms:label ref="label"/>
+                                            <xforms:value ref="value"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xforms:group>
+
+                                <!-- TODO: expression for @constraint + figure out how to deal w/ max length etc. -->
+
+                                <!-- TODO: expression for @required -->
+
+                                <xforms:group appearance="xxforms:fieldset">
+                                    <xforms:label>Expressions</xforms:label>
+                                    <xforms:input ref="constraint" incremental="true">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="" title=""/>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/constraint/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xforms:alert ref="$resources/dialog-validation-details/constraint/alert"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/constraint/hint"/>
+                                    </xforms:input>
+
+                                    <xforms:input ref="relevant" incremental="true">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/visibility/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xforms:alert ref="$resources/dialog-validation-details/visibility/alert"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/visibility/hint"/>
+                                    </xforms:input>
+
+                                    <xforms:input ref="readonly" incremental="true">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/readonly/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xforms:alert ref="$resources/dialog-validation-details/readonly/alert"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/readonly/hint"/>
+                                    </xforms:input>
+
+                                    <xforms:input ref="initial-value" incremental="true">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/flag_yellow.png" alt="" title=""/>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/initial-value/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xforms:alert ref="$resources/dialog-validation-details/initial-value/alert"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/initial-value/hint"/>
+                                    </xforms:input>
+
+                                    <xforms:input ref="calculate" incremental="true">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/calculate/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xforms:alert ref="$resources/dialog-validation-details/calculate/alert"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/calculate/hint"/>
+                                    </xforms:input>
+                                </xforms:group>
+
+                                <!-- Alert message -->
+                                <xforms:textarea ref="alert" incremental="true">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/exclamation.png" alt="" title=""/>
+                                        <xhtml:span><xforms:output value="$resources/dialog-validation-details/alert/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:hint ref="$resources/dialog-validation-details/alert/hint"/>
+                                </xforms:textarea>
+                            </xhtml:div>
+                        </xhtml:div>
+
+                        <xhtml:div class="fr-dialog-buttons">
+                            <fr:button ref="save-trigger" class="fr-inplace-rename">
+                                <xforms:label ref="$resources/apply/label"/>
+                                <!-- Close and save upon DOMActivate -->
+                                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
+                                    <xxforms:context name="fb:save" value="true()"/>
+                                </xforms:dispatch>
+                            </fr:button>
+                            <xforms:output value="$resources/or/label"/>
+                            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                                <xforms:label ref="$resources/cancel/label"/>
+                                <!-- Close and cancel upon DOMActivate -->
+                                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
+                                    <xxforms:context name="fb:save" value="false()"/>
+                                </xforms:dispatch>
+                            </xforms:trigger>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xxforms:dialog>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

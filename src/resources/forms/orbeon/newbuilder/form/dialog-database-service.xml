@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-database-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-database-service-model">
+
+    <xforms:label ref="$form-resources/dialog-database-services/dialog-title"/>
+
+    <xhtml:div class="fr-grid">
+        <xhtml:div class="fr-grid-content">
+            <xforms:input ref="name" id="fb-database-service-name-input" incremental="true">
+                <xforms:label ref="$form-resources/dialog-database-services/service-name/label"/>
+                <xforms:hint ref="$form-resources/dialog-database-services/service-name/hint"/>
+            </xforms:input>
+
+            <xforms:input ref="datasource" incremental="true">
+                <xforms:label ref="$form-resources/dialog-database-services/datasource/label"/>
+                <xforms:hint ref="$form-resources/dialog-database-services/datasource/hint"/>
+            </xforms:input>
+
+            <xforms:textarea ref="query" incremental="true">
+                <xforms:label ref="$form-resources/dialog-database-services/query/label"/>
+                <xforms:hint ref="$form-resources/dialog-database-services/query/hint"/>
+            </xforms:textarea>
+        </xhtml:div>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:group>
+            <!-- Test button -->
+            <!-- TODO: testing is disabled for now, implement in the future -->
+            <fr:button ref="save-test-trigger[false()]">
+                <xforms:label>
+                    <xhtml:img src="/forms/orbeon/newbuilder/images/play.png" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-database-services/test/label"/></xhtml:span>
+                </xforms:label>
+
+                <!-- Test submission -->
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Clear response -->
+                    <xforms:setvalue xxforms:iterate="response/*[not(*)]" ref="."/>
+                    <xforms:delete nodeset="response/headers/header"/>
+
+                    <!-- Toggle back response submission -->
+                    <xforms:toggle case="fb-service-dialog-none"/>
+
+                    <!-- Send submission -->
+                    <xforms:send submission="fb-test-submission-submission"/>
+                </xforms:action>
+
+                <!-- Common response actions -->
+                <xforms:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-submission-submission">
+                    <xforms:toggle case="fb-service-dialog-response"/>
+                    <xforms:action context="response">
+                        <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
+                        <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
+                        <xforms:delete nodeset="headers/header"/>
+                        <xforms:insert context="headers" origin="event('response-headers')"/>
+                        <!-- Handle response body -->
+                        <xxforms:variable name="error-body" select="event('response-body')"/>
+                        <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
+                            then $error-body else saxon:serialize($error-body, xxforms:instance('fr-xsl-output-instance'))"/>
+                    </xforms:action>
+                </xforms:action>
+                <!-- Error actions -->
+                <xforms:action ev:event="xforms-submit-error" ev:observer="fb-test-submission-submission">
+                    <xforms:action context="response">
+                        <xforms:setvalue ref="error-type" value="event('error-type')"/>
+                    </xforms:action>
+                </xforms:action>
+            </fr:button>
+            <!-- Save button -->
+            <fr:button ref="save-test-trigger">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/dialog-database-services/save/label"/></xhtml:span>
+                </xforms:label>
+                <!-- Save changes to form -->
+                <xforms:action ev:event="DOMActivate" xmlns:sql="http://orbeon.org/oxf/xml/sql">
+                    <xxforms:variable name="instance" select="instance('fb-database-service-instance')"/>
+                    <!-- Actual id of the submission and instance -->
+                    <xxforms:variable name="submission-id" select="$instance/submission-id"/>
+                    <xxforms:variable name="instance-id" select="$instance/instance-id"/>
+
+                    <!-- Insert new submission if needed -->
+                    <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
+                        <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-database-submission-template')"/>
+                        <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
+                    </xforms:action>
+                    <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
+
+                    <!-- Insert new instance just before submission if needed -->
+                    <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
+                        <xforms:insert nodeset="$submission" position="before" origin="instance('fb-database-instance-template')"/>
+                        <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
+                    </xforms:action>
+
+                    <!-- Set instance content -->
+                    <xforms:action context="$model/xforms:instance[@id = $instance-id]/*">
+                        <!-- Get query template -->
+                        <xxforms:variable name="sql-query" select="xxforms:extract-document(instance('fb-database-query-template'), '#all')/*" as="element()"/>
+                        <!-- Set datasource -->
+                        <xforms:setvalue ref="$sql-query/sql:datasource" value="$instance/datasource"/>
+                        <!-- Set query -->
+                        <xforms:delete nodeset="$sql-query/sql:query"/>
+                        <xforms:insert context="$sql-query" nodeset="*" origin="saxon:parse($instance/query-xml)/*"/>
+                        <!-- Set request instance -->
+                        <xforms:setvalue ref="." value="saxon:serialize($sql-query, xxforms:instance('fr-xsl-output-instance'))"/>
+                    </xforms:action>
+
+                    <!-- Hide dialog -->
+                    <xxforms:hide dialog="fb-database-service-dialog"/>
+                </xforms:action>
+            </fr:button>
+            <fr:button>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                </xforms:label>
+                <!-- Hide dialog -->
+                <xxforms:hide ev:event="DOMActivate" dialog="fb-database-service-dialog"/>
+            </fr:button>
+        </xforms:group>
+    </xhtml:div>
+
+    <!-- Initialize dialog -->
+    <xforms:action ev:event="xxforms-dialog-open" xmlns:sql="http://orbeon.org/oxf/xml/sql">
+        <xxforms:variable name="instance" select="instance('fb-database-service-instance')"/>
+        <xxforms:variable name="submission-name" select="event('submission-name')"/>
+
+        <!-- Clear instance entirely -->
+        <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+        <xforms:setvalue ref="$instance/datasource" value="instance('fb-database-query-template')/sql:datasource"/>
+        <xforms:setvalue ref="$instance/query" value="instance('fb-database-query-template')/sql:query"/>
+
+        <!-- Copy parameters if any -->
+        <xforms:action if="$submission-name">
+            <xforms:setvalue ref="$instance/name" value="$submission-name"/>
+            <xforms:setvalue ref="$instance/initial-name" value="$submission-name"/>
+            <xxforms:variable name="submission" select="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
+            <!-- Get query -->
+            <xxforms:variable name="query-instance" select="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+            <xforms:action if="normalize-space($query-instance/*) != ''">
+                <!-- Assume there is a serialized query -->
+                <xxforms:variable name="sql-query" select="saxon:parse($query-instance/*)/*" as="element()"/>
+                <!-- Restore datasource -->
+                <xforms:setvalue ref="$instance/datasource" value="$sql-query/sql:datasource"/>
+                <!-- Serialize sql:query and remove containing element -->
+                <xforms:setvalue ref="$instance/query" value="substring-before(substring-after(saxon:serialize($sql-query/sql:query, xxforms:instance('fr-xsl-output-instance')), '>'), '&lt;/sql:query>')"/>
+            </xforms:action>
+        </xforms:action>
+    </xforms:action>
+
+    <!-- Model for the submission editor -->
+    <xforms:model id="fb-database-service-model">
+
+        <xxforms:variable name="model" select="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+
+        <xforms:instance id="fb-database-service-instance">
+            <submission>
+                <name/>
+                <initial-name/>
+                <submission-id/>
+                <instance-id/>
+                <datasource/>
+                <query/>
+                <query-xml/>
+                <response/>
+                <save-test-trigger/>
+            </submission>
+        </xforms:instance>
+
+        <!-- Enable/disable trigger -->
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-database-service-instance" ref="save-test-trigger">disabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-database-service-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+
+        <xforms:bind nodeset="instance('fb-database-service-instance')">
+            <!-- Make sure that the name is not already in use  -->
+            <xforms:bind nodeset="name" type="xs:NCName"
+                         constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
+                                        or not(../submission-id = $model/xforms:submission/@id
+                                            or ../instance-id = $model/xforms:instance/@id)"/>
+            <xforms:bind nodeset="submission-id" calculate="concat(../name, '-submission')"/>
+            <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>
+            <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
+            <xforms:bind nodeset="datasource" type="xs:string" required="true()"/>
+            <!-- Check that the resulting XML document is well-formed -->
+            <xforms:bind nodeset="query-xml" type="xxforms:xml"
+                         calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
+            <xforms:bind nodeset="query" constraint="xxforms:valid(../query-xml)"/>
+
+            <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
+        </xforms:bind>
+
+        <!-- Template for the submission -->
+        <xforms:instance id="fb-database-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+            <xforms:submission id="" class="fr-database-service" ref="instance('fr-service-request-instance')"
+                   resource="/fr/service/custom/orbeon/database" method="post"
+                   serialization="application/xml" replace="instance" instance="fr-service-response-instance"/>
+        </xforms:instance>
+
+        <!-- Template for inserting an instance -->
+        <xforms:instance id="fb-database-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+            <xforms:instance id="" class="fr-database-service" xxforms:exclude-result-prefixes="#all">
+                <body/>
+            </xforms:instance>
+        </xforms:instance>
+
+        <!-- Template for the instance containing the SQL query -->
+        <xforms:instance id="fb-database-query-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+            <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
+                <sql:datasource/>
+                <sql:query xmlns:xs="http://www.w3.org/2001/XMLSchema">SELECT * FROM customers
+WHERE first_name = &lt;sql:param type="xs:string" select=""/></sql:query>
+            </sql:config>
+        </xforms:instance>
+
+        <!-- Submission to test a service -->
+        <xforms:submission id="fb-test-database-service-submission"
+                ref="saxon:parse(instance('fb-database-service-instance')/sql)/*"
+                method="post"
+                resource="/fr/service/custom/orbeon/database"
+                replace="text" target="instance('fb-database-service-instance')/response"/>
+
+    </xforms:model>
+
+</xxforms:dialog>

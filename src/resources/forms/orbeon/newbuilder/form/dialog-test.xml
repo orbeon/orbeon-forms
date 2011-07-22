@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2010 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fr-dialog fb-test-dialog"
+      style="width: 400px; height: 600px">
+
+    <xforms:label ref="$form-resources/dialog-test/dialog-title"/>
+
+    <xhtml:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"></xhtml:iframe>
+    <fr:button class="">
+        <xforms:label>
+            <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+            <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
+        </xforms:label>
+        <xxforms:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
+    </fr:button>
+
+</xxforms:dialog>

@@ -1,0 +1,61 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions">
+
+    <xbl:binding id="fb-form-editor-binding" element="fb|form-editor">
+
+        <xbl:template>
+            <!-- NOTE: Create an outer id, so that events can be dispatched to us directly. This means at this time only
+                 one component can be created in a scope. -->
+            <xf:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxf:internal" id="actions">
+
+                <!-- Don't let any event go out from within this group -->
+                <xf:action ev:event="#all" ev:propagate="stop"/>
+
+                <xxf:var name="binding" value="."/>
+
+                <!-- Dialogs -->
+                <fb:dialog-control-details-new id="dialog-control-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                <fb:dialog-validation-details  id="dialog-validation-details" form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                <fb:dialog-section-details     id="dialog-section-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                <fb:dialog-help                id="dialog-help"               form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+
+                <fr:alert-dialog id="dialog-confirmation">
+                    <fr:label ref="$form-resources/dialog-confirmation/dialog-title"/>
+                    <fr:negative-choice/>
+                    <fr:positive-choice/>
+                </fr:alert-dialog>
+
+                <!-- Dialog to edit itemsets -->
+                <!--<xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>-->
+
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

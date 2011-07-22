@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<!--
+    This is the standard Form Builder standard controls library.
+ -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+        <display-name lang="en">Other Controls</display-name>
+        <display-name lang="fr">Autres contrôles</display-name>
+        <display-name lang="ru">Другие элементы</display-name>
+        <!--<icon lang="en">-->
+            <!--<small-icon>/forms/orbeon/newbuilder/images/input.png</small-icon>-->
+            <!--<large-icon>/forms/orbeon/newbuilder/images/input.png</large-icon>-->
+        <!--</icon>-->
+    </metadata>
+
+    <xbl:binding id="fb-trigger" element="xforms|trigger">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Browser Button</display-name>
+            <display-name lang="fr">Bouton navigateur</display-name>
+            <display-name lang="ru">Кнопка браузера</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/newbuilder/images/button.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/button.png</large-icon>
+            </icon>
+            <template>
+                <xforms:trigger id="" xmlns="">
+                    <xforms:label ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-trigger-minimal" element="xforms|trigger[appearance='minimal']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Link Button</display-name>
+            <display-name lang="fr">Bouton lien</display-name>
+            <display-name lang="ru">Кнопка-ссылка</display-name>
+            <icon lang="en">
+                <small-icon>/apps/fr/style/images/silk/link.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/link.png</large-icon>
+            </icon>
+            <template>
+                <xforms:trigger id="" xmlns="" appearance="minimal">
+                    <xforms:label ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </xforms:trigger>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <xbl:binding id="fb-button" element="fr|button">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Standardized Button</display-name>
+            <display-name lang="fr">Bouton standardisé</display-name>
+            <display-name lang="ru">Стандартная кнопка</display-name>
+            <icon lang="en">
+                <small-icon>/forms/orbeon/newbuilder/images/button.png</small-icon>
+                <large-icon>/forms/orbeon/newbuilder/images/button.png</large-icon>
+            </icon>
+            <template xmlns="">
+                <fr:button id="">
+                    <xforms:label ref=""/>
+                    <xforms:help ref=""/>
+                    <xforms:hint ref=""/>
+                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                </fr:button>
+            </template>
+        </metadata>
+    </xbl:binding>
+
+    <!--<xbl:binding id="fb-slider" element="xforms|range">-->
+        <!--<metadata xmlns="http://orbeon.org/oxf/xml/form-builder">-->
+            <!--<display-name lang="en">Slider</display-name>-->
+            <!--<display-name lang="fr">Curseur</display-name>-->
+            <!--<icon lang="en">-->
+                <!--<small-icon>/forms/orbeon/newbuilder/images/timeline_marker.png</small-icon>-->
+                <!--<large-icon>/forms/orbeon/newbuilder/images/timeline_marker.png</large-icon>-->
+            <!--</icon>-->
+            <!--<template xmlns="">-->
+                <!--<xforms:range id="" ref="" xmlns="">-->
+                    <!--<xforms:label ref=""/>-->
+                    <!--<xforms:hint ref=""/>-->
+                    <!--<xforms:help ref=""/>-->
+                    <!--<xforms:alert ref="$fr-resources/detail/labels/alert"/>-->
+                <!--</xforms:range>-->
+            <!--</template>-->
+        <!--</metadata>-->
+    <!--</xbl:binding>-->
+
+</xbl:xbl>

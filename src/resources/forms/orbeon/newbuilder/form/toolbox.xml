@@ -1,0 +1,493 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+
+      id="fb-toolbox">
+
+    <xxforms:variable name="lang" value="xxforms:instance('fr-language-instance')"/>
+
+    <xhtml:div class="fb-toolbox-inside">
+
+        <xhtml:dl id="fb-toolbox-dl" class="accordion-menu">
+            <!-- Controls -->
+            <xhtml:dt id="fb-toolbox-controls-dt" class="a-m-t a-m-d-expand fb-toolbox-section-title">
+                <xforms:output value="$form-resources/controls/label"/>
+            </xhtml:dt>
+            <xhtml:dd class="a-m-d a-m-d-expand fb-toolbox-controls-section">
+                <xhtml:div class="bd">
+                    <!-- XVC toolbox -->
+                    <xhtml:div class="fb-tools fb-xvc">
+                        <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger" id="cut-trigger">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/images/silk/cut.png" alt="{$form-resources/cut/label}" title="{$form-resources/cut/label}"/>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                toolboxOps:cutToClipboard($current-td)
+                            </xforms:action>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="minimal" ref="$xcv/copy-trigger" id="copy-trigger">
+                            <xforms:label>
+                                <xhtml:img src="/forms/orbeon/newbuilder/images/copy.gif" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                toolboxOps:copyToClipboard($current-td)
+                            </xforms:action>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="minimal" ref="$xcv/paste-trigger" id="paste-trigger">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/images/silk/paste_plain.png" alt="{$form-resources/paste/label}" title="{$form-resources/paste/label}"/>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                toolboxOps:pasteFromClipboard($current-td)
+                            </xforms:action>
+                        </xforms:trigger>
+                        <!-- Reload components -->
+                        <xforms:trigger appearance="minimal" class="fb-reload-components-trigger">
+                            <xforms:label>
+                                <xhtml:img src="/apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
+                            </xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>
+                                <xforms:send submission="fb-load-components"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:div>
+                    <!-- Sections, grids, etc. toolbox -->
+                    <xhtml:div class="fb-tools">
+                        <!-- Add new section -->
+                        <xhtml:div class="fb-tool">
+                            <fr:button id="insert-new-section-trigger">
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
+                                    <xhtml:span><xforms:output value="$form-resources/new-section/label"/></xhtml:span>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                    toolboxOps:insertNewSection($model)
+                                </xforms:action>
+                            </fr:button>
+                        </xhtml:div>
+                        <!-- Add grids -->
+                        <xforms:group ref="instance('fb-variables')/grids-triggers" appearance="xxforms:internal">
+                            <xhtml:div class="fb-tool">
+                                <fr:button appearance="full" id="insert-new-grid-trigger">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                                        <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                        toolboxOps:insertNewGrid($model)
+                                    </xforms:action>
+                                </fr:button>
+                            </xhtml:div>
+                            <xhtml:div class="fb-tool">
+                                <fr:button appearance="full" id="insert-new-repeat-trigger">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                                        <!-- TODO: i18n <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>-->
+                                        <xhtml:span>New Repeat</xhtml:span>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                        toolboxOps:insertNewRepeat($model)
+                                    </xforms:action>
+                                </fr:button>
+                            </xhtml:div>
+                        </xforms:group>
+                    </xhtml:div>
+                    <!-- Controls and components -->
+                    <xforms:repeat nodeset="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
+                        <xhtml:div class="fb-tools">
+                            <xforms:group>
+                                <!-- Display localized name -->
+                                <xforms:label ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/>
+
+                                <xforms:repeat nodeset="xbl:binding" id="fb-components-template-repeat">
+
+                                    <xxforms:variable name="binding" value="." as="element(xbl:binding)"/>
+
+                                    <!-- Whether the component is a section component or not -->
+                                    <xxforms:variable name="is-section-component" value="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
+
+                                    <xhtml:div class="fb-tool">
+                                        <fr:button id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">
+                                            <xforms:label>
+                                                <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
+                                                <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
+                                            </xforms:label>
+                                            <!-- TODO: move to Scala -->
+                                            <!--<xforms:action ev:event="DOMActivate" if="$is-section-component">-->
+                                                <!--&lt;!&ndash; Insert a new section component &ndash;&gt;-->
+
+                                                <!--<xxforms:variable name="current-section" value="$body/*[index('fb-top-level-repeat')]" as="element()"/>-->
+
+                                                <!--&lt;!&ndash; Is the current section empty (i.e. no children non-XForms elements, or an empty grid)? &ndash;&gt;-->
+                                                <!--<xxforms:variable name="is-current-section-empty" as="xs:boolean"-->
+                                                                  <!--value="not(exists($current-section/*[namespace-uri() != 'http://www.w3.org/2002/xforms']))-->
+                                                                          <!--or exists($current-section/(fr:grid | fb:grid)) and not(exists($current-section/(fr:grid | fb:grid)//*:td/*))"/>-->
+
+                                                <!--&lt;!&ndash;<xforms:message>&ndash;&gt;-->
+                                                    <!--&lt;!&ndash;xxx <xforms:output value="$is-current-section-empty"/> xxx&ndash;&gt;-->
+                                                <!--&lt;!&ndash;</xforms:message>&ndash;&gt;-->
+
+                                                <!--<xforms:action if="not($is-current-section-empty)">-->
+                                                    <!--&lt;!&ndash; Insert new section &ndash;&gt;-->
+                                                    <!--<xforms:dispatch name="DOMActivate" target="insert-new-section-trigger"/>-->
+                                                <!--</xforms:action>-->
+
+                                                <!--&lt;!&ndash; Point to insert section &ndash;&gt;-->
+                                                <!--<xxforms:variable name="insert-section" value="$body/*[index('fb-top-level-repeat')]" as="element()"/>-->
+
+                                                <!--&lt;!&ndash; Remove existing fr:* if any &ndash;&gt;-->
+                                                <!--<xforms:delete nodeset="$insert-section/fr:*"/>-->
+
+                                                <!--&lt;!&ndash; Insert reference to component &ndash;&gt;-->
+                                                <!--<xforms:insert context="$insert-section" nodeset="*" origin="$binding/fb:metadata/fb:template/*[1]"/>-->
+
+                                            <!--</xforms:action>-->
+                                            <xforms:action type="xpath" ev:event="DOMActivate" if="not($is-section-component)" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                                toolboxOps:insertNewControl($model, $binding)
+                                            </xforms:action>
+-                                        </fr:button>
+                                    </xhtml:div>
+                                </xforms:repeat>
+                            </xforms:group>
+                        </xhtml:div>
+                    </xforms:repeat>
+
+                    <!--<xforms:trigger appearance="minimal">-->
+                        <!--<xforms:label>test</xforms:label>-->
+                        <!--<xxforms:invalidate-instances ev:event="DOMActivate"/>-->
+                    <!--</xforms:trigger>-->
+
+                </xhtml:div>
+            </xhtml:dd>
+            <xhtml:dt id="fb-toolbox-metadata-dt" class="a-m-t"><xforms:output value="$form-resources/metadata/label"/></xhtml:dt>
+            <xhtml:dd class="a-m-d">
+                <xhtml:div class="bd">
+                    <!-- Metadata toolbox -->
+                    <xhtml:div class="fb-tools fb-hide-alert">
+                        <xhtml:div class="fr-grid">
+                            <xhtml:div class="fr-grid-content">
+                                <xhtml:div>
+                                    <!-- Application name -->
+                                    <xforms:output id="application-name-control" bind="application-name-bind"
+                                                   class="fr-summary fr-search fr-static" incremental="true">
+                                        <xforms:label ref="$form-resources/application-name/label"/>
+                                        <xforms:alert ref="$form-resources/application-name/alert"/>
+                                    </xforms:output>
+                                </xhtml:div>
+                                <xhtml:div>
+                                    <xforms:output id="form-name-control" bind="form-name-bind"
+                                                   class="fr-summary fr-search fr-static" incremental="true">
+                                        <xforms:label ref="$form-resources/form-name/label"/>
+                                        <xforms:alert ref="$form-resources/form-name/alert"/>
+                                    </xforms:output>
+                                </xhtml:div>
+                                <xhtml:div>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label ref="$form-resources/edit-metadata/label"/>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <!-- Copy data to editor instance -->
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/application-name"
+                                                             value="xxforms:bind('application-name-bind')"/>
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/form-name"
+                                                             value="xxforms:bind('form-name-bind')"/>
+                                            <!-- Show and focus -->
+                                            <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'edit'"/>
+                                            <xxforms:show dialog="fb-editor-metadata-dialog"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                            </xhtml:div>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xhtml:div>
+            </xhtml:dd>
+            <xhtml:dt class="a-m-t"><xforms:output value="$form-resources/advanced/label"/></xhtml:dt>
+            <xhtml:dd class="a-m-d">
+                <xhtml:div class="bd">
+                    <!-- Actions toolbox -->
+                    <xhtml:div class="fb-tools">
+                        <xhtml:div class="fb-tool">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/schema">
+                                <!-- Upload XML Schema -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/forms/orbeon/newbuilder/images/schema.gif" alt=""/>
+                                        <xhtml:span>
+                                            <xforms:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
+                                        </xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/css">
+                                <!-- Upload CSS -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/css.png" alt=""/>
+                                        <xhtml:span>
+                                            <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
+                                        </xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/pdf">
+                                <!-- Upload PDF Template -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
+                                        <xhtml:span>
+                                            <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
+                                        </xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                                <!-- Edit Source -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/edit-source/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
+                                <!-- Custom XML -->
+                                <fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/permissions">
+                                <!-- Permissions -->
+                                <fb:permissions id="fb-permissions" resources-ref="$form-resources"
+                                    metadata-ref="instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata"/>
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/permissions/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-permissions"/>
+                                </fr:button>
+                            </xforms:group>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xhtml:div>
+            </xhtml:dd>
+            <!-- To facilitate marking buttons read-only -->
+            <xxforms:variable name="trigger" value="instance('fb-metadata-instance')/toolbox/services-actions" as="element()"/>
+            <xforms:group>
+                <xhtml:dt class="a-m-t"><xforms:output value="$form-resources/services-actions/label"/></xhtml:dt>
+                <xhtml:dd class="a-m-d">
+                    <xhtml:div class="bd">
+
+                        <!-- Services -->
+                        <xhtml:div class="fb-tools">
+                            <xforms:group class="fb-hide-alert">
+                                <xforms:label ref="$form-resources/http-services/label"/>
+                                <!-- Repeat over existing services -->
+                                <xhtml:ul>
+                                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
+                                        <xxforms:variable name="current-submission" value="."/>
+                                        <xhtml:li>
+                                            <xxforms:variable name="submission-name" value="substring-before(@id, '-submission')"/>
+                                            <xforms:trigger ref="$trigger" appearance="minimal">
+                                                <xforms:label>
+                                                    <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
+                                                </xforms:label>
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-service-dialog">
+                                                    <xxforms:context name="submission-name" value="$submission-name"/>
+                                                </xxforms:show>
+                                            </xforms:trigger>
+                                            <xforms:trigger ref="$trigger" appearance="minimal" id="fb-submission-remove">
+                                                <xforms:label>
+                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
+                                                </xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Ask confirmation -->
+                                                    <xxforms:show dialog="fb-confirmation-dialog">
+                                                        <xxforms:context name="fr:message"
+                                                                         value="concat($form-resources/messages/delete-service, ' ''',
+                                                                                     $submission-name,
+                                                                                     '''?')"/>
+                                                        <xxforms:context name="fr:confirmation-target" value="'fb-submission-remove'"/>
+                                                    </xxforms:show>
+                                                </xforms:action>
+                                                <xforms:action ev:event="fb-confirmation-yes">
+                                                    <!-- Delete stuff -->
+                                                    <xforms:delete nodeset="$current-submission"/>
+                                                    <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <xforms:output value="$submission-name"/>
+                                        </xhtml:li>
+                                    </xforms:repeat>
+                                </xhtml:ul>
+                                <xforms:group>
+                                    <xforms:trigger ref="$trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
+                                            <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-service-dialog"/>
+                                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                                    </xforms:trigger>
+                                </xforms:group>
+                            </xforms:group>
+                        </xhtml:div>
+
+                        <!-- Database services -->
+                        <xhtml:div class="fb-tools">
+                            <xforms:group class="fb-hide-alert">
+                                <xforms:label ref="$form-resources/database-services/label"/>
+                                <!-- Repeat over existing services -->
+                                <xhtml:ul>
+                                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
+                                        <xxforms:variable name="current-submission" value="."/>
+                                        <xhtml:li>
+                                            <xxforms:variable name="submission-name" value="substring-before(@id, '-submission')"/>
+                                            <xforms:trigger ref="$trigger" appearance="minimal">
+                                                <xforms:label>
+                                                    <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
+                                                </xforms:label>
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-database-service-dialog">
+                                                    <xxforms:context name="submission-name" value="$submission-name"/>
+                                                </xxforms:show>
+                                            </xforms:trigger>
+                                            <xforms:trigger ref="$trigger" appearance="minimal" id="fb-database-service-remove">
+                                                <xforms:label>
+                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
+                                                </xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Ask confirmation -->
+                                                    <xxforms:show dialog="fb-confirmation-dialog">
+                                                        <xxforms:context name="fr:message"
+                                                                         value="concat($form-resources/messages/delete-service, ' ''',
+                                                                                     $submission-name,
+                                                                                     '''?')"/>
+                                                        <xxforms:context name="fr:confirmation-target" value="'fb-database-service-remove'"/>
+                                                    </xxforms:show>
+                                                </xforms:action>
+                                                <xforms:action ev:event="fb-confirmation-yes">
+                                                    <!-- Delete stuff -->
+                                                    <xforms:delete nodeset="$current-submission"/>
+                                                    <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <xforms:output value="$submission-name"/>
+                                        </xhtml:li>
+                                    </xforms:repeat>
+                                </xhtml:ul>
+                                <xforms:group>
+                                    <xforms:trigger ref="$trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
+                                            <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-database-service-dialog"/>
+                                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                                    </xforms:trigger>
+                                </xforms:group>
+                            </xforms:group>
+                        </xhtml:div>
+
+                        <!-- Actions -->
+                        <xhtml:div class="fb-tools">
+                            <xforms:group class="fb-hide-alert">
+                                <xforms:label ref="$form-resources/actions/label"/>
+                                <!-- Repeat over existing bindings -->
+                                <xhtml:ul>
+                                    <xforms:repeat nodeset="$model/xforms:action[ends-with(@id, '-binding')]">
+                                        <xxforms:variable name="current-action" value="."/>
+                                        <xhtml:li>
+                                            <xxforms:variable name="binding-name" value="substring-before(@id, '-binding')"/>
+                                            <xforms:trigger ref="$trigger" appearance="minimal">
+                                                <xforms:label>
+                                                    <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
+                                                </xforms:label>
+                                                <xxforms:show ev:event="DOMActivate" dialog="fb-action-dialog">
+                                                    <xxforms:context name="binding-name" value="$binding-name"/>
+                                                </xxforms:show>
+                                            </xforms:trigger>
+                                            <xforms:trigger ref="$trigger" appearance="minimal" id="fb-binding-remove">
+                                                <xforms:label>
+                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
+                                                </xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <!-- Ask confirmation -->
+                                                    <xxforms:show dialog="fb-confirmation-dialog">
+                                                        <xxforms:context name="fr:message"
+                                                                         value="concat($form-resources/messages/delete-action, ' ''',
+                                                                                     $binding-name,
+                                                                                     '''?')"/>
+                                                        <xxforms:context name="fr:confirmation-target" value="'fb-binding-remove'"/>
+                                                    </xxforms:show>
+                                                </xforms:action>
+                                                <xforms:action ev:event="fb-confirmation-yes">
+                                                    <!-- Delete stuff -->
+                                                    <xforms:delete nodeset="$current-action"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                            <xforms:output value="$binding-name"/>
+                                        </xhtml:li>
+                                    </xforms:repeat>
+                                </xhtml:ul>
+                                <xforms:group>
+                                    <xforms:trigger ref="$trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
+                                            <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
+                                        </xforms:label>
+                                        <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog"/>
+                                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                                    </xforms:trigger>
+                                </xforms:group>
+                            </xforms:group>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xhtml:dd>
+            </xforms:group>
+        </xhtml:dl>
+        <!-- Orbeon Forms version -->
+        <fr:version/>
+    </xhtml:div>
+
+    <!-- Dialog to tell the user that the feature is PE-only -->
+    <fr:alert-dialog id="fb-pe-dialog">
+        <fr:label ref="$form-resources/dialog-pe/dialog-title"/>
+        <fr:message>
+            <xforms:output value="xxforms:serialize($form-resources/dialog-pe/message/*[1], 'html')" mediatype="text/html"/>
+        </fr:message>
+        <fr:neutral-choice/>
+    </fr:alert-dialog>
+
+</xhtml:div>

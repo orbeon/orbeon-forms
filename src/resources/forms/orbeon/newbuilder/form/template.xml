@@ -1,0 +1,122 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:exforms="http://www.exforms.org/exf/1-0"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            xmlns:saxon="http://saxon.sf.net/"
+            xmlns:sql="http://orbeon.org/oxf/xml/sql"
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xhtml:head>
+        <xhtml:title>[Give this form a title]</xhtml:title>
+        <xforms:model id="fr-form-model">
+
+            <!-- Main instance -->
+            <xforms:instance id="fr-form-instance">
+                <form>
+                    <section-1>
+                        <control-1>Value of control-1</control-1>
+                    </section-1>
+                </form>
+            </xforms:instance>
+
+            <!-- Bindings -->
+            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
+                <xforms:bind id="section-1-bind" name="section-1" nodeset="section-1">
+                    <xforms:bind id="control-1-bind" name="control-1" nodeset="control-1"/>
+                </xforms:bind>
+            </xforms:bind>
+
+            <!-- Metadata -->
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata>
+                    <application-name/>
+                    <form-name/>
+                    <title xml:lang=""/>
+                    <description xml:lang=""/>
+                    <author/>
+                    <logo mediatype="" filename="" size=""/>
+                </metadata>
+            </xforms:instance>
+
+            <!-- Attachments -->
+            <xforms:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xforms:instance>
+
+            <!-- All form resources -->
+            <!-- Don't make readonly by default in case a service modifies the resources -->
+            <xforms:instance id="fr-form-resources" xxforms:readonly="false">
+                <resources>
+                    <resource xml:lang="">
+                        <section-1>
+                            <label/>
+                            <help/>
+                        </section-1>
+                        <control-1>
+                            <label>Control 1 label</label>
+                            <hint>Control 1 hint</hint>
+                            <help>Control 1 help</help>
+                            <alert/>
+                        </control-1>
+                    </resource>
+                </resources>
+            </xforms:instance>
+
+            <!-- Utility instances for services -->
+            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+                <request/>
+            </xforms:instance>
+
+            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+                <response/>
+            </xforms:instance>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view>
+            <xforms:label ref="instance('fr-form-metadata')/title"/>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xforms:label ref="$form-resources/section-1/label"/>
+                    <xforms:help ref="$form-resources/section-1/help"/>
+                    <fr:grid>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="control-1-control" bind="control-1-bind">
+                                    <xforms:label ref="$form-resources/control-1/label"/>
+                                    <xforms:hint ref="$form-resources/control-1/hint"/>
+                                    <xforms:help ref="$form-resources/control-1/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td/>
+                        </xhtml:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

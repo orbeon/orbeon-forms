@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-add-language-dialog" appearance="minimal" level="modeless">
+
+    <xforms:label ref="$form-resources/dialog-add-language/dialog-title"/>
+
+    <xhtml:div>
+        <xforms:group>
+            <xforms:group class="fb-hide-alert">
+                <xhtml:div class="fr-grid">
+                    <xhtml:div class="fr-grid-content">
+                        <xforms:select1 ref="$variables/new-language" id="fb-add-language-select1">
+                            <xforms:label ref="$form-resources/dialog-add-language/new-language/label"/>
+                            <xforms:item>
+                                <xforms:label ref="$form-resources/select/label"/>
+                                <xforms:value/>
+                            </xforms:item>
+                            <!-- All the languages except the languages already selected -->
+                            <xforms:itemset model="fr-resources-model"
+                                            nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
+                                <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                <xforms:value ref="@code"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:div>
+                </xhtml:div>
+            </xforms:group>
+            <xhtml:span>
+                <fr:button class="fr-inplace-rename" ref="$variables/new-language-trigger">
+                    <xforms:label ref="$form-resources/add/label"/>
+                    <xforms:action ev:event="DOMActivate">
+                        <!-- Copy first resources into new resources and set new language -->
+                        <xforms:action context="$resources">
+                            <xforms:insert context="." nodeset="resource" origin="resource[1]"/>
+                            <xforms:setvalue ref="resource[last()]/@xml:lang" value="$variables/new-language"/>
+                        </xforms:action>
+                        <!-- Copy form metadata and set new language -->
+                        <xforms:action context="$metadata-instance">
+                            <xforms:insert context="." nodeset="title | description" origin="title[1] | description[1]"/>
+                            <xforms:setvalue ref="title[last()]/@xml:lang" value="$variables/new-language"/>
+                            <xforms:setvalue ref="description[last()]/@xml:lang" value="$variables/new-language"/>
+                        </xforms:action>
+                        <!-- Change current language -->
+                        <xforms:setvalue ref="$fb-lang" value="$variables/new-language"/>
+
+                        <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
+                        <xforms:rebuild model="fr-form-model"/>
+                        <xforms:recalculate model="fr-form-model"/>
+                        <xforms:revalidate model="fr-form-model"/> 
+                    </xforms:action>
+                </fr:button>
+                <xforms:output value="$form-resources/or/label"/>
+                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                    <xforms:label ref="$form-resources/cancel/label"/>
+                </xforms:trigger>
+            </xhtml:span>
+        </xforms:group>
+    </xhtml:div>
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
+    <!-- Clear selection list when the dialog opens -->
+    <xforms:action ev:event="xxforms-dialog-open">
+        <xforms:setvalue ref="$variables/new-language"/>
+    </xforms:action>
+</xxforms:dialog>

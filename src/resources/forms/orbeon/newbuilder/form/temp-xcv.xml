@@ -1,0 +1,87 @@
+<xforms:model xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:saxon="http://saxon.sf.net/"
+      xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
+
+      xxforms:external-events="show-fb-test-dialog"
+      xxforms:noscript-support="false"
+      xxforms:xhtml-layout="span"
+      xxforms:xpath-analysis="false"
+
+      id="fr-form-model">
+
+    <!-- Paste control if there is one in the clipboard -->
+    <xforms:action ev:event="fb-paste-control" if="$xcv/control/*">
+
+        <!-- Try to find empty td -->
+        <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
+
+        <!-- Get new td -->
+        <xxforms:variable name="new-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]"/>
+        <xforms:action context="$new-td" if="not(exists(*))">
+            <!-- We now have an empty cell for pasting -->
+
+            <xxforms:variable name="xcv-control-id" select="$xcv/control/*/@id"/>
+
+            <!-- Check if clipboard control id is in use -->
+            <xforms:action if="$body//*[@id = $xcv-control-id]">
+                <!-- If so, get new id and replace references -->
+                <xforms:dispatch name="fb-next-id" target="fb-form-editor$actions">
+                    <xxforms:context name="token">control</xxforms:context>
+                </xforms:dispatch>
+                <xxforms:variable name="new-control-name" select="concat('control-', $next-id)"/>
+
+                <!-- Adjust bindings on xcv control -->
+                <xforms:dispatch name="fb-rename-control" target="fr-form-model">
+                    <xxforms:context name="control" select="$xcv/control/*"/>
+                    <xxforms:context name="new-name" select="$new-control-name"/>
+                </xforms:dispatch>
+
+                <!-- Rename holders -->
+                <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
+                    <xxforms:context name="holders" select="($xcv/holder/*, $xcv/resources/*)"/>
+                    <xxforms:context name="new-name" select="$new-control-name"/>
+                </xforms:dispatch>
+
+                <!-- Update bind if existing -->
+                <xforms:setvalue ref="$xcv/bind/xforms:bind/@id" value="concat($new-control-name, '-bind')"/>
+                <xforms:setvalue ref="$xcv/bind/xforms:bind/@ref" value="$new-control-name"/>
+
+            </xforms:action>
+
+            <!-- Insert control -->
+            <xforms:insert context="$new-td" origin="$xcv/control/*"/>
+
+            <!-- Insert instance and resource holders -->
+            <!-- TODO: match against existing languages, as that may have changed between copy and paste -->
+            <xxforms:variable name="section-name" select="$current-td/ancestor::*:section[1]/(if (@context) then @context else substring-before(@bind, '-bind'))"/>
+            <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
+                <xxforms:context name="current-td" select="$new-td"/>
+                <xxforms:context name="section-name" select="$section-name"/>
+                <xxforms:context name="instance-holder" select="$xcv/holder/*"/>
+                <xxforms:context name="resource-holders" select="$xcv/resources/*"/>
+            </xforms:dispatch>
+
+            <!-- Insert bind if any -->
+            <xforms:action if="exists($xcv/bind/xforms:bind)">
+                <xxforms:variable name="control-name" select="substring-before($xcv/control/*/@id, '-control')"/>
+                <xforms:action type="xpath">
+                    fbf:ensureBindsTemp($model, ($section-name, $control-name), fbf:isCustomInstance())
+                </xforms:action>
+                <xxforms:variable name="bind" select="$model//xforms:bind[@ref = $control-name]"/>
+                <xforms:insert ref="$bind" origin="$xcv/bind/xforms:bind"/>
+                <xforms:delete ref="$bind"/>
+            </xforms:action>
+
+        </xforms:action>
+    </xforms:action>
+</xforms:model>

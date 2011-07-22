@@ -1,0 +1,142 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+
+         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <xbl:binding id="fr-section" element="fr|section">
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+
+                <xsl:variable name="mode" select="'edit'"/><!-- TODO -->
+                <!--<xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>-->
+                <xsl:variable name="ancestor-sections" select="0"/><!-- TODO -->
+                <xsl:variable name="is-section-collapse" select="true()"/><!-- TODO -->
+                <xsl:variable name="is-animate-sections" select="true()"/><!-- TODO -->
+
+                <xsl:variable name="open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
+
+                <xsl:template match="/*">
+                    <!-- Section content area -->
+                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
+
+                        <xf:group xxbl:scope="inner" appearance="xxf:internal">
+
+                            <!-- TODO: resources -->
+                            <xxf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xxf:var>
+
+                            <!-- Section title area: open/close button, title, help -->
+                            <xsl:element name="{if ($ancestor-sections = 0) then 'xhtml:h2' else 'xhtml:h3'}">
+                                <xsl:attribute name="class" select="'fr-section-title'"/>
+
+                                <!-- Open/close button -->
+                                <xforms:group appearance="xxforms:internal">
+                                    <xsl:if test="$is-section-collapse">
+                                        <xforms:switch id="switch-button" xxforms:readonly-appearance="dynamic" class="fr-section-arrow">
+                                            <xforms:case id="case-button-closed" selected="{not($open)}">
+                                                <!-- "+" trigger -->
+                                                <xforms:trigger appearance="minimal" id="button-open" class="fr-section-open-close">
+                                                    <xforms:label>
+                                                        <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="{{$fr-resources/components/labels/open-section}}"/>
+                                                    </xforms:label>
+                                                </xforms:trigger>
+                                            </xforms:case>
+                                            <xforms:case id="case-button-open" selected="{$open}">
+                                                <!-- "-" trigger -->
+                                                <xforms:trigger appearance="minimal" id="button-close" class="fr-section-open-close">
+                                                    <xforms:label>
+                                                        <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="{{$fr-resources/components/labels/close-section}}"/>
+                                                    </xforms:label>
+                                                </xforms:trigger>
+                                            </xforms:case>
+                                        </xforms:switch>
+
+                                        <!-- Handle DOMActivate event to open/close the switches -->
+                                        <xforms:action ev:event="DOMActivate" ev:target="section button-open button-close">
+                                            <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
+                                            <xforms:action if="$expand">
+                                                <!-- Expand -->
+                                                <xforms:toggle case="case-open"/>
+                                                <xforms:toggle case="case-button-open"/>
+                                            </xforms:action>
+                                            <xforms:action if="not($expand)">
+                                                <!-- Collapse -->
+                                                <xforms:toggle case="case-closed"/>
+                                                <xforms:toggle case="case-button-closed"/>
+                                            </xforms:action>
+                                        </xforms:action>
+                                    </xsl:if>
+
+                                    <xsl:choose>
+                                        <xsl:when test="$is-section-collapse">
+                                            <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
+                                            <!-- TODO: check noscript help now that we have changed to XBL -->
+                                            <xforms:trigger appearance="minimal" class="fr-section-label" xxbl:scope="outer">
+                                                <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
+                                            </xforms:trigger>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- Set the section id to this output: this id matching is needed for noscript help -->
+                                            <!-- TODO: check noscript help now that we have changed to XBL -->
+                                            <xforms:output appearance="minimal" value="''" xxbl:scope="outer">
+                                                <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
+                                            </xforms:output>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+
+                                </xforms:group>
+
+                            </xsl:element>
+
+                            <xforms:switch id="switch" xxforms:readonly-appearance="dynamic">
+                                <!-- Closed section -->
+                                <xforms:case id="case-closed" selected="{not($open)}"/>
+                                <!-- Open section -->
+                                <xforms:case id="case-open" selected="{$open}">
+                                    <xsl:if test="$is-animate-sections">
+                                        <xsl:attribute name="class">xxforms-animate</xsl:attribute>
+                                    </xsl:if>
+                                    <xforms:group class="fr-section-content" xxbl:scope="outer">
+                                        <!-- Section content except label, event handlers, and buttons -->
+                                        <xsl:apply-templates select="* except (xforms:label, xforms:help, fr:buttons)"/>
+                                    </xforms:group>
+                                </xforms:case>
+                            </xforms:switch>
+                        </xf:group>
+                    </xforms:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

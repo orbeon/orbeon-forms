@@ -30,7 +30,7 @@
     <!-- Import components -->
     <xsl:import href="view.xsl"/>
     <xsl:import href="buttons.xsl"/>
-    <xsl:import href="inplace.xsl"/>
+    <xsl:import href="inplace.xsl"/><!-- just for inplace textarea for now -->
     <xsl:import href="section.xsl"/>
     <xsl:import href="repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
 
@@ -40,7 +40,7 @@
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
     <xsl:variable name="is-detail" select="$mode != 'summary'" as="xs:boolean"/>
-    <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
+    <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = ('builder', 'newbuilder')" as="xs:boolean"/>
     <xsl:variable name="is-noscript-support" select="not(/xhtml:html/xhtml:head/xforms:model[1]/@xxforms:noscript-support = 'false')" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'
                                                 and $is-noscript-support" as="xs:boolean"/>

@@ -50,9 +50,11 @@
     <property as="xs:integer" name="oxf.fb.grid.max-columns"                         value="4"/>
 
     <!-- Don't animate section collapse -->
-    <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.orbeon.builder"  value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.orbeon.builder"    value="false"/>
+    <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.orbeon.newbuilder" value="false"/>
 
     <!-- Form Builder summary page  -->
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="new edit delete"/>
+    <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.newbuilder"        value="new edit delete"/>
 
 </properties>

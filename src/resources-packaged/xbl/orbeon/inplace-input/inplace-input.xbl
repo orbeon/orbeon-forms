@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -59,8 +58,6 @@
                 .xbl-fr-inplace-input .fr-inplace-buttons { display: block; margin-top:0.5em }
                 .xbl-fr-inplace-input .fr-inplace-buttons .xforms-control { display: inline }
                 .xbl-fr-inplace-input .fr-inplace-hint { font-style: italic }
-
-                .fr-grid-content .xbl-fr-inplace-input { width: 100% }
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>
@@ -75,6 +72,10 @@
             <xsl:transform version="2.0">
                 <!-- Matches the bound element -->
                 <xsl:template match="/*">
+
+                    <!-- 2011-07-22: Temporary attribute to allow FB to disable the use of fr:button until script issues are fixed -->
+                    <xsl:variable name="button-qname" select="if (@button-element) then @button-element else 'fr:button'"/>
+
                     <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
                     <xforms:switch xxbl:scope="outer" xbl:attr="model context ref bind">
                         <xsl:attribute name="class" select="string-join(('fr-component-group', @class), ' ')"/>
@@ -133,14 +134,15 @@
                                     </xforms:action>
                                 </xforms:input>
                                 <xhtml:span class="fr-inplace-buttons">
-                                    <fr:button class="fr-inplace-rename">
+                                    <xsl:element name="{$button-qname}">
+                                        <xsl:attribute name="class">fr-inplace-rename</xsl:attribute>
                                         <!-- TODO: i18n -->
                                         <xforms:label>Apply</xforms:label>
                                         <xforms:action ev:event="DOMActivate">
                                             <!-- Write value back -->
                                             <xforms:setvalue ref="$result" value="context()"/>
                                         </xforms:action>
-                                    </fr:button>
+                                    </xsl:element>
                                     or
                                     <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                                         <!-- TODO: i18n -->

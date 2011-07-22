@@ -24,14 +24,15 @@ import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsInstance}
 import java.util.Collections
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
-import org.dom4j.{Attribute, QName, Element}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement
 import org.orbeon.saxon.pattern.{NameTest, NodeKindTest, LocalNameTest}
 import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
+import org.dom4j.{Document, Attribute, QName, Element}
 
 object XML {
 
     // TODO: Like for XFSS, this should not be global
+
     private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
     // Convenience methods for the XPath API
@@ -99,6 +100,9 @@ object XML {
 
     // Better operations on sequences of NodeInfo
     class RichNodeInfoSeq(seq: Seq[NodeInfo]) {
+
+        require(seq ne null)
+
         // Semantic is the same as XPath: at least one value must match
         def ===(s: String) = seq exists (_ === s)
 
@@ -122,6 +126,8 @@ object XML {
 
     // Better operations on NodeInfo
     class RichNodeInfo(nodeInfo: NodeInfo) {
+
+        require(nodeInfo ne null)
 
         def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
 
@@ -214,7 +220,11 @@ object XML {
     implicit def nodeInfoToDom4jElement(nodeInfo: NodeInfo): Element =
         nodeInfo.asInstanceOf[NodeWrapper].getUnderlyingNode.asInstanceOf[Element]
 
+    def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
     def elemToDocumentInfo(e: Elem): DocumentInfo = TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, e.toString, false, false)
+
+    implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) \ * head
+    implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) \ *
     implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToDocumentInfo(e) \ * head
     implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) \ *
 

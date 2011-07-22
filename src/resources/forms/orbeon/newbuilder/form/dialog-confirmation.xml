@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-confirmation-dialog" level="modal" close="false" draggable="true" model="fb-confirmation-model">
+    
+    <xforms:label ref="$form-resources/dialog-confirmation/dialog-title"/>
+
+    <xhtml:div>
+        <xhtml:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="Question" class="fr-dialog-icon"/>
+        <xhtml:div class="fr-dialog-message">
+            <xforms:output value="message"/>
+        </xhtml:div>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:group>
+            <fr:button>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/delete/label"/></xhtml:span>
+                </xforms:label>
+                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{confirmation-target}"/>
+            </fr:button>
+            <fr:button id="fb-confirmation-dialog-cancel-trigger">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                </xforms:label>
+                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{confirmation-target}"/>
+            </fr:button>
+        </xforms:group>
+    </xhtml:div>
+
+    <!-- Hide dialog -->
+    <xxforms:hide ev:event="DOMActivate" dialog="fb-confirmation-dialog"/>
+
+    <xforms:action ev:event="xxforms-dialog-open">
+        <!-- Remember parameters -->
+        <xforms:setvalue ref="message" value="event('fr:message')"/>
+        <xforms:setvalue ref="confirmation-target" value="event('fr:confirmation-target')"/>
+        <!-- Set focus when the dialog open  -->
+        <xforms:setfocus control="fb-confirmation-dialog-cancel-trigger"/>
+    </xforms:action>
+
+    <!-- Model for the confirmation dialog -->
+    <xforms:model id="fb-confirmation-model">
+
+        <xforms:instance id="fb-confirmation-instance">
+            <confirmation>
+                <message/>
+                <confirmation-target/>
+            </confirmation>
+        </xforms:instance>
+
+    </xforms:model>
+</xxforms:dialog>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:saxon="http://saxon.sf.net/"
+
+      id="fb-schema-upload-dialog" level="modal" class="fr-dialog">
+
+    <xforms:label ref="$form-resources/dialog-upload-schema/dialog-title"/>
+    
+    <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>
+    <xhtml:div>
+        <xforms:group>
+
+            <!-- Schema information -->
+            <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]" as="element()?"/>
+            <xxforms:variable name="is-existing-schema" select="exists($model/xs:schema)" as="xs:boolean"/>
+            <xxforms:variable name="is-new-schema" select="exists($instance/schema/xs:schema)" as="xs:boolean"/>
+
+            <xforms:group ref="$schema-element" class="fb-hide-alert">
+                <xforms:label class="fb-dialog-h2" value="$form-resources/dialog-upload-schema/messages/(if ($is-new-schema) then new-schema-information else existing-schema-information)"/>
+
+                <xhtml:div class="fb-dialog-section">
+                    <xforms:group ref=".[xs:simpleType]">
+                        <!-- Schema types -->
+                        <xforms:select1 ref="$instance/temp-type" appearance="compact">
+                            <xforms:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
+                            <xforms:hint ref="$form-resources/dialog-upload-schema/schema-type/hint"/>
+                            <xforms:itemset nodeset="$schema-element/xs:simpleType">
+                                <xforms:label ref="@name"/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xforms:group>
+                    <xforms:group ref=".[not(xs:simpleType)]">
+                        <xforms:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
+                        <!-- Display message when no simpletypes are available -->
+                        <xforms:output value="$form-resources/dialog-upload-schema/messages/no-simple-types"/>
+                    </xforms:group>
+                    <xforms:group ref=".[@targetNamespace]">
+                        <xforms:output value="@targetNamespace">
+                            <xforms:label ref="$form-resources/dialog-upload-schema/namespace-uri/label"/>
+                            <xforms:hint ref="$form-resources/dialog-upload-schema/namespace-uri/hint"/>
+                        </xforms:output>
+                    </xforms:group>
+                </xhtml:div>
+
+            </xforms:group>
+            <xforms:group class="fb-hide-alert">
+                <xforms:label class="fb-dialog-h2" ref="$form-resources/dialog-upload-schema/operations/label"/>
+
+                <xhtml:div class="fb-dialog-section">
+
+                    <!-- Delete schema button -->
+                    <fr:button ref=".[not($is-new-schema) and $model/xs:schema]">
+                        <xforms:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
+
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Delete XML Schema -->
+                            <xforms:delete nodeset="$model/xs:schema"/>
+                            <!-- TODO: Ask for confirmation, esp. if some types are in use -->
+                            <!-- TODO: Check and adjust types that could be in use -->
+                        </xforms:action>
+
+                    </fr:button>
+
+                    <!-- Upload a schema -->
+                    <xforms:upload ref="$instance/schema-uri">
+                        <xforms:label value="$form-resources/dialog-upload-schema/(if ($is-new-schema) then change-schema else if ($is-existing-schema) then replace-schema else upload-schema)/label"/>
+                        <xforms:filename ref="@filename"/>
+                        <xforms:mediatype ref="@mediatype"/>
+                        <xxforms:size ref="@size"/>
+
+                        <!-- Handle a successful submission -->
+                        <xforms:action ev:event="xxforms-upload-done" context="$instance">
+                            <!-- Read the schema and store it -->
+                            <!-- TODO: support catching dynamic XPath error in case doc() fails -->
+                            <xforms:insert context="schema" origin="doc(../schema-uri)"/>
+                            <xxforms:variable name="schema-element" select="schema/*"/>
+                            <xforms:action if="$schema-element/self::xs:schema">
+                                <!-- We got something that looks like a schema -->
+
+                                <!-- Check for inclusions -->
+                                <xforms:action if="$schema-element/(xs:import | xs:include)">
+                                    <xforms:message><xforms:output value="$form-resources/dialog-upload-schema/messages/has-includes"/></xforms:message>
+                                    <!-- Delete inclusions -->
+                                    <xforms:delete nodeset="$schema-element/(xs:import | xs:include)"/>
+                                </xforms:action>
+
+                            </xforms:action>
+                            <xforms:action if="not($schema-element/self::xs:schema)">
+                                <!-- Oops, this is definitely not a schema -->
+                                <xforms:message><xforms:output value="$form-resources/dialog-upload-schema/messages/not-a-schema"/></xforms:message>
+                                <!-- Clear uploaded content -->
+                                <xforms:setvalue ref="schema-uri"/>
+                                <xforms:delete nodeset="$schema-element"/>
+                            </xforms:action>
+                        </xforms:action>
+
+                        <!-- Clear information when deselected -->
+                        <xforms:action ev:event="xforms-deselect">
+                            <!-- Clear uploaded content -->
+                            <xforms:setvalue ref="$instance/schema-uri"/>
+                            <xforms:delete nodeset="$instance/schema/*"/>
+                        </xforms:action>
+                    </xforms:upload>
+                </xhtml:div>
+            </xforms:group>
+
+        </xforms:group>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xforms:group appearance="xxforms:internal">
+            <fr:button class="fr-inplace-rename" id="fb-edit-schema-trigger">
+                <xforms:label ref="$form-resources/apply/label"/>
+
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Insert schema into the model -->
+
+                    <!-- Delete existing XML Schema if any -->
+                    <!-- TODO: What we want in fact is to disable this button if there is an existing schema, and the user will explicitly remove the previous schema -->
+                    <xforms:delete nodeset="$model/xs:schema"/>
+
+                    <xforms:insert context="$model" origin="$instance/schema/*"/>
+                </xforms:action>
+
+            </fr:button>
+            <xforms:output value="$form-resources/or/label"/>
+            <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
+                <xforms:label ref="$form-resources/cancel/label"/>
+            </xforms:trigger>
+
+            <xforms:action ev:event="DOMActivate">
+                <!-- Hide dialog -->
+                <xxforms:hide dialog="fb-schema-upload-dialog"/>
+                <!-- Clear uploaded content -->
+                <xforms:setvalue ref="$instance/schema-uri"/>
+                <xforms:delete nodeset="$instance/schema/*"/>
+            </xforms:action>
+        </xforms:group>
+    </xhtml:div>
+</xxforms:dialog>

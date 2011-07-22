@@ -1,0 +1,120 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+
+         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+
+    <xbl:binding id="fb-dialog-help" element="fb|dialog-help">
+        <xbl:handlers>
+            <!-- Handler to open dialog -->
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xf:setvalue xxf:iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <xf:setvalue ref="@relevant" value="'true'"/>
+
+                <xf:setvalue ref="control-id" value="event('control-id')"/>
+                <xf:setvalue ref="help" value="controlOps:getControlHelpOrEmpty(../control-id)"/>
+
+                <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="model">
+                <xf:instance id="local">
+                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                        <control-id/>
+                        <help/>
+
+                        <save-trigger/>          <!-- Contains 'enabled' if all the fields are valid -->
+                    </local>
+                </xf:instance>
+
+                <!-- Enable/disable trigger -->
+                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-invalid">disabled</xf:setvalue>
+                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xf:setvalue>
+
+                <xf:bind ref="save-trigger" readonly=". = 'disabled'"/>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group id="container" ref=".[@relevant = 'true']" appearance="xxf:internal">
+
+                <!-- Bindings specified on control -->
+                <xxf:var name="form"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxf:var>
+                <xxf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxf:var>
+                <xxf:var name="components"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xxf:var>
+
+                <xxf:var name="local" value="instance('local')"/>
+
+                <!-- Close dialog upon cancel -->
+                <xxf:hide ev:event="DOMActivate" ev:observer="cancel-trigger" dialog="dialog"/>
+
+                <!-- Save data upon close -->
+                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
+
+                    <xf:action type="xpath">    
+                        controlOps:setControlHelp($local/control-id, $local/help)
+                    </xf:action>
+
+                    <xxf:hide dialog="dialog"/>
+                </xf:action>
+
+                <!-- Make ourselves non-relevant when the dialog closes -->
+                <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>
+
+                <!-- Actual dialog -->
+                <xxf:dialog id="dialog" appearance="full" level="modal">
+                    <xf:label ref="$resources/dialog-help/dialog-title"/>
+
+                    <xh:div>
+                        <xh:div class="fr-grid">
+                            <xh:div class="fr-grid-content">
+                                <xf:group class="fb-hide-alert">
+                                    <xf:textarea ref="$local/help" id="fb-edit-help-dialog-text">
+                                        <xf:label ref="$resources/dialog-help/help-message/label"/>
+                                    </xf:textarea>
+                                </xf:group>
+                            </xh:div>
+                        </xh:div>
+                        <xh:div class="fr-dialog-buttons">
+                            <xf:group id="triggers">
+                                <fr:button class="fr-inplace-rename" ref="save-trigger" id="save-trigger">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </fr:button>
+                                <xf:output value="$resources/or/label"/>
+                                <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xf:label ref="$resources/cancel/label"/>
+                                </xf:trigger>
+                            </xf:group>
+                        </xh:div>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

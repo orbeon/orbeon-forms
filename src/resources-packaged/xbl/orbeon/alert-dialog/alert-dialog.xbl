@@ -31,6 +31,10 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-show" phase="target">
+                <xforms:setvalue if="event('message')" ref="message" value="event('message')"/>
+                <xforms:setvalue if="event('positive-targetid')" ref="positive" value="event('positive-targetid')"/>
+                <xforms:setvalue if="event('negative-targetid')" ref="negative" value="event('negative-targetid')"/>
+                <xforms:setvalue if="event('neutral-targetid')" ref="neutral" value="event('neutral-targetid')"/>
                 <xxforms:show dialog="dialog" xxbl:scope="inner"/>
             </xbl:handler>
         </xbl:handlers>
@@ -39,9 +43,24 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:template match="/*">
+                    
                     <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
                     <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="false"
                             class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
+
+                        <xforms:model>
+                            <xforms:instance>
+                                <alert>
+                                    <message/>
+                                    <positive/>
+                                    <negative/>
+                                    <neutral/>
+                                </alert>
+                            </xforms:instance>
+                        </xforms:model>
+
+                        <xxforms:variable name="local" value="instance()"/>
+
                         <!-- Set the focus on the first button in the dialog. This is done:
                              a) For usability: so users can press enter to activate the button, or press tab to go to
                                 the next button.
@@ -60,11 +79,25 @@
                         </xxforms:script>
                         <xforms:label xxbl:scope="outer"><xsl:copy-of select="fr:label/(@* | node())"/></xforms:label>
                         <xforms:group appearance="xxforms:internal">
-                            <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
+                            <!-- Any button click closes the dialog and clears the local data -->
+                            <xforms:action ev:event="DOMActivate">
+                                <xxforms:hide dialog="dialog"/>
+                                <xforms:setvalue xxforms:iterate="*" ref="."/>
+                            </xforms:action>
+
                             <xhtml:div class="xbl-fr-alert-dialog-message">
-                                <xforms:output value="''" xxbl:scope="outer">
-                                    <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
-                                </xforms:output>
+                                <xsl:choose>
+                                    <xsl:when test="fr:message">
+                                        <!-- Use static message -->
+                                        <xforms:output value="''" xxbl:scope="outer">
+                                            <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
+                                        </xforms:output>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- use dynamic message -->
+                                        <xforms:output value="''"><xforms:label ref="$local/message"/></xforms:output>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xhtml:div>
                             <xhtml:div class="xbl-fr-alert-dialog-buttons">
                                 <xsl:apply-templates/>
@@ -75,25 +108,26 @@
 
                 <xsl:template match="fr:positive-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-positive">
-                        <xsl:copy-of select="fr:button(*, 'Yes')"/>
+                        <xsl:copy-of select="fr:button(*, 'Yes', 'positive')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:template match="fr:negative-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-negative">
-                        <xsl:copy-of select="fr:button(*, 'No')"/>
+                        <xsl:copy-of select="fr:button(*, 'No', 'negative')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:template match="fr:neutral-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-neutral">
-                        <xsl:copy-of select="fr:button(*, 'OK')"/>
+                        <xsl:copy-of select="fr:button(*, 'OK', 'neutral')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:function name="fr:button">
                     <xsl:param name="content" as="element()*"/>
                     <xsl:param name="default" as="xs:string"/>
+                    <xsl:param name="handler" as="xs:string"/>
                     <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
                     <fr:button ref="." xxbl:scope="outer">
                         <xforms:label>
@@ -107,6 +141,9 @@
                             </xsl:choose>
                         </xforms:label>
                         <xsl:copy-of select="$content except $fr-label"/>
+                        <!-- If a custom target is provided, dispatch to it -->
+                        <!-- NOTE: For now target must be an effective id -->
+                        <xforms:dispatch ev:event="DOMActivate" if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner"/>
                     </fr:button>
                 </xsl:function>
 

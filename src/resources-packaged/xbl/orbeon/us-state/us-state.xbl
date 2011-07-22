@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -24,7 +23,7 @@
     <xbl:binding id="fr-us-state-binding" element="fr|us-state" xxbl:container="span">
 
         <!-- Orbeon Form Builder Component Metadata -->
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xforms="http://www.w3.org/2002/xforms">
             <display-name lang="en">US State</display-name>
             <display-name lang="fr">Etat US</display-name>
             <display-name lang="ru">Штат США</display-name>

@@ -124,8 +124,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Static Image</display-name>
             <display-name lang="fr">Image statique</display-name>
-            <display-name lang="ru">Изображение</display-name>
-            <display-name lang="ru">Изображение</display-name>
+            <display-name lang="ru">Неизменяемое изображение</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/photo.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>

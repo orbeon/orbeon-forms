@@ -132,7 +132,7 @@ object FormRunner {
 
     def getPersistenceHeadersAsXML(app: String, form: String, formOrData: String) = {
 
-        val (uri, headers) = getPersistenceURLHeaders(app, form, formOrData)
+        val (_, headers) = getPersistenceURLHeaders(app, form, formOrData)
 
         // Build headers document
         val headersXML =

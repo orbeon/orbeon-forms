@@ -51,6 +51,9 @@
                     padding-top: .5em; padding-bottom: 1em;
                 }
 
+                /* Grids */
+                .fr-grid { width: 100% }
+
                 /* Itemset editor */
                 #fb-itemset-editor-dialog { width: 35em }
                 #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }

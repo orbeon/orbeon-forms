@@ -300,11 +300,10 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 div.fb-liner { position: relative }
 
+.fr-grid { border-collapse: collapse; width: 100% }
 .fr-grid tbody { width: 100% }
 .fr-grid-td { border: 1px solid transparent }
-
-.fb-section-content .fr-grid { border-collapse: collapse } /* TODO: remove once new fb grid is in place */
-.fb-section-content .fr-grid:hover .fr-grid-td { border: 1px dotted gray } /* TODO: remove once new fb grid is in place */
+.fr-grid:hover .fr-grid-td { border: 1px dotted gray }
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 

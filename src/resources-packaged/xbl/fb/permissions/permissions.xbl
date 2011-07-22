@@ -83,7 +83,7 @@
                             <!-- Current role -->
                             <xxforms:variable name="role" select="."/>
                             <!-- Permissions for the current role -->
-                            <xxforms:variable name="permissions" select="$metadata/permissions/permission[if ($role = '') then position() = 1 else user-role/@any-of/tokenize($role, '\s') = $role]"/>
+                            <xxforms:variable name="permissions" select="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
                             <!-- Operations for the current role -->
                             <xxforms:variable name="operations-raw" select="$permissions/@operations/tokenize(., '\s')"/>
                             <!-- Replace read and update by read-update -->

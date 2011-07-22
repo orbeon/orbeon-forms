@@ -24,6 +24,7 @@
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+              xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner"
               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
@@ -31,9 +32,9 @@
     <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
     <xxforms:variable name="document" select="$parameters/document"/>
 
-    <!-- Model initialization -->
+    <!-- Model initialization when we have a specific app and form -->
     <!-- TODO: Should not do this on summary page, for example -->
-    <xforms:action ev:event="xforms-model-construct-done">
+    <xforms:action ev:event="xforms-model-construct-done" if="$app != '*' and $form != '*'">
 
         <!-- Initialize parameters to pass to "new" service -->
         <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -57,6 +58,19 @@
             <xforms:message level="xxforms:log-debug">Could not get source form from request. Trying submission instead.</xforms:message>
             <xforms:send submission="get-source-form-submission"/>
         </xforms:action>
+
+        <!-- Compute authorized operations -->
+        <xxforms:variable name="metadata" select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
+        <xforms:setvalue ref="instance('fr-authorized-operations')" value="string-join(form-runner:authorizedOperationsOnForm($metadata), ' ')"/>
+        <!-- If user can't perform the required operations, deny access to this page -->
+        <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode treat as element()"/>
+        <xxforms:variable name="operations" select="tokenize(instance('fr-authorized-operations'), '\s')"/>
+        <xxforms:variable name="unauthorized-access" select="
+            ($mode = 'summary' and not($operations = ('*', 'read', 'update', 'delete'))) or
+            ($mode = 'new' and not($operations = ('*', 'create'))) or
+            ($mode = 'edit' and not($operations = ('*', 'update'))) or
+            ($mode = 'view' and not($operations = ('*', 'read')))"/>
+        <xforms:action if="$unauthorized-access" type="xpath">form-runner:unauthorizedAccess()</xforms:action>
 
         <!-- Whether a document id is provided -->
         <xxforms:variable name="is-document-id-provided" select="$document != ''" as="xs:boolean"/>
@@ -409,6 +423,11 @@
             method="get" serialization="none"
             resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
             replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="true"/>
+
+    <!-- Which operations the user can perform -->
+    <xforms:instance id="fr-authorized-operations">
+        <operations/>
+    </xforms:instance>
 
     <xforms:instance id="fr-service-parameters">
         <parameters/>

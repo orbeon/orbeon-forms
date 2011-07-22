@@ -15,10 +15,12 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xml._
-import scala.collection.JavaConversions._
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.scaxon.XML._
+import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.util.{NetUtils, XPathCache}
 
 object FormRunner {
 
@@ -90,8 +92,8 @@ object FormRunner {
 
     def getPersistenceURLHeaders(app: String, form: String, formOrData: String) = {
 
-        require(app.nonEmpty)
-        require(form.nonEmpty)
+        require(augmentString(app).nonEmpty)
+        require(augmentString(form).nonEmpty)
         require(Set("form", "data")(formOrData))
 
         val propertySet = Properties.instance.getPropertySet
@@ -119,7 +121,7 @@ object FormRunner {
         // Build headers map
         val headers = (
             for {
-                propertyName <- propertySet.getPropertiesStartsWith(propertyPrefix)
+                propertyName <- propertySet.getPropertiesStartsWith(propertyPrefix).asScala
                 lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
                 if lowerSuffix != "uri"
                 headerName = "Orbeon-" + capitalizeHeader(lowerSuffix)
@@ -145,5 +147,29 @@ object FormRunner {
 
         // Convert to TinyTree
         TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, headersXML, false, false)
+    }
+
+    /**
+     * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform.
+     * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
+     */
+    def authorizedOperationsOnForm(metadata: NodeInfo): java.util.List[String] = {
+        val request = NetUtils.getExternalContext.getRequest
+        (metadata \ "permissions" match {
+            case Seq() => Seq("*")                                                      // No permissions defined for this form, authorize any operation
+            case ps => ( ps \ "permission"
+                    filter (p =>
+                        (p \ * isEmpty) ||                                              // No constraint on the permission, so it is automatically satisfied
+                        (p \ "user-role" forall (r =>                                   // If we have user-role constraints, they must all pass
+                            (r \@ "any-of" getStringValue) split "\\s+"                 // Constraint is satisfied if user has at least one of the roles
+                            exists (request.isUserInRole(_)))))
+                    flatMap (p => (p \@ "operations" getStringValue) split "\\s+")      // For the permissions that passed, return the list operations
+                    distinct                                                            // Remove duplicate operations
+                )
+        }) asJava
+    }
+
+    def unauthorizedAccess() {
+        throw new RuntimeException("You don't have the appropriate authorization to access this page")
     }
 }

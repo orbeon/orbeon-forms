@@ -87,137 +87,137 @@
                     </trailer-coach-vessel>
                 </form>
             </xforms:instance>
-            <xforms:bind id="fr-form-binds" nodeset=".">
-                <xforms:bind id="personal-information-bind" nodeset="personal-information"
+            <xforms:bind id="fr-form-binds" ref=".">
+                <xforms:bind id="personal-information-bind" ref="personal-information"
                              name="personal-information">
-                    <xforms:bind id="birth-date-bind" nodeset="birth-date" type="xs:date" required="true()"/>
-                    <xforms:bind id="icon-1-bind" nodeset="icon-1" type="xforms:anyURI" name="icon-1"/>
-                    <xforms:bind id="voter-address-change-bind" nodeset="voter-address-change"
+                    <xforms:bind id="birth-date-bind" ref="birth-date" type="xs:date" required="true()"/>
+                    <xforms:bind id="icon-1-bind" ref="icon-1" type="xforms:anyURI" name="icon-1"/>
+                    <xforms:bind id="voter-address-change-bind" ref="voter-address-change"
                                  name="voter-address-change"
                                  type="xforms:boolean"/>
-                    <xforms:bind id="last-name-bind" nodeset="last-name" name="last-name" type="dmv:last-name"
+                    <xforms:bind id="last-name-bind" ref="last-name" name="last-name" type="dmv:last-name"
                                  required="true()"
                                  />
-                    <xforms:bind id="first-name-bind" nodeset="first-name" name="first-name"
+                    <xforms:bind id="first-name-bind" ref="first-name" name="first-name"
                                  type="dmv:first-name"
                                  required="true()"
                                  />
-                    <xforms:bind id="driver-license-number-bind" nodeset="driver-license-number"
+                    <xforms:bind id="driver-license-number-bind" ref="driver-license-number"
                                  name="driver-license-number"
                                  type="dmv:driver-license-number"
                                  required="true()"
                                  />
-                    <xforms:bind id="initial-bind" nodeset="initial" name="initial" type="dmv:initial"/>
+                    <xforms:bind id="initial-bind" ref="initial" name="initial" type="dmv:initial"/>
                 </xforms:bind>
-                <xforms:bind id="residence-address-bind" nodeset="residence-address"
+                <xforms:bind id="residence-address-bind" ref="residence-address"
                              name="residence-address">
-                    <xforms:bind id="icon-2-bind" nodeset="icon-2" name="icon-2" type="xforms:anyURI"/>
-                    <xforms:bind id="residence-street-name-1-bind" nodeset="residence-street-name-1"
+                    <xforms:bind id="icon-2-bind" ref="icon-2" name="icon-2" type="xforms:anyURI"/>
+                    <xforms:bind id="residence-street-name-1-bind" ref="residence-street-name-1"
                                  name="residence-street-name-1"
                                  type="dmv:street-name-1"
                                  required="true()"
                                  />
-                    <xforms:bind id="residence-city-bind" nodeset="residence-city" name="residence-city"
+                    <xforms:bind id="residence-city-bind" ref="residence-city" name="residence-city"
                                  type="dmv:city"
                                  required="true()"
                                  />
-                    <xforms:bind id="residence-state-bind" nodeset="residence-state" name="residence-state"
+                    <xforms:bind id="residence-state-bind" ref="residence-state" name="residence-state"
                                  type="dmv:state"
                                  required="true()"
                                  />
-                    <xforms:bind id="residence-zip-bind" nodeset="residence-zip" name="residence-zip"
+                    <xforms:bind id="residence-zip-bind" ref="residence-zip" name="residence-zip"
                                  type="dmv:zip"
                                  required="true()"
                                  />
-                    <xforms:bind id="residence-street-number-bind" nodeset="residence-street-number"
+                    <xforms:bind id="residence-street-number-bind" ref="residence-street-number"
                                  name="residence-street-number"
                                  type="dmv:street-number"/>
-                    <xforms:bind id="residence-street-name-2-bind" nodeset="residence-street-name-2"
+                    <xforms:bind id="residence-street-name-2-bind" ref="residence-street-name-2"
                                  name="residence-street-name-2"
                                  type="dmv:street-name-2"/>
-                    <xforms:bind id="residence-apt-bind" nodeset="residence-apt" name="residence-apt"
+                    <xforms:bind id="residence-apt-bind" ref="residence-apt" name="residence-apt"
                                  type="dmv:apt"/>
 
                 </xforms:bind>
-                <xforms:bind id="mailing-address-bind" nodeset="mailing-address" name="mailing-address">
-                    <xforms:bind id="icon-3-bind" nodeset="icon-3" type="xs:anyURI"/>
-                    <xforms:bind id="mailing-street-name-1-bind" nodeset="mailing-street-name-1"
+                <xforms:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
+                    <xforms:bind id="icon-3-bind" ref="icon-3" type="xs:anyURI"/>
+                    <xforms:bind id="mailing-street-name-1-bind" ref="mailing-street-name-1"
                                  name="mailing-street-name-1"
                                  type="dmv:street-name-1"
                                  required="true()"
                                  />
-                    <xforms:bind id="mailing-city-bind" nodeset="mailing-city" name="mailing-city"
+                    <xforms:bind id="mailing-city-bind" ref="mailing-city" name="mailing-city"
                                  type="dmv:city"
                                  required="true()"
                                  />
-                    <xforms:bind id="mailing-state-bind" nodeset="mailing-state" name="mailing-state"
+                    <xforms:bind id="mailing-state-bind" ref="mailing-state" name="mailing-state"
                                  type="dmv:state"
                                  required="true()"
                                  />
-                    <xforms:bind id="mailing-zip-bind" nodeset="mailing-zip" name="mailing-zip" type="dmv:zip"
+                    <xforms:bind id="mailing-zip-bind" ref="mailing-zip" name="mailing-zip" type="dmv:zip"
                                  required="true()"
                                  />
-                    <xforms:bind id="mailing-street-number-bind" nodeset="mailing-street-number"
+                    <xforms:bind id="mailing-street-number-bind" ref="mailing-street-number"
                                  name="mailing-street-number"
                                  type="dmv:street-number"/>
-                    <xforms:bind id="mailing-street-name-2-bind" nodeset="mailing-street-name-2"
+                    <xforms:bind id="mailing-street-name-2-bind" ref="mailing-street-name-2"
                                  name="mailing-street-name-2"
                                  type="dmv:street-name-2"/>
-                    <xforms:bind id="mailing-apt-bind" nodeset="mailing-apt" name="mailing-apt" type="dmv:apt"/>
+                    <xforms:bind id="mailing-apt-bind" ref="mailing-apt" name="mailing-apt" type="dmv:apt"/>
                 </xforms:bind>
-                <xforms:bind id="vehicles-bind" nodeset="vehicles" name="vehicles">
-                    <xforms:bind nodeset="vehicle">
-                        <xforms:bind id="leased-bind" nodeset="leased" name="leased" type="xforms:boolean"/>
-                        <xforms:bind id="plate-number-bind" nodeset="plate-number" name="plate-number"
+                <xforms:bind id="vehicles-bind" ref="vehicles" name="vehicles">
+                    <xforms:bind ref="vehicle">
+                        <xforms:bind id="leased-bind" ref="leased" name="leased" type="xforms:boolean"/>
+                        <xforms:bind id="plate-number-bind" ref="plate-number" name="plate-number"
                                      type="dmv:plate-number"
                                      required="true()"
                                      
                                      readonly="false()"
                                      calculate="upper-case(.)"/>
-                        <xforms:bind id="vin-bind" nodeset="vin" name="vin" type="dmv:vin" required="true()"
+                        <xforms:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
                                      
                                      readonly="false()"
                                      calculate="upper-case(.)"/>
                     </xforms:bind>
-                    <xforms:bind id="leasing-company-name-bind" nodeset="leasing-company-name"
+                    <xforms:bind id="leasing-company-name-bind" ref="leasing-company-name"
                                  name="leasing-company-name"
                                  type="dmv:company-name"/>
                 </xforms:bind>
-                <xforms:bind id="trailer-coach-vessel-bind" nodeset="trailer-coach-vessel"
+                <xforms:bind id="trailer-coach-vessel-bind" ref="trailer-coach-vessel"
                              name="trailer-coach-vessel">
-                    <xforms:bind id="vehicle-street-name-1-bind" nodeset="vehicle-street-name-1"
+                    <xforms:bind id="vehicle-street-name-1-bind" ref="vehicle-street-name-1"
                                  name="vehicle-street-name-1"
                                  type="dmv:street-name-1"
                                  required="true()"
                                  />
-                    <xforms:bind id="vehicle-city-bind" nodeset="vehicle-city" name="vehicle-city"
+                    <xforms:bind id="vehicle-city-bind" ref="vehicle-city" name="vehicle-city"
                                  type="dmv:city"
                                  required="true()"
                                  />
-                    <xforms:bind id="vehicle-county-bind" nodeset="vehicle-county" name="vehicle-county"
+                    <xforms:bind id="vehicle-county-bind" ref="vehicle-county" name="vehicle-county"
                                  type="dmv:county"
                                  required="true()"
                                  />
-                    <xforms:bind id="vehicle-street-number-bind" nodeset="vehicle-street-number"
+                    <xforms:bind id="vehicle-street-number-bind" ref="vehicle-street-number"
                                  name="vehicle-street-number"
                                  type="dmv:street-number"/>
-                    <xforms:bind id="vehicle-street-name-2-bind" nodeset="vehicle-street-name-2"
+                    <xforms:bind id="vehicle-street-name-2-bind" ref="vehicle-street-name-2"
                                  name="vehicle-street-name-2"
                                  type="dmv:street-name-2"/>
                 </xforms:bind>
-                <xforms:bind id="old-address-bind" nodeset="old-address" name="old-address">
-                    <xforms:bind id="old-street-number-name-bind" nodeset="old-street-number-name"
+                <xforms:bind id="old-address-bind" ref="old-address" name="old-address">
+                    <xforms:bind id="old-street-number-name-bind" ref="old-street-number-name"
                                  name="old-street-number-name"
                                  type="xs:string"
                                  required="true()"
                                  />
-                    <xforms:bind id="old-city-bind" nodeset="old-city" name="old-city" type="dmv:city"
+                    <xforms:bind id="old-city-bind" ref="old-city" name="old-city" type="dmv:city"
                                  required="true()"
                                  />
-                    <xforms:bind id="old-state-bind" nodeset="old-state" name="old-state" type="dmv:state"
+                    <xforms:bind id="old-state-bind" ref="old-state" name="old-state" type="dmv:state"
                                  required="true()"
                                  />
-                    <xforms:bind id="old-zip-bind" nodeset="old-zip" name="old-zip" type="dmv:zip"
+                    <xforms:bind id="old-zip-bind" ref="old-zip" name="old-zip" type="dmv:zip"
                                  required="true()"
                                  />
                 </xforms:bind>
@@ -803,7 +803,7 @@
                                     <xforms:hint ref="$form-resources/voter-address-change/hint"/>
                                     <xforms:help ref="$form-resources/voter-address-change/help"/>
                                     <xforms:alert ref="$form-resources/voter-address-change/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/voter-address-change/item">
+                                    <xforms:itemset ref="$form-resources/voter-address-change/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
@@ -882,7 +882,7 @@
                                     <xforms:hint ref="$form-resources/residence-state/hint"/>
                                     <xforms:help ref="$form-resources/residence-state/help"/>
                                     <xforms:alert ref="$form-resources/residence-state/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/residence-state/item">
+                                    <xforms:itemset ref="$form-resources/residence-state/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
@@ -957,7 +957,7 @@
                                     <xforms:hint ref="$form-resources/mailing-state/hint"/>
                                     <xforms:help ref="$form-resources/mailing-state/help"/>
                                     <xforms:alert ref="$form-resources/mailing-state/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/mailing-state/item">
+                                    <xforms:itemset ref="$form-resources/mailing-state/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
@@ -975,49 +975,46 @@
                 </fr:section>
                 <fr:section id="vehicles-section" bind="vehicles-bind">
                     <xforms:label ref="$form-resources/vehicles/label"/>
-                    <!-- TODO: use fr:grid instead -->
-                    <fr:repeat ref="vehicle" columns="4" id="vehicles-repeat"
+                    <fr:grid ref="vehicle" id="vehicles-repeat"
                                minOccurs="1"
                                maxOccurs="3"
                                origin="instance('vehicle-template')">
-                        <fr:body>
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:input id="plate-number-control" class="fr-width-10em" bind="plate-number-bind">
-                                        <xforms:label ref="$form-resources/plate-number/label"/>
-                                        <xforms:hint ref="$form-resources/plate-number/hint"/>
-                                        <xforms:help ref="$form-resources/plate-number/help"/>
-                                        <xforms:alert ref="$form-resources/plate-number/alert"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:input id="vin-control" class="fr-width-50" bind="vin-bind">
-                                        <xforms:label ref="$form-resources/vin/label"/>
-                                        <xforms:hint ref="$form-resources/vin/hint"/>
-                                        <xforms:help ref="$form-resources/vin/help"/>
-                                        <xforms:alert ref="$form-resources/vin/alert"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:select id="leased-control" appearance="full" bind="leased-bind">
-                                        <xforms:label ref="$form-resources/leased/label"/>
-                                        <xforms:hint ref="$form-resources/leased/hint"/>
-                                        <xforms:help ref="$form-resources/leased/help"/>
-                                        <xforms:alert ref="$form-resources/leased/alert"/>
-                                        <xforms:itemset nodeset="$form-resources/leased/item">
-                                            <xforms:label ref="label"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <fr:california-plate ref="plate-number">
-                                        <xforms:label ref="$form-resources/plate-preview/label"/>
-                                    </fr:california-plate>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </fr:body>
-                    </fr:repeat>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="plate-number-control" class="fr-width-10em" bind="plate-number-bind">
+                                    <xforms:label ref="$form-resources/plate-number/label"/>
+                                    <xforms:hint ref="$form-resources/plate-number/hint"/>
+                                    <xforms:help ref="$form-resources/plate-number/help"/>
+                                    <xforms:alert ref="$form-resources/plate-number/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input id="vin-control" class="fr-width-50" bind="vin-bind">
+                                    <xforms:label ref="$form-resources/vin/label"/>
+                                    <xforms:hint ref="$form-resources/vin/hint"/>
+                                    <xforms:help ref="$form-resources/vin/help"/>
+                                    <xforms:alert ref="$form-resources/vin/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:select id="leased-control" appearance="full" bind="leased-bind">
+                                    <xforms:label ref="$form-resources/leased/label"/>
+                                    <xforms:hint ref="$form-resources/leased/hint"/>
+                                    <xforms:help ref="$form-resources/leased/help"/>
+                                    <xforms:alert ref="$form-resources/leased/alert"/>
+                                    <xforms:itemset ref="$form-resources/leased/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:california-plate ref="plate-number">
+                                    <xforms:label ref="$form-resources/plate-preview/label"/>
+                                </fr:california-plate>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                     <!--</fr:section>-->
                 <!--<fr:section id="leased-vehicles-section" bind="leased-vehicles-bind">-->
                     <!--<xforms:label ref="$form-resources/leased-vehicles/label"/>-->
@@ -1113,7 +1110,7 @@
                                     <xforms:hint ref="$form-resources/old-state/hint"/>
                                     <xforms:help ref="$form-resources/old-state/help"/>
                                     <xforms:alert ref="$form-resources/old-state/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/old-state/item">
+                                    <xforms:itemset ref="$form-resources/old-state/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>

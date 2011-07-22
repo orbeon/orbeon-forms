@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
   
@@ -142,19 +141,19 @@
                 </book>
             </xforms:instance>
 
-            <xforms:bind id="fr-form-binds" nodeset=".">
-                <xforms:bind id="details-bind" nodeset="details">
-                    <xforms:bind id="title-bind" nodeset="title" required="true()"/>
-                    <xforms:bind id="author-bind" nodeset="author" required="true()"/>
-                    <xforms:bind id="language-bind" nodeset="language"/>
-                    <xforms:bind id="link-bind" nodeset="link"/>
-                    <xforms:bind id="rating-bind" nodeset="rating"/>
-                    <xforms:bind id="publication-year-bind" nodeset="publication-year"/>
-                    <xforms:bind id="review-bind" nodeset="review"/>
-                    <xforms:bind id="image-bind" nodeset="image" type="xs:anyURI"/>
+            <xforms:bind id="fr-form-binds" ref=".">
+                <xforms:bind id="details-bind" ref="details">
+                    <xforms:bind id="title-bind" ref="title" required="true()"/>
+                    <xforms:bind id="author-bind" ref="author" required="true()"/>
+                    <xforms:bind id="language-bind" ref="language"/>
+                    <xforms:bind id="link-bind" ref="link"/>
+                    <xforms:bind id="rating-bind" ref="rating"/>
+                    <xforms:bind id="publication-year-bind" ref="publication-year"/>
+                    <xforms:bind id="review-bind" ref="review"/>
+                    <xforms:bind id="image-bind" ref="image" type="xs:anyURI"/>
                 </xforms:bind>
-                <xforms:bind id="notes-bind" nodeset="notes">
-                    <xforms:bind id="note-bind" nodeset="note"/>
+                <xforms:bind id="notes-bind" ref="notes">
+                    <xforms:bind id="note-bind" ref="note"/>
                 </xforms:bind>
             </xforms:bind>
 
@@ -471,7 +470,7 @@
                                         <xforms:label>Choose One...</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="$form-resources/language/item">
+                                    <xforms:itemset ref="$form-resources/language/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
@@ -493,7 +492,7 @@
                                     <xforms:hint ref="$form-resources/rating/hint"/>
                                     <xforms:help ref="$form-resources/rating/help"/>
                                     <xforms:alert ref="$form-resources/rating/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/rating/item">
+                                    <xforms:itemset ref="$form-resources/rating/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
@@ -526,20 +525,18 @@
                 <fr:section id="notes-section" bind="notes-bind">
                     <xforms:label ref="$form-resources/notes/label"/>
                     <xforms:help ref="$form-resources/notes/help"/>
-                    <fr:repeat nodeset="note" id="book-repeat" origin="instance('note-template')" columns="1" appearance="xxforms:table">
-                        <fr:body>
-                            <fr:tr>
-                                <fr:td>
-                                    <xforms:textarea id="note-control" ref="." appearance="xxforms:autosize">
-                                        <xforms:label ref="$form-resources/note/label"/>
-                                        <xforms:hint ref="$form-resources/note/hint"/>
-                                        <xforms:help ref="$form-resources/note/help"/>
-                                        <xforms:alert ref="$form-resources/note/alert"/>
-                                    </xforms:textarea>
-                                </fr:td>
-                            </fr:tr>
-                        </fr:body>
-                    </fr:repeat>
+                    <fr:grid repeat="true" ref="note" id="book-repeat" origin="instance('note-template')">
+                        <fr:tr>
+                            <fr:td>
+                                <xforms:textarea id="note-control" ref="." appearance="xxforms:autosize">
+                                    <xforms:label ref="$form-resources/note/label"/>
+                                    <xforms:hint ref="$form-resources/note/hint"/>
+                                    <xforms:help ref="$form-resources/note/help"/>
+                                    <xforms:alert ref="$form-resources/note/alert"/>
+                                </xforms:textarea>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
                 </fr:section>
             </fr:body>
         </fr:view>

@@ -319,6 +319,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 }
 /*.fr-section-container .fr-section-open-close:hover { background-color: #FFFFDD; border: 1px solid #FFFF88 }*/
 .fr-section-container .fr-section-content {
+    display: block;
     margin-left: 22px;
     margin-bottom: .25em;
 }

@@ -303,7 +303,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* ***** Grid ******************************************************************************************************* */
 
 /* Modify grid content in editable mode */
-.fr-editable .fr-grid-content { padding: 0; position: relative }
+.fr-editable .fr-grid-content { padding: 0; margin: 0; position: relative }
 
 .xbl-fr-grid table.fr-grid.fr-editable { border-collapse: collapse } /* override default in form-runner-base.css */
 .fr-grid-td { border: 1px solid transparent }

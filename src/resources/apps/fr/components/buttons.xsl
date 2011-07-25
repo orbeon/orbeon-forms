@@ -219,7 +219,6 @@
             <fr:button id="fr-collapse-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt=""/>
-                    <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/collapse-all"/>-->
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fr-collapse-all" target="fr-sections-model"/>
             </fr:button>
@@ -231,7 +230,6 @@
             <fr:button id="fr-expand-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt=""/>
-                    <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/expand-all"/>-->
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fr-expand-all" target="fr-sections-model"/>
             </fr:button>

@@ -31,7 +31,7 @@
     <xsl:import href="view.xsl"/>
     <xsl:import href="buttons.xsl"/>
     <xsl:import href="inplace.xsl"/><!-- just for inplace textarea for now -->
-    <xsl:import href="section.xsl"/>
+    <xsl:import href="section.xsl"/><!-- pass global section properties to fr:section -->
     <xsl:import href="repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
@@ -226,17 +226,9 @@
             <xsl:variable name="section-ids" select="$input-data//fr:section/@id" as="xs:string*"/>
             <xsl:variable name="section-ids-sequence" select="concat('(', string-join(for $s in $section-ids return concat('''', $s, ''''), ','), ')')" as="xs:string*"/>
 
-            <!-- Collapse all sections -->
-            <xforms:action ev:event="fr-collapse-all" xxforms:iterate="{$section-ids-sequence}">
-                <xforms:toggle case="case-{{.}}-closed"/>
-                <xforms:toggle case="case-button-{{.}}-closed"/>
-            </xforms:action>
-
-            <!-- Expand all sections -->
-            <xforms:action ev:event="fr-expand-all" xxforms:iterate="{$section-ids-sequence}">
-                <xforms:toggle case="case-{{.}}-open"/>
-                <xforms:toggle case="case-button-{{.}}-open"/>
-            </xforms:action>
+            <!-- Collapse or expand all sections -->
+            <xforms:dispatch ev:event="fr-collapse-all" xxforms:iterate="{$section-ids-sequence}" name="fr-collapse" targetid="{{.}}"/>
+            <xforms:dispatch ev:event="fr-expand-all"   xxforms:iterate="{$section-ids-sequence}" name="fr-expand"   targetid="{{.}}"/>
         </xforms:model>
         <!-- This model handles global error summary information -->
         <xforms:model id="fr-error-summary-model">

@@ -33,27 +33,39 @@
 
     <xbl:binding id="fr-section" element="fr|section">
 
+        <xbl:handlers>
+            <xbl:handler event="fr-expand" phase="target">
+                <xforms:toggle case="case-button-open"/>
+                <xforms:toggle case="case-open"/>
+            </xbl:handler>
+            <xbl:handler event="fr-collapse" phase="target">
+                <xforms:toggle case="case-button-closed"/>
+                <xforms:toggle case="case-closed"/>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template xxbl:transform="oxf:xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
-                <xsl:variable name="mode" select="'edit'"/><!-- TODO -->
-                <!--<xsl:variable name="ancestor-sections" as="xs:integer" select="count(ancestor::fr:section)"/>-->
-                <xsl:variable name="ancestor-sections" select="0"/><!-- TODO -->
-                <xsl:variable name="is-section-collapse" select="true()"/><!-- TODO -->
-                <xsl:variable name="is-animate-sections" select="true()"/><!-- TODO -->
-
-                <xsl:variable name="open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
-
                 <xsl:template match="/*">
+
+                    <!-- Section configuration -->
+                    <xsl:variable name="mode" select="@mode"/>
+                    <xsl:variable name="ancestor-sections" select="count(ancestor::fr:section)"/><!-- TODO -->
+                    <xsl:variable name="collapse" select="not(@collapse = 'false')"/>
+                    <xsl:variable name="animate" select="not(@animate = 'false')"/>
+
+                    <xsl:variable name="open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
+
                     <!-- Section content area -->
                     <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
                         <xsl:attribute name="class" select="string-join(('fr-section-container', @class), ' ')"/>
 
                         <xf:group xxbl:scope="inner" appearance="xxf:internal">
 
-                            <!-- TODO: resources -->
+                            <!-- Q: Is this the best way to get access to Form Runner resources? -->
                             <xxf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xxf:var>
 
                             <!-- Section title area: open/close button, title, help -->
@@ -62,7 +74,7 @@
 
                                 <!-- Open/close button -->
                                 <xforms:group appearance="xxforms:internal">
-                                    <xsl:if test="$is-section-collapse">
+                                    <xsl:if test="$collapse">
                                         <xforms:switch id="switch-button" xxforms:readonly-appearance="dynamic" class="fr-section-arrow">
                                             <xforms:case id="case-button-closed" selected="{not($open)}">
                                                 <!-- "+" trigger -->
@@ -83,7 +95,7 @@
                                         </xforms:switch>
 
                                         <!-- Handle DOMActivate event to open/close the switches -->
-                                        <xforms:action ev:event="DOMActivate" ev:target="section button-open button-close">
+                                        <xforms:action ev:event="DOMActivate">
                                             <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
                                             <xforms:action if="$expand">
                                                 <!-- Expand -->
@@ -98,8 +110,9 @@
                                         </xforms:action>
                                     </xsl:if>
 
+                                    <!-- Actual section title -->
                                     <xsl:choose>
-                                        <xsl:when test="$is-section-collapse">
+                                        <xsl:when test="$collapse">
                                             <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
                                             <!-- TODO: check noscript help now that we have changed to XBL -->
                                             <xforms:trigger appearance="minimal" class="fr-section-label" xxbl:scope="outer">
@@ -124,7 +137,7 @@
                                 <xforms:case id="case-closed" selected="{not($open)}"/>
                                 <!-- Open section -->
                                 <xforms:case id="case-open" selected="{$open}">
-                                    <xsl:if test="$is-animate-sections">
+                                    <xsl:if test="$animate">
                                         <xsl:attribute name="class">xxforms-animate</xsl:attribute>
                                     </xsl:if>
                                     <xforms:group class="fr-section-content" xxbl:scope="outer">

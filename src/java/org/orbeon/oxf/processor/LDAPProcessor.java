@@ -13,27 +13,21 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
-import javax.naming.Context;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
+import javax.naming.*;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class LDAPProcessor extends ProcessorImpl {
     static private Logger logger = LoggerFactory.createLogger(LDAPProcessor.class);
@@ -55,6 +49,7 @@ public class LDAPProcessor extends ProcessorImpl {
     public static final String BIND_PROPERTY = "bind-dn";
     public static final String PASSWORD_PROPERTY = "password";
     public static final String PROTOCOL_PROPERTY = "protocol";
+    public static final String SCOPE_PROPERTY = "scope";
 
 
     public LDAPProcessor() {
@@ -80,6 +75,7 @@ public class LDAPProcessor extends ProcessorImpl {
                             String password = XPathUtils.selectStringValueNormalize(doc, "/config/password");
                             String protocol = XPathUtils.selectStringValueNormalize(doc, "/config/protocol");
                             String referral = XPathUtils.selectStringValueNormalize(doc, "/config/referral ");
+                            String scope = XPathUtils.selectStringValueNormalize(doc, "/config/scope");
 
                             //logger.info("Referral="+referral);
 
@@ -89,10 +85,11 @@ public class LDAPProcessor extends ProcessorImpl {
                             config.setBindDN(bindDN != null ? bindDN : getPropertySet().getString(BIND_PROPERTY));
                             config.setPassword(password != null ? password : getPropertySet().getString(PASSWORD_PROPERTY));
                             config.setProtocol(protocol != null ? protocol : getPropertySet().getString(PROTOCOL_PROPERTY));
+                            config.setScope(scope != null ? scope: getPropertySet().getString(SCOPE_PROPERTY));
 
                             // If not set use providers default. Valid values are follow, ignore, throw
                             if (referral != null){
-                            	config.setReferral(referral);
+                              config.setReferral(referral);
                             }
 
                             // The password and bind DN are allowed to be blank
@@ -163,7 +160,7 @@ public class LDAPProcessor extends ProcessorImpl {
                         final String[] attrs = new String[attributesList.size()];
                         attributesList.toArray(attrs);
 
-                        List results = search(ctx, config.getRootDN(), command.getName(), attrs);
+                        List results = search(ctx, config.getRootDN(), config.getScope(), command.getName(), attrs);
                         serialize(results, config, xmlReceiver);
                     }
 
@@ -215,18 +212,39 @@ public class LDAPProcessor extends ProcessorImpl {
         }
     }
 
-    private List search(DirContext ctx, String rootDN, String filter, String[] attributes) {
+    private List search(DirContext ctx, String rootDN, String scope, String filter, String[] attributes) {
         try {
             List listResults = new ArrayList();
             SearchControls constraints = new SearchControls();
 
-            constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            constraints.setSearchScope(convertSearchScope(scope));
             constraints.setReturningAttributes(attributes);
 
-            NamingEnumeration results = ctx.search(rootDN, filter, constraints);
-            for (; results.hasMore();) {
-                SearchResult result = (SearchResult) results.next();
-                listResults.add(result);
+            try {
+                if (scope != null && scope.toUpperCase().equals("ALLLEVELS")) {
+                    String[] levels = rootDN.split(",");
+                    for (int i = 0; i < levels.length; i++) {
+                        String[] currentLevels = new String[levels.length - i];
+                        System.arraycopy(levels, i, currentLevels, 0, levels.length - i);
+                        String levelRootDN = StringUtils.join(currentLevels, ",");
+                        if (logger.isDebugEnabled())
+                            logger.debug("LDAP Search on level " + levelRootDN);
+                        NamingEnumeration results = ctx.search(levelRootDN, filter, constraints);
+                        for (; results.hasMore(); ) {
+                            SearchResult result = (SearchResult) results.next();
+                            listResults.add(result);
+                        }
+                    }
+                } else {
+                    NamingEnumeration results = ctx.search(rootDN, filter, constraints);
+                    for (; results.hasMore(); ) {
+                        SearchResult result = (SearchResult) results.next();
+                        listResults.add(result);
+                    }
+                }
+
+            } catch (NameNotFoundException e) {
+                // for example in case of ALLLEVELS scope, if the LDAP database suffix has more than one component, the last iteration would result in NameNotFoundException
             }
             return listResults;
         } catch (NamingException e) {
@@ -244,7 +262,11 @@ public class LDAPProcessor extends ProcessorImpl {
 
                 ch.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
                 addElement(ch, "name", sr.getName());
-
+                try {
+                  addElement(ch, "fullname", sr.getNameInNamespace());
+                } catch (UnsupportedOperationException e) {
+                    // This seems to be the only  way to know if sr contains a name!
+                }
                 Attributes attr = sr.getAttributes();
                 NamingEnumeration attrEn = attr.getAll();
                 while (attrEn.hasMoreElements()) {
@@ -291,7 +313,7 @@ public class LDAPProcessor extends ProcessorImpl {
             env.put(Context.INITIAL_CONTEXT_FACTORY, DEFAULT_CTX);
             env.put(Context.PROVIDER_URL, "ldap://" + config.getHost() + ":" + config.getPort());
             if (config.getReferral() != null){
-            	env.put(Context.REFERRAL, config.getReferral());
+              env.put(Context.REFERRAL, config.getReferral());
             }
 
             if (config.getProtocol() != null)
@@ -327,6 +349,17 @@ public class LDAPProcessor extends ProcessorImpl {
         contentHandler.characters(charArray, 0, charArray.length);
     }
 
+    private int convertSearchScope(String scope) {
+        if (scope != null && scope.toUpperCase().equals("SUBTREE")) {
+            return SearchControls.SUBTREE_SCOPE;
+        } else if (scope != null && scope.toUpperCase().equals("OBJECT")) {
+            return SearchControls.OBJECT_SCOPE;
+        } else if (scope != null && (scope.toUpperCase().equals("ALLLEVELS") || scope.toUpperCase().equals("ONELEVEL"))) {
+            return SearchControls.ONELEVEL_SCOPE;
+        } else {
+            return SearchControls.SUBTREE_SCOPE;
+        }
+    }
 
     private static class Config {
         private String host = DEFAULT_HOST;
@@ -336,6 +369,7 @@ public class LDAPProcessor extends ProcessorImpl {
         private String rootDN;
         private String protocol;
         private String referral;
+        private String scope;
 
         private List attributes = new ArrayList();
 
@@ -393,6 +427,14 @@ public class LDAPProcessor extends ProcessorImpl {
 
         public void setReferral(String referral) {
             this.referral = referral;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
         }
 
         public List getAttributes() {

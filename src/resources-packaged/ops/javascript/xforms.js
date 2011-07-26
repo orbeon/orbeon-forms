@@ -3449,6 +3449,14 @@ ORBEON.xforms.Events = {
 
             // Iterate on ancestors, stop when we don't find ancestors anymore or we arrive at the form element
             while (node != null && ! (ORBEON.util.Dom.isElement(node) && node.tagName.toLowerCase() == "form")) {
+
+                // First check clickable group
+                if (YAHOO.util.Dom.hasClass(node, "xforms-activable")) {
+                    var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, null, "DOMActivate");
+                    ORBEON.xforms.server.AjaxServer.fireEvents([event]);
+                    break;
+                }
+
                 // Iterate on previous siblings
                 var delimiterCount = 0;
                 var foundRepeatBegin = false;

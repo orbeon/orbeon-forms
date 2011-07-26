@@ -74,7 +74,7 @@
                 <xsl:template match="/*">
 
                     <!-- 2011-07-22: Temporary attribute to allow FB to disable the use of fr:button until script issues are fixed -->
-                    <xsl:variable name="button-qname" select="if (@button-element) then @button-element else 'fr:button'"/>
+                        <xsl:variable name="button-qname" select="if (@button-element) then @button-element else 'fr:button'"/>
 
                     <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
                     <xforms:switch xxbl:scope="outer" xbl:attr="model context ref bind">

@@ -16,15 +16,24 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.XFormsConstants
 
 class XXFormsControlElement extends XFormsFunction {
 
     override def evaluateItem(xpathContext: XPathContext) =
         Option(if (argument.length == 0) xpathContext.getContextItem else argument(0).evaluateItem(xpathContext)) map
-            (item => getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), item.getStringValue, null)) flatMap {
+            (item => resolveOrFindByEffectiveId(xpathContext, item.getStringValue)) flatMap {
                 case control: XFormsControl =>
                     Some(getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(control.getControlElement))
                 case _ =>
                     None
             } orNull
+
+    def resolveOrFindByEffectiveId(xpathContext: XPathContext, staticOrEffectiveId: String) =
+        if (isEffectiveId(staticOrEffectiveId))
+            getContainingDocument(xpathContext).getObjectByEffectiveId(staticOrEffectiveId)
+        else
+            getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), staticOrEffectiveId, null)
+
+    def isEffectiveId(id: String) = id.contains(XFormsConstants.COMPONENT_SEPARATOR) || id.contains(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)
 }

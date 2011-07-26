@@ -52,9 +52,8 @@
                 <xbl:content/>
 
                 <!-- Listen to activations on grid cells -->
-                <xf:action ev:event="DOMActivate" if="tokenize(xxf:control-element(xxf:event('xxf:targetid'))/@class, '\s+') = 'xforms-activable'">
-                <!--<xf:action ev:event="DOMActivate">-->
-                    <xf:setvalue xxbl:scope="inner" ref="instance()" value="xxf:event('xxf:targetid')"/>
+                <xf:action ev:event="DOMActivate" if="tokenize(xxf:control-element(xxf:event('xxf:effective-targetid'))/@class, '\s+') = 'xforms-activable'">
+                    <xf:setvalue xxbl:scope="inner" ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="xxf:event('xxf:targetid')"/>
                     <!--<xf:message value="xxf:control-element(xxf:event('xxf:targetid'))/@class"/>-->
                 </xf:action>
 

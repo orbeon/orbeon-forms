@@ -28,7 +28,7 @@
 
          xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
 
-    <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
+    <xbl:binding id="fb-dialog-control-details-new" element="fb|dialog-control-details-new">
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">

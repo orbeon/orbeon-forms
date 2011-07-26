@@ -50,20 +50,18 @@
                         <!-- Edit details for any control -->
                         <xf:trigger appearance="minimal" id="fb-edit-details-trigger">
                             <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>
-                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-control-details">
+                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-control-details">
                                 <xxf:context name="control-id" value="$control/@id"/>
                             </xf:dispatch>
                         </xf:trigger>
 
                         <!-- Edit validation for any control -->
-                        <xf:trigger appearance="minimal" id="fb-edit-alert-trigger">
+                        <xf:trigger appearance="minimal" id="fb-edit-validation-trigger">
                             <xf:label><xh:img class="fb-control-alert" alt="{$fb-resources/validation-settings-icon/label}" title="{$fb-resources/validation-settings-icon/label}" src="/apps/fr/style/images/silk/exclamation.png"/></xf:label>
-                            <xf:action ev:event="DOMActivate">
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-validation-details">
-                                    <!-- TODO: neighbor="fb-edit-alert-trigger" -->
-                                    <xxf:context name="control-id" value="$control/@id"/>
-                                </xf:dispatch>
-                            </xf:action>
+                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-validation-details">
+                                <!-- TODO: neighbor="fb-edit-validation-trigger" -->
+                                <xxf:context name="control-id" value="$control/@id"/>
+                            </xf:dispatch>
                         </xf:trigger>
 
                         <!--&lt;!&ndash; Change appearance for selection controls &ndash;&gt;-->

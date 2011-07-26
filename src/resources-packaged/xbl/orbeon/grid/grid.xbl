@@ -347,7 +347,7 @@
                                                             <xsl:choose>
                                                                 <xsl:when test="$editable">
                                                                     <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                                    <xsl:attribute name="class">fr-grid-td{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
+                                                                    <xsl:attribute name="class">xforms-activable fr-grid-td{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
                                                                     <xsl:attribute name="class">fr-grid-td</xsl:attribute>
@@ -402,11 +402,6 @@
                                                                                 </xf:action>
                                                                             </xf:trigger>
                                                                         </xsl:if>
-                                                                        <!-- TMP: handle focus -->
-                                                                        <xf:trigger appearance="minimal">
-                                                                            <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_green.png"/></xf:label>
-                                                                            <xf:setvalue ev:event="DOMActivate" ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$td/@id"/>
-                                                                        </xf:trigger>
                                                                     </xh:div>
                                                                 </xsl:if>
 

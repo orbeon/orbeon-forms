@@ -28,8 +28,8 @@
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <xsl:template match="xhtml:body//fr:section | xbl:binding/xbl:template//fr:section">
         <fr:section animate="{$is-animate-sections}" collapse="{$is-section-collapse}" mode="{$mode}">
-            <xsl:copy-of select="@* except (@animate, @collapse, @mode)"/>
-            <xsl:copy-of select="node()"/>
+            <xsl:apply-templates select="@* except (@animate, @collapse, @mode)"/>
+            <xsl:apply-templates select="node()"/>
         </fr:section>
     </xsl:template>
 </xsl:stylesheet>

@@ -105,21 +105,24 @@ object XFormsAPI {
     }
 
     // Move the given element before another element
-    def moveElementBefore(element: NodeInfo, other: NodeInfo) {
-        insert(into = element.parent.get, before = other, origin = element)
+    def moveElementBefore(element: NodeInfo, other: NodeInfo) = {
+        val inserted = insert(into = element.parent.get, before = other, origin = element)
         delete(element)
+        inserted.head
     }
 
     // Move the given element after another element
-    def moveElementAfter(element: NodeInfo, other: NodeInfo) {
-        insert(into = element.parent.get, after = other, origin = element)
+    def moveElementAfter(element: NodeInfo, other: NodeInfo) = {
+        val inserted = insert(into = element.parent.get, after = other, origin = element)
         delete(element)
+        inserted.head
     }
 
-    // Move the given element into another element at the end
-    def moveElementInto(element: NodeInfo, other: NodeInfo) {
-        insert(into = other, after = other \ *, origin = element)
+    // Move the given element into another element as the last element
+    def moveElementIntoAsLast(element: NodeInfo, other: NodeInfo) = {
+        val inserted = insert(into = other, after = other \ *, origin = element)
         delete(element)
+        inserted.head
     }
 
     // Set an attribute value, creating it if missing, updating it if present

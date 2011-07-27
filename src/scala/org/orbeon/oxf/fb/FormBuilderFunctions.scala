@@ -86,10 +86,6 @@ object FormBuilderFunctions {
         (metadataInstance ne null) && metadataInstance \ "form-instance-mode" === "custom"
     }
 
-    // Convert two options to an optional tuple
-    def tupleOption[T](option1: Option[T], option2: Option[T]) =
-        option1.toList.zip(option2.toList).headOption
-
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) {

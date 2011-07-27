@@ -330,7 +330,7 @@ object GridOps {
     def findTemplateHolder(descendantOrSelf: NodeInfo, controlName: String) =
         for {
             grid <- findGrid(descendantOrSelf)
-            gridName <- getContainerName(grid)
+            gridName <- getControlNameOption(grid)
             root <- templateRoot(descendantOrSelf, gridName)
             holder <- root descendantOrSelf * filter (name(_) == controlName) headOption
         } yield

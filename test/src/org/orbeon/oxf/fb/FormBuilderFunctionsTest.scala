@@ -97,7 +97,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val doc = getNewDoc
 
         assert(findSectionName(doc, control1).get === section1)
-        assert(getContainerName(doc \\ "*:section" head).get === section1)
+        assert(getControlNameOption(doc \\ "*:section" head).get === section1)
     }
 
     private def mockActionInterpreter(doc: DocumentWrapper) = {

@@ -79,7 +79,7 @@ object ToolboxOps {
                 val level1Block = containers.last
 
                 val newSectionName = "section-" + nextId(doc, "section")
-                val precedingSectionName = getContainerName(level1Block)
+                val precedingSectionName = getControlNameOption(level1Block)
 
                 val sectionTemplate: NodeInfo =
                     <fb:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref=""
@@ -174,7 +174,7 @@ object ToolboxOps {
                 val newGrid = insert(into = level1Block, after = level2Block, origin = gridTemplate)
 
                 // Find section name
-                val sectionName = getContainerName(level1Block).get
+                val sectionName = getControlNameOption(level1Block).get
 
                 // Insert instance holder
                 val sectionHolder = formInstanceRoot(doc) \ sectionName head

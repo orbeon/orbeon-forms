@@ -37,12 +37,12 @@ object SectionOps {
     // Move the section right if possible
     def moveSectionRight(container: NodeInfo) =
         precedingSection(container) foreach
-            (moveContainerLR(container, _, moveElementInto))
+            (moveContainer(container, _, moveElementIntoAsLast))
 
     // Move the section left if possible
     def moveSectionLeft(container: NodeInfo) =
         parentSection(container) foreach
-            (moveContainerLR(container, _, moveElementAfter))
+            (moveContainer(container, _, moveElementAfter))
 
     def parentSection(container: NodeInfo) = container.parent filter (localname(_) == "section")
     def parentContainer(container: NodeInfo) = container.parent filter (p => Set("section", "body")(localname(p)))
@@ -52,7 +52,7 @@ object SectionOps {
 
     // Find the section name given a descendant node
     def findSectionName(descendant: NodeInfo): String  =
-        (descendant ancestor "*:section" map (getContainerName(_)) flatten).head
+        (descendant ancestor "*:section" map (getControlNameOption(_)) flatten).head
 
     // Find the section name for a given control name
     def findSectionName(doc: NodeInfo, controlName: String): Option[String] =

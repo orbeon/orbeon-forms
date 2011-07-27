@@ -58,7 +58,12 @@ object ControlOps {
     def findBindByNameOrEmpty(doc: NodeInfo, name: String) = findBindById(doc, bindId(name)).orNull
 
     // Get the control's name based on the control element
-    def getControlName(control: NodeInfo) = controlName(control \@ "id" getStringValue)
+    def getControlName(control: NodeInfo) = getControlNameOption(control).get
+
+    // Get the control's name based on the control element
+    def getControlNameOption(control: NodeInfo) =
+        (control \@ "id" headOption) map
+            (id => controlName(id.getStringValue))
 
     // Find a control (including grids and sections) element by id
     def findControlById(doc: NodeInfo, id: String) =
@@ -217,6 +222,10 @@ object ControlOps {
             (findResourceHolders(doc, holderName) map (Option(_))) :+
             (findControlElement(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
+    def findResourceAndTemplateHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
+        (findResourceHolders(doc, holderName) map (Option(_))) :+
+            (findControlElement(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+
     // Find or create a data holder for the given hierarchy of names
     def ensureDataHolder(root: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]) = {
 
@@ -276,7 +285,7 @@ object ControlOps {
         // Insert repeat template holder if needed
         for {
             grid <- findGrid(currentTd)
-            gridName <- getContainerName(grid)
+            gridName <- getControlNameOption(grid)
             root <- templateRoot(doc, gridName)
         } yield
             ensureDataHolder(root, Seq((() => dataHolder, precedingControlName)))

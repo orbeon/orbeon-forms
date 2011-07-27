@@ -34,6 +34,22 @@ object SectionOps {
         container.followingElement foreach
             (moveContainer(container, _, moveElementAfter))
 
+    // Move the section right if possible
+    def moveSectionRight(container: NodeInfo) =
+        precedingSection(container) foreach
+            (moveContainerLR(container, _, moveElementInto))
+
+    // Move the section left if possible
+    def moveSectionLeft(container: NodeInfo) =
+        parentSection(container) foreach
+            (moveContainerLR(container, _, moveElementAfter))
+
+    def parentSection(container: NodeInfo) = container.parent filter (localname(_) == "section")
+    def parentContainer(container: NodeInfo) = container.parent filter (p => Set("section", "body")(localname(p)))
+    def grandParentContainer(container: NodeInfo) = parentSection(container) flatMap (parentContainer(_))
+
+    def precedingSection(container: NodeInfo) = container precedingSibling "*:section" headOption
+
     // Find the section name given a descendant node
     def findSectionName(descendant: NodeInfo): String  =
         (descendant ancestor "*:section" map (getContainerName(_)) flatten).head

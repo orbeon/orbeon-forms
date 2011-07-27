@@ -184,6 +184,12 @@
         <move-down-icon>
             <label>Move Down</label>
         </move-down-icon>
+        <move-right-icon>
+            <label>Move Right</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>Move Left</label>
+        </move-left-icon>
         <control-details-icon>
             <label>Control Details</label>
         </control-details-icon>
@@ -961,6 +967,12 @@
         <move-down-icon>
             <label>Déplacer vers le bas</label>
         </move-down-icon>
+        <move-right-icon>
+            <label>Déplacer vers la droite</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>Déplacer vers la gauche</label>
+        </move-left-icon>
         <control-details-icon>
             <label>Détails du contrôle</label>
         </control-details-icon>
@@ -1735,6 +1747,12 @@
         <move-down-icon>
             <label>Flytt ned</label>
         </move-down-icon>
+        <move-right-icon>
+            <label>[Move Right]</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>[Move Left]</label>
+        </move-left-icon>
         <control-details-icon>
             <label>Elementdetaljer</label>
         </control-details-icon>
@@ -2508,6 +2526,12 @@
         <move-down-icon>
             <label>Переместить ниже</label>
         </move-down-icon>
+        <move-right-icon>
+            <label>[Move Right]</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>[Move Left]</label>
+        </move-left-icon>
         <control-details-icon>
             <label>Настройки элемента</label>
         </control-details-icon>

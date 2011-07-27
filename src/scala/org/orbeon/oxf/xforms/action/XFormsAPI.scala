@@ -116,7 +116,13 @@ object XFormsAPI {
         delete(element)
     }
 
-    // Set an attribute value, creating it if missing, updating it if presenty
+    // Move the given element into another element at the end
+    def moveElementInto(element: NodeInfo, other: NodeInfo) {
+        insert(into = other, after = other \ *, origin = element)
+        delete(element)
+    }
+
+    // Set an attribute value, creating it if missing, updating it if present
     // NOTE: This should be implemented as an optimization of the XForms insert action.
     // @return the new or existing attribute node
     // NOTE: Would be nice to return attribute (new or existing), but doInsert() is not always able to wrap the inserted

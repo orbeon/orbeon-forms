@@ -60,12 +60,8 @@ object ContainerOps {
         delete(container)
     }
 
-    // Move a container based on a move function (typically up or down). The container remains at the same hierarhical level.
-    def moveContainer(container: NodeInfo, other: NodeInfo, move: (NodeInfo, NodeInfo) => Unit) {
-
-        // Convert two options to an optional tuple
-        def tupleOption[T](option1: Option[T], option2: Option[T]) =
-            option1.toList.zip(option2.toList).headOption
+    // Move a container based on a move function (typically up or down). The container remains at the same hierarchical level.
+    def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) => Unit) {
 
         // Find all siblings of the given element with the given name, excepting the given element
         def findSiblingsWithName(element: NodeInfo, siblingName: String) =
@@ -75,27 +71,62 @@ object ContainerOps {
 
         // Get names before moving the container
         val nameOption = getContainerName(container)
-        val otherNameOption = getContainerName(other)
+        val otherNameOption = getContainerName(otherContainer)
+
+        val doc = container.getDocumentRoot
 
         // Move container itself
-        move(container, other)
+        move(container, otherContainer)
 
         // Try to move based on name of other element
         tupleOption(nameOption, otherNameOption) foreach {
-            case (name, precedingName) =>
+            case (name, otherName) =>
 
                 // Move data, resources, and template holders
                 for {
-                    holder <- findHolders(container, name)
-                    sibling <- findSiblingsWithName(holder, precedingName) take 1
+                    holder <- findHolders(doc, name)
+                    sibling <- findSiblingsWithName(holder, otherName) take 1
                 } yield
                     move(holder, sibling)
 
                 // Move bind
                 for {
-                    bind <- findBindByName(container, name)
-                    otherBind <- findBindByName(container, precedingName)
-                    if bind.parent.get isSameNodeInfo otherBind.parent.get
+                    bind <- findBindByName(doc, name)
+                    otherBind <- findBindByName(doc, otherName)
+                    if bind.parent.get isSameNodeInfo otherBind.parent.get // what if not?
+                } yield
+                    move(bind, otherBind)
+        }
+    }
+
+    def moveContainerLR(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) => Unit) {
+
+        // Get names before moving the container
+        val nameOption = getContainerName(container)
+        val otherNameOption = getContainerName(otherContainer)
+
+        val doc = container.getDocumentRoot
+
+        // Move container itself
+        move(container, otherContainer)
+
+        // Try to move based on name of other element
+        tupleOption(nameOption, otherNameOption) foreach {
+            case (name, otherName) =>
+
+                // Move data holder only
+                for {
+                    holder <- findDataHolder(doc, name)
+                    otherHolder <- findDataHolder(doc, otherName)
+                } yield
+                    move(holder, otherHolder)
+
+                // TODO: adjust resource holders for cosmetics
+
+                // Move bind
+                for {
+                    bind <- findBindByName(doc, name)
+                    otherBind <- findBindByName(doc, otherName)
                 } yield
                     move(bind, otherBind)
         }

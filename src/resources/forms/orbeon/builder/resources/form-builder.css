@@ -83,7 +83,7 @@ h1.fr-form-title {
 #fb-toolbox ul { margin: 0; overflow: auto }
 #fb-toolbox li { list-style-type: none; white-space: nowrap; font-size: 11px }
 
-#fb-toolbox a.xforms-trigger { text-decoration: none }
+#fb-toolbox span.xforms-trigger a { text-decoration: none }
 
 #fb-toolbox .fb-metadata-settings select { width: 100% }
 

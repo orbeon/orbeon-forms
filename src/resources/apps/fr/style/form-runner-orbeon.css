@@ -165,12 +165,17 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
     padding: 0
 }
 
+/* Add a star before the label of required fields */
+/* NOTE: This only works in span layout, and at this point we are still using nospan in FR */
+.xforms-required label {
+    background-image: url(asterisk.png);
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
 /* Colored border for invalid fields */
-/* NOTE: style required-empty as well to show user which are the required fields */
-.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited,
-    .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty,
-        input.xforms-required-empty, .xforms-required-empty input
-        { border-color: #DF731B }
+/* NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label */
+.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: #DF731B }
 
 /* Upload control information */
 .xforms-upload-info { background-color: transparent }

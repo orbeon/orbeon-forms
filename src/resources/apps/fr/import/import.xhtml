@@ -120,6 +120,11 @@
                 <xf:message ev:event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
             </xf:submission>
 
+            <!-- Start import once data is deleted -->
+            <xf:action ev:event="xforms-submit-done" ev:observer="fr-import-delete-data-submission">
+                <xf:send submission="fr-import-import-submission"/>
+            </xf:action>
+
             <!-- Statistics gathered upon polling event -->
             <xf:instance id="fr-batch-stats">
                 <stats>
@@ -399,10 +404,6 @@
                                                 <xf:label>Delete</xf:label>
                                                 <!-- Delete data first -->
                                                 <xf:send ev:event="DOMActivate" submission="fr-import-delete-data-submission"/>
-                                                <!-- Then start import -->
-                                                <xf:action ev:event="xforms-submit-done" ev:observer="fr-import-delete-data-submission">
-                                                    <xf:send submission="fr-import-import-submission"/>
-                                                </xf:action>
                                             </fr:button>
                                         </fr:td>
                                     </fr:tr>

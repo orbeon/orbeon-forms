@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.URLRewriterUtils
 import java.util.{Collections, HashMap}
 
-// This request copies all values of the given request
+// This request copies all values of the given request ahead of time
 class AsyncRequest(req: Request) extends ExternalContext.Request {
 
     private val session = req.getSession(true) // assume it's ok to create a session
@@ -29,8 +29,9 @@ class AsyncRequest(req: Request) extends ExternalContext.Request {
     def getSession(create: Boolean) = session
     def sessionInvalidate() = session.invalidate()
 
-    // TODO: We can't support this w/o knowing a list of roles in advance
-    def isUserInRole(role: String) = throw new UnsupportedOperationException
+    // With Liferay, we know in advance the list of roles and we already have them available as a header
+    // With other containers, we don't know the list of headers in advance, so this won't work!
+    def isUserInRole(role: String) = getHeaderValuesMap.get("orbeon-liferay-user-roles") contains role
 
     // TODO
     val getReader = null

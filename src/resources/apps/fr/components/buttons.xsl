@@ -30,8 +30,7 @@
         <xforms:group ref=".[property('xxforms:noscript')]">
             <fr:button id="fr-refresh-button">
                 <xforms:label>
-                    <xhtml:img width="11" height="16" src="/apps/fr/style/images/silk/arrow_refresh.png" alt=""/>
-                    <xforms:output value="$fr-resources/summary/labels/refresh"/>
+                    <xhtml:img width="11" height="16" src="/apps/fr/style/images/silk/arrow_refresh.png" alt="{{$fr-resources/summary/labels/refresh}}"/>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <!-- NOP -->
@@ -218,7 +217,7 @@
         <xsl:if test="$is-section-collapse">
             <fr:button id="fr-collapse-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt=""/>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt="{{$fr-resources/detail/labels/collapse-all}}"/>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fr-collapse-all" target="fr-sections-model"/>
             </fr:button>
@@ -229,7 +228,7 @@
         <xsl:if test="$is-section-collapse">
             <fr:button id="fr-expand-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt=""/>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt="{{$fr-resources/detail/labels/expand-all}}"/>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fr-expand-all" target="fr-sections-model"/>
             </fr:button>

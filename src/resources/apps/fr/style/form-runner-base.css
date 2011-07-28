@@ -236,15 +236,15 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 }
 
 /* Special sizing for expand/collapse buttons */
-.fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger,
-    .fr-buttons #fr-collapse-all-button .xforms-trigger button, .fr-buttons #fr-expand-all-button .xforms-trigger button {
+.fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger, .fr-buttons #fr-refresh-button .xforms-trigger,
+    .fr-buttons #fr-collapse-all-button .xforms-trigger button, .fr-buttons #fr-expand-all-button .xforms-trigger button, .fr-buttons #fr-refresh-button .xforms-trigger button {
 
     min-width: 2em;
     width: 2em;
     padding: 0;
 }
 
-.fr-buttons #fr-collapse-all-button img, .fr-buttons #fr-expand-all-button img {
+.fr-buttons #fr-collapse-all-button img, .fr-buttons #fr-expand-all-button img, .fr-buttons #fr-refresh-button img {
     margin-right: 0
 }
 

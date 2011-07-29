@@ -50,6 +50,7 @@ public class Connection {
     private static final String LOG_TYPE = "connection";
 
     public static final String HTTP_FORWARD_HEADERS_PROPERTY = "oxf.http.forward-headers";
+    public static final String HTTP_FORWARD_COOKIES_PROPERTY = "oxf.http.forward-cookies";
 
     public static final String HTTP_STATE_PROPERTY = "oxf.http.state";
     private static final String HTTP_COOKIE_STORE_ATTRIBUTE = "oxf.http.cookie-store";
@@ -141,7 +142,9 @@ public class Connection {
         }
 
         // Forward cookies for session handling
-        if (username == null) {
+        // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
+        final String[] cookiesToForward = getForwardCookies();
+        if (username == null && cookiesToForward.length > 0) {
 
             // NOTES 2011-01-22:
             //
@@ -162,9 +165,12 @@ public class Connection {
 
             // START "NEW" 2009 ALGORITHM
 
+            // By convention, the first cookie name is the session cookie
+            final String sessionCookieName = cookiesToForward[0];
+
             // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
             // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
-            // Websphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
+            // WebSphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
             // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
 
             // TODO: ExternalContext must provide direct access to cookies
@@ -191,14 +197,14 @@ public class Connection {
                     }
 
                     if (forwardSessionCookies) {
-                        for (final Cookie cookie: cookies) {
-                            // This is the standard JSESSIONID cookie
-                            final boolean isJSessionId = cookie.getName().equals("JSESSIONID");
-                            // Remember if we've seen JSESSIONID
-                                sessionCookieSet |= isJSessionId;
 
-                            // Forward JSESSIONID and JSESSIONIDSSO for JBoss
-                            if (isJSessionId || cookie.getName().equals("JSESSIONIDSSO")) {
+                        final List<String> cookiesToForwardAsList = Arrays.asList(cookiesToForward);
+
+                        for (final Cookie cookie: cookies) {
+                            // Remember if we've seen the session cookie
+                            sessionCookieSet |= cookie.getName().equals(sessionCookieName);
+
+                            if (cookiesToForwardAsList.contains(cookie.getName())) {
                                 // Multiple cookies in the header, separated with ";"
                                 if (sb.length() > 0)
                                     sb.append("; ");
@@ -221,7 +227,7 @@ public class Connection {
                 }
             }
 
-            // 2. If there is no incoming JSESSIONID cookie, try to make our own cookie. This may fail with e.g.
+            // 2. If there is no incoming session cookie, try to make our own cookie. This may fail with e.g.
             // WebSphere.
             if (!sessionCookieSet) {
                 final ExternalContext.Session session = externalContext.getSession(false);
@@ -229,15 +235,16 @@ public class Connection {
                 if (session != null) {
 
                     // This will work with Tomcat, but may not work with other app servers
-                    StringConversions.addValueToStringArrayMap(headersMap, "Cookie", "JSESSIONID=" + session.getId());
+                    StringConversions.addValueToStringArrayMap(headersMap, "Cookie", sessionCookieName + "=" + session.getId());
 
+                    // All this is for logging!
                     if (indentedLogger.isDebugEnabled()) {
 
                         String incomingSessionHeader = null;
-                        final String[] cookieHeaders = externalContext.getRequest(   ).getHeaderValuesMap().get("cookie");
+                        final String[] cookieHeaders = externalContext.getRequest().getHeaderValuesMap().get("cookie");
                         if (cookieHeaders != null) {
                             for (final String cookie: cookieHeaders) {
-                                if (cookie.indexOf("JSESSIONID") != -1) {
+                                if (cookie.indexOf(sessionCookieName) != -1) {
                                     incomingSessionHeader = cookie;
                                 }
                             }
@@ -248,7 +255,7 @@ public class Connection {
                             final Cookie[] cookies = ((HttpServletRequest) externalContext.getNativeRequest()).getCookies();
                             if (cookies != null) {
                                 for (final Cookie cookie: cookies) {
-                                    if (cookie.getName().equals("JSESSIONID")) {
+                                    if (cookie.getName().equals(sessionCookieName)) {
                                         incomingSessionCookie = cookie.getValue();
                                     }
                                 }
@@ -259,8 +266,9 @@ public class Connection {
                                 "new session", Boolean.toString(session.isNew()),
                                 "session id", session.getId(),
                                 "requested session id", externalContext.getRequest().getRequestedSessionId(),
-                                "incoming JSESSIONID cookie", incomingSessionCookie,
-                                "incoming JSESSIONID header", incomingSessionHeader);
+                                "session cookie name", sessionCookieName,
+                                "incoming session cookie", incomingSessionCookie,
+                                "incoming session header", incomingSessionHeader);
                     }
                 }
             }
@@ -269,7 +277,7 @@ public class Connection {
         }
 
         // Forward headers if needed
-        // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ JSESSIONID
+        // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ session cookies
         if (headersToForwardMap != null) {
 
             final Map<String, String[]> requestHeaderValuesMap = externalContext.getRequest().getHeaderValuesMap();
@@ -692,5 +700,10 @@ public class Connection {
     public static String getForwardHeaders() {
         final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
         return propertySet.getString(HTTP_FORWARD_HEADERS_PROPERTY, "");
+    }
+    public static String[] getForwardCookies() {
+        final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
+        final String stringValue = propertySet.getString(HTTP_FORWARD_COOKIES_PROPERTY, "JSESSIONID JSESSIONIDSSO");
+        return org.apache.commons.lang.StringUtils.split(stringValue);
     }
 }

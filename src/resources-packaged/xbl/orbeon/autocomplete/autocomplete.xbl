@@ -241,10 +241,19 @@
                                 <xforms:input id="search" ref="$local/textfield-value" incremental="true" class="fr-autocomplete-search" xbl:attr="tabindex accesskey"/>
                                 <!-- Button that opens the list of suggestions -->
                                 <xsl:if test="not(@show-suggestions-button = 'false')">
-                                    <!-- Bound to text field value so button becomes readonly when the textfield is readonly -->
-                                    <fr:button ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
-                                        <xforms:label/>
-                                    </fr:button>
+                                    <!-- Make button non-relevant in static readonly mode, in order to avoid updates to
+                                         the relevance of the nested trigger. Without this, if the trigger is initially
+                                         readonly, it won't output markup at all. But then if it becomes non-relevant,
+                                         the server will tell the client to make it non-relevant, as it has lost the
+                                         knowledge that the button was static readonly. By making the whole thing
+                                         non-relevant, we avoid this change of state. Of course ideally static
+                                         readonly would not have this unwanted behavior. -->
+                                    <xforms:group ref=".[not($local/readonly = 'true' and property('xxforms:readonly-appearance') = 'static')]">
+                                        <!-- Bound to text field value so button becomes readonly when the textfield is readonly -->
+                                        <fr:button ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
+                                            <xforms:label/>
+                                        </fr:button>
+                                    </xforms:group>
                                 </xsl:if>
                                 <xhtml:div class="fr-autocomplete-yui-div"/>
                             </xhtml:div>

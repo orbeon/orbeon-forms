@@ -39,6 +39,8 @@
             <xforms:model id="permissions-model">
                 <xforms:instance id="ui">
                     <ui>
+                        <valid/>
+                        <apply-trigger/>
                         <has-permissions/>
                         <readonly-checked>create read-update delete</readonly-checked>
                         <permissions>
@@ -48,7 +50,14 @@
                         </permissions>
                     </ui>
                 </xforms:instance>
-                <xforms:bind ref="instance('ui')/readonly-checked" readonly="true()"/>
+                <!-- Maintain validity flag -->
+                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="instance('ui')/valid">false</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-valid" ev:observer="ui" ref="instance('ui')/valid">true</xforms:setvalue>
+                <xforms:bind ref="instance('ui')">
+                    <xforms:bind ref="apply-trigger" readonly="../valid = 'false'"/>
+                    <xforms:bind ref="readonly-checked" readonly="true()"/>
+                    <xforms:bind ref="permissions/permission/role" type="xs:NMTOKEN"/>
+                </xforms:bind>
                 <xforms:instance id="permission-template">
                     <permission>
                         <role/>
@@ -112,7 +121,7 @@
                         <xxforms:variable name="permissions" select="$ui/permissions/permission[position() > 1]"/>
                         <xforms:action xxforms:iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
                             <xxforms:variable name="operation" select="."/>
-                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
+                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role/normalize-space()), ' ')"/>
                             <xforms:insert context="$metadata/permissions" nodeset="*" origin="xxforms:element('permission', (
                                 xxforms:attribute('operations', $operation),
                                 xxforms:element('user-role', xxforms:attribute('any-of', $roles))))"/>
@@ -164,7 +173,9 @@
                                             <xforms:output value="$resources/dialog-permissions/anyone"/>
                                         </xforms:group>
                                         <xforms:group ref=".[not($is-first)]">
-                                            <xforms:input ref="role"/>
+                                            <xforms:input ref="role" incremental="true">
+                                                <xforms:alert ref="$resources/dialog-permissions/invalid-role-name"/>
+                                            </xforms:input>
                                         </xforms:group>
                                     </xhtml:td>
                                     <xhtml:td>
@@ -209,7 +220,7 @@
                     <xhtml:div class="fr-dialog-buttons">
                         <xforms:group appearance="xxforms:internal" id="triggers">
                             <xhtml:span>
-                                <fr:button class="fr-inplace-rename" id="save-trigger">
+                                <fr:button class="fr-inplace-rename" ref="$ui/apply-trigger" id="save-trigger">
                                     <xforms:label ref="$resources/apply/label"/>
                                 </fr:button>
                                 <xforms:output value="$resources/or/label"/>

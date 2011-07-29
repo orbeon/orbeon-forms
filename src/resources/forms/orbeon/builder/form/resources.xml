@@ -729,6 +729,7 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
+            <invalid-role-name>Invalid role name</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
@@ -1470,6 +1471,7 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Activer les permissions basées sur les rôles pour ce formulaire</role-based-permissions>
             <role>Rôle</role>
+            <invalid-role-name>Nom de rôle invalide</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Opérations</operations>
             <anyone>Toute personne</anyone>
@@ -2213,6 +2215,7 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
+            <invalid-role-name>Invalid role name</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
@@ -2955,6 +2958,7 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
+            <invalid-role-name>Invalid role name</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>

@@ -36,13 +36,8 @@ import java.util.*;
 public class Connection {
 
     // NOTE: Could add a distinction for portlet session scope.
-    public enum StateScope {
-        NONE, REQUEST, SESSION, APPLICATION
-    }
-
-    public enum Method {
-        GET, PUT, POST
-    }
+    public enum StateScope { NONE, REQUEST, SESSION, APPLICATION }
+    public enum Method { GET, PUT, POST }
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -55,8 +50,21 @@ public class Connection {
     public static final String HTTP_STATE_PROPERTY = "oxf.http.state";
     private static final String HTTP_COOKIE_STORE_ATTRIBUTE = "oxf.http.cookie-store";
 
-    private CookieStore cookieStore;
     private final StateScope stateScope = getStateScope();
+
+    private CookieStore cookieStore;
+
+    private boolean isHTTPOrHTTPS;
+    private IndentedLogger indentedLogger;
+    private boolean logBody;
+    private String httpMethod;
+    private URL connectionURL;
+    private String username;
+    private String password;
+    private String domain;
+    String contentType;
+    private byte[] messageBody;
+    private Map<String, String[]> headersMap;
 
     /**
      * Perform a connection to the given URL with the given parameters.
@@ -77,32 +85,54 @@ public class Connection {
 
         indentedLogger.startHandleOperation(LOG_TYPE, "opening connection");
         try {
-            final boolean isHTTPOrHTTPS = isHTTPOrHTTPS(connectionURL.getProtocol());
-
-            // Caller might pass null here
-            if (headerNameValues == null)
-                headerNameValues = Collections.emptyMap();
-
-            // Get state if possible
-            if (isHTTPOrHTTPS)
-                loadHttpState(externalContext, indentedLogger);
-
-            // Get  the headers to forward if any
-            final Map<String, String[]> headersMap = (externalContext.getRequest() != null) ?
-                    getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
-
-            // Open the connection
-            final ConnectionResult result = connect(indentedLogger, logBody, httpMethod, connectionURL, username, password, domain, contentType, messageBody, headersMap);
-
-            // Save state if possible
-            if (isHTTPOrHTTPS)
-                saveHttpState(externalContext, indentedLogger);
+            // Prepare, connect, and cleanup
+            prepare(externalContext, indentedLogger, logBody, httpMethod, connectionURL, username, password, domain, contentType, messageBody, headerNameValues, headersToForward, true);
+            final ConnectionResult result = connect();
+            cleanup(externalContext, true);
 
             return result;
         } finally {
             // In case an exception is thrown in the body, still do adjust the logs
             indentedLogger.endHandleOperation();
         }
+    }
+
+    public Connection prepare(ExternalContext externalContext, IndentedLogger indentedLogger, boolean logBody,
+                              String httpMethod, final URL connectionURL, String username, String password, String domain,
+                              String contentType, byte[] messageBody, Map<String, String[]> headerNameValues,
+                              String headersToForward, boolean handleState) {
+
+        isHTTPOrHTTPS = isHTTPOrHTTPS(connectionURL.getProtocol());
+
+        // Caller might pass null here
+        if (headerNameValues == null)
+            headerNameValues = Collections.emptyMap();
+
+        // Get state if possible
+        if (handleState && isHTTPOrHTTPS)
+            loadHttpState(externalContext, indentedLogger);
+
+        this.indentedLogger = indentedLogger;
+        this.logBody = logBody;
+        this.httpMethod = httpMethod;
+        this.connectionURL = connectionURL;
+        this.username = username;
+        this.password = password;
+        this.domain = domain;
+        this.contentType = contentType;
+        this.messageBody = messageBody;
+
+        // Get  the headers to forward if any
+        headersMap = (externalContext.getRequest() != null) ?
+                getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
+
+        return this;
+    }
+
+    public void cleanup(ExternalContext externalContext, boolean handleState) {
+        // Save state if possible
+        if (handleState && isHTTPOrHTTPS)
+            saveHttpState(externalContext, indentedLogger);
     }
 
     /**
@@ -309,6 +339,9 @@ public class Connection {
     }
 
     private void loadHttpState(ExternalContext externalContext, IndentedLogger indentedLogger) {
+
+        // NOTE: BasicCookieStore is @ThreadSafe
+
         switch (stateScope) {
             case REQUEST:
                 cookieStore = (CookieStore) externalContext.getRequest().getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
@@ -365,20 +398,9 @@ public class Connection {
     /**
      * Open the connection. This sends request headers, request body, and reads status and response headers.
      *
-     * @param indentedLogger    logger
-     * @param logBody           whether the request/response body must be logged
-     * @param httpMethod        method i.e. GET, etc.
-     * @param connectionURL     URL to connect to
-     * @param username          username or null
-     * @param password          password or null
-     * @param contentType       content type for POST and PUT
-     * @param messageBody       request body for POST and PUT
-     * @param headersMap        LinkedHashMap<String headerName, String[] headerValues> headers to set
      * @return                  connection result
      */
-    private ConnectionResult connect(IndentedLogger indentedLogger, boolean logBody,
-                                     String httpMethod, final URL connectionURL, String username, String password,
-                                     String domain, String contentType, byte[] messageBody, Map<String, String[]> headersMap) {
+    public ConnectionResult connect() {
 
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
 
@@ -664,7 +686,7 @@ public class Connection {
      * @param headersToForward  space-separated list of headers to forward
      * @return  Map<String, String> lowercase header name to user-specified header name or null if null String passed
      */
-    private static Map<String, String> getHeadersToForward(String headersToForward) {
+    public static Map<String, String> getHeadersToForward(String headersToForward) {
         if (headersToForward == null)
             return null;
 

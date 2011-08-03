@@ -14,9 +14,11 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.AsyncExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -92,7 +94,8 @@ public class AsynchronousSubmissionManager {
         // o OR provide an explicit hint on xf:submission
         asynchronousSubmissions.submit(new Callable<SubmissionResult>() {
 
-            final ExternalContext externalContext = NetUtils.getExternalContext();
+            // Submission should not need an ExternalContext, but if it does we must provide access to a safe one
+            final ExternalContext externalContext = new AsyncExternalContext(NetUtils.getExternalContext().getRequest(), NetUtils.getExternalContext().getResponse());
             public SubmissionResult call() throws Exception {
                 // Make sure an ExternalContext is scoped for the callable. We use the same external context as the caller,
                 // even though that can be a dangerous. Should we use AsyncExternalContext here?

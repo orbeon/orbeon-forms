@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
@@ -56,17 +55,18 @@ public class RegularSubmission extends BaseSubmission {
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
-        // TODO: Prepare all in the current thread => find solution for cleanup too
-        final ExternalContext externalContext = NetUtils.getExternalContext();
+        // Prepare Connection in this thread as async submission can't access the request object
+        final Connection connection = new Connection();
+        connection.prepare(NetUtils.getExternalContext(), detailsLogger, isLogBody(), p.actualHttpMethod, absoluteResolvedURL,
+                p2.username, p2.password, p2.domain, sp.actualRequestMediatype, sp.messageBody,
+                customHeaderNameValues, headersToForward, true);
 
-        // Pack external call into a Runnable so it can be run:
+        // Pack external call into a Callable so it can be run:
         // o now and synchronously
         // o now and asynchronously
         // o later as a "foreground" asynchronous submission
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
             public SubmissionResult call() throws Exception {
-
-                // TODO: This refers to ExternalContext, XFormsContainingDocument, and Submission. FIXME!
 
                 // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
                 // because it may get out of the caches and not be picked up by further incoming Ajax requests.
@@ -78,15 +78,23 @@ public class RegularSubmission extends BaseSubmission {
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = new Connection().open(externalContext, detailsLogger, isLogBody(),
-                         p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
-                         sp.actualRequestMediatype, sp.messageBody,
-                         customHeaderNameValues, headersToForward);
+                    detailsLogger.startHandleOperation("", "opening connection");
+                    try {
+                        // Connect, and cleanup
+                        final ConnectionResult result = connection.connect();
+                        // TODO: Consider how the state could be saved. Maybe do this before connect() in the initiating thread?
+                        connection.cleanup(NetUtils.getExternalContext(), !p2.isAsynchronous); // NOTE: ExternalContext not used if we don't save state, as of 2011-08-02
+                        connectionResult = result;
+                    } finally {
+                        // In case an exception is thrown in the body, still do adjust the logs
+                        detailsLogger.endHandleOperation();
+                    }
 
                     // Update status
                     status[0] = true;
 
                     // Obtain replacer
+                    // TODO: This refers to Submission.
                     final Replacer replacer = submission.getReplacer(connectionResult, p);
                     if (replacer != null) {
                         // Deserialize here so it can run in parallel

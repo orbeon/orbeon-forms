@@ -59,6 +59,9 @@
             <xforms:send submission="get-source-form-submission"/>
         </xforms:action>
 
+        <!--  Send a "Not Found" error if the form definition is not found -->
+        <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">form-runner:sendError(404)</xforms:action>
+
         <!-- Compute authorized operations -->
         <xxforms:variable name="metadata" select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
         <xforms:setvalue ref="instance('fr-authorized-operations')" value="string-join(form-runner:authorizedOperationsOnForm($metadata), ' ')"/>
@@ -70,7 +73,8 @@
             ($mode = 'new' and not($operations = ('*', 'create'))) or
             ($mode = 'edit' and not($operations = ('*', 'update'))) or
             ($mode = 'view' and not($operations = ('*', 'read')))"/>
-        <xforms:action if="$unauthorized-access" type="xpath">form-runner:unauthorizedAccess()</xforms:action>
+        <!-- Send an "Unauthorized" error if the user is unauthorized -->
+        <xforms:action if="$unauthorized-access" type="xpath">form-runner:sendError(401)</xforms:action>
 
         <!-- Whether a document id is provided -->
         <xxforms:variable name="is-document-id-provided" select="$document != ''" as="xs:boolean"/>

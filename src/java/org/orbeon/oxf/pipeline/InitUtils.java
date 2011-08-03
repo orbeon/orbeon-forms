@@ -89,14 +89,19 @@ public class InitUtils {
             processor.start(pipelineContext);
             success = true;
         } catch (Throwable e) {
-            final LocationData locationData = ValidationException.getRootLocationData(e);
             final Throwable throwable = OXFException.getRootThrowable(e);
-            final String message = locationData == null
-                    ? "Exception with no location data"
-                    : "Exception at " + locationData.toString();
-            logger.error(message, throwable);
-            // Make sure the caller can do something about it, like trying to run an error page
-            throw new OXFException(e);
+            if (throwable instanceof HttpStatusCodeException) {
+                // Special exception used to set an error status code
+                externalContext.getResponse().sendError(((HttpStatusCodeException) throwable).code);
+            } else {
+                final LocationData locationData = ValidationException.getRootLocationData(e);
+                final String message = locationData == null
+                        ? "Exception with no location data"
+                        : "Exception at " + locationData.toString();
+                logger.error(message, throwable);
+                // Make sure the caller can do something about it, like trying to run an error page
+                throw new OXFException(e);
+            }
         } finally {
             // Free context
             StaticExternalContext.removeStaticContext();
@@ -470,5 +475,22 @@ public class InitUtils {
                 }
             });
         }
+    }
+
+    private static class HttpStatusCodeException extends RuntimeException {
+        public final int code;
+
+        public HttpStatusCodeException(int code) {
+            this.code = code;
+        }
+    }
+
+    /**
+     * Interrupt current processing and send an error code to the client.
+     *
+     * This assumes that the response has not yet been committed.
+     */
+    public static void sendError(int code) {
+        throw new HttpStatusCodeException(code);
     }
 }

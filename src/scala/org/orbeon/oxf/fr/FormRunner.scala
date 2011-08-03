@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.util.{NetUtils, XPathCache}
+import org.orbeon.oxf.pipeline.InitUtils
 
 object FormRunner {
 
@@ -169,7 +170,7 @@ object FormRunner {
         }) asJava
     }
 
-    def unauthorizedAccess() {
-        throw new RuntimeException("You don't have the appropriate authorization to access this page")
-    }
+    // Interrupt current processing and send an error code to the client.
+    // NOTE: This could be done through ExternalContext
+    def sendError(code: Int) = InitUtils.sendError(code)
 }

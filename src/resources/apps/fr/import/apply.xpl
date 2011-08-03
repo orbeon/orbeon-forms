@@ -65,12 +65,22 @@
                 <xsl:variable name="sheet" select="doc(/*/file[@name = concat('xl/', $sheet-filename)])" as="document-node()"/>
 
                 <xsl:for-each select="$sheet/*/ms-main:sheetData/ms-main:row">
-                    <row>
-                        <xsl:for-each select="ms-main:c">
-                            <xsl:variable name="v" select="ms-main:v"/>
-                            <c><xsl:value-of select="if (exists(@t)) then $strings/*/ms-main:si[xs:integer($v) + 1]/ms-main:t else $v"/></c>
-                        </xsl:for-each>
-                    </row>
+
+                    <!-- Format row  -->
+                    <xsl:variable name="row" as="element(row)">
+                        <row>
+                            <xsl:for-each select="ms-main:c">
+                                <xsl:variable name="v" select="ms-main:v"/>
+                                <c><xsl:value-of select="if (exists(@t)) then $strings/*/ms-main:si[xs:integer($v) + 1]/ms-main:t else $v"/></c>
+                            </xsl:for-each>
+                        </row>
+                    </xsl:variable>
+
+                    <!-- Only output non-blank rows -->
+                    <xsl:if test="exists($row/c[normalize-space()])">
+                        <xsl:copy-of select="$row"/>
+                    </xsl:if>
+
                 </xsl:for-each>
             </rows>
         </p:input>

@@ -62,6 +62,6 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
     @Override
     public boolean supportAjaxUpdates() {
         // Don't output anything for triggers in static readonly mode
-        return !(isStaticReadonly() && isReadonly());
+        return ! isStaticReadonly();
     }
 }

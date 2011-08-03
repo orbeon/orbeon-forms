@@ -117,9 +117,14 @@ public class WSRP2Utils {
                 matcherEnd = matcher.end();
                 try {
                     // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
-                    // denoted ( with parens ) in the expression.  Hence we start with group 1.
-                    final String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
+                    // denoted (with parens) in the expression. Hence we start with group 1.
+                    String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
                     final String value = URLDecoder.decode(matcher.group(2), STANDARD_PARAMETER_ENCODING);
+
+                    // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
+                    // full Ajax updates!
+                    if (acceptAmp && name.startsWith("amp;"))
+                        name = name.substring("amp;".length());
 
                     StringConversions.addValueToStringArrayMap(result, name, value);
                 } catch (UnsupportedEncodingException e) {
@@ -218,7 +223,8 @@ public class WSRP2Utils {
                 }
 
                 // Simply set all navigation parameters, including orbeon.path
-                portletURL.setParameters(navigationParameters);
+                if (navigationParameters != null)
+                    portletURL.setParameters(navigationParameters);
             }
 
             // TODO: wsrp-fragmentID

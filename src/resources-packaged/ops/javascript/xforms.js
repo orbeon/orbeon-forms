@@ -4244,6 +4244,12 @@ ORBEON.xforms.Init = {
                                     ORBEON.xforms.Globals.formDynamicState[formID].value);
                             ORBEON.xforms.Document.storeInClientState(formID, "uuid",
                                     ORBEON.xforms.Globals.formUUID[formID].value);
+                        } else {
+                            // The user reloaded or navigated back to this page. Reset the value of the $uuid field to
+                            // the value found in the client state, because the browser sometimes restores the value of
+                            // hidden fields in an erratic way, for example from the value the hidden field had from
+                            // the same URL loaded in another tab (e.g. Chrome, Firefox).
+                            ORBEON.xforms.Globals.formUUID[formID].value = ORBEON.xforms.Document.getFromClientState(formID, "uuid");
                         }
                     } else if (element.name.indexOf("$repeat-tree") != -1) {
                         xformsRepeatTree = element;

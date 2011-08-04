@@ -56,7 +56,7 @@
                 <xforms:bind ref="instance('ui')">
                     <xforms:bind ref="apply-trigger" readonly="../valid = 'false'"/>
                     <xforms:bind ref="readonly-checked" readonly="true()"/>
-                    <xforms:bind ref="permissions/permission/role" type="xs:NMTOKEN"/>
+                    <xforms:bind ref="permissions/permission/role" constraint="normalize-space()" required="true()"/>
                 </xforms:bind>
                 <xforms:instance id="permission-template">
                     <permission>
@@ -90,7 +90,8 @@
                         <xxforms:variable name="roles" select="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
                         <xforms:action xxforms:iterate="$roles">
                             <!-- Current role -->
-                            <xxforms:variable name="role" select="."/>
+                            <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
+                            <xxforms:variable name="role" select="replace(., '%20', ' ')"/>
                             <!-- Permissions for the current role -->
                             <xxforms:variable name="permissions" select="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
                             <!-- Operations for the current role -->
@@ -98,7 +99,7 @@
                             <!-- Replace read and update by read-update -->
                             <xxforms:variable name="operations-read-update" select="distinct-values(for $o in $operations-raw return if ($o = ('read', 'update')) then 'read-update' else $o)"/>
                             <!-- Insert new permission in UI, and populate it -->
-                            <xforms:insert if="$role != ''" context="$ui/permissions" nodeset="permission" origin="instance('permission-template')"/>
+                            <xforms:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xxforms:variable name="new-permission" select="$ui/permissions/permission[last()]"/>
                             <xforms:setvalue if="$role != ''"  ref="$new-permission/role" value="$role"/>
                             <xforms:setvalue ref="$new-permission/operations" value="string-join($operations-read-update, ' ')"/>
@@ -111,7 +112,7 @@
                     <!-- Reset permissions element -->
                     <xforms:delete ref="$metadata/permissions"/>
                     <xforms:action if="$ui/has-permissions = 'true'">
-                        <xforms:insert context="$metadata" nodeset="*" origin="xxforms:element('permissions')"/>
+                        <xforms:insert context="$metadata" ref="*" origin="xxforms:element('permissions')"/>
                         <!-- In UI replace "read-update" by "read update" -->
                         <xforms:setvalue xxforms:iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
                         <!-- Add "anyone" permission -->
@@ -121,8 +122,9 @@
                         <xxforms:variable name="permissions" select="$ui/permissions/permission[position() > 1]"/>
                         <xforms:action xxforms:iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
                             <xxforms:variable name="operation" select="."/>
-                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role/normalize-space()), ' ')"/>
-                            <xforms:insert context="$metadata/permissions" nodeset="*" origin="xxforms:element('permission', (
+                            <!-- NOTE: Escape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
+                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role/replace(normalize-space(.), ' ', '%20')), ' ')"/>
+                            <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
                                 xxforms:attribute('operations', $operation),
                                 xxforms:element('user-role', xxforms:attribute('any-of', $roles))))"/>
                         </xforms:action>
@@ -132,7 +134,7 @@
                         <xforms:delete ref="$metadata/permissions/permission[user-role]"/>
                         <xforms:action xxforms:iterate="1 to count($any-ofs)">
                             <xxforms:variable name="i" select="position()"/>
-                            <xforms:insert context="$metadata/permissions" nodeset="*" origin="xxforms:element('permission', (
+                            <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
                                 xxforms:attribute('operations', saxon:item-at($operations, $i)),
                                 xxforms:element('user-role', xxforms:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
                         </xforms:action>
@@ -212,7 +214,7 @@
                         <!-- Add -->
                         <xforms:trigger appearance="minimal">
                             <xforms:label><xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add"/></xforms:label>
-                            <xforms:insert ev:event="DOMActivate" nodeset="$ui/permissions/permission" origin="instance('permission-template')"/>
+                            <xforms:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
                         </xforms:trigger>
                     </xforms:group>
 

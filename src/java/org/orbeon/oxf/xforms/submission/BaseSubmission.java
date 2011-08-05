@@ -130,7 +130,7 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Perform a local local submission.
      */
-    protected ConnectionResult openLocalConnection(ExternalContext.Request request,
+    protected ConnectionResult openLocalConnection(ExternalContext externalContext,
                                                    ExternalContext.Response response,
                                                    final IndentedLogger indentedLogger,
                                                    XFormsModelSubmission xformsModelSubmission,
@@ -153,7 +153,7 @@ public abstract class BaseSubmission implements Submission {
                 messageBody = new byte[0];
 
             // Destination context path is the context path of the current request, or the context path implied by the new URI
-            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? request.getContextPath() : NetUtils.getFirstPathElement(resource);
+            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
 
             // Create requestAdapter depending on method
             final ForwardExternalContextRequestWrapper requestAdapter;
@@ -172,7 +172,7 @@ public abstract class BaseSubmission implements Submission {
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(request, destinationContextPath,
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext, indentedLogger, destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames, customHeaderNameValues);
                 } else {
                     // Simulate a GET or DELETE
@@ -192,7 +192,7 @@ public abstract class BaseSubmission implements Submission {
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(request, destinationContextPath,
+                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext, indentedLogger, destinationContextPath,
                             rootAdjustedResourceURI, httpMethod, headerNames, customHeaderNameValues);
                 }
             }

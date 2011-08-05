@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.externalcontext;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.servlet.ServletExternalContext;
+import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringConversions;
 
 import java.io.*;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,17 +49,17 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
      *
      * @param customHeaderNameValues    can be null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery,
+    public ForwardExternalContextRequestWrapper(ExternalContext externalContext, IndentedLogger indentedLogger, String contextPath, String pathQuery,
                                                 String method, String mediaType, byte[] messageBody, String[] namesOfHeadersToForward,
                                                 Map<String, String[]> customHeaderNameValues) {
-        super(request);
+        super(externalContext.getRequest());
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
         this.mediaType = mediaType;
         this.messageBody = messageBody;
 
-        initializeHeaders(request, namesOfHeadersToForward, customHeaderNameValues);
+        initializeHeaders(externalContext, indentedLogger, namesOfHeadersToForward, customHeaderNameValues);
     }
 
     /**
@@ -65,58 +67,25 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
      *
      * @param customHeaderNameValues    can be null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery,
+    public ForwardExternalContextRequestWrapper(ExternalContext externalContext, IndentedLogger indentedLogger, String contextPath, String pathQuery,
                                                 String method, String[] namesOfHeadersToForward, Map<String, String[]> customHeaderNameValues) {
-        super(request);
+        super(externalContext.getRequest());
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
         this.method = method;
 
-        initializeHeaders(request, namesOfHeadersToForward, customHeaderNameValues);
+        initializeHeaders(externalContext, indentedLogger, namesOfHeadersToForward, customHeaderNameValues);
     }
 
-    private void initializeHeaders(ExternalContext.Request request, String[] namesOfHeadersToForward, Map<String, String[]> customHeaderNameValues) {
-        /**
-         * We don't want to pass all the headers. For instance passing the Referer or Content-Length would be wrong. So
-         * we only pass 2 headers:
-         *
-         * Cookie: In particular for the JSESSIONID. We want the page to be able to know who the user is.
-         *
-         * Authorization: If we don't pass this header, when the destination page makes a query to a service it won't be
-         * able to pass the Authorization header, which in certain cases leads to a 401. Why in some cases passing just
-         * the JSESSIONID cookie is enough while in other cases this leads to a 401 is unclear.
-         */
-        {
-            // NOTE: Make sure header names are normalized to lowercase in headerValuesMap
-            this.headerValuesMap = new LinkedHashMap<String, String[]>();
+    private void initializeHeaders(ExternalContext externalContext, IndentedLogger indentedLogger, String[] namesOfHeadersToForward, Map<String, String[]> customHeaderNameValues) {
 
-            final Map<String, String[]> requestHeaderValuesMap = request.getHeaderValuesMap();
+        // Determine headers to set
+        headerValuesMap = Connection.getHeadersMap(externalContext, indentedLogger, null, customHeaderNameValues, StringUtils.join(namesOfHeadersToForward, ' '));
 
-            // Handle headers to forward
-            if (namesOfHeadersToForward != null) {
-                for (final String currentHeaderName : namesOfHeadersToForward) {
-                    final String currentHeaderNameLower = currentHeaderName.toLowerCase();
-                    final String[] v2 = requestHeaderValuesMap.get(currentHeaderNameLower);
-                    if (v2 != null)
-                        headerValuesMap.put(currentHeaderNameLower, v2);
-                }
-            }
-
-            // Handle custom headers. Those override existing headers if any.
-            if (customHeaderNameValues != null) {
-                for (final Map.Entry<String, String[]> currentEntry : customHeaderNameValues.entrySet()) {
-                    final String currentHeaderNameLower = currentEntry.getKey().toLowerCase();
-                    final String[] currentHeaderValues = currentEntry.getValue();
-
-                    headerValuesMap.put(currentHeaderNameLower, currentHeaderValues);
-                }
-            }
-
-            // Set Content-Type and Content-Length headers
-            if (mediaType != null && messageBody != null) {
-                headerValuesMap.put("content-type", new String[] { mediaType });
-                headerValuesMap.put("content-length", new String[] { Integer.toString(messageBody.length) });
-            }
+        // Set Content-Type and Content-Length headers
+        if (mediaType != null && messageBody != null) {
+            headerValuesMap.put("content-type", new String[] { mediaType });
+            headerValuesMap.put("content-length", new String[] { Integer.toString(messageBody.length) });
         }
     }
 

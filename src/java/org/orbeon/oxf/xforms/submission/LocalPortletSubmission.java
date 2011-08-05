@@ -130,7 +130,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                 final boolean[] status = { false , false };
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openLocalConnection(asyncExternalContext.getRequest(), response,
+                    connectionResult = openLocalConnection(asyncExternalContext, response,
                         detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                         p.actualHttpMethod, resolvedURI.toString(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {

@@ -144,14 +144,17 @@ public class Connection {
      * o a list of headers to forward
      *
      * @param externalContext   context
-     * @param indentedLogger    logger
-     * @param username          username
-     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues>
-     * @param headersToForward  headers to forward
+     * @param indentedLogger    logger or null
+     * @param username          username or null
+     * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
+     * @param headersToForward  headers to forward or null
      * @return LinkedHashMap<String headerName, String[] headerValues>
      */
-    private static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
+    public static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
                                     Map<String, String[]> headerNameValues, String headersToForward) {
+
+        final boolean doLog = (indentedLogger != null && indentedLogger.isDebugEnabled());
+
         // Resulting header names and values to set
         final LinkedHashMap<String, String[]> headersMap = new LinkedHashMap<String, String[]>();
 
@@ -159,15 +162,16 @@ public class Connection {
         final Map<String, String> headersToForwardMap = getHeadersToForward(headersToForward);
 
         // Set headers if provided
-        if (headerNameValues.size() > 0) {
+        if (headerNameValues != null && headerNameValues.size() > 0) {
             for (final Map.Entry<String, String[]> currentEntry: headerNameValues.entrySet()) {
                 final String currentHeaderName = currentEntry.getKey();
+                final String currentHeaderNameLowercase = currentHeaderName.toLowerCase();
                 final String[] currentHeaderValues = currentEntry.getValue();
                 // Set header
-                headersMap.put(currentHeaderName, currentHeaderValues);
+                headersMap.put(currentHeaderNameLowercase, currentHeaderValues);
                 // Remove from list of headers to forward below
                 if (headersToForwardMap != null)
-                    headersToForwardMap.remove(currentHeaderName.toLowerCase());
+                    headersToForwardMap.remove(currentHeaderNameLowercase);
             }
         }
 
@@ -248,10 +252,11 @@ public class Connection {
                         if (sb.length() > 0) {
                             // One or more cookies were set
                             final String cookieString = sb.toString();
-                            indentedLogger.logDebug(LOG_TYPE, "forwarding cookies",
-                                    "cookie", cookieString,
-                                    "requested session id", externalContext.getRequest().getRequestedSessionId());
-                            StringConversions.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
+                            if (doLog)
+                                indentedLogger.logDebug(LOG_TYPE, "forwarding cookies",
+                                        "cookie", cookieString,
+                                        "requested session id", externalContext.getRequest().getRequestedSessionId());
+                            StringConversions.addValueToStringArrayMap(headersMap, "cookie", cookieString );
                         }
                     }
                 }
@@ -265,10 +270,10 @@ public class Connection {
                 if (session != null) {
 
                     // This will work with Tomcat, but may not work with other app servers
-                    StringConversions.addValueToStringArrayMap(headersMap, "Cookie", sessionCookieName + "=" + session.getId());
+                    StringConversions.addValueToStringArrayMap(headersMap, "cookie", sessionCookieName + "=" + session.getId());
 
                     // All this is for logging!
-                    if (indentedLogger.isDebugEnabled()) {
+                    if (doLog) {
 
                         String incomingSessionHeader = null;
                         final String[] cookieHeaders = externalContext.getRequest().getHeaderValuesMap().get("cookie");
@@ -323,13 +328,15 @@ public class Connection {
                     final boolean isAuthorizationHeader = currentHeaderNameLowercase.equalsIgnoreCase(Connection.AUTHORIZATION_HEADER);
                     if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
                         // Only forward Authorization header if there is no username provided
-                        indentedLogger.logDebug(LOG_TYPE, "forwarding header",
-                                "name", currentHeaderName, "value", currentIncomingHeaderValues.toString());
-                        StringConversions.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
+                        if (doLog)
+                            indentedLogger.logDebug(LOG_TYPE, "forwarding header",
+                                    "name", currentHeaderNameLowercase, "value", currentIncomingHeaderValues.toString());
+                        StringConversions.addValuesToStringArrayMap(headersMap, currentHeaderNameLowercase, currentIncomingHeaderValues);
                     } else {
                         // Just log this information
-                        indentedLogger.logDebug(LOG_TYPE,
-                                "not forwarding Authorization header because username is present");
+                        if (doLog)
+                            indentedLogger.logDebug(LOG_TYPE,
+                                    "not forwarding Authorization header because username is present");
                     }
                 }
             }

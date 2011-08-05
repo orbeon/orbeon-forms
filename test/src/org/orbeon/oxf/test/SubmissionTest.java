@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.mockito.Mockito;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.externalcontext.RequestAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -21,13 +22,13 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class SubmissionTest extends TestCase {
+public class SubmissionTest extends ResourceManagerTestBase {
 
-    protected void setUp() throws Exception {
-    }
-
-    public void testForwardHeaders() {
+    @Test
+    public void forwardHeaders() {
 
         // Custom headers
         final Map<String, String[]> customHeaderValuesMap = new LinkedHashMap<String, String[]>();
@@ -62,8 +63,11 @@ public class SubmissionTest extends TestCase {
             }
         };
 
+        final ExternalContext externalContext = Mockito.mock(ExternalContext.class);
+        Mockito.when(externalContext.getRequest()).thenReturn(incomingRequest);
+
         final ForwardExternalContextRequestWrapper request
-                = new ForwardExternalContextRequestWrapper(incomingRequest, "/orbeon", "/foo/bar",
+                = new ForwardExternalContextRequestWrapper(externalContext, null, "/orbeon", "/foo/bar",
                 "GET", new String[] { "cookie", "authorization", "user-agent"}, customHeaderValuesMap);
 
         // Test standard headers received

@@ -48,7 +48,7 @@ public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTes
             throw new OXFException(e);
         }
 
-        final ForwardExternalContextRequestWrapper wrapper = new ForwardExternalContextRequestWrapper(NetUtils.getExternalContext().getRequest(),
+        final ForwardExternalContextRequestWrapper wrapper = new ForwardExternalContextRequestWrapper(NetUtils.getExternalContext(), null,
                 "/orbeon", "/foobar?name1=value1a&name2=value2a&name3=value3", "post", "application/x-www-form-urlencoded",
                 messageBody, null, null);
 

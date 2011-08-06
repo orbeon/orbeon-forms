@@ -362,7 +362,7 @@ public class LDAPProcessor extends ProcessorImpl {
           return SearchControls.SUBTREE_SCOPE;
         } else if ((scope != null) && (scope.toUpperCase().equals("OBJECT"))) {
           return SearchControls.OBJECT_SCOPE;
-        } else if ((scope != null) && (scope.toUpperCase().equals("ALLEVELS") || scope.toUpperCase().equals("ONELEVEL"))) {
+        } else if ((scope != null) && (scope.toUpperCase().equals("ALLLEVELS") || scope.toUpperCase().equals("ONELEVEL"))) {
           return SearchControls.ONELEVEL_SCOPE;
         } else {
           return SearchControls.SUBTREE_SCOPE;

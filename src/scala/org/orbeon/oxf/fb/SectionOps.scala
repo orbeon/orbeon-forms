@@ -41,13 +41,10 @@ object SectionOps {
 
     // Move the section left if possible
     def moveSectionLeft(container: NodeInfo) =
-        parentSection(container) foreach
+        findContainers(container).headOption foreach
             (moveContainer(container, _, moveElementAfter))
 
-    def parentSection(container: NodeInfo) = container.parent filter (localname(_) == "section")
-    def parentContainer(container: NodeInfo) = container.parent filter (p => Set("section", "body")(localname(p)))
-    def grandParentContainer(container: NodeInfo) = parentSection(container) flatMap (parentContainer(_))
-
+    // TODO: Could also move into fr:tabview/fr:tab?
     def precedingSection(container: NodeInfo) = container precedingSibling "*:section" headOption
 
     // Find the section name given a descendant node

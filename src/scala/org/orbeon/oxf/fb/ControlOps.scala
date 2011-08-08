@@ -248,25 +248,31 @@ object ControlOps {
         ensure(root, holders.toIterator)
     }
 
-    // Insert data and resource holders
-    def insertHolders(currentTd: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo) {
+    // Insert data and resource holders for all languages
+    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
         // Create one holder per existing language
-        val resourceHolders = (formResourcesRoot(currentTd) \ "resource" \@ "*:lang") map
+        val resourceHolders = (formResourcesRoot(controlElement) \ "resource" \@ "*:lang") map
             (att => (att.getStringValue, resourceHolder))
 
-        insertHolders(currentTd, dataHolder, resourceHolders)
+        insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
     }
 
-    def insertHolders(currentTd: NodeInfo, dataHolder: NodeInfo, resourceHolders: Seq[(String, NodeInfo)]) {
-        val doc = currentTd.getDocumentRoot
-        val containerNames = findContainerNames(currentTd)
+    def precedingControlNameInSection(controlElement: NodeInfo) = {
 
-        val precedingControlName: Option[String] = {
-            // All the *:td elements up to the current one within the current section
-            val tdsInSection = (currentTd preceding "*:td") intersect (currentTd ancestor "*:section" take 1 descendant "*:td")
-            // Last non-empty td's first element's id
-            tdsInSection.reverse filter hasChildren takeRight 1 child * att "id" map (id => controlName(id.getStringValue)) headOption
-        }
+        // Control is assumed to be in a grid td
+        val parentTd = controlElement.parent.get
+        assert(localname(parentTd) == "td")
+
+        // All the *:td elements up to the current one within the current section
+        val precedingTdsInSection = (parentTd preceding "*:td") intersect (controlElement ancestor "*:section" take 1 descendant "*:td")
+        // Last non-empty td's first element's id
+        precedingTdsInSection.reverse filter hasChildren takeRight 1 child * att "id" map (id => controlName(id.getStringValue)) headOption
+    }
+
+    // Insert data and resource holders for all languages
+    def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolders: Seq[(String, NodeInfo)], precedingControlName: Option[String]) {
+        val doc = controlElement.getDocumentRoot
+        val containerNames = findContainerNames(controlElement)
 
         // Insert hierarchy of data holders
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
@@ -274,17 +280,19 @@ object ControlOps {
         ensureDataHolder(formInstanceRoot(doc), (containerNames.reverse map (n => (() => elementInfo(n), None))) :+ (() => dataHolder, precedingControlName))
 
         // Insert resources placeholders for all languages
-        val resourceHoldersMap = resourceHolders.toMap
-        for {
-            resource <- formResourcesRoot(doc) \ "resource"
-            lang = (resource \@ "*:lang").getStringValue
-            holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
-        } yield
-            insert(into = resource, after = resource \ * filter (name(_) == precedingControlName.getOrElse("")), origin = holder)
+        if (resourceHolders.nonEmpty) {
+            val resourceHoldersMap = resourceHolders.toMap
+            for {
+                resource <- formResourcesRoot(doc) \ "resource"
+                lang = (resource \@ "*:lang").getStringValue
+                holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
+            } yield
+                insert(into = resource, after = resource \ * filter (name(_) == precedingControlName.getOrElse("")), origin = holder)
+        }
 
         // Insert repeat template holder if needed
         for {
-            grid <- findGrid(currentTd)
+            grid <- findGrid(controlElement)
             gridName <- getControlNameOption(grid)
             root <- templateRoot(doc, gridName)
         } yield

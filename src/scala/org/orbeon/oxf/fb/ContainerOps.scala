@@ -22,7 +22,7 @@ import org.orbeon.oxf.fb.ControlOps._
 object ContainerOps {
 
     // Hardcoded list of FB controls we know can contain others
-    val containerElementNames = Set("section", "grid", "tabview")
+    val containerElementNames = Set("section", "grid", "body") // TODO: "tab" is special because within "tabview"
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull

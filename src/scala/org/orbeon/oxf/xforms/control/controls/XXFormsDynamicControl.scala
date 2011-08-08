@@ -237,12 +237,15 @@ object InstanceMirror {
                 // Find inner instance
                 val innerInstance = container.findInstance(instanceId)
 
-                // Find destination path in instance
-                val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.getFullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
-                evalOne(innerInstance.getDocumentInfo, innerPath, namespaces) match {
-                    case newNode: NodeWrapper => Some(newNode)
-                    case _ => throw new IllegalStateException
-                }
+                if (innerInstance ne null) { // may not be found if instance was just created
+                    // Find destination path in instance
+                    val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.getFullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
+                    evalOne(innerInstance.getDocumentInfo, innerPath, namespaces) match {
+                        case newNode: NodeWrapper => Some(newNode)
+                        case _ => throw new IllegalStateException
+                    }
+                } else
+                    None
 
             case _ => None // ignore change as it is not within an instance
         }

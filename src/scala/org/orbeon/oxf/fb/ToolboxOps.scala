@@ -42,8 +42,11 @@ object ToolboxOps {
 
                 val containers = findContainers(currentTd)
 
-                val level1Block = containers.last
-                val level2Block = containers.init.last // TODO: this assumes we are nested 2 levels deep
+                // We must always have a parent (grid) and grandparent (possibly fr:body) container
+                assert(containers.size >= 2)
+
+                val parentContainer = containers.head
+                val grandParentContainer = containers.tail.head
 
                 // NOTE: At some point we could allow any grid bound and so with a name/id and bind
                 //val newGridName = "grid-" + nextId(doc, "grid")
@@ -54,32 +57,46 @@ object ToolboxOps {
                              xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                              xmlns:xhtml="http://www.w3.org/1999/xhtml">
                         <xhtml:tr>
-                            <xhtml:td id={tdId("td-" + nextId(currentTd, "td"))}/>
+                            <xhtml:td id={tdId("td-" + nextId(doc, "td"))}/>
                         </xhtml:tr>
                     </fr:grid>
 
                 // Insert after current level 2 if found, otherwise into level 1
-                val newGrid = insert(into = level1Block, after = level2Block, origin = gridTemplate)
+                val newGrid = insert(into = grandParentContainer, after = parentContainer, origin = gridTemplate)
 
                 // Select first grid cell
                 selectTd(newGrid \\ "*:td" head)
+
+                debugDumpDocument("insert new grid", doc)
 
             case _ => // NOP
         }
     }
 
-    // Insert a new top-level section
+    // Insert a new section
     def insertNewSection(doc: NodeInfo) {
 
         findSelectedTd(doc) match {
-            case Some(currentTd) =>
+            case Some(currentTd) => // A td is selected
 
-                // TODO: case where there is no section at all
                 val containers = findContainers(currentTd)
-                val level1Block = containers.last
+
+                // We must always have a parent (grid) and grandparent (possibly fr:body) container
+                assert(containers.size >= 2)
+
+                // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
+                // current section/tabview, the section is inserted after the current grid.
+                val grandParentContainer = containers.tail.head // section/tab, body
+                val greatGrandParentContainerOption = containers.tail.tail.headOption
+
+                val (into, after) =
+                    greatGrandParentContainerOption match {
+                        case Some(greatGrandParentContainer) => (greatGrandParentContainer, Some(grandParentContainer))
+                        case None => (grandParentContainer, grandParentContainer \ * headOption)
+                    }
 
                 val newSectionName = "section-" + nextId(doc, "section")
-                val precedingSectionName = getControlNameOption(level1Block)
+                val precedingSectionName = after flatMap (getControlNameOption(_))
 
                 val sectionTemplate: NodeInfo =
                     <fb:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref=""
@@ -91,18 +108,14 @@ object ToolboxOps {
                         <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>
                         <fr:grid edit-ref="">
                             <xhtml:tr>
-                                <xhtml:td id={tdId("td-" + nextId(currentTd, "td"))}/>
+                                <xhtml:td id={tdId("td-" + nextId(doc, "td"))}/>
                             </xhtml:tr>
                         </fr:grid>
                     </fb:section>
 
-                val newSection = insert(into = findBodyElement(doc), after = level1Block, origin = sectionTemplate)
+                val newSectionElement = insert(into = into, after = after.toSeq, origin = sectionTemplate).head
 
-                // Insert data holder
-                val dataHolder = elementInfo(newSectionName)
-                ensureDataHolder(formInstanceRoot(doc), Seq((() => dataHolder, precedingSectionName)))
-
-                // Insert resource holders
+                // Create and insert holders
                 val resourceHolder = {
 
                     val findUntitledSectionMessage = {
@@ -114,18 +127,20 @@ object ToolboxOps {
                     elementInfo(newSectionName, elementContent)
                 }
 
-                for (resource <- formResourcesRoot(doc) \ "resource")
-                    insert(into = resource, after = resource \ * filter (name(_) == precedingSectionName.getOrElse("")), origin = resourceHolder)
+                insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
 
                 // Insert the bind element
-                ensureBinds(doc, Seq(newSectionName), isCustomInstance)
+                ensureBinds(doc, findContainerNames(newSectionElement).reverse :+ newSectionName, isCustomInstance)
 
                 // Select first grid cell
-                selectTd(newSection \\ "*:td" head)
+                selectTd(newSectionElement \\ "*:td" head)
 
                 // TODO: Open label editor for newly inserted section
 
-            case _ => // NOP
+                debugDumpDocument("insert new section", doc)
+
+            case _ => // No td is selected, add top-level section
+                // TODO
         }
     }
 
@@ -137,10 +152,15 @@ object ToolboxOps {
 
                 val containers = findContainers(currentTd)
 
-                val level1Block = containers.last
-                val level2Block = containers.init.last // TODO: this assumes we are nested 2 levels deep
+                // We must always have a parent (grid) and grandparent (possibly fr:body) container
+                assert(containers.size >= 2)
+
+                val parentContainer = containers.head // grid
+                val grandParentContainer = containers.tail.head // section/tab, body
 
                 val newGridName = "grid-" + nextId(doc, "grid")
+                val precedingControlName = getControlNameOption(parentContainer)
+
                 val templateInstanceId = templateId(newGridName)
 
                 // Handle data template
@@ -170,22 +190,20 @@ object ToolboxOps {
                         </xhtml:tr>
                     </fr:grid>
 
-                // Insert after current level 2 if found, otherwise into level 1
-                val newGrid = insert(into = level1Block, after = level2Block, origin = gridTemplate)
+                // Insert grid
+                val newGridElement = insert(into = grandParentContainer, after = parentContainer, origin = gridTemplate).head
 
-                // Find section name
-                val sectionName = getControlNameOption(level1Block).get
-
-                // Insert instance holder
-                val sectionHolder = formInstanceRoot(doc) \ sectionName head
-
-                insert(into = sectionHolder, after = sectionHolder \ * takeRight 1, origin = elementInfo(newGridName))
+                // Insert instance holder (but no resource holders)
+                insertHolders(newGridElement, elementInfo(newGridName), Seq(), precedingControlName)
 
                 // Make sure binds are created
-                ensureBinds(doc, Seq(sectionName, newGridName), isCustomInstance)
+                ensureBinds(doc, findContainerNames(newGridElement).reverse :+ newGridName, isCustomInstance)
 
                 // Select new td
-                selectTd(newGrid \\ "*:td" head)
+                selectTd(newGridElement \\ "*:td" head)
+
+                debugDumpDocument("insert new repeat", doc)
+
             case _ => // NOP
         }
     }
@@ -198,8 +216,6 @@ object ToolboxOps {
 
                 val newControlId = nextId(doc, "control")
                 val newControlName = "control-" + newControlId
-
-                // TODO xxx find insertion point for holder: grid / repeated grid
 
                 // Insert control template
                 val newControlElement: NodeInfo =
@@ -214,9 +230,9 @@ object ToolboxOps {
                             val firstElementCSSName = (binding \@ "element" getStringValue) split "," head
                             val elementQName = firstElementCSSName.replace('|', ':')
 
-                            val controlElement = insert(into = gridTd, origin = elementInfo(resolveQName(binding, elementQName)))
+                            val controlElement = insert(into = gridTd, origin = elementInfo(resolveQName(binding, elementQName))).head
                             insert(into = controlElement, origin = lhhaTemplate \ *)
-                            controlElement.head
+                            controlElement
                     }
 
                 // Set default pointer to resources if there is an xforms:alert
@@ -243,7 +259,7 @@ object ToolboxOps {
                 val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
 
                 // Insert data and resource holders
-                insertHolders(gridTd, dataHolder, resourceHolder)
+                insertHolders(newControlElement, dataHolder, resourceHolder, precedingControlNameInSection(newControlElement))
 
                 // Insert the bind element
                 val bind = ensureBinds(doc, findContainerNames(gridTd).reverse :+ newControlName, isCustomInstance)
@@ -256,7 +272,7 @@ object ToolboxOps {
                 if (controlType != "xs:string")
                     insert(into = bind, origin = attributeInfo("type", controlType))
 
-                debugDumpDocument("insert row control", doc)
+                debugDumpDocument("insert new control", doc)
 
                 // Open label editor for newly inserted control -->
                 // TODO
@@ -330,8 +346,13 @@ object ToolboxOps {
                 }
 
                 // Insert control and holders
-                insert(into = gridTd, origin = control)
-                insertHolders(gridTd, xvc \ "holder" \ * head, xvc \ "resources" \ "resource" map (r => (r \@ "*:lang" getStringValue, r \ * head)))
+                val newControlElement = insert(into = gridTd, origin = control).head
+                insertHolders(
+                    newControlElement,
+                    xvc \ "holder" \ * head,
+                    xvc \ "resources" \ "resource" map (r => (r \@ "*:lang" getStringValue, r \ * head)),
+                    precedingControlNameInSection(newControlElement)
+                )
 
                 // Create the bind and copy all attributes and content
                 val bind = ensureBinds(gridTd, findContainerNames(gridTd).reverse :+ controlName, isCustomInstance)

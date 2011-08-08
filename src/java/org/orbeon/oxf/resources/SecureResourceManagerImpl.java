@@ -95,7 +95,7 @@ public class SecureResourceManagerImpl extends ResourceManagerBase {
         if (v != null)
             return v.getInputStream();
         else
-            throw new ResourceNotFoundException("Cannot read from file " + key);
+            throw new ResourceNotFoundException(key);
     }
 
     /**
@@ -119,7 +119,7 @@ public class SecureResourceManagerImpl extends ResourceManagerBase {
             return 0;
         else {
             if (doNotThrowResourceNotFound) return -1;
-            else throw new ResourceNotFoundException("Cannot read from file " + key);
+            else throw new ResourceNotFoundException(key);
         }
     }
 
@@ -132,7 +132,7 @@ public class SecureResourceManagerImpl extends ResourceManagerBase {
         if (v != null)
             return v.getSize();
         else
-            throw new ResourceNotFoundException("Cannot read from file " + key);
+            throw new ResourceNotFoundException(key);
     }
 
     /**

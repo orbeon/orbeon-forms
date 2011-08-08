@@ -140,7 +140,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             if (lastModified != -1)
                 return lastModified;
         }
-        throw new ResourceNotFoundException("Cannot find resource " + key);
+        throw new ResourceNotFoundException(key);
     }
 
     public int length(final String key) {
@@ -168,7 +168,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         return (OutputStream) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
                 if (!resourceManager.canWrite(key))
-                    throw new ResourceNotFoundException("Try next resource manager.");
+                    throw new ResourceNotFoundException(key);
                 return resourceManager.getOutputStream(key);
             }
         });
@@ -178,7 +178,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         return (Writer) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
                 if (!resourceManager.canWrite(key))
-                    throw new ResourceNotFoundException("Try next resource manager.");
+                    throw new ResourceNotFoundException(key);
                 return resourceManager.getWriter(key);
             }
         });
@@ -208,7 +208,7 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         return (XMLReceiver) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
                 if (!resourceManager.canWrite(key))
-                    throw new ResourceNotFoundException("Try next resource manager.");
+                    throw new ResourceNotFoundException(key);
                 return resourceManager.getWriteContentHandler(key);
             }
         });

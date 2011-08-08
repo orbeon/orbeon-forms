@@ -66,7 +66,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
         try {
             return url.openStream();
         } catch (IOException ioe) {
-            throw new ResourceNotFoundException("Cannot connect to URL: " + url);
+            throw new ResourceNotFoundException(key);// NOTE: could also pass resolved URL in addition
         }
     }
 
@@ -92,7 +92,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
             return NetUtils.getLastModified(url);
         } catch (IOException e) {
             if (doNotThrowResourceNotFound) return -1;
-            else throw new ResourceNotFoundException("Cannot connect to URL " + url);
+            else throw new ResourceNotFoundException(key);// NOTE: could also pass resolved URL in addition
         }
     }
 
@@ -114,12 +114,12 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
                 conn.getInputStream().close();
             }
         } catch (IOException e) {
-            throw new ResourceNotFoundException("Cannot connect to URL " + url);
+            throw new ResourceNotFoundException(key);// NOTE: could also pass resolved URL in addition
         }
     }
 
     /**
-     * Indicates if the resource manager implementation suports write operations
+     * Indicates if the resource manager implementation supports write operations
      * @return true if write operations are allowed
      */
     public boolean canWrite(String key) {
@@ -148,17 +148,6 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
         return null;
     }
 
-
-//    private URLConnection getURLConnection(String key) throws IOException {
-//        URLConnection conn = (URLConnection) urlCache.get(key);
-//        if (conn == null) {
-//            conn = getURL(key).openConnection();
-//            urlCache.put(key, conn);
-//        }
-//        return conn;
-//
-//    }
-
     private URL getURL(String key) {
         try {
             if (key.startsWith("/"))
@@ -166,7 +155,7 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
             else
                 return new URL(baseURL, key);
         } catch (MalformedURLException e) {
-            throw new ResourceNotFoundException("Cannot build URL from key: " + key);
+            throw new ResourceNotFoundException(key);
         }
     }
 }

@@ -64,9 +64,9 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
             if (file.canRead()) {
                 return new FileInputStream(file);
             } else
-                throw new ResourceNotFoundException("Cannot read from file " + key);
+                throw new ResourceNotFoundException(key);
         } catch (FileNotFoundException e) {
-            throw new ResourceNotFoundException("Cannot read from file " + key);
+            throw new ResourceNotFoundException(key);
         }
     }
 
@@ -92,7 +92,7 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
             return file.lastModified();
         else {
             if (doNotThrowResourceNotFound) return -1;
-            else throw new ResourceNotFoundException("Cannot read from file " + key);
+            else throw new ResourceNotFoundException(key);
         }
     }
 

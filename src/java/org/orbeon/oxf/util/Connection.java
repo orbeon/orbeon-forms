@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.CookieStore;
 import org.apache.log4j.Level;
 import org.orbeon.oxf.common.OXFException;
@@ -330,7 +331,7 @@ public class Connection {
                         // Only forward Authorization header if there is no username provided
                         if (doLog)
                             indentedLogger.logDebug(LOG_TYPE, "forwarding header",
-                                    "name", currentHeaderNameLowercase, "value", currentIncomingHeaderValues.toString());
+                                    "name", currentHeaderNameLowercase, "value", StringUtils.join(currentIncomingHeaderValues, ' '));
                         StringConversions.addValuesToStringArrayMap(headersMap, currentHeaderNameLowercase, currentIncomingHeaderValues);
                     } else {
                         // Just log this information

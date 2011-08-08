@@ -107,7 +107,7 @@ public interface ExternalContext extends WebAppExternalContext {
         void setContentLength(int len);
         void setHeader(String name, String value);
         void addHeader(String name, String value);
-        void sendError(int len) throws IOException;
+        void sendError(int code) throws IOException;
         String getCharacterEncoding();
 
         void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException;

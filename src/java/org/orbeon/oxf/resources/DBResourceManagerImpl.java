@@ -115,7 +115,7 @@ public class DBResourceManagerImpl extends ResourceManagerBase {
                     }
                 };
             } else {
-                throw new ResourceNotFoundException("Can't retrieve document for key " + key);
+                throw new ResourceNotFoundException(key);
             }
         } catch (Exception e) {
             logger.fatal("Can't retrieve document for key " + key, e);
@@ -192,7 +192,7 @@ public class DBResourceManagerImpl extends ResourceManagerBase {
                 };
 
             } else {
-                throw new ResourceNotFoundException("Can't retrieve document for key " + key);
+                throw new ResourceNotFoundException(key);
             }
         } catch (Exception e) {
             logger.fatal("Can't retrieve document for key " + key, e);

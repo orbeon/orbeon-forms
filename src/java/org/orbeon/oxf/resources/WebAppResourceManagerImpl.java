@@ -71,7 +71,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
 
         InputStream result = servletContext.getResourceAsStream(rootDirectory + key);
         if (result == null)
-            throw new ResourceNotFoundException("Cannot load \"" + key + "\" with webapp loader");
+            throw new ResourceNotFoundException(key);
         return result;
     }
 
@@ -92,14 +92,14 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
                 URL url = servletContext.getResource(rootDirectory + key);
                 if (url == null) {
                     if (doNotThrowResourceNotFound) return -1;
-                    else throw new ResourceNotFoundException("Cannot read from file " + key);
+                    else throw new ResourceNotFoundException(key);
                 }
                 lm = url.openConnection().getLastModified();
             } else {
                 File file = new File(realPath);
                 if (!file.canRead()) {
                     if (doNotThrowResourceNotFound) return -1;
-                    else throw new ResourceNotFoundException("Cannot read from file " + key);
+                    else throw new ResourceNotFoundException(key);
                 }
                 lm = file.lastModified();
             }

@@ -21,16 +21,19 @@ import org.orbeon.oxf.common.OXFException;
  */
 public class ResourceNotFoundException extends OXFException {
 
-    public ResourceNotFoundException(String message) {
-        super(message);
+    public final String resource;
+
+    public ResourceNotFoundException(String resource, Exception exception) {
+        super("Cannot find resource: " + resource, exception);
+        this.resource = resource;
     }
 
-    public ResourceNotFoundException(String message, Exception exception) {
-        super(message, exception);
+    public ResourceNotFoundException(String resource) {
+        this(resource, null);
     }
 
     public ResourceNotFoundException(Exception exception) {
-        super(exception);
+        this(exception.getMessage(), exception);
     }
 }
 

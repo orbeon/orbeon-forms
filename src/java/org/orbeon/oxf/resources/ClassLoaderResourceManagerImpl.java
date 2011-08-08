@@ -39,7 +39,7 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
         final java.net.URL u = clazz.getResource( adjustedKey );
         if (u == null) {
             if (doNotThrowResourceNotFound) return null;
-            else throw new ResourceNotFoundException( "Cannot read from file " + key );
+            else throw new ResourceNotFoundException(key);
         }
         return u.openConnection();
     }

@@ -358,7 +358,7 @@
                         </p:input>
                     </p:processor>
 
-                    <!-- For form data, create materialized view -->
+                    <!-- For form data, create view -->
                     <p:choose href="#request-description">
                         <p:when test="/request/type = 'form' and /request/filename = 'form.xhtml' and /request/create-flat-view = 'true'">
                             <p:processor name="oxf:unsafe-xslt">
@@ -368,16 +368,16 @@
                                         <xsl:import href="sql-utils.xsl"/>
                                         <xsl:template match="/">
 
-                                            <!-- Compute materialized view name -->
+                                            <!-- Compute view name -->
                                             <!-- NOTE: Max name length is 30. -12 for "orbeon_flat_", leaves 18, or 8 for the app name, 9 for the form name -->
                                             <xsl:variable name="mv-name" select="concat('orbeon_flat_', f:xml-to-sql-id(/request/app, 8), '_', f:xml-to-sql-id(/request/form, 9))"/>
 
-                                            <!-- SQL to drop possibly existing materialized view -->
+                                            <!-- SQL to drop possibly existing view -->
                                             <xsl:result-document href="output:drop-sql">
                                                 <xsl:call-template name="update-wrapper">
                                                     <xsl:with-param name="sql">
                                                         begin
-                                                            <!-- Drop table catching exception, as Oracle doesn't have a "create or replace materialized view" -->
+                                                            <!-- Drop table catching exception, as Oracle doesn't have a "create or replace view" -->
                                                             <!-- NOTE: Use "execute immediate", as Oracle doesn't like DDL in PL/SQL -->
                                                             execute immediate 'drop view <xsl:value-of select="$mv-name"/>';
                                                         exception
@@ -389,7 +389,7 @@
                                                 </xsl:call-template>
                                             </xsl:result-document>
 
-                                            <!-- SQL to create materialized view -->
+                                            <!-- SQL to create view -->
                                             <xsl:result-document href="output:create-sql">
                                                 <xsl:call-template name="update-wrapper">
                                                     <xsl:with-param name="sql">

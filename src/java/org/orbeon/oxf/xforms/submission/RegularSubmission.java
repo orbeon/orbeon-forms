@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.net.URL;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class RegularSubmission extends BaseSubmission {
 
         // Headers
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
-        final String headersToForward = getHeadersToForward(containingDocument, p.isReplaceAll);
+        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll);
 
         final String submissionEffectiveId = submission.getEffectiveId();
 

@@ -145,7 +145,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         // Headers
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
-        final String[] headersToForward = StringUtils.split(getHeadersToForward(containingDocument, p.isReplaceAll));
+        final String[] headersToForward = StringUtils.split(XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll));
 
         final String submissionEffectiveId = submission.getEffectiveId();
 

@@ -119,7 +119,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
                         final URLConnection connection = URLFactory.createURL(absoluteResourceURI).openConnection();
 
-                        // Outgoing headers if specified
+                        // Set outgoing headers
                         for (final Map.Entry<String, String[]> entry : resource.headers.entrySet() ) {
                             final String name = entry.getKey();
                             for (final String value : entry.getValue())
@@ -339,7 +339,8 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param headers           connection headers
      * @return                  client URI
      */
-    public static String proxyURI(String uri, String filename, String contentType, long lastModified, Map<String, String[]> headers) {
+    public static String proxyURI(IndentedLogger indentedLogger, String uri, String filename, String contentType,
+                                  long lastModified, Map<String, String[]> headers, String headersToForward) {
 
         // Create a digest, so that for a given URI we always get the same key
         final String digest = SecureUtils.digestString(uri, "MD5", "hex");
@@ -349,9 +350,13 @@ public class XFormsResourceServer extends ProcessorImpl {
         final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
 
         if (session != null) {
+
+            // Determine outgoing headers
+            final Map<String, String[]> outgoingHeaders = Connection.getHeadersMap(externalContext, indentedLogger, null, headers, headersToForward);
+
             // Store mapping into session
             session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                    new DynamicResource(uri, filename, contentType, -1, lastModified, headers));
+                    new DynamicResource(uri, filename, contentType, -1, lastModified, outgoingHeaders));
         }
 
         // Rewrite new URI to absolute path without the context

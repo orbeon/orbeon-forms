@@ -21,6 +21,7 @@ import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -173,17 +174,18 @@ public class XFormsOutputControl extends XFormsValueControl {
                     final String resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
 
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
-                    updatedValue = XFormsResourceServer.proxyURI(resolvedURI, fileInfo.getFileName(), mediatype, lastModified, evaluateHeaders());
+                    updatedValue = XFormsResourceServer.proxyURI(getIndentedLogger(), resolvedURI, fileInfo.getFileName(), mediatype, lastModified, evaluateHeaders(),
+                            XFormsProperties.getForwardSubmissionHeaders(containingDocument, true));
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
                 }
             } else if ("base64Binary".equals(typeName)) {
                 // xs:base64Binary type
-                // TODO: avoid cast to PipelineContext
                 final String uri = NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE);
                 // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
-                updatedValue = XFormsResourceServer.proxyURI(uri, fileInfo.getFileName(), mediatype, -1, evaluateHeaders());
+                updatedValue = XFormsResourceServer.proxyURI(getIndentedLogger(), uri, fileInfo.getFileName(), mediatype, -1, evaluateHeaders(),
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument, true));
 
             } else {
                 // Return dummy image

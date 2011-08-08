@@ -77,6 +77,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
         val connection = proxyEstablishConnection(request, dropTrailingSlash(persistenceBaseURL) + path, headers)
+        // Proxy status code
+        response.setStatus(connection.getResponseCode)
         // Proxy incoming headers
         proxyHeaders(connection.getHeaderFields map {case (name, values) => (name, values.toSeq)}, response.setHeader _, out = false)
         copyStream(connection.getInputStream, response.getOutputStream)
@@ -145,6 +147,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             // Read all the forms for the current service
             val serviceURI = baseURI + "/form"
             val inputStream = proxyEstablishConnection(request, serviceURI, headers) getInputStream
+            // TODO: handle connection.getResponseCode
             val forms = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, serviceURI, false, false)
             forms \\ "forms" \\ "form"
         }

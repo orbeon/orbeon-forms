@@ -282,6 +282,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-repeat-table tr th .xforms-help-image { margin-top: 0 }
 
 .yui-skin-sam .fr-repeat-column-trigger .yui-dt-liner { padding: 4px } /* override YUI */
+.yui-skin-sam .yui-dt .fr-repeat-table th .yui-dt-liner { white-space: normal } /* override YUI as this is not a datatable, so allow repeat th text to wrap */
 .fr-repeat-table .fr-repeat-column-trigger { width: 24px; text-align: center }
 .yui-skin-sam .fr-repeat-table .fr-repeat-column-trigger { vertical-align: middle } /* override YUI */
 .fr-repeat-table .fr-repeat-column-trigger img { margin: 0; display: block }

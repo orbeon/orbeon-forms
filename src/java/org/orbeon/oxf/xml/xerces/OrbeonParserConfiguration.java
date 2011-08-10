@@ -75,6 +75,21 @@ public class OrbeonParserConfiguration extends XIncludeAwareParserConfiguration 
         result.put("http://xml.org/sax/features/namespaces", true);
         result.put("http://xml.org/sax/features/namespace-prefixes", false);
 
+        // 2011-08-09: Disable loading and using of DTDs when validation is turned off. If not, the effect is that, even
+        // when validation is turned off:
+        //
+        // - internal DTDs are processed
+        // - external DTDs are loaded and processed
+        // - DTDs are used to set default attributes and attribute types
+        //
+        // Whether this is generally expected is debatable. However, given that DTDs are rarely used in Orbeon and that
+        // loading external DTDs is costly, we decide to disable this by default.
+        //
+        // These two features are turned on automatically by Xerces when validation is on.
+        // See: http://xerces.apache.org/xerces-j/features.html
+        result.put("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        result.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
         result.put("http://xml.org/sax/features/external-general-entities", externalEntities);
         result.put("http://xml.org/sax/features/external-parameter-entities", externalEntities);
 

@@ -138,45 +138,33 @@ public class LocalPortletSubmission extends BaseSubmission {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
                                 currentPortlet.getProcessorService().service(new ExternalContextWrapper(asyncExternalContext) {
-                                            @Override
-                                            public ExternalContext.Request getRequest() {
-                                                return request;
-                                            }
+                                    @Override
+                                    public ExternalContext.Request getRequest() {
+                                        return request;
+                                    }
 
-                                            @Override
-                                            public ExternalContext.Response getResponse() {
-                                                return response;
-                                            }
-                                        }, new PipelineContext());
+                                    @Override
+                                    public ExternalContext.Response getResponse() {
+                                        return response;
+                                    }
+                                }, new PipelineContext());
                             }
                         }, true, false);
 
                     // Update status
                     status[0] = true;
 
-                    if (connectionResult.dontHandleResponse) {
-                        // This means we got a submission with replace="all" and above already did all the work
-                        // TODO: Could this be done in a Replacer instead?
+                    // TODO: can we put this in the Replacer?
+                    if (connectionResult.dontHandleResponse)
                         containingDocument.setGotSubmissionReplaceAll();
 
-                        // Update status
-                        status[1] = true;
+                    // Obtain replacer, deserialize and update status
+                    final Replacer replacer = submission.getReplacer(connectionResult, p);
+                    replacer.deserialize(connectionResult, p, p2);
+                    status[1] = true;
 
-                        // Caller has nothing to do
-                        return null;
-                    } else {
-                        // Obtain replacer
-                        final Replacer replacer = submission.getReplacer(connectionResult, p);
-
-                        // Deserialize
-                        replacer.deserialize(connectionResult, p, p2);
-
-                        // Update status
-                        status[1] = true;
-
-                        // Return result
-                        return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
-                    }
+                    // Return result
+                    return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
                 } catch (Throwable throwable) {
                     // Exceptions are handled further down
                     return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);

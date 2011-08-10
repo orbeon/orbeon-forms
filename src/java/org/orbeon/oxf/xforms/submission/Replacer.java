@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.PropertyContext;
 
 import java.io.IOException;
 
@@ -24,6 +23,7 @@ public interface Replacer {
                      XFormsModelSubmission.SubmissionParameters p,
                      XFormsModelSubmission.SecondPassParameters p2) throws Exception;
 
+    // NOTE: replace() is allowed to throw exceptions, including XFormsSubmissionException
     Runnable replace(ConnectionResult connectionResult,
                      XFormsModelSubmission.SubmissionParameters p,
                      XFormsModelSubmission.SecondPassParameters p2) throws IOException;

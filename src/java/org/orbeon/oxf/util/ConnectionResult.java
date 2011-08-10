@@ -206,7 +206,7 @@ public class ConnectionResult {
             indentedLogger.log(logLevel, logType, "response", "status code", Integer.toString(statusCode));
 
             // Log headers if needed
-            if (responseHeaders.size() > 0) {
+            if (responseHeaders != null && responseHeaders.size() > 0) {
                 final List<String> headersToLog = new ArrayList<String>();
 
                 for (Map.Entry<String, List<String>> currentEntry: responseHeaders.entrySet()) {

@@ -22,8 +22,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -143,9 +141,7 @@ public class AsynchronousSubmissionManager {
 
                         // Process response by dispatching an event to the submission
                         final XFormsModelSubmission submission = (XFormsModelSubmission) containingDocument.getObjectByEffectiveId(result.getSubmissionEffectiveId());
-                        final XBLContainer container = submission.getXBLContainer(containingDocument);
-                        // NOTE: not clear whether we should use an event for this as there doesn't seem to be a benefit
-                        container.dispatchEvent(new XXFormsSubmitReplaceEvent(containingDocument, submission, result));
+                        submission.doSubmitReplace(result);
 
                     } catch (Throwable throwable) {
                         // Something bad happened
@@ -184,9 +180,7 @@ public class AsynchronousSubmissionManager {
 
                         // Process response by dispatching an event to the submission
                         final XFormsModelSubmission submission = (XFormsModelSubmission) containingDocument.getObjectByEffectiveId(result.getSubmissionEffectiveId());
-                        final XBLContainer container = submission.getXBLContainer(containingDocument);
-                        // NOTE: not clear whether we should use an event for this as there doesn't seem to be a benefit
-                        container.dispatchEvent(new XXFormsSubmitReplaceEvent(containingDocument, submission, result));
+                        submission.doSubmitReplace(result);
                     } catch (Throwable throwable) {
                         // Something bad happened
                         throw new OXFException(throwable);

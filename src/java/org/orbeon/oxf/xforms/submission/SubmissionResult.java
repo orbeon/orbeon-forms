@@ -15,6 +15,9 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
 
+/*
+ * This must either have a non-null Replacer or a non-null Throwable.
+ */
 public class SubmissionResult {
 
     private String submissionEffectiveId;

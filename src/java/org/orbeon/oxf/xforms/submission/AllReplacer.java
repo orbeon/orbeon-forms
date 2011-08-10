@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,13 +43,26 @@ public class AllReplacer extends BaseReplacer {
         // Remember that we got a submission producing output
         containingDocument.setGotSubmissionReplaceAll();
 
-        replace(connectionResult, containingDocument.getResponse());
+        final ReplaceAllResponse replaceAllResponse = new ReplaceAllResponse(containingDocument.getResponse());
+        replace(connectionResult, replaceAllResponse);
+        connectionResult.statusCode = replaceAllResponse.getStatus();
 
-        // "the event xforms-submit-done may be dispatched"
-        // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-        if (!p.isDeferredSubmissionSecondPassReplaceAll) {
-            return dispatchSubmitDone(connectionResult);
+        // Success: "the event xforms-submit-done may be dispatched with appropriate context information"
+        // Error: "either the document is replaced with an implementation-specific indication of an error or submission
+        // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
+        // error-type of resource-error"
+        if (! p.isDeferredSubmissionSecondPassReplaceAll) {
+            if (XFormsSubmissionUtils.isSuccessCode(connectionResult.statusCode))
+                return dispatchSubmitDone(connectionResult);
+            else
+                // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has
+                // already been written out. This gives the form author a chance to do something in cases the response is
+                // buffered, for example do a sendError().
+                throw new XFormsSubmissionException(submission, "xforms:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                        new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         } else {
+            // We don't want any changes to happen to the document upon xxforms-submit when producing a new document, so
+            // we don't dispatch success/error events.
             return null;
         }
     }
@@ -69,5 +85,24 @@ public class AllReplacer extends BaseReplacer {
         // End document and close
         outputStream.flush();
         outputStream.close();
+    }
+
+    public static class ReplaceAllResponse extends ResponseWrapper {
+
+        private int status;
+
+        public ReplaceAllResponse(ExternalContext.Response response) {
+            super(response);
+        }
+
+        @Override
+        public void setStatus(int status) {
+            this.status = status;
+            super.setStatus(status);
+        }
+
+        public int getStatus() {
+            return status;
+        }
     }
 }

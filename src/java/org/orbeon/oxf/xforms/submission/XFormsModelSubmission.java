@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
@@ -272,12 +271,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     public void performDefaultAction(XFormsEvent event) {
         final String eventName = event.getName();
 
-        if (XFormsEvents.XXFORMS_SUBMIT_REPLACE.equals(eventName)) {
-            // Custom event to process the response of asynchronous submissions
-
-            doSubmitReplace(event);
-
-        } else if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
+        if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
@@ -301,7 +295,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         // Make sure submission element info is extracted
         extractSubmissionElement();
 
-        Runnable submitDoneRunnable = null;
+        Runnable submitDoneOrErrorRunnable = null;
         try {
             try {
                 // Big bag of initial runtime parameters
@@ -431,15 +425,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // Serialize
                 final SerializationParameters sp = new SerializationParameters(p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData);
 
-                /* ***** Execute submission ***************************************************************************** */
+                /* ***** Submission connection ************************************************************************** */
 
                 // Result information
                 SubmissionResult submissionResult = null;
 
-                /* ***** Submission connection ************************************************************************** */
-
                 // Iterate through submissions and run the first match
-                for (final Submission submission: submissions) {
+                for (final Submission submission : submissions) {
                     if (submission.isMatch(p, p2, sp)) {
                         if (indentedLogger.isDebugEnabled())
                             indentedLogger.startHandleOperation("", "connecting", "type", submission.getType());
@@ -454,17 +446,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 /* ***** Submission result processing ******************************************************************* */
-                submitDoneRunnable = handleSubmissionResult(p, p2, submissionResult);
 
-            } catch (Throwable throwable) {
+                // NOTE: handleSubmissionResult() catches Throwable and returns a Runnable
+                if (submissionResult != null)// submissionResult is null in case the submission is running asynchronously, AND when ???
+                    submitDoneOrErrorRunnable = handleSubmissionResult(p, p2, submissionResult);
+
+            } catch (final Throwable throwable) {
                 /* ***** Handle errors ********************************************************************************** */
-                if (p != null && p.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
-                    // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                    throw new XFormsSubmissionException(this, throwable, "Error while processing xforms:submission", "processing submission");
-                } else {
-                    // Any exception will cause an error event to be dispatched
-                    sendSubmitError(resolvedActionOrResource, throwable);
-                }
+                final SubmissionParameters pVal = p;
+                final String resolvedActionOrResourceVal = resolvedActionOrResource;
+                submitDoneOrErrorRunnable = new Runnable() {
+                    public void run() {
+                        if (pVal != null && pVal.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
+                            // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
+                            throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xforms:submission", "processing submission");
+                        } else {
+                            // Any exception will cause an error event to be dispatched
+                            sendSubmitError(resolvedActionOrResourceVal, throwable);
+                        }
+                    }
+                };
             }
         } finally {
             // Log total time spent in submission
@@ -473,21 +474,25 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
         }
 
-        // Execute submit done runnable if any
-        if (submitDoneRunnable != null) {
-            // Do this outside the above catch block so that if a problem occurs during dispatching xforms-submit-done
-            // we don't dispatch xforms-submit-error (which would be illegal)
-            submitDoneRunnable.run();
+        // Execute post-submission code if any
+        // This typically dispatches xforms-submit-done/xforms-submit-error, or may throw another exception
+        if (submitDoneOrErrorRunnable != null) {
+            // We do this outside the above catch block so that if a problem occurs during dispatching xforms-submit-done
+            // or xforms-submit-error we don't dispatch xforms-submit-error (which would be illegal).
+            submitDoneOrErrorRunnable.run();
         }
     }
 
-    private void doSubmitReplace(XFormsEvent event) {
-        final XXFormsSubmitReplaceEvent replaceEvent = (XXFormsSubmitReplaceEvent) event;
+    /*
+     * Process the response of an asynchronous submission.
+     */
+    public void doSubmitReplace(SubmissionResult submissionResult) {
+
+        assert submissionResult != null;
 
         // Big bag of initial runtime parameters
-        final SubmissionParameters p = new SubmissionParameters(event.getName());
+        final SubmissionParameters p = new SubmissionParameters(null);
         final SecondPassParameters p2 = new SecondPassParameters(p);
-        final SubmissionResult submissionResult = replaceEvent.getSubmissionResult();
 
         final Runnable submitDoneRunnable = handleSubmissionResult(p, p2, submissionResult);
 
@@ -499,40 +504,46 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
     }
 
-    private Runnable handleSubmissionResult(SubmissionParameters p, SecondPassParameters p2, SubmissionResult submissionResult) {
-        Runnable submitDoneRunnable = null;
-        if (submissionResult != null) { // submissionResult is null in case the submission is running asynchronously
-            try {
-                final IndentedLogger indentedLogger = getIndentedLogger();
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.startHandleOperation("", "handling result");
-                try {
-                    // Get fresh XPath context because function context might have changed
-                    // NOTE: It is not ideal that we have to do this!
-                    p.initializeXPathContext();
-                    // Process the different types of response
-                    if (submissionResult.getReplacer() != null) {
-                        // Replacer provided, perform replacement
-                        submitDoneRunnable = submissionResult.getReplacer().replace(submissionResult.getConnectionResult(), p, p2);
-                    } else if (submissionResult.getThrowable() != null) {
-                        // Propagate throwable, which might have come from a separate thread
-                        sendSubmitError(submissionResult.getThrowable(), submissionResult);
-                    } else {
-                        // Should not happen
-                    }
-                } finally {
-                    if (indentedLogger.isDebugEnabled())
-                        indentedLogger.endHandleOperation();
+    private Runnable handleSubmissionResult(SubmissionParameters p, SecondPassParameters p2, final SubmissionResult submissionResult) {
 
-                    // Clean-up result
-                    submissionResult.close();
+        assert p != null;
+        assert p2 != null;
+        assert submissionResult != null;
+
+        Runnable submitDoneOrErrorRunnable = null;
+        try {
+            final IndentedLogger indentedLogger = getIndentedLogger();
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.startHandleOperation("", "handling result");
+            try {
+                // Get fresh XPath context because function context might have changed
+                // NOTE: It is not ideal that we have to do this!
+                p.initializeXPathContext();
+                // Process the different types of response
+                if (submissionResult.getThrowable() != null) {
+                    // Propagate throwable, which might have come from a separate thread
+                    submitDoneOrErrorRunnable = new Runnable() {
+                        public void run() { sendSubmitError(submissionResult.getThrowable(), submissionResult); }
+                    };
+                } else {
+                    // Replacer provided, perform replacement
+                    assert submissionResult.getReplacer() != null;
+                    submitDoneOrErrorRunnable = submissionResult.getReplacer().replace(submissionResult.getConnectionResult(), p, p2);
                 }
-            } catch (Throwable throwable) {
-                // Any exception will cause an error event to be dispatched
-                sendSubmitError(throwable, submissionResult);
+            } finally {
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.endHandleOperation();
+
+                // Clean-up result
+                submissionResult.close();
             }
+        } catch (final Throwable throwable) {
+            // Any exception will cause an error event to be dispatched
+            submitDoneOrErrorRunnable = new Runnable() {
+                public void run() { sendSubmitError(throwable, submissionResult); }
+            };
         }
-        return submitDoneRunnable;
+        return submitDoneOrErrorRunnable;
     }
 
     /**
@@ -615,10 +626,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
 
-        if (connectionResult != null && !connectionResult.dontHandleResponse) {
+        if (connectionResult != null) {
             // Handle response
             final Replacer replacer;
-            if (connectionResult.statusCode >= 200 && connectionResult.statusCode < 300) {// accept any success code (in particular "201 Resource Created")
+            if (connectionResult.dontHandleResponse) {
+                // Always return a replacer even if it does nothing, this way we don't have to deal with null
+                replacer = new NoneReplacer(this, containingDocument);
+            } else if (XFormsSubmissionUtils.isSuccessCode(connectionResult.statusCode)) {
                 // Successful response
                 if (connectionResult.hasContent()) {
                     // There is a body

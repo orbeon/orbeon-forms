@@ -489,6 +489,16 @@ public class XFormsToXHTML extends ProcessorImpl {
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, xmlReceiver, false, true);
     }
 
+    /*
+     * Create a response that writes to the receiver.
+     *
+     * As of 2011-08-09 this response is used with replace="all" by:
+     *
+     * - RequestDispatcherSubmission and LocalPortletSubmission
+     * - AllReplacer
+     *
+     * This can be used upon form initialization, or during the 2nd pass of a 2-pass submission.
+     */
     public static ExternalContext.Response getResponse(XMLReceiver xmlReceiver, final ExternalContext externalContext) {
         ExternalContext.Response response;
         if (xmlReceiver != null) {
@@ -521,13 +531,14 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 @Override
                 public void setContentLength(int len) {
-                    // TODO: should be set on ContentHandlerOutputStream
+                    // TODO: set on ContentHandlerOutputStream
                     setHeader("Content-Length", Integer.toString(len));
                 }
 
                 @Override
                 public void setStatus(int status) {
-                    // TODO: should be set on ContentHandlerOutputStream
+                    // TODO: set on ContentHandlerOutputStream
+                    // See: http://wiki.orbeon.com/forms/projects/xforms/better-error-handling-for-replace-all-submission
                 }
 
                 @Override

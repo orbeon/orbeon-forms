@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.IOException;
@@ -248,13 +248,18 @@ public abstract class BaseSubmission implements Submission {
                 }
             };
             if (isReplaceAll) {
-                // "the event xforms-submit-done is dispatched"
-                if (xformsModelSubmission != null)
-                    xformsModelSubmission.getXBLContainer(containingDocument).dispatchEvent(
-                            new XFormsSubmitDoneEvent(containingDocument, xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
-
-                submissionProcess.process(requestAdapter, effectiveResponse);
+                final AllReplacer.ReplaceAllResponse replaceAllResponse = new AllReplacer.ReplaceAllResponse(effectiveResponse);
+                submissionProcess.process(requestAdapter, replaceAllResponse);
+                connectionResult.statusCode = replaceAllResponse.getStatus();
                 connectionResult.dontHandleResponse = true;
+
+                // Here we cause dispatch xforms-submit-error upon getting a non-success error code, even though the
+                // response has already been written out. This gives the form author a chance to do something in cases
+                // the response is buffered, for example do a sendError().
+                if (! XFormsSubmissionUtils.isSuccessCode(connectionResult.statusCode))
+                    throw new XFormsSubmissionException(submission, "xforms:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                            new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+
             } else {
                 // We must intercept the reply
                 final ResponseAdapter responseAdapter = new ResponseAdapter(response.getNativeResponse(), response);

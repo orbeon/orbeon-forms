@@ -17,8 +17,12 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.*;
-import java.io.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Map;
 
@@ -135,7 +139,7 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
     }
 
     public void setStatus(int i) {
-            response.setStatus(i);
+        response.setStatus(i);
     }
 
     public void setStatus(int i, String clazz) {

@@ -33,7 +33,6 @@ public class XFormsEvents {
     public static final String XXFORMS_SERVER_EVENTS = "xxforms-server-events";
     public static final String XXFORMS_POLL = "xxforms-poll";
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
-    public static final String XXFORMS_SUBMIT_REPLACE = "xxforms-submit-replace";
     public static final String XXFORMS_LOAD = "xxforms-load";
     public static final String XXFORMS_REPEAT_FOCUS = "xxforms-repeat-focus";
     public static final String XXFORMS_ACTION_ERROR = "xxforms-action-error";

@@ -61,6 +61,11 @@ public class XFormsSubmissionUtils {
         return method.equals("delete") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "delete"));
     }
 
+    public static boolean isSuccessCode(int code) {
+        // Accept any success code (in particular "201 Resource Created")
+        return code >= 200 && code < 300;
+    }
+
     /**
      * Check whether an XML sub-tree satisfies validity and required MIPs.
      *

@@ -118,7 +118,6 @@ public class InstanceReplacer extends BaseReplacer {
                 // XForms 1.1: "If the processing of the targetref attribute fails,
                 // then submission processing ends after dispatching the event
                 // xforms-submit-error with an error-type of target-error."
-
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
                         new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }

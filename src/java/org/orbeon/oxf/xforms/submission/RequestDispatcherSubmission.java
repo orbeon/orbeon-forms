@@ -170,29 +170,17 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                     // Update status
                     status[0] = true;
 
-                    if (connectionResult.dontHandleResponse) {
-                        // This means we got a submission with replace="all" and openRequestDispatcherConnection() already did all the work
-                        // TODO: Could this be done in a Replacer instead?
+                    // TODO: can we put this in the Replacer?
+                    if (connectionResult.dontHandleResponse)
                         containingDocument.setGotSubmissionReplaceAll();
 
-                        // Update status
-                        status[1] = true;
+                    // Obtain replacer, deserialize and update status
+                    final Replacer replacer = submission.getReplacer(connectionResult, p);
+                    replacer.deserialize(connectionResult, p, p2);
+                    status[1] = true;
 
-                        // Caller has nothing to do
-                        return null;
-                    } else {
-                        // Obtain replacer
-                        final Replacer replacer = submission.getReplacer(connectionResult, p);
-
-                        // Deserialize
-                        replacer.deserialize(connectionResult, p, p2);
-
-                        // Update status
-                        status[1] = true;
-
-                        // Return result
-                        return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
-                    }
+                    // Return result
+                    return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
                 } catch (Throwable throwable) {
                     // Exceptions are handled further down
                     return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);

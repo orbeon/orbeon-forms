@@ -301,13 +301,16 @@
             </xforms:instance>
 
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
-            <xforms:submission id="search-submission"
+                <xforms:submission id="search-submission"
                     ref="instance('fr-search-instance')" validate="false"
                     method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
                     replace="instance" instance="fr-summary-instance">
                 <!-- Set language upon submitting -->
                 <xforms:action ev:event="xforms-submit">
                     <xforms:setvalue ref="lang" value="xxforms:instance('fr-language-instance')"/>
+                </xforms:action>
+                <xforms:action ev:event="xforms-submit-error">
+                    <xforms:message>Error performing search.</xforms:message>
                 </xforms:action>
             </xforms:submission>
 

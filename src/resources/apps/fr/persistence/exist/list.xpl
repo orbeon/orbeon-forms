@@ -38,14 +38,10 @@
                                             }/?_howmany={/*/page-size}&amp;_start={/*/page-number}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="/*/*[1]"/>
-                <!-- Copy eXist error -->
-                <xforms:action ev:event="xforms-submit-error">
-                    <!--<xforms:insert context="/" origin="xxforms:element('error')"/>-->
-                    <!--<xforms:insert context="/" origin="xxforms:html-to-xml(event('response-body'))"/>-->
-                    <xforms:delete nodeset="/*/*"/>
-                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                <!-- Log and propagate error to caller -->
+                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                    <!-- TODO: Propagate error to caller -->
+                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
                 </xforms:action>
             </xforms:submission>
         </p:input>

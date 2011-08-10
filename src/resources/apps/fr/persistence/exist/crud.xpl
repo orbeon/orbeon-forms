@@ -115,11 +115,10 @@
                             <xforms:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
                                     resource="{/*/exist-uri}/{/*/group[1]}">
-                                <xforms:action ev:event="xforms-submit-error">
-                                    <!-- TODO: Propagate error to caller -->
-                                    <xforms:delete nodeset="/*/*"/>
-                                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                                <!-- Log and propagate error to caller -->
+                                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
                                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
+                                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
@@ -135,11 +134,10 @@
                         <p:input name="submission">
                             <xforms:submission method="delete" replace="none" serialization="none"
                                     resource="{/*/exist-uri}/{/*/group[1]}">
-                                <xforms:action ev:event="xforms-submit-error">
-                                    <!-- TODO: Propagate error to caller -->
-                                    <xforms:delete nodeset="/*/*"/>
-                                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                                <!-- Log and propagate error to caller -->
+                                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
                                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
+                                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>
@@ -155,11 +153,10 @@
                         <p:input name="submission">
                             <xforms:submission ref="/*/*[1]" method="put" replace="none"
                                     resource="{/root/request-description/exist-uri}/{/root/request-description/group[1]}">
-                                <xforms:action ev:event="xforms-submit-error">
-                                    <!-- TODO: Propagate error to caller -->
-                                    <xforms:delete nodeset="/*/*"/>
-                                    <xforms:setvalue ref="/*" value="event('response-body')"/>
+                                <!-- Log and propagate error to caller -->
+                                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
                                     <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
+                                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
                                 </xforms:action>
                             </xforms:submission>
                         </p:input>

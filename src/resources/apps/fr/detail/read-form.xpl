@@ -43,7 +43,12 @@
                                 resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml{
                                     if (instance('fr-parameters-instance')/document != '') then concat('?document=', instance('fr-parameters-instance')/document) else ''}"
                                 replace="all" xxforms:xinclude="true">
-                            <xforms:action ev:event="xforms-submit-error" type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
+                            <!-- HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way -->
+                            <xforms:action ev:event="xforms-submit-error" type="xpath">
+                                if (xxforms:get-request-path() != '/fr/service/custom/orbeon/newbuilder/toolbox')
+                                then form-runner:sendError((event('response-status-code'), 500)[1])
+                                else ()
+                            </xforms:action>
                         </xforms:submission>
                         <xforms:send ev:event="xforms-model-construct-done" submission="get-source-form-submission"/>
                     </xforms:model>

@@ -200,7 +200,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                 // "Otherwise, if the origin attribute is not given, then the origin node-set consists of the last
                 // node of the Node Set Binding node-set."
-                final Node singleSourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1), CANNOT_INSERT_READONLY_MESSAGE);
+                final Node singleSourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1));
                 // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
                 final Node singleClonedNode = Dom4jUtils.createCopy(singleSourceNode);
 
@@ -228,7 +228,7 @@ public class XFormsInsertAction extends XFormsAction {
                         // This is the regular case covered by XForms 1.1 / XPath 1.0
 
                         // NOTE: Don't clone nodes if doClone == false
-                        final Node sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) currentObject, CANNOT_INSERT_READONLY_MESSAGE);
+                        final Node sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) currentObject);
                         final Node clonedNode = doClone ? (sourceNode instanceof Element) ? ((Element) sourceNode).createCopy() : (Node) sourceNode.clone() : sourceNode;
 
                         sourceNodes.add(sourceNode);

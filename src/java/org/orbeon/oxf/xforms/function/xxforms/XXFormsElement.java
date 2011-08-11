@@ -14,10 +14,12 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Attribute;
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
@@ -85,27 +87,20 @@ public class XXFormsElement extends XFormsFunction {
         } else if (item instanceof NodeInfo) {
             // Insert nodes
 
-            if (item instanceof NodeWrapper) {
-                // dom4j node
+            // Copy node before using it
+            final Node currentNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) item);
+            // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
+            final Node newNode = Dom4jUtils.createCopy(currentNode);
 
-                // Copy node before using it
-                final Node newNode; {
-                final Node currentNode = (Node) ((NodeWrapper) item).getUnderlyingNode();
-                    // TODO: check namespace handling might be incorrect. Should use copyElementCopyParentNamespaces() instead?
-                    newNode = Dom4jUtils.createCopy(currentNode);
-                }
-
-                if (newNode instanceof Attribute) {
-                    // Add attribute
-                    element.add((Attribute) newNode);
-                } else {
-                    // Append node
-                    element.content().add(newNode);
-                }
-
+            if (newNode instanceof Attribute) {
+                // Add attribute
+                element.add((Attribute) newNode);
+            } else if (newNode instanceof Document) {
+                // use the document root instead
+                element.content().add(newNode.getDocument().getRootElement());
             } else {
-                // Other type of node
-                // TODO: read and convert
+                // Append node
+                element.content().add(newNode);
             }
         }
         return hasNewText;

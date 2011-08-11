@@ -842,9 +842,16 @@ public class XFormsUtils {
         return null;
     }
 
-    public static Node getNodeFromNodeInfoConvert(NodeInfo nodeInfo, String errorMessage) {
+    /**
+     * Return the underlying Node from the given NodeInfo, possibly converting it to a Dom4j Node. Changes to the returned Node may or may not 
+     * reflect on the original, depending on its type.
+     *
+     * @param nodeInfo      NodeInfo to process
+     * @return              Node
+     */
+    public static Node getNodeFromNodeInfoConvert(NodeInfo nodeInfo) {
         if (nodeInfo instanceof NodeWrapper)
-            return getNodeFromNodeInfo(nodeInfo, errorMessage);
+            return (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
         else
             return TransformerUtils.tinyTreeToDom4j2((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
     }

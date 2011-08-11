@@ -253,7 +253,7 @@
                                                         <xh:tr>
                                                             <xsl:choose>
                                                                 <xsl:when test="$is-repeat">
-                                                                    <xsl:attribute name="class">fr-grid-tr {string-join((if ($repeat-position mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if ($repeat-position = 1) then 'yui-dt-first' else ()), ' ')}</xsl:attribute>
+                                                                    <xsl:attribute name="class">fr-grid-tr {string-join((if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if (xxf:repeat-position() = 1) then 'yui-dt-first' else ()), ' ')}</xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
                                                                     <xsl:attribute name="class">fr-grid-tr</xsl:attribute>

@@ -11,18 +11,14 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-
-
 package org.orbeon.oxf.xforms.function.xxforms
 
-
-import org.orbeon.oxf.xforms.XFormsControls
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.XFormsContextStack
 
 /**
  * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
@@ -32,27 +28,14 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
  */
 class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
 
-    override def evaluateItem(xpathContext: XPathContext): Item = {
-
-        // Note that this is deprecated. Move to warning later?
-        val indentedLogger = getContainingDocument(xpathContext).getIndentedLogger(XFormsControls.LOGGING_CATEGORY)
-        if (indentedLogger.isDebugEnabled)
-            indentedLogger.logDebug("xxforms:repeat-current()", "function is deprecated, use context() or xxforms:context() instead")
-
-        getContextStack(xpathContext).getRepeatCurrentSingleNode(getRepeatIdExpression match {
-            case Some(repeatIdExpression) =>
-                // Argument passed => get context id by evaluating expression
-                repeatIdExpression.evaluateAsString(xpathContext).toString
-            case None =>
-                // No argument passed => pass null
-                null
-        })
-    }
+    override def evaluateItem(xpathContext: XPathContext) =
+        getRepeatCurrentSingleNode(getContextStack(xpathContext),
+            argument.headOption map (_.evaluateAsString(xpathContext).toString))
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
 
         // Match on context expression
-        getRepeatIdExpression match {
+        argument.headOption match {
             case Some(repeatIdExpression: StringLiteral) =>
                 // Argument is literal and we have a context to ask
                 pathMap.getPathMapContext match {
@@ -76,5 +59,11 @@ class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
         }
     }
 
-    private def getRepeatIdExpression = if (argument.length == 0) None else Some(argument(0))
+    /**
+     * Return the single item associated with the iteration of the repeat specified. If a null
+     * repeat id is passed, return the single item associated with the closest enclosing repeat
+     * iteration.
+     */
+    private def getRepeatCurrentSingleNode(contextStack: XFormsContextStack, repeatId: Option[String]) =
+        XXFormsRepeatFunctions.getEnclosingRepeatIterationBindingContext(contextStack, repeatId).getSingleItem
 }

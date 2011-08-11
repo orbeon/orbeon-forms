@@ -2076,4 +2076,76 @@
         </output>
     </test>
 
+    <test description="xxforms:repeat-position()" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                </head>
+                <body>
+                    <xforms:repeat ref="department" id="repeat-department">
+                        <xforms:output id="o1" value="xxforms:repeat-position()"/>
+                        <xforms:repeat ref="employee" id="repeat-employee">
+                            <xforms:output id="o2" value="string-join(for $p in (xxforms:repeat-position('repeat-department'), xxforms:repeat-position(), xxforms:repeat-position('repeat-employee')) return xs:string($p), '-')"/>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat-department" index="1"/>
+                            <control effective-id="repeat-employee·1" index="1"/>
+                            <control effective-id="repeat-employee·2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="o1·1">1</xxf:control>
+                        <xxf:control id="o2·1-1">1-1-1</xxf:control>
+                        <xxf:control id="o2·1-2">1-2-2</xxf:control>
+                        <xxf:control id="o1·2">2</xxf:control>
+                        <xxf:control id="o2·2-1">2-1-1</xxf:control>
+                        <xxf:control id="o2·2-2">2-2-2</xxf:control>
+                        <xxf:control id="o2·2-3">2-3-3</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

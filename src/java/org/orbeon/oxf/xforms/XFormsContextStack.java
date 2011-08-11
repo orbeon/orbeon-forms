@@ -645,7 +645,7 @@ public class XFormsContextStack {
 
     public BindingContext getCurrentBindingContext() {
         return contextStack.peek();
-    }
+   }
 
     public BindingContext popBinding() {
         if (contextStack.size() == 1)
@@ -735,34 +735,7 @@ public class XFormsContextStack {
         return getCurrentBindingContext().getInScopeVariables();
     }
 
-    /**
-     * Return the single item associated with the iteration of the repeat specified. If a null
-     * repeat id is passed, return the single item associated with the closest enclosing repeat
-     * iteration.
-     *
-     * NOTE: Use getContextForId() instead.
-     *
-     * @param repeatId  enclosing repeat id, or null
-     * @return          the single item
-     */
-    public Item getRepeatCurrentSingleNode(String repeatId) {
-        BindingContext currentBindingContext = getCurrentBindingContext();
-        do {
-            if (isRepeatIterationBindingContext(currentBindingContext) && (repeatId == null || currentBindingContext.parent.elementId.equals(repeatId))) {
-                // Found binding context for relevant repeat iteration
-                return currentBindingContext.getSingleItem();
-            }
-            currentBindingContext = currentBindingContext.parent;
-        } while (currentBindingContext != null);
-
-        // It is required that there is a relevant enclosing xforms:repeat
-        if (repeatId == null)
-            throw new ValidationException("No enclosing xforms:repeat found.", getCurrentBindingContext().getLocationData());
-        else
-            throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + repeatId, getCurrentBindingContext().getLocationData());
-    }
-
-    private boolean isRepeatIterationBindingContext(BindingContext bindingContext) {
+    public boolean isRepeatIterationBindingContext(BindingContext bindingContext) {
         // First, we need a parent
         final BindingContext parent = bindingContext.parent;
         if (parent == null)

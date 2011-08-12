@@ -231,14 +231,15 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                             itemset.visit(xmlReceiver, new ItemsetListener() {
 
-                                private int optgroupCount = 0;
+                                private boolean inOptgroup = false; // nesting opgroups is not allowed, avoid it
 
                                 public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {}
 
                                 public void endLevel(ContentHandler contentHandler) throws SAXException {
-                                    if (optgroupCount-- > 0) {
+                                    if (inOptgroup) {
                                         // End xhtml:optgroup
                                         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
+                                        inOptgroup = false;
                                     }
                                 }
 
@@ -249,14 +250,21 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                     final String value = item.getValue();
 
                                     if (value == null) {
+                                        assert item.hasChildren();
                                         final String itemClasses = getItemClasses(item, null);
                                         final AttributesImpl optGroupAttributes = getAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
                                         if (label != null)
                                             optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
+                                        
+                                        // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
+                                        // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
+                                        // the indentation himself, it will still look right.
+                                        if (inOptgroup)
+                                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
 
                                         // Start xhtml:optgroup
                                         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
-                                        optgroupCount++;
+                                        inOptgroup = true;
                                     } else {
                                         handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMultiple, item);
                                     }

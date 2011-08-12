@@ -16,14 +16,12 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.ResponseAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
-import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.Metadata;
@@ -40,9 +38,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -500,112 +495,6 @@ public class XFormsToXHTML extends ProcessorImpl {
      * This can be used upon form initialization, or during the 2nd pass of a 2-pass submission.
      */
     public static ExternalContext.Response getResponse(XMLReceiver xmlReceiver, final ExternalContext externalContext) {
-        ExternalContext.Response response;
-        if (xmlReceiver != null) {
-            // If a response is written, it will be through a conversion to XML first
-            final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(xmlReceiver);
-            response = new ResponseAdapter() {
-
-                private String charset;
-                private PrintWriter printWriter;
-                private ExternalContext.Response originalResponse = externalContext.getResponse();
-
-                @Override
-                public OutputStream getOutputStream() throws IOException {
-                    return contentHandlerOutputStream;
-                }
-
-                @Override
-                public PrintWriter getWriter() throws IOException {
-                    // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
-                    if (printWriter == null) {
-                        printWriter = new PrintWriter(new OutputStreamWriter(contentHandlerOutputStream, charset != null ? charset : CachedSerializer.DEFAULT_ENCODING));
-                    }
-                    return printWriter;
-                }
-
-                @Override
-                public void setContentType(String contentType) {
-                    setHeader("Content-Type", contentType);
-                }
-
-                @Override
-                public void setContentLength(int len) {
-                    // TODO: set on ContentHandlerOutputStream
-                    setHeader("Content-Length", Integer.toString(len));
-                }
-
-                @Override
-                public void setStatus(int status) {
-                    // TODO: set on ContentHandlerOutputStream
-                    // See: http://wiki.orbeon.com/forms/projects/xforms/better-error-handling-for-replace-all-submission
-                }
-
-                @Override
-                public Object getNativeResponse() {
-                    return externalContext.getNativeResponse();
-                }
-
-                @Override
-                public void setHeader(String name, String value) {
-
-                    // Handle Content-Type
-                    if (name.toLowerCase().equals("content-type")) {
-                        try {
-                            // Assume that content type is always set, otherwise this won't work
-                            charset = NetUtils.getContentTypeCharset(value);
-                            contentHandlerOutputStream.startDocument(value);
-                        } catch (SAXException e) {
-                            throw new OXFException(e);
-                        }
-                    }
-                    // Don't allow other headers
-                }
-
-                @Override
-                public void setTitle(String title) {
-                    originalResponse.setTitle(title);
-                }
-
-                @Override
-                public String getNamespacePrefix() {
-                    return originalResponse.getNamespacePrefix();
-                }
-
-                @Override
-                public String rewriteResourceURL(String urlString, int rewriteMode) {
-                    return originalResponse.rewriteResourceURL(urlString, rewriteMode);
-                }
-
-                @Override
-                public String rewriteResourceURL(String urlString, boolean absolute) {
-                    return originalResponse.rewriteResourceURL(urlString, absolute);
-                }
-
-                @Override
-                public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-                    return originalResponse.rewriteRenderURL(urlString, portletMode, windowState);
-                }
-
-                @Override
-                public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-                    return originalResponse.rewriteActionURL(urlString, portletMode, windowState);
-                }
-
-                @Override
-                public String rewriteRenderURL(String urlString) {
-                    return originalResponse.rewriteRenderURL(urlString);
-                }
-
-                @Override
-                public String rewriteActionURL(String urlString) {
-                    return originalResponse.rewriteActionURL(urlString);
-                }
-            };
-        } else {
-            // We get the actual output response
-            response = externalContext.getResponse();
-        }
-        return response;
+        return PipelineResponse.getResponse(xmlReceiver, externalContext);
     }
 }

@@ -17,7 +17,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
@@ -61,7 +62,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
         final ProcessorOutput output = new CacheableTransformerOutputImpl(HttpBinarySerializer.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 // Create OutputStream that converts to Base64
-                ContentHandlerOutputStream outputStream = new ContentHandlerOutputStream(xmlReceiver);
+                ContentHandlerOutputStream outputStream = new ContentHandlerOutputStream(xmlReceiver, true);
 
                 // Read configuration input
                 Config config = readConfig(pipelineContext);
@@ -69,7 +70,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
 
                 try {
                     // Start document
-                    outputStream.startDocument(contentType);
+                    outputStream.setContentType(contentType);
 
                     // Write content
                     readInput(pipelineContext, getInputByName(INPUT_DATA), config, outputStream);

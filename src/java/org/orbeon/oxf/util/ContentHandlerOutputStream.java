@@ -30,41 +30,65 @@ public class ContentHandlerOutputStream extends OutputStream {
 
     private static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
-    private ContentHandler contentHandler;
+    private final ContentHandler contentHandler;
+    private final boolean doStartEndDocument;
 
-    private byte[] byteBuffer = new byte[76 * 3 / 4]; // maximum bytes that, once decoded, can fit in a line of 76 characters
+    private final byte[] byteBuffer = new byte[76 * 3 / 4]; // maximum bytes that, once decoded, can fit in a line of 76 characters
     private int currentBufferSize = 0;
-    private char[] resultingLine = new char[76 + 1];
+    private final char[] resultingLine = new char[76 + 1];
 
     private byte[] singleByte = new byte[1];
+
+    private String contentType;
+    private String statusCode;
 
     private boolean documentStarted;
     private boolean closed;
 
-    public ContentHandlerOutputStream(ContentHandler contentHandler) {
+    public ContentHandlerOutputStream(ContentHandler contentHandler, boolean doStartEndDocument) {
         this.contentHandler = contentHandler;
+        this.doStartEndDocument = doStartEndDocument;
     }
 
-    /**
-     * Start a document, add a root element and output the content type attribute specified. Calling this method is
-     * optional. If it is called, upon close() the corresponding element and document are closed as well.
-     *
-     * @param contentType   content type
-     * @throws SAXException
-     */
-    public void startDocument(String contentType) throws SAXException {
-        // Start document
-        AttributesImpl attributes = new AttributesImpl();
-        attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
-        if (contentType != null)
-            attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
-        contentHandler.startDocument();
-        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-        contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-        contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+    public void setStatusCode(String statusCode) {
+        this.statusCode = statusCode;
+    }
 
-        documentStarted = true;
+    private void outputStartIfNeeded() throws SAXException {
+        if (doStartEndDocument && ! documentStarted) {
+            // Start document
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+            if (contentType != null)
+                attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+            if (statusCode != null)
+                attributes.addAttribute("", "status-code", "status-code", "CDATA", statusCode);
+
+            contentHandler.startDocument();
+            contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+            contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+            contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+
+            documentStarted = true;
+        }
+    }
+
+    private void outputEndIfNeeded() {
+        if (doStartEndDocument && documentStarted) {
+            try {
+                // End document
+                contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+                contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                contentHandler.endDocument();
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
+        }
     }
 
     /**
@@ -79,17 +103,7 @@ public class ContentHandlerOutputStream extends OutputStream {
             flushBuffer();
 
             // Only close element and document if startDocument was called
-            if (documentStarted) {
-                try {
-                    // End document
-                    contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-                    contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
-                    contentHandler.endPrefixMapping(XMLConstants.XSD_PREFIX);
-                    contentHandler.endDocument();
-                } catch (SAXException e) {
-                    throw new OXFException(e);
-                }
-            }
+            outputEndIfNeeded();
             closed = true;
         }
     }
@@ -119,7 +133,7 @@ public class ContentHandlerOutputStream extends OutputStream {
         addBytes(singleByte, 0, 1);
     }
 
-    private void addBytes(byte b[], int off, int len) {
+    private void addBytes(byte b[], int off, int len)  {
         // Check bounds
         if ((off < 0) || (len < 0) || (off > b.length) || ((off + len) > b.length))
 	        throw new IndexOutOfBoundsException();
@@ -127,6 +141,8 @@ public class ContentHandlerOutputStream extends OutputStream {
 	        return;
 
         try {
+            outputStartIfNeeded();
+
             while (len > 0) {
                 // Fill buffer as much as possible
                 int lenToCopy = Math.min(len, byteBuffer.length - currentBufferSize);
@@ -153,12 +169,15 @@ public class ContentHandlerOutputStream extends OutputStream {
 
     private void flushBuffer() {
         if (currentBufferSize > 0) {
-            byte[] tempBuf = new byte[currentBufferSize];
-            System.arraycopy(byteBuffer, 0, tempBuf, 0, currentBufferSize);
-            String encoded = Base64.encode(tempBuf);
-            encoded.getChars(0, encoded.length(), resultingLine, 0);
-            // Output characters
             try {
+                outputStartIfNeeded();
+
+                byte[] tempBuf = new byte[currentBufferSize];
+                System.arraycopy(byteBuffer, 0, tempBuf, 0, currentBufferSize);
+                String encoded = Base64.encode(tempBuf);
+                encoded.getChars(0, encoded.length(), resultingLine, 0);
+                // Output characters
+
                 contentHandler.characters(resultingLine, 0, encoded.length());
             } catch (SAXException e) {
                 throw new OXFException(e);

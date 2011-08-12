@@ -38,7 +38,6 @@ import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.xml.sax.SAXException;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -222,7 +221,7 @@ public class ImageServer extends ProcessorImpl {
                 }
 
                 // Set Content-Type
-                imageResponse.startDocument("image/jpeg");
+                imageResponse.setContentType("image/jpeg");
 
                 // Optimize if no transformation is specified
                 if (imageConfig.transformCount == 0) {
@@ -340,7 +339,7 @@ public class ImageServer extends ProcessorImpl {
                 return response.getOutputStream();
             }
 
-            public void startDocument(String contentType) {
+            public void setContentType(String contentType) {
                 response.setContentType(contentType);
             }
 
@@ -360,7 +359,7 @@ public class ImageServer extends ProcessorImpl {
 
             public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
 
-                final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(xmlReceiver);
+                final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(xmlReceiver, true);
 
                 // Start processing
                 processImage(pipelineContext, new ImageResponse() {
@@ -378,13 +377,8 @@ public class ImageServer extends ProcessorImpl {
                         // NOP
                     }
 
-                    public void startDocument(String contentType) {
-                        try {
-                            // Create and start document
-                            contentHandlerOutputStream.startDocument(contentType);
-                        } catch (SAXException e) {
-                            throw new OXFException(e);
-                        }
+                    public void setContentType(String contentType) {
+                        contentHandlerOutputStream.setContentType(contentType);
                     }
 
                     public void setStatus(int status) {
@@ -463,7 +457,7 @@ public class ImageServer extends ProcessorImpl {
         public void setStatus(int status);
         public void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
-        public void startDocument(String contentType);
+        public void setContentType(String contentType);
         public OutputStream getOutputStream() throws IOException;
     }
 

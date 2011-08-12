@@ -966,7 +966,7 @@ public class XMLUtils {
     public static void inputStreamToBase64Characters(InputStream is, ContentHandler contentHandler) {
 
         try {
-            final OutputStream os = new ContentHandlerOutputStream(contentHandler);
+            final OutputStream os = new ContentHandlerOutputStream(contentHandler, false);
             NetUtils.copyStream(new BufferedInputStream(is), os);
             os.close(); // necessary with ContentHandlerOutputStream to make sure all extra characters are written
         } catch (Exception e) {

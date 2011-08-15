@@ -561,13 +561,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 try {
                     if (result.getReplacer() != null) {
                         // Replacer provided, perform replacement
-
-                        // This has to be a replace="all" otherwise we shouldn't get here
-                        assert result.getReplacer() instanceof AllReplacer;
-
-                        // Replace
-                        AllReplacer.replace(result.getConnectionResult(), response);
-
+                        if (result.getReplacer() instanceof AllReplacer)
+                            AllReplacer.replace(result.getConnectionResult(), response);
+                        else
+                            assert result.getReplacer() instanceof NoneReplacer;
                     } else if (result.getThrowable() != null) {
                         // Propagate throwable, which might have come from a separate thread
                         throw new OXFException(result.getThrowable());

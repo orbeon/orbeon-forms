@@ -144,11 +144,11 @@ public class XFormsFeatures {
             return true;
         }
 
-        public static boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName) {
+        public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName) {
             return staticStateGlobalOps != null && staticStateGlobalOps.hasControlByName(controlName);
         }
 
-        public static boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName, QName appearanceOrMediatypeName) {
+        public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps, String controlName, QName appearanceOrMediatypeName) {
             return staticStateGlobalOps != null && staticStateGlobalOps.hasControlAppearance(controlName, appearanceOrMediatypeName);
         }
 

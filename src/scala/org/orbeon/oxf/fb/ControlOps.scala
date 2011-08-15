@@ -257,14 +257,13 @@ object ControlOps {
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
     }
 
-    def precedingControlNameInSection(controlElement: NodeInfo) = {
+    def precedingControlNameInSection(controlElement: NodeInfo) =
+        precedingControlNameInSectionForTd(controlElement.parent.get)
 
-        // Control is assumed to be in a grid td
-        val parentTd = controlElement.parent.get
-        assert(localname(parentTd) == "td")
-
+    def precedingControlNameInSectionForTd(td: NodeInfo, includeSelf: Boolean = false) = {
         // All the *:td elements up to the current one within the current section
-        val precedingTdsInSection = (parentTd preceding "*:td") intersect (controlElement ancestor "*:section" take 1 descendant "*:td")
+        val preceding = (if (includeSelf) Seq(td) else Seq()) ++ (td preceding "*:td")
+        val precedingTdsInSection = preceding intersect (td ancestor "*:section" take 1 descendant "*:td")
         // Last non-empty td's first element's id
         precedingTdsInSection.reverse filter hasChildren takeRight 1 child * att "id" map (id => controlName(id.getStringValue)) headOption
     }

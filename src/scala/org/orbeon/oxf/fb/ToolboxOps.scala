@@ -40,7 +40,7 @@ object ToolboxOps {
         findSelectedTd(doc) match {
             case Some(currentTd) =>
 
-                val containers = findContainers(currentTd)
+                val containers = findAncestorContainers(currentTd)
 
                 // We must always have a parent (grid) and grandparent (possibly fr:body) container
                 assert(containers.size >= 2)
@@ -79,7 +79,7 @@ object ToolboxOps {
         findSelectedTd(doc) match {
             case Some(currentTd) => // A td is selected
 
-                val containers = findContainers(currentTd)
+                val containers = findAncestorContainers(currentTd)
 
                 // We must always have a parent (grid) and grandparent (possibly fr:body) container
                 assert(containers.size >= 2)
@@ -150,17 +150,15 @@ object ToolboxOps {
         findSelectedTd(doc) match {
             case Some(currentTd) =>
 
-                val containers = findContainers(currentTd)
+                val currentTdContainers = findAncestorContainers(currentTd)
 
                 // We must always have a parent (grid) and grandparent (possibly fr:body) container
-                assert(containers.size >= 2)
+                assert(currentTdContainers.size >= 2)
 
-                val parentContainer = containers.head // grid
-                val grandParentContainer = containers.tail.head // section/tab, body
+                val currentTdGrid = currentTdContainers.head // grid
+                val currentTdGrandParentContainer = currentTdContainers.tail.head // section/tab, body
 
                 val newGridName = "grid-" + nextId(doc, "grid")
-                val precedingControlName = getControlNameOption(parentContainer)
-
                 val templateInstanceId = templateId(newGridName)
 
                 // Handle data template
@@ -191,10 +189,10 @@ object ToolboxOps {
                     </fr:grid>
 
                 // Insert grid
-                val newGridElement = insert(into = grandParentContainer, after = parentContainer, origin = gridTemplate).head
+                val newGridElement = insert(into = currentTdGrandParentContainer, after = currentTdGrid, origin = gridTemplate).head
 
                 // Insert instance holder (but no resource holders)
-                insertHolders(newGridElement, elementInfo(newGridName), Seq(), precedingControlName)
+                insertHolders(newGridElement, elementInfo(newGridName), Seq(), precedingControlNameInSectionForTd(currentTdGrid \\ "*:td" last, includeSelf = true))
 
                 // Make sure binds are created
                 ensureBinds(doc, findContainerNames(newGridElement).reverse :+ newGridName, isCustomInstance)

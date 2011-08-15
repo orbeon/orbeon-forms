@@ -41,7 +41,7 @@ object SectionOps {
 
     // Move the section left if possible
     def moveSectionLeft(container: NodeInfo) =
-        findContainers(container).headOption foreach
+        findAncestorContainers(container).headOption foreach
             (moveContainer(container, _, moveElementAfter))
 
     // TODO: Could also move into fr:tabview/fr:tab?

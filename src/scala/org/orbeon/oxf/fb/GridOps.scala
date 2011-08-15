@@ -41,7 +41,7 @@ object GridOps {
 
     // Find the first enclosing grid if any
     def findGrid(descendantOrSelf: NodeInfo) =
-        findContainersOrSelf(descendantOrSelf) filter (e => localname(e) == "grid" && e \@ "repeat" === "true") headOption
+        findAncestorContainers(descendantOrSelf, true) filter (e => localname(e) == "grid" && e \@ "repeat" === "true") headOption
 
     // Extract the rowspan of a td (default is 1 if there is no attribute)
     private def getRowspan(td: NodeInfo) =  attValueOption(td \@ "rowspan") map (_.toInt) getOrElse 1

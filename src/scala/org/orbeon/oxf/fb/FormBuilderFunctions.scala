@@ -43,14 +43,18 @@ object FormBuilderFunctions {
     // Get the form model
     def findModelElement(doc: NodeInfo) = doc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasId(_, "fr-form-model")) head
 
+    // Find an xforms:instance element
+    def instanceElement(doc: NodeInfo, id: String) =
+        findModelElement(doc) \ "*:instance" filter (hasId(_, id)) headOption
+
     // Find an inline instance's root element
-    def instanceRootElement(doc: NodeInfo, id: String) =
-        (findModelElement(doc) \ "*:instance" filter (hasId(_, id))) \ * headOption
+    def inlineInstanceRootElement(doc: NodeInfo, id: String) =
+        instanceElement(doc, id).toSeq \ * headOption
 
     // Get the root element of instances
-    def formInstanceRoot(doc: NodeInfo) = instanceRootElement(doc, "fr-form-instance").get
-    def formResourcesRoot(doc: NodeInfo) = instanceRootElement(doc, "fr-form-resources").get
-    def templateRoot(doc: NodeInfo, templateName: String) = instanceRootElement(doc, templateId(templateName))
+    def formInstanceRoot(doc: NodeInfo) = inlineInstanceRootElement(doc, "fr-form-instance").get
+    def formResourcesRoot(doc: NodeInfo) = inlineInstanceRootElement(doc, "fr-form-resources").get
+    def templateRoot(doc: NodeInfo, templateName: String) = inlineInstanceRootElement(doc, templateId(templateName))
 
     // Find the next available id for a given token
     def nextId(doc: NodeInfo, token: String) = nextIds(doc, token, 1).head

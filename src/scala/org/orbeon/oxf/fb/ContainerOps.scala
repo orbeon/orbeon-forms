@@ -18,6 +18,7 @@ import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
+import org.orbeon.oxf.fb.GridOps._
 
 object ContainerOps {
 
@@ -28,31 +29,47 @@ object ContainerOps {
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
 
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
-    def findContainers(descendant: NodeInfo) =
-        descendant ancestor * filter (e => containerElementNames(localname(e)))
-
-    def findContainersOrSelf(descendantOrSelf: NodeInfo) =
-        descendantOrSelf ancestorOrSelf  * filter (e => containerElementNames(localname(e)))
+    def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
+        if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
+            (e => containerElementNames(localname(e)))
 
     // Find ancestor section and grid names from leaf to root
     def findContainerNames(descendant: NodeInfo): Seq[String] =
-        findContainers(descendant) map (getControlNameOption(_)) flatten
+        findAncestorContainers(descendant) map (getControlNameOption(_)) flatten
 
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) {
+        // Go depth-first so we delete containers after all their content has been deleted
+        childrenContainers(container) foreach (deleteContainer(_))
 
-        // Delete all descendant controls
-        container \\ "*:tr" \\ "*:td" foreach (deleteControl(_))
+        // Delete all controls directly in the grid
+        // NOTE: lack of object-orientation is ugly here
+        if (localname(container) == "grid")
+            container \\ "*:tr" \\ "*:td" foreach (deleteControl(_))
 
-        def deleteOne(f: String => Option[NodeInfo]) =
-            getControlNameOption(container) flatMap
-                (gridName => f(gridName)) foreach
-                    (delete(_))
+        // Delete container itself
+        deleteContainerOnly(container)
+    }
 
-        // Delete data holder, bind and repeat template if present
-        deleteOne(containerName => findDataHolder(container, containerName))
-        deleteOne(containerName => findBindByName(container, containerName))
-        deleteOne(containerName => findModelElement(container) \ "*:instance" filter (hasId(_, templateId(containerName))) headOption)
+    def childrenContainers(container: NodeInfo) =
+        container \ * filter (e => containerElementNames(localname(e)))
+
+    def deleteContainerOnly(container: NodeInfo) = {
+
+        val doc = container.getDocumentRoot
+
+        getControlNameOption(container) foreach { containerName =>
+
+            // Delete: holders, bind, templates, resources
+            val toDelete =
+                Seq(findDataHolder(doc, containerName),
+                    findBindByName(doc, containerName),
+                    instanceElement(doc, templateId(containerName)),
+                    findTemplateHolder(container, containerName)) ++
+                    (findResourceHolders(doc, containerName) map (Option(_))) flatten
+
+            toDelete foreach (delete(_))
+        }
 
         // Delete whole container element
         delete(container)

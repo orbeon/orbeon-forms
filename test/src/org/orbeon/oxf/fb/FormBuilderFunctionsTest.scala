@@ -180,7 +180,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         val firstTd = findBodyElement(doc) \\ "*:grid" \\ "*:td" head
 
-        val containers = findContainers(firstTd)
+        val containers = findAncestorContainers(firstTd)
 
         assert(localname(containers(0)) === "grid")
         assert(localname(containers(1)) === "section")
@@ -247,8 +247,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = findDataHolder(doc, containerNames.head)
                 assert(dataHolder.isDefined)
-//                println(TransformerUtils.tinyTreeToString(doc))
-//                assert(name(dataHolder.get precedingSibling * head) === "control-1")
+                assert(name(dataHolder.get precedingSibling * head) === "control-1")
 
                 val controlBind = findBindByName(doc, "grid-1").get
                 assert(hasId(controlBind, bindId("grid-1")))

@@ -525,10 +525,10 @@
                                                                                     <!-- Context is on current grid -->
 
                                                                                     <xforms:action xxforms:iterate="$grid/*:tr/*:td">
-                                                                                        <!-- Delete control -->
-                                                                                        <xforms:dispatch if="exists(*)" name="fb-delete-control" target="fr-form-model">
-                                                                                            <xxforms:context name="control" select="*[1]"/>
-                                                                                        </xforms:dispatch>
+                                                                                        <!-- Delete cell content -->
+                                                                                        <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                                                                            controlOps:deleteCellContent(.)
+                                                                                        </xforms:action>
                                                                                     </xforms:action>
 
                                                                                     <!-- Delete whole grid element -->
@@ -634,9 +634,9 @@
                                                                                         <!-- Iterate over rows and in each delete the appropriate column -->
                                                                                         <xforms:action xxforms:iterate="$delete-tds">
                                                                                             <!-- Delete control -->
-                                                                                            <xforms:dispatch if="exists(*)" name="fb-delete-control" target="fr-form-model">
-                                                                                                <xxforms:context name="control" select="*[1]"/>
-                                                                                            </xforms:dispatch>
+                                                                                            <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                                                                                controlOps:deleteCellContent(.)
+                                                                                            </xforms:action>
                                                                                             <xforms:delete nodeset="."/>
                                                                                         </xforms:action>
                                                                                     </xforms:action>
@@ -741,9 +741,9 @@
                                                                                             <!-- Delete holder elements and resources -->
                                                                                             <xforms:action xxforms:iterate="$tr/*:td">
                                                                                                 <!-- Delete control -->
-                                                                                                <xforms:dispatch if="exists(*)" name="fb-delete-control" target="fr-form-model">
-                                                                                                    <xxforms:context name="control" select="*[1]"/>
-                                                                                                </xforms:dispatch>
+                                                                                                <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                                                                                    controlOps:deleteCellContent(.)
+                                                                                                </xforms:action>
                                                                                             </xforms:action>
 
                                                                                             <!-- Delete whole row including nested controls -->

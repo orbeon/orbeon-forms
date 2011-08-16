@@ -185,9 +185,9 @@
         <xforms:action>
 
             <!-- Insert bind if needed -->
-            <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                <xxforms:context name="control-name" select="$current-control-name"/>
-            </xforms:dispatch>
+            <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                controlOps:ensureBindsByName($model, $current-control-name)
+            </xforms:action>
 
             <!-- Make sure the control points to the bind -->
             <xforms:action context="$current-control">

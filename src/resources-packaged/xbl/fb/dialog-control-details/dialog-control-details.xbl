@@ -25,6 +25,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
          script-type="application/xhtml+xml">
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
         <xbl:handlers>
@@ -172,25 +173,11 @@
                     <!-- Find reference to control -->
                     <xxforms:variable name="control" select="$body//*[@id = concat($old-name, '-control')]"/>
                     <!-- Rename if needed -->
-                    <xforms:action if="$old-name != $new-name">
-                        <!-- Rename instance holder and all resources -->
-                        <xforms:dispatch name="fb-rename-holders" target="fr-form-model" xxbl:scope="outer">
-                            <xxforms:context name="holders" select="($instance-holder, $form-resources/resource/*[name() = $old-name])" xxbl:scope="inner"/>
-                            <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
-                        </xforms:dispatch>
-                        <!-- Update control id and bindings -->
-                        <xforms:dispatch name="fb-rename-control" target="fr-form-model" xxbl:scope="outer">
-                            <xxforms:context name="control" select="$control" xxbl:scope="inner"/>
-                            <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
-                        </xforms:dispatch>
-                        <!-- Rename bind if existing -->
-                        <xforms:dispatch name="fb-rename-bind" target="fr-form-model" xxbl:scope="outer">
-                            <xxforms:context name="old-name" select="$old-name" xxbl:scope="inner"/>
-                            <xxforms:context name="new-name" select="$new-name" xxbl:scope="inner"/>
-                        </xforms:dispatch>
+                    <xforms:action if="$old-name != $new-name" type="xpath">
+                        controlOps:findRenameControl($form, $old-name, $new-name)
                     </xforms:action>
                     <!-- Update XPath on bind -->
-                    <xforms:setvalue if="$is-custom-mode" ref="$binds//xforms:bind[@id = $bind-id]/@nodeset treat as attribute()" value="$local/control-xpath"/>
+                    <xforms:setvalue if="$is-custom-mode" ref="controlOps:findBindByNameOrEmpty($form, $new-name)/((@ref, @nodeset)[1]) treat as attribute()" value="$local/control-xpath"/>
                     <!-- Set proper classes -->
                     <xxforms:variable name="classes" select="tokenize($local/classes, '\s+')"/>
                     <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>

@@ -38,39 +38,28 @@
                 <xhtml:div class="bd">
                     <!-- XVC toolbox -->
                     <xhtml:div class="fb-tools fb-xvc">
-                        <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger">
+                        <xforms:trigger appearance="minimal" ref="$xcv/cut-trigger" id="cut-trigger">
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/images/silk/cut.png" alt="{$form-resources/cut/label}" title="{$form-resources/cut/label}"/>
                             </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Copy control -->
-                                <xforms:dispatch name="fb-copy-control" target="fr-form-model">
-                                    <xxforms:context name="current-td" select="$current-td"/>
-                                </xforms:dispatch>
-                                <!-- Then delete the source -->
-                                <xforms:dispatch name="fb-delete-control" target="fr-form-model">
-                                    <xxforms:context name="control" select="$current-td/*[1]"/>
-                                </xforms:dispatch>
+                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                toolboxOps:cutToClipboard($current-td)
                             </xforms:action>
                         </xforms:trigger>
-                        <xforms:trigger appearance="minimal" ref="$xcv/copy-trigger">
+                        <xforms:trigger appearance="minimal" ref="$xcv/copy-trigger" id="copy-trigger">
                             <xforms:label>
                                 <xhtml:img src="/forms/orbeon/builder/images/copy.gif" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/>
                             </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Copy control -->
-                                <xforms:dispatch name="fb-copy-control" target="fr-form-model">
-                                    <xxforms:context name="current-td" select="$current-td"/>
-                                </xforms:dispatch>
+                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                toolboxOps:copyToClipboard($current-td)
                             </xforms:action>
                         </xforms:trigger>
-                        <xforms:trigger appearance="minimal" ref="$xcv/paste-trigger">
+                        <xforms:trigger appearance="minimal" ref="$xcv/paste-trigger" id="paste-trigger">
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/images/silk/paste_plain.png" alt="{$form-resources/paste/label}" title="{$form-resources/paste/label}"/>
                             </xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <!-- Paste control -->
-                                <xforms:dispatch name="fb-paste-control" target="fr-form-model"/>
+                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                toolboxOps:pasteFromClipboard($current-td)
                             </xforms:action>
                         </xforms:trigger>
                         <!-- Reload components -->
@@ -137,9 +126,9 @@
                                     </xforms:action>
 
                                     <!-- Make sure the bind is created -->
-                                    <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                                        <xxforms:context name="section-name" select="$new-section-name"/>
-                                    </xforms:dispatch>
+                                    <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                        controlOps:ensureBindsByName($model, $new-section-name)
+                                    </xforms:action>
 
                                     <!-- Open label editor for newly inserted section -->
                                     <!-- TODO: these ids don't exist anymore; instead, dispatch to fr-inplace-fb-top-level-section-editable-title -->
@@ -216,82 +205,12 @@
 
                                             </xforms:action>
                                             <xforms:action ev:event="DOMActivate" if="not($is-section-component)">
-                                                <!-- Insert a new cell component -->
-
-                                                <!-- Compute next control id -->
-                                                <xforms:dispatch target="fr-form-model" name="fb-compute-control-id"/>
-                                                <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
-                                                <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind'))"/>
-
-                                                <!-- Try to find empty td -->
-                                                <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
-
-                                                <!-- This ensures the context is recomputed -->
-                                                <xxforms:variable name="new-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]"/>
-                                                <xforms:action context="$new-td" if="not(exists(*))">
-                                                    <!-- Context is now on td and there is room for insertion -->
-
-                                                    <!-- Insert control into td -->
-                                                    <xforms:action if="$binding/fb:metadata/fb:template/*">
-                                                        <xforms:insert context="." origin="$binding/fb:metadata/fb:template/*[1]"/>
-                                                    </xforms:action>
-                                                    <xforms:action if="not($binding/fb:metadata/fb:template/*)">
-                                                        <!-- Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar) -->
-                                                        <xxforms:variable name="element-qname" select="replace(normalize-space(tokenize($binding/@element, ',')[1]), '\|', ':')" as="xs:string"/>
-                                                        <xforms:insert context="." origin="xxforms:element(resolve-QName($element-qname, $binding))"/>
-                                                        <!-- Insert control content (label, hint, help, alert) -->
-                                                        <xxforms:variable name="control" select="*[1]"/>
-                                                        <xforms:insert context="$control" origin="instance('fb-lhha-template')/*"/>
-                                                    </xforms:action>
-
-                                                    <xxforms:variable name="control" select="*[1]"/>
-
-                                                    <!-- Set default pointer to resources if there is an xforms:alert -->
-                                                    <xforms:setvalue ref="$control/xforms:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
-
-                                                    <!-- Get control type -->
-                                                    <!-- TODO: for now assume a literal 'xs:' prefix (should resolve namespace) -->
-                                                    <!--<xxforms:variable name="control-type" select="$binding/xhtml:meta[resolve-QName(@property, .) = xs:QName('xforms:type')]/@content"/>-->
-                                                    <xxforms:variable name="control-type" select="$binding/fb:metadata/fb:datatype"/>
-
-                                                    <!-- Adjust bindings on newly inserted control -->
-                                                    <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-                                                        <xxforms:context name="control" select="$control"/>
-                                                        <xxforms:context name="new-name" select="$new-control-name"/>
-                                                    </xforms:dispatch>
-
-                                                    <!-- Insert instance and resource holders -->
-                                                    <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
-                                                        <xxforms:context name="current-td" select="$new-td"/>
-                                                        <xxforms:context name="section-name" select="$section-name"/>
-                                                        <!-- Instance holder, with extra attributes if needed -->
-                                                        <xxforms:context name="instance-holder"
-                                                                         select="xxforms:element($new-control-name,
-                                                                                    if ($control-type = ('xs:anyURI', 'xforms:anyURI'))
-                                                                                    then (xxforms:attribute('filename'), xxforms:attribute('mediatype'), xxforms:attribute('size'))
-                                                                                    else ())"/>
-                                                        <xxforms:context name="resource-holders" select="for $r in $resources/resource return xxforms:element($new-control-name)"/>
-                                                    </xforms:dispatch>
-
-                                                    <!-- Insert the bind element -->
-                                                    <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                                                        <xxforms:context name="control-name" select="$new-control-name"/>
-                                                    </xforms:dispatch>
-                                                    <xxforms:variable name="bind" select="$model//xforms:bind[@name = $new-control-name] treat as element()"/>
-
-                                                    <!-- Make sure there is a @bind instead of a @ref -->
-                                                    <xforms:delete nodeset="$control/@ref"/>
-                                                    <xforms:insert context="$control" origin="xxforms:attribute('bind', $bind/@id)"/>
-
-                                                    <!-- Set bind type if needed -->
-                                                    <xforms:insert if="$control-type and not($control-type = 'xs:string')" context="$bind" origin="xxforms:attribute('type', $control-type)"/>
-
-                                                    <!-- Open label editor for newly inserted control -->
-                                                    <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
-                                                    <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
-
+                                                <xforms:action type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                                    toolboxOps:insertNewControl($model, $binding)
                                                 </xforms:action>
-
+                                                <!-- Open label editor for newly inserted control -->
+                                                <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
+                                                <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
                                             </xforms:action>
                                         </fr:button>
                                     </xhtml:div>

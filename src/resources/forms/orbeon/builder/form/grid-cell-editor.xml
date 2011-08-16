@@ -80,9 +80,9 @@
                         <!-- Increase rowspan on current xhtml:td -->
                         <xforms:insert context="$td" origin="xxforms:attribute('rowspan', xs:string($current-rowspan + $rowspan-delta))"/>
                         <!-- Delete holder element, resources, and control in td to delete -->
-                        <xforms:dispatch if="exists($delete-td/*)" name="fb-delete-control" target="fr-form-model">
-                            <xxforms:context name="control" select="$delete-td/*[1]"/>
-                        </xforms:dispatch>
+                        <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                            controlOps:deleteCellContent($delete-td)
+                        </xforms:action>
                         <!-- Delete xhtml:td -->
                         <xforms:delete nodeset="$delete-td"/>
                     </xforms:action>
@@ -117,10 +117,10 @@
                 <xforms:trigger appearance="minimal" ref=".[$readwrite-grid]">
                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-control-icon/label}" title="{$form-resources/delete-control-icon/label}"/></xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <!-- Delete control -->
-                        <xforms:dispatch name="fb-delete-control" target="fr-form-model">
-                            <xxforms:context name="control" select="$control"/>
-                        </xforms:dispatch>
+                        <!-- Delete cell content -->
+                        <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                            controlOps:deleteCellContent($td)
+                        </xforms:action>
                     </xforms:action>
                 </xforms:trigger>
             </xforms:group>

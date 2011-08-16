@@ -389,24 +389,6 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Delete control and associated resources -->
-    <xforms:action ev:event="fb-delete-control">
-        <xxforms:variable name="control" select="event('control')"/>
-
-        <xxforms:variable name="control-name" select="substring-before($control/@id, '-control')"/>
-        <xxforms:variable name="section-name" select="$control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind'))"/>
-        <xxforms:variable name="bind" select="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@nodeset = $section-name]/xforms:bind[@nodeset = $control-name]"/>
-
-        <!-- Delete control -->
-        <xforms:delete nodeset="$control"/>
-        <!-- Delete instance holder -->
-        <xforms:delete nodeset="$form-instance/*[name() = $section-name]/*[name() = $control-name]"/>
-        <!-- Delete resources -->
-        <xforms:delete nodeset="$resources/resource/*[name() = $control-name]"/>
-        <!-- Delete bind if any -->
-        <xforms:delete nodeset="$bind"/>
-    </xforms:action>
-
     <!-- Insert instance and resource holders -->
     <xforms:action ev:event="fb-insert-holders">
         <xxforms:variable name="current-td" select="event('current-td')"/>
@@ -458,35 +440,6 @@
         <xforms:bind nodeset="copy-trigger" readonly="not(exists($current-td/*))"/>
         <xforms:bind nodeset="paste-trigger" readonly="not(exists(../control/*))"/>
     </xforms:bind>
-
-    <!-- Copy current control to xcv instance -->
-    <xforms:action ev:event="fb-copy-control">
-        <xxforms:variable name="current-control" select="event('current-td')/*"/>
-
-        <xforms:action if="exists($current-control)">
-            <xxforms:variable name="current-control-name" select="substring-before($current-control/@id, '-control')"/>
-            <xxforms:variable name="current-bind-id" select="concat($current-control-name, '-bind')"/>
-            <xxforms:variable name="bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
-
-            <!-- Clear clipboard -->
-            <xforms:action xxforms:iterate="$xcv/*">
-                <xforms:delete nodeset="*"/>
-            </xforms:action>
-
-            <!-- Copy control -->
-            <xforms:insert context="$xcv/control" origin="$current-control"/>
-
-            <!-- Copy holder -->
-            <xforms:insert context="$xcv/holder" origin="$form-instance/*/*[name() = $current-control-name]"/>
-
-            <!-- Copy all resources -->
-            <xforms:insert context="$xcv/resources" origin="$resources/resource/*[name() = $current-control-name]"/>
-
-            <!-- Copy bind if any -->
-            <xforms:insert context="$xcv/bind" origin="$bind"/>
-        </xforms:action>
-
-    </xforms:action>
 
     <!-- Adjust control bindings -->
     <xforms:action ev:event="fb-rename-control">
@@ -545,70 +498,6 @@
         </xforms:action>
     </xforms:action>
 
-    <!-- Paste control if there is one in the clipboard -->
-    <xforms:action ev:event="fb-paste-control" if="$xcv/control/*">
-
-        <!-- Try to find empty td -->
-        <xforms:dispatch name="fb-ensure-empty-td" target="fr-form-model"/>
-
-        <!-- Get new td -->
-        <xxforms:variable name="new-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]"/>
-        <xforms:action context="$new-td" if="not(exists(*))">
-            <!-- We now have an empty cell for pasting -->
-
-            <xxforms:variable name="xcv-control-id" select="$xcv/control/*/@id"/>
-
-            <!-- Check if clipboard control id is in use -->
-            <xforms:action if="$body//*[@id = $xcv-control-id]">
-                <!-- If so, get new id and replace references -->
-                <xforms:dispatch name="fb-compute-control-id" target="fr-form-model"/>
-                <xxforms:variable name="new-control-name" select="concat('control-', $next-control-id)"/>
-
-                <!-- Adjust bindings on xcv control -->
-                <xforms:dispatch name="fb-rename-control" target="fr-form-model">
-                    <xxforms:context name="control" select="$xcv/control/*"/>
-                    <xxforms:context name="new-name" select="$new-control-name"/>
-                </xforms:dispatch>
-
-                <!-- Rename holders -->
-                <xforms:dispatch name="fb-rename-holders" target="fr-form-model">
-                    <xxforms:context name="holders" select="($xcv/holder/*, $xcv/resources/*)"/>
-                    <xxforms:context name="new-name" select="$new-control-name"/>
-                </xforms:dispatch>
-
-                <!-- Update bind if existing -->
-                <xforms:setvalue ref="$xcv/bind/xforms:bind/@id" value="concat($new-control-name, '-bind')"/>
-                <xforms:setvalue ref="$xcv/bind/xforms:bind/@nodeset" value="$new-control-name"/>
-
-            </xforms:action>
-
-            <!-- Insert control -->
-            <xforms:insert context="$new-td" origin="$xcv/control/*"/>
-
-            <!-- Insert instance and resource holders -->
-            <!-- TODO: match against existing languages, as that may have changed between copy and paste -->
-            <xxforms:variable name="section-name" select="$current-td/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind'))"/>
-            <xforms:dispatch name="fb-insert-holders" target="fr-form-model">
-                <xxforms:context name="current-td" select="$new-td"/>
-                <xxforms:context name="section-name" select="$section-name"/>
-                <xxforms:context name="instance-holder" select="$xcv/holder/*"/>
-                <xxforms:context name="resource-holders" select="$xcv/resources/*"/>
-            </xforms:dispatch>
-
-            <!-- Insert bind if any -->
-            <xforms:action if="exists($xcv/bind/xforms:bind)">
-                <xxforms:variable name="control-name" select="substring-before($xcv/control/*/@id, '-control')"/>
-                <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-                    <xxforms:context name="control-name" select="$control-name"/>
-                </xforms:dispatch>
-                <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $control-name]"/>
-                <xforms:insert nodeset="$bind" origin="$xcv/bind/xforms:bind"/>
-                <xforms:delete nodeset="$bind"/>
-            </xforms:action>
-
-        </xforms:action>
-    </xforms:action>
-
     <!-- Generic instance to set the control id on which to work -->
     <!-- NOTE: Ideally we wouldn't need this kind of global variables, but could either call functions or pass parameters to events -->
     <xforms:instance id="fb-current-control-instance">
@@ -617,53 +506,6 @@
         </control>
     </xforms:instance>
     <xxforms:variable name="current-control-name" select="instance('fb-current-control-instance')/id"/>
-
-    <!-- Create the bind element for the current control or section if it does not exist yet -->
-    <xforms:action ev:event="fb-ensure-bind">
-        <!-- Control name: use this if you want to create the bind for the section and the control -->
-        <xxforms:variable name="control-name" select="event('control-name')" as="xs:string?"/>
-        <!-- Section name: use this if you don't pass a control name and just want to create the bind for the section -->
-        <xxforms:variable name="section-name" select="event('section-name')" as="xs:string?"/>
-
-        <!-- Proceed only if a control name or section name is provided -->
-        <xforms:action if="$control-name or $section-name">
-            <!-- Insert bind container if needed -->
-            <xforms:insert context="$model"
-                           if="not(xforms:bind[@id = 'fr-form-binds'])"
-                           nodeset="xforms:instance[@id = 'fr-form-instance']"
-                           origin="instance('fb-bind-template')"/>
-
-            <!-- Insert bind for section if needed -->
-            <xxforms:variable name="current-control"
-                              select="if ($control-name) then $body//*[@id = concat($control-name, '-control')] else ()"/>
-            <xxforms:variable name="current-section-name"
-                              select="if ($control-name) then $current-control/ancestor::fr:section[1]/(if (@context) then @context else substring-before(@bind, '-bind')) else $section-name"/>
-            <xxforms:variable name="is-custom-instance" select="$metadata-instance/form-instance-mode = 'custom'"/>
-            <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']">
-                <xforms:action if="empty(xforms:bind[@name = $current-section-name])">
-                    <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
-                    <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
-                    <xforms:setvalue ref="$bind/@id" value="concat($current-section-name, '-bind')"/>
-                    <xforms:setvalue ref="$bind/@name" value="$current-section-name"/>
-                    <xforms:setvalue ref="$bind/@nodeset" value="if ($is-custom-instance) then '()' else $current-section-name"/>
-                </xforms:action>
-            </xforms:action>
-
-            <xforms:action if="$control-name">
-                <!-- Insert bind for control if needed -->
-                <xxforms:variable name="current-bind-id" select="concat($control-name, '-bind')"/>
-                <xforms:action context="$model/xforms:bind[@id = 'fr-form-binds']/xforms:bind[@name = $current-section-name]">
-                    <xforms:action if="not(xforms:bind[@id = $current-bind-id])">
-                        <xforms:insert context="." nodeset="xforms:bind" origin="instance('fb-bind-template')"/>
-                        <xxforms:variable name="bind" select="xforms:bind[last()]" as="element(xforms:bind)"/>
-                        <xforms:setvalue ref="$bind/@id" value="$current-bind-id"/>
-                        <xforms:insert context="$bind" origin="xxforms:attribute('name', $control-name)"/>
-                        <xforms:setvalue ref="$bind/@nodeset" value="if ($is-custom-instance) then '()' else $control-name"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:action>
-        </xforms:action>
-    </xforms:action>
 
     <!-- TODO: Use this once OF supports custom XPath functions -->
     <!--<xforms:function name="fb:get-section-name" as="xs:string">-->

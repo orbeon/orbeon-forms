@@ -99,9 +99,9 @@
         <xxforms:variable name="section" select="($body//fr:section[@context = $old-name or @bind = concat($old-name, '-bind')])[1]" as="element(fr:section)"/>
 
         <!-- Make sure the bind is created (as it may not have one if it is an older form with @context only) -->
-        <xforms:dispatch name="fb-ensure-bind" target="fr-form-model">
-            <xxforms:context name="section-name" select="$old-name"/>
-        </xforms:dispatch>
+        <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                controlOps:ensureBindsByName($model, $old-name)
+            </xforms:action>
         <xxforms:variable name="bind" select="$model//xforms:bind[@nodeset = $old-name]" as="element(xforms:bind)"/>
 
         <!-- Add @bind if missing -->

@@ -48,7 +48,8 @@ public class ColumnIteratorInterpreter extends SQLProcessor.InterpreterContentHa
             // Iterate through result set columns
             for (int i = 1; i <= metadata.getColumnCount(); i++) {
                 interpreterContext.pushContext();
-                interpreterContext.setColumnContext(i, metadata.getColumnName(i), metadata.getColumnTypeName(i), GetterInterpreter.getColumnStringValue(resultSet, i, metadata.getColumnType(i)));
+                // NOTE: getColumnLabel() allows SQL "AS" to work
+                interpreterContext.setColumnContext(i, metadata.getColumnLabel(i), metadata.getColumnTypeName(i), GetterInterpreter.getColumnStringValue(resultSet, i, metadata.getColumnType(i)));
                 repeatBody();
                 interpreterContext.popContext();
             }

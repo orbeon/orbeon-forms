@@ -177,7 +177,8 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                     result = columnName;
                 } else {
                     // Get name from index
-                    result = metadata.getColumnName(Integer.parseInt(columnIndex));
+                    // NOTE: getColumnLabel() allows SQL "AS" to work
+                    result = metadata.getColumnLabel(Integer.parseInt(columnIndex));
                 }
 
                 final char[] charResult = result.toCharArray();
@@ -301,7 +302,8 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 // Iterate through all columns
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
                     // Get column name
-                    String columnName = metadata.getColumnName(i);
+                    // NOTE: getColumnLabel() allows SQL "AS" to work
+                    String columnName = metadata.getColumnLabel(i);
                     // Make sure it is not excluded
                     if (getColumnsExcludes != null && getColumnsExcludes.get(columnName.toLowerCase()) != null)
                         continue;
@@ -439,7 +441,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 return getColumnStringValue(resultSet, columnIndex, columnType);
             }
         } catch (SQLException e) {
-            throw new ValidationException("Exception while getting column: " + (resultSet.getMetaData().getColumnName(columnIndex)), e, new LocationData(locator));
+            throw new ValidationException("Exception while getting column: " + (resultSet.getMetaData().getColumnLabel(columnIndex)), e, new LocationData(locator));
         }
     }
 

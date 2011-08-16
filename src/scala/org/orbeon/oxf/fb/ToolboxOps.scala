@@ -130,7 +130,7 @@ object ToolboxOps {
                 insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
 
                 // Insert the bind element
-                ensureBinds(doc, findContainerNames(newSectionElement).reverse :+ newSectionName, isCustomInstance)
+                ensureBinds(doc, findContainerNames(newSectionElement) :+ newSectionName, isCustomInstance)
 
                 // Select first grid cell
                 selectTd(newSectionElement \\ "*:td" head)
@@ -195,7 +195,7 @@ object ToolboxOps {
                 insertHolders(newGridElement, elementInfo(newGridName), Seq(), precedingControlNameInSectionForTd(currentTdGrid \\ "*:td" last, includeSelf = true))
 
                 // Make sure binds are created
-                ensureBinds(doc, findContainerNames(newGridElement).reverse :+ newGridName, isCustomInstance)
+                ensureBinds(doc, findContainerNames(newGridElement) :+ newGridName, isCustomInstance)
 
                 // Select new td
                 selectTd(newGridElement \\ "*:td" head)
@@ -260,7 +260,7 @@ object ToolboxOps {
                 insertHolders(newControlElement, dataHolder, resourceHolder, precedingControlNameInSection(newControlElement))
 
                 // Insert the bind element
-                val bind = ensureBinds(doc, findContainerNames(gridTd).reverse :+ newControlName, isCustomInstance)
+                val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName, isCustomInstance)
 
                 // Make sure there is a @bind instead of a @ref on the control
                 delete(newControlElement \@ "ref")
@@ -286,7 +286,7 @@ object ToolboxOps {
         val name = getControlName(td \ * head)
         val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
 
-        findControlElement(td, name) foreach { controlElement =>
+        findControlByName(td, name) foreach { controlElement =>
 
             // Create <resource xml:lang="..."> containers
             val resourcesWithLang = findResourceHoldersWithLang(td, name) map {
@@ -353,7 +353,7 @@ object ToolboxOps {
                 )
 
                 // Create the bind and copy all attributes and content
-                val bind = ensureBinds(gridTd, findContainerNames(gridTd).reverse :+ controlName, isCustomInstance)
+                val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ controlName, isCustomInstance)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind =>
                     insert(into = bind, origin = (xvcBind \@ *) ++ (xvcBind \ *))
                 }

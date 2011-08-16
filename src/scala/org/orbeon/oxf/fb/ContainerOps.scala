@@ -30,9 +30,9 @@ object ContainerOps {
         if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
             (e => containerElementNames(localname(e)))
 
-    // Find ancestor section and grid names from leaf to root
+    // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
-        findAncestorContainers(descendant) map (getControlNameOption(_)) flatten
+        findAncestorContainers(descendant).reverse map (getControlNameOption(_)) flatten
 
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {

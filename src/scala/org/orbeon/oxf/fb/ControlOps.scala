@@ -41,14 +41,14 @@ object ControlOps {
         case _ => null
     }
 
-    // Find a control element
-    def findControlElement(doc: NodeInfo, controlName: String) =
+    // Find a control by name (less efficient than searching by id)
+    def findControlByName(doc: NodeInfo, controlName: String) =
         Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
             (suffix => findControlById(doc, controlName + '-' + suffix)) headOption
 
     // XForms callers: find a control element by name or null (the empty sequence)
-    def findControlElementOrEmpty(doc: NodeInfo, controlName: String) =
-        findControlElement(doc, controlName).orNull
+    def findControlByNameOrEmpty(doc: NodeInfo, controlName: String) =
+        findControlByName(doc, controlName).orNull
 
     // Find a bind by name
     def findBindByName(doc: NodeInfo, name: String) =
@@ -111,8 +111,8 @@ object ControlOps {
 
     // Ensure that a tree of bind exists
     def ensureBindsByName(doc: NodeInfo, name: String) =
-        findControlById(doc, controlId(name)) foreach { control =>
-            ensureBinds(doc, findContainerNames(control).reverse :+ controlName(controlId(name)), isCustomInstance)
+        findControlByName(doc, name) foreach { control =>
+            ensureBinds(doc, findContainerNames(control) :+ name, isCustomInstance)
         }
 
     // Ensure that a tree of bind exists
@@ -177,7 +177,7 @@ object ControlOps {
         if (oldName != newName) {
             findRenameHolders(doc, oldName, newName)
             findRenameBind(doc, oldName, newName)
-            findControlElement(doc, oldName) foreach (renameControlByElement(_, newName))
+            findControlByName(doc, oldName) foreach (renameControlByElement(_, newName))
             renameTemplate(doc, oldName, newName)
         }
 
@@ -230,11 +230,11 @@ object ControlOps {
     def findHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
         Seq(findDataHolder(doc, holderName)) ++
             (findResourceHolders(doc, holderName) map (Option(_))) :+
-            (findControlElement(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+            (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     def findResourceAndTemplateHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
         (findResourceHolders(doc, holderName) map (Option(_))) :+
-            (findControlElement(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+            (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     // Find or create a data holder for the given hierarchy of names
     def ensureDataHolder(root: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]) = {
@@ -286,7 +286,7 @@ object ControlOps {
         // Insert hierarchy of data holders
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
         // In practice, the ancestor holders should already exist.
-        ensureDataHolder(formInstanceRoot(doc), (containerNames.reverse map (n => (() => elementInfo(n), None))) :+ (() => dataHolder, precedingControlName))
+        ensureDataHolder(formInstanceRoot(doc), (containerNames. map (n => (() => elementInfo(n), None))) :+ (() => dataHolder, precedingControlName))
 
         // Insert resources placeholders for all languages
         if (resourceHolders.nonEmpty) {
@@ -318,7 +318,7 @@ object ControlOps {
         findControlById(doc, controlId) foreach { control =>
 
             // Get or create the bind element
-            val bind = ensureBinds(doc, findContainerNames(control).reverse :+ controlName(controlId), isCustomInstance)
+            val bind = ensureBinds(doc, findContainerNames(control) :+ controlName(controlId), isCustomInstance)
 
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {

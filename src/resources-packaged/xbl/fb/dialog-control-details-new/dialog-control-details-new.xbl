@@ -169,7 +169,7 @@
                     <xxforms:variable name="new-name" select="$local/control-name/string()"/>
 
                     <!-- Find reference to control -->
-                    <xxforms:variable name="control" select="controlOps:findControlElementOrEmpty($form, $old-name)"/>
+                    <xxforms:variable name="control" select="controlOps:findControlByNameOrEmpty($form, $old-name)"/>
                     <!-- Rename if needed -->
                     <xforms:action if="$old-name != $new-name" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                         controlOps:findRenameControl($form, $old-name, $new-name)

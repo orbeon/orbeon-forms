@@ -53,5 +53,5 @@ object SectionOps {
 
     // Find the section name for a given control name
     def findSectionName(doc: NodeInfo, controlName: String): Option[String] =
-        findControlElement(doc, controlName) map (findSectionName(_))
+        findControlByName(doc, controlName) map (findSectionName(_))
 }

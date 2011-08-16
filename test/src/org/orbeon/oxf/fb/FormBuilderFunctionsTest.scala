@@ -74,8 +74,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(controlName(bindId(control1)) === control1)
 
         // Find control element
-        assert(findControlElement(doc, control1).get.getDisplayName === "xforms:input")
-        assert(hasId(findControlElement(doc, control1).get, controlId(control1)))
+        assert(findControlByName(doc, control1).get.getDisplayName === "xforms:input")
+        assert(hasId(findControlByName(doc, control1).get, controlId(control1)))
     }
 
     @Test def controlElements() {
@@ -204,7 +204,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             insertNewControl(doc, binding)
 
             // Test result
-            assert(hasId(findControlElement(doc, "control-2").get, controlId("control-2")))
+            assert(hasId(findControlByName(doc, "control-2").get, controlId("control-2")))
 
             val newlySelectedTd = findSelectedTd(doc)
             assert(newlySelectedTd.isDefined)
@@ -242,10 +242,10 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 assert((newlySelectedTd flatMap (_.parent) flatMap (_.parent) get) \@ "id" === gridId("grid-1"))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
-                assert(containerNames === Seq("grid-1", "section-1"))
+                assert(containerNames === Seq("section-1", "grid-1"))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
-                val dataHolder = findDataHolder(doc, containerNames.head)
+                val dataHolder = findDataHolder(doc, containerNames.last)
                 assert(dataHolder.isDefined)
                 assert(name(dataHolder.get precedingSibling * head) === "control-1")
 
@@ -269,9 +269,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 assert(newlySelectedTd.get \ * \@ "id" === controlId("control-2"))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
-                assert(containerNames === Seq("grid-1", "section-1"))
+                assert(containerNames === Seq("section-1", "grid-1"))
 
-                assert(hasId(findControlElement(doc, "control-2").get, controlId("control-2")))
+                assert(hasId(findControlByName(doc, "control-2").get, controlId("control-2")))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = findDataHolder(doc, "control-2")

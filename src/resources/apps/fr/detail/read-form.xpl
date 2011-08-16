@@ -45,7 +45,7 @@
                                 replace="all" xxforms:xinclude="true">
                             <!-- HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way -->
                             <xforms:action ev:event="xforms-submit-error" type="xpath">
-                                if (xxforms:get-request-path() != '/fr/service/custom/orbeon/newbuilder/toolbox')
+                                if (not(matches(xxforms:get-request-path(), '/fr/service/custom/orbeon/(new)?builder/toolbox')))
                                 then form-runner:sendError((event('response-status-code'), 500)[1])
                                 else ()
                             </xforms:action>

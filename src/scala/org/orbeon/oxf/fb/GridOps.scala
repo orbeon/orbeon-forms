@@ -172,7 +172,7 @@ object GridOps {
         }
 
         // Delete all controls in the row
-        tr \ "*:td" foreach (deleteControl(_))
+        tr \ "*:td" foreach (deleteCellContent(_))
 
         // Delete row and its content
         delete(tr)
@@ -237,7 +237,7 @@ object GridOps {
         // Delete the concrete td at this column position in each row
 
         allRowCells map (_(pos)) filterNot (_.missing) foreach { cell =>
-            deleteControl(cell.td)
+            deleteCellContent(cell.td)
             delete(cell.td)
         }
 

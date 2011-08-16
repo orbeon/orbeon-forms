@@ -310,7 +310,7 @@ object ToolboxOps {
     // Cut control to the clipboard
     def cutToClipboard(td: NodeInfo) {
         copyToClipboard(td)
-        deleteControl(td)
+        deleteCellContent(td)
     }
 
     // Paste control from the clipboard

@@ -400,7 +400,7 @@
                                                                                     <xf:trigger appearance="minimal">
                                                                                         <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-control-icon/label}}" title="{{$fb-resources/delete-control-icon/label}}"/></xf:label>
                                                                                         <xf:action ev:event="DOMActivate" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                                                                            controlOps:deleteControl($td)
+                                                                                            controlOps:deleteCellContent($td)
                                                                                         </xf:action>
                                                                                     </xf:trigger>
                                                                                 </xsl:if>

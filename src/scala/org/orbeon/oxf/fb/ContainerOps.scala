@@ -14,16 +14,13 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fb.GridOps._
-
 object ContainerOps {
 
     // Hardcoded list of FB controls we know can contain others
-    val containerElementNames = Set("section", "grid", "body") // TODO: "tab" is special because within "tabview"
+    val containerElementNames = Set("section", "grid", "body", "repeat") // TODO: "tab" is special because within "tabview" // repeat for legacy FB
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
@@ -38,42 +35,21 @@ object ContainerOps {
         findAncestorContainers(descendant) map (getControlNameOption(_)) flatten
 
     // Delete the entire container and contained controls
-    def deleteContainer(container: NodeInfo) {
-        // Go depth-first so we delete containers after all their content has been deleted
-        childrenContainers(container) foreach (deleteContainer(_))
+    def deleteContainer(container: NodeInfo) = {
 
-        // Delete all controls directly in the grid
-        // NOTE: lack of object-orientation is ugly here
-        if (localname(container) == "grid")
-            container \\ "*:tr" \\ "*:td" foreach (deleteControl(_))
+        def recurse(container: NodeInfo): Seq[NodeInfo] = {
+            // Go depth-first so we delete containers after all their content has been deleted
+            (childrenContainers(container) flatMap (recurse(_))) ++                                 // children containers
+            (if (localname(container) == "grid") container \\ "*:tr" \\ "*:td" \ * else Seq()) ++   // grid controls if any
+            controlElementsToDelete(container)                                                      // container itself
+        }
 
-        // Delete container itself
-        deleteContainerOnly(container)
+        // Start with top-level container and delete everything that was returned
+        recurse(container) foreach (delete(_))
     }
 
     def childrenContainers(container: NodeInfo) =
         container \ * filter (e => containerElementNames(localname(e)))
-
-    def deleteContainerOnly(container: NodeInfo) = {
-
-        val doc = container.getDocumentRoot
-
-        getControlNameOption(container) foreach { containerName =>
-
-            // Delete: holders, bind, templates, resources
-            val toDelete =
-                Seq(findDataHolder(doc, containerName),
-                    findBindByName(doc, containerName),
-                    instanceElement(doc, templateId(containerName)),
-                    findTemplateHolder(container, containerName)) ++
-                    (findResourceHolders(doc, containerName) map (Option(_))) flatten
-
-            toDelete foreach (delete(_))
-        }
-
-        // Delete whole container element
-        delete(container)
-    }
 
     // Find all siblings of the given element with the given name, excepting the given element
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =

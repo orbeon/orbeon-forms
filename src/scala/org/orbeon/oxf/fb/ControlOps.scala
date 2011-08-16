@@ -29,7 +29,7 @@ import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
  */
 object ControlOps {
 
-    private val ControlName = """(.+)-(control|bind|grid|section|template)""".r
+    private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // repeat for legacy FB
 
     private val topLevelBindTemplate: NodeInfo =
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')"
@@ -43,7 +43,7 @@ object ControlOps {
 
     // Find a control element
     def findControlElement(doc: NodeInfo, controlName: String) =
-        Stream("control", "grid", "section") flatMap
+        Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
             (suffix => findControlById(doc, controlName + '-' + suffix)) headOption
 
     // XForms callers: find a control element by name or null (the empty sequence)
@@ -110,6 +110,12 @@ object ControlOps {
     def findCurrentResourceHolder(controlName: String) = currentResources \ * filter (name(_) == controlName) headOption
 
     // Ensure that a tree of bind exists
+    def ensureBindsByName(doc: NodeInfo, name: String) =
+        findControlById(doc, controlId(name)) foreach { control =>
+            ensureBinds(doc, findContainerNames(control).reverse :+ controlName(controlId(name)), isCustomInstance)
+        }
+
+    // Ensure that a tree of bind exists
     def ensureBinds(doc: NodeInfo, names: Seq[String], isCustomInstance: Boolean): NodeInfo = {
 
         // Insert bind container if needed
@@ -145,21 +151,25 @@ object ControlOps {
     }
 
     // Delete the controls in the given grid cell, if any
-    def deleteControl(td: NodeInfo) {
+    def deleteCellContent(td: NodeInfo) =
+        td \ * flatMap (controlElementsToDelete(_)) foreach (delete(_))
 
-        val doc = td.getDocumentRoot
+    // Find all associated elements to delete for a given control element
+    def controlElementsToDelete(control: NodeInfo): Seq[NodeInfo] = {
 
-        td \ * foreach { control =>
+        val doc = control.getDocumentRoot
 
-            val name = getControlName(control)
-
-            // Delete: control, bind, and holders
-            val toDelete =
-                Seq(Some(control), findDataHolder(doc, name), findBindByName(doc, name), findTemplateHolder(td, name)) ++
-                    (findResourceHolders(doc, name) map (Option(_))) flatten
-
-            toDelete foreach (delete(_))
+        // Holders, bind, templates, resources if the control has a name
+        val holders = getControlNameOption(control).toSeq flatMap { controlName =>
+            Seq(findDataHolder(doc, controlName),
+                findBindByName(doc, controlName),
+                instanceElement(doc, templateId(controlName)),
+                findTemplateHolder(control, controlName)) ++
+                (findResourceHolders(doc, controlName) map (Option(_))) flatten
         }
+
+        // Append control element
+        holders :+ control
     }
 
     // Rename a control with its holders, binds, etc.

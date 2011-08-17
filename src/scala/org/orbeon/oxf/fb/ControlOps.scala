@@ -301,7 +301,7 @@ object ControlOps {
 
         // Insert repeat template holder if needed
         for {
-            grid <- findGrid(controlElement)
+            grid <- findContainingRepeat(controlElement)
             gridName <- getControlNameOption(grid)
             root <- templateRoot(doc, gridName)
         } yield

@@ -51,11 +51,17 @@ object ControlOps {
         findControlByName(doc, controlName).orNull
 
     // Find a bind by name
-    def findBindByName(doc: NodeInfo, name: String) =
-        findBindById(doc, bindId(name))
+    def findBindByName(doc: NodeInfo, name: String) = findBind(doc, isBindForName(_, name))
 
     // XForms callers: find a bind by name or null (the empty sequence)
-    def findBindByNameOrEmpty(doc: NodeInfo, name: String) = findBindById(doc, bindId(name)).orNull
+    def findBindByNameOrEmpty(doc: NodeInfo, name: String) = findBindByName(doc, name).orNull
+
+    // Find a bind by predicate
+    def findBind(doc: NodeInfo, p: NodeInfo => Boolean) =
+        ((findModelElement(doc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
+
+    def isBindForName(bind: NodeInfo, name: String) =
+        hasId(bind, bindId(name)) || (bind \@ "ref" ++ bind \@ "nodeset" getStringValue) == name // also check ref/nodeset in case id is not present
 
     // Get the control's name based on the control element
     def getControlName(control: NodeInfo) = getControlNameOption(control).get
@@ -68,10 +74,6 @@ object ControlOps {
     // Find a control (including grids and sections) element by id
     def findControlById(doc: NodeInfo, id: String) =
         findBodyElement(doc) \\ * filter (hasId(_, id)) headOption
-
-    // Find a bind by id
-    def findBindById(doc: NodeInfo, id: String) =
-        ((findModelElement(doc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (hasId(_, id)) headOption
 
     // Find control holder
     def findDataHolder(doc: NodeInfo, controlName: String) =
@@ -129,7 +131,7 @@ object ControlOps {
         @tailrec def ensureBind(container: NodeInfo, names: Iterator[String]): NodeInfo = {
             if (names.hasNext) {
                 val bindName = names.next()
-                val bind =  container \ "*:bind" filter (_ \@ "name" === bindName) match {
+                val bind =  container \ "*:bind" filter (isBindForName(_, bindName)) match {
                     case Seq(bind: NodeInfo, _*) => bind
                     case _ =>
 
@@ -330,7 +332,7 @@ object ControlOps {
 
     def getMip(doc: NodeInfo, controlId: String, mipName: String) = {
         require(Model.MIP.withName(mipName) ne null) // withName() will throw NoSuchElementException if not present
-        findBindById(doc, bindId(controlName(controlId))) flatMap (bind => attValueOption(bind \@ Model.mipNameToAttributeQName(mipName)))
+        findBindByName(doc, controlName(controlId)) flatMap (bind => attValueOption(bind \@ Model.mipNameToAttributeQName(mipName)))
     }
 
     // XForms callers: find the value of a MIP or null (the empty sequence)

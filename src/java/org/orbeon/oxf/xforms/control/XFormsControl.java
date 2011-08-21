@@ -662,7 +662,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Rewrite an HTML value which may contain URLs, for example in @src or @href attributes.
+     * Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.
      *
      *
      * @param rawValue          value to rewrite
@@ -673,58 +673,55 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (rawValue == null)
             return null;
 
-        // Quick check for the most common attributes, src and href. Ideally we should check more.
-        final boolean needsRewrite = rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1;
-        final String result;
-        if (needsRewrite) {
-            // Rewrite URLs
-            final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
-            // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-            final ExternalContext.Rewriter rewriter = NetUtils.getExternalContext().getResponse();
-            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver() {
+        final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
+        // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
+        final ExternalContext.Rewriter rewriter = NetUtils.getExternalContext().getResponse();
+        XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver() {
 
-                private boolean isStartElement;
+            private final String[] voidElementsNames = {
+                // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
+                "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr",
+                // Legacy
+                "basefont", "frame", "isindex"
+            };
+            private final Set<String> voidElements = new HashSet<String>(Arrays.asList(voidElementsNames));
+            private boolean isStartElement;
 
-                public void characters(char[] chars, int start, int length) throws SAXException {
-                    sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
-                    isStartElement = false;
+            public void characters(char[] chars, int start, int length) throws SAXException {
+                sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
+                isStartElement = false;
+            }
+
+            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                sb.append('<');
+                sb.append(localname);
+                final int attributeCount = attributes.getLength();
+                for (int i = 0; i < attributeCount; i++) {
+
+                    final String currentName = attributes.getLocalName(i);
+                    final String currentValue = attributes.getValue(i);
+
+                    sb.append(' ');
+                    sb.append(currentName);
+                    sb.append("=\"");
+                    sb.append(currentValue);
+                    sb.append('"');
                 }
+                sb.append('>');
+                isStartElement = true;
+            }
 
-                public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                    sb.append('<');
+            public void endElement(String uri, String localname, String qName) throws SAXException {
+                if (!isStartElement || !voidElements.contains(localname)) {
+                    // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.). Be sure not to drop closing elements of other tags though!
+                    sb.append("</");
                     sb.append(localname);
-                    final int attributeCount = attributes.getLength();
-                    for (int i = 0; i < attributeCount; i++) {
-
-                        final String currentName = attributes.getLocalName(i);
-                        final String currentValue = attributes.getValue(i);
-
-                        sb.append(' ');
-                        sb.append(currentName);
-                        sb.append("=\"");
-                        sb.append(currentValue);
-                        sb.append('"');
-                    }
                     sb.append('>');
-                    isStartElement = true;
                 }
-
-                public void endElement(String uri, String localname, String qName) throws SAXException {
-                    if (!isStartElement) {
-                        // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.)
-                        sb.append("</");
-                        sb.append(localname);
-                        sb.append('>');
-                    }
-                    isStartElement = false;
-                }
-            }, true), rawValue, locationData, "xhtml");
-            result = sb.toString();
-        } else {
-            // No rewriting needed
-            result = rawValue;
-        }
-        return result;
+                isStartElement = false;
+            }
+        }, true), rawValue, locationData, "xhtml");
+        return sb.toString();
     }
 
     /**

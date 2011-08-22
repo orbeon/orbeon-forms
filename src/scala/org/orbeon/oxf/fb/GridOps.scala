@@ -39,13 +39,16 @@ object GridOps {
     def findGridElementOrEmpty(doc: NodeInfo, gridName: String) =
         findGridElement(doc, gridName).orNull
 
+    def isGridOrRepeat(nodeInfo: NodeInfo) = nodeInfo self ("*:grid" || "*:repeat") nonEmpty
+    def isRepeat(nodeInfo: NodeInfo) = ((nodeInfo self "*:grid" nonEmpty) && nodeInfo \@ "repeat" === "true") || (nodeInfo self "*:repeat" nonEmpty)
+
     // Find the first enclosing repeated grid or legacy repeat if any
-    def findContainingRepeat(descendantOrSelf: NodeInfo) =
-        findAncestorContainers(descendantOrSelf, true) filter (e => (localname(e) == "grid" && e \@ "repeat" === "true") || localname(e) == "repeat") headOption
+    def findContainingRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+        findAncestorContainers(descendantOrSelf, includeSelf) filter (isRepeat(_)) headOption
 
     // Get the first enclosing repeated grid or legacy repeat
-    def getContainingGridOrRepeat(descendantOrSelf: NodeInfo) =
-        findAncestorContainers(descendantOrSelf, false) filter (e => Set("grid", "repeat")(localname(e))) head
+    def getContainingGridOrRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+        findAncestorContainers(descendantOrSelf, includeSelf) filter (isGridOrRepeat(_)) head
 
     // Extract the rowspan of a td (default is 1 if there is no attribute)
     private def getRowspan(td: NodeInfo) =  attValueOption(td \@ "rowspan") map (_.toInt) getOrElse 1
@@ -184,7 +187,7 @@ object GridOps {
     }
 
     // Delete the entire grid and contained controls
-    def deleteGrid(grid: NodeInfo)  = deleteContainer(grid)
+    def deleteGrid(grid: NodeInfo) = deleteContainer(grid)
 
     // Insert a column to the right
     def insertColRight(firstRowTd: NodeInfo) {
@@ -264,7 +267,7 @@ object GridOps {
     // Find the currently selected grid td if any
     def findSelectedTd(doc: NodeInfo) = selectedCellId match {
         case Some(selectedCell) =>
-            val tdId = selectedCell.getStringValue
+            val tdId = selectedCell.stringValue
             findBodyElement(doc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
         case _ => // legacy FB
             legacySelectedCell
@@ -273,7 +276,7 @@ object GridOps {
     // Make the given grid td selected
     def selectTd(newTd: NodeInfo) = selectedCellId match {
         case Some(selectedCell) =>
-            setvalue(selectedCell, newTd \@ "id" getStringValue)
+            setvalue(selectedCell, newTd \@ "id" stringValue)
         case _ => // legacy FB
     }
 
@@ -342,7 +345,7 @@ object GridOps {
     // Find template holder
     def findTemplateHolder(descendantOrSelf: NodeInfo, controlName: String) =
         for {
-            grid <- findContainingRepeat(descendantOrSelf)
+            grid <- findContainingRepeat(descendantOrSelf, true)
             gridName <- getControlNameOption(grid)
             root <- templateRoot(descendantOrSelf, gridName)
             holder <- root descendantOrSelf * filter (name(_) == controlName) headOption

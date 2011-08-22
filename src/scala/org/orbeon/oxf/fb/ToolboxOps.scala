@@ -34,6 +34,86 @@ object ToolboxOps {
             <xforms:alert ref="$fr-resources/detail/labels/alert"/>
         </template>
 
+    // Insert a new control in a cell
+    def insertNewControl(doc: NodeInfo, binding: NodeInfo) {
+
+        ensureEmptyTd(doc) match {
+            case Some(gridTd) =>
+
+                val newControlId = nextId(doc, "control")
+                val newControlName = "control-" + newControlId
+
+                // Insert control template
+                val newControlElement: NodeInfo =
+                    binding \ "*:metadata" \ "*:template" \ * match {
+                        case Seq(template, _*) =>
+                            // There is a specific template available
+                            insert(into = gridTd, origin = template).head
+                        case _ =>
+                            // No specific, create simple element with LHHA
+
+                            // Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar)
+                            val firstElementCSSName = (binding \@ "element" stringValue) split "," head
+                            val elementQName = firstElementCSSName.replace('|', ':')
+
+                            val controlElement = insert(into = gridTd, origin = elementInfo(resolveQName(binding, elementQName))).head
+                            insert(into = controlElement, origin = lhhaTemplate \ *)
+                            controlElement
+                    }
+
+                // Set default pointer to resources if there is an xforms:alert
+                setvalue(newControlElement \ "*:alert" \@ "ref", "$fr-resources/detail/labels/alert")
+
+                // Adjust bindings on newly inserted control
+                renameControlByElement(newControlElement, newControlName)
+
+                // Get control type
+                // TODO: for now assume a literal 'xs:' prefix (should resolve namespace)
+                val controlType = binding \ "*:metadata" \ "*:datatype" match {
+                    case Seq(datatype, _*) => datatype.stringValue
+                    case _ => "xs:string"
+                }
+
+                // Data holder may contain file attributes
+                val dataHolder =
+                    if (Set("xs:anyURI", "xforms:anyURI")(controlType))
+                        elementInfo(newControlName, Seq("filename", "mediatype", "size") map (attributeInfo(_)))
+                    else
+                        elementInfo(newControlName)
+
+                val lhhaNames = newControlElement \ * filter (e => Set("label", "help", "hint", "alert")(localname(e))) map (localname(_))
+                val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
+
+                // Insert data and resource holders
+                insertHolders(
+                    newControlElement,
+                    dataHolder,
+                    resourceHolder,
+                    precedingControlNameInSectionForControl(newControlElement)
+                )
+
+                // Insert the bind element
+                val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName, isCustomInstance)
+
+                // Make sure there is a @bind instead of a @ref on the control
+                delete(newControlElement \@ "ref")
+                ensureAttribute(newControlElement, "bind", bind \@ "id" stringValue)
+
+                // Set bind type if needed
+                if (controlType != "xs:string")
+                    insert(into = bind, origin = attributeInfo("type", controlType))
+
+                debugDumpDocument("insert new control", doc)
+
+                // Open label editor for newly inserted control -->
+                // TODO
+//                <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
+//                <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
+
+            case _ => // no empty td found/created so NOP
+        }
+    }
+
     // Insert a new grid
     def insertNewGrid(doc: NodeInfo) {
 
@@ -192,7 +272,12 @@ object ToolboxOps {
                 val newGridElement = insert(into = currentTdGrandParentContainer, after = currentTdGrid, origin = gridTemplate).head
 
                 // Insert instance holder (but no resource holders)
-                insertHolders(newGridElement, elementInfo(newGridName), Seq(), precedingControlNameInSectionForTd(currentTdGrid \\ "*:td" last, includeSelf = true))
+                insertHolders(
+                    newGridElement,
+                    elementInfo(newGridName),
+                    Seq(),
+                    precedingControlNameInSectionForGrid(currentTdGrid, true)
+                )
 
                 // Make sure binds are created
                 ensureBinds(doc, findContainerNames(newGridElement) :+ newGridName, isCustomInstance)
@@ -203,81 +288,6 @@ object ToolboxOps {
                 debugDumpDocument("insert new repeat", doc)
 
             case _ => // NOP
-        }
-    }
-
-    // Insert a new control in a cell
-    def insertNewControl(doc: NodeInfo, binding: NodeInfo) {
-
-        ensureEmptyTd(doc) match {
-            case Some(gridTd) =>
-
-                val newControlId = nextId(doc, "control")
-                val newControlName = "control-" + newControlId
-
-                // Insert control template
-                val newControlElement: NodeInfo =
-                    binding \ "*:metadata" \ "*:template" \ * match {
-                        case Seq(template, _*) =>
-                            // There is a specific template available
-                            insert(into = gridTd, origin = template).head
-                        case _ =>
-                            // No specific, create simple element with LHHA
-
-                            // Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar)
-                            val firstElementCSSName = (binding \@ "element" getStringValue) split "," head
-                            val elementQName = firstElementCSSName.replace('|', ':')
-
-                            val controlElement = insert(into = gridTd, origin = elementInfo(resolveQName(binding, elementQName))).head
-                            insert(into = controlElement, origin = lhhaTemplate \ *)
-                            controlElement
-                    }
-
-                // Set default pointer to resources if there is an xforms:alert
-                setvalue(newControlElement \ "*:alert" \@ "ref", "$fr-resources/detail/labels/alert")
-
-                // Adjust bindings on newly inserted control
-                renameControlByElement(newControlElement, newControlName)
-
-                // Get control type
-                // TODO: for now assume a literal 'xs:' prefix (should resolve namespace)
-                val controlType = binding \ "*:metadata" \ "*:datatype" match {
-                    case Seq(datatype, _*) => datatype.getStringValue
-                    case _ => "xs:string"
-                }
-
-                // Data holder may contain file attributes
-                val dataHolder =
-                    if (Set("xs:anyURI", "xforms:anyURI")(controlType))
-                        elementInfo(newControlName, Seq("filename", "mediatype", "size") map (attributeInfo(_)))
-                    else
-                        elementInfo(newControlName)
-
-                val lhhaNames = newControlElement \ * filter (e => Set("label", "help", "hint", "alert")(localname(e))) map (localname(_))
-                val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
-
-                // Insert data and resource holders
-                insertHolders(newControlElement, dataHolder, resourceHolder, precedingControlNameInSection(newControlElement))
-
-                // Insert the bind element
-                val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName, isCustomInstance)
-
-                // Make sure there is a @bind instead of a @ref on the control
-                delete(newControlElement \@ "ref")
-                ensureAttribute(newControlElement, "bind", bind \@ "id" getStringValue)
-
-                // Set bind type if needed
-                if (controlType != "xs:string")
-                    insert(into = bind, origin = attributeInfo("type", controlType))
-
-                debugDumpDocument("insert new control", doc)
-
-                // Open label editor for newly inserted control -->
-                // TODO
-//                <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
-//                <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
-
-            case _ => // no empty td found/created so NOP
         }
     }
 
@@ -348,14 +358,14 @@ object ToolboxOps {
                 insertHolders(
                     newControlElement,
                     xvc \ "holder" \ * head,
-                    xvc \ "resources" \ "resource" map (r => (r \@ "*:lang" getStringValue, r \ * head)),
-                    precedingControlNameInSection(newControlElement)
+                    xvc \ "resources" \ "resource" map (r => (r \@ "*:lang" stringValue, r \ * head)),
+                    precedingControlNameInSectionForControl(newControlElement)
                 )
 
                 // Create the bind and copy all attributes and content
                 val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ controlName, isCustomInstance)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind =>
-                    insert(into = bind, origin = (xvcBind \@ *) ++ (xvcBind \ *))
+                    insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
                 }
             }
         }

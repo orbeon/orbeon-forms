@@ -21,6 +21,7 @@ object ContainerOps {
 
     // Hardcoded list of FB controls we know can contain others
     val containerElementNames = Set("section", "grid", "body", "repeat") // TODO: "tab" is special because within "tabview" // repeat for legacy FB
+    val containerElementTest = "*:section" || "*:grid" || "*:body" || "*:repeat"
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
@@ -37,19 +38,22 @@ object ContainerOps {
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {
 
+        def childrenContainers(container: NodeInfo) =
+            container \ * filter (e => containerElementNames(localname(e)))
+
         def recurse(container: NodeInfo): Seq[NodeInfo] = {
             // Go depth-first so we delete containers after all their content has been deleted
-            (childrenContainers(container) flatMap (recurse(_))) ++                                 // children containers
-            (if (localname(container) == "grid") container \\ "*:tr" \\ "*:td" \ * else Seq()) ++   // grid controls if any
-            controlElementsToDelete(container)                                                      // container itself
+            (childrenContainers(container) flatMap (recurse(_))) ++                     // children containers
+            (if (localname(container) == "grid")                                        // grid controls if any
+                container \\ "*:tr" \\ "*:td" \ * flatMap (controlElementsToDelete(_))
+             else
+                Seq()) ++
+            controlElementsToDelete(container)                                          // container itself
         }
 
         // Start with top-level container and delete everything that was returned
         recurse(container) foreach (delete(_))
     }
-
-    def childrenContainers(container: NodeInfo) =
-        container \ * filter (e => containerElementNames(localname(e)))
 
     // Find all siblings of the given element with the given name, excepting the given element
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =

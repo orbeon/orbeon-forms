@@ -286,7 +286,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 assert(formResourcesRoot(doc) \ "resource" \ "control-2" nonEmpty)
 
                 val templateHolder = templateRoot(doc, "grid-1").get \ "control-2" headOption
-
+                
                 assert(templateHolder.isDefined)
                 assert(templateHolder.get precedingSibling * isEmpty)
                 assert(name(templateHolder.get.parent.get) === "grid-1")
@@ -317,6 +317,52 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val trs = grid \ "tr"
         for ((expected, index) <- expected.zipWithIndex)
             yield assert(getRowCells(trs(index)) === expected)
+    }
+
+    @Test def testPrecedingNameForControl() {
+
+        val section: NodeInfo =
+            <section>
+                <grid>
+                    <tr><td><input id="control-11-control"/></td></tr>
+                </grid>
+                <grid id="grid-2-grid">
+                    <tr><td><input id="control-21-control"/></td></tr>
+                </grid>
+                <grid>
+                    <tr><td><input id="control-31-control"/></td></tr>
+                </grid>
+            </section>
+
+        val controls = section \\ "*:td" \ * filter (_ \@ "id" nonEmpty)
+
+        val expected = Seq(None, Some("grid-2"), Some("grid-2"))
+        val actual = controls map (precedingControlNameInSectionForControl(_))
+
+        assert(actual === expected)
+    }
+
+    @Test def testPrecedingNameForGrid() {
+
+        val section: NodeInfo =
+            <section>
+                <grid>
+                    <tr><td><input id="control-11-control"/></td></tr>
+                </grid>
+                <grid id="grid-2-grid">
+                    <tr><td><input id="control-21-control"/></td></tr>
+                </grid>
+                <grid>
+                    <tr><td><input id="control-31-control"/></td></tr>
+                </grid>
+            </section>
+
+        val grids = section \\ "*:grid"
+
+        val expected = Seq(Some("control-11"), Some("grid-2"), Some("control-31"))
+        val actual = grids map (precedingControlNameInSectionForGrid(_, true))
+
+        assert(actual === expected)
     }
 
 //    @Test def insertHolders() {

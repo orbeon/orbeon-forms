@@ -61,7 +61,7 @@ object ControlOps {
         ((findModelElement(doc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
-        hasId(bind, bindId(name)) || (bind \@ "ref" ++ bind \@ "nodeset" getStringValue) == name // also check ref/nodeset in case id is not present
+        hasId(bind, bindId(name)) || (bind \@ "ref" ++ bind \@ "nodeset" stringValue) == name // also check ref/nodeset in case id is not present
 
     // Get the control's name based on the control element
     def getControlName(control: NodeInfo) = getControlNameOption(control).get
@@ -69,7 +69,9 @@ object ControlOps {
     // Get the control's name based on the control element
     def getControlNameOption(control: NodeInfo) =
         (control \@ "id" headOption) map
-            (id => controlName(id.getStringValue))
+            (id => controlName(id.stringValue))
+
+    def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
 
     // Find a control (including grids and sections) element by id
     def findControlById(doc: NodeInfo, id: String) =
@@ -83,7 +85,7 @@ object ControlOps {
             val bindRefs = (bind ancestorOrSelf "*:bind" map
                 (b => ((b \@ "nodeset") ++ (b \@ "ref")) head)).reverse.tail
 
-            val path = bindRefs map ("(" + _.getStringValue + ")") mkString "/"
+            val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
 
             // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
             val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(bind))
@@ -100,7 +102,7 @@ object ControlOps {
     def findResourceHoldersWithLang(doc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
         for {
             resource <- formResourcesRoot(doc) \ "resource"
-            lang = (resource \@ "*:lang").getStringValue
+            lang = (resource \@ "*:lang").stringValue
             holder <- resource \ * filter (name(_) == controlName) headOption
         } yield
             (lang, holder)
@@ -198,7 +200,7 @@ object ControlOps {
         controlElement \ * filter (e => Set("label", "help", "hint", "alert")(localname(e))) map
             (e => (e \@ "ref", localname(e))) filter
                 (_._1 nonEmpty) filter { e =>
-                    val ref = e._1.getStringValue
+                    val ref = e._1.stringValue
                     ref.isEmpty || ref.startsWith("$form-resources")
                 } foreach { e =>
                     setvalue(e._1, "$form-resources/" + newName + '/' + e._2)
@@ -264,20 +266,43 @@ object ControlOps {
     def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
         // Create one holder per existing language
         val resourceHolders = (formResourcesRoot(controlElement) \ "resource" \@ "*:lang") map
-            (att => (att.getStringValue, resourceHolder))
+            (att => (att.stringValue, resourceHolder))
 
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
     }
 
-    def precedingControlNameInSection(controlElement: NodeInfo) =
-        precedingControlNameInSectionForTd(controlElement.parent.get)
+    def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 
-    def precedingControlNameInSectionForTd(td: NodeInfo, includeSelf: Boolean = false) = {
-        // All the *:td elements up to the current one within the current section
-        val preceding = (if (includeSelf) Seq(td) else Seq()) ++ (td preceding "*:td")
-        val precedingTdsInSection = preceding intersect (td ancestor "*:section" take 1 descendant "*:td")
-        // Last non-empty td's first element's id
-        precedingTdsInSection.reverse filter hasChildren takeRight 1 child * att "id" map (id => controlName(id.getStringValue)) headOption
+        val td = controlElement.parent.get
+        val grid = findAncestorContainers(td).head
+        assert(localname(grid) == "grid")
+
+        // First check within the current grid as well as the grid itself
+        val preceding = td preceding "*:td"
+        val precedingInGrid = preceding intersect (grid descendant "*:td")
+
+        val nameInGridOption = precedingInGrid :+ grid flatMap
+            { case td if localname(td) == "td" => td \ *; case other => other } flatMap
+                (getControlNameOption(_).toSeq) headOption
+
+        // Return that if found, otherwise find before the current grid
+        nameInGridOption orElse precedingControlNameInSectionForGrid(grid, false)
+    }
+
+    def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
+
+        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq()) ++ (grid precedingSibling containerElementTest)
+
+        // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
+        // with a name (there might not be one).
+        val controlsWithName =
+            precedingOrSelfContainers flatMap {
+                case grid if getControlNameOption(grid).isEmpty => grid \\ "*:td" \ * filter (hasName(_)) lastOption
+                case other => Some(other)
+            }
+
+        // Take the first result
+        controlsWithName.headOption flatMap (getControlNameOption(_))
     }
 
     // Insert data and resource holders for all languages
@@ -295,7 +320,7 @@ object ControlOps {
             val resourceHoldersMap = resourceHolders.toMap
             for {
                 resource <- formResourcesRoot(doc) \ "resource"
-                lang = (resource \@ "*:lang").getStringValue
+                lang = (resource \@ "*:lang").stringValue
                 holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
             } yield
                 insert(into = resource, after = resource \ * filter (name(_) == precedingControlName.getOrElse("")), origin = holder)
@@ -351,7 +376,7 @@ object ControlOps {
     // Get the control's resource holder
     def getControlResourceOrEmpty(controlId: String, resourceName: String) =
         findCurrentResourceHolder(controlName(controlId)) flatMap
-            (n => n \ resourceName map (_.getStringValue) headOption) getOrElse("")
+            (n => n \ resourceName map (_.stringValue) headOption) getOrElse("")
 
     def getControlHelpOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "help")
     def getControlAlertOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "alert")

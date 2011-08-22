@@ -14,7 +14,6 @@
 package org.orbeon.scaxon
 
 import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.ExpressionTool
 import org.orbeon.saxon.value.StringValue
 import xml.Elem
 import org.orbeon.saxon.om._
@@ -25,9 +24,10 @@ import java.util.Collections
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement
-import org.orbeon.saxon.pattern.{NameTest, NodeKindTest, LocalNameTest}
 import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
 import org.dom4j.{Document, Attribute, QName, Element}
+import org.orbeon.saxon.pattern._
+import org.orbeon.saxon.expr.{Token, ExpressionTool}
 
 object XML {
 
@@ -75,7 +75,7 @@ object XML {
 
     // Like XPath namespace-uri()
     def namespaceURI(nodeInfo: NodeInfo) = {
-        var uri = nodeInfo.getURI
+        val uri = nodeInfo.getURI
         if (uri == null) "" else uri
     }
 
@@ -86,10 +86,6 @@ object XML {
         (parts(0), parts(1))
     }
 
-    // Selector for any node
-    // TODO: Use class to represent selectors
-    val * = "*"
-
     // Useful predicates
     val hasChildren: NodeInfo => Boolean = element => element \ * nonEmpty
     val hasId: (NodeInfo, String) => Boolean = (element, id) => element \@ "id" === id
@@ -98,8 +94,129 @@ object XML {
     // Get the value of the first attribute passed if any
     def attValueOption(atts: Seq[NodeInfo]) = atts.headOption map (_.getStringValue)
 
-    // Better operations on sequences of NodeInfo
-    class RichNodeInfoSeq(seq: Seq[NodeInfo]) {
+    // Node test
+    abstract class Test {
+        def test(nodeInfo: NodeInfo): NodeTest
+
+        // Combinators
+        def or(that: Test) = new OrTest(this, that)
+        def and(that: Test) = new AndTest(this, that)
+        def except(that: Test) = new ExceptTest(this, that)
+
+        // Symbolic equivalents
+        def ||(that: Test) = or(that)
+        def &&(that: Test) = and(that)
+        def -(that: Test) = except(that)
+    }
+
+    class NodeLocalNameTest(nodeKind: Int, name: String) extends Test {
+        override def test(nodeInfo: NodeInfo) = {
+
+            val pool = nodeInfo.getNamePool
+
+            // For now just test on the local name
+            // TODO: support for testing on qualified name -> requires namespace context
+//                    val fingerprint = pool.getFingerprint(uri, qName._2)
+//                    val test = new NameTest(nodeKind, fingerprint, pool)
+
+            val qName = parseQName(name)
+
+            // Warn in case the caller used "foo:bar". We don't warn for plain "foo" as that's a common use case for
+            // attributes, even through it's actually wrong. However most attributes are unprefixed anyway so it will
+            // be rare, but we need to support qualified names quickly.
+            if (! Set("", "*")(qName._1))
+                throw new IllegalArgumentException("""Only local name tests of the form "*:foo" are supported.""")
+
+            new LocalNameTest(pool, nodeKind, qName._2)
+        }
+    }
+
+    class NodeQNameTest(nodeKind: Int, name: QName) extends Test {
+        override def test(nodeInfo: NodeInfo) = {
+            val pool = nodeInfo.getNamePool
+            new NameTest(nodeKind, name.getNamespaceURI, name.getName, pool)
+        }
+    }
+
+    class OrTest(s1: Test, s2: Test) extends Test {
+        def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.UNION, s2.test(nodeInfo))
+    }
+
+    class AndTest(s1: Test, s2: Test) extends Test {
+        def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.INTERSECT, s2.test(nodeInfo))
+    }
+
+    class ExceptTest(s1: Test, s2: Test) extends Test {
+        def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.EXCEPT, s2.test(nodeInfo))
+    }
+
+    // Match any element
+    val * = new Test {
+        def test(nodeInfo: NodeInfo) = NodeKindTest.makeNodeKindTest(Type.ELEMENT)
+    }
+
+    // Match any attribute
+    val @* = new Test {
+        def test(nodeInfo: NodeInfo) = NodeKindTest.makeNodeKindTest(Type.ATTRIBUTE)
+    }
+
+    // Passing a string as test means to test on the local name of an element
+    implicit def stringToElementLocalNameTest(s: String) = new NodeLocalNameTest(Type.ELEMENT, s)
+
+    // Passing a QName as test means to test on the qualified name of an element
+    implicit def qNameToElementQNameTest(s: QName) = new NodeQNameTest(Type.ELEMENT, s)
+
+    // Operations on NodeInfo
+    class NodeInfoOps(nodeInfo: NodeInfo) {
+
+        require(nodeInfo ne null)
+
+        def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
+
+        def \(test: Test) = find(Axis.CHILD, test)
+        def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
+
+        // Return an element's attributes
+        def \@(attName: String): Seq[NodeInfo] = \@(new NodeLocalNameTest(Type.ATTRIBUTE, attName))
+        def \@(attName: QName): Seq[NodeInfo] = \@(new NodeQNameTest(Type.ATTRIBUTE, attName))
+        def \@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
+
+        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(Axis.ATTRIBUTE, attName))
+        def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
+
+        def att(attName: String) = \@(attName)
+        def att(test: Test) = \@(test)
+        def child(test: Test) = \(test)
+        def descendant(test: Test) = \\(test)
+
+        def self(test: Test) = find(Axis.SELF, test)
+        def parent = Option(nodeInfo.getParent)
+
+        def ancestor(test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR, test)
+        def ancestorOrSelf (test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR_OR_SELF, test)
+        def descendantOrSelf(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT_OR_SELF, test)
+
+        def preceding(test: Test): Seq[NodeInfo] = find(Axis.PRECEDING, test) // TODO: use Type/NODE?
+        def following(test: Test): Seq[NodeInfo] = find(Axis.FOLLOWING, test) // TODO: use Type/NODE?
+
+        def precedingSibling(test: Test): Seq[NodeInfo] = find(Axis.PRECEDING_SIBLING, test) // TODO: use Type/NODE?
+        def followingSibling(test: Test): Seq[NodeInfo] = find(Axis.FOLLOWING_SIBLING, test) // TODO: use Type/NODE?
+
+        def precedingElement = nodeInfo precedingSibling * headOption
+        def followingElement = nodeInfo followingSibling * headOption
+
+        def stringValue = nodeInfo.getStringValue
+
+        private def find(axisNumber: Byte, test: Test) = {
+            // We know the result contains only NodeInfo
+            val iterator: Iterator[NodeInfo] = nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))
+            // Be lazy: a good idea?
+            iterator.toStream
+        }
+    }
+
+    // Operations on sequences of NodeInfo
+    class NodeInfoSeqOps(seq: Seq[NodeInfo]) {
 
         require(seq ne null)
 
@@ -107,97 +224,26 @@ object XML {
         def ===(s: String) = seq exists (_ === s)
 
         def \@(attName: String): Seq[NodeInfo] = seq flatMap (_ \@ attName)
-        def \(elementName: String): Seq[NodeInfo] = seq flatMap (_ \ elementName)
-        def \\(elementName: String): Seq[NodeInfo] = seq flatMap (_ \\ elementName)
+        def \(test: Test): Seq[NodeInfo] = seq flatMap (_ \ test)
+        def \\(test: Test): Seq[NodeInfo] = seq flatMap (_ \\ test)
 
         def att(attName: String) = \@(attName)
-        def child(elementName: String) = \(elementName)
-        def descendant(elementName: String) = \\(elementName)
+        def child(test: Test) = \(test)
+        def descendant(test: Test) = \\(test)
 
         def parent = seq map (_.getParent) filter (_ ne null)
 
-        def getStringValue = seq match {
+        // The string value is not defined on sequences. We take the first value, for convenience, like in XPath 2.0's
+        // XPath 1.0 compatibility mode.
+        def stringValue = seq match {
             case Seq() => ""
             case Seq(nodeInfo, _*) => nodeInfo.getStringValue
         }
     }
 
-    implicit def nodeInfoSeqToRichNodeInfoSeq(seq: Seq[NodeInfo]): RichNodeInfoSeq = new RichNodeInfoSeq(seq)
-
-    // Better operations on NodeInfo
-    class RichNodeInfo(nodeInfo: NodeInfo) {
-
-        require(nodeInfo ne null)
-
-        def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
-
-        // Return an element's attribute by name
-        def \@(attName: String): Seq[NodeInfo] = find(Type.ATTRIBUTE, Axis.ATTRIBUTE, attName)
-        def \@(attName: QName): Seq[NodeInfo] = find(Type.ATTRIBUTE, Axis.ATTRIBUTE, attName)
-        def \(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.CHILD, elementName)
-        def \\@(elementName: String): Seq[NodeInfo] = find(Type.ATTRIBUTE, Axis.DESCENDANT, elementName)
-        def \\(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.DESCENDANT, elementName)
-
-        def att(attName: String) = \@(attName)
-        def child(elementName: String) = \(elementName)
-        def descendant(elementName: String) = \\(elementName)
-
-        def parent = Option(nodeInfo.getParent)
-
-        def ancestor(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.ANCESTOR, elementName)
-        def ancestorOrSelf (elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.ANCESTOR_OR_SELF, elementName)
-        def descendantOrSelf(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.DESCENDANT_OR_SELF, elementName)
-
-        def preceding(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.PRECEDING, elementName) // TODO: use Type/NODE?
-        def following(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.FOLLOWING, elementName) // TODO: use Type/NODE?
-
-        def precedingSibling(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.PRECEDING_SIBLING, elementName) // TODO: use Type/NODE?
-        def followingSibling(elementName: String): Seq[NodeInfo] = find(Type.ELEMENT, Axis.FOLLOWING_SIBLING, elementName) // TODO: use Type/NODE?
-
-        def precedingElement = nodeInfo precedingSibling * headOption
-        def followingElement = nodeInfo followingSibling * headOption
-
-        private def find(nodeKind: Int, axisNumber: Byte, name: String) = {
-            val pool = nodeInfo.getNamePool
-
-            val test =
-                if (name == "*") {
-                    NodeKindTest.makeNodeKindTest(nodeKind)
-                } else {
-                    // For now just test on the local name
-                    // TODO: support for testing on qualified name -> requires namespace context
-//                    val fingerprint = pool.getFingerprint(uri, qName._2)
-//                    val test = new NameTest(nodeKind, fingerprint, pool)
-
-                    val qName = parseQName(name)
-
-                    // Warn in case the caller used "foo:bar". We don't warn for plain "foo" as that's a common use case for
-                    // attributes, even through it's actually wrong. However most attributes are unprefixed anyway so it will
-                    // be rare, but we need to support qualified names quickly.
-                    if (! Set("", "*")(qName._1))
-                        throw new IllegalArgumentException("""Only local name tests of the form "*:foo" are supported.""")
-
-                    new LocalNameTest(pool, nodeKind, qName._2)
-                }
-
-            // We know the result contains only NodeInfo
-            val iterator: Iterator[NodeInfo] = nodeInfo.iterateAxis(axisNumber, test)
-
-            iterator.toStream
-        }
-
-        private def find(nodeKind: Int, axisNumber: Byte, name: QName) = {
-            val pool = nodeInfo.getNamePool
-            val test = new NameTest(nodeKind, name.getNamespaceURI, name.getName, pool)
-
-            // We know the result contains only NodeInfo
-            val iterator: Iterator[NodeInfo] = nodeInfo.iterateAxis(axisNumber, test)
-
-            iterator.toStream
-        }
-    }
-
-    implicit def nodeInfoToRichNodeInfo(nodeInfo: NodeInfo): RichNodeInfo = new RichNodeInfo(nodeInfo)
+    // Scope ops on NodeInfo / Seq[NodeInfo]
+    implicit def nodeInfoToRichNodeInfo(nodeInfo: NodeInfo): NodeInfoOps = new NodeInfoOps(nodeInfo)
+    implicit def nodeInfoSeqToRichNodeInfoSeq(seq: Seq[NodeInfo]): NodeInfoSeqOps = new NodeInfoSeqOps(seq)
 
     // Other implicits
 

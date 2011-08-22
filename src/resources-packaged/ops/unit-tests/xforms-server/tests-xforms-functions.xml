@@ -2042,6 +2042,47 @@
         </output>
     </test>
 
+    <test description="xxforms:create-document() with multiple uses" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316168&group_id=168&atid=350207 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <document/>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xxforms:var name="new1" value="xxforms:create-document()"/>
+                            <xforms:insert context="$new1" origin="xxforms:element('foo', (xxforms:attribute('new-attr', 'bar'), 'baz'))"/>
+                            <xxforms:var name="new2" value="xxforms:create-document()"/>
+                            <xforms:insert ref="instance()" origin="$new2"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body/>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <document/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="xforms:seconds-from-dateTime() function" name="oxf:pipeline">
         <!-- See also: http://forge.ow2.org/tracker/index.php?func=detail&aid=316000&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl" />

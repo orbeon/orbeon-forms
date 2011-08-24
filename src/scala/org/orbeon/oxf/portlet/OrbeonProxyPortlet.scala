@@ -36,11 +36,11 @@ class OrbeonProxyPortlet extends GenericPortlet {
 //    private val actions = Set("new", "summary")
 
     private val preferences = Map(
-        (PreferenceName.FormRunnerURL -> "Form Runner URL"),
-        (PreferenceName.AppName -> "Form Runner app name"),
-        (PreferenceName.FormName -> "Form Runner form name"),
-        (PreferenceName.Action -> "Form Runner action"),
-        (PreferenceName.ReadOnly -> "Read-Only access")
+        PreferenceName.FormRunnerURL -> "Form Runner URL",
+        PreferenceName.AppName -> "Form Runner app name",
+        PreferenceName.FormName -> "Form Runner form name",
+        PreferenceName.Action -> "Form Runner action",
+        PreferenceName.ReadOnly -> "Read-Only access"
     )
 
     // Return the value of the preference if set, otherwise the value of the initialization parameter

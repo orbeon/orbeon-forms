@@ -347,9 +347,12 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     @Override
     public boolean isStaticReadonly() {
         // Static read-only if we are read-only and static (global or local setting)
-        return isReadonly()
-                && (XFormsProperties.isStaticReadonlyAppearance(containingDocument)
-                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
+        return isReadonly() && hasStaticReadonlyAppearance();
+    }
+
+    public boolean hasStaticReadonlyAppearance() {
+        return XFormsProperties.isStaticReadonlyAppearance(containingDocument)
+                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME));
     }
 
     @Override

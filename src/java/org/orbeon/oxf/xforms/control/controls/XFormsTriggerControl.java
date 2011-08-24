@@ -40,9 +40,16 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
 
     @Override
     protected boolean computeRelevant() {
-        // Special case for triggers: they are non-relevant in static readonly mode!
-        final boolean parentRelevant = super.computeRelevant();
-        return parentRelevant && !isStaticReadonly();
+        // NOTE: We used to make the trigger non-relevant if it was static-readonly. But this caused issues:
+        //
+        // o at the time computeRelevant() is called, MIPs haven't been read yet
+        // o even if we specially read the readonly value from the binding here, then:
+        //   o the static-readonly control becomes non-relevant
+        //   o therefore its readonly value becomes false (the default)
+        //   o therefore isStaticReadonly() returns false!
+        //
+        // So we keep the control relevant in this case.
+        return super.computeRelevant();
     }
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();

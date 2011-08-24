@@ -15,40 +15,28 @@ package org.orbeon.oxf.xforms.xbl;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.dom4j.Text;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xforms.PartAnalysis;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.analysis.*;
-import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xforms.control.XFormsComponentControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xml.NamespaceMapping;
+import org.orbeon.oxf.xforms.analysis.Metadata;
+import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl;
+import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.Attributes;
-import scala.collection.Seq;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * All the information statically gathered about XBL bindings.
@@ -69,105 +57,6 @@ public class XBLBindingsBase {
     protected final boolean logShadowTrees;                   // whether to log shadow trees as they are built
 
     protected final PartAnalysisImpl partAnalysis;
-
-    // binding QName => control factory
-    protected Map<QName, XFormsControlFactory.Factory> xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
-    // QNames => abstract binding
-    protected Map<QName, AbstractBinding> abstractBindings = new HashMap<QName, AbstractBinding>();
-    // prefixed id => concrete binding
-    protected Map<String, ConcreteBinding> concreteBindings = new HashMap<String, ConcreteBinding>();
-
-    protected List<Element> allScripts;                       // List<Element scriptElement>
-    protected List<Element> allStyles;                        // List<Element styleElement>
-
-    // Abstract XBL bindings
-    public static class AbstractBinding {
-        public final QName qNameMatch;
-        public final Element bindingElement;
-        public final String bindingId;
-        public final List<Element> scripts;
-        public final List<Element> styles;
-        public final List<Element> handlers;
-        public final List<Document> implementations;
-        public final Document global;
-
-        public AbstractBinding(Element bindingElement, NamespaceMapping namespaceMapping, List<Element> scripts, IdGenerator idGenerator) {
-            this.bindingElement = bindingElement;
-            this.scripts = scripts;
-
-            // For now, only handle "prefix|name" selectors
-            // NOTE: Pass blank prefix as XBL bindings are all within the top-level document
-            final String elementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
-            qNameMatch = Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementAttribute.replace('|', ':'), true);
-
-            // Binding id
-            final String existingBindingId = XFormsUtils.getElementStaticId(bindingElement);
-            this.bindingId = (existingBindingId != null) ? existingBindingId : (idGenerator != null) ? idGenerator.getNextId() : null; // idGenerator can be null when this is used to find styles
-
-            // Extract xbl:binding/xbl:resources/xbl:style
-            List<Element> styles = null;
-            final List<Element> resourcesElements = Dom4jUtils.elements(bindingElement, XFormsConstants.XBL_RESOURCES_QNAME);
-            for (final Element resourcesElement : resourcesElements) {
-                final List<Element> styleElements = Dom4jUtils.elements(resourcesElement, XFormsConstants.XBL_STYLE_QNAME);
-
-                if (styleElements.size() > 0) {
-                    if (styles == null)
-                        styles = new ArrayList<Element>(styleElements.size());
-
-                    styles.addAll(styleElements);
-                }
-            }
-            this.styles = styles != null ? styles : Collections.<Element>emptyList();
-
-            // Extract xbl:handlers/xbl:handler
-            final Element handlersElement = bindingElement.element(XFormsConstants.XBL_HANDLERS_QNAME);
-            if (handlersElement != null) {
-                this.handlers = Dom4jUtils.elements(handlersElement, XFormsConstants.XBL_HANDLER_QNAME);
-            } else {
-                this.handlers = Collections.emptyList();
-            }
-
-            // Extract xbl:implementation/xforms:model
-            final Element implementationElement = bindingElement.element(XFormsConstants.XBL_IMPLEMENTATION_QNAME);
-            if (implementationElement != null) {
-                implementations = extractChildrenModels(implementationElement, true); // just detach because they are copied later anyway
-            } else {
-                implementations = Collections.emptyList();
-            }
-
-            // Extract global markup
-            final Element globalElement = bindingElement.element(XFormsConstants.XXBL_GLOBAL_QNAME);
-            if (globalElement == null) {
-                global = null;
-            } else {
-                global = Dom4jUtils.createDocumentCopyParentNamespaces(globalElement, true);
-            }
-        }
-    }
-
-    // Concrete XBL bindings
-    public static class ConcreteBinding {
-        public final XBLBindingsBase.Scope innerScope;  // each binding defines a new scope
-        public final Document fullShadowTree;       // with full content, e.g. XHTML
-        public final Document compactShadowTree;    // without full content, only the XForms controls
-        public final Seq<Model> models;             // all the models
-        public final String bindingId;
-        public String containerElementName;
-
-        public ConcreteBinding(AbstractBinding abstractBinding, XBLBindingsBase.Scope innerScope, Document fullShadowTree, Document compactShadowTree, Seq<Model> models) {
-            this.innerScope = innerScope;
-            this.fullShadowTree = fullShadowTree;
-            this.compactShadowTree = compactShadowTree;
-            this.models = models;
-
-            this.bindingId = abstractBinding.bindingId;
-            assert this.bindingId != null : "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement);
-
-            this.containerElementName = (abstractBinding.bindingElement != null) ? abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME) : null;
-            if (this.containerElementName == null)
-                this.containerElementName = "div";
-        }
-    }
 
     public static class Global {
         public final Document fullShadowTree;       // with full content, e.g. XHTML
@@ -245,102 +134,12 @@ public class XBLBindingsBase {
      */
     protected Metadata metadata;
 
-    public XBLBindingsBase(IndentedLogger indentedLogger, PartAnalysisImpl partAnalysis,
-                           Metadata metadata, List<Document> inlineXBLDocuments) {
+    public XBLBindingsBase(PartAnalysisImpl partAnalysis, Metadata metadata) {
 
         this.partAnalysis = partAnalysis;
         this.metadata = metadata;
 
         this.logShadowTrees = XFormsProperties.getDebugLogging().contains("analysis-xbl-tree");
-
-        // Obtain list of XBL documents
-        final List<Document> xblDocuments = new ArrayList<Document>();
-        {
-            // Get inline <xbl:xbl> elements
-            xblDocuments.addAll(inlineXBLDocuments);
-
-            // Get automatically-included XBL documents
-            final Set<String> includes = metadata.getBingingIncludes();
-            for (final String include : includes)
-                xblDocuments.add(readXBLResource(include));
-        }
-
-        if (xblDocuments.size() > 0) {
-            // Process <xbl:xbl>
-
-            indentedLogger.startHandleOperation("", "extracting top-level XBL documents");
-
-            int xblBindingCount = 0;
-            for (final Document xblDocument: xblDocuments) {
-                xblBindingCount += extractXBLBindings(xblDocument, partAnalysis);
-            }
-
-            indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(xblDocuments.size()),
-                    "xbl:binding count", Integer.toString(xblBindingCount));
-        }
-    }
-
-    public Document readXBLResource(String include) {
-        // Update last modified so that dependencies on external XBL files can be handled
-        final long lastModified = ResourceManagerWrapper.instance().lastModified(include, false);
-        metadata.updateBindingsLastModified(lastModified);
-
-        // Read
-        return ResourceManagerWrapper.instance().getContentAsDOM4J(include, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false);
-    }
-
-    public int extractXBLBindings(Document xblDocument, PartAnalysis partAnalysis) {
-
-        // Extract xbl:xbl/xbl:script
-        // TODO: should do this differently, in order to include only the scripts and resources actually used
-        final List<Element> scriptElements = Dom4jUtils.elements(xblDocument.getRootElement(), XFormsConstants.XBL_SCRIPT_QNAME);
-        if (scriptElements.size() > 0) {
-            if (allScripts == null)
-                allScripts = new ArrayList<Element>();
-            allScripts.addAll(scriptElements);
-        }
-
-        // Find bindings
-        int xblBindingCount = 0;
-        for (final Element currentBindingElement : Dom4jUtils.elements(xblDocument.getRootElement(), XFormsConstants.XBL_BINDING_QNAME)) {
-            final String currentElementAttribute = currentBindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME);
-
-            if (currentElementAttribute != null) {
-
-                final AbstractBinding abstractBinding = new AbstractBinding(currentBindingElement, partAnalysis.getNamespaceMapping("", currentBindingElement), scriptElements, metadata.idGenerator());
-
-                // Create and remember factory for this QName
-                xblComponentsFactories.put(abstractBinding.qNameMatch,
-                    new XFormsControlFactory.Factory() {
-                        public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
-                            return new XFormsComponentControl(container, parent, element, name, effectiveId);
-                        }
-                    });
-
-                if (allStyles == null)
-                    allStyles = new ArrayList<Element>(abstractBinding.styles.size());
-                allStyles.addAll(abstractBinding.styles);
-                abstractBindings.put(abstractBinding.qNameMatch, abstractBinding);
-                
-                xblBindingCount++;
-            }
-        }
-        return xblBindingCount;
-    }
-
-    protected static List<Document> extractChildrenModels(Element parentElement, boolean detach) {
-
-        final List<Document> result = new ArrayList<Document>();
-        final List<Element> modelElements = Dom4jUtils.elements(parentElement, XFormsConstants.XFORMS_MODEL_QNAME);
-
-        if (modelElements.size() > 0) {
-            for (Element currentModelElement: modelElements) {
-                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentModelElement, detach);
-                result.add(modelDocument);
-            }
-        }
-
-        return result;
     }
 
     public Document annotateHandler(Element currentHandlerElement, String newPrefix, XBLBindingsBase.Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
@@ -546,139 +345,6 @@ public class XBLBindingsBase {
             // Handle xxbl:scope
             scopeStack.pop();
         }
-    }
-
-    protected Document applyPipelineTransform(Element templateElement, Element boundElement) {
-        final QName processorName = Dom4jUtils.extractAttributeValueQName(templateElement, XFormsConstants.XXBL_TRANSFORM_QNAME);
-        if (processorName == null) {
-            // @xxbl:transform is missing or empty: keep the template element alone
-            return Dom4jUtils.createDocumentCopyParentNamespaces(templateElement);
-        } else {
-            // Find a processor and create one
-            final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
-            if (processorFactory == null) {
-                throw new OXFException("Cannot find a processor for xxbl:transform='" +
-                        templateElement.attributeValue(XFormsConstants.XXBL_TRANSFORM_QNAME) + "'.");
-            }
-            final Processor processor = processorFactory.createInstance();
-
-            // Check if we have a single root for our transformation
-            final int nbChildElements = templateElement.elements().size();
-            if (nbChildElements != 1) {
-                throw new OXFException("xxbl:transform requires a single child element.");
-            }
-
-            // Connect this root to the processor config input
-            final Element templateChild = (Element) templateElement.elements().get(0);
-            final DOMGenerator domGeneratorConfig = PipelineUtils.createDOMGenerator(
-                    Dom4jUtils.createDocumentCopyParentNamespaces(templateChild),
-                    "xbl-xslt-config", processor, Dom4jUtils.makeSystemId(templateChild));
-            PipelineUtils.connect(domGeneratorConfig, "data", processor, "config");
-
-            // Connect the bound element to the processor data input
-            final DOMGenerator domGeneratorData = PipelineUtils.createDOMGenerator(
-                    Dom4jUtils.createDocumentCopyParentNamespaces(boundElement),
-                    "xbl-xslt-data", processor, Dom4jUtils.makeSystemId(boundElement));
-            PipelineUtils.connect(domGeneratorData, "data", processor, "data");
-
-            // Connect a DOM serializer to the processor data output
-            final DOMSerializer domSerializerData = new DOMSerializer();
-            PipelineUtils.connect(processor, "data", domSerializerData, "data");
-
-            // Run the transformation
-            final PipelineContext newPipelineContext = new PipelineContext();
-            boolean success = false;
-            final Document generated;
-            try {
-                domSerializerData.start(newPipelineContext);
-
-                // Get the result, move its root element into a xbl:template and return it
-                generated = domSerializerData.getDocument(newPipelineContext);
-                success = true;
-            } finally {
-                newPipelineContext.destroy(success);
-            }
-            final Element result = (Element) generated.getRootElement().detach();
-            generated.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"));
-            final Element newRoot = generated.getRootElement();
-            newRoot.add(XFormsConstants.XBL_NAMESPACE);
-            newRoot.add(result);
-
-            return generated;
-        }
-    }
-
-    /**
-     * All component bindings.
-     *
-     * @return Map<QName, Element> of QNames to bindings, or null
-     */
-    public Map<QName, AbstractBinding> getComponentBindings() {
-        return abstractBindings;
-    }
-
-    /**
-     * Return whether the given QName has an associated binding.
-     *
-     * @param qName QName to check
-     * @return      true iif there is a binding
-     */
-    public boolean isComponent(QName qName) {
-        return abstractBindings != null && abstractBindings.get(qName) != null;
-    }
-
-    /**
-     * Return a control factory for the given QName.
-     *
-     * @param qName QName to check
-     * @return      control factory, or null
-     */
-    public XFormsControlFactory.Factory getComponentFactory(QName qName) {
-        return (xblComponentsFactories == null) ? null : xblComponentsFactories.get(qName);
-    }
-
-    /**
-     * Return the id of the <xbl:binding> element associated with the given prefixed control id.
-     *
-     * @param controlPrefixedId     prefixed control id
-     * @return                      binding id or null if not found
-     */
-    public String getBindingId(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = getBinding(controlPrefixedId);
-        return (concreteBinding == null) ? null : concreteBinding.bindingId;
-    }
-
-    /**
-     * Whether the given prefixed control id has a binding.
-     *
-     * @param controlPrefixedId     prefixed control id
-     * @return                      true iif id has an associated binding
-     */
-    public boolean hasBinding(String controlPrefixedId) {
-        final ConcreteBinding concreteBinding = getBinding(controlPrefixedId);
-        return concreteBinding != null && concreteBinding.bindingId != null;
-    }
-
-    public ConcreteBinding getBinding(String controlPrefixedId) {
-        return (concreteBindings == null) ? null : concreteBindings.get(controlPrefixedId);
-    }
-
-    /**
-     * Return a List of xbl:style elements.
-     *
-     * @return list of <xbl:style> elements
-     */
-    public List<Element> getXBLStyles() {
-        return allStyles != null ? allStyles : Collections.<Element>emptyList();
-    }
-
-    /**
-     * Return a List of xbl:script elements.
-     *
-     * @return list of <xbl:script> elements
-     */
-    public List<Element> getXBLScripts() {
-        return allScripts != null ? allScripts : Collections.<Element>emptyList();
     }
 
     public void freeTransientState() {

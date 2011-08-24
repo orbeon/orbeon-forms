@@ -526,7 +526,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 final XFormsComponentControl newControl = (XFormsComponentControl) listener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
 
                 // Recurse into the shadow component tree
-                final Element shadowTreeDocumentElement = currentXBLContainer.getPartAnalysis().getBinding(idPrefix + controlStaticId).compactShadowTree.getRootElement();
+                final Element shadowTreeDocumentElement = currentXBLContainer.getPartAnalysis().getBinding(idPrefix + controlStaticId).compactShadowTree().getRootElement();
                 visitControlElementsHandleRepeat(listener,
                         staticState, newControl.getNestedContainer(), shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 

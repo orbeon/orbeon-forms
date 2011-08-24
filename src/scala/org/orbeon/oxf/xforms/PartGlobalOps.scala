@@ -18,11 +18,11 @@ import analysis.ElementAnalysis
 import analysis.model.Instance
 import control.XFormsControlFactory
 import event.XFormsEventHandler
-import xbl.XBLBindingsBase
-import xbl.XBLBindingsBase.{Global, ConcreteBinding}
+import xbl.XBLBindingsBase.Global
 import org.dom4j.{Element, QName}
 import java.util.{List => JList, Map => JMap}
 import org.orbeon.oxf.xml.SAXStore
+import xbl.{ConcreteBinding, XBLBindingsBase}
 
 trait PartGlobalOps {
 

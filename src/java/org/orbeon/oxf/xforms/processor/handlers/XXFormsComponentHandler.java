@@ -47,7 +47,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
-        this.elementName = staticGlobalOps.getBinding(prefixedId).containerElementName;
+        this.elementName = staticGlobalOps.getBinding(prefixedId).containerElementName();
         this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         // Produce class of the form xbl-foo-bar
@@ -60,7 +60,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
         handlerContext.pushComponentContext(prefixedId);
 
         // Process shadow content if present
-        final Document shadowTree = staticGlobalOps.getBinding(prefixedId).fullShadowTree;
+        final Document shadowTree = staticGlobalOps.getBinding(prefixedId).fullShadowTree();
         if (shadowTree != null)
             processShadowTree(controller, shadowTree);
     }

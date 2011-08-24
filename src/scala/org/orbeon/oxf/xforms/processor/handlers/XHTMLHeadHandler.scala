@@ -48,7 +48,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
     // Output baseline, remaining, and inline resources
     private def outputResources(outputElement: (Option[String], Option[String], Option[String]) => Unit,
                                 getBuiltin: StaticStateGlobalOps => JList[XFormsFeatures.ResourceConfig],
-                                getXBL: => JList[Element], xblBaseline: collection.Set[String], minimal: Boolean) {
+                                getXBL: => Seq[Element], xblBaseline: collection.Set[String], minimal: Boolean) {
 
         // For now, actual builtin resources always include the baseline builtin resources
         val builtinBaseline = LinkedHashSet(getBuiltin(null) map (_.getResourcePath(minimal)): _*)

@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.xbl.ConcreteBinding;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -755,7 +756,7 @@ public abstract class PartAnalysisBase implements PartAnalysis {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
-                final XBLBindingsBase.ConcreteBinding newConcreteBinding = xblBindings.processElementIfNeeded(
+                final ConcreteBinding newConcreteBinding = xblBindings.processElementIfNeeded(
                         getIndentedLogger(), controlElement, controlPrefixedId, locationData, controlsDocumentInfo,
                         innerScope);
 
@@ -803,8 +804,8 @@ public abstract class PartAnalysisBase implements PartAnalysis {
                 // Recursively analyze the binding's component tree if any
                 // NOTE: Do this after creating the binding control as the sub-tree must have the binding control as parent
                 if (newConcreteBinding != null) {
-                    analyzeComponentTree(newConcreteBinding.innerScope,
-                            newConcreteBinding.compactShadowTree.getRootElement(),
+                    analyzeComponentTree(newConcreteBinding.innerScope(),
+                            newConcreteBinding.compactShadowTree().getRootElement(),
                             (ContainerTrait) elementAnalysis, externalLHHA);
                 }
 

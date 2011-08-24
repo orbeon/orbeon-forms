@@ -85,10 +85,10 @@ class PartAnalysisImpl(val staticState: XFormsStaticState, val parent: Option[Pa
     def isComponent(binding: QName) = xblBindings.isComponent(binding)
     def getBinding(prefixedId: String) = xblBindings.getBinding(prefixedId)
     def getBindingId(prefixedId: String) = xblBindings.getBindingId(prefixedId)
-    def getBindingQNames = xblBindings.getComponentBindings.keys toSeq
-    def getAbstractBinding(binding: QName) = xblBindings.getComponentBindings.get(binding)
+    def getBindingQNames = xblBindings.abstractBindings.keys toSeq
+    def getAbstractBinding(binding: QName) = xblBindings.abstractBindings.get(binding)
 
-    def getComponentBindings = xblBindings.getComponentBindings
+    def getComponentBindings = xblBindings.abstractBindings
 
     def getComponentFactory(qName: QName) = xblBindings.getComponentFactory(qName)
 
@@ -144,8 +144,8 @@ class PartAnalysisImpl(val staticState: XFormsStaticState, val parent: Option[Pa
 
     def getGlobals = xblBindings.allGlobals
 
-    def getXBLStyles = xblBindings.getXBLStyles
-    def getXBLScripts = xblBindings.getXBLScripts
+    def getXBLStyles = xblBindings.allStyles
+    def getXBLScripts = xblBindings.allScripts
     def baselineResources = xblBindings.baselineResources
 
     def getTopLevelControlElements: JList[Element] = {

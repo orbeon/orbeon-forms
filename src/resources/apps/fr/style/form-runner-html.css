@@ -25,7 +25,7 @@ i { font-style: italic }
 b { font-weight: bold }
 th, td {border: 0; padding: 0 }
 
-body, body table, textarea.xforms-textarea, button {
+body, body table, textarea.xforms-textarea, pre.xforms-textarea, span.xforms-textarea pre, button {
     font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 

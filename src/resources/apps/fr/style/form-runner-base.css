@@ -45,18 +45,6 @@
 #fr-view .fr-hidden { display: none }
 .fr-grid .fr-grid-td .fr-grid-content .fr-hidden { display: none } /* for users of .fr-hidden without #fr-view */
 
-/* Nicely position the help image */
-.xforms-help-image {
-    vertical-align: middle;
-    display: inline;
-    margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
-    *margin-top: .25em;   /* help IE 6 position icon relatively to the label */
-    padding: 0;
-    float: left; /* HACK: Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
-                    image at the left of the label.
-                    2011-07-18: Mmh, but we need float left anyway, right? */
-}
-
 .xforms-noscript .xforms-help-image {
     /* NOTE: In noscript mode, help appears last in a control for accessibility reasons */
     display: block;
@@ -352,11 +340,22 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     *padding-right: 6px;        /* To help IE move back controls within .fr-grid-content */
 }
 
+.fr-grid-content .xforms-control {
+    margin-top: 1em;            /* Space between control and the one on top of this one */
+}
+
+.fr-grid-content .xforms-help-image {
+    margin: 0 0 0 -1px; /* move icon to the left a bit to align it better */
+    padding: 0 .5em 0 0;
+    float: left;
+}
+
 .fr-grid-content .xforms-label {
-    margin-top: .25em;      /* Space between control and the one on top of this one */
-    margin-bottom: 0.3em;   /* Insert some space between the label / help and the control (we add spacing below the label rather
-                               than above the control to make the CSS more generally applicable to XBL components) */
-    display: block;         /* So the margin has an effect */
+    margin-bottom: .5em;        /* Insert some space between the label / help and the control (we add spacing below the label rather
+                                   than above the control to make the CSS more generally applicable to XBL components) */
+    display: block;             /* Content after the label to show on a "new line" */
+    overflow: hidden;           /* So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU */
+    zoom: 1;                    /* For the overflow: hidden to have an effect on IE6 */
 }
 
 /* Style controls or component groups */

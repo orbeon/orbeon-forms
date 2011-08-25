@@ -250,7 +250,8 @@ public abstract class BaseSubmission implements Submission {
             if (isReplaceAll) {
                 final AllReplacer.ReplaceAllResponse replaceAllResponse = new AllReplacer.ReplaceAllResponse(effectiveResponse);
                 submissionProcess.process(requestAdapter, replaceAllResponse);
-                connectionResult.statusCode = replaceAllResponse.getStatus();
+                if (replaceAllResponse.getStatus() > 0)
+                    connectionResult.statusCode = replaceAllResponse.getStatus();
                 connectionResult.dontHandleResponse = true;
 
                 // Here we cause dispatch xforms-submit-error upon getting a non-success error code, even though the

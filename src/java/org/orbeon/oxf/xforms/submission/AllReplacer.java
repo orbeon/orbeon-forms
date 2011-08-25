@@ -45,7 +45,9 @@ public class AllReplacer extends BaseReplacer {
 
         final ReplaceAllResponse replaceAllResponse = new ReplaceAllResponse(containingDocument.getResponse());
         replace(connectionResult, replaceAllResponse);
-        connectionResult.statusCode = replaceAllResponse.getStatus();
+        // Update status code if it was updated
+        if (replaceAllResponse.getStatus() > 0)
+            connectionResult.statusCode = replaceAllResponse.getStatus();
 
         // Success: "the event xforms-submit-done may be dispatched with appropriate context information"
         // Error: "either the document is replaced with an implementation-specific indication of an error or submission
@@ -89,7 +91,7 @@ public class AllReplacer extends BaseReplacer {
 
     public static class ReplaceAllResponse extends ResponseWrapper {
 
-        private int status;
+        private int status = -1; // indicate that status was not set
 
         public ReplaceAllResponse(ExternalContext.Response response) {
             super(response);
@@ -97,6 +99,8 @@ public class AllReplacer extends BaseReplacer {
 
         @Override
         public void setStatus(int status) {
+            assert status > 0;
+
             this.status = status;
             super.setStatus(status);
         }

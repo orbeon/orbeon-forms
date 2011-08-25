@@ -20,6 +20,7 @@ import org.orbeon.oxf.resources.URLFactory
 import processor.XFormsServer
 import org.orbeon.oxf.util.LoggerFactory
 import store.MemoryStoreEvictionPolicy
+import org.orbeon.oxf.common.OXFException
 
 object Caches {
 
@@ -38,17 +39,17 @@ object Caches {
                 new CacheManager
         }
 
-    private val cacheName = "xforms.resources"
+    private val resourceCacheName = "xforms.resources"
 
     lazy val resourcesCache =
-        Caches.cacheManager.getCache(cacheName) match {
+        Caches.cacheManager.getCache(resourceCacheName) match {
             // If manager already knows about our cache we are good to go
             case cache: Cache =>
-                debug("found cache configuration for " + cacheName)
+                debug("found cache configuration for " + resourceCacheName)
                 cache
             // Otherwise use fallback configuration
             case _ =>
-                val cache = new Cache(new CacheConfiguration(cacheName, 200)
+                val cache = new Cache(new CacheConfiguration(resourceCacheName, 200)
                         memoryStoreEvictionPolicy MemoryStoreEvictionPolicy.LFU
                         overflowToDisk true
                         diskSpoolBufferSizeMB 1
@@ -61,8 +62,21 @@ object Caches {
                         diskExpiryThreadIntervalSeconds 120)
 
                 Caches.cacheManager.addCache(cache)
-                debug("used fallback cache configuration for " + cacheName)
+                debug("used fallback cache configuration for " + resourceCacheName)
                 cache
+        }
+
+    private val xblCacheName = "xforms.xbl"
+
+    lazy val xblCache =
+        Caches.cacheManager.getCache(xblCacheName) match {
+            // If manager already knows about our cache we are good to go
+            case cache: Cache =>
+                debug("found cache configuration for " + xblCacheName)
+                cache
+            // Otherwise use fallback configuration
+            case _ =>
+                throw new OXFException("Cache configuration not found for " + xblCacheName + ". Make sure an ehcache.xml file is in place.")
         }
 
     private val LOGGING_CATEGORY = "caches"

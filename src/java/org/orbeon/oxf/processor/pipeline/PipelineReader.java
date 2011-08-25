@@ -77,16 +77,24 @@ public class PipelineReader extends ProcessorImpl {
     }
 
     public void start(PipelineContext context) {
+        final Document pipelineDocument = readInputAsDOM4J(context, "pipeline");
+        pipeline = readPipeline(pipelineDocument, getInputValidity(context, getInputByName("pipeline")));
+    }
 
-        Document pipelineDocument = readInputAsDOM4J(context, "pipeline");
+    public static ASTPipeline readPipeline(Document pipelineDocument, Object validity) {
 
-        Element configElement = (Element) XPathUtils.selectSingleNode(pipelineDocument, "p:config | p:pipeline", PREFIXES);
+        final Element rootElement = pipelineDocument.getRootElement();
+
+        final ASTPipeline ast = new ASTPipeline();
+        ast.setValidity(validity);
+
         List<ASTParam> params = new ArrayList<ASTParam>();
 
         // Read params
-        for (Iterator i = XPathUtils.selectIterator(configElement, "p:param", PREFIXES); i.hasNext();) {
-            Element paramElement = (Element) i.next();
-            ASTParam param = new ASTParam();
+        for (final Iterator i = XPathUtils.selectIterator(rootElement, "p:param", PREFIXES); i.hasNext();) {
+            final Element paramElement = (Element) i.next();
+            final ASTParam param = new ASTParam();
+
             param.setNode(paramElement);
             param.setName(paramElement.attributeValue("name"));
             param.setType(paramElement.attributeValue("type").equals("input") ? ASTParam.INPUT : ASTParam.OUTPUT);
@@ -96,15 +104,16 @@ public class PipelineReader extends ProcessorImpl {
             params.add(param);
         }
 
-        // Read processors and choose
-        pipeline = new ASTPipeline();
-        pipeline.setValidity(getInputValidity(context, getInputByName("pipeline")));
-        pipeline.setNode(configElement);
-        pipeline.getParams().addAll(params);
-        pipeline.getStatements().addAll(readStatements(configElement));
+        ast.setNode(rootElement);
+        ast.getParams().addAll(params);
+
+        // Read and add all statements
+        ast.getStatements().addAll(readStatements(rootElement));
+
+        return ast;
     }
 
-    private List<ASTStatement> readStatements(Element containerElement) {
+    private static List<ASTStatement> readStatements(Element containerElement) {
 
         List<ASTStatement> result = new ArrayList<ASTStatement>();
         PatternMatcher matcher = new Perl5Matcher();
@@ -213,7 +222,7 @@ public class PipelineReader extends ProcessorImpl {
         return result;
     }
 
-    private ASTHref readHref(Node node, String href) {
+    private static ASTHref readHref(Node node, String href) {
 
         LocationData locationData = (LocationData) ((Element) node).getData();
         HrefResult result = readHrefWorker(locationData, href);
@@ -225,7 +234,7 @@ public class PipelineReader extends ProcessorImpl {
         return result.astHref;
     }
 
-    private HrefResult readHrefWorker(LocationData locationData, String href) {
+    private static HrefResult readHrefWorker(LocationData locationData, String href) {
 
         HrefResult result = new HrefResult();
         PatternMatcher matcher = new Perl5Matcher();

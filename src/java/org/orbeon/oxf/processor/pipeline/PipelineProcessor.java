@@ -17,7 +17,9 @@ import org.dom4j.*;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.debugger.api.*;
+import org.orbeon.oxf.debugger.api.Breakpoint;
+import org.orbeon.oxf.debugger.api.BreakpointKey;
+import org.orbeon.oxf.debugger.api.Debuggable;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -31,7 +33,9 @@ import org.orbeon.oxf.processor.pipeline.foreach.ConcreteForEachProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -671,14 +675,6 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     public void reset(final PipelineContext context) {
         setState(context, new State());
     }
-
-//    /**
-//     * FIXME - We can't really do this until we have the config. The way we
-//     * implement this is going to change when we introduce abstract processors.
-//     */
-//    public void checkSockets() {
-//        // nop
-//    }
 
     private static class State {
         public Map<String, ProcessorInput> nameToBottomInputMap = new HashMap<String, ProcessorInput>();

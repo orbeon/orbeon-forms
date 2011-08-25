@@ -29,13 +29,10 @@ import java.lang.IllegalStateException
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{PipelineUtils, XPathCache, IndentedLogger}
-import org.orbeon.oxf.processor.{DOMSerializer, ProcessorFactoryRegistry}
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
 import java.util.{List => JList, Map => JMap}
 import collection.mutable.{ArrayBuffer, LinkedHashSet, LinkedHashMap}
-
+import net.sf.ehcache.{Element => EhElement }
 class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata, inlineXBLDocuments: JList[Document])
     extends XBLBindingsBase(partAnalysis, metadata) {
 
@@ -49,7 +46,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     val allGlobals = LinkedHashMap[QName, XBLBindingsBase.Global]()
 
     // Inline <xbl:xbl> and automatically-included XBL documents
-    val xblDocuments = (inlineXBLDocuments.asScala map ((_, 0L)) ) ++
+    val xblDocuments = (inlineXBLDocuments.asScala map ((_, 0L))) ++
         (metadata.getBingingIncludes.asScala map (readXBLResource(_)))
 
     // Process <xbl:xbl>
@@ -63,7 +60,6 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
     lazy val baselineResources = {
 
-        // xxx TODO
         val metadata = partAnalysis.metadata
 
         // Register baseline includes
@@ -106,34 +102,44 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                                controlsDocumentInfo: DocumentWrapper, containerScope: XBLBindingsBase.Scope): ConcreteBinding = {
 
         // Create concrete binding if there is an abstract binding
-        abstractBindings.get(controlElement.getQName) map
+        abstractBindings.get(controlElement.getQName) flatMap
             (binding => createConcreteBinding(indentedLogger, controlElement, controlPrefixedId, locationData, controlsDocumentInfo, containerScope, binding)) orNull
     }
 
-    def createConcreteBinding(indentedLogger: IndentedLogger, controlElement: Element, boundControlPrefixedId: String, locationData: LocationData,
-               controlsDocumentInfo: DocumentWrapper, containerScope: XBLBindingsBase.Scope, abstractBinding: AbstractBinding): ConcreteBinding = {
+    private def createConcreteBinding(indentedLogger: IndentedLogger, controlElement: Element, boundControlPrefixedId: String, locationData: LocationData,
+               controlsDocumentInfo: DocumentWrapper, containerScope: XBLBindingsBase.Scope, abstractBinding: AbstractBinding): Option[ConcreteBinding] = {
 
         // New prefix corresponds to bound element prefixed id
         val newPrefix = boundControlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR
 
         // Generate the shadow content for this particular binding
-        val fullShadowTreeDocument = withProcessAutomaticXBL {
-            generateShadowTree(indentedLogger, controlsDocumentInfo, controlElement, abstractBinding, newPrefix)
-        }
-
-        if (fullShadowTreeDocument != null) // null if there is no template
-            createConcreteBinding(indentedLogger, controlElement, boundControlPrefixedId, locationData, containerScope, abstractBinding, fullShadowTreeDocument, newPrefix)
-        else
-            null
+        withProcessAutomaticXBL { generateShadowTree(indentedLogger, controlsDocumentInfo, controlElement, abstractBinding, newPrefix) } map
+            (createConcreteBinding(indentedLogger, controlElement, boundControlPrefixedId, locationData, containerScope, abstractBinding, _, newPrefix))
     }
 
+    // Cache binding key -> AbstractBinding
     object BindingCache {
-        // TODO: Implement
-        def put(key: String, lastModified: Long, abstractBinding: AbstractBinding) {}
-        def get(key: String, lastModified: Long): Option[AbstractBinding] = None
+
+        private val cache = Caches.xblCache
+
+        def put(key: String, lastModified: Long, abstractBinding: AbstractBinding) =
+            cache.put(new EhElement(key, abstractBinding, lastModified))
+
+        def get(key: String, lastModified: Long): Option[AbstractBinding] =
+            Option(cache.get(key)) flatMap { element =>
+                // NOTE: As of Ehcache 2.4.0, the version attribute is entirely handled by the caller. See:
+                // http://jira.terracotta.org/jira/browse/EHC-666
+                val cacheLastModified = element.getVersion
+                if (lastModified <= cacheLastModified) {
+                    Some(element.getValue.asInstanceOf[AbstractBinding])
+                } else {
+                    cache.remove(key)
+                    None
+                }
+            }
     }
 
-    def extractXBLBindings(path: Option[String], xblDocumentLastModified: (Document, Long), partAnalysis: PartAnalysis): Int = {
+    private def extractXBLBindings(path: Option[String], xblDocumentLastModified: (Document, Long), partAnalysis: PartAnalysis): Int = {
 
         val (xblDocument, lastModified) = xblDocumentLastModified
 
@@ -144,17 +150,19 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
         def createCacheKey(qNameMatch: QName) = path map (_ + '#' + qNameMatch.getQualifiedName)
 
-        // Find bindings
+        // Find abstract bindings
         val resultingBindings =
             for {
+                // Find xbl:binding/@element
                 bindingElement <- Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME)
                 currentElementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME)
                 if (currentElementAttribute ne null)
                 namespaceMapping = partAnalysis.getNamespaceMapping("", bindingElement)
                 qNameMatch = AbstractBinding.qNameMatch(bindingElement, namespaceMapping)
+                // Try cached binding first, otherwise create new AbstractBinding
                 cachedBinding = createCacheKey(qNameMatch) flatMap (BindingCache.get(_, lastModified))
-                // Foobar
-                abstractBinding = cachedBinding getOrElse AbstractBinding(bindingElement, lastModified, scriptElements, namespaceMapping, metadata.idGenerator)
+                abstractBinding = cachedBinding getOrElse
+                    AbstractBinding(bindingElement, lastModified, scriptElements, namespaceMapping, metadata.idGenerator)
             } yield {
                 // Create and remember factory for this QName
                 xblComponentsFactories += abstractBinding.qNameMatch -> new XFormsControlFactory.Factory {
@@ -166,9 +174,8 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 abstractBindings += abstractBinding.qNameMatch -> abstractBinding
 
                 // Cache binding
-                createCacheKey(qNameMatch) foreach { key =>
-                    BindingCache.put(key, lastModified, abstractBinding)
-                }
+                createCacheKey(qNameMatch) foreach
+                    (BindingCache.put(_, lastModified, abstractBinding))
 
                 abstractBinding
             }
@@ -176,7 +183,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         resultingBindings.size
     }
 
-    def withProcessAutomaticXBL[T](body: => T) = {
+    private def withProcessAutomaticXBL[T](body: => T) = {
         // Check how many automatic XBL includes we have so far
         val initialIncludesCount = metadata.bindingIncludes.size
 
@@ -335,11 +342,13 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
      * @param boundElement      element to which the binding applies
      * @param abstractBinding  corresponding <xbl:binding>
      * @param prefix            prefix of the ids within the new shadow tree, e.g. component1$component2$
-     * @return shadow tree document
+     * @return Some shadow tree document if there is a template, None otherwise
      */
-    protected def generateShadowTree(indentedLogger: IndentedLogger, documentWrapper: DocumentWrapper, boundElement: Element, abstractBinding: AbstractBinding, prefix: String): Document = {
-        abstractBinding.bindingElement.element(XFormsConstants.XBL_TEMPLATE_QNAME) match {
-            case templateElement: Element =>
+    private def generateShadowTree(indentedLogger: IndentedLogger, documentWrapper: DocumentWrapper, boundElement: Element,
+                                     abstractBinding: AbstractBinding, prefix: String): Option[Document] = {
+        abstractBinding.templateElement map {
+            templateElement =>
+                
                 if (indentedLogger.isDebugEnabled) {
                     indentedLogger.startHandleOperation("", "generating XBL shadow content",
                         "bound element", Dom4jUtils.elementToDebugString(boundElement),
@@ -351,8 +360,10 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 // Here we create a completely separate document
 
                 // 1. Apply optional preprocessing step (usually XSLT)
-                // Copy as the template element may be used many times
-                val shadowTreeDocument = applyPipelineTransform(abstractBinding, templateElement, boundElement)
+                // If @xxbl:transform is not present, just use a copy of the template element itself
+                val shadowTreeDocument =
+                    abstractBinding.newTransform(boundElement) getOrElse
+                        Dom4jUtils.createDocumentCopyParentNamespaces(templateElement)
 
                 // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
                 XBLTransformer.transform(documentWrapper, shadowTreeDocument, boundElement)
@@ -360,11 +371,10 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 // 3: Annotate tree
                 val hasUpdateFull = hasFullUpdate(shadowTreeDocument)
                 val annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, prefix, hasUpdateFull)
-                if (indentedLogger.isDebugEnabled) {
+                if (indentedLogger.isDebugEnabled)
                     indentedLogger.endHandleOperation("document", if (logShadowTrees) Dom4jUtils.domToString(annotatedShadowTreeDocument) else null)
-                }
+
                 annotatedShadowTreeDocument
-            case _ => null
         }
     }
 
@@ -384,80 +394,6 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 }
         } yield
             partAnalysis.addModel(newInnerScope, annotated)
-    }
-
-    private def applyPipelineTransform(abstractBinding: AbstractBinding, templateElement: Element, boundElement: Element): Document = {
-        val processorQName = Dom4jUtils.extractAttributeValueQName(templateElement, XFormsConstants.XXBL_TRANSFORM_QNAME)
-        if (processorQName eq null) {
-            // @xxbl:transform is missing or empty: keep the template element alone
-            Dom4jUtils.createDocumentCopyParentNamespaces(templateElement)
-        } else {
-            // Check if we have a single root for our transformation
-            val nbChildElements = templateElement.elements.size
-            if (nbChildElements != 1)
-                throw new OXFException("xxbl:transform requires a single child element.")
-            val templateChild = templateElement.elements.get(0).asInstanceOf[Element]
-
-            // Create the pipeline
-            // NOTE: use AbstractBinding lastModified as validity
-            val domSerializerData = createXBLPipeline(processorQName, abstractBinding.lastModified, templateChild, boundElement)
-
-            // Run the transformation
-            val newPipelineContext = new PipelineContext
-            var success = false
-            val generatedDocument =
-                try {
-                    domSerializerData.start(newPipelineContext)
-
-                    // Get the result, move its root element into a xbl:template and return it
-                    val result = domSerializerData.getDocument(newPipelineContext)
-                    success = true
-                    result
-                } finally {
-                    newPipelineContext.destroy(success)
-                }
-
-            val generatedRootElement = generatedDocument.getRootElement.detach.asInstanceOf[Element]
-            generatedDocument.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"))
-            val newRoot = generatedDocument.getRootElement
-            newRoot.add(XFormsConstants.XBL_NAMESPACE)
-            newRoot.add(generatedRootElement)
-
-            generatedDocument
-        }
-    }
-
-    def createXBLPipeline(processorQName: QName, lastModified: Long, templateChild: Element, boundElement: Element) = {
-        // Find a processor and create one
-        val processorFactory = ProcessorFactoryRegistry.lookup(processorQName)
-        if (processorFactory eq null)
-            throw new OXFException("Cannot find a processor for xxbl:transform='" + processorQName.getQualifiedName + "'.")
-
-        val transformProcessor = processorFactory.createInstance
-
-        // Connect this root to the processor config input
-        val domGeneratorConfig = PipelineUtils.createDOMGenerator(
-            Dom4jUtils.createDocumentCopyParentNamespaces(templateChild),
-            "xbl-xslt-config",
-            lastModified,
-            Dom4jUtils.makeSystemId(templateChild)
-        )
-        PipelineUtils.connect(domGeneratorConfig, "data", transformProcessor, "config")
-
-        // Connect the bound element to the processor data input
-        val domGeneratorData = PipelineUtils.createDOMGenerator(
-            Dom4jUtils.createDocumentCopyParentNamespaces(boundElement),
-            "xbl-xslt-data",
-            transformProcessor,
-            Dom4jUtils.makeSystemId(boundElement)
-        )
-        PipelineUtils.connect(domGeneratorData, "data", transformProcessor, "data")
-
-        // Connect a DOM serializer to the processor data output
-        val domSerializerData = new DOMSerializer
-        PipelineUtils.connect(transformProcessor, "data", domSerializerData, "data")
-
-        domSerializerData
     }
 
     // This function is not called as of 2011-06-28 but if/when we support removing scopes, check these notes:

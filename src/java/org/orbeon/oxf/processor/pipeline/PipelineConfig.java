@@ -30,8 +30,8 @@ import java.util.*;
 public class PipelineConfig {
 
     // Maps: (String inputParamName) -> (List[InternalTopOutput internalTopOutput])
-    private Map<String, List<PipelineProcessor.InternalTopOutput>> nameToTopOuputMap = new HashMap<String, List<PipelineProcessor.InternalTopOutput>>();
-    // Maps: (String outputParamName) -> (ProcessorInput internalBottonInput)
+    private Map<String, List<PipelineProcessor.InternalTopOutput>> nameToTopOutputMap = new HashMap<String, List<PipelineProcessor.InternalTopOutput>>();
+    // Maps: (String outputParamName) -> (ProcessorInput internalBottomInput)
     private Map<String, ProcessorInput> nameToBottomInputMap = new HashMap<String, ProcessorInput>();
     // All internal processors
     private List<Processor> processors = new ArrayList<Processor>();
@@ -49,16 +49,16 @@ public class PipelineConfig {
     }
 
     public void declareTopOutput(String name, PipelineProcessor.InternalTopOutput topOutput) {
-        List<PipelineProcessor.InternalTopOutput> outputsForName = nameToTopOuputMap.get(name);
+        List<PipelineProcessor.InternalTopOutput> outputsForName = nameToTopOutputMap.get(name);
         if (outputsForName == null) {
             outputsForName = new ArrayList<PipelineProcessor.InternalTopOutput>();
-            nameToTopOuputMap.put(name, outputsForName);
+            nameToTopOutputMap.put(name, outputsForName);
         }
         outputsForName.add(topOutput);
     }
 
     public Map<String, List<PipelineProcessor.InternalTopOutput>> getNameToOutputMap() {
-        return nameToTopOuputMap;
+        return nameToTopOutputMap;
     }
 
     public void declareBottomInput(String name, org.orbeon.oxf.processor.ProcessorInput bottomInput) {

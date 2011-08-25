@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.processor.impl;
 
-import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 public class DelegatingProcessorInput implements ProcessorInput {
@@ -90,9 +92,5 @@ public class DelegatingProcessorInput implements ProcessorInput {
 
     public LocationData getLocationData() {
         return delegateInput.getLocationData();
-    }
-
-    public void setBreakpointKey(BreakpointKey breakpointKey) {
-        delegateInput.setBreakpointKey(breakpointKey);
     }
 }

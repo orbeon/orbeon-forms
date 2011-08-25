@@ -17,15 +17,18 @@ import org.dom4j.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.debugger.api.BreakpointKey;
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TraceEntry;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.InspectingContentHandler;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 
@@ -43,7 +46,6 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
     private String schema;
     private String debugMessage;
     private LocationData locationData;
-//    private BreakpointKey breakpointKey;
 
     public ProcessorOutputImpl(Class processorClass, String name) {
         this.processor = null;
@@ -110,10 +112,6 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
 
     public void setLocationData(LocationData locationData) {
         this.locationData = locationData;
-    }
-
-    public void setBreakpointKey(BreakpointKey breakpointKey) {
-//        this.breakpointKey = breakpointKey;
     }
 
     /**
@@ -193,10 +191,6 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
         }
 
         public LocationData getLocationData() {
-            throw new OXFException("This method should never be called!");
-        }
-
-        public void setBreakpointKey(BreakpointKey breakpointKey) {
             throw new OXFException("This method should never be called!");
         }
 

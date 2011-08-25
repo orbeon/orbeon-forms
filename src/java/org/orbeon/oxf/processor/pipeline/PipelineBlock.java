@@ -17,7 +17,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -90,10 +89,7 @@ public class PipelineBlock {
             } else if (outputIdToTeeProcessor.containsKey(referencedId)) {
                 // ASTInput already shared: just add ourselves to the tee
                 final TeeProcessor tee = (TeeProcessor) outputIdToTeeProcessor.get(referencedId);
-                final LocationData locDat = Dom4jUtils.getLocationData();
-                final BreakpointKey breakpointKey = new BreakpointKey(locDat);
                 final ProcessorOutput teeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA, isFromInnerforEach);
-                teeOutput.setBreakpointKey(breakpointKey);
                 teeOutput.setInput(processorInput);
                 processorInput.setOutput(teeOutput);
             } else {
@@ -102,23 +98,16 @@ public class PipelineBlock {
                 createdProcessors.add(tee);
                 outputIdToTeeProcessor.put(referencedId, tee);
 
-                final LocationData firstLocationData = Dom4jUtils.getLocationData();
-                final BreakpointKey firstBreakpointKey = new BreakpointKey(firstLocationData);
-
                 if (referencedOutput.getInput() != null) { // can be null if isFromInnerforEach == true
                     // Reconnect the "other guy" to the tee output
                     final ProcessorOutput firstTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA, false);
-                    firstTeeOutput.setBreakpointKey(firstBreakpointKey);
                     final ProcessorInput otherGuyInput = referencedOutput.getInput();
                     firstTeeOutput.setInput(otherGuyInput);
                     otherGuyInput.setOutput(firstTeeOutput);
                 }
 
                 // Connect tee to processor
-                final LocationData secondLocationData = Dom4jUtils.getLocationData();
-                final BreakpointKey secondBreakpointKey  = new BreakpointKey(secondLocationData);
                 final ProcessorOutput secondTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA, isFromInnerforEach);
-                secondTeeOutput.setBreakpointKey(secondBreakpointKey );
                 secondTeeOutput.setInput(processorInput);
                 processorInput.setOutput(secondTeeOutput);
 

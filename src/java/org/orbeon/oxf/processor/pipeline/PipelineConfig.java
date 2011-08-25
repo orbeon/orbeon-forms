@@ -15,12 +15,13 @@ package org.orbeon.oxf.processor.pipeline;
 
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.util.NullFriendlyStringComparator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Encapsulates the "configuration" of a pipeline: contains references to
@@ -37,16 +38,6 @@ public class PipelineConfig {
     private List<Processor> processors = new ArrayList<Processor>();
     // List of Processor objects: we have to call their start() method
     private List<Processor> processorsToStart = new ArrayList<Processor>();
-    
-    private TreeMap<String,BreakpointKey> outnameToBreakpointKey
-        = new java.util.TreeMap<String, BreakpointKey>( NullFriendlyStringComparator.instance );
-    
-    void setOutputBreakpointKey( final String nm, final BreakpointKey bptKey ) {
-        outnameToBreakpointKey.put( nm, bptKey );
-    }
-    BreakpointKey getOutputBreakpointKey( final String nm ) {
-        return outnameToBreakpointKey.get( nm );
-    }
 
     public void declareTopOutput(String name, PipelineProcessor.InternalTopOutput topOutput) {
         List<PipelineProcessor.InternalTopOutput> outputsForName = nameToTopOutputMap.get(name);

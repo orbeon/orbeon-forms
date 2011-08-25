@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
@@ -58,6 +57,4 @@ public interface ProcessorInputOutput {
 
     void setDebug(String debugMessage);
     String getDebugMessage();
-
-    void setBreakpointKey(BreakpointKey breakpointKey);
 }

@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.processor.impl;
 
-import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
@@ -33,7 +34,6 @@ public class ProcessorInputImpl implements ProcessorInput {
     private String debugMessage;
     private LocationData locationData;
     private String systemId;
-//    private BreakpointKey breakpointKey;
 
     public ProcessorInputImpl(Class clazz, String name) {
         this.processor = null;
@@ -108,9 +108,5 @@ public class ProcessorInputImpl implements ProcessorInput {
 
     public void setSystemId(String systemId) {
         this.systemId = systemId;
-    }
-
-    public void setBreakpointKey(BreakpointKey breakpointKey) {
-//        this.breakpointKey = breakpointKey;
     }
 }

@@ -336,12 +336,8 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Cell content */
 .fr-grid-content {
-    margin: 0 0.5em 0.5em;      /* Add some space around control */
+    margin: 0.5em;              /* Add some space around control */
     *padding-right: 6px;        /* To help IE move back controls within .fr-grid-content */
-}
-
-.fr-grid-content .xforms-control {
-    margin-top: 1em;            /* Space between control and the one on top of this one */
 }
 
 .fr-grid-content .xforms-help-image {

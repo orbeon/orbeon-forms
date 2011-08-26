@@ -345,7 +345,7 @@ div.fb-liner { position: relative }
 }
 
 /* Grid content */
-.fr-grid-content { padding: 0 18px}
+.fr-grid-content { padding: 0 18px; margin: 0 } /* margin: override FR */
 
 .fb-empty-cell { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-empty-cell span { display: none }

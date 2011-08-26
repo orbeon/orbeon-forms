@@ -26,12 +26,12 @@ html { overflow: hidden }
 .fb-hide-alert .xforms-alert { display: none }
 
 /* This is like the form runner's help image */
-a.fb-edit-help-trigger img {
-    vertical-align: -0.2em;
-    display: inline;
-    margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
-    padding: 0;
-}
+/*a.fb-edit-help-trigger img {*/
+    /*vertical-align: -0.2em;*/
+    /*display: inline;*/
+    /*margin: 0 .5em 0 -1px;*//* move icon to the left a bit to align it better */
+    /*padding: 0;*/
+/*}*/
 
 /* This is for the form builder title at the top */
 h1.fr-form-title {
@@ -276,12 +276,6 @@ h1.fr-form-title {
 }
 
 .fb-control-label .fr-inplace-edit .xforms-alert { display: none }
-/* TODO: Should only be the main label/hint of the control, right? For XBL components, nested LHHA must not be hidden */
-.fb-control-control .xforms-label,
-    .fb-control-control .xforms-help,
-    .fb-control-control .xforms-help-image,
-    .fb-control-control .xforms-hint,
-    .fb-control-control .xforms-alert { display: none }
 
 a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
@@ -302,15 +296,13 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* ***** Grid ******************************************************************************************************* */
 
-/* Modify grid content in editable mode */
-.fr-editable .fr-grid-content { padding: 0; margin: 0; position: relative }
-
 .xbl-fr-grid table.fr-grid.fr-editable { border-collapse: collapse } /* override default in form-runner-base.css */
 .fr-grid-td { border: 1px solid transparent }
 .fr-editable .fr-grid-tr { height: 58px } /* enough space to hold row icons so that hovering doesn't cause the row to expand */
 .fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px dotted gray } /* only for grid which is NOT a repeat*/
 
-.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
+/*.fb-grid-cell-icons, .fb-grid-control-icons, */
+.fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 
 /* Grid icons and hovering */
 .fb-grid-top-left-td { text-align: center; width: 24px }
@@ -322,16 +314,16 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid.fr-editable .fr-grid-tr:hover .fb-grid-row-icons img { display: inline }
 
 /* Cell icons and hovering */
-.fb-grid-cell-icons { position: absolute; }
+/*.fb-grid-cell-icons { position: absolute; }*/
 
-.fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
-.fr-grid .fr-grid-td .fb-grid-cell-icons img { display: none }
-.fr-grid .fr-grid-td:hover .fb-grid-cell-icons img { display: inline }
+/*.fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }*/
+/*.fr-grid .fr-grid-td .fb-grid-cell-icons img { display: none }*/
+/*.fr-grid .fr-grid-td:hover .fb-grid-cell-icons img { display: inline }*/
 
-.fb-grid-control-icons { position: absolute; right: 0}
-.fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
-.fr-grid .fr-grid-td .fb-grid-control-icons img { display: none }
-.fr-grid .fr-grid-td:hover .fb-grid-control-icons img { display: inline }
+/*.fb-grid-control-icons { position: absolute; right: 0}*/
+/*.fb-grid-control-icons img { margin-bottom: 0; padding: 0 }*/
+/*.fr-grid .fr-grid-td .fb-grid-control-icons img { display: none }*/
+/*.fr-grid .fr-grid-td:hover .fb-grid-control-icons img { display: inline }*/
 
 /* Column icons */
 .fb-grid-column-toolbar-td {
@@ -350,9 +342,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 }
 
 /* Grid content */
-.fb-grid-content { padding: 0 18px}
-
-/*.fr-grid-content .xbl-fr-inplace-input { width: 100%; display: inline-block }*/
+.fr-grid-content { padding: 0 18px; margin: .5em 0 } /* margin: override FR */
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-selected .fb-use-toolbar-message { display: block }

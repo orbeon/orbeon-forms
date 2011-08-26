@@ -53,7 +53,7 @@
                 </fr:alert-dialog>
 
                 <!-- Dialog to edit itemsets -->
-                <!--<xi:include href="oxf:/forms/orbeon/builder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>-->
+                <!--<xi:include href="oxf:/forms/orbeon/newbuilder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>-->
 
             </xf:group>
         </xbl:template>

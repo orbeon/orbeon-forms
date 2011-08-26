@@ -336,7 +336,6 @@
                                                                 <xsl:variable name="static-col-pos" select="position()"/>
                                                                 <xsl:variable name="control" select="*[1]" as="element()?"/>
                                                                 <xsl:variable name="has-control" select="exists($control)"/>
-                                                                <xsl:variable name="control-name" select="substring-before($control/@id, '-control')"/>
 
                                                                 <xsl:if test="$is-editable">
                                                                     <!-- Point to this td -->
@@ -358,55 +357,6 @@
                                                                     <xsl:copy-of select="@* except (@class, @xxf:control)"/>
 
                                                                     <xh:div class="fr-grid-content{if ($is-repeat) then ' yui-dt-liner' else ''}">
-
-                                                                        <xsl:if test="$is-editable">
-                                                                            <xh:div class="fb-grid-cell-icons">
-                                                                                <!-- Expand cell down -->
-                                                                                <xf:group ref="$grid[exists($td/../following-sibling::*:tr[if ($td/@rowspan) then xs:integer($td/@rowspan) else 1])]">
-                                                                                    <xf:trigger appearance="minimal" id="down-{$static-row-pos}-{$static-col-pos}-trigger">
-                                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_down.png" alt="{{$fb-resources/expand-icon/label}}" title="{{$fb-resources/expand-icon/label}}"/></xf:label>
-
-                                                                                        <!-- TODO: can we move these handlers up so that they are not duplicated? -->
-                                                                                        <xf:action ev:event="DOMActivate">
-
-                                                                                            <xxf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
-
-                                                                                            <!-- Ask confirmation -->
-                                                                                            <xf:dispatch if="$confirm" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
-                                                                                                <xxf:context name="message" value="$fb-resources/messages/expand-cell"/>
-                                                                                                <xxf:context name="positive-targetid" value="xxf:effective-id('down-{$static-row-pos}-{$static-col-pos}-trigger')"/>
-                                                                                            </xf:dispatch>
-                                                                                            <xf:action if="not($confirm)">
-                                                                                                <!-- We are automatically confirmed as there is no control to delete -->
-                                                                                                <xf:dispatch name="fr-positive" target="down-{$static-row-pos}-{$static-col-pos}-trigger"/>
-                                                                                            </xf:action>
-                                                                                        </xf:action>
-                                                                                        <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                                                                            gridOps:expandCell($td)
-                                                                                        </xf:action>
-                                                                                    </xf:trigger>
-                                                                                </xf:group>
-                                                                                <!-- Shrink -->
-                                                                                <xf:group ref="$grid[$td/@rowspan and $td/@rowspan > 1]">
-                                                                                    <xf:trigger appearance="minimal">
-                                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_up.png" alt="{{$fb-resources/shrink-icon/label}}" title="{{$fb-resources/shrink-icon/label}}"/></xf:label>
-                                                                                        <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                                                                            gridOps:shrinkCell($td)
-                                                                                        </xf:action>
-                                                                                    </xf:trigger>
-                                                                                </xf:group>
-                                                                                <!-- Delete control -->
-                                                                                <xsl:if test="$has-control">
-                                                                                    <xf:trigger appearance="minimal">
-                                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-control-icon/label}}" title="{{$fb-resources/delete-control-icon/label}}"/></xf:label>
-                                                                                        <xf:action ev:event="DOMActivate" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                                                                            controlOps:deleteCellContent($td)
-                                                                                        </xf:action>
-                                                                                    </xf:trigger>
-                                                                                </xsl:if>
-                                                                            </xh:div>
-                                                                        </xsl:if>
-
                                                                         <xsl:choose>
                                                                             <xsl:when test="not($is-editable)">
                                                                                 <xf:group xxbl:scope="outer" appearance="xxf:internal">
@@ -420,20 +370,17 @@
                                                                             <xsl:when test="$has-control">
                                                                                 <!-- Use the cell editor -->
                                                                                 <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                                                    <!-- NOTE: Not great that we scope this variable in the outer scope, but how else can we pass this to the control editor? -->
-                                                                                    <xxf:variable name="fb-control"><xxf:sequence value="$control" xxbl:scope="inner"/></xxf:variable>
-                                                                                    <fb:control-editor ref="$fb-control">
-                                                                                        <xsl:copy-of select="node()"/>
-                                                                                    </fb:control-editor>
+                                                                                    <xsl:copy-of select="node()"/>
                                                                                 </xf:group>
                                                                             </xsl:when>
                                                                             <xsl:otherwise>
-                                                                                <xh:span class="fb-click-message">
-                                                                                    <xf:output value="$fb-resources/click-cell/label"/>
-                                                                                </xh:span>
-                                                                                <xh:span class="fb-use-toolbar-message">
-                                                                                    <xf:output value="$fb-resources/insert-control/label"/>
-                                                                                </xh:span>
+                                                                                <!-- This is not very useful and takes resources. We could do a lightweight implementation in JavaScript/CSS if needed. -->
+                                                                                <!--<xh:span class="fb-click-message">-->
+                                                                                    <!--<xf:output value="$fb-resources/click-cell/label"/>-->
+                                                                                <!--</xh:span>-->
+                                                                                <!--<xh:span class="fb-use-toolbar-message">-->
+                                                                                    <!--<xf:output value="$fb-resources/insert-control/label"/>-->
+                                                                                <!--</xh:span>-->
                                                                             </xsl:otherwise>
                                                                         </xsl:choose>
                                                                     </xh:div>

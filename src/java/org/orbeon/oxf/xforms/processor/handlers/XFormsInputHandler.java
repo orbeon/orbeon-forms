@@ -188,9 +188,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
-                            if (isHTMLDisabled(inputControl))
-                                outputDisabledAttribute(reusableAttributes);
-
                             // Handle accessibility attributes
                             handleAccessibilityAttributes(attributes, reusableAttributes);
                             if (isDateMinimal) {
@@ -201,6 +198,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes);
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
                             } else {
+                                if (isHTMLDisabled(inputControl))
+                                    outputDisabledAttribute(reusableAttributes);
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
                             }

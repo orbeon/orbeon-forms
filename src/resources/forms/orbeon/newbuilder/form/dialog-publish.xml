@@ -173,8 +173,9 @@
             <!-- Prepare submission -->
             <!-- See also model.xml -->
             <xforms:action ev:event="xforms-submit">
-                <!-- Copy form -->
-                <xforms:insert ref="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fb-form-instance')"/>
+                <!-- Copy de-annotated form locally -->
+                <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
+                <xforms:insert ref="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fr-form-instance')"/>
                 <!-- Embed only XBL for section templates that are in use -->
                 <!-- NOTE: We used to embed all XBL components here. This is not desirable in most cases so we don't do it anymore. -->
                 <xxforms:variable name="available-section-xbl" as="element(xbl:xbl)*"

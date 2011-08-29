@@ -1000,13 +1000,13 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
-             * For the initial overlays (error dialog, loading indicator, message), which don't contains any XForms
-             * markup that relies on the container being rendered on the page to initialize, we want the overlay
-             * to be really hidden so it doesn't constrain how wide or high our browser needs to be.
+             * See: http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Problem-and-solution
              */
             overlayUseDisplayHidden: function(overlay) {
                 YD.setStyle(overlay.element, "display", "none");
-                overlay.beforeShowEvent.subscribe(function() { YD.setStyle(overlay.element, "display", "block"); });
+                // For why use subscribers.unshift instead of subscribe, see:
+                // http://wiki.orbeon.com/forms/projects/ui/mobile-and-tablet-support#TOC-Avoiding-scroll-when-showing-a-mess
+                overlay.beforeShowEvent.subscribers.unshift(new YAHOO.util.Subscriber(function() { YD.setStyle(overlay.element, "display", "block"); }));
                 overlay.beforeHideEvent.subscribe(function() { YD.setStyle(overlay.element, "display", "none"); });
             },
 

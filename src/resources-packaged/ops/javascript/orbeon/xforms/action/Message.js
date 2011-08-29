@@ -32,6 +32,7 @@
                 this._messageDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
                     width: "30em",
                     fixedcenter: true,
+                    constraintoviewport: true,
                     modal: true,
                     close: false,
                     visible: false,

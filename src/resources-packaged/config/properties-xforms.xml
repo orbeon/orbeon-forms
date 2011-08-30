@@ -112,8 +112,6 @@
     <property as="xs:boolean" name="oxf.xforms.ajax-portlet"                                value="false"/>
     <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                        value="4"/>
-    <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
-    <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
@@ -130,6 +128,7 @@
     <property as="xs:string"  name="oxf.xforms.xhtml-layout"                                value="nospan"/>    <!-- nospan | span -->
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
+    <property as="xs:boolean" name="oxf.xforms.use-aria"                                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>     <!-- default will switch to true at some point -->
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->

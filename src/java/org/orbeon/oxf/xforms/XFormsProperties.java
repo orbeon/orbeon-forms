@@ -113,6 +113,7 @@ public class XFormsProperties {
     public static final String XHTML_LAYOUT = "xhtml-layout";
     public static final String RETRY_DELAY_INCREMENT = "retry.delay-increment";
     public static final String RETRY_MAX_DELAY = "retry.max-delay";
+    public static final String USE_ARIA = "use-aria";
 
     public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
 
@@ -235,6 +236,7 @@ public class XFormsProperties {
             new PropertyDefinition(XHTML_LAYOUT, XHTMLLayout.NOSPAN.toString().toLowerCase(), true),
             new PropertyDefinition(RETRY_DELAY_INCREMENT, 5000, true),
             new PropertyDefinition(RETRY_MAX_DELAY, 30000, true),
+            new PropertyDefinition(USE_ARIA, false, true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY, 500, true),

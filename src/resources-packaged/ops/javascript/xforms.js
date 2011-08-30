@@ -954,6 +954,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 this.xhtmlLayout = new ORBEON.util.Property("xhtml-layout", "nospan");
                 this.retryDelayIncrement = new ORBEON.util.Property("retry.delay-increment", 5000);
                 this.retryMaxDelay = new ORBEON.util.Property("retry.max-delay", 30000);
+                this.useARIA = new ORBEON.util.Property("use-aria", false);
             }
         },
 
@@ -4711,7 +4712,7 @@ ORBEON.xforms.Init = {
                 fixedcenter: false,
                 constraintoviewport: true,
                 underlay: "none",
-                usearia: true,
+                usearia: ORBEON.util.Properties.useARIA.get(),
                 role: "" // See bug 315634 http://goo.gl/54vzd
             });
             // Close the dialog when users click on document
@@ -4726,7 +4727,7 @@ ORBEON.xforms.Init = {
                 fixedcenter: false,
                 constraintoviewport: true,
                 underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
-                usearia: true,
+                usearia: ORBEON.util.Properties.useARIA.get(),
                 role: "" // See bug 315634 http://goo.gl/54vzd
             });
 			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);

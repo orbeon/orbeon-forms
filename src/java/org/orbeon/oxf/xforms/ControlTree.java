@@ -384,8 +384,10 @@ public class ControlTree implements ExternalCopyable {
                                                                   XFormsContextStack.BindingContext bindingContext,
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
 
-        // Create new index for the controls created in the iteration
-        final ControlIndex iterationControlIndex = new ControlIndex(containingDocument.getStaticState().isNoscript());
+        // Index for the controls created in the iteration
+        // NOTE: We used to create a separate index, but this caused this bug:
+        // [ #316177 ] When new repeat iteration is created upon repeat update, controls are not immediately accessible by id
+        final ControlIndex iterationControlIndex = controlIndex;
 
         // Create iteration and set its binding context
         final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getXBLContainer(), repeatControl, iterationIndex);
@@ -397,9 +399,6 @@ public class ControlTree implements ExternalCopyable {
         // Create the subtree
         containingDocument.getControls().visitControlElementsHandleRepeat(repeatControl, iterationIndex,
                 new CreateControlsListener(iterationControlIndex, repeatIterationControl, null));
-
-        // Update main index before dispatching, so that events can access newly created controls
-        controlIndex.addAll(iterationControlIndex);
 
         return repeatIterationControl;
     }
@@ -425,15 +424,14 @@ public class ControlTree implements ExternalCopyable {
 
     public void createAndInitializeSubTree(XFormsContainingDocument containingDocument, XXFormsDynamicControl dynamicControl) {
 
-        // Create new index for the controls created in the iteration
-        final ControlIndex index = new ControlIndex(containingDocument.getStaticState().isNoscript());
+        // Index for the controls created in the subtree
+        // NOTE: We used to create a separate index, but this caused this bug:
+        // [ #316177 ] When new repeat iteration is created upon repeat update, controls are not immediately accessible by id
+        final ControlIndex index = controlIndex;
 
         // Create the subtree
         containingDocument.getControls().visitControlElementsHandleRepeat(dynamicControl,
                 new CreateControlsListener(index, (XFormsControl) dynamicControl, null));
-
-        // Update main index before dispatching, so that events can access newly created controls
-        controlIndex.addAll(index);
 
         // Gather all control ids and controls
         final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();

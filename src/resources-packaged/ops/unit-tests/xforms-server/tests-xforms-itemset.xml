@@ -1372,4 +1372,90 @@
         </output>
     </test>
 
+    <test description="xxforms:itemset() function used during construction of new repeat iteration" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316177&group_id=168&atid=350207 -->
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:encrypt-item-values="false">
+                                    <xforms:instance id="instance">
+                                        <values show="false">
+                                            <value>1</value>
+                                        </values>
+                                    </xforms:instance>
+                                    <xforms:instance id="itemset">
+                                        <fruits>
+                                            <fruit id="1">
+                                                <description>Apple</description>
+                                            </fruit>
+                                        </fruits>
+                                    </xforms:instance>
+
+                                    <!--<xforms:insert ev:event="xforms-ready" context="instance()" origin="xxforms:element('value', 1)"/>-->
+                                    <xforms:setvalue ev:event="xforms-ready" ref="@show">true</xforms:setvalue>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:repeat ref="*[instance()/@show = 'true']">
+                                    <xforms:select id="my-select" ref=".">
+                                        <xforms:itemset ref="instance('itemset')/fruit">
+                                            <xforms:label ref="description"/>
+                                            <xforms:value ref="@id"/>
+                                        </xforms:itemset>
+                                    </xforms:select>
+
+                                    <xforms:group id="my-group" ref=".[. = xxforms:itemset('my-select', 'xml')//item/value]">
+                                        <xforms:output id="my-output" value="."/>
+                                    </xforms:group>
+                                </xforms:repeat>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values show="true">
+                                    <value>1</value>
+                                </values>
+                            </instance>
+                            <instance id="itemset" model-id="model">
+                                <fruits>
+                                    <fruit id="1">
+                                        <description>Apple</description>
+                                    </fruit>
+                                </fruits>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-select·1">1</xxf:control>
+                        <xxf:itemset id="my-select·1">[{"label":"Apple","value":"1"}]</xxf:itemset>
+                        <xxf:control id="my-output·1">1</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

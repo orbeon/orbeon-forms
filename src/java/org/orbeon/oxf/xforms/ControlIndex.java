@@ -38,12 +38,6 @@ public class ControlIndex {
         isNoscript = noscript;
     }
 
-    public void addAll(ControlIndex other) {
-        for (XFormsControl control: other.effectiveIdsToControls.values()) {
-            indexControl(control);
-        }
-    }
-
     /**
      * Index a single controls.
      *

@@ -32,6 +32,7 @@
 
         <!-- Script for accordion menu -->
         <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/accordion-menu-v2.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/form-builder.js"/>
         <xh:script type="text/javascript">
             var fbAccordionMenuOptions = {
                 dependent: false,
@@ -70,7 +71,7 @@
                         layout.resize();
                     });
 
-                    layout.render();    
+                    layout.render();
 
                     // Only make content visible after initialization to prevent expensive relayout
                     YAHOO.util.Dom.setStyle("left1", "display", "block");
@@ -316,7 +317,7 @@
 
                         <!-- TODO: fix issue of inplace editors keeping focus -->
                         <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:text="i" name="DOMActivate" targetid="fb-add-component-trigger·1-1"/>-->
-                        
+
                         <!-- Cursor right, left, up, down -->
                         <!--<xf:message ev:observer="#document" ev:event="keypress" xxf:text="&#39;"/>-->
                         <!--<xf:message ev:observer="#document" ev:event="keypress" xxf:text="&#37;"/>-->
@@ -371,7 +372,7 @@
                         <fb:form-editor ref="instance('fb-form-instance')" id="fb-form-editor"/>
 
                         <!--  Cell editor -->
-                        <xh:div style="border: 2px solid #eee; padding: .5em">
+                        <xh:div style="border: 2px solid #eee; padding: .5em" class="fb-cell-editor">
                             <xf:var name="td" value="instance('fb-form-instance')//*:td[@id = $selected-cell]"/>
                             <xf:var name="grid" value="$td/ancestor::*:grid[1]"/>
                             <xf:var name="control" value="$td/*[1]"/>
@@ -425,12 +426,12 @@
                             </xh:span>
 
                             <!-- Edit help for any control -->
-                            <xf:trigger appearance="minimal" id="fb-edit-control-help-trigger" class="fb-edit-help-trigger" ref=".[$has-control]">
-                                <xf:label><xh:img alt="{$fb-resources/help-icon/label}" title="{$fb-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xf:label>
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">
-                                    <xxf:context name="control-id" value="$control/@id"/>
-                                </xf:dispatch>
-                            </xf:trigger>
+                            <!--<xf:trigger appearance="minimal" id="fb-edit-control-help-trigger" class="fb-edit-help-trigger" ref=".[$has-control]">-->
+                                <!--<xf:label><xh:img alt="{$fb-resources/help-icon/label}" title="{$fb-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xf:label>-->
+                                <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">-->
+                                    <!--<xxf:context name="control-id" value="$control/@id"/>-->
+                                <!--</xf:dispatch>-->
+                            <!--</xf:trigger>-->
 
                             <xf:group class="fb-grid-control-icons" ref=".[$has-control]">
                                 <!-- Edit details for any control -->
@@ -509,32 +510,32 @@
                             </xf:group>
 
                             <!-- Inplace editor if the control has a label -->
-                            <xh:div>
-                                <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                    <fr:inplace-input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">
-                                        <xf:hint ref="$fb-resources/enter-label/label"/>
-                                    </fr:inplace-input>
-                                </xf:group>
-                            </xh:div>
+                            <!--<xh:div>-->
+                                <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">-->
+                                    <!--<fr:inplace-input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">-->
+                                        <!--<xf:hint ref="$fb-resources/enter-label/label"/>-->
+                                    <!--</fr:inplace-input>-->
+                                <!--</xf:group>-->
+                            <!--</xh:div>-->
 
                             <!-- Inplace editor if the control has a hint -->
-                            <xh:div>
-                                <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                    <fr:inplace-input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint">
-                                        <xf:hint ref="$fb-resources/enter-hint/label"/>
-                                    </fr:inplace-input>
-                                </xf:group>
-                            </xh:div>
+                            <!--<xh:div>-->
+                                <!--<xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">-->
+                                    <!--<fr:inplace-input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint">-->
+                                        <!--<xf:hint ref="$fb-resources/enter-hint/label"/>-->
+                                    <!--</fr:inplace-input>-->
+                                <!--</xf:group>-->
+                            <!--</xh:div>-->
 
-                            <xf:trigger ref="$control[xf:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
-                                <xf:label>
-                                    <xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
-                                    <xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>
-                                </xf:label>
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-itemset-editor" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                    <xxf:context name="fb:resource-id" select="controlOps:controlName($control-id)"/>
-                                </xf:dispatch>
-                            </xf:trigger>
+                            <!--<xf:trigger ref="$control[xf:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">-->
+                                <!--<xf:label>-->
+                                    <!--<xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>-->
+                                    <!--<xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>-->
+                                <!--</xf:label>-->
+                                <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-itemset-editor" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">-->
+                                    <!--<xxf:context name="fb:resource-id" select="controlOps:controlName($control-id)"/>-->
+                                <!--</xf:dispatch>-->
+                            <!--</xf:trigger>-->
                         </xh:div>
 
                         <!-- Display the form being edited -->

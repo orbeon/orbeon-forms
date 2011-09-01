@@ -6,29 +6,31 @@ currentGridTd = null
 Event.onDOMReady () ->
 
     # Get and hide the icons to the top left of the cell
-    gridCellIcons = (YD.getElementsByClassName "fb-grid-cell-icons", null, document)[0]
-    gridCellIcons.style.display = "none"
+    cellEditorChildren = do ->
+        cellEditor = (YD.getElementsByClassName "fb-cell-editor", null, document)[0]
+        YD.getChildren cellEditor
 
-    # Calls function on event with given name on a grid td
-    onGridTd = (eventName, callback) ->
-        Event.addListener document, eventName, (event) ->
-            target = Event.getTarget event
-            if YD.hasClass target, "fr-grid-td"
-                # Target is the grid td, we're good
-                callback target
-            else
-                # See if the grid td is a parent of the target
-                parentGridTd = YD.getAncestorByClassName target, "fr-grid-td"
-                callback parentGridTd if parentGridTd?
+    # Keep track the grid id the mouse is over
+    currentGridTd = null
 
-    onGridTd "mouseover", (td) ->
-        console.log "mouseover", td
-        position = YD.getXY td
-        gridCellIcons.style.display = ""
-        YD.setXY gridCellIcons, position
-
-    onGridTd "mouseout", (td) ->
-        console.log "mouseout", td
-        gridCellIcons.style.display = "none"
-
-
+    Event.addListener document, "mouseover", (event) ->
+        target = Event.getTarget event
+        gridTd =
+            # Target is the grid td, we're good
+            if YD.hasClass target, "fr-grid-td" then target
+            # Try finding a grid td parent of the target
+            else YD.getAncestorByClassName target, "fr-grid-td"
+        if gridTd?
+            # We're in a grid td, look for its content
+            gridContent = (YD.getElementsByClassName "fr-grid-content", null, gridTd)[0]
+            if gridTd isnt currentGridTd
+                # We're in a new grid td: move cell editor controls under this td
+                _.each cellEditorChildren, (child) -> YD.insertBefore child, gridContent
+            currentGridTd = gridTd
+            # Display or hide cell editor control depending on whether content is present
+            emptyContent = (YD.getChildren gridContent).length is 0
+            _.each cellEditorChildren, (child) -> child.style.display = if emptyContent then "none" else ""
+        else if gridTd is null
+            # We're outside of a grid td: hide cell editor controls
+            _.each cellEditorChildren, (child) -> child.style.display = "none"
+            currentGridTd = null

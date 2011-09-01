@@ -295,14 +295,17 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-logo .xforms-upload-remove { padding-left: 0 }
 
 /* ***** Grid ******************************************************************************************************* */
+.fb-cell-editor { display: none } /* Contains the editing markup that will be moved inside each grid td */
 
 .xbl-fr-grid table.fr-grid.fr-editable { border-collapse: collapse } /* override default in form-runner-base.css */
-.fr-grid-td { border: 1px solid transparent }
+.fr-grid-td {
+    border: 1px solid transparent;
+    position: relative;                     /* So FB icons inside the grid td can use absolute positioning relative to the td */
+}
 .fr-editable .fr-grid-tr { height: 58px } /* enough space to hold row icons so that hovering doesn't cause the row to expand */
 .fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px dotted gray } /* only for grid which is NOT a repeat*/
 
-/*.fb-grid-cell-icons, .fb-grid-control-icons, */
-.fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
+.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 
 /* Grid icons and hovering */
 .fb-grid-top-left-td { text-align: center; width: 24px }
@@ -313,17 +316,14 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid.fr-editable .fr-grid-tr .fb-grid-row-icons img { display: none }
 .fr-grid.fr-editable .fr-grid-tr:hover .fb-grid-row-icons img { display: inline }
 
-/* Cell icons and hovering */
-/*.fb-grid-cell-icons { position: absolute; }*/
+/* Cell icons */
+.fb-grid-cell-icons { position: absolute; }
+.fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
+.fr-grid .fr-grid-td .fb-grid-cell-icons img { display: inline }
 
-/*.fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }*/
-/*.fr-grid .fr-grid-td .fb-grid-cell-icons img { display: none }*/
-/*.fr-grid .fr-grid-td:hover .fb-grid-cell-icons img { display: inline }*/
-
-/*.fb-grid-control-icons { position: absolute; right: 0}*/
-/*.fb-grid-control-icons img { margin-bottom: 0; padding: 0 }*/
-/*.fr-grid .fr-grid-td .fb-grid-control-icons img { display: none }*/
-/*.fr-grid .fr-grid-td:hover .fb-grid-control-icons img { display: inline }*/
+.fb-grid-control-icons { position: absolute; right: 0}
+.fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
+.fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
 
 /* Column icons */
 .fb-grid-column-toolbar-td {

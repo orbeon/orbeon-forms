@@ -1,5 +1,7 @@
 Event = YAHOO.util.Event
 YD = YAHOO.util.Dom
+AjaxServer = ORBEON.xforms.server.AjaxServer
+Controls = ORBEON.xforms.Controls
 
 currentGridTd = null
 
@@ -13,6 +15,7 @@ Event.onDOMReady () ->
     # Keep track the grid id the mouse is over
     currentGridTd = null
 
+    # Position cell editor controls on the right cell on the mouse over
     Event.addListener document, "mouseover", (event) ->
         target = Event.getTarget event
         gridTd =
@@ -34,3 +37,12 @@ Event.onDOMReady () ->
             # We're outside of a grid td: hide cell editor controls
             _.each cellEditorChildren, (child) -> child.style.display = "none"
             currentGridTd = null
+
+    # On click on any of the cell editor controls, make the cell the current one
+    _.each cellEditorChildren, (child) ->
+        Event.addListener child, "click", () ->
+            # Send a DOMActivate to the closest xforms-activable ancestor
+            activable = YD.getAncestorByClassName child, "xforms-activable"
+            form = Controls.getForm activable
+            event = new AjaxServer.Event form, activable.id, null, null, "DOMActivate"
+            AjaxServer.fireEvents [event]

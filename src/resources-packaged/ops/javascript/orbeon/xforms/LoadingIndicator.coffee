@@ -85,10 +85,10 @@ class LoadingIndicator
     _updateLoadingPosition: () ->
         @loadingOverlay.cfg.setProperty "x", do =>
             # Keep the distance to the right border of the viewport the same
-            scrollX = document.documentElement.scrollLeft ? document.body.scrollLeft
+            scrollX = YD.getDocumentScrollLeft()
             scrollX + YD.getViewportWidth() - @initialRight
         @loadingOverlay.cfg.setProperty "y", do =>
-            scrollY = document.documentElement.scrollTop ? document.body.scrollTop
+            scrollY = YD.getDocumentScrollTop()
             if scrollY + Properties.loadingMinTopPadding.get() > @initialTop
             # Place indicator at a few pixels from the top of the viewport
             then scrollY + Properties.loadingMinTopPadding.get()

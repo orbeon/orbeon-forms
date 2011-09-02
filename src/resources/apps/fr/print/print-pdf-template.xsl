@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+  Copyright (C) 2011 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xsl:version="2.0"
+<xsl:transform version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -23,167 +23,106 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
-
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+        xmlns:map="java:java.util.Map"
+        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+        xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
 
     <xsl:variable name="data" select="/*" as="element()"/>
-    <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
-    <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
     <xsl:variable name="parameters" select="doc('input:parameters')/*" as="element()"/>
 
-    <!-- Reference components -->
-    <!-- NOTE: Some of this logic for components is also in Form Builder -->
-    <xsl:variable name="component-bindings" select="$xhtml//xbl:binding" as="element(xbl:binding)*"/>
-    <xsl:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
+    <xsl:function name="fr:classes" as="xs:string*">
+        <xsl:param name="e" as="element()"/>
+        <xsl:copy-of select="tokenize($e/@class, '\s+')"/>
+    </xsl:function>
 
-    <!-- Get current resources -->
-    <xsl:variable name="request-language" select="$request/parameters/parameter[name = 'fr-language']/value" as="xs:string"/>
-    <xsl:variable name="resources-instance" select="$xhtml/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-resources']/resources" as="element(resources)"/>
-    <xsl:variable name="current-resources" select="$resources-instance/resource[@xml:lang = $request-language]" as="element(resource)"/>
+    <xsl:function name="fr:is-container" as="xs:boolean">
+        <xsl:param name="e" as="element()"/>
+        <xsl:copy-of select="ends-with($e/@id/xformsUtils:getStaticIdFromId(.), '-section') or fr:classes($e) = ('fr-section', 'xbl-fr-section')"/>
+    </xsl:function>
 
-    <!-- TODO: resources.xml should go through fr-resources.xpl so that overrides work -->
-    <xsl:variable name="fr-resources" select="doc(pipeline:rewriteServiceURI('/fr/service/i18n/fr-resources/orbeon/dmv-14', true()))/*" as="element(resources)"/>
-    <!--<xsl:variable name="fr-resources" select="doc('oxf:/apps/fr/i18n/resources.xml')/*" as="element(resources)"/>-->
-    <xsl:variable name="fr-current-resources" select="($fr-resources/resource[@xml:lang = $request-language], $fr-resources/resource[1])[1]" as="element(resource)"/>
+    <xsl:variable name="is-a-control-classes" select="('xforms-control', 'xbl-component')" as="xs:string*"/>
+    <xsl:variable name="is-not-a-control-classes" select="('xforms-trigger', 'xforms-disabled', 'xforms-group', 'xforms-case', 'xforms-switch', 'xforms-repeat')" as="xs:string*"/>
+    <xsl:variable name="control-classes" select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')" as="xs:string*"/>
+    <xsl:variable name="attachment-classes" select="('fr-attachment', 'xbl-fr-image-attachment')" as="xs:string*"/>
 
-    <!-- Template -->
-    <template href="input:template" show-grid="false"/>
+    <xsl:template match="/">
+        <config>
+            <!-- Template -->
+            <template href="input:template" show-grid="false"/>
 
-    <!-- Barcode -->
-    <!-- NOTE: Code 39 only take uppercase letters, hence we upper-case(…) -->
-    <xsl:variable name="barcode-value" select="upper-case($parameters/document)" as="xs:string?"/>
-    <xsl:if test="normalize-space($barcode-value) != '' and pipeline:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
-        <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
-            <barcode left="50" top="780" height="15" value="'{$barcode-value}'"/>
-        </group>
-    </xsl:if>
+            <!-- Barcode -->
+            <!-- NOTE: Code 39 only take uppercase letters, hence we upper-case(…) -->
+            <xsl:variable name="barcode-value" select="upper-case($parameters/document)" as="xs:string?"/>
+            <xsl:if test="normalize-space($barcode-value) != '' and pipeline:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
+                <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
+                    <barcode left="50" top="780" height="15" value="'{$barcode-value}'"/>
+                </group>
+            </xsl:if>
 
-    <group ref="/*">
-        <!-- Iterate over top-level sections -->
-        <xsl:for-each select="$xhtml/xhtml:body//fr:body//fr:section">
+            <xsl:variable name="pdfFormats" select="formRunner:getPDFFormats()"/>
 
-            <xsl:variable name="section-name" select="substring-before(@bind, '-bind')" as="xs:string"/>
-            <xsl:variable name="section-holder" select="$data/*[local-name() = $section-name]" as="element()"/>
+            <xsl:for-each select="//*[@id = 'fr-form-group']//*[fr:classes(.) = $is-a-control-classes and not(fr:classes(.) = $is-not-a-control-classes)]">
 
-            <group ref="{$section-name}">
+                <xsl:variable name="control" select="."/>
+                <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId(@id)"/>
+                <xsl:variable name="iterations" select="tokenize(xformsUtils:getEffectiveIdSuffix(@id), '-')"/>
+                
+                <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/xformsUtils:getStaticIdFromId(@id)"/>
+                <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
 
-                <!-- Iterate over nested grids OR section templates -->
-                <xsl:for-each select="fr:grid | fr:repeat | *[resolve-QName(name(), .) = $components-qnames]">
+                <xsl:variable name="classes" select="fr:classes(.)"/>
 
-                    <!-- NOTE: Some of this logic for components is also in Form Builder -->
-                    <!-- Current section content QName -->
-                    <xsl:variable name="current-qname" select="resolve-QName(name(), .)" as="xs:QName"/>
-                    <!-- Whether this is a component -->
-                    <xsl:variable name="is-component" select="$current-qname = $components-qnames" as="xs:boolean"/>
-                    <!-- Component template if this is a component (take first one) -->
-                    <xsl:variable name="component-template" as="element(xbl:template)?"
-                                  select="if ($is-component)
-                                          then ($component-bindings[$current-qname = (for $t in .//fb:template/*[1] return resolve-QName(name($t), $t))]/xbl:template)[1]
-                                          else ()"/>
+                <!-- Get the expression to evaluate on the control from the configuration properties -->
+                <xsl:variable name="expression" as="xs:string?">
+                    <xsl:choose>
+                        <xsl:when test="$classes = 'xbl-component'">
+                            <!-- XBL component -->
+                            <xsl:variable name="component-name" select="for $c in $classes return if ($c != 'xbl-component' or not(starts-with($c, 'xbl-'))) then substring-after($c, 'xbl-') else ()"/>
+                            <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, ())"/>
+                        </xsl:when>
+                        <xsl:when test="$classes = $control-classes">
+                            <!-- Built-in controls -->
+                            <xsl:variable name="component-name" select="$control-classes[. = $classes][1]"/>
+                            <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
+                            <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:variable>
 
-                    <xsl:variable name="section-resources" as="element(resource)"
-                                  select="if (not($is-component))
-                                            then $current-resources
-                                            else ($component-template//xforms:instance[@id = 'fr-form-resources']/resources/resource[@xml:lang = $request-language])[1]"/>
+                <!-- If an expression was found, evaluate it to produce the value of the field -->
+                <xsl:if test="$expression">
+                    <xsl:variable name="value" select="$control/saxon:evaluate(string($expression))"/>
+                    <xsl:if test="$value">
+                        <xsl:choose>
+                            <xsl:when test="$classes = $attachment-classes">
+                                <!-- Handle URL rewriting for image attachments -->
+                                <image acro-field-name="'{$effective-id}'" href="{pipeline:rewriteServiceURI($value, true())}"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <field acro-field-name="'{$effective-id}'" value="'{replace($value, '''', '''''')}'"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:if>
+                </xsl:if>
 
-                    <xsl:variable name="is-repeat" select="$current-qname = xs:QName('fr:repeat') or ($current-qname = xs:QName('fr:grid') and (@repeat = 'true' or exists((@minOccurs, @maxOccurs))))" as="xs:boolean"/>
-
-                    <!-- Find grid -->
-                    <!-- TODO: search for fr:repeat/fr:body in component too -->
-                    <xsl:variable name="grid" as="element()"
-                                      select="if ($is-component) then $component-template//fr:grid[1]
-                                              else if ($is-repeat) then (fr:body[1], .)[1] else ."/>
-
-                    <!-- Iterate over the grid's children XForms and XBL controls -->
-                    <xsl:for-each select="$grid//(xforms:* | fr:*)[(@ref or @bind) and ends-with(@id, '-control')]">
-                        <xsl:variable name="control" select="." as="element()"/>
-                        <xsl:variable name="control-name" select="substring-before($control/@id, '-control')" as="xs:string"/>
-                        <!-- Obtain the value directly from the data (makes it easier to deal with itemsets) -->
-                        <!--<xsl:message>-->
-                            <!--aaa <xsl:value-of select="$section-name"/>-->
-                            <!--aaa <xsl:value-of select="$control-name"/>-->
-                            <!--aaa <xsl:value-of select="$data/*[local-name() = $section-name]/*[local-name() = $control-name]"/>-->
-                        <!--</xsl:message>-->
-
-                        <xsl:variable name="bind" select="$xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]" as="element(xforms:bind)?"/>
-                        <!--<xsl:variable name="path" select="if ($bind)-->
-                            <!--then string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')-->
-                            <!--else string-join(($control/ancestor-or-self::*/(@ref | @context)), '/')" as="xs:string"/>-->
-
-                        <xsl:for-each select="if ($is-repeat) then $section-holder/* else $section-holder">
-                            <xsl:variable name="iteration" select="position()" as="xs:integer"/>
-
-                            <!-- Here use section$field$iteration pattern -->
-                            <xsl:variable name="field-name" select="concat($section-name, '$', $control-name, if ($is-repeat) then concat('$', xs:string($iteration)) else '')"/>
-
-                            <xsl:variable name="control-value" select="*[local-name() = $control-name]" as="xs:string?"/>
-
-                            <xsl:choose>
-                                <xsl:when test="local-name($control) = ('select', 'select1')">
-                                    <!-- Selection control -->
-                                    <xsl:variable name="control-resources" select="$section-resources/*[local-name() = $control-name]" as="element()"/>
-
-                                    <xsl:choose>
-                                        <xsl:when test="local-name($control) = 'select' and $control/@appearance = 'full'">
-                                            <!-- Checkboxes: we expect to have a PDF field for each value for a name section$control$value, with a value of 'true' -->
-                                            <xsl:for-each select="tokenize($control-value, '\s+')">
-                                                <xsl:variable name="item-value" as="xs:string" select="."/>
-                                                <field acro-field-name="'{$field-name}${$item-value}'" value="'true'"/>
-                                            </xsl:for-each>
-                                        </xsl:when>
-                                        <xsl:when test="local-name($control) = 'select1' and $control/@appearance = 'full'">
-                                            <!-- Radio buttons: use control value and match export values in PDF -->
-                                            <field acro-field-name="'{$field-name}'" value="'{$control-value}'"/>
-                                        </xsl:when>
-                                        <xsl:when test="local-name($control) = 'select1'">
-                                            <!-- Other single-selection controls: just use label -->
-                                            <field acro-field-name="'{$field-name}'" value="'{$control-resources/item[value = $control-value]/label}'"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <!-- Other multiple-selection controls: just use the label -->
-                                            <field acro-field-name="'{$field-name}'"
-                                                   value="'{string-join(for $v in tokenize($control-value, '\s+')
-                                                                return $control-resources/item[value = $v]/label, ' - ')}'"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xsl:when>
-                                <xsl:when test="local-name($control) = ('image-attachment') and normalize-space($control-value) != ''">
-                                    <!-- Image attachment -->
-                                    <image acro-field-name="'{$field-name}'"
-                                           href="{pipeline:rewriteServiceURI($control-value, true())}"/>
-                                </xsl:when>
-                                <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'date'">
-                                    <!-- Date -->
-                                    <field acro-field-name="'{$field-name}'"
-                                           value="'{if ($control-value castable as xs:date)
-                                                    then format-date(xs:date($control-value), $fr-current-resources/print/formats/date, $request-language, (), ())
-                                                    else $control-value}'"/>
-                                </xsl:when>
-                                <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'time'">
-                                    <!-- Time -->
-                                    <field acro-field-name="'{$field-name}'"
-                                           value="'{if ($control-value castable as xs:time)
-                                                    then format-time(xs:time($control-value), $fr-current-resources/print/formats/time, $request-language, (), ())
-                                                    else $control-value}'"/>
-                                </xsl:when>
-                                <xsl:when test="$bind/@type and substring-after($bind/@type, ':') = 'dateTime'">
-                                    <!-- Date and time -->
-                                    <field acro-field-name="'{$field-name}'"
-                                           value="'{if ($control-value castable as xs:dateTime)
-                                                    then format-dateTime(xs:dateTime($control-value), $fr-current-resources/print/formats/dateTime, $request-language, (), ())
-                                                    else $control-value}'"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <!-- Other control -->
-                                    <field acro-field-name="'{$field-name}'" value="'{replace($control-value, '''', '''''')}'"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-
+                <!-- Also provide a mapping for select where disjoint values are output as separate acrobat fields -->
+                <xsl:if test="$classes = 'xforms-select'">
+                    <xsl:variable name="expression" select="map:get($pdfFormats, 'select-values')"/>
+                    <xsl:if test="$expression">
+                        <xsl:for-each select="$control/saxon:evaluate(string($expression))">
+                            <xsl:variable name="item-value" as="xs:string" select="."/>
+                            <xsl:if test="$item-value">
+                                <field acro-field-name="'{$effective-id}${$item-value}'" value="'true'"/>
+                            </xsl:if>
                         </xsl:for-each>
+                    </xsl:if>
+                </xsl:if>
+            </xsl:for-each>
+        </config>
+    </xsl:template>
 
-                    </xsl:for-each>
-                </xsl:for-each>
-            </group>
-        </xsl:for-each>
-    </group>
-</config>
+
+</xsl:transform>

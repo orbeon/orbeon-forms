@@ -45,6 +45,7 @@
     <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'
                                                 and $is-noscript-support" as="xs:boolean"/>
     <xsl:variable name="input-data" select="/*" as="element(xhtml:html)"/>
+    <xsl:variable name="has-pdf-template" select="normalize-space(/xhtml:html/xhtml:head//xforms:instance[@id = 'fr-form-attachments']/*/pdf) != ''"/>
 
     <!-- Properties -->
     <xsl:variable name="has-version" select="pipeline:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
@@ -176,7 +177,8 @@
         <!-- Model receiving input parameters -->
         <xforms:model id="fr-parameters-model"
                       xxforms:external-events="{@xxforms:external-events}{if ($mode = ('new', 'view', 'edit')) then ' fr-open-pdf' else ''}"
-                      xxforms:readonly-appearance="{if ($mode = ('view', 'pdf', 'email')) then 'static' else 'dynamic'}"
+                      xxforms:readonly-appearance="{if ($mode = ('view', 'email') or ($mode = 'pdf' and not($has-pdf-template))) then 'static' else 'dynamic'}"
+                      xxforms:encrypt-item-values="{not($mode = 'pdf' and $has-pdf-template)}"
                       xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:offline="false"
                       xxforms:noscript="{$is-noscript}"

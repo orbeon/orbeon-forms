@@ -22,6 +22,8 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.util.{NetUtils, XPathCache}
 import org.orbeon.oxf.pipeline.InitUtils
+import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
+import java.util.{Map => JMap}
 
 object FormRunner {
 
@@ -251,4 +253,33 @@ object FormRunner {
     // Interrupt current processing and send an error code to the client.
     // NOTE: This could be done through ExternalContext
     def sendError(code: Int) = InitUtils.sendError(code)
+
+    // Return mappings (formatName -> expression) for all PDF formats in the properties
+    def getPDFFormats = {
+
+        def propertiesStartingWith(prefix: String) =
+            XXFormsPropertiesStartsWith.propertiesStartsWith(prefix).asScala map (_.getStringValue)
+
+        val formatPairs =
+            for {
+                formatPropertyName <- propertiesStartingWith("oxf.fr.pdf.format")
+                expression <- Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
+                formatName = formatPropertyName split '.' last
+            } yield (formatName -> expression)
+
+        formatPairs.toMap.asJava
+    }
+
+    // Return the PDF formatting expression for the given parameters
+    def getPDFFormatExpression(pdfFormats: JMap[String, String], app: String, form: String, name: String, dataType: String) = {
+        val propertyName = Seq("oxf.fr.pdf.map", app, form, name) ++ Option(dataType).toSeq mkString "."
+
+        val expressionOption =
+            for {
+                format <- Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
+                expression <- Option(pdfFormats.get(format))
+            } yield expression
+
+        expressionOption.orNull
+    }
 }

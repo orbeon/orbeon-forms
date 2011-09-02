@@ -13,47 +13,38 @@
  */
 package org.orbeon.oxf.processor.pdf;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
+import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.FloatValue;
 import org.orbeon.saxon.value.Int64Value;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
  */
 public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is supposedly deprecated
 
-//    static private Logger logger = LoggerFactory.createLogger(PDFTemplateProcessor.class);
+    static private Logger logger = LoggerFactory.createLogger(PDFTemplateProcessor.class);
 
     public static String DEFAULT_CONTENT_TYPE = "application/pdf";
     public static final String PDF_TEMPLATE_MODEL_NAMESPACE_URI = "http://www.orbeon.com/oxf/pdf-template/model";
@@ -422,7 +413,28 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                         image = Image.getInstance(os.toByteArray());
                     } else {
                         // Read and create the image
-                        image = Image.getInstance(URLFactory.createURL(hrefAttribute));
+                        final URL url = URLFactory.createURL(hrefAttribute);
+
+                        // Use ConnectionResult so that header/session forwarding takes place
+                        final ConnectionResult connectionResult
+                            = new Connection().open(NetUtils.getExternalContext(), new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
+                                url, null, null, null, null, null, null, Connection.getForwardHeaders());
+
+                        if (connectionResult.statusCode != 200) {
+                            connectionResult.close();
+                            throw new OXFException("Got invalid return code while loading image: " + url.toExternalForm() + ", " + connectionResult.statusCode);
+                        }
+
+                        // Make sure things are cleaned-up not too late
+                        pipelineContext.addContextListener(new PipelineContext.ContextListener() {
+                            public void contextDestroyed(boolean success) {
+                                connectionResult.close();
+                            }
+                        });
+
+                        // Here we decide to copy to temp file and load as a URL. We could also provide bytes directly.
+                        final String tempURLString = NetUtils.inputStreamToAnyURI(connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
+                        image = Image.getInstance(URLFactory.createURL(tempURLString));
                     }
                 }
 
@@ -434,14 +446,18 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                     final String fieldName = XPathCache.evaluateAsString(groupContext.contextNodeSet, groupContext.contextPosition, fieldNameStr, namespaceMapping, variableToValueMap, functionLibrary, null, null, (LocationData) currentElement.getData());
                     final float[] positions = groupContext.acroFields.getFieldPositions(fieldName);
 
-                    final Rectangle rectangle = new Rectangle(positions[1], positions[2], positions[3], positions[4]);
+                    if (positions != null) {
+                        final Rectangle rectangle = new Rectangle(positions[1], positions[2], positions[3], positions[4]);
 
-                    // This scales the image so that it fits in the box (but the aspect ratio is not changed)
-                    image.scaleToFit(rectangle.getWidth(), rectangle.getHeight());
+                        // This scales the image so that it fits in the box (but the aspect ratio is not changed)
+                        image.scaleToFit(rectangle.getWidth(), rectangle.getHeight());
 
-                    final float yPosition = positions[2] + rectangle.getHeight() - image.getScaledHeight();
+                        final float yPosition = positions[2] + rectangle.getHeight() - image.getScaledHeight();
+                        image.setAbsolutePosition(positions[1] + (rectangle.getWidth() - image.getScaledWidth()) / 2, yPosition);
 
-                    image.setAbsolutePosition(positions[1] + (rectangle.getWidth() - image.getScaledWidth()) / 2, yPosition);
+                        // Add image
+                        groupContext.contentByte.addImage(image);
+                    }
 
                 } else {
                     // Use position, etc.
@@ -468,11 +484,10 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                         final int dpiInt = Integer.parseInt(dpi);
                         image.setDpi(dpiInt, dpiInt);
                     }
-                }
 
-                // TODO: Lots of other parameters can be used to configure the image here
-                // Add image
-                groupContext.contentByte.addImage(image);
+                    // Add image
+                    groupContext.contentByte.addImage(image);
+                }
             } else {
                 // NOP
             }

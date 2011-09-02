@@ -85,6 +85,34 @@
     <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                        value="get"/>
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
 
+    <!-- PDF template formatting -->
+    <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
+    <property as="xs:string"  name="oxf.fr.pdf.format.input-string"                             value=".//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string()"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime"                           value="string-join(.//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string(), ' ')"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.select-label"                             value="(.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)[1]/string()"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.select-value"                             value="(.//option[@selected = 'selected'], .//input[@checked = 'checked'])[1]/@value/string()"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.select-labels-string"                     value="string-join((.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)/string(), ' - ')"/>
+
+    <property as="xs:string"  name="oxf.fr.pdf.format.select-labels"                            value="(.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)/string()"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.select-values"                            value="(.//option[@selected = 'selected'], .//input[@checked = 'checked'])/@value/string()"/>
+
+    <property as="xs:string"  name="oxf.fr.pdf.format.attachment-url"                           value="(./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-output' and not(tokenize(@class, '\s+') = 'xforms-disabled')]/
+                                                                                                           img[tokenize(@class, '\s+') = 'xforms-output-output']/@src)[1]/
+                                                                                                           string()[. != '/ops/images/xforms/spacer.gif']"/>
+
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.*"                          value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.date"                       value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                       value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.dateTime"                   value="input-dateTime"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.boolean"                    value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                         value="select-labels-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                        value="select-label"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.boolean"                   value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.boolean"                  value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state"                             value="select-label"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"                    value="attachment-url"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment"                     value="attachment-url"/>
+
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                             value=""/>
@@ -112,6 +140,7 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh pdf workflow-review collapse-all expand-all"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="resource"/>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state"                   value="select-value"/>
     <property as="xs:boolean" name="oxf.fr.noscript-link.orbeon.contact"                        value="true"/>
 
     <!-- Register and license forms -->

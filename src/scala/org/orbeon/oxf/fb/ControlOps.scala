@@ -313,7 +313,7 @@ object ControlOps {
         // Insert hierarchy of data holders
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
         // In practice, the ancestor holders should already exist.
-        ensureDataHolder(formInstanceRoot(doc), (containerNames. map (n => (() => elementInfo(n), None))) :+ (() => dataHolder, precedingControlName))
+        ensureDataHolder(formInstanceRoot(doc), (containerNames map (n => (() => elementInfo(n), None))) :+ (() => dataHolder, precedingControlName))
 
         // Insert resources placeholders for all languages
         if (resourceHolders.nonEmpty) {

@@ -29,7 +29,7 @@
                 </instance>
             </xforms:instance>
 
-            <xforms:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
+            <xforms:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep?delay=5" replace="none"/>
 
             <xforms:action ev:event="my-event" if="started = 'true'">
                 <!-- Increment count -->

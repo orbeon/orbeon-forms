@@ -14,6 +14,7 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:thread="java.lang.Thread">
 
     <p:param name="data" type="output"/>
@@ -36,7 +37,7 @@
                     <xsl:value-of select="doc('http://dummy')"/>
                 </xsl:if>
                 <!-- Wait for n seconds -->
-                <xsl:value-of select="thread:sleep(/request/parameters/parameter/value * 1000)"/>
+                <xsl:value-of select="thread:sleep(xs:integer(/request/parameters/parameter/value * 1000))"/>
                 <xsl:value-of select="/request/parameters/parameter/value"/>
             </delay>
         </p:input>

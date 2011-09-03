@@ -49,15 +49,16 @@ class LoadingIndicator
                     @shownCounter++
 
         # When an Ajax call ends, we might want to hide the indicator
-        Events.ajaxResponseProcessedEvent.subscribe =>
-            if @nextConnectShow
-                # Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator
-                _.defer =>
-                    @shownCounter--
-                    @hide() if @shownCounter == 0
+        requestEnded = =>
+            # Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator
+            _.defer =>
+                @shownCounter--
+                @hide() if @shownCounter == 0
             # Reset show and message
             @nextConnectShow = true
             @nextConnectMessage = DEFAULT_LOADING_TEXT
+        Events.ajaxResponseProcessedEvent.subscribe requestEnded
+        Connect.failureEvent.subscribe requestEnded
 
     setNextConnectProgressShown: (shown) -> @nextConnectShow = shown
     setNextConnectProgressMessage: (message) -> @nextConnectMessage = message

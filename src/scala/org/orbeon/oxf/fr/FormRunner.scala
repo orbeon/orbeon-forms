@@ -193,6 +193,7 @@ object FormRunner {
 
     def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo): NodeInfo = {
         val request = NetUtils.getExternalContext.getRequest
+        // Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
         getFormBuilderPermissionsAsXML(formRunnerRoles, Option(request.getHeaderValuesMap.get("orbeon-roles")) getOrElse Array[String]() toSet)
     }
 
@@ -220,8 +221,6 @@ object FormRunner {
             Map()
         } else {
             // Roles configured
-
-            // Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
             val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet
             val applicableRoleNames = allConfiguredRoleNames & incomingRoleNames
             val applicableRoles = configuredRoles filter (e => (applicableRoleNames + "*")(e.attValue("name")))

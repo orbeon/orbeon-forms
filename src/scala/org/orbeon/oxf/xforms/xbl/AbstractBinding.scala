@@ -29,6 +29,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.processor.DOMSerializer
 import org.orbeon.oxf.pipeline.api.PipelineContext
 
+// Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
     qNameMatch: QName,
     bindingElement: Element,

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -29,22 +28,14 @@
         <!-- Special treatment for Form Builder if roles are configured -->
 
         <xforms:action if="doc-available('oxf:/config/form-runner-roles.xml')">
+            <!-- Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point -->
+            <xxforms:variable name="header-property-name" select="normalize-space(xxforms:property('oxf.fr.authentication.header.roles.property-name'))" as="xs:string"/>
+            <xxforms:variable name="tokens" select="for $t in xxforms:get-request-header('Orbeon-Roles') return normalize-space($t)" as="xs:string*"/>
 
-            <xxforms:variable name="method" select="xxforms:property('oxf.fr.authentication.method')"/>
-            <xforms:action if="$method = 'header'">
-                <xxforms:variable name="header-property-name" select="normalize-space(xxforms:property('oxf.fr.authentication.header.roles.property-name'))" as="xs:string"/>
-                <!-- NOTE: Header specified in oxf.fr.authentication.header.roles is already parsed into 'Orbeon-Roles' at this point -->
-                <xxforms:variable name="tokens" select="for $t in xxforms:get-request-header('Orbeon-Roles') return normalize-space($t)" as="xs:string*"/>
-
-                <xforms:setvalue ref="instance('fr-roles-instance')/all-roles"
-                                 value="string-join(for $t in $tokens
-                                                        return if ($header-property-name != '')
-                                                                then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
-            </xforms:action>
-
-            <xforms:action if="$method = 'container'">
-                <xforms:setvalue ref="instance('fr-roles-instance')/all-roles" value="xxforms:property('oxf.fr.authentication.container.roles')"/>
-            </xforms:action>
+            <xforms:setvalue ref="instance('fr-roles-instance')/all-roles"
+                             value="string-join(for $t in $tokens
+                                                    return if ($header-property-name != '')
+                                                            then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
 
             <!-- Handle configuration -->
             <xforms:send submission="fr-get-roles-submission"/>
@@ -101,9 +92,6 @@
             <!-- Remember whether roles configuration was provided -->
             <xxforms:variable name="has-roles" as="xs:boolean" select="exists($all-roles)"/>
             <xforms:setvalue ref="instance('fr-roles-instance')/has-roles" value="$has-roles"/>
-
-            <!-- TODO: option of using servlet roles -->
-            <!--$servlet-roles := for $r in $all-roles return if (xxforms:is-user-in-role(normalize-space($r))) then $r else ()-->
 
             <!-- Take flat structure and create structure for current role's allowed apps and forms -->
             <xxforms:variable name="distinct-apps" as="xs:string*"
@@ -163,7 +151,7 @@
 
                 <!-- Issue a redirect if the user is not authorized -->
                 <!-- NOTE: Remove this, since in eforms IAM protects the pages. And if we put this in, then we probably
-                     want to add a config in form-runner-roles.xml to allow e.g. anynymous creation of new form data.
+                     want to add a config in form-runner-roles.xml to allow e.g. anonymous creation of new form data.
                 <xforms:load if="not(instance('fr-roles-instance')/authorized = 'true')"
                              resource="/fr/unauthorized"/>
                  -->

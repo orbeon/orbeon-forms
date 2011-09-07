@@ -54,7 +54,7 @@ object FormRunner {
 
                 val rolesArray = (
                     for {
-                        role <- rolesString.split(""",\s+""")
+                        role <- rolesString.split(""",|\s+""")
                         if userRoles.isUserInRole(role)
                     } yield
                         role)

@@ -216,7 +216,8 @@
 
         <xxforms:variable name="url-base-for-requests" select="'{$url-base-for-requests}'"/>
 
-        <!-- This model handles roles and permissions -->
+        <!-- This model handles Form Builder roles and permissions -->
+        <!-- NOTE: We could remove this if not($is-form-builder), except for the use of the $fr-roles variable -->
         <xi:include href="oxf:/apps/fr/includes/roles-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles i18n resources -->
         <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
@@ -313,7 +314,7 @@
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
             <!-- Variable exposing all the user roles -->
-            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s+')" as="xs:string*"/>
+            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-permissions')/@all-roles, '\s+')" as="xs:string*"/>
 
         </xsl:copy>
 

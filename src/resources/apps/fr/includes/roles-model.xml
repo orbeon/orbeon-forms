@@ -21,24 +21,27 @@
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
               xmlns:xhtml="http://www.w3.org/1999/xhtml"
               xmlns:saxon="http://saxon.sf.net/"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- Model initialization -->
     <xforms:action ev:event="xforms-model-construct-done">
         <!-- Special treatment for Form Builder if roles are configured -->
 
-        <xforms:action if="doc-available('oxf:/config/form-runner-roles.xml')">
-            <!-- Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point -->
-            <xxforms:variable name="header-property-name" select="normalize-space(xxforms:property('oxf.fr.authentication.header.roles.property-name'))" as="xs:string"/>
-            <xxforms:variable name="tokens" select="for $t in xxforms:get-request-header('Orbeon-Roles') return normalize-space($t)" as="xs:string*"/>
+        <xxforms:variable name="fb-roles"
+                          value="if (doc-available('oxf:/config/form-builder-permissions.xml')) then doc('oxf:/config/form-builder-permissions.xml')
+                                 else if (doc-available('oxf:/config/form-runner-roles.xml')) then doc('oxf:/config/form-runner-roles.xml')
+                                 else ()"/>
 
-            <xforms:setvalue ref="instance('fr-roles-instance')/all-roles"
-                             value="string-join(for $t in $tokens
-                                                    return if ($header-property-name != '')
-                                                            then if (tokenize($t, '=')[1] = $header-property-name) then tokenize($t, '=')[2] else () else $t, ' ')"/>
+        <xforms:action if="exists($fb-roles)">
 
-            <!-- Handle configuration -->
-            <xforms:send submission="fr-get-roles-submission"/>
+            <!-- Process permissions -->
+            <xforms:insert ref="instance('fr-permissions')" origin="form-runner:getFormBuilderPermissionsAsXML($fb-roles)"/>
+
+            <xforms:message level="xxforms:log-debug">
+                ORBEON ROLES DEBUG INFORMATION:
+                Resulting permissions: <xforms:output value="saxon:serialize(instance('fr-permissions'), 'xml')"/>
+            </xforms:message>
 
             <!--
                 Ok this is tricky:
@@ -49,129 +52,19 @@
                 * So we must recalculate/revalidate fr-form-model after setting roles here
 
             -->
-            <xforms:action if="instance('fr-roles-instance')/all-roles != ''">
+            <xforms:action if="instance('fr-permissions')/@all-roles != ''">
                 <xforms:recalculate model="fr-form-model"/>
                 <xforms:revalidate model="fr-form-model"/>
             </xforms:action>
         </xforms:action>
     </xforms:action>
 
-    <!-- Instance containing roles information -->
-    <xforms:instance id="fr-roles-instance">
-        <roles xmlns="">
-            <!-- Whether roles are configured -->
-            <has-roles>false</has-roles>
-            <!-- List of all available roles, space-separated -->
-            <all-roles/>
-            <!-- Whether the current page is authorized given the current roles -->
-            <authorized>false</authorized>
-        </roles>
-    </xforms:instance>
-
-    <!-- Instance containing roles -->
-    <xforms:instance id="fr-roles-config" xxforms:readonly="true">
-        <roles xmlns="">
-            <!-- Entries look like this: -->
-            <!--<role name="eforms-list-sash_subside" app="sash" form="subside"/>-->
-        </roles>
-    </xforms:instance>
-
-    <!-- Handle loading of roles configuration -->
-    <!-- TODO: wasteful to use submission and instance when doc() could be used. However summary view listens to this submission. -->
-    <xforms:submission id="fr-get-roles-submission" serialization="none"
-            method="get" resource="oxf:/config/form-runner-roles.xml"
-            replace="instance" instance="fr-roles-config">
-
-        <xforms:action ev:event="xforms-submit-done">
-            <xxforms:variable name="all-roles" select="instance('fr-roles-config')/role" as="element(role)*"/>
-
-            <xxforms:variable name="header-roles" as="element(role)*"
-                              select="for $r in $all-roles return if (normalize-space($r/@name) = tokenize(xxforms:instance('fr-roles-instance')/all-roles, '\s+')) then $r else ()"/>
-            <xxforms:variable name="current-roles" as="element(role)*" select="$header-roles"/>
-
-            <!-- Remember whether roles configuration was provided -->
-            <xxforms:variable name="has-roles" as="xs:boolean" select="exists($all-roles)"/>
-            <xforms:setvalue ref="instance('fr-roles-instance')/has-roles" value="$has-roles"/>
-
-            <!-- Take flat structure and create structure for current role's allowed apps and forms -->
-            <xxforms:variable name="distinct-apps" as="xs:string*"
-                              select="distinct-values(instance('fr-roles-config')/role[@name = ($current-roles/@name, '*')]/@app)"/><!-- also match on "*" to mean "any role" -->
-            <xforms:action if="$distinct-apps = '*'">
-                <!-- User has access to all apps (and therefore all forms) -->
-                <xforms:insert context="instance('fr-permissions')"
-                               origin="xxforms:element('app', (xxforms:attribute('name', '*'), xxforms:element('form', xxforms:attribute('name', '*'))))"/>
-            </xforms:action>
-            <xforms:action if="not($distinct-apps = '*')" xxforms:iterate="$distinct-apps">
-                <!-- User has access to certain apps only -->
-                <xxforms:variable name="current-app" select="." as="xs:string"/>
-
-                <!-- Insert new app element -->
-                <xforms:insert context="instance('fr-permissions')" nodeset="app"
-                               origin="xxforms:element('app', xxforms:attribute('name', $current-app))"/>
-
-                <xxforms:variable name="distinct-forms" as="xs:string*"
-                                  select="distinct-values(instance('fr-roles-config')/role[@app = $current-app]/@form)"/>
-
-                <xforms:action if="$distinct-forms = '*'">
-                    <!-- User has access to all forms within this app -->
-                    <xforms:insert context="instance('fr-permissions')/app[@name = $current-app]" nodeset="form"
-                                   origin="xxforms:element('form', xxforms:attribute('name', '*'))"/>
-                </xforms:action>
-                <xforms:action if="not($distinct-forms = '*')" xxforms:iterate="$distinct-forms">
-                    <!-- User has access to certain forms within this app only -->
-                    <xxforms:variable name="current-form" select="." as="xs:string"/>
-
-                    <!-- Insert new form element -->
-                    <xforms:insert context="instance('fr-permissions')/app[@name = $current-app]" nodeset="form"
-                                   origin="xxforms:element('form', xxforms:attribute('name', $current-form))"/>
-                </xforms:action>
-            </xforms:action>
-            <xforms:action if="not($current-roles)">
-                <!-- TODO: in this case, nothing must be shown! -->
-            </xforms:action>
-
-            <xforms:message level="xxforms:log-debug">
-                ORBEON ROLES DEBUG INFORMATION:
-                Resulting permissions: <xforms:output value="saxon:serialize(instance('fr-permissions'), 'xml')"/>
-            </xforms:message>
-
-            <!--
-                Remember whether the page is authorized or not. Usually a container protection by path will be in
-                place, but we double-check here.
-             -->
-            <xforms:setvalue if="not($has-roles)" ref="instance('fr-roles-instance')/authorized">true</xforms:setvalue>
-            <xforms:action if="$has-roles">
-                <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
-                <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
-
-                <!-- TODO: This logic should be a reusable function -->
-                <xforms:setvalue ref="instance('fr-roles-instance')/authorized"
-                             value="exists(instance('fr-permissions')/app[@name = '*'])
-                                        or exists(instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)])"/>
-
-                <!-- Issue a redirect if the user is not authorized -->
-                <!-- NOTE: Remove this, since in eforms IAM protects the pages. And if we put this in, then we probably
-                     want to add a config in form-runner-roles.xml to allow e.g. anonymous creation of new form data.
-                <xforms:load if="not(instance('fr-roles-instance')/authorized = 'true')"
-                             resource="/fr/unauthorized"/>
-                 -->
-
-            </xforms:action>
-
-        </xforms:action>
-
-    </xforms:submission>
-
     <!-- Instance to specify user permissions for app/form -->
     <xforms:instance id="fr-permissions">
-        <apps xmlns="">
+        <apps xmlns="" has-roles="false" all-roles="">
             <!--<app name="orbeon">-->
-                <!--<form name="bookcast"/>-->
-                <!--<form name="foo"/>-->
-            <!--</app>-->
-            <!--<app name="vd">-->
-                <!--<form name="contact"/>-->
-                <!--<form name="bar"/>-->
+                <!--<form name="bookshelf"/>-->
+                <!--<form name="dmv-14"/>-->
             <!--</app>-->
             <!--<app name="foo">-->
                 <!--<form name="*"/>-->

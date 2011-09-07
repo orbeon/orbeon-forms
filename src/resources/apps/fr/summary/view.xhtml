@@ -40,7 +40,7 @@
             <!-- NOTE: This test is duplicated in other places -->
             <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = ('builder', 'newbuilder')"/>
 
-            <xxforms:variable name="has-roles" select="xxforms:instance('fr-roles-instance')/has-roles = 'true'" as="xs:boolean"/>
+            <xxforms:variable name="has-roles" select="xxforms:instance('fr-permissions')/@has-roles = 'true'" as="xs:boolean"/>
             <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xxforms:variable name="form-query" select="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xxforms:variable name="initial-app-value" select="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>

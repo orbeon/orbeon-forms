@@ -28,9 +28,12 @@ object FormRunner {
     val propertyPrefix = "oxf.fr.authentication."
 
     val methodPropertyName = propertyPrefix + "method"
-    val containerRolesPropertyName = propertyPrefix + "container.roles"
+    val containerRolesPropertyName = propertyPrefix + "container.roles" // NOTE: this could be inferred from form-builder-permissions.xml, right?
     val headerUsernamePropertyName = propertyPrefix + "header.username"
     val headerRolesPropertyName = propertyPrefix + "header.roles"
+    val headerRolesPropertyNamePropertyName = propertyPrefix + "header.roles.property-name"
+
+    val NameValueMatch = "([^=]+)=([^=]+)".r
 
     type UserRoles = {
         def getRemoteUser(): String
@@ -68,10 +71,27 @@ object FormRunner {
 
             case "header" =>
 
+                val headerPropertyName = propertySet.getString(headerRolesPropertyNamePropertyName, "").trim match {
+                    case "" => None
+                    case value => Some(value)
+                }
+
                 def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p => getHeader(p.toLowerCase))
 
+                // Headers can be separated by comma or pipe
+                def split1(value: String) = value split """(\s*[,\|]\s*)+"""
+                // Then, if configured, a header can have the form name=value, where name is specified in a property
+                def split2(value: String) = headerPropertyName match {
+                    case Some(propertyName) =>
+                        value match {
+                            case NameValueMatch(`propertyName`, value) => Seq(value)
+                            case _ => Seq()
+                        }
+                    case _ => Seq(value)
+                }
+
                 val username = headerOption(headerUsernamePropertyName) map (_.head)
-                val roles = headerOption(headerRolesPropertyName) map (_ flatMap (_.split("""(\s*[,\|]\s*)+""")))
+                val roles = headerOption(headerRolesPropertyName) map (_ flatMap (split1(_)) flatMap (split2(_)))
 
                 (username, roles)
 
@@ -81,7 +101,7 @@ object FormRunner {
 
     def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String => Option[Array[String]]) = {
 
-        val (username, roles) = FormRunner.getUserRoles(userRoles, getHeader)
+        val (username, roles) = getUserRoles(userRoles, getHeader)
 
         val result = collection.mutable.Map[String, Array[String]]()
 
@@ -162,13 +182,71 @@ object FormRunner {
                     filter (p =>
                         (p \ * isEmpty) ||                                              // No constraint on the permission, so it is automatically satisfied
                         (p \ "user-role" forall (r =>                                   // If we have user-role constraints, they must all pass
-                            (r \@ "any-of" stringValue) split "\\s+"                 // Constraint is satisfied if user has at least one of the roles
+                            (r \@ "any-of" stringValue) split "\\s+"                    // Constraint is satisfied if user has at least one of the roles
                             map (_.replace("%20", " "))                                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
                             exists (request.isUserInRole(_)))))
-                    flatMap (p => (p \@ "operations" stringValue) split "\\s+")      // For the permissions that passed, return the list operations
+                    flatMap (p => (p \@ "operations" stringValue) split "\\s+")         // For the permissions that passed, return the list operations
                     distinct                                                            // Remove duplicate operations
                 )
         }) asJava
+    }
+
+    def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo): NodeInfo = {
+        val request = NetUtils.getExternalContext.getRequest
+        getFormBuilderPermissionsAsXML(formRunnerRoles, Option(request.getHeaderValuesMap.get("orbeon-roles")) getOrElse Array[String]() toSet)
+    }
+
+    def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): NodeInfo = {
+
+        val appForms = getFormBuilderPermissions(formRunnerRoles, incomingRoleNames)
+
+        if (appForms.isEmpty) {
+            <apps has-roles="false" all-roles=""/>
+        } else {
+            // Result document contains a tree structure of apps and forms
+            <apps has-roles="true" all-roles={incomingRoleNames mkString " "}>{
+                appForms map { case (app, forms) =>
+                    <app name={app}>{ forms map { form => <form name={form}/> } }</app>
+                }
+            }</apps>
+        }
+    }
+
+    def getFormBuilderPermissions(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): Map[String, Set[String]] = {
+
+        val configuredRoles = formRunnerRoles.root \ * \ "role"
+        if (configuredRoles.isEmpty) {
+            // No role configured
+            Map()
+        } else {
+            // Roles configured
+
+            // Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
+            val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet
+            val applicableRoleNames = allConfiguredRoleNames & incomingRoleNames
+            val applicableRoles = configuredRoles filter (e => (applicableRoleNames + "*")(e.attValue("name")))
+            val applicableAppNames = applicableRoles map (_.attValue("app")) toSet
+
+            if (applicableAppNames("*")) {
+                // User has access to all apps (and therefore all forms)
+                Map("*" -> Set("*"))
+            } else {
+                // User has access to certain apps only
+                (for {
+                    app <- applicableAppNames
+                    forms = {
+                        val applicableFormsForApp = applicableRoles filter (_.attValue("app") == app) map (_.attValue("form")) toSet
+
+                        if (applicableFormsForApp("*")) Set("*") else applicableFormsForApp
+                    }
+                } yield app -> forms) toMap
+            }
+        }
+    }
+
+    private def isAuthorized(appForms: Map[String, Set[String]], app: String, form: String) = {
+        // Authorized if access to all apps OR if access to current app AND (access to all forms in app OR to specific form in app)
+        (appForms contains "*") || (appForms.get(app) map (_ & Set("*", form) nonEmpty) getOrElse false)
     }
 
     // Interrupt current processing and send an error code to the client.

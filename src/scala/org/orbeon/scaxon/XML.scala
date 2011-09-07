@@ -184,10 +184,14 @@ object XML {
         def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(Axis.ATTRIBUTE, attName))
         def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
+        def root = nodeInfo.getDocumentRoot
+
         def att(attName: String) = \@(attName)
         def att(test: Test) = \@(test)
         def child(test: Test) = \(test)
         def descendant(test: Test) = \\(test)
+
+        def attValue(attName: String) = \@(attName).stringValue
 
         def self(test: Test) = find(Axis.SELF, test)
         def parent = Option(nodeInfo.getParent)

@@ -15,74 +15,45 @@
 package org.orbeon.oxf.xforms;
 
 import net.sf.ehcache._
-import config.CacheConfiguration
 import org.orbeon.oxf.resources.URLFactory
 import processor.XFormsServer
 import org.orbeon.oxf.util.LoggerFactory
-import store.MemoryStoreEvictionPolicy
 import org.orbeon.oxf.common.OXFException
 
+/**
+ * All Ehcache-based caches.
+ */
 object Caches {
+
+    lazy val stateCache = getCache("xforms.state")
+    lazy val resourcesCache = getCache("xforms.resources")
+    lazy val xblCache = getCache("xforms.xbl")
 
     private val ehcachePath = "oxf:/config/ehcache.xml"
 
-    lazy val cacheManager =
+    private lazy val cacheManager =
         try {
             // Read configuration from XML file in resources
             val manager = new CacheManager(URLFactory.createURL(ehcachePath))
-            debug("initialized cache manager from " + ehcachePath)
-            manager
+            withMessage(manager, "initialized cache manager from " + ehcachePath)
         } catch {
             case _ =>
-                // Fallback configuration if not found
-                warn("unable to read cache manager configuration from " + ehcachePath)
-                new CacheManager
+                throw new OXFException("unable to read cache manager configuration from " + ehcachePath)
         }
 
-    private val resourceCacheName = "xforms.resources"
-
-    lazy val resourcesCache =
-        Caches.cacheManager.getCache(resourceCacheName) match {
-            // If manager already knows about our cache we are good to go
+    private def getCache(cacheName: String) =
+        cacheManager.getCache(cacheName) match {
             case cache: Cache =>
-                debug("found cache configuration for " + resourceCacheName)
-                cache
-            // Otherwise use fallback configuration
+                withMessage(cache, "found cache configuration for " + cacheName)
             case _ =>
-                val cache = new Cache(new CacheConfiguration(resourceCacheName, 200)
-                        memoryStoreEvictionPolicy MemoryStoreEvictionPolicy.LFU
-                        overflowToDisk true
-                        diskSpoolBufferSizeMB 1
-                        diskStorePath "java.io.tmpdir/orbeon/cache"
-                        eternal true
-                        timeToLiveSeconds 0
-                        timeToIdleSeconds 0
-                        diskPersistent true
-                        maxElementsOnDisk 0
-                        diskExpiryThreadIntervalSeconds 120)
-
-                Caches.cacheManager.addCache(cache)
-                debug("used fallback cache configuration for " + resourceCacheName)
-                cache
+                throw new OXFException("Cache configuration not found for " + cacheName + ". Make sure an ehcache.xml file is in place.")
         }
 
-    private val xblCacheName = "xforms.xbl"
+    private val indentedLogger = {
+        val LOGGING_CATEGORY = "caches"
+        val logger = LoggerFactory.createLogger(Caches.getClass)
+        XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger, LOGGING_CATEGORY)
+    }
 
-    lazy val xblCache =
-        Caches.cacheManager.getCache(xblCacheName) match {
-            // If manager already knows about our cache we are good to go
-            case cache: Cache =>
-                debug("found cache configuration for " + xblCacheName)
-                cache
-            // Otherwise use fallback configuration
-            case _ =>
-                throw new OXFException("Cache configuration not found for " + xblCacheName + ". Make sure an ehcache.xml file is in place.")
-        }
-
-    private val LOGGING_CATEGORY = "caches"
-    private val logger = LoggerFactory.createLogger(Caches.getClass)
-    private val indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger, LOGGING_CATEGORY)
-
-    private def debug(message: String) = indentedLogger.logDebug("", message)
-    private def warn(message: String) = indentedLogger.logWarning("", message)
+    private def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
 }

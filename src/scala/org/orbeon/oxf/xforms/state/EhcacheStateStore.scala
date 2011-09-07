@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import net.sf.ehcache.{Element => EhElement, _ }
-import config._
-import store.MemoryStoreEvictionPolicy
+import net.sf.ehcache.{Element => EhElement }
 import org.orbeon.oxf.xforms._
 
 /**
@@ -26,31 +24,7 @@ object EhcacheStateStore extends XFormsStateStore {
 
     private val storeDebugName = "Ehcache"
 
-    private val cacheName = "xforms.state"
-
-    private lazy val stateCache =
-        Caches.cacheManager.getCache(cacheName) match {
-            // If manager already knows about our cache we are good to go
-            case cache: Cache =>
-                debug("found cache configuration for " + cacheName)
-                cache
-            // Otherwise use fallback configuration
-            case _ =>
-                val cache = new Cache(new CacheConfiguration(cacheName, 50)
-                        memoryStoreEvictionPolicy MemoryStoreEvictionPolicy.LFU
-                        overflowToDisk true
-                        diskSpoolBufferSizeMB 10
-                        diskStorePath "java.io.tmpdir/orbeon/cache"
-                        eternal false
-                        timeToLiveSeconds 0
-                        timeToIdleSeconds (30 * 60)
-                        diskPersistent false
-                        diskExpiryThreadIntervalSeconds 120)
-                
-                Caches.cacheManager.addCache(cache)
-                debug("used fallback cache configuration for " + cacheName)
-                cache
-        }
+    private def stateCache = Caches.stateCache
 
     def storeDocumentState(document: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean) = {
 
@@ -119,7 +93,4 @@ object EhcacheStateStore extends XFormsStateStore {
 
     private def debug(message: String) =
         XFormsStateManager.getIndentedLogger.logDebug("", storeDebugName + " store: " + message)
-
-    private def warn(message: String) =
-        XFormsStateManager.getIndentedLogger.logWarning("", storeDebugName + " store: " + message)
 }

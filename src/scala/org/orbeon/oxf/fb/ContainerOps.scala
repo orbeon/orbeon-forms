@@ -17,6 +17,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
+
 object ContainerOps {
 
     // Hardcoded list of FB controls we know can contain others

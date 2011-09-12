@@ -86,13 +86,13 @@
                                             then $current-resources
                                             else ($component-template//xforms:instance[@id = 'fr-form-resources']/resources/resource[@xml:lang = $request-language])[1]"/>
 
-                    <xsl:variable name="is-repeat" select="$current-qname = xs:QName('fr:repeat')" as="xs:boolean"/>
+                    <xsl:variable name="is-repeat" select="$current-qname = xs:QName('fr:repeat') or ($current-qname = xs:QName('fr:grid') and (@repeat = 'true' or exists((@minOccurs, @maxOccurs))))" as="xs:boolean"/>
 
                     <!-- Find grid -->
                     <!-- TODO: search for fr:repeat/fr:body in component too -->
                     <xsl:variable name="grid" as="element()"
                                       select="if ($is-component) then $component-template//fr:grid[1]
-                                              else if ($is-repeat) then fr:body[1] else ."/>
+                                              else if ($is-repeat) then (fr:body[1], .)[1] else ."/>
 
                     <!-- Iterate over the grid's children XForms and XBL controls -->
                     <xsl:for-each select="$grid//(xforms:* | fr:*)[(@ref or @bind) and ends-with(@id, '-control')]">

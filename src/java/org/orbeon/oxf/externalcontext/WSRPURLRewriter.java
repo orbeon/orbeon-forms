@@ -17,9 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -123,7 +121,7 @@ public class WSRPURLRewriter implements URLRewriter {
     }
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {
-        // JSR-268 supports portlet resources
+        // JSR-286 supports portlet resources
 
         // First rewrite path to support versioned resources
         final String rewrittenPath = URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(),

@@ -210,7 +210,7 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
         request.getAttributesMap().put(clazz, o);
     }
 
-    // JSR-268 methods
+    // JSR-286 methods
     public String getETag() {
         // TODO
         return null;

@@ -141,7 +141,7 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
         // TODO
     }
 
-    // JSR-268 methods
+    // JSR-286 methods
 
     public ResourceURL createResourceURL() {
         if (nativeResponse != null)

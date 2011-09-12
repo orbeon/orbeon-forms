@@ -17,9 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
@@ -263,7 +261,7 @@ public class OrbeonPortlet2DelegateBase extends GenericPortlet {
         }
     }
 
-    // JSR-268 method
+    // JSR-286 method
     @Override
     public void serveResource(ResourceRequest request, ResourceResponse response) throws PortletException, IOException {
         try {

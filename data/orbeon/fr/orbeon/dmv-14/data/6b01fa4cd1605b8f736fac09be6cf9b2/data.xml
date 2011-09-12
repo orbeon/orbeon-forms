@@ -18,7 +18,8 @@
         <residence-state>CA</residence-state>
         <residence-zip>94102</residence-zip>
     </residence-address>
-    <mailing-address show="true">
+    <mailing-address>
+        <mailing-address-different>true</mailing-address-different>
         <mailing-street-number>456</mailing-street-number>
         <mailing-street-name-1>Pine Avenue</mailing-street-name-1>
         <mailing-street-name-2>Apt 42</mailing-street-name-2>
@@ -52,7 +53,8 @@
         <old-state>CA</old-state>
         <old-zip>12345</old-zip>
     </old-address>
-    <trailer-coach-vessel show="true">
+    <trailer-coach-vessel>
+        <has-trailer-coach-vessel>true</has-trailer-coach-vessel>
         <vehicle-street-number>456</vehicle-street-number>
         <vehicle-street-name-1>Pine Avenue</vehicle-street-name-1>
         <vehicle-street-name-2>Apt 42</vehicle-street-name-2>

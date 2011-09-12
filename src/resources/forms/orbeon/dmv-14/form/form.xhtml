@@ -55,6 +55,7 @@
                         <residence-zip/>
                     </residence-address>
                     <mailing-address>
+                        <mailing-address-different/>
                         <mailing-street-number/>
                         <mailing-street-name-1/>
                         <mailing-street-name-2/>
@@ -79,6 +80,7 @@
                         <old-zip/>
                     </old-address>
                     <trailer-coach-vessel>
+                        <has-trailer-coach-vessel/>
                         <vehicle-street-number/>
                         <vehicle-street-name-1/>
                         <vehicle-street-name-2/>
@@ -140,6 +142,8 @@
 
                 </xforms:bind>
                 <xforms:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
+                    <xforms:bind id="mailing-address-different-bind" ref="mailing-address-different" type="xforms:boolean"/>
+                    <xforms:bind ref="* except mailing-address-different" relevant="../mailing-address-different = 'true'"/>
                     <xforms:bind id="icon-3-bind" ref="icon-3" type="xs:anyURI"/>
                     <xforms:bind id="mailing-street-name-1-bind" ref="mailing-street-name-1"
                                  name="mailing-street-name-1"
@@ -185,6 +189,8 @@
                 </xforms:bind>
                 <xforms:bind id="trailer-coach-vessel-bind" ref="trailer-coach-vessel"
                              name="trailer-coach-vessel">
+                    <xforms:bind id="has-trailer-coach-vessel-bind" ref="has-trailer-coach-vessel" type="xforms:boolean"/>
+                    <xforms:bind ref="* except has-trailer-coach-vessel" relevant="../has-trailer-coach-vessel = 'true'"/>
                     <xforms:bind id="vehicle-street-name-1-bind" ref="vehicle-street-name-1"
                                  name="vehicle-street-name-1"
                                  type="dmv:street-name-1"
@@ -477,6 +483,16 @@
                             <help/>
                             <alert>The value of this field is incorrect</alert>
                         </residence-address>
+                        <mailing-address-different>
+                            <label>Mailing address is different from residence address</label>
+                            <hint/>
+                            <help/>
+                            <alert>The value of this field is incorrect</alert>
+                            <item>
+                                <label>Mark this box if mailing address is different from residence address</label>
+                                <value>true</value>
+                            </item>
+                        </mailing-address-different>
                         <mailing-address>
                             <label>New or Correct Mailing Address</label>
                             <hint/>
@@ -489,6 +505,16 @@
                             <help/>
                             <alert>The value of this field is incorrect</alert>
                         </vehicles>
+                         <has-trailer-coach-vessel>
+                            <label>Location is different from residence address</label>
+                            <hint/>
+                            <help/>
+                            <alert>The value of this field is incorrect</alert>
+                            <item>
+                                <label>Mark this box if location is different from residence address</label>
+                                <value>true</value>
+                            </item>
+                        </has-trailer-coach-vessel>
                         <old-address>
                             <label>Old Address</label>
                             <hint/>
@@ -724,7 +750,7 @@
 
                 <fr:section id="personal-information-section" bind="personal-information-bind">
                     <xforms:label ref="$form-resources/personal-information/label"/>
-                    <fr:grid columns="4">
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="last-name-control" class="fr-summary fr-search fr-width-10em"
@@ -794,7 +820,7 @@
                     <!--</fr:section>-->
                 <!--<fr:section id="voter-address-change-section" bind="voter-address-change-bind">-->
                     <!--<xforms:label ref="$form-resources/voter-address-change/label"/>-->
-                    <fr:grid columns="1">
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:select appearance="full" id="voter-address-change-control"
@@ -814,7 +840,7 @@
                 </fr:section>
                 <fr:section id="residence-address-section" bind="residence-address-bind">
                     <xforms:label ref="$form-resources/residence-address/label"/>
-                    <fr:grid columns="4">
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="residence-street-number-control" class="fr-width-5em"
@@ -898,7 +924,24 @@
                     </fr:grid>
                 </fr:section>
                 <fr:section id="mailing-address-section" bind="mailing-address-bind">
-                    <fr:grid columns="4">
+                    <fr:grid>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select appearance="full" id="mailing-address-different-control"
+                                               bind="mailing-address-different-bind">
+                                    <xforms:label ref="$form-resources/mailing-address-different/label"/>
+                                    <xforms:hint ref="$form-resources/mailing-address-different/hint"/>
+                                    <xforms:help ref="$form-resources/mailing-address-different/help"/>
+                                    <xforms:alert ref="$form-resources/mailing-address-different/alert"/>
+                                    <xforms:itemset ref="$form-resources/mailing-address-different/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="mailing-street-number-control" class="fr-width-5em"
@@ -1018,7 +1061,7 @@
                     <!--</fr:section>-->
                 <!--<fr:section id="leased-vehicles-section" bind="leased-vehicles-bind">-->
                     <!--<xforms:label ref="$form-resources/leased-vehicles/label"/>-->
-                    <fr:grid columns="1">
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="leasing-company-name-control" bind="leasing-company-name-bind">
@@ -1033,7 +1076,24 @@
                 </fr:section>
                 <fr:section id="trailer-coach-vessel-section" bind="trailer-coach-vessel-bind">
                     <xforms:label ref="$form-resources/trailer-coach-vessel/label"/>
-                    <fr:grid columns="4">
+                    <fr:grid>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select appearance="full" id="has-trailer-coach-vessel-control"
+                                               bind="has-trailer-coach-vessel-bind">
+                                    <xforms:label ref="$form-resources/has-trailer-coach-vessel/label"/>
+                                    <xforms:hint ref="$form-resources/has-trailer-coach-vessel/hint"/>
+                                    <xforms:help ref="$form-resources/has-trailer-coach-vessel/help"/>
+                                    <xforms:alert ref="$form-resources/has-trailer-coach-vessel/alert"/>
+                                    <xforms:itemset ref="$form-resources/has-trailer-coach-vessel/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="vehicle-street-number-control" class="fr-width-5em"
@@ -1086,7 +1146,7 @@
                 </fr:section>
                 <fr:section id="old-address-section" bind="old-address-bind">
                     <xforms:label ref="$form-resources/old-address/label"/>
-                    <fr:grid columns="4">
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input id="old-street-number-name-control" bind="old-street-number-name-bind">

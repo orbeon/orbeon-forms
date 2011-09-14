@@ -34,8 +34,6 @@ import xml.{NodeSeq, Node, XML}
 
  Known issues:
 
- * does not support storing and retrieving forms
- * does not support storing and retrieving form attachments
  * reusing connection to MongoDB (opens/closes at each request)
 */
 class MongoDBPersistence extends HttpServlet {
@@ -45,6 +43,8 @@ class MongoDBPersistence extends HttpServlet {
     private val LAST_UPDATE_KEY = "_orbeon_last_update"
     private val XML_KEY = "_orbeon_xml"
     private val KEYWORDS_KEY = "_orbeon_keywords"
+    private val FORM_KEY = "_orbeon_form"
+    private val XHTML_KEY = "_orbeon_xhtml"
 
     /*! Regexp matching a form data path */
     private val DataPath = """.*/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+)""".r
@@ -63,8 +63,11 @@ class MongoDBPersistence extends HttpServlet {
                 storeDocument(app, form, documentId, req.getInputStream)
             case DataPath(app, form, documentId, attachmentName) =>
                 storeAttachment(app, form, documentId, attachmentName, req)
-            case FormPath(app, form, documentId) =>
-                // TODO
+            case FormPath(app, form, "form.xhtml") =>
+                storeForm(app, form, req.getInputStream)
+            case FormPath(app, form, attachmentName) =>
+                storeFormAttachment(app, form, attachmentName, req)
+
             case _ => throw new ServletException
         }
     }
@@ -79,8 +82,10 @@ class MongoDBPersistence extends HttpServlet {
                 retrieveDocument(app, form, documentId, resp)
             case DataPath(app, form, documentId, attachmentName) =>
                 retrieveAttachment(app, form, documentId, attachmentName, resp)
-            case FormPath(app, form, documentId) =>
-                // TODO
+            case FormPath(app, form, "form.xhtml") =>
+                retrieveForm(app, form, resp)
+            case FormPath(app, form, attachmentName) =>
+                retrieveFormAttachment(app, form, attachmentName, resp)
             case _ => throw new ServletException
         }
     }
@@ -157,6 +162,64 @@ class MongoDBPersistence extends HttpServlet {
     def retrieveAttachment(app: String, form: String, documentId: String, name: String, resp: HttpServletResponse) {
         withFS {
             _.findOne(Seq(app, form, documentId, name) mkString "/") match {
+                case Some(dbFile) =>
+                    resp.setContentType(dbFile.contentType)
+                    copyStream(dbFile.inputStream, resp.getOutputStream)
+                case _ => resp.setStatus(404)
+            }
+        }
+    }
+
+    /*!## Store an XHTML document */
+    def storeForm(app: String, form: String, inputStream: InputStream) {
+
+        // Use MongoDB ObjectID as that can serve as timestamp for creation
+        val builder = MongoDBObject.newBuilder
+        builder += (FORM_KEY -> form)
+        builder += (LAST_UPDATE_KEY -> DateTimeValue.getCurrentDateTime(null).getCanonicalLexicalRepresentation.toString)
+
+        //Load XML Doc, add to builder for storage
+        val root = XML.load(inputStream)
+
+        builder += (XHTML_KEY -> root.toString)
+
+        // Create or update
+        withCollection(app, form) {
+            _.update(MongoDBObject(FORM_KEY -> form), builder.result, upsert = true, multi = false)
+        }
+    }
+
+    /*!## Retrieve an XHTML document */
+    def retrieveForm(app: String, form: String, resp: HttpServletResponse) {
+        withCollection(app, form) { coll =>
+            coll.findOne(MongoDBObject(FORM_KEY -> form)) match {
+                case Some(result: DBObject) =>
+                    result(XHTML_KEY) match {
+                        case xml: String =>
+                            resp.setContentType("application/xhtml+xml")
+                            useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
+                                osw => osw.write(xml)
+                            }
+                        case _ => resp.setStatus(404)
+                    }
+                case _ => resp.setStatus(404)
+            }
+        }
+    }
+
+    def storeFormAttachment(app: String, form: String, name: String, req: HttpServletRequest) {
+        withFS {
+            _(req.getInputStream) { fh =>
+                fh.filename = Seq(app, form, "form", name) mkString "/"
+                fh.contentType = Option(req.getContentType) getOrElse "application/octet-stream"
+            }
+        }
+    }
+
+    /*!## Retrieve an attachment */
+    def retrieveFormAttachment(app: String, form: String, name: String, resp: HttpServletResponse) {
+        withFS {
+            _.findOne(Seq(app, form, "form", name) mkString "/") match {
                 case Some(dbFile) =>
                     resp.setContentType(dbFile.contentType)
                     copyStream(dbFile.inputStream, resp.getOutputStream)

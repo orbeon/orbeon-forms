@@ -26,7 +26,7 @@ class CoffeeScriptTask extends MatchingTask {
     @BeanProperty var fromDir: File = _
     @BeanProperty var toDir: File = _
 
-    override def execute = {
+    override def execute() {
 
         Seq(fromDir, toDir) find (!_.isDirectory) foreach (s => throw new BuildException(s + " is not a valid directory"))
 
@@ -48,7 +48,13 @@ class CoffeeScriptTask extends MatchingTask {
 
                     // Write result
                     oFile.getParentFile.mkdirs()
-                    copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
+                    try {
+                        copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
+                    } catch {
+                        case e =>
+                            runQuietly(oFile.delete()) // remove output file if something happened while producing the file
+                            throw e
+                    }
                 }
             }
         } catch {

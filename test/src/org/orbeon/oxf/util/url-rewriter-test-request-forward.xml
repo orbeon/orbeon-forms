@@ -77,6 +77,10 @@
             <name>javax.servlet.forward.context_path</name>
             <value>/myapp</value>
         </attribute>
+        <attribute>
+            <name>oxf.xforms.renderer.deployment</name>
+            <value>separate</value>
+        </attribute>
     </attributes>
     <method>GET</method>
     <path-info>/doc/home-welcome</path-info>

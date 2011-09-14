@@ -454,7 +454,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
     public abstract class BaseResponse implements Response {
 
-        private URLRewriter urlRewriter = new WSRPURLRewriter(pipelineContext, request);
+        private final URLRewriter urlRewriter = new WSRPURLRewriter(pipelineContext, request, URLRewriterUtils.isWSRPEncodeResources());
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // NIY / FIXME
@@ -617,13 +617,13 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
                 if (StringBuilderWriter != null) {
                     // Write directly
-                    WSRP2Utils.write(request.getContextPath(), response, StringBuilderWriter.toString(), XMLUtils.isXMLMediatype(contentType));
+                    WSRP2Utils.write(response, StringBuilderWriter.toString(), XMLUtils.isXMLMediatype(contentType));
                 } else if (byteStream != null) {
                     // Transform to string and write
                     String encoding = NetUtils.getContentTypeCharset(contentType);
                     if (encoding == null)
                         encoding = CachedSerializer.DEFAULT_ENCODING;
-                    WSRP2Utils.write(request.getContextPath(), response, new String(byteStream.getByteArray(), 0, byteStream.size(), encoding), XMLUtils.isXMLMediatype(contentType));
+                    WSRP2Utils.write(response, new String(byteStream.getByteArray(), 0, byteStream.size(), encoding), XMLUtils.isXMLMediatype(contentType));
                 } else {
                     throw new IllegalStateException("Processor execution did not return content.");
                 }

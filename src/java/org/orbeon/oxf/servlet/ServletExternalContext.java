@@ -770,8 +770,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 response.setURLRewriter(new TemplateURLRewriter(request));
             } else if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
                         "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
-                // Configuration asks to use portlet2
-                response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest()));
+                // Configuration asks to use portlet2/wsrp
+                response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
             } else {
                 // Default
                 response.setURLRewriter(new ServletURLRewriter(getRequest()));

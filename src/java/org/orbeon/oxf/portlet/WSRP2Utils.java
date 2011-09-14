@@ -42,7 +42,7 @@ public class WSRP2Utils {
      *
      * It is possible to escape by using the string wsrp_rewritewsrp_rewrite.
      */
-    public static void write(String contextPath, MimeResponse response, String content, boolean encodeForXML) throws IOException {
+    public static void write(MimeResponse response, String content, boolean encodeForXML) throws IOException {
         int stringLength = content.length();
         int currentIndex = 0;
         int index;
@@ -70,7 +70,7 @@ public class WSRP2Utils {
 
                 currentIndex = endIndex + WSRPURLRewriter.END_TAG_LENGTH;
 
-                final String decodedPortletURL = wsrpToPortletURL(contextPath, encodedURL, response);
+                final String decodedPortletURL = wsrpToPortletURL(encodedURL, response);
                 writer.write(encodeForXML ? escapeXMLMinimal(decodedPortletURL) : decodedPortletURL);
 
             } else if (index < stringLength - WSRPURLRewriter.BASE_TAG_LENGTH && content.charAt(index + WSRPURLRewriter.BASE_TAG_LENGTH) == '_') {
@@ -141,7 +141,7 @@ public class WSRP2Utils {
     /**
      * Decode a WSRP-encoded URL into a Portlet-encoded URL.
      */
-    private static String wsrpToPortletURL(String contextPath, String encodedURL, MimeResponse response) {
+    private static String wsrpToPortletURL(String encodedURL, MimeResponse response) {
         // Parse URL
         final Map<String, String[]> wsrpParameters = decodeQueryString(encodedURL, true);
 
@@ -181,8 +181,6 @@ public class WSRP2Utils {
                 }
             }
 
-            final boolean SERVE_RESOURCES_VIA_PORTLET = false;
-
             if (urlTypeValue.equals(WSRPURLRewriter.URL_TYPE_RESOURCE_STRING)) {// NOTE: With Liferay, baseURL instanceof ResourceURL is always true!
                 final String resourcePath = navigationParameters.get(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME)[0];
 
@@ -192,27 +190,24 @@ public class WSRP2Utils {
                 final String resourceQuery = NetUtils.encodeQueryString2(navigationParameters);
                 final String resourceId = NetUtils.appendQueryString(resourcePath, resourceQuery);
 
-                if (SERVE_RESOURCES_VIA_PORTLET) {
-                    // Serve resources via the portlet
-                    final ResourceURL resourceURL = (ResourceURL) baseURL;
+                // Serve resources via the portlet
+                // NOTE: If encoding resource URLs is disabled, we won't even reach this point as a plain URL/path is
+                // generated. See WSRPURLRewriter.rewriteResourceURL().
+                final ResourceURL resourceURL = (ResourceURL) baseURL;
 
-                    // With resource URLs, mode and state can't be changed
+                // With resource URLs, mode and state can't be changed
 
-                    // Use resource id
-                    // The portal actually automatically adds existing parameters, including orbeon.path, in the resource URL.
-                    // If we set orbeon.path again to store the resource URL, the resulting URL ends up having two orbeon.path.
-                    // So instead we use the resource id, which seems to be designed for this anyway.
+                // Use resource id
+                // The portal actually automatically adds existing parameters, including orbeon.path, in the resource URL.
+                // If we set orbeon.path again to store the resource URL, the resulting URL ends up having two orbeon.path.
+                // So instead we use the resource id, which seems to be designed for this anyway.
 
-                    resourceURL.setResourceID(resourceId);
+                resourceURL.setResourceID(resourceId);
 
-                    // PAGE is the default
-                    // Could set it to FULL or PORTLET for resources such as images, JavaScript, etc., but NOT for e.g. /xforms-server
-                    // Note that Liferay doesn't seem to do much with ResourceURL.FULL.
-                    resourceURL.setCacheability(ResourceURL.PAGE);
-                } else {
-                    // Serve resources via the servlet
-                    return response.encodeURL(contextPath + resourceId);
-                }
+                // PAGE is the default
+                // Could set it to FULL or PORTLET for resources such as images, JavaScript, etc., but NOT for e.g. /xforms-server
+                // Note that Liferay doesn't seem to do much with ResourceURL.FULL.
+                resourceURL.setCacheability(ResourceURL.PAGE);
             } else if (baseURL instanceof PortletURL) {
 
                 final PortletURL portletURL = (PortletURL) baseURL;

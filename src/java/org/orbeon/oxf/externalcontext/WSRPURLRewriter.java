@@ -51,11 +51,13 @@ public class WSRPURLRewriter implements URLRewriter {
 
     private final PropertyContext propertyContext;
     private final ExternalContext.Request request;
+    private final boolean wsrpEncodeResources;
     private List<URLRewriterUtils.PathMatcher> pathMatchers;
 
-    public WSRPURLRewriter(PropertyContext propertyContext, ExternalContext.Request request) {
+    public WSRPURLRewriter(PropertyContext propertyContext, ExternalContext.Request request, boolean wsrpEncodeResources) {
         this.propertyContext = propertyContext;
         this.request = request;
+        this.wsrpEncodeResources = wsrpEncodeResources;
     }
 
     @SuppressWarnings("unchecked")
@@ -121,14 +123,20 @@ public class WSRPURLRewriter implements URLRewriter {
     }
 
     public String rewriteResourceURL(String urlString, int rewriteMode) {
-        // JSR-286 supports portlet resources
+        if (wsrpEncodeResources) {
+            // JSR-286 supports portlet resources
 
-        // First rewrite path to support versioned resources
-        final String rewrittenPath = URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(),
+            // First rewrite path to support versioned resources
+            final String rewrittenPath = URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(),
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
 
-        // Then do the WSRP encoding
-        return rewritePortletURL(rewrittenPath, URL_TYPE_RESOURCE, null, null);
+            // Then do the WSRP encoding
+            return rewritePortletURL(rewrittenPath, URL_TYPE_RESOURCE, null, null);
+        } else {
+            // Generate resource served by the servlet
+            return URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(),
+                ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+        }
     }
 
     /**

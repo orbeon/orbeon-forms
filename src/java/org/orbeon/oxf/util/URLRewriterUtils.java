@@ -26,9 +26,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utility class to rewrite URLs.
@@ -38,6 +36,7 @@ public class URLRewriterUtils {
     // Versioned resources configuration
     public static final String RESOURCES_VERSIONED_PROPERTY = "oxf.resources.versioned";
     public static final boolean RESOURCES_VERSIONED_DEFAULT = false;
+    public static final boolean WSRP_ENCODE_RESOURCES_DEFAULT = false;
 
     private static final String REWRITING_PLATFORM_PATHS_PROPERTY = "oxf.url-rewriting.platform-paths";
     private static final String REWRITING_APP_PATHS_PROPERTY = "oxf.url-rewriting.app-paths";
@@ -45,6 +44,7 @@ public class URLRewriterUtils {
     private static final String REWRITING_STRATEGY_PROPERTY_PREFIX = "oxf.url-rewriting.strategy.";
     private static final String REWRITING_CONTEXT_PROPERTY_PREFIX = "oxf.url-rewriting.";
     private static final String REWRITING_CONTEXT_PROPERTY_SUFFIX = ".context";
+    private static final String REWRITING_WSRP_ENCODE_RESOURCES_PROPERTY = "oxf.url-rewriting.wsrp.encode-resources";
 
     public static final String RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number";
 
@@ -124,23 +124,19 @@ public class URLRewriterUtils {
         // in the case of includes, it represents properties of the included servlet, not the values of the including
         // servlet.
         final String sourceContextPath = (String) attributes.get("javax.servlet.forward.context_path");
-        if (sourceContextPath != null) {
-            // We were forwarded to
-            if (isPlatformPath && isSeparateDeployment(request)) {
-                // This is the case of forwarding in separate deployment: Orbeon resources are forwarded
+        if (sourceContextPath != null && isSeparateDeployment(request)) {
+            // This is the case of forwarding in separate deployment
+            if (isPlatformPath) {
+                // Orbeon resources are forwarded
                 // E.g. /foobar/orbeon
                 return sourceContextPath + request.getContextPath();
-            } else if (isPlatformPath) {
-                // This is the case of forwarding without separate deployment: Orbeon resources are loaded by the Orbeon context
-                // E.g. /orbeon
-                return request.getContextPath();
             } else {
-                // This is the case of application resources: they are loaded from the original context
+                // Application resources are loaded from the original context
                 // E.g. /foobar
                 return sourceContextPath;
             }
         } else {
-            // We were not forwarded to
+            // We were not forwarded to or we were forwarded but we are not in separate deployment
             return request.getContextPath();
         }
     }
@@ -413,6 +409,10 @@ public class URLRewriterUtils {
 
     public static String getRewritingContext(String rewritingStrategy, String defaultContext) {
         return Properties.instance().getPropertySet().getString(REWRITING_CONTEXT_PROPERTY_PREFIX + rewritingStrategy + REWRITING_CONTEXT_PROPERTY_SUFFIX, defaultContext);
+    }
+
+    public static boolean isWSRPEncodeResources() {
+        return Properties.instance().getPropertySet().getBoolean(REWRITING_WSRP_ENCODE_RESOURCES_PROPERTY, WSRP_ENCODE_RESOURCES_DEFAULT);
     }
 
     public static String getServiceBaseURI() {

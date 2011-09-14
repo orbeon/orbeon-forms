@@ -258,42 +258,42 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
         assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers , mode));
 //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-        assertEquals("http://localhost:8080/myapp/42/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
-        assertEquals("http://localhost:8080/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("http://localhost:8080/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
-        assertEquals("http://localhost:8080/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("http://localhost:8080/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
-        assertEquals("http://localhost:8080/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
 
         mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
         assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers , mode));
 //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-        assertEquals("/myapp/42/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
-        assertEquals("/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
-        assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
-        assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+        assertEquals("/myapp/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
 
         mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT;
         assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers , mode));
 //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-        assertEquals("/42/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
-        assertEquals("/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
-        assertEquals("/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
+        assertEquals("/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
         assertEquals("/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
 
         mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE;
         assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers , mode));
 //        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
-        assertEquals("/myapp/42/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
-        assertEquals("/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
-        assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
-        assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+        assertEquals("/myapp/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar", pathMatchers , mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
     }
 
     @Test

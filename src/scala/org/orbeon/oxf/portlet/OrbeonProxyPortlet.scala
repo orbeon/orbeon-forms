@@ -81,7 +81,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
         try {
             propagateHeaders(response, connection)
             getRemoteSessionId(request, connection)
-            readRewrite(request.getContextPath, response, connection, true, false)
+            readRewrite(response, connection, true, false)
         } finally {
             val is = connection.getInputStream
             if (is ne null) is.close()
@@ -151,7 +151,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                     propagateHeaders(response, connection)
                     getRemoteSessionId(request, connection)
 
-                    readRewrite(request.getContextPath, response, connection, Net.getContentTypeMediaType(connection.getContentType) == "text/css", false)
+                    readRewrite(response, connection, Net.getContentTypeMediaType(connection.getContentType) == "text/css", false)
                 } finally {
                     val is = connection.getInputStream
                     if (is ne null) is.close()
@@ -175,7 +175,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                     propagateHeaders(response, connection)
                     getRemoteSessionId(request, connection)
 
-                    readRewrite(request.getContextPath, response, connection, Net.getContentTypeMediaType(connection.getContentType) == "application/xml", true)
+                    readRewrite(response, connection, Net.getContentTypeMediaType(connection.getContentType) == "application/xml", true)
                 } finally {
                     val is = connection.getInputStream
                     if (is ne null) is.close()
@@ -191,12 +191,12 @@ class OrbeonProxyPortlet extends GenericPortlet {
         }
 
     // Read a response and rewrite URLs within it
-    private def readRewrite(contextPath: String, response: MimeResponse, connection: HttpURLConnection, mustRewrite: Boolean, escape: Boolean): Unit  =
+    private def readRewrite(response: MimeResponse, connection: HttpURLConnection, mustRewrite: Boolean, escape: Boolean): Unit  =
         if (mustRewrite) {
             // Read content
             val content = Net.readStreamAsString(new InputStreamReader(connection.getInputStream, "utf-8"))
             // Rewrite and send
-            WSRP2Utils.write(contextPath, response, content, escape)
+            WSRP2Utils.write(response, content, escape)
 
         } else {
             // Simply forward content

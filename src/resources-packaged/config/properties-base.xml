@@ -24,7 +24,6 @@
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
     <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$"/>
-
     <property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms)/.*$"/>
     <property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>
 
@@ -34,6 +33,7 @@
     <!-- TODO: support for base context for servlet rewriting strategy -->
     <!--<property as="xs:string"  name="oxf.url-rewriting.portlet.context"               value=""/>-->
     <property as="xs:string"  name="oxf.url-rewriting.portlet2.context"              value=""/>
+    <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>
 
     <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <property as="xs:string"  name="oxf.http.forward-headers"                        value=""/>

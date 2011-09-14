@@ -26,9 +26,7 @@ import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
@@ -526,7 +524,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 expires = now + (now - lastModified) / 10;
             }
 
-            // Set last-modified
+            // Set caching headers
             nativeResponse.setDateHeader("Last-Modified", lastModified);
             nativeResponse.setDateHeader("Expires", expires);
 

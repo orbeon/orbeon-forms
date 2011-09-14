@@ -14,9 +14,7 @@
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
-import org.orbeon.oxf.externalcontext.URLRewriter;
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
+import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
@@ -619,13 +617,13 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
                 if (StringBuilderWriter != null) {
                     // Write directly
-                    WSRP2Utils.write(response, StringBuilderWriter.toString(), XMLUtils.isXMLMediatype(contentType));
+                    WSRP2Utils.write(request.getContextPath(), response, StringBuilderWriter.toString(), XMLUtils.isXMLMediatype(contentType));
                 } else if (byteStream != null) {
                     // Transform to string and write
                     String encoding = NetUtils.getContentTypeCharset(contentType);
                     if (encoding == null)
                         encoding = CachedSerializer.DEFAULT_ENCODING;
-                    WSRP2Utils.write(response, new String(byteStream.getByteArray(), 0, byteStream.size(), encoding), XMLUtils.isXMLMediatype(contentType));
+                    WSRP2Utils.write(request.getContextPath(), response, new String(byteStream.getByteArray(), 0, byteStream.size(), encoding), XMLUtils.isXMLMediatype(contentType));
                 } else {
                     throw new IllegalStateException("Processor execution did not return content.");
                 }

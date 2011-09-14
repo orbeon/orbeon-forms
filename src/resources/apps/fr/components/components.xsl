@@ -67,6 +67,7 @@
     <xsl:variable name="is-show-explanation" select="pipeline:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(pipeline:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(pipeline:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
+    <xsl:variable name="has-captcha" as="xs:boolean" select="pipeline:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
 
     <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
 
@@ -251,10 +252,11 @@
                 <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
                 <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
                 <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
-                <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
-                <xforms:action if="$has-captcha and xxforms:instance('fr-persistence-instance')/captcha = 'false'">
-                    <xforms:dispatch target="recaptcha" name="fr-verify"/>
-                </xforms:action>
+                <xsl:if test="$has-captcha">
+                    <xforms:action if="xxforms:instance('fr-persistence-instance')/captcha = 'false'">
+                        <xforms:dispatch target="recaptcha" name="fr-verify"/>
+                    </xforms:action>
+                </xsl:if>
 
                 <!-- Show all error in error summaries -->
                 <xsl:if test="$error-summary-top"><xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/></xsl:if>

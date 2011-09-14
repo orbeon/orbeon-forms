@@ -125,27 +125,29 @@
                                             <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
                                             <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
                                             <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
-                                            <xforms:group ref=".[$has-captcha and $mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
-                                                <fr:recaptcha id="recaptcha" theme="clean">
-                                                    <!-- Success: remember the captcha passed, which also influences validity -->
-                                                    <xforms:action ev:event="fr-verify-done">
-                                                        <xforms:setvalue ref="$captcha">true</xforms:setvalue>
-                                                        <xforms:revalidate model="fr-persistence-model"/>
-                                                        <xforms:refresh/>
-                                                    </xforms:action>
-                                                    <!-- Failure: load another challenge -->
-                                                    <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="recaptcha" name="fr-reload"/>
-                                                </fr:recaptcha>
-                                                <!-- Non-visible output bound to captcha node to influence form validity -->
-                                                <xhtml:span style="display: none">
-                                                    <xforms:output ref="$captcha">
-                                                        <!-- Focus from error summary proxies to captcha -->
-                                                        <xforms:setfocus ev:event="xforms-focus" control="recaptcha"/>
-                                                        <xforms:label ref="$fr-resources/detail/labels/captcha-label"/>
-                                                        <xforms:alert ref="$fr-resources/detail/labels/captcha-help"/>
-                                                    </xforms:output>
-                                                </xhtml:span>
-                                            </xforms:group>
+                                            <xsl:if test="$has-captcha">
+                                                <xforms:group ref=".[$mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
+                                                    <fr:recaptcha id="recaptcha" theme="clean">
+                                                        <!-- Success: remember the captcha passed, which also influences validity -->
+                                                        <xforms:action ev:event="fr-verify-done">
+                                                            <xforms:setvalue ref="$captcha">true</xforms:setvalue>
+                                                            <xforms:revalidate model="fr-persistence-model"/>
+                                                            <xforms:refresh/>
+                                                        </xforms:action>
+                                                        <!-- Failure: load another challenge -->
+                                                        <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="recaptcha" name="fr-reload"/>
+                                                    </fr:recaptcha>
+                                                    <!-- Non-visible output bound to captcha node to influence form validity -->
+                                                    <xhtml:span style="display: none">
+                                                        <xforms:output ref="$captcha">
+                                                            <!-- Focus from error summary proxies to captcha -->
+                                                            <xforms:setfocus ev:event="xforms-focus" control="recaptcha"/>
+                                                            <xforms:label ref="$fr-resources/detail/labels/captcha-label"/>
+                                                            <xforms:alert ref="$fr-resources/detail/labels/captcha-help"/>
+                                                        </xforms:output>
+                                                    </xhtml:span>
+                                                </xforms:group>
+                                            </xsl:if>
                                         </xforms:group>
                                     </xforms:group>
 

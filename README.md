@@ -4,8 +4,8 @@ Orbeon Forms - Open source web forms done the right way
 Last updated for Orbeon Forms 3.9, March 2011
 
 
-1. What is Orbeon Forms?
-------------------------
+What is Orbeon Forms?
+---------------------
 
 Orbeon Forms is an open source, standard-based web forms solution, which
 includes:
@@ -26,8 +26,8 @@ Also check the Orbeon Forms Frequently Asked Questions (FAQ):
 - <http://wiki.orbeon.com/forms/orbeon-forms-faq>
 
 
-2. Editions
------------
+Editions
+--------
 
 Orbeon Forms comes in two editions:
 
@@ -40,8 +40,8 @@ For more information:
 - <http://www.orbeon.com/support-services/professional>
 
 
-3. Community and support
-------------------------
+Community and support
+---------------------
 
 See: <http://www.orbeon.com/forms/community>
 
@@ -63,8 +63,8 @@ In a nutshell:
   <info@orbeon.com>
 
 
-4. What's new in the latest release
------------------------------------
+What's new in the latest release
+--------------------------------
 
 A complete list of changes can be found online at:
 
@@ -75,16 +75,16 @@ Changes for the previous release:
 > <http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38>
 
 
-5. Documentation
-----------------
+Documentation
+-------------
 
 All new documentation is available on the Orbeon Forms wiki:
 
 > <http://wiki.orbeon.com/forms/>
 
 
-6. System requirements and installation
----------------------------------------
+System requirements and installation
+------------------------------------
 
 The system requirements and installation procedure are detailed at:
 
@@ -95,16 +95,16 @@ In addition, the Orbeon Forms tutorial also tackles installation:
 > <http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial>
 
 
-7. What's happening?
---------------------
+What's happening?
+-----------------
 
 - Follow Orbeon on Twitter: <http://twitter.com/orbeon>
 - Latest commits on github: <https://github.com/orbeon/orbeon-forms/commits/>
 - Mailing-list archive: <http://orbeon-forms-ops-users.24843.n4.nabble.com/>
 
 
-8. Compiling Orbeon Forms
--------------------------
+Compiling Orbeon Forms
+----------------------
 
 You usually don't have to compile Orbeon Forms yourself. Now if you want to,
 please visit:
@@ -123,16 +123,16 @@ Orbeon Forms is written mainly using the following languages and technologies:
 - XForms, XSLT, and related XML technologies
 
 
-9. Known bugs and requests for enhancements
--------------------------------------------
+Known bugs and requests for enhancements
+----------------------------------------
 
 For a list of known issues and RFEs, check the issue tracking system:
 
 > <http://goo.gl/iSEyq>
 
 
-10. License
------------
+License
+-------
 
 The source code is distributed under the terms of the GNU Lesser General
 Public License (LGPL). The full text of the license is available at
@@ -154,8 +154,8 @@ See the next section for more details about the licenses of included
 third-party software.
 
 
-11. Third-party software
-------------------------
+Third-party software
+--------------------
 
 This product includes software developed by the Apache Software Foundation
 (http://www.apache.org/):

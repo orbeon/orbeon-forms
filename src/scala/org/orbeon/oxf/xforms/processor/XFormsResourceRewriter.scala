@@ -94,10 +94,9 @@ object XFormsResourceRewriter {
                 val rewrittenURI = response.rewriteResourceURL(resolvedURI, false)
                 "url(" + rewrittenURI + ")"
             } catch {
-                case e: Exception => {
+                case _ =>
                     logger.logWarning("resources", "found invalid URI in CSS file", "uri", url)
                     "url(" + url + ")"
-                }
             }
 
         // Find approximately pairs of selectors/blocks and rewrite each part
@@ -106,20 +105,17 @@ object XFormsResourceRewriter {
         r.replaceAllIn(css, e => (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
     }
 
-    private def generateJS(indentedLogger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateJS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
         outputWriter.write("// This file was produced by " + Version.getVersionString + "\n")
         outputWriter.flush()
 
-        var first = true
         for (resourceConfig <- resources) {
-            if (!first)
-                os.write('\n')
             ScalaUtils.useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is =>
                 NetUtils.copyStream(is, os)
             }
-            first = false
+            os.write('\n')
         }
     }
 }

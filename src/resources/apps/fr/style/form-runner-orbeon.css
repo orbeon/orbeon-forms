@@ -270,4 +270,5 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
     .fr-section-container div.fr-collapsible { color: black }
     .fr-container { border: none }
     .fr-top, .fr-bottom { background: none }
+    .xforms-required label { background-image: none; padding-left: 0 }
 }

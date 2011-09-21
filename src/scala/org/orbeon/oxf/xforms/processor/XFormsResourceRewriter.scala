@@ -103,7 +103,7 @@ object XFormsResourceRewriter {
         // Find approximately pairs of selectors/blocks and rewrite each part
         // Ids are rewritten only if the namespace is not empty
         val r = """([^\{]*\s*)(\{[^\}]*\})""".r
-        r.replaceAllIn(css, e => (if (namespace isEmpty) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
+        r.replaceAllIn(css, e => (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
     }
 
     private def generateJS(indentedLogger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {

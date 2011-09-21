@@ -94,7 +94,7 @@ object XFormsAPI {
 
         if (oldName != newName) {
             val newNodeInfo = nodeInfo.getNodeKind match {
-                case ELEMENT_NODE => elementInfo(newName, nodeInfo \ *) // TODO: This only copies over the children elements. Must copy all nodes!
+                case ELEMENT_NODE => elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ node))
                 case ATTRIBUTE_NODE =>  attributeInfo(newName, attValueOption(nodeInfo).get)
                 case _ => throw new IllegalArgumentException
             }

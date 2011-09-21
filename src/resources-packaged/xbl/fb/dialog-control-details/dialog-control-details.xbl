@@ -119,7 +119,7 @@
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <xxforms:variable name="bind" select="$binds//xforms:bind[@id = $bind-id] treat as element()"/>
-                    <xforms:setvalue ref="$local/control-xpath" value="$bind/@nodeset treat as attribute()"/>
+                    <xforms:setvalue ref="$local/control-xpath" value="$bind/(@ref, @nodeset)[1] treat as attribute()"/>
                     <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
                     <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
                     <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>

@@ -155,6 +155,11 @@ object XML {
         def test(nodeInfo: NodeInfo) = NodeKindTest.makeNodeKindTest(Type.ELEMENT)
     }
 
+    // Match any child node
+    val node = new Test {
+        def test(nodeInfo: NodeInfo) = AnyNodeTest.getInstance()
+    }
+
     // Match any attribute
     val @* = new Test {
         def test(nodeInfo: NodeInfo) = NodeKindTest.makeNodeKindTest(Type.ATTRIBUTE)

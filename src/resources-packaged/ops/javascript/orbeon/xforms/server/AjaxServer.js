@@ -800,12 +800,12 @@
                                                 // Increment nestedRepeatLevel when we enter a nested repeat
                                                 if (YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-end-") == 0)
                                                     nestedRepeatLevel++;
-                                                // Remove "xforms-repeat-template" from classes on copy of element
+                                                // Remove "xforms-repeat-template", "xforms-disabled" from classes on copy of element
                                                 var nodeCopyClasses = nodeCopy.className.split(" ");
                                                 var nodeCopyNewClasses = new Array();
                                                 for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
                                                     var currentClass = nodeCopyClasses[nodeCopyClassIndex];
-                                                    if (currentClass != "xforms-repeat-template")
+                                                    if (currentClass != "xforms-repeat-template" && currentClass != "xforms-disabled" && currentClass != "xforms-disabled-subsequent")
                                                         nodeCopyNewClasses.push(currentClass);
                                                 }
                                                 nodeCopy.className = nodeCopyNewClasses.join(" ");

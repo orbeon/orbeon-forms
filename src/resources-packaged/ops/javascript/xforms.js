@@ -1332,6 +1332,21 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
+             * Take a sequence a function, and returns a function(testCase, next). If a function in the sequence
+             * invokes and XHR, then the following function will only run when that XHR finished.
+             */
+            runMayCauseXHR: function(testCase, continuations) {
+                if (continuations.length > 0) {
+                    var continuation = continuations.shift();
+                    ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
+                        continuation.call(testCase);
+                    }, function() {
+                        ORBEON.util.Test.runMayCauseXHR(testCase, continuations);
+                    });
+                }
+            },
+
+            /**
              * Starts Firebug Lite if Firebug is not already available (as it is most of the time on Firefox)
              */
             startFirebugLite: function() {

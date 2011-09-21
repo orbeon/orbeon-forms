@@ -1,0 +1,60 @@
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>XForms Hello</xhtml:title>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-flat-repeat.js"/>
+        <xforms:model>
+            <xforms:instance>
+                <instance show="false">
+                    <i/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind ref="." relevant="@show = 'true'"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background: none; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:trigger id="show">
+            <xforms:label>Show</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="@show">true</xforms:setvalue>
+        </xforms:trigger>
+        <xforms:trigger id="hide">
+            <xforms:label>Hide</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="@show">false</xforms:setvalue>
+        </xforms:trigger>
+        <xforms:trigger id="add">
+            <xforms:label>Add</xforms:label>
+            <xforms:insert ev:event="DOMActivate" context="." origin="xxforms:element('i')"/>
+        </xforms:trigger>
+        <xhtml:ul>
+            <xforms:group ref=".">
+                <xforms:repeat nodeset="i" id="i-repeat">
+                    <xhtml:li><xhtml:img src="http://placekitten.com/g/200/100" alt="cat" id="cat"/></xhtml:li>
+                </xforms:repeat>
+            </xforms:group>
+        </xhtml:ul>
+    </xhtml:body>
+</xhtml:html>

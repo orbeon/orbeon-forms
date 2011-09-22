@@ -38,9 +38,45 @@
         <xsl:copy-of select="tokenize($e/@class, '\s+')"/>
     </xsl:function>
 
+    <xsl:function name="fr:is-container-xbl" as="xs:boolean">
+        <xsl:param name="e" as="element()"/>
+        <xsl:variable name="classes" select="fr:classes($e)"/>
+        <xsl:copy-of select="$classes = 'xbl-fr-section' or ($classes = 'xbl-fr-grid' and $e//table[fr:classes(.) = 'fr-repeat'])"/>
+    </xsl:function>
+
+    <xsl:function name="fr:is-container-legacy" as="xs:boolean">
+        <xsl:param name="e" as="element()"/>
+        <xsl:variable name="classes" select="fr:classes($e)"/>
+        <xsl:copy-of select="$classes = 'fr-section-container' or ($e/self::table and $classes = 'fr-repeat')"/>
+    </xsl:function>
+
     <xsl:function name="fr:is-container" as="xs:boolean">
         <xsl:param name="e" as="element()"/>
-        <xsl:copy-of select="fr:classes($e) = ('fr-section', 'fr-section-container', 'xbl-fr-section')"/>
+        <!-- This is more complicated than it should be cause we want to address XBL versions of fr:section/fr:grid as well as legacy versions of those and fr:repeat -->
+        <!-- NOTE: Non-repeated grids are not considered "containers" for this purpose for now -->
+        <xsl:copy-of select="fr:is-container-xbl($e) or fr:is-container-legacy($e)"/>
+    </xsl:function>
+
+    <xsl:function name="fr:container-static-id" as="xs:string">
+        <xsl:param name="e" as="element()"/>
+
+        <xsl:variable name="classes" select="fr:classes($e)"/>
+        <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId($e/@id)"/>
+
+        <xsl:choose>
+            <xsl:when test="fr:is-container-xbl($e)">
+                <!-- Normal case -->
+                <xsl:value-of select="$static-id"/>
+            </xsl:when>
+            <xsl:when test="ends-with($static-id, '-section-group')">
+                <!-- Case of a legacy section -->
+                <xsl:value-of select="substring-before($static-id, '-group')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Case of a legacy repeat -->
+                <xsl:value-of select="replace(($e//tr[fr:classes(.) = 'xforms-repeat-begin-end'])[1]/@id, 'repeat-begin-(.*)', '$1')"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 
     <xsl:variable name="is-a-control-classes" select="('xforms-control', 'xbl-component')" as="xs:string*"/>
@@ -70,8 +106,7 @@
                 <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId(@id)"/>
                 <xsl:variable name="iterations" select="tokenize(xformsUtils:getEffectiveIdSuffix(@id), '-')"/>
                 
-                <xsl:variable name="ancestor-static-ids" select="for $a in ancestor::*[fr:is-container(.)]/xformsUtils:getStaticIdFromId(@id)
-                                                                 return (if (ends-with($a, '-section-group')) then substring-before($a, '-group') else $a)"/>
+                <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/fr:container-static-id(.)"/>
                 <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
 
                 <xsl:variable name="classes" select="fr:classes(.)"/>

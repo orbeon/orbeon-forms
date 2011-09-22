@@ -40,7 +40,7 @@
 
     <xsl:function name="fr:is-container" as="xs:boolean">
         <xsl:param name="e" as="element()"/>
-        <xsl:copy-of select="ends-with($e/@id/xformsUtils:getStaticIdFromId(.), '-section') or fr:classes($e) = ('fr-section', 'xbl-fr-section')"/>
+        <xsl:copy-of select="fr:classes($e) = ('fr-section', 'fr-section-container', 'xbl-fr-section')"/>
     </xsl:function>
 
     <xsl:variable name="is-a-control-classes" select="('xforms-control', 'xbl-component')" as="xs:string*"/>
@@ -70,7 +70,8 @@
                 <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId(@id)"/>
                 <xsl:variable name="iterations" select="tokenize(xformsUtils:getEffectiveIdSuffix(@id), '-')"/>
                 
-                <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/xformsUtils:getStaticIdFromId(@id)"/>
+                <xsl:variable name="ancestor-static-ids" select="for $a in ancestor::*[fr:is-container(.)]/xformsUtils:getStaticIdFromId(@id)
+                                                                 return (if (ends-with($a, '-section-group')) then substring-before($a, '-group') else $a)"/>
                 <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
 
                 <xsl:variable name="classes" select="fr:classes(.)"/>
@@ -99,7 +100,7 @@
                         <xsl:choose>
                             <xsl:when test="$classes = $attachment-classes">
                                 <!-- Handle URL rewriting for image attachments -->
-                                <image acro-field-name="'{$effective-id}'" href="{pipeline:rewriteServiceURI($value, true())}"/>
+                                <image acro-field-name="'{$effective-id}'" href="{pipeline:rewriteResourceURI($value, true())}"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <field acro-field-name="'{$effective-id}'" value="'{replace($value, '''', '''''')}'"/>

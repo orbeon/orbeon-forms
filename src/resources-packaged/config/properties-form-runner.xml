@@ -97,7 +97,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.format.select-values"                            value="(.//option[@selected = 'selected'], .//input[@checked = 'checked'])/@value/string()"/>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.attachment-url"                           value="(./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-output' and not(tokenize(@class, '\s+') = 'xforms-disabled')]/
-                                                                                                           img[tokenize(@class, '\s+') = 'xforms-output-output']/@src)[1]/
+                                                                                                           img[not(tokenize(@class, '\s+') = ('xforms-help', 'xforms-disabled')) and (tokenize(@class, '\s+') = 'xforms-output-output' or not(@id))]/@src)[1]/
                                                                                                            string()[. != '/ops/images/xforms/spacer.gif']"/>
 
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.*"                          value="input-string"/>

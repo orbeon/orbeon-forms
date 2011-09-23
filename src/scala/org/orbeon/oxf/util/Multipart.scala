@@ -163,11 +163,13 @@ object Multipart {
 
                         // Get expected size first from part then from request
                         val expectedLength = item.getHeaders match {
-                            case headers: FileItemHeaders if headers.getHeader("content-length") ne null => Some(headers.getHeader("content-length").toLong)
-                            case _ => request.getHeaderValuesMap.get("content-length") match {
-                                case Array(requestLength: String) => Some(requestLength.toLong)
-                                case _ => None
-                            }
+                            case headers: FileItemHeaders if headers.getHeader("content-length") ne null =>
+                                Some(headers.getHeader("content-length").toLong)
+                            case _ =>
+                                request.getHeaderValuesMap.get("content-length") match {
+                                    case Array(requestLength: String) => Some(requestLength.toLong)
+                                    case _ => None
+                                }
                         }
 
                         // Store into session with start value

@@ -51,6 +51,16 @@
                 <data type="string"/>
             </element>
         </optional>
+        <optional>
+            <element name="scope">
+				      <choice>
+					      <value>SUBTREE</value>
+			       		<value>ONELEVEL</value>
+      					<value>ALLLEVELS</value>
+      					<value>OBJECT</value>
+      				</choice>
+            </element>
+        </optional>
         <zeroOrMore>
             <element name="attribute">
                 <data type="string"/>

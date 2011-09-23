@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.processor.pdf;
 
+import com.lowagie.text.pdf.BaseFont;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ServletURLRewriter;
@@ -22,6 +24,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
+import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.*;
 import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -68,6 +72,11 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         final URLRewriter servletRewriter = new ServletURLRewriter(externalContext.getRequest());
 
         final ITextRenderer renderer = new ITextRenderer(DEFAULT_DOTS_PER_POINT, DEFAULT_DOTS_PER_PIXEL);
+
+        // Embed fonts if needed, based on configuration properties
+        embedFonts(renderer);
+
+
         try {
             final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
                 public String resolveURI(String uri) {
@@ -147,6 +156,32 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         } finally {
             // Free resources associated with the rendering context
             renderer.getSharedContext().reset();
+        }
+    }
+
+    public static void embedFonts(ITextRenderer renderer) {
+        final PropertySet propertySet = Properties.instance().getPropertySet();
+        for (final String propertyName : propertySet.getPropertiesStartsWith("oxf.fr.pdf.font.path")) {
+            final String path = StringUtils.trimToNull(propertySet.getString(propertyName));
+            if (path != null) {
+                try {
+                    // Overriding the font family is optional
+                    final String family; {
+                        final String[] tokens = StringUtils.split(propertyName, '.');
+                        if (tokens.length >= 6) {
+                            final String id = tokens[5];
+                            family = StringUtils.trimToNull(propertySet.getString("oxf.fr.pdf.font.family" + '.' + id));
+                        } else {
+                            family = null;
+                        }
+                    }
+
+                    // Add the font
+                    renderer.getFontResolver().addFont(path, family, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null);
+                } catch (Exception e) {
+                    logger.warn("Failed to load font by path: '" + path + "' specified with property '"  + propertyName + "'");
+                }
+            }
         }
     }
 }

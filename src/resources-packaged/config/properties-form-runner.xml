@@ -113,6 +113,12 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"                    value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment"                     value="attachment-url"/>
 
+    <!-- PDF fonts -->
+    <!-- Optional PDF font embedding. Specifying a family name is optional.
+    <property as="xs:string"  name="oxf.fr.pdf.font.path.ID"                                    value=""/>
+    <property as="xs:string"  name="oxf.fr.pdf.font.family.ID"                                  value=""/>
+    -->
+
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                             value=""/>

@@ -432,4 +432,20 @@ object GridOps {
         // 2. Select the first td if any
         findBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
     }
+
+    def moveRowUp(td: NodeInfo) {
+
+    }
+
+    def moveRowDown(td: NodeInfo) {
+
+    }
+
+    def moveColLeft(td: NodeInfo) {
+
+    }
+
+    def moveColRight(td: NodeInfo) {
+
+    }
 }

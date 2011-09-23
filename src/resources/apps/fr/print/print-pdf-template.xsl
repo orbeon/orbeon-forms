@@ -47,7 +47,8 @@
     <xsl:function name="fr:is-container-legacy" as="xs:boolean">
         <xsl:param name="e" as="element()"/>
         <xsl:variable name="classes" select="fr:classes($e)"/>
-        <xsl:copy-of select="$classes = 'fr-section-container' or ($e/self::table and $classes = 'fr-repeat')"/>
+        <xsl:copy-of select="($classes = 'fr-section-container' and not($e/ancestor::*[fr:classes(.) = 'xbl-fr-section']))
+                                or ($e/self::table and $classes = 'fr-repeat' and not($e/ancestor::*[fr:classes(.) = 'xbl-fr-grid']))"/>
     </xsl:function>
 
     <xsl:function name="fr:is-container" as="xs:boolean">

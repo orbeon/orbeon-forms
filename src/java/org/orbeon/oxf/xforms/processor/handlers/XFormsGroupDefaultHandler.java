@@ -16,10 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.analysis.controls.ContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -78,7 +76,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     protected void handleLabel() throws SAXException {
         // TODO: check why we output our own label here
 
-        final XFormsGroupControl groupControl = (XFormsGroupControl) getControl();
+        final XFormsSingleNodeControl groupControl = (XFormsSingleNodeControl) getControl();
         final String effectiveId = getEffectiveId();
 
         reusableAttributes.clear();

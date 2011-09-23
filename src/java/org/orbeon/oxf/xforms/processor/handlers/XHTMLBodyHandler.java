@@ -21,13 +21,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.xml.sax.*;
 import scala.collection.Seq;
 
 import java.util.Map;
@@ -290,7 +285,18 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
 
         // xforms:switch
-        controller.registerHandler(XFormsSwitchHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
+        // NOTE: We use the same handlers for switch as we do for group
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                // XFormsAnnotatorContentHandler adds this appearance if needed
+
+                // NOTE: we just check on the attribute value instead of resolving the QName, so that XFormsAnnotatorContentHandler
+                // doesn't have to declare the xxforms:* prefix.
+                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
+            }
+        });
+        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
         controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
 
         // xforms:repeat

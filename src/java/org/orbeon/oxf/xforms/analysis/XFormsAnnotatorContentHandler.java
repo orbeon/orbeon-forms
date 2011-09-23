@@ -16,17 +16,11 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.dom4j.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
@@ -201,7 +195,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text", attributes);
-            } else if ("group".equals(localname) && isClosestXHTMLAncestorTableContainer()) {
+            } else if (("group".equals(localname) || "switch".equals(localname)) && isClosestXHTMLAncestorTableContainer()) {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(), XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 startElement(true, uri, localname, qName, attributes);

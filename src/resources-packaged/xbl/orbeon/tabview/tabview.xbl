@@ -95,8 +95,8 @@
                             <xhtml:ul class="yui-nav">
                                 <xsl:for-each select="fr:tab">
                                     <xsl:variable name="label" as="element(fr:label)" select="fr:label[1]"/>
-                                    <xhtml:li style="{{if ($fr-tab-relevance-{position()}) then '' else 'display: none'}}"
-                                            class="{{if (active-tab-position = '{position()}') then 'selected' else ''}}{{
+                                    <xhtml:li class="{{if ($fr-tab-relevance-{position()}) then '' else 'xforms-disabled-subsequent'}}{{
+                                                if (active-tab-position = '{position()}') then 'selected' else ''}}{{
                                                 if (exf:readonly($fr-tab-binding-{position()})) then ' disabled' else ''}}" id="nav-{position()}">
                                         <!-- Transform xforms:label into xforms:output -->
                                         <xhtml:a href="#tab{position()}"><xhtml:em>

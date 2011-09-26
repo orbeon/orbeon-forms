@@ -19,13 +19,16 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.junit._
+import org.orbeon.oxf.externalcontext.ResponseWrapper
 
 class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     var response: Response = _
 
     @Before def setup() {
-        response = NetUtils.getExternalContext.getResponse
+        response = new ResponseWrapper(NetUtils.getExternalContext.getResponse) {
+            override def getNamespacePrefix = "_ns_"
+        }
     }
 
     @Test def urls() {
@@ -59,5 +62,5 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
     }
 
     private def rewriteCSS(css: String) =
-        XFormsResourceRewriter.rewriteCSS(css, "_ns_", "/styles/style.css", response, null)
+        XFormsResourceRewriter.rewriteCSS(css, "/styles/style.css", response, null)
 }

@@ -89,18 +89,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getContainerNamespace() {
-            if (namespace == null) {
-                final String namespaceAttribute = (String) nativeRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_NAMESPACE_TEMPLATE_ATTRIBUTE);
-                if (namespaceAttribute != null) {
-                    // Namespace is provided with request so we use that
-                    // This is useful e.g. when a portlet delegates rendering to a servlet
-                    namespace = namespaceAttribute;
-                } else {
-                    namespace = "";
-                }
-            }
-
-            return namespace;
+            return getResponse().getNamespacePrefix();
         }
 
         public String getContextPath() {
@@ -553,7 +542,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getNamespacePrefix() {
-            return "";
+            return urlRewriter.getNamespacePrefix();
         }
 
         public void setTitle(String title) {

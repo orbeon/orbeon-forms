@@ -24,12 +24,14 @@ import java.util.Map;
 
 public class TemplateURLRewriter implements URLRewriter {
 
+    private final String namespace;
     private final String renderURLTemplate;
     private final String actionURLTemplate;
     private final String resourceURLTemplate;
 
     public TemplateURLRewriter(ExternalContext.Request request) {
         final Map<String, Object> attributes = request.getAttributesMap();
+        namespace = (String) attributes.get(OrbeonPortletXFormsFilter.PORTLET_NAMESPACE_TEMPLATE_ATTRIBUTE);
         renderURLTemplate = (String) attributes.get(OrbeonPortletXFormsFilter.PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE);
         actionURLTemplate = (String) attributes.get(OrbeonPortletXFormsFilter.PORTLET_ACTION_URL_TEMPLATE_ATTRIBUTE);
         resourceURLTemplate = (String) attributes.get(OrbeonPortletXFormsFilter.PORTLET_RESOURCE_URL_TEMPLATE_ATTRIBUTE);
@@ -65,5 +67,9 @@ public class TemplateURLRewriter implements URLRewriter {
                 throw new OXFException(e);
             }
         }
+    }
+
+    public String getNamespacePrefix() {
+        return namespace != null ? namespace : "";
     }
 }

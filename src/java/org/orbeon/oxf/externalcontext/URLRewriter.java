@@ -19,4 +19,5 @@ public interface URLRewriter {
     String rewriteActionURL(String urlString);
     String rewriteActionURL(String urlString, String portletMode, String windowState);
     String rewriteResourceURL(String urlString, int rewriteMode);
+    String getNamespacePrefix();
 }

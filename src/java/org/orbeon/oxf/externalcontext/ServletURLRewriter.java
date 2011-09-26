@@ -16,7 +16,6 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.util.List;
@@ -67,5 +66,9 @@ public class ServletURLRewriter implements URLRewriter {
     public String rewriteResourceURL(String urlString, int rewriteMode) {
         // NOTE: Get path matchers lazily, as External Context might be created before PFC runs and sets matchers
         return URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers(), rewriteMode);
+    }
+
+    public String getNamespacePrefix() {
+        return "";
     }
 }

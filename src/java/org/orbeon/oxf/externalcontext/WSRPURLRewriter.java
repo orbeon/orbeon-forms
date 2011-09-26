@@ -139,6 +139,10 @@ public class WSRPURLRewriter implements URLRewriter {
         }
     }
 
+    public String getNamespacePrefix() {
+        return PREFIX_TAG;
+    }
+
     /**
      * Encode an URL into a WSRP pattern including the string "wsrp_rewrite".
      *
@@ -154,7 +158,7 @@ public class WSRPURLRewriter implements URLRewriter {
      */
     public static String encodePortletURL(int urlType, String navigationalState, String mode, String windowState, String fragmentId, boolean secure) {
 
-        final StringBuffer sb = new StringBuffer(START_TAG);
+        final StringBuilder sb = new StringBuilder(START_TAG);
         sb.append(URL_TYPE_PARAM);
         sb.append('=');
 

@@ -108,21 +108,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public String getContainerNamespace() {
-            if (namespace == null) {
-                if (getNativeResponse() instanceof MimeResponse) {
-                    // We have a render response, so we can get the namespace directly and remember it
-                    namespace = ((MimeResponse) getNativeResponse()).getNamespace().replace(' ', '_');// replacement probably because at some point Liferay was allowing spaces in namespace
-                    Portlet2ExternalContext.this.getAttributesMap().put(OPS_CONTEXT_NAMESPACE_KEY, namespace);
-                } else {
-                    // We don't have a render response, and we hope for two things:
-                    // 1. For a given portlet, the namespace tends to remain constant for the lifetime of the portlet
-                    // 2. Even if it is not constant, we hope that it tends to be between a render and action requests
-                    namespace = (String) Portlet2ExternalContext.this.getAttributesMap().get(OPS_CONTEXT_NAMESPACE_KEY);
-                    if (namespace == null)
-                        throw new OXFException("Unable to find portlet namespace in portlet context.");
-                }
-            }
-            return namespace;
+            return getResponse().getNamespacePrefix();
         }
 
         public String getContextPath() {
@@ -521,7 +507,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public String getNamespacePrefix() {
-            return WSRP2Utils.encodeNamespacePrefix();
+            return urlRewriter.getNamespacePrefix();
         }
 
         public Object getNativeResponse() {

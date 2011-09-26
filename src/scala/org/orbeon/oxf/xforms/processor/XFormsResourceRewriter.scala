@@ -45,10 +45,8 @@ object XFormsResourceRewriter {
     }
 
     private def generateCSS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {
-        val externalContext = NetUtils.getExternalContext
-        val response = externalContext.getResponse
-        val containerNamespace = externalContext.getRequest.getContainerNamespace
 
+        val response = NetUtils.getExternalContext.getResponse
         val outputWriter = new OutputStreamWriter(os, "utf-8")
 
         // Create matcher that matches all paths in case resources are versioned
@@ -72,12 +70,14 @@ object XFormsResourceRewriter {
             }
 
             // Rewrite it all
-            outputWriter write rewriteCSS(originalCSS, containerNamespace, resourcePath, response, logger)
+            outputWriter write rewriteCSS(originalCSS, resourcePath, response, logger)
         }
         outputWriter.flush()
     }
 
-    def rewriteCSS(css: String, namespace: String, resourcePath: String, response: ExternalContext.Response, logger: IndentedLogger) = {
+    def rewriteCSS(css: String, resourcePath: String, response: ExternalContext.Response, logger: IndentedLogger) = {
+
+        val namespace = response.getNamespacePrefix
 
         // Match and rewrite an id within a selector
         val matchId = """#([\w]+)""".r

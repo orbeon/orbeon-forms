@@ -32,10 +32,6 @@ import java.util.regex.Pattern;
  */
 public class WSRP2Utils {
 
-    public static String encodeNamespacePrefix() {
-        return WSRPURLRewriter.PREFIX_TAG;
-    }
-
     /**
      * This method parses a string containing WSRP Consumer URL and namespace encoding and encode the URLs and namespaces
      * as per the Portlet API.
@@ -47,6 +43,9 @@ public class WSRP2Utils {
         int currentIndex = 0;
         int index;
         Writer writer = response.getWriter();
+
+        final String namespace = response.getNamespace().replace(' ', '_');// replacement probably because at some point Liferay was allowing spaces in namespace
+
         while ((index = content.indexOf(WSRPURLRewriter.BASE_TAG, currentIndex)) != -1) {
             // Write up to the current mark
             writer.write(content, currentIndex, index - currentIndex);
@@ -75,7 +74,7 @@ public class WSRP2Utils {
 
             } else if (index < stringLength - WSRPURLRewriter.BASE_TAG_LENGTH && content.charAt(index + WSRPURLRewriter.BASE_TAG_LENGTH) == '_') {
                 // Namespace encoding
-                writer.write(response.getNamespace());
+                writer.write(namespace);
                 currentIndex = index + WSRPURLRewriter.PREFIX_TAG_LENGTH;
             } else {
                 throw new OXFException("Invalid wsrp rewrite tagging.");

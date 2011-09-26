@@ -30,24 +30,16 @@ import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.script.ScriptInterpreter;
-import org.orbeon.oxf.xforms.state.XFormsState;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
-import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
-import org.orbeon.oxf.xforms.submission.SubmissionResult;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.state.*;
+import org.orbeon.oxf.xforms.submission.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.Item;
@@ -222,7 +214,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     private void initializeRequestInformation() {
-        final ExternalContext.Request request = NetUtils.getExternalContext().getRequest();
+        final ExternalContext externalContext = NetUtils.getExternalContext();
+        final ExternalContext.Request request = externalContext.getRequest();
 
         // Remember if filter provided separate deployment information
         final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
@@ -245,7 +238,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
 
         this.containerType = request.getContainerType();
-        this.containerNamespace = StringUtils.defaultIfEmpty(request.getContainerNamespace(), "");
+        this.containerNamespace = StringUtils.defaultIfEmpty(externalContext.getResponse().getNamespacePrefix(), "");
     }
 
     /**

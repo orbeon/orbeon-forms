@@ -70,7 +70,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
             if (statusCode > 0)
                 return SingletonIterator.makeIterator(new Int64Value(statusCode));
             else
-                return EmptyIterator.getInstance();// instead of returning NaN, we return an empty 
+                return EmptyIterator.getInstance();// instead of returning NaN, we return an empty
         } else if ("response-headers".equals(name)) {
             // "Zero or more elements, each one representing a content header in the error response received by a
             // failed submission. The returned node-set is empty if the failed submission did not receive an error
@@ -88,7 +88,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
                     sb.append("</name>");
                     for (String headerValue: currentEntry.getValue()) {
                         sb.append("<value>");
-                        sb.append(headerValue);
+                        sb.append(XMLUtils.escapeXMLMinimal(headerValue));
                         sb.append("</value>");
                     }
                     sb.append("</header>");

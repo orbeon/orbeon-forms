@@ -16,7 +16,7 @@
 
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
     <!-- NOTE: We leave this here so that the page flow creates the list of path matchers for XForms versioned resources -->
-    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|txt)" matcher="oxf:perl5-matcher"/>
+    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="oxf:perl5-matcher"/>
 
     <!-- This should be the only path matched  -->
     <page id="renderer" path-info="/xforms-renderer" model="xforms-renderer.xpl"/>

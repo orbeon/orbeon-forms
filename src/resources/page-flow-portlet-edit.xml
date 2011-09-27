@@ -15,7 +15,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
-    <files path-info="(?!/(xforms-server|([^/]+)/service/)).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|txt)" matcher="oxf:perl5-matcher"/>
+    <files path-info="(?!/(xforms-server|([^/]+)/service/)).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="oxf:perl5-matcher"/>
     <!-- Also exclude .xml files handled by Form Runner -->
     <files path-info="(?!/(xforms-server|fr|([^/]+)/service)/).+\.xml" matcher="oxf:perl5-matcher" mime-type="application/xml"/>
     <!-- For the following we override the standard mediatype to help browsers -->

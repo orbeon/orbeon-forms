@@ -943,19 +943,19 @@
         <delete dir="build/exist-data"/>
         <mkdir dir="build/exist-data"/>
         <!-- Store config first -->
-        <xdb:store configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="admin" password="">
+        <xdb:store configuration="${basedir}/descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="admin" password="">
             <fileset dir="data">
                 <include name="system/**"/>
             </fileset>
         </xdb:store>
         <!-- Store data -->
-        <xdb:store configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="guest" password="guest">
+        <xdb:store configuration="${basedir}/descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" initDb="true" createcollection="true" createsubcollections="true" user="guest" password="guest">
             <fileset dir="data">
                 <include name="orbeon/**"/>
             </fileset>
         </xdb:store>
         <!-- Make sure the database is shut down -->
-        <xdb:shutdown configuration="descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" user="admin" password=""/>
+        <xdb:shutdown configuration="${basedir}/descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" user="admin" password=""/>
     </target>
 
     <target name="exist-import-sample-data-to-www" depends="exist-task">

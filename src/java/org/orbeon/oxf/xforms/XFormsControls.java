@@ -600,11 +600,11 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Don't do anything if there are no children controls
         if (getCurrentControlTree().getChildren() == null) {
-            indentedLogger.logDebug("model", "not performing refresh because no controls are available");
+            indentedLogger.logDebug("controls", "not performing refresh because no controls are available");
             // Don't forget to clear the flag or we risk infinite recursion
             refreshDone();
         } else {
-            indentedLogger.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
+            indentedLogger.startHandleOperation("controls", "performing refresh", "container id", container.getEffectiveId());
             {
                 // Notify dependencies
                 xpathDependencies.refreshStart();
@@ -629,7 +629,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 } else {
                     // No UI events to send because there is no event handlers for any of them
-                    indentedLogger.logDebug("model", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
+                    indentedLogger.logDebug("controls", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
 
                     // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
                     // effect, and clear the corresponding flag."

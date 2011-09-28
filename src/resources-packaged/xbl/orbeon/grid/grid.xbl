@@ -254,10 +254,10 @@
                                                         <xh:tr>
                                                             <xsl:choose>
                                                                 <xsl:when test="$is-repeat">
-                                                                    <xsl:attribute name="class">fr-grid-tr {string-join((if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if (xxf:repeat-position() = 1) then 'yui-dt-first' else ()), ' ')}</xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="string-join(('fr-grid-tr', @class), ' ')"/> {string-join((if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if (xxf:repeat-position() = 1) then 'yui-dt-first' else ()), ' ')}</xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
-                                                                    <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="string-join(('fr-grid-tr', @class), ' ')"/></xsl:attribute>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
                                                             <xsl:copy-of select="@* except @class"/>
@@ -349,10 +349,10 @@
                                                                     <xsl:choose>
                                                                         <xsl:when test="$is-editable">
                                                                             <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                                            <xsl:attribute name="class">xforms-activable fr-grid-td{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
+                                                                            <xsl:attribute name="class"><xsl:value-of select="string-join(('xforms-activable', 'fr-grid-td', @class), ' ')"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
                                                                         </xsl:when>
                                                                         <xsl:otherwise>
-                                                                            <xsl:attribute name="class">fr-grid-td</xsl:attribute>
+                                                                            <xsl:attribute name="class"><xsl:value-of select="string-join(('fr-grid-td', @class), ' ')"/></xsl:attribute>
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                     <xsl:copy-of select="@* except (@class, @xxf:control)"/>
@@ -435,14 +435,14 @@
                 </xsl:template>
 
                 <xsl:template match="*:tr[empty(ancestor::*/local-name()[not(. = ('group', 'grid'))])]">
-                    <xh:tr class="fr-grid-tr">
+                    <xh:tr class="{string-join(('fr-grid-tr', @class), ' ')}">
                         <xsl:copy-of select="@* except @class"/>
                         <xsl:apply-templates select="*"/><!-- don't bother with other nodes -->
                     </xh:tr>
                 </xsl:template>
 
                 <xsl:template match="*:td[empty(ancestor::*/local-name()[not(. = ('group', 'tr', 'grid'))])]">
-                    <xh:td class="fr-grid-td">
+                    <xh:td class="{string-join(('fr-grid-td', @class), ' ')}">
                         <xsl:copy-of select="@* except @class"/>
                         <xh:div class="fr-grid-content">
                             <xsl:apply-templates select="node()"/>

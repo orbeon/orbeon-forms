@@ -21,19 +21,18 @@ Events = ORBEON.xforms.Events
 
 class LoadingIndicator
 
-    constructor: (form) ->
+    constructor: (@form) ->
         @shownCounter = 0
-        # Span for loading indicator is a child of the form element
-        loadingSpan = _.detect form.childNodes, (node) -> YD.hasClass node, "xforms-loading-loading"
-        # On scroll, we might need to move the overlay
-        loadingSpan.style.display = "block"
-        @initialRight = YD.getViewportWidth() - YD.getX loadingSpan
-        @initialTop = YD.getY loadingSpan
+
+        # For now hide the loading indicator
+        @loadingSpan = _.detect @form.childNodes, (node) -> YD.hasClass node, "xforms-loading-loading"
+        @loadingSpan.style.display = "none"
+
+        # Differ creation of the overlay to the first time we need it,
+        @loadingOverlay = null
+        # On scroll or resize, move the overlay so it stays visible
         Overlay.windowScrollEvent.subscribe => @_updateLoadingPosition()
-        # Create a YUI overlay after showing the span
-        @loadingOverlay = new YAHOO.widget.Overlay loadingSpan, { visible: false, monitorresize: true }
-        Utils.overlayUseDisplayHidden @loadingOverlay
-        loadingSpan.style.right = "auto"
+        Overlay.windowResizeEvent.subscribe => @_updateLoadingPosition()
 
         # When an Ajax call starts, we might want to show the indicator
         Connect.startEvent.subscribe =>
@@ -73,6 +72,7 @@ class LoadingIndicator
 
     # Actually shows the loading indicator (no delay or counter)
     show: (message) ->
+        @_initLoadingOverlay()
         message ?= DEFAULT_LOADING_TEXT
         OD.setStringValue @loadingOverlay.element, message
         @loadingOverlay.show()
@@ -83,7 +83,20 @@ class LoadingIndicator
         if not Globals.loadingOtherPage
             @loadingOverlay.cfg.setProperty "visible", false
 
+    _initLoadingOverlay: () ->
+        # Initialize @loadingOverlay if not done already
+        if not @loadingOverlay?
+            # On scroll, we might need to move the overlay
+            @loadingSpan.style.display = "block"
+            @initialRight = YD.getViewportWidth() - YD.getX @loadingSpan
+            @initialTop = YD.getY @loadingSpan
+            # Create a YUI overlay after showing the span
+            @loadingOverlay = new YAHOO.widget.Overlay @loadingSpan, { visible: false, monitorresize: true }
+            Utils.overlayUseDisplayHidden @loadingOverlay
+            @loadingSpan.style.right = "auto"
+
     _updateLoadingPosition: () ->
+        @_initLoadingOverlay()
         @loadingOverlay.cfg.setProperty "x", do =>
             # Keep the distance to the right border of the viewport the same
             scrollX = YD.getDocumentScrollLeft()

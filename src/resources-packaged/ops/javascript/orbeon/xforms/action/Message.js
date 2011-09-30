@@ -18,18 +18,20 @@
     var YD = YAHOO.util.Dom;
     var Event = YAHOO.util.Event;
     var Utils = ORBEON.util.Utils;
+    var SimpleDialog = YAHOO.widget.SimpleDialog;
 
     ORBEON.xforms.action.Message = {
 
         _messageQueue: [],
         _messageDialog: null,
 
-        clinit: function() {
-            YAHOO.util.Event.onDOMReady(function() {
+        // Delayed dialog initialization
+        _initDialog: function() {
+            if (this._messageDialog == null) {
                 // Prevent SimpleDialog from registering itself on the form
-                YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
+                SimpleDialog.prototype.registerForm = function() {};
                 // Create one single instance of the YUI dialog used for xforms:message
-                this._messageDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
+                this._messageDialog = new SimpleDialog("xforms-message-dialog", {
                     width: "30em",
                     fixedcenter: true,
                     constraintoviewport: true,
@@ -59,13 +61,14 @@
                 // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
                 var dialogDiv = OD.get("xforms-message-dialog");
                 dialogDiv.setAttribute("aria-live", "polite");
-            }, this, true);
+            }
         },
 
         _showMessage: function() {
             // Create a span, otherwise setBody() assume the parameters is HTML, while we want it to be text
             var span = document.createElement("span");
             OD.setStringValue(span, this._messageQueue[0]);
+            this._initDialog();
             this._messageDialog.setBody(span);
             this._messageDialog.show();
         },
@@ -78,6 +81,7 @@
          * @param {Array.<string>} messages
          */
         showMessages: function(messages) {
+            this._initDialog();
             _.each(messages, function(message) { this._messageQueue.push(message); }, this);
             Event.onAvailable("xforms-message-dialog", this._showMessage, this, true);
         },
@@ -90,6 +94,4 @@
             }
         }
     };
-
-    ORBEON.xforms.action.Message.clinit();
 })();

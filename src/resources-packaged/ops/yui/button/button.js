@@ -2729,7 +2729,7 @@ version: 2.8.1
 
             YAHOO.widget.Button.superclass.init.call(this, p_oElement, p_oAttributes);
 
-            // ORBEON: allows custom id
+            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
             var sId = this.get("id"),
                 sButtonId = oButton.id != null ? oButton.id: sId + "-button";
 
@@ -2754,6 +2754,8 @@ version: 2.8.1
 			};
 
 
+            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+            /*
 			if (oSrcElement && this.get("type") != "link") {
 
 				aLabels = Dom.getElementsBy(hasLabel, "label");
@@ -2765,6 +2767,7 @@ version: 2.8.1
 				}
 
 			}
+			*/
 
 
             m_oButtons[sId] = this;

@@ -369,8 +369,16 @@
                                         <xsl:template match="/">
 
                                             <!-- Compute view name -->
-                                            <!-- NOTE: Max name length is 30. -12 for "orbeon_flat_", leaves 18, or 8 for the app name, 9 for the form name -->
-                                            <xsl:variable name="mv-name" select="concat('orbeon_flat_', f:xml-to-sql-id(/request/app, 8), '_', f:xml-to-sql-id(/request/form, 9))"/>
+                                            <!-- Max name length is 30. -9 for "orbeon_f_", leaves 21 characters -->
+                                            <!-- Just convert to SQL format without truncating (hence the 99) -->
+                                            <xsl:variable name="app-xml" select="f:xml-to-sql-id(/request/app, 99)"/>
+                                            <xsl:variable name="form-xml" select="f:xml-to-sql-id(/request/form, 99)"/>
+                                            <xsl:variable name="mv-name" select="concat('ORBEON_F_',
+                                                    if (string-length($app-xml) + string-length($form-xml) le 20) then concat($app-xml, '_', $form-xml)
+                                                    else if (string-length($app-xml) gt 10 and string-length($form-xml) gt 10) then concat(substring($app-xml, 1, 10), '_', substring($form-xml, 1, 10))
+                                                    else if (string-length($app-xml) gt 10) then concat(substring($app-xml, 1, 20 - string-length($form-xml)), '_', $form-xml)
+                                                    else concat($app-xml, '_', substring($form-xml, 1, 20 - string-length($app-xml)))
+                                                )"/>
 
                                             <!-- SQL to drop possibly existing view -->
                                             <xsl:result-document href="output:drop-sql">

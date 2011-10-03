@@ -19,11 +19,11 @@ import org.orbeon.oxf.util.XPathCache
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
-import java.util.{LinkedHashMap => JLinkedHashMap}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
 import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
 import org.dom4j.{QName, Text, Element}
 import org.orbeon.oxf.xforms._
+import collection.JavaConverters._
 
 trait SelectionControl extends SimpleElementAnalysis {
 
@@ -152,16 +152,6 @@ trait SelectionControl extends SimpleElementAnalysis {
 
             def startElement(element: Element) {
 
-                def getAttributes(itemChoiceItemsetElement: Element) = {
-                    val result = new JLinkedHashMap[QName, String]
-                    for (attributeName <- XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE) {
-                        val attributeValue = itemChoiceItemsetElement.attributeValue(XFormsConstants.CLASS_QNAME)
-                        if (attributeValue ne null)
-                            result.put(attributeName, attributeValue)
-                    }
-                    result
-                }
-
                 element.getQName match {
 
                     case XFormsConstants.ITEM_QNAME => // xforms:item
@@ -177,7 +167,7 @@ trait SelectionControl extends SimpleElementAnalysis {
                             throw new ValidationException("xforms:item must contain an xforms:value element.", ElementAnalysis.createLocationData(element))
                         val value = XFormsUtils.getStaticChildElementValue(valueElement, false, null)
 
-                        val attributes = getAttributes(element)
+                        val attributes = SelectionControlUtil.getAttributes(element)
                         currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
 
                     case XFormsConstants.ITEMSET_QNAME => // xforms:itemset
@@ -192,7 +182,7 @@ trait SelectionControl extends SimpleElementAnalysis {
 
                             assert(label ne null)
 
-                            val attributes = getAttributes(element)
+                            val attributes = SelectionControlUtil.getAttributes(element)
                             val newContainer = new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
                             currentContainer.addChildItem(newContainer);
                             currentContainer = newContainer
@@ -213,5 +203,22 @@ trait SelectionControl extends SimpleElementAnalysis {
             def text(text: Text) = ()
         })
         result
+    }
+}
+
+object SelectionControlUtil {
+
+    private val attributesToPropagate = XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE.toSeq
+
+    def getAttributes(itemChoiceItemset: Element) = {
+        val tuples =
+            for {
+                attributeName <- attributesToPropagate
+                attributeValue = itemChoiceItemset.attributeValue(attributeName)
+                if attributeValue ne null
+            } yield
+                attributeName -> attributeValue
+
+        tuples.toMap.asJava
     }
 }

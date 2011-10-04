@@ -55,6 +55,7 @@
                             <xsl:copy-of select="xxbl:parameter(., 'swf')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'width')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'height')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'chart-id')"/>
                         </xforms:group>
                     </xforms:group>
                 </xsl:template>

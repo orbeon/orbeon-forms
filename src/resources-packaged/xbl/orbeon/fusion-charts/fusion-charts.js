@@ -30,12 +30,15 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         var swf = ORBEON.xforms.Document.getValue(swfElement.id);
         var widthElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-width", null, this.container)[0];
         var width = ORBEON.xforms.Document.getValue(widthElement.id);
+        var chartIdElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-chart-id", null, this.container)[0];
+        var chartId = ORBEON.xforms.Document.getValue(chartIdElement.id);
         var heightElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-height", null, this.container)[0];
         var height = ORBEON.xforms.Document.getValue(heightElement.id);
         var resourcesBaseURL = ORBEON.xforms.Globals.resourcesBaseURL[ORBEON.xforms.Controls.getForm(this.container).id];
         var pathToSwf = resourcesBaseURL + uriToSwf + "/" + swf + ".swf?registerWithJS=1";
         this.createChart = function() {
-            var fusionChart = new FusionCharts(pathToSwf, this.container.id + "-fusion", width, height, "0", "0");
+       		if (chartId == '') chartId = this.container.id + "-fusion";
+            var fusionChart = new FusionCharts(pathToSwf, chartId, width, height, "0", "0");
             fusionChart.setDataXML(this.xml);
             fusionChart.setTransparent(false);
             fusionChart.render(chartDiv.id);

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exslt="http://exslt.org/common"
     xmlns:xslt="http://xml.apache.org/xslt"
@@ -30,7 +29,7 @@
             </context-param>
 
             <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'filesystem resource manager'"/>
+                <xsl:with-param name="caption" select="'filesystem resource manager (development mode)'"/>
                 <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <xsl:comment>Filesystem resource managers</xsl:comment>
@@ -40,62 +39,39 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value>
-                            <xsl:choose>
-                                <xsl:when test="$target = 'devel'"><xsl:value-of select="$build-root"/>/src/resources</xsl:when>
-                                <xsl:otherwise>/path/to/orbeon/src/resources</xsl:otherwise>
-                            </xsl:choose>
-                        </param-value>
+                        <param-value><xsl:value-of select="$build-root"/>/src/resources</param-value>
                     </context-param>
-                    <xsl:comment>Web application resource manager</xsl:comment>
-                    <context-param>
-                        <param-name>oxf.resources.priority.2</param-name>
-                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
-                    </context-param>
-                    <context-param>
-                        <param-name>oxf.resources.priority.2.oxf.resources.webapp.rootdir</param-name>
-                        <param-value>/WEB-INF/resources</param-value>
-                    </context-param>
+                </xsl:with-param>
+            </xsl:call-template>
+            <xsl:comment>Web application resource manager for resources</xsl:comment>
+            <context-param>
+                <param-name>oxf.resources.priority.2</param-name>
+                <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+            </context-param>
+            <context-param>
+                <param-name>oxf.resources.priority.2.oxf.resources.webapp.rootdir</param-name>
+                <param-value>/WEB-INF/resources</param-value>
+            </context-param>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'filesystem resource manager (development mode)'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="content">
+                    <xsl:comment>Web application resource manager for packaged resources</xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.3</param-name>
                         <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value>
-                            <xsl:choose>
-                                <xsl:when test="$target = 'devel'"><xsl:value-of select="$build-root"/>/src/resources-packaged</xsl:when>
-                                <xsl:otherwise>/path/to/orbeon/src/resources-packaged</xsl:otherwise>
-                            </xsl:choose>
-                        </param-value>
-                    </context-param>
-                    <xsl:comment>Classloader resource manager</xsl:comment>
-                    <context-param>
-                        <param-name>oxf.resources.priority.4</param-name>
-                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                        <param-value><xsl:value-of select="$build-root"/>/src/resources-packaged</param-value>
                     </context-param>
                 </xsl:with-param>
             </xsl:call-template>
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'webapp resource manager'"/>
-                <xsl:with-param name="commented" select="$target = 'devel'"/>
-                <xsl:with-param name="content">
-                    <xsl:comment>Web application resource manager</xsl:comment>
-                    <context-param>
-                        <param-name>oxf.resources.priority.1</param-name>
-                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
-                    </context-param>
-                    <context-param>
-                        <param-name>oxf.resources.priority.1.oxf.resources.webapp.rootdir</param-name>
-                        <param-value>/WEB-INF/resources</param-value>
-                    </context-param>
-                    <xsl:comment>Classloader resource manager</xsl:comment>
-                    <context-param>
-                        <param-name>oxf.resources.priority.2</param-name>
-                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
-                    </context-param>
-                </xsl:with-param>
-            </xsl:call-template>
+            <xsl:comment>Classloader resource manager</xsl:comment>
+            <context-param>
+                <param-name>oxf.resources.priority.4</param-name>
+                <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+            </context-param>
 
             <xsl:comment>Orbeon Class Loader</xsl:comment>
             <context-param>

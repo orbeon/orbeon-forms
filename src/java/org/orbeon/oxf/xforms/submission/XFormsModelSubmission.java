@@ -121,10 +121,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         this.submissions = new Submission[] {
             new EchoSubmission(this),
             new ClientGetAllSubmission(this),
-            new LocalPortletSubmission(this),
             new FilterPortletSubmission(this),
-            new RequestDispatcherSubmission(this),
             new CacheableSubmission(this),
+            new LocalPortletSubmission(this),
+            new RequestDispatcherSubmission(this),
             new RegularSubmission(this)
         };
     }

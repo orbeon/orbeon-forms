@@ -141,7 +141,28 @@ public class CacheableSubmission extends BaseSubmission {
                                     try {
                                         // Run regular submission but force synchronous execution and readonly result
                                         final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
-                                        submissionResult = new RegularSubmission(submission).connect(p, updatedP2, sp);
+
+                                        // For now support caching local portlet, request dispatcher, and regular submissions
+                                        final Submission[] submissions = new Submission[] {
+                                            new LocalPortletSubmission(submission),
+                                            new RequestDispatcherSubmission(submission),
+                                            new RegularSubmission(submission)
+                                        };
+
+                                        // Iterate through submissions and run the first match
+                                        for (final Submission submission : submissions) {
+                                            if (submission.isMatch(p, p2, sp)) {
+                                                if (detailsLogger.isDebugEnabled())
+                                                    detailsLogger.startHandleOperation("", "connecting", "type", submission.getType());
+                                                try {
+                                                    submissionResult = submission.connect(p, updatedP2, sp);
+                                                    break;
+                                                } finally {
+                                                    if (detailsLogger.isDebugEnabled())
+                                                        detailsLogger.endHandleOperation();
+                                                }
+                                            }
+                                        }
 
                                         // Check if the connection returned a throwable
                                         final Throwable throwable = submissionResult.getThrowable();

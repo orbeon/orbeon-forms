@@ -41,10 +41,9 @@
                         <xsl:choose>
                             <!-- Inline data picker-->
                             <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">
-                                <!-- Init event -->
-                                <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xxforms:script>
                                 <xhtml:div class="xbl-fr-date-calendar-div"/>
                                 <xforms:input ref="." class="xbl-fr-date-input">
+                                    <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xxforms:script>
                                     <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.instance(this).valueChanged();</xxforms:script>
                                 </xforms:input>
                             </xsl:when>

@@ -44,7 +44,7 @@
                         <xsl:value-of select="$prefix"/>
                         <xsl:text>", "</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($component)"/>
-                        <xsl:text>", "</xsl:text>
+                        <xsl:text>", this, "</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($property)"/>
                         <xsl:text>");</xsl:text>
                     </xxforms:script>

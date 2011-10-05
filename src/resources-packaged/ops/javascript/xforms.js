@@ -3975,11 +3975,11 @@ ORBEON.xforms.XBL = {
         };
     },
 
-    callValueChanged: function(prefix, component, property) {
+    callValueChanged: function(prefix, component, target, property) {
         var partial = YAHOO.xbl;                                    if (partial == null) return;
         partial = partial[prefix];                                  if (partial == null) return;
         partial = partial[component];                               if (partial == null) return;
-        partial = partial.instance(this);                           if (partial == null) return;
+        partial = partial.instance(target);                         if (partial == null) return;
         var method = partial["parameter" + property + "Changed"];   if (method == null) return;
         method.call(partial);
     },

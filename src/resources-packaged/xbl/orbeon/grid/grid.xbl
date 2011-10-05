@@ -88,7 +88,7 @@
                         <xh:div class="{string-join((if ($is-repeat) then 'yui-dt' else ()), ' ')}">
                             <xh:div class="yui-dt-hd">
                                 <!-- Grid table -->
-                                <xh:table class="fr-grid {string-join((if ($is-repeat) then ('yui-dt-table', 'fr-repeat', 'fr-repeat-table') else 'fr-norepeat', if ($is-editable) then 'fr-editable' else ()), ' ')}">
+                                <xh:table class="{string-join(('fr-grid', @class, if ($is-repeat) then ('yui-dt-table', 'fr-repeat', 'fr-repeat-table') else 'fr-norepeat', if ($is-editable) then 'fr-editable' else ()), ' ')}">
 
                                     <!-- If editable, add top row to manipulate grid -->
                                     <xsl:if test="$is-editable">

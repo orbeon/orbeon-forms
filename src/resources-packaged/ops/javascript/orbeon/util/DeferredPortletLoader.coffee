@@ -10,16 +10,11 @@ insertResponseInContainer = (container, response) ->
     # Insert DOM from Ajax response
     container.innerHTML = response.responseText
 
-    # Remove scripts (won't be included)
-    toRemove = _.map ["script", "link"], (e) -> container.getElementsByTagName e
-    _.each toRemove[0], (e) -> e.parentNode.removeChild e
-    _.each toRemove[1], (e) -> e.parentNode.removeChild e
-
     # Mock JSON we're retrieve from a div
     jsonContainer = (Dom.getElementsByClassName "orbeon-portlet-resources", "div", container)[0]
     jsonContainer.parentNode.removeChild jsonContainer
     json = jsonContainer.innerText || jsonContainer.textContent
-    json = json.replace /\n/g, ""
+    json = json.replace /\n/g, " "
     json = JSON.parse json
 
     # Prevent YUI DOMReady event from firing everything is loaded

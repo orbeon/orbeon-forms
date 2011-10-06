@@ -30,7 +30,7 @@
         <xsl:for-each select="$view">
             <!-- Just to set the context -->
 
-            <xforms:group id="fr-view">
+            <xforms:group id="fr-view" class="orbeon-buttons">
                 <xhtml:div
                     id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
                     class="{if (fr:left) then 'yui-t2 ' else ''}{concat(' fr-mode-', $mode)}">
@@ -590,6 +590,7 @@
                         <fr:buttons>
                             <xsl:for-each select="$view-buttons">
                                 <xsl:element name="fr:{.}-button"/>
+                                <xsl:text>X</xsl:text>
                             </xsl:for-each>
                         </fr:buttons>
                     </xsl:variable>
@@ -608,10 +609,11 @@
                         <fr:buttons>
                             <xsl:for-each select="$buttons">
                                 <xsl:element name="fr:{.}-button"/>
+                                <xsl:text> </xsl:text>
                             </xsl:for-each>
                         </fr:buttons>
                     </xsl:variable>
-                    <xsl:apply-templates select="$default-buttons/*"/>
+                    <xsl:apply-templates select="$default-buttons/node()"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xhtml:div>

@@ -350,12 +350,12 @@
                                         </td>
                                         <td class="fr-search-button-td">
                                             <!-- Search button -->
-                                            <fr:button>
+                                            <xforms:trigger>
                                                 <xforms:label>
                                                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
                                                     <xforms:output value="$fr-resources/summary/search/search-forms"/>
                                                 </xforms:label>
-                                            </fr:button>
+                                            </xforms:trigger>
                                         </td>
                                         <td class="fr-search-options-td">
                                             <!-- Search options -->
@@ -489,13 +489,13 @@
                                     </xforms:repeat>
                                     <xhtml:div class="fr-search-options-buttons">
                                         <!-- Search button -->
-                                        <fr:button>
+                                        <xforms:trigger>
                                             <xforms:label>
                                                 <!--<xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>-->
                                                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
                                                 <xforms:output value="$fr-resources/summary/search/search-forms"/>
                                             </xforms:label>
-                                        </fr:button>
+                                        </xforms:trigger>
                                         <!-- Close search options -->
                                         <xforms:trigger appearance="minimal">
                                             <xforms:label ref="$fr-resources/summary/search/close-options"/>
@@ -763,7 +763,7 @@
                         <xhtml:span class="fr-button">
                             <!-- New button -->
                             <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
-                                <fr:button ref=".">
+                                <xforms:trigger ref=".">
                                     <xforms:label>
                                         <!--<xhtml:img src="/apps/fr/style/add.gif" alt=""/>-->
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt=""/>
@@ -772,11 +772,11 @@
                                     <!-- TODO: add hints to buttons -->
                                     <!--<xforms:hint>Create a new form</xforms:hint>-->
                                     <xforms:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <!-- Print button -->
                             <xforms:group ref="if (. = 'print') then instance('fr-summary-triggers-instance')/view else ()">
-                                <fr:button ref=".">
+                                <xforms:trigger ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/eye.png" alt=""/>
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/review"/></xhtml:span>
@@ -788,7 +788,7 @@
                                         <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
                                         <xforms:dispatch targetid="fr-form-model" name="fr-summary-view"/>
                                     </xforms:action>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <!-- PDF button -->
                             <xforms:group ref="if (. = 'pdf') then instance('fr-summary-triggers-instance')/pdf else ()">
@@ -806,7 +806,7 @@
                                     }, this);
                                 </xxforms:script>
 
-                                <fr:button ref=".">
+                                <xforms:trigger ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
@@ -818,7 +818,7 @@
                                         <xforms:load resource="/fr/{$app}/{$form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxforms:instance('fr-language-instance')}"
                                                      xxforms:show-progress="false" f:url-type="resource"/>
                                     </xforms:action>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <!-- Test button -->
                             <xforms:group ref="if (. = 'test') then instance('fr-summary-triggers-instance')/view else ()">
@@ -836,7 +836,7 @@
                                     }, this);
                                 </xxforms:script>
 
-                                <fr:button ref=".">
+                                <xforms:trigger ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="" title="Test Form"/>
                                         <xhtml:span>Test</xhtml:span>
@@ -853,28 +853,28 @@
                                         <!--<xforms:setindex repeat="documents-repeat" index="instance('fr-selection-instance')"/>-->
                                         <xforms:dispatch targetid="fr-form-model" name="fr-summary-test"/>
                                     </xforms:action>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <!-- Delete button -->
                             <xforms:group ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
-                                <fr:button ref=".">
+                                <xforms:trigger ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
                                     </xforms:label>
                                     <!-- Open delete confirmation dialog -->
                                     <xforms:dispatch ev:event="DOMActivate" name="fr-show" targetid="delete-confirmation-dialog"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <!-- Import button -->
                             <xforms:group ref="if (. = 'import') then instance('fr-summary-triggers-instance')/import else ()">
-                                <fr:button ref=".">
+                                <xforms:trigger ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/up_16.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/import-forms"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:load ev:event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                         </xhtml:span>
                     </xforms:repeat>

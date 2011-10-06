@@ -350,6 +350,47 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
     background-color: #ff3;
 }
 
+/* ***** Orbeon buttons ********************************************************************************************* */
+
+.orbeon-buttons .xforms-trigger button {
+    font-size: 93%;
+    -khtml-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    background: #DDD url(../../ops/yui/assets/skins/sam/sprite.png) repeat-x 0 0;
+    border-color: #BBB #BBB #999;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 0;
+    overflow: visible;
+    padding: 3px 9px 3px 9px;
+    text-shadow: 0 1px #F0F0F0;
+    color: #333!important;
+    -moz-box-shadow: 0 1px 0 #f8f8f8;
+    -wekbit-box-shadow: 0 1px 0 #f8f8f8;
+    box-shadow: 0 1px 0 #f8f8f8;
+}
+
+.orbeon-buttons .xforms-trigger button:hover,
+.orbeon-buttons .xforms-trigger button:focus {
+    background-position: 0 -6px;
+    border-color: #999 #999 #666;
+    color: black;
+    text-decoration: none;
+}
+
+.orbeon-buttons .xforms-trigger.xforms-readonly button,
+.orbeon-buttons .xforms-trigger.xforms-readonly button:hover {
+    background: #DDD url(../../ops/yui/assets/skins/sam/sprite.png) repeat-x 0 0;
+    background-position: 0 -1500px;
+    border-color: #CCC;
+    cursor: default;
+    color: #AAA!important;
+    text-shadow: none;
+}
+
 /* ***** Indicators and messages ************************************************************************************ */
 
 .xforms-loading-loading {

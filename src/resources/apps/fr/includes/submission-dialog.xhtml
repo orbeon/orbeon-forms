@@ -24,7 +24,7 @@
         id="fr-submission-result-dialog" level="modal" close="false" draggable="false" class="fr-dialog" model="fr-submission-result-model">
 
     <xforms:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
-    
+
     <xhtml:div>
         <xxforms:variable name="content-from-persistence" select="xxforms:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
         <xforms:output ref="if ($content-from-persistence) then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
@@ -33,7 +33,7 @@
         <xforms:group>
             <xforms:repeat ref="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')">
                 <!-- Clear button -->
-                <fr:button ref=".[. = 'clear']">
+                <xforms:trigger ref=".[. = 'clear']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
@@ -46,9 +46,9 @@
                         <!-- Make sure a new document id is created -->
                         <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
                     </xforms:action>
-                </fr:button>
+                </xforms:trigger>
                 <!-- Keep button -->
-                <fr:button ref=".[. = 'keep']">
+                <xforms:trigger ref=".[. = 'keep']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
@@ -57,9 +57,9 @@
                         <xxforms:hide dialog="fr-submission-result-dialog"/>
                         <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
                     </xforms:action>
-                </fr:button>
+                </xforms:trigger>
                 <!-- Go button -->
-                <fr:button ref=".[. = 'go']">
+                <xforms:trigger ref=".[. = 'go']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
@@ -68,15 +68,15 @@
                         <xxforms:variable name="uri-xpath" select="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
                         <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
                     </xforms:action>
-                </fr:button>
+                </xforms:trigger>
                 <!-- Close window button -->
-                <fr:button ref=".[. = 'close-window']">
+                <xforms:trigger ref=".[. = 'close-window']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
                     </xforms:label>
                     <xxforms:script ev:event="DOMActivate">window.close();</xxforms:script>
-                </fr:button>
+                </xforms:trigger>
             </xforms:repeat>
         </xforms:group>
     </xhtml:div>

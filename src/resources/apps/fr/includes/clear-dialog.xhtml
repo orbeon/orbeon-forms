@@ -32,20 +32,20 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xxforms:hide ev:event="DOMActivate" dialog="fr-clear-confirm-dialog"/>
-            <fr:button>
+            <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
                 </xforms:label>
                 <!-- Restore instance -->
                 <xforms:dispatch ev:event="DOMActivate" name="fr-clear" targetid="fr-persistence-model"/>
-            </fr:button>
-            <fr:button>
+            </xforms:trigger>
+            <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>
                 </xforms:label>
-            </fr:button>
+            </xforms:trigger>
         </xforms:group>
     </xhtml:div>
 </xxforms:dialog>

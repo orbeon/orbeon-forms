@@ -296,12 +296,12 @@
                                 </fr:td>
                                 <fr:td>
                                     <!-- Cancel validation -->
-                                    <fr:button>
+                                    <xf:trigger>
                                         <xf:label>Cancel</xf:label>
                                         <xf:action ev:event="DOMActivate" type="xpath">
                                             xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
                                         </xf:action>
-                                    </fr:button>
+                                    </xf:trigger>
                                 </fr:td>
                                 <fr:td/>
                             </fr:tr>
@@ -347,7 +347,7 @@
                                         <xh:span class="fb-import-warning">
                                             Validation was canceled.
                                         </xh:span>
-                                        <fr:button>
+                                        <xf:trigger>
                                             <xf:label>Start Over</xf:label>
                                             <xf:action ev:event="DOMActivate">
                                                 <!-- Clear stats -->
@@ -358,7 +358,7 @@
                                                 <!-- Reload page (xf:reset would help instead!) -->
                                                 <xf:load resource="import"/>
                                             </xf:action>
-                                        </fr:button>
+                                        </xf:trigger>
                                     </fr:td>
                                 </fr:tr>
                             </xf:group>
@@ -395,28 +395,28 @@
                                     </fr:tr>
                                     <fr:tr>
                                         <fr:td>
-                                            <fr:button>
+                                            <xf:trigger>
                                                 <xf:label>Add</xf:label>
                                                 <!-- Start import -->
                                                 <xf:send ev:event="DOMActivate" submission="fr-import-import-submission"/>
-                                            </fr:button>
-                                            <fr:button>
+                                            </xf:trigger>
+                                            <xf:trigger>
                                                 <xf:label>Delete</xf:label>
                                                 <!-- Delete data first -->
                                                 <xf:send ev:event="DOMActivate" submission="fr-import-delete-data-submission"/>
-                                            </fr:button>
+                                            </xf:trigger>
                                         </fr:td>
                                     </fr:tr>
                                 </xf:group>
                                 <xf:group ref=".[$existing le 0]">
                                     <fr:tr>
                                         <fr:td>
-                                            <fr:button>
+                                            <xf:trigger>
                                                 <xf:label>Import</xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <xf:send submission="fr-import-import-submission"/>
                                                 </xf:action>
-                                            </fr:button>
+                                            </xf:trigger>
                                         </fr:td>
                                     </fr:tr>
                                 </xf:group>
@@ -444,12 +444,12 @@
                                     </fr:td>
                                     <fr:td>
                                         <!-- Cancel import -->
-                                        <fr:button>
+                                        <xf:trigger>
                                             <xf:label>Cancel</xf:label>
                                             <xf:action ev:event="DOMActivate" type="xpath">
                                                 xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
                                             </xf:action>
-                                        </fr:button>
+                                        </xf:trigger>
                                     </fr:td>
                                 </fr:tr>
                             </xf:group>
@@ -480,7 +480,7 @@
                                             <xh:span class="fb-import-warning">
                                                 Import was canceled.
                                             </xh:span>
-                                            <fr:button>
+                                            <xf:trigger>
                                                 <xf:label>Start Over</xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <!-- Clear stats -->
@@ -491,7 +491,7 @@
                                                     <!-- Reload page (xf:reset would help instead!) -->
                                                     <xf:load resource="import"/>
                                                 </xf:action>
-                                            </fr:button>
+                                            </xf:trigger>
                                         </fr:td>
                                     </fr:tr>
                                 </xf:group>
@@ -504,9 +504,9 @@
                 <!--<fr:xforms-inspector/>-->
 
             </fr:body>
-            <fr:buttons>
+            <xf:triggers>
                 <fr:close-button/>
-            </fr:buttons>
+            </xf:triggers>
         </fr:view>
     </xh:body>
 </xh:html>

@@ -364,7 +364,7 @@ public class InitUtils {
     /**
      * Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used.
      */
-    public static ProcessorDefinition getDefinitionFromMap(Map map, String uriNamePropertyPrefix, String inputPropertyPrefix) {
+    public static ProcessorDefinition getDefinitionFromMap(Map<String, String> map, String uriNamePropertyPrefix, String inputPropertyPrefix) {
         ProcessorDefinition processorDefinition = null;
         final String processorURI = (String) map.get(uriNamePropertyPrefix + "uri");
         final Object processorName = map.get(uriNamePropertyPrefix + "name");
@@ -396,11 +396,12 @@ public class InitUtils {
     /**
      * Present a read-only view of the properties as a Map.
      */
-    public static class OXFPropertiesMap extends AttributesToMap<Object> {
+    public static class OXFPropertiesMap extends AttributesToMap<String> {
         public OXFPropertiesMap() {
-            super(new Attributeable<Object>() {
-                public Object getAttribute(String s) {
-                    return Properties.instance().getPropertySet().getObject(s);
+            super(new Attributeable<String>() {
+                public String getAttribute(String s) {
+                    final Object o = Properties.instance().getPropertySet().getObject(s);
+                    return (o != null) ? o.toString() : null;
                 }
 
                 public java.util.Enumeration<String> getAttributeNames() {
@@ -411,7 +412,7 @@ public class InitUtils {
                     throw new UnsupportedOperationException();
                 }
 
-                public void setAttribute(String s, Object o) {
+                public void setAttribute(String s, String o) {
                     throw new UnsupportedOperationException();
                 }
             });
@@ -421,10 +422,10 @@ public class InitUtils {
     /**
      * Present a read-only view of the ServletContext initialization parameters as a Map.
      */
-    public static class ServletContextInitMap extends AttributesToMap<Object> {
+    public static class ServletContextInitMap extends AttributesToMap<String> {
         public ServletContextInitMap(final ServletContext servletContext) {
-            super(new Attributeable<Object>() {
-                public Object getAttribute(String s) {
+            super(new Attributeable<String>() {
+                public String getAttribute(String s) {
                     return servletContext.getInitParameter(s);
                 }
 
@@ -436,7 +437,7 @@ public class InitUtils {
                     throw new UnsupportedOperationException();
                 }
 
-                public void setAttribute(String s, Object o) {
+                public void setAttribute(String s, String o) {
                     throw new UnsupportedOperationException();
                 }
             });

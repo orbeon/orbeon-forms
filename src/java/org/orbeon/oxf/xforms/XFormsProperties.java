@@ -33,7 +33,6 @@ public class XFormsProperties {
 
     public static final String NOSCRIPT_PROPERTY = "noscript";
     public static final String NOSCRIPT_SUPPORT_PROPERTY = "noscript-support";
-    public static final String AJAX_PORTLET_PROPERTY = "ajax-portlet";
 
     public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
     public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
@@ -189,7 +188,6 @@ public class XFormsProperties {
             },
             new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
             new PropertyDefinition(NOSCRIPT_SUPPORT_PROPERTY, true, false),
-            new PropertyDefinition(AJAX_PORTLET_PROPERTY, false, false),
             new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false) {
                 @Override
@@ -309,6 +307,8 @@ public class XFormsProperties {
 
     private static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
 
+    private static final String AJAX_PORTLET_PROPERTY = XFORMS_PROPERTY_PREFIX + "ajax-portlet";
+
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
@@ -418,6 +418,9 @@ public class XFormsProperties {
     public static PropertySet.Property getResourcesBaseline() {
         return Properties.instance().getPropertySet().getProperty(BASELINE_PROPERTY);
     }
+    public static boolean isAjaxPortlet() {
+        return Properties.instance().getPropertySet().getBoolean(AJAX_PORTLET_PROPERTY, false);
+    }
 
     public static boolean getDebugLogXPathAnalysis() {
         return Properties.instance().getPropertySet().getBoolean(DEBUG_LOG_XPATH_ANALYSIS, false);
@@ -431,10 +434,6 @@ public class XFormsProperties {
 
     public static boolean isClientStateHandling(XFormsContainingDocument containingDocument) {
         return getStateHandling(containingDocument).equals(STATE_HANDLING_CLIENT_VALUE);
-    }
-
-    public static boolean isAjaxPortlet(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, AJAX_PORTLET_PROPERTY);
     }
 
     public static boolean isOptimizeGetAllSubmission(XFormsContainingDocument containingDocument) {

@@ -14,13 +14,14 @@
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.*;
+import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.externalcontext.URLRewriter;
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xml.XMLUtils;
 
 import javax.portlet.*;
 import java.io.*;
@@ -77,16 +78,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest, MimeResponse mimeResponse) {
         this(pipelineContext, portletContext, initAttributesMap, portletRequest);
         this.mimeResponse = mimeResponse;
-    }
-
-    Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, ExternalContext.Request request, ExternalContext.Response response) {
-        this(portletContext, initAttributesMap);
-
-        this.pipelineContext = pipelineContext;
-        this.request = request;
-        this.response = response;
-        this.session = request.getSession(true);
-
     }
 
     private Portlet2ExternalContext(PortletContext portletContext, Map<String, String> initAttributesMap) {
@@ -438,9 +429,13 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
-    public abstract class BaseResponse implements Response {
+    public abstract static class BaseResponse implements ExternalContext.Response {
 
-        private final URLRewriter urlRewriter = new WSRPURLRewriter(pipelineContext, request, URLRewriterUtils.isWSRPEncodeResources());
+        private final URLRewriter urlRewriter;
+
+        public BaseResponse(PipelineContext pipelineContext, ExternalContext.Request request) {
+            urlRewriter = new WSRPURLRewriter(pipelineContext, request, URLRewriterUtils.isWSRPEncodeResources());
+        }
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // NIY / FIXME
@@ -511,27 +506,26 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public Object getNativeResponse() {
-            return Portlet2ExternalContext.this.getNativeResponse();
+            throw new OXFException("NIY");
+//            return Portlet2ExternalContext.this.getNativeResponse();
         }
     }
 
-    private static class LocalByteArrayOutputStream extends ByteArrayOutputStream {
-        public byte[] getByteArray() {
-            return buf;
-        }
-    }
-
-    public class BufferedResponse extends BaseResponse {
+    public static class BufferedResponse extends BaseResponse {
 
         private String contentType;
         private String redirectPathInfo;
-        private Map redirectParameters;
+        private Map<String, String[]> redirectParameters;
         private boolean redirectIsExitPortal;
-        private StringBuilderWriter StringBuilderWriter;
+        private StringBuilderWriter stringBuilderWriter;
         private PrintWriter printWriter;
-        private LocalByteArrayOutputStream byteStream;
+        private ByteArrayOutputStream byteStream;
         private String title;
-
+        
+        public BufferedResponse(PipelineContext pipelineContext, ExternalContext.Request request) {
+            super(pipelineContext, request);
+        }
+        
         public String getContentType() {
             return contentType;
         }
@@ -540,8 +534,16 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             return redirectPathInfo;
         }
 
-        public Map getRedirectParameters() {
+        public Map<String, String[]> getRedirectParameters() {
             return redirectParameters;
+        }
+
+        public StringBuilderWriter getStringBuilderWriter() {
+            return stringBuilderWriter;
+        }
+
+        public ByteArrayOutputStream getByteStream() {
+            return byteStream;
         }
 
         public boolean isRedirectIsExitPortal() {
@@ -549,16 +551,16 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public PrintWriter getWriter() throws IOException {
-            if (StringBuilderWriter == null) {
-                StringBuilderWriter = new StringBuilderWriter();
-                printWriter = new PrintWriter(StringBuilderWriter);
+            if (stringBuilderWriter == null) {
+                stringBuilderWriter = new StringBuilderWriter();
+                printWriter = new PrintWriter(stringBuilderWriter);
             }
             return printWriter;
         }
 
         public OutputStream getOutputStream() throws IOException {
             if (byteStream == null)
-                byteStream = new LocalByteArrayOutputStream();
+                byteStream = new ByteArrayOutputStream();
             return byteStream;
         }
 
@@ -573,7 +575,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
          * @param isServerSide  this is ignored for portlets
          * @param isExitPortal  if this is true, the redirect will exit the portal
          */
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
+        public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) {
             if (isCommitted())
                 throw new IllegalStateException("Cannot call sendRedirect if response is already committed.");
             this.redirectPathInfo = pathInfo;
@@ -597,42 +599,12 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             // NOP
         }
 
-        public void write(MimeResponse response) throws IOException {
-            if (XMLUtils.isTextOrJSONContentType(contentType) || XMLUtils.isXMLMediatype(contentType)) {
-                // We are dealing with text content that may need rewriting
-                // CHECK: Is this check on the content-type going to cover the relevant cases?
-                if (StringBuilderWriter != null) {
-                    // Write directly
-                    WSRP2Utils.write(response, StringBuilderWriter.toString(), XMLUtils.isXMLMediatype(contentType));
-                } else if (byteStream != null) {
-                    // Transform to string and write
-                    String encoding = NetUtils.getContentTypeCharset(contentType);
-                    if (encoding == null)
-                        encoding = CachedSerializer.DEFAULT_ENCODING;
-                    WSRP2Utils.write(response, new String(byteStream.getByteArray(), 0, byteStream.size(), encoding), XMLUtils.isXMLMediatype(contentType));
-                } else {
-                    throw new IllegalStateException("Processor execution did not return content.");
-                }
-            } else {
-                // We are dealing with content that does not require rewriting
-                if (StringBuilderWriter != null) {
-                    // Write directly
-                    response.getWriter().write(StringBuilderWriter.toString());
-                } else if (byteStream != null) {
-                    // Transform to string and write
-                    byteStream.writeTo(response.getPortletOutputStream());
-                } else {
-                    throw new IllegalStateException("Processor execution did not return content.");
-                }
-            }
-        }
-
         public boolean isRedirect() {
             return redirectPathInfo != null;
         }
 
-        public boolean isContent() {
-            return byteStream != null || StringBuilderWriter != null;
+        public boolean hasContent() {
+            return byteStream != null || stringBuilderWriter != null;
         }
 
         public void setTitle(String title) {
@@ -641,16 +613,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
 
         public String getTitle() {
             return title;
-        }
-    }
-
-    public class DirectResponseTemp extends BufferedResponse {
-
-        public DirectResponseTemp() {
-        }
-
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {
-            throw new IllegalStateException();
         }
     }
 
@@ -669,12 +631,8 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     }
 
     public Response getResponse() {
-        if (response == null) {
-            if (mimeResponse == null)
-                response = new BufferedResponse();
-            else
-                response = new DirectResponseTemp();
-        }
+        if (response == null)
+            response = new BufferedResponse(pipelineContext, request);
         return response;
     }
 

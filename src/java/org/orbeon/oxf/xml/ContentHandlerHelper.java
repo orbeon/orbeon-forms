@@ -83,7 +83,7 @@ public class ContentHandlerHelper {
 
     public void startElement(String prefix, String namespaceURI, String name, Attributes attributes) {
         try {
-            final String qName = prefix == null || "".equals(prefix) ? name : prefix + ":" + name;
+            final String qName = XMLUtils.buildQName(prefix, name);
             xmlReceiver.startElement(namespaceURI, name, qName, attributes);
             elements.add(new ElementInfo(namespaceURI, name, qName));
         } catch (SAXException e) {

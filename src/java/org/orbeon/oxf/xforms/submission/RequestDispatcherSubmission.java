@@ -59,7 +59,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         if (isDebugEnabled) {
             indentedLogger.logDebug("", "checking whether " + getType() + " submission is allowed",
                 "resource", p2.actionOrResource, "noscript", Boolean.toString(p.isNoscript),
-                "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet(containingDocument)),
+                "is ajax portlet", Boolean.toString(XFormsProperties.isAjaxPortlet()),
                 "is asynchronous", Boolean.toString(p2.isAsynchronous),
                 "container type", request.getContainerType(),
                 "norewrite", Boolean.toString(submission.isURLNorewrite()),
@@ -86,7 +86,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         }
 
         // TODO: why is this condition here?
-        if (p.isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument)) {
+        if (p.isNoscript && !XFormsProperties.isAjaxPortlet()) {
             if (isDebugEnabled)
                 indentedLogger.logDebug("", SKIPPING_SUBMISSION_DEBUG_MESSAGE,
                         "reason", "noscript mode enabled and not in ajax portlet mode");

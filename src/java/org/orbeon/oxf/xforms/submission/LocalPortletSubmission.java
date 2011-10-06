@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.externalcontext.AsyncExternalContext;
+import org.orbeon.oxf.externalcontext.AsyncRequest;
 import org.orbeon.oxf.externalcontext.ExternalContextWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -115,7 +116,7 @@ public class LocalPortletSubmission extends BaseSubmission {
 
         final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : NetUtils.getExternalContext().getResponse();
         final ExternalContext asyncExternalContext = p2.isAsynchronous
-                ? new AsyncExternalContext(NetUtils.getExternalContext().getRequest(), response)
+                ? new AsyncExternalContext(new AsyncRequest(NetUtils.getExternalContext().getRequest()), response)
                 : NetUtils.getExternalContext();
 
         // Pack external call into a Runnable so it can be run synchronously or asynchronously.
@@ -137,7 +138,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
-                                currentPortlet.getProcessorService().service(new ExternalContextWrapper(asyncExternalContext) {
+                                currentPortlet.processorService().service(new ExternalContextWrapper(asyncExternalContext) {
                                     @Override
                                     public ExternalContext.Request getRequest() {
                                         return request;

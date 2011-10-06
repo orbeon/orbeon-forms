@@ -15,14 +15,14 @@ package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import java.lang.{Throwable, String}
-import org.orbeon.oxf.pipeline.api.ExternalContext.{Response, Request, Application}
+import org.orbeon.oxf.pipeline.api.ExternalContext.{Response, Application}
 import org.orbeon.oxf.pipeline.api.ExternalContext.Application.ApplicationListener
 import org.orbeon.oxf.util.URLRewriterUtils
 
 // This context copies all the values of the given request. It uses the original session.
-class AsyncExternalContext(request: Request, response: Response) extends ExternalContext {
+class AsyncExternalContext(request: AsyncRequest, response: Response) extends ExternalContext {
 
-    val getRequest = new AsyncRequest(request)
+    val getRequest = request
     val getResponse = response
     def getSession(create: Boolean) = getRequest.getSession(create)
 
@@ -41,8 +41,8 @@ class AsyncExternalContext(request: Request, response: Response) extends Externa
     def getAttributesMap = throw new UnsupportedOperationException
 
     def getApplication = new Application {
-        def removeListener(applicationListener: ApplicationListener) {throw new UnsupportedOperationException}
-        def addListener(applicationListener: ApplicationListener) {throw new UnsupportedOperationException}
+        def removeListener(applicationListener: ApplicationListener) = throw new UnsupportedOperationException
+        def addListener(applicationListener: ApplicationListener) = throw new UnsupportedOperationException
     }
 
     def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException

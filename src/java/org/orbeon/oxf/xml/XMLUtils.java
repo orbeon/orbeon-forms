@@ -223,7 +223,7 @@ public class XMLUtils {
     }
 
     public static String buildQName(String prefix, String localname) {
-        return (prefix.equals("")) ? localname : prefix + ":" + localname;
+        return (prefix == null || prefix.equals("")) ? localname : prefix + ":" + localname;
     }
 
     /**

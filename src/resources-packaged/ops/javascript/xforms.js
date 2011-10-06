@@ -4527,67 +4527,16 @@ ORBEON.xforms.Init = {
         var resourcesBaseURL = null;
         var xformsServerURL = null;
 
-        // Try scripts
-        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-            var script = scripts[scriptIndex];
-            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
-            if (scriptSrc != null) {
-                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_1);
-                if (startPathToJavaScript != -1) {
-                    // Found path to non-xforms-server resource
-                    // scriptSrc: (/context)(/version)/ops/javascript/xforms-min.js
-
-                    // Take the part of the path before the JS path
-                    // prefix: (/context)(/version)
-                    // NOTE: may be "" if no context is present
-                    var prefix = scriptSrc.substr(0, startPathToJavaScript);
-                    resourcesBaseURL = prefix;
-                    if (versioned) {
-                        // Remove version
-                        xformsServerURL = prefix.substring(0, prefix.lastIndexOf("/")) + XFORMS_SERVER_PATH;
-                    } else {
-                        xformsServerURL = prefix + XFORMS_SERVER_PATH;
-                    }
-
-                    break;
-                } else {
-                    startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT_2);
-                    if (startPathToJavaScript != -1) {
-                        // Found path to xforms-server resource
-                        // scriptSrc: (/context)/xforms-server(/version)/xforms-...-min.js
-
-                        // Take the part of the path before the JS path
-                        // prefix: (/context)
-                        // NOTE: may be "" if no context is present
-                        var prefix = scriptSrc.substr(0, startPathToJavaScript);
-                        var jsPath = scriptSrc.substr(startPathToJavaScript);
-                        if (versioned) {
-
-                            var bits = /^(\/[^\/]+)(\/[^\/]+)(\/.*)$/.exec(jsPath);
-                            var version = bits[2];
-
-                            resourcesBaseURL = prefix + version;
-                            xformsServerURL = prefix + XFORMS_SERVER_PATH;
-                        } else {
-                            resourcesBaseURL = prefix;
-                            xformsServerURL = prefix + XFORMS_SERVER_PATH;
-                        }
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (resourcesBaseURL == null) {
-            if (!(window.orbeonInitData === undefined)) {
-                // Try values passed by server (in portlet mode)
-                // NOTE: We try this second as of 2010-08-27 server always puts these in
-                var formInitData = window.orbeonInitData[formID];
-                if (formInitData && formInitData["paths"]) {
-                    resourcesBaseURL = formInitData["paths"]["resources-base"];
-                    xformsServerURL = formInitData["paths"]["xforms-server"];
-                }
+        if (!(window.orbeonInitData === undefined)) {
+            // NOTE: We switched back and forth between trusting the client or the server on this. Starting 2010-08-27
+            // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client
+            // detection, as that works in portals. The concern with using the server values was proxying. But should
+            // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
+            // server values it is.
+            var formInitData = window.orbeonInitData[formID];
+            if (formInitData && formInitData["paths"]) {
+                resourcesBaseURL = formInitData["paths"]["resources-base"];
+                xformsServerURL = formInitData["paths"]["xforms-server"];
             }
         }
 

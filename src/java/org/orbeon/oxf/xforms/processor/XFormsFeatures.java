@@ -194,4 +194,19 @@ public class XFormsFeatures {
         }
         return result;
     }
+    private static final ResourceConfig[] ajaxPortletScripts = {
+            new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
+            new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
+            new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),
+            new ResourceConfig("/ops/yui/dom/dom.js", "/ops/yui/dom/dom-min.js"),
+            new ResourceConfig("/ops/yui/json/json.js", "/ops/yui/json/json-min.js"),
+            new ResourceConfig("/ops/yui/connection/connection.js", "/ops/yui/connection/connection-min.js"),
+            new ResourceConfig("/ops/yui/get/get.js", "/ops/yui/get/get-min.js"),
+            new ResourceConfig("/ops/yui/stylesheet/stylesheet.js", "/ops/yui/stylesheet/stylesheet-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/util/DeferredPortletLoader.js", "/ops/javascript/orbeon/util/DeferredPortletLoader-min.js")
+    };
+    
+    public static ResourceConfig[] getAjaxPortletScripts() {
+        return ajaxPortletScripts;
+    }
 }

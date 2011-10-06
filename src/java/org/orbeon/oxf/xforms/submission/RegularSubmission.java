@@ -93,7 +93,7 @@ public class RegularSubmission extends BaseSubmission {
 
                     // Update status
                     status[0] = true;
-
+                    
                     // Obtain replacer
                     // TODO: This refers to Submission.
                     final Replacer replacer = submission.getReplacer(connectionResult, p);

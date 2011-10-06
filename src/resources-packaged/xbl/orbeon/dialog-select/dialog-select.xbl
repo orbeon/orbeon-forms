@@ -57,28 +57,144 @@
         </xbl:resources>
 
         <xbl:implementation>
-            <!-- Local model -->
             <xforms:model id="model">
-                <xforms:instance id="instance">
-                    <instance>
-                        <available-itemset/>
-                        <selected-itemset/>
-                        <available/>
-                        <selected/>
-                        <add-trigger/>
-                        <remove-trigger/>
-                    </instance>
-                </xforms:instance>
-                <xforms:bind nodeset="add-trigger" readonly="normalize-space(../available) = ''"/>
-                <xforms:bind nodeset="remove-trigger" readonly="normalize-space(../selected) = ''"/>
-
-                <xforms:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+                <xforms:instance id="model-resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
                                  xxforms:readonly="true" xxforms:cache="true"/>
-
-                <!-- TODO: i18n -->
-                <xxforms:variable name="resources" select="instance('resources')/resource[@xml:lang = 'en']" as="element()?"/>
+                <xxforms:variable name="resources" select="instance('model-resources')/resource[@xml:lang = 'en']" as="element()?"/>
             </xforms:model>
         </xbl:implementation>
+
+        <xxbl:global>
+            <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
+                 clearly two choices: confirm the selection or cancel -->
+            <xxforms:dialog id="fr-dialog-select-dialog" xbl:attr="close" appearance="full" level="modal" class="fr-dialog-select-dialog" model="fr-dialog-editor-model">
+                <!--<xforms:label value="$resources/title"/>-->
+                <xforms:model id="fr-dialog-editor-model">
+                    <xforms:instance id="fr-dialog-editor-instance">
+                        <instance>
+                            <items/>
+                            <available-itemset/>
+                            <selected-itemset/>
+                            <available/>
+                            <selected/>
+                            <add-trigger/>
+                            <remove-trigger/>
+                            <callback-id/>
+                        </instance>
+                    </xforms:instance>
+                    <xforms:bind nodeset="add-trigger" readonly="normalize-space(../available) = ''"/>
+                    <xforms:bind nodeset="remove-trigger" readonly="normalize-space(../selected) = ''"/>
+                    <xforms:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+                                     xxforms:readonly="true" xxforms:cache="true"/>
+                </xforms:model>
+
+                <xforms:action ev:event="fr-edit">
+                    <!-- When dialog open, get list of available and selected items -->
+                    <xxforms:variable name="binding" select="tokenize(event('fr-binding'), '\s+')"/>
+                    <xxforms:variable name="items" select="event('fr-items')"/>
+                    <xforms:delete ref="items/*"/>
+                    <xforms:insert context="items" origin="$items"/>
+                    <xforms:setvalue ref="available-itemset" value="string-join($items/value/string()[not(. = $binding)], ' ')"/>
+                    <xforms:setvalue ref="selected-itemset"  value="string-join($items/value/string()[. = $binding], ' ')"/>
+                    <xforms:setvalue ref="available"/>
+                    <xforms:setvalue ref="selected"/>
+                    <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
+                    <xxforms:show dialog="fr-dialog-select-dialog"/>
+                    <xforms:setfocus control="fr-dialog-select-dialog"/>
+                </xforms:action>
+
+                <xxforms:variable name="resources" select="instance('resources')/resource[@xml:lang = 'en']" as="element()?"/>
+                <xxforms:variable name="available-values" select="tokenize(available-itemset, '\s+')" as="xs:string*"/>
+                <xxforms:variable name="selected-values" select="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
+                <xxforms:variable name="items" select="items/item"/>
+
+                <xhtml:table>
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <!-- List of available items -->
+                            <xforms:select ref="available" id="available-list">
+                                <xforms:label value="$resources/available"/>
+                                <xforms:itemset nodeset="$items[value = $available-values]">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
+                            </xforms:select>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:trigger ref="add-trigger" class="fr-add-button" id="add">
+                                <xforms:label>
+                                    <xforms:output value="$resources/add"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate" >
+                                    <xxforms:variable name="selection" select="tokenize(../available, '\s+')" as="xs:string*"/>
+                                    <xforms:setvalue ref="../selected-itemset"
+                                                     value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
+                                    <xforms:setvalue ref="../available-itemset"
+                                                     value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
+                                    <xforms:setvalue ref="../available"/>
+                                    <xforms:setvalue ref="../selected"/>
+                                </xforms:action>
+                            </xforms:trigger>
+
+                            <xforms:trigger ref="remove-trigger" class="fr-remove-button" id="remove">
+                                <xforms:label>
+                                    <xforms:output value="$resources/remove"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate" >
+                                    <xxforms:variable name="selection" select="tokenize(../selected, '\s+')" as="xs:string*"/>
+                                    <xforms:setvalue ref="../available-itemset"
+                                                     value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
+                                    <xforms:setvalue ref="../selected-itemset"
+                                                     value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
+                                    <xforms:setvalue ref="../available"/>
+                                    <xforms:setvalue ref="../selected"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <!-- List of selected items -->
+                            <xforms:select ref="selected" id="selected-list">
+                                <xforms:label value="$resources/selected"/>
+                                <xforms:itemset nodeset="$items[value = $selected-values]">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="value"/>
+                                </xforms:itemset>
+                            </xforms:select>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xhtml:table>
+
+                <xhtml:div class="fr-dialog-buttons">
+                    <!-- Confirm button -->
+                    <xforms:trigger id="confirm">
+                        <xforms:label>
+                            <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
+                            <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Store values in itemset order -->
+                            <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" target="{callback-id}">
+                                <xxforms:context name="fr-new-values" select="for $selected-itemset in instance()/selected-itemset
+                                    return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
+                            </xforms:dispatch>
+                            <xxforms:hide dialog="fr-dialog-select-dialog"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <!-- Cancel button -->
+                    <xforms:trigger id="cancel">
+                        <xforms:label>
+                            <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                            <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- Just close -->
+                            <xxforms:hide dialog="fr-dialog-select-dialog"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xhtml:div>
+
+            </xxforms:dialog>
+        </xxbl:global>
 
         <xbl:template>
             <!-- Outer group -->
@@ -142,115 +258,16 @@
                         </xforms:group>
 
                         <!-- Select button -->
-                        <fr:button id="select" ref="$binding">
-                            <xforms:label value="$resources/select"/>
-                            <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
-                        </fr:button>
-
-                        <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
-                             clearly two choices: confirm the selection or cancel -->
-                        <xxforms:dialog id="dialog" xbl:attr="close" appearance="full" level="modal" class="fr-dialog-select-dialog">
-                            <xforms:label value="$resources/title"/>
-
-                            <xforms:action ev:event="xxforms-dialog-open">
-                                <!-- When dialog open, get list of available and selected items -->
-                                <xforms:setvalue ref="available-itemset"
-                                                 value="string-join($items/value/string()[not(. = tokenize($binding, '\s+'))], ' ')"/>
-                                <xforms:setvalue ref="selected-itemset"
-                                                 value="string-join($items/value/string()[. = tokenize($binding, '\s+')], ' ')"/>
-                                <xforms:setvalue ref="available"/>
-                                <xforms:setvalue ref="selected"/>
-                                <xforms:setfocus control="dialog"/>
-                            </xforms:action>
-
-                            <xxforms:variable name="available-values" select="tokenize(available-itemset, '\s+')" as="xs:string*"/>
-                            <xxforms:variable name="selected-values" select="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
-
-                            <xhtml:table>
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <!-- List of available items -->
-                                        <xforms:select ref="available" id="available-list">
-                                            <xforms:label value="$resources/available"/>
-                                            <xforms:itemset nodeset="$items[value = $available-values]">
-                                                <xforms:label ref="label"/>
-                                                <xforms:value ref="value"/>
-                                            </xforms:itemset>
-                                        </xforms:select>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <fr:button ref="add-trigger" class="fr-add-button" id="add">
-                                            <xforms:label>
-                                                <xforms:output value="$resources/add"/>
-                                            </xforms:label>
-                                            <xforms:action ev:event="DOMActivate" >
-                                                <xxforms:variable name="selection" select="tokenize(available, '\s+')" as="xs:string*"/>
-                                                <xforms:setvalue ref="selected-itemset"
-                                                                 value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
-                                                <xforms:setvalue ref="available-itemset"
-                                                                 value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
-                                                <xforms:setvalue ref="available"/>
-                                                <xforms:setvalue ref="selected"/>
-                                            </xforms:action>
-                                        </fr:button>
-
-                                        <fr:button ref="remove-trigger" class="fr-remove-button" id="remove">
-                                            <xforms:label>
-                                                <xforms:output value="$resources/remove"/>
-                                            </xforms:label>
-                                            <xforms:action ev:event="DOMActivate" >
-                                                <xxforms:variable name="selection" select="tokenize(selected, '\s+')" as="xs:string*"/>
-                                                <xforms:setvalue ref="available-itemset"
-                                                                 value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
-                                                <xforms:setvalue ref="selected-itemset"
-                                                                 value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
-                                                <xforms:setvalue ref="available"/>
-                                                <xforms:setvalue ref="selected"/>
-                                            </xforms:action>
-                                        </fr:button>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <!-- List of selected items -->
-                                        <xforms:select ref="selected" id="selected-list">
-                                            <xforms:label value="$resources/selected"/>
-                                            <xforms:itemset nodeset="$items[value = $selected-values]">
-                                                <xforms:label ref="label"/>
-                                                <xforms:value ref="value"/>
-                                            </xforms:itemset>
-                                        </xforms:select>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xhtml:table>
-
-                            <xhtml:div class="fr-dialog-buttons">
-                                <!-- Confirm button -->
-                                <fr:button id="confirm">
-                                    <xforms:label>
-                                        <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
-                                        <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <!-- Store values in itemset order -->
-                                        <xforms:setvalue ref="$binding"
-                                                         value="for $selected-itemset in instance()/selected-itemset
-                                                                return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
-                                        <xxforms:hide dialog="dialog"/>
-                                    </xforms:action>
-                                </fr:button>
-                                <!-- Cancel button -->
-                                <fr:button id="cancel">
-                                    <xforms:label>
-                                        <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                                        <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <!-- Just close -->
-                                        <xxforms:hide dialog="dialog"/>
-                                    </xforms:action>
-                                </fr:button>
-                            </xhtml:div>
-
-                        </xxforms:dialog>
+                        <xforms:trigger id="select" ref="$binding">
+                            <xforms:label>…</xforms:label>
+                            <!--<xforms:label value="$resources/select"/>-->
+                            <xforms:dispatch ev:event="DOMActivate" target="fr-dialog-select-dialog" name="fr-edit" xxbl:scope="outer">
+                                <xxforms:context name="fr-binding" select="$binding" xxbl:scope="inner"/>
+                                <xxforms:context name="fr-items" select="$items" xxbl:scope="inner"/>
+                                <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>
+                            </xforms:dispatch>
+                            <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-new-values')"/>
+                        </xforms:trigger>
                     </xforms:group>
 
                 </xforms:group>

@@ -102,31 +102,24 @@
     <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
     <xsl:template match="fr:pdf-button">
         <!-- TODO: bind to strict-submit, but maybe fr-pdf-submission should check validity instead -->
-        <xforms:group id="fr-pdf-button-group" appearance="xxforms:internal">
-
-            <!-- Create the link so that the URL gets rewritten -->
-            <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
-            <xhtml:a style="display:none" class="fr-pdf-anchor" target="_blank" f:url-type="resource"
-                     href="/fr/service/{$app}/{$form}/pdf/{{xxforms:instance('fr-parameters-instance')/document}}/{{xxforms:document-id()}}.pdf"/>
-
+        <!-- Create the link so that the URL gets rewritten -->
+        <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
+        <xhtml:a style="display:none" class="fr-pdf-anchor" target="_blank" f:url-type="resource"
+                 href="/fr/service/{$app}/{$form}/pdf/{{xxforms:instance('fr-parameters-instance')/document}}/{{xxforms:document-id()}}.pdf"/>
+        <xforms:trigger id="fr-pdf-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
             <!-- In script mode, intercept client-side click and open window directly -->
             <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
                 var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
-                YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
-                    var a = YAHOO.util.Dom.getElementsByClassName("fr-pdf-anchor", null, group)[0];
-                    window.open(a.href, a.target)
-                }, this);
+                var a = YAHOO.util.Dom.getPreviousSibling(this);
+                YAHOO.util.Event.addListener(button, "click", function() { window.open(a.href, a.target) });
             </xxforms:script>
-
-            <xforms:trigger id="fr-pdf-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-                </xforms:label>
-                <!-- Only call submission directly in noscript mode -->
-                <xforms:dispatch ev:event="DOMActivate" if="property('xxforms:noscript')" name="fr-open-pdf" targetid="fr-navigation-model"/>
-            </xforms:trigger>
-        </xforms:group>
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+            </xforms:label>
+            <!-- Only call submission directly in noscript mode -->
+            <xforms:dispatch ev:event="DOMActivate" if="property('xxforms:noscript')" name="fr-open-pdf" targetid="fr-navigation-model"/>
+        </xforms:trigger>
     </xsl:template>
 
     <xsl:template match="fr:save-button">

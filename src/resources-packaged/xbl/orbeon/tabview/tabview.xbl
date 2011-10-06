@@ -98,7 +98,7 @@
                                     <xhtml:li class="{{if ($fr-tab-relevance-{position()}) then '' else 'xforms-disabled-subsequent'}}{{
                                                 if (active-tab-position = '{position()}') then 'selected' else ''}}{{
                                                 if (exf:readonly($fr-tab-binding-{position()})) then ' disabled' else ''}}{
-                                                if (@class = '') then '' else concat(' ', @class)}" id="nav-{position()}">
+                                                if (exists(@class)) then concat(' ', @class) else ''}" id="nav-{position()}">
                                         <!-- Transform xforms:label into xforms:output -->
                                         <xhtml:a href="#tab{position()}"><xhtml:em>
                                             <xsl:choose>
@@ -127,7 +127,7 @@
                                         <xsl:variable name="case-id" as="xs:string?" select="@id"/>
                                         <!-- Listen on xforms-readonly -->
                                         <xhtml:div>
-                                            <xsl:if test="@class"><xsl:attribute name="class" select="@class"/></xsl:if>
+                                            <xsl:if test="exists(@class)"><xsl:attribute name="class" select="@class"/></xsl:if>
                                             <!-- Tab content has outer scope -->
                                             <xforms:group xxbl:scope="outer">
                                                 <xsl:if test="pipeline:property('oxf.xforms.xbl.fr.tabview.tab-changes-context')">

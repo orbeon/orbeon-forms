@@ -24,9 +24,6 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer
 import actors.Futures._
 import actors.Future
 import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponse
-import org.orbeon.oxf.pipeline.InitUtils._
-import org.orbeon.oxf.webapp.ProcessorService._
-import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.{ResourcesAggregator, XFormsFeatures}
@@ -34,6 +31,7 @@ import collection.mutable.LinkedHashSet
 import org.orbeon.oxf.externalcontext.{WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
 import org.orbeon.oxf.util.{URLRewriterUtils, NetUtils}
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
+import OrbeonPortlet2Delegate._
 
 /**
  * Orbeon portlet.
@@ -54,19 +52,19 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 
     // Portlet action
     override def processAction(request: ActionRequest, response: ActionResponse) =
-        OrbeonPortlet2Delegate.currentPortlet.withValue(this) {
+        currentPortlet.withValue(this) {
             doProcessAction(request, response)
         }
 
     // Portlet render
     override def render(request: RenderRequest, response: RenderResponse) =
-        OrbeonPortlet2Delegate.currentPortlet.withValue(this) {
+        currentPortlet.withValue(this) {
             renderFunction(request, response)
         }
 
     // Portlet resource
     override def serveResource(request: ResourceRequest, response: ResourceResponse) =
-        OrbeonPortlet2Delegate.currentPortlet.withValue(this) {
+        currentPortlet.withValue(this) {
             doServeResource(request, response)
         }
 
@@ -79,19 +77,6 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 
         def this(response: BufferedResponse, parameters: Map[String, List[String]]) =
             this(getResponseData(response), Option(response.getContentType), Option(response.getTitle), parameters)
-    }
-
-    val FormRunnerEdit = "/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?".r
-    val _frProcessorService = {
-        val map = Map("oxf.main-processor.name" → "{http://www.orbeon.com/oxf/processors}pipeline",
-                      "oxf.main-processor.input.config" → "oxf:/test-fr.xpl")
-
-        val definition = getDefinitionFromMap(map.asJava, MAIN_PROCESSOR_PROPERTY_PREFIX, MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX)
-
-        val processorService = new ProcessorService
-        processorService.init(definition, null)
-
-        processorService
     }
 
     def tryStoringRenderResponse = Properties.instance.getPropertySet.getBoolean("test.store-render", false)
@@ -149,7 +134,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
                 rewriter.rewriteResourceURL(path, Response.REWRITE_MODE_ABSOLUTE_PATH) // NOTE: mode is ignored
 
             val resources = LinkedHashSet(XFormsFeatures.getAjaxPortletScripts map (_.getResourcePath(isMinimal)): _*)
-            ResourcesAggregator.aggregate(resources, false, path ⇒ WSRP2Utils.write(response, rewrite(path), false))
+            ResourcesAggregator.aggregate(resources, false, path ⇒ WSRP2Utils.write(response, rewrite(path), shortIdNamespace(response), false))
 
             writer.write(""""></script>""")
 
@@ -309,10 +294,10 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
                 // Text/JSON/XML content type: rewrite response content
                 data match {
                     case Left(string) ⇒
-                        WSRP2Utils.write(response, string, XMLUtils.isXMLMediatype(contentType))
+                        WSRP2Utils.write(response, string, shortIdNamespace(response), XMLUtils.isXMLMediatype(contentType))
                     case Right(bytes) ⇒
                         val encoding = Option(NetUtils.getContentTypeCharset(contentType)) getOrElse CachedSerializer.DEFAULT_ENCODING
-                        WSRP2Utils.write(response, new String(bytes, 0, bytes.length, encoding), XMLUtils.isXMLMediatype(contentType))
+                        WSRP2Utils.write(response, new String(bytes, 0, bytes.length, encoding), shortIdNamespace(response), XMLUtils.isXMLMediatype(contentType))
                 }
             case _ ⇒
                 // All other types: just output
@@ -342,7 +327,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
     private def setResponseWithParameters(request: PortletRequest, responseWithParameters: ResponseWithParameters) =
         request.getPortletSession.setAttribute(ResponseSessionKey, responseWithParameters)
 
-    private def clearResponseWithParameters(request: PortletRequest): Unit =
+    private def clearResponseWithParameters(request: PortletRequest) =
         request.getPortletSession.removeAttribute(ResponseSessionKey)
 
     private def getFutureResponse(request: PortletRequest) =
@@ -351,11 +336,51 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
     private def setFutureResponse(request: PortletRequest, responseWithParameters: Future[ResponseWithParameters]) =
         request.getPortletSession.setAttribute(FutureResponseSessionKey, responseWithParameters)
 
-    private def clearFutureResponse(request: PortletRequest): Unit =
+    private def clearFutureResponse(request: PortletRequest) =
         request.getPortletSession.removeAttribute(FutureResponseSessionKey)
-
 }
 
 object OrbeonPortlet2Delegate {
+
     val currentPortlet = new DynamicVariable[OrbeonPortlet2Delegate](null)
+
+    // Immutable portletNamespace → idNamespace information stored in the portlet context
+    private object NamespaceMappings {
+        private def newId(seq: Int) = "o" + seq
+        def apply(portletNamespace: String): NamespaceMappings = NamespaceMappings(0, Map(portletNamespace → newId(0)))
+    }
+
+    private case class NamespaceMappings(private val last: Int, map: Map[String, String]) {
+        def next(key: String) = NamespaceMappings(last + 1, map + (key → NamespaceMappings.newId(last + 1)))
+    }
+
+    // Return the short id namespace for this portlet. The idea of this is that portal-provided namespaces are large,
+    // and since the XForms engine produces lots of ids, the DOM size increases a lot. All we want really are unique ids
+    // in the DOM, so we make up our own short prefixes, hope they don't conflict within anything, and we map the portal
+    // namespaces to our short ids.
+    def shortIdNamespace(response: MimeResponse) = {
+        // PLT.10.1: "There is one instance of the PortletContext interface associated with each portlet application
+        // deployed into a portlet container." In order for multiple Orbeon portlets to not walk on each other, we
+        // synchronize.
+        val portletContext = currentPortlet.value.getPortletContext
+        portletContext.synchronized {
+
+            val IdNamespacesSessionKey = "org.orbeon.oxf.id-namespaces"
+            val portletNamespace = response.getNamespace
+
+            // Get or create NamespaceMappings
+            val mappings = Option(portletContext.getAttribute(IdNamespacesSessionKey).asInstanceOf[NamespaceMappings]) getOrElse {
+                val newMappings = NamespaceMappings(portletNamespace)
+                portletContext.setAttribute(IdNamespacesSessionKey, newMappings)
+                newMappings
+            }
+
+            // Get or create specific mapping portletNamespace → idNamespace
+            mappings.map.get(portletNamespace) getOrElse {
+                val newMappings = mappings.next(portletNamespace)
+                portletContext.setAttribute(IdNamespacesSessionKey, newMappings)
+                newMappings.map(portletNamespace)
+            }
+        }
+    }
 }

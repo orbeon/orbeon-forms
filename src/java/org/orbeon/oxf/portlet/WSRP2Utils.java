@@ -19,7 +19,9 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringConversions;
 
 import javax.portlet.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,13 +40,11 @@ public class WSRP2Utils {
      *
      * It is possible to escape by using the string wsrp_rewritewsrp_rewrite.
      */
-    public static void write(MimeResponse response, String content, boolean encodeForXML) throws IOException {
+    public static void write(MimeResponse response, String content, String namespace, boolean encodeForXML) throws IOException {
         int stringLength = content.length();
         int currentIndex = 0;
         int index;
-        Writer writer = response.getWriter();
-
-        final String namespace = response.getNamespace().replace(' ', '_');// replacement probably because at some point Liferay was allowing spaces in namespace
+        final Writer writer = response.getWriter();
 
         while ((index = content.indexOf(WSRPURLRewriter.BASE_TAG, currentIndex)) != -1) {
             // Write up to the current mark
@@ -65,7 +65,7 @@ public class WSRP2Utils {
                 int endIndex = content.indexOf(WSRPURLRewriter.END_TAG, index);
                 if (endIndex == -1)
                     throw new OXFException("Missing end tag for WSRP encoded URL.");
-                String encodedURL = content.substring(index + WSRPURLRewriter.START_TAG_LENGTH, endIndex);
+                final String encodedURL = content.substring(index + WSRPURLRewriter.START_TAG_LENGTH, endIndex);
 
                 currentIndex = endIndex + WSRPURLRewriter.END_TAG_LENGTH;
 

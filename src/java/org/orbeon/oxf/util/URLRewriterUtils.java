@@ -19,6 +19,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
@@ -26,7 +27,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class to rewrite URLs.
@@ -268,51 +271,12 @@ public class URLRewriterUtils {
             }
 
             // 3. Iterate through matchers and see if we get a match
-            for (final PathMatcher pathMatcher: pathMatchers) {
-
-                final boolean isMatch;
-                if (pathMatcher.matcher == null) {
-                    // There is no matcher, use basic rules
-
-                    if (pathMatcher.pathInfo.startsWith("*")) {
-                        // Extension match
-                        isMatch = absolutePathNoContext.endsWith(pathMatcher.pathInfo.substring(1));
-                    } else if (pathMatcher.pathInfo.endsWith("*")) {
-                        // Partial match
-                        isMatch = absolutePathNoContext.startsWith(pathMatcher.pathInfo.substring(0, pathMatcher.pathInfo.length() - 1));
-                    } else {
-                        // Exact match
-                        isMatch = absolutePathNoContext.equals(pathMatcher.pathInfo);
-                    }
-                } else {
-                    // Use matcher
-
-                    // Instantiate matcher processor to parallel what's done in the Page Flow
-                    final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(pathMatcher.matcher);
-                    if (processorFactory == null)
-                        throw new OXFException("Cannot find processor factory with name '"
-                                + pathMatcher.matcher.getNamespacePrefix() + ":" + pathMatcher.matcher.getName() + "'");
-
-                    final Processor processor = processorFactory.createInstance();
-                    if (processor instanceof MatchProcessor) {
-                        final MatchProcessor matcherProcessor = (MatchProcessor) processor;
-
-                        // Perform the test
-                        isMatch = matcherProcessor.match(pathMatcher.pathInfo, absolutePathNoContext).matches;
-                    } else {
-                        throw new OXFException("Matcher processor is not an instance of MatchProcessor'"
-                                + pathMatcher.matcher.getNamespacePrefix() + ":" + pathMatcher.matcher.getName() + "'");
-                    }
-                }
-
-                if (isMatch) {
-                    // 4. Found a match, perform additional rewrite at the beginning
-
-                    final String version = isPlatformURL ? Version.getVersionNumber() : applicationVersion;
-                    // Call full method so that we can get the proper client context path
-                    return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
-                            request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);
-                }
+            if (isVersionedURL(absolutePathNoContext, pathMatchers)) {
+                // 4. Found a match, perform additional rewrite at the beginning
+                final String version = isPlatformURL ? Version.getVersionNumber() : applicationVersion;
+                // Call full method so that we can get the proper client context path
+                return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
+                        request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);
             }
 
             // No match found, perform regular rewrite
@@ -483,5 +447,55 @@ public class URLRewriterUtils {
 
             return matcherElement;
         }
+    }
+    
+    public static boolean isVersionedURL(String absolutePathNoContext, List<URLRewriterUtils.PathMatcher> pathMatchers) {
+        for (final URLRewriterUtils.PathMatcher pathMatcher : pathMatchers) {
+
+            final boolean isMatch;
+            if (pathMatcher.matcher == null) {
+                // There is no matcher, use basic rules
+
+                if (pathMatcher.pathInfo.startsWith("*")) {
+                    // Extension match
+                    isMatch = absolutePathNoContext.endsWith(pathMatcher.pathInfo.substring(1));
+                } else if (pathMatcher.pathInfo.endsWith("*")) {
+                    // Partial match
+                    isMatch = absolutePathNoContext.startsWith(pathMatcher.pathInfo.substring(0, pathMatcher.pathInfo.length() - 1));
+                } else {
+                    // Exact match
+                    isMatch = absolutePathNoContext.equals(pathMatcher.pathInfo);
+                }
+            } else {
+                // Use matcher
+
+                // Instantiate matcher processor to parallel what's done in the Page Flow
+                final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(pathMatcher.matcher);
+                if (processorFactory == null)
+                    throw new OXFException("Cannot find processor factory with name '"
+                            + pathMatcher.matcher.getNamespacePrefix() + ":" + pathMatcher.matcher.getName() + "'");
+
+                final Processor processor = processorFactory.createInstance();
+                if (processor instanceof MatchProcessor) {
+                    final MatchProcessor matcherProcessor = (MatchProcessor) processor;
+
+                    // Perform the test
+                    isMatch = matcherProcessor.match(pathMatcher.pathInfo, absolutePathNoContext).matches;
+                } else {
+                    throw new OXFException("Matcher processor is not an instance of MatchProcessor'"
+                            + pathMatcher.matcher.getNamespacePrefix() + ":" + pathMatcher.matcher.getName() + "'");
+                }
+            }
+            
+            if (isMatch)
+                return true;
+        }
+        
+        return false;
+    }
+    
+    public static List<URLRewriterUtils.PathMatcher> getPathMatchers() {
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+        return (pathMatchers != null) ? pathMatchers : URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
     }
 }

@@ -205,7 +205,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Is the previous <files> or <page> using simple matching
                     boolean previousIsSimple = true;
                     boolean previousIsFile = false;
-                    boolean previousFileIsVersioned = false;
                     boolean isFirst = true;
                     ASTChoose currentChoose = null;
                     int matcherCount = 0;
@@ -248,13 +247,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             // Remember this FilesInfo if needed
                             if (currentFileIsVersioned) {
-                                pathMatchers.add(new URLRewriterUtils.PathMatcher(pathInfo, matcherQName, mimeType, currentFileIsVersioned));
+                                pathMatchers.add(new URLRewriterUtils.PathMatcher(pathInfo, matcherQName, mimeType, true));
                             }
 
                             // Can we just add this condition to the previous "when" statement?
                             boolean canAddToPreviousWhen =
                                     previousIsFile && currentIsFile &&
-                                            previousFileIsVersioned == currentFileIsVersioned &&
                                             previousIsSimple && matcherURI == null && matcherQName == null && mimeType == null;
 
                             // Create <p:when>
@@ -343,13 +341,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 if (currentIsFile) {
                                     // Handle file
                                     previousIsFile = true;
-                                    previousFileIsVersioned = currentFileIsVersioned;
 
                                     // For files, enforce GET method
                                     if (matcherURI == null && matcherQName == null)// TODO: should do this when we have matchers as well, but the condition applies to the #matcher-* input
                                         when.setTest("/request/method = 'GET' and (" + when.getTest() + ")");
 
-                                    handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance, currentFileIsVersioned);
+                                    handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance);
                                 } else if ("page".equals(element.getName())) {
                                     // Handle page
                                     previousIsFile = false;
@@ -1127,22 +1124,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      */
     private void handleFile(ASTWhen when, final ASTOutput request, final String mimeType,
                             final ASTOutput epilogueData, final ASTOutput epilogueModelData,
-                            final ASTOutput epilogueInstance, final boolean isVersioned) {
+                            final ASTOutput epilogueInstance) {
         when.addStatement(new ASTProcessorCall(XMLConstants.RESOURCE_SERVER_PROCESSOR_QNAME) {{
-            if (isVersioned) {
-                // Path is versioned, i.e. of the form /3.6.0.200801092029/... (Orbeon resource) or /1.1/... (app resource)
-                // Use XPath function to decode the resource URI before passing it to the resource server
-                addInput(new ASTInput("config",
-                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
-                                    "p:decode-resource-uri(/request/request-path, true())"))
-                ));
-            } else {
-                // Path is not versioned
-                addInput(new ASTInput("config",
-                            new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
-                                    "p:decode-resource-uri(/request/request-path, false())"))
-                ));
-            }
+
+            addInput(new ASTInput("config", new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request), "string(/request/request-path)"))));
 
             if (mimeType == null) {
                 addInput(new ASTInput(ResourceServer.MIMETYPE_INPUT, new ASTHrefURL("oxf:/oxf/mime-types.xml")));

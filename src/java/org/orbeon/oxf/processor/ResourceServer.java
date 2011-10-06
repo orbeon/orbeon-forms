@@ -20,6 +20,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler;
@@ -45,6 +46,8 @@ public class ResourceServer extends ProcessorImpl {
     public static final String MIMETYPES_NAMESPACE_URI = "http://www.orbeon.com/oxf/mime-types";
 
     public static final String MIMETYPE_INPUT = "mime-types";
+
+    public static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
     public ResourceServer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, RESOURCE_SERVER_NAMESPACE_URI));
@@ -77,10 +80,16 @@ public class ResourceServer extends ProcessorImpl {
                 // There must be a configuration
                 if (urlString == null)
                     throw new OXFException("Missing configuration.");
-
-                // Use the default protocol to read the file as a resource
-                urlString = "oxf:" + urlString;
             }
+
+            // Remove version from the path if it is versioned
+            final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
+            final boolean isVersioned = URLRewriterUtils.isVersionedURL(urlString, pathMatchers);
+            urlString = URLRewriterUtils.decodeResourceURI(urlString, isVersioned);
+
+            // Use the default protocol to read the file as a resource
+            if (!urlString.startsWith("oxf:"))
+                urlString = "oxf:" + urlString;
 
             InputStream urlConnectionInputStream = null;
             try {
@@ -145,7 +154,13 @@ public class ResourceServer extends ProcessorImpl {
                     if (lastModified == -1) lastModified = NetUtils.getLastModified(urlConnection);
 
                     // Set Last-Modified, required for caching and conditional get
-                    response.setCaching(lastModified, false, false);
+                    if (isVersioned) {
+                        // Use expiration far in the future
+                        response.setResourceCaching(lastModified, lastModified + ONE_YEAR_IN_MILLISECONDS);
+                    } else {
+                        // Use standard expiration policy
+                        response.setResourceCaching(lastModified, 0);
+                    }
 
                     // Check If-Modified-Since and don't return content if condition is met
                     if (!response.checkIfModifiedSince(lastModified, false)) {

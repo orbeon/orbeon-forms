@@ -20,8 +20,8 @@ import org.orbeon.oxf.processor.PageFlowControllerProcessor
 import java.util.{List => JList}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.pipeline.api.ExternalContext
 import scala.collection.JavaConversions._
+import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
 
 object XFormsResourceRewriter {
     /**
@@ -29,30 +29,31 @@ object XFormsResourceRewriter {
      *
      * @param logger                logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param propertyContext       current PipelineContext (used for rewriting and matchers)
      * @param os                    OutputStream to write to
      * @param isCSS                 whether to generate CSS or JavaScript resources
      * @param isMinimal             whether to use minimal resources
      */
-    def generate(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
+    def generate(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
         if (isCSS)
-            generateCSS(logger, resources, propertyContext, os, isMinimal)
+            generateCSS(logger, resources, os, isMinimal)
         else
-            generateJS(logger, resources, propertyContext, os, isMinimal)
+            generateJS(logger, resources, os, isMinimal)
 
         os.flush()
         os.close()
     }
 
-    private def generateCSS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateCSS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
 
         val response = NetUtils.getExternalContext.getResponse
         val outputWriter = new OutputStreamWriter(os, "utf-8")
 
+        val pipelineContext = PipelineContext.get
+
         // Create matcher that matches all paths in case resources are versioned
-        if (propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS) eq null) {
+        if (pipelineContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS) eq null) {
             val matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher
-            propertyContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, matchAllPathMatcher)
+            pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, matchAllPathMatcher)
         }
 
         // Output Orbeon Forms version
@@ -105,7 +106,7 @@ object XFormsResourceRewriter {
         r.replaceAllIn(css, e => (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
     }
 
-    private def generateJS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], propertyContext: PropertyContext, os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateJS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
         outputWriter.write("// This file was produced by " + Version.getVersionString + "\n")

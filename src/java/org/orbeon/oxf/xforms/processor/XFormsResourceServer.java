@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ResourceServer;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
@@ -40,7 +41,6 @@ public class XFormsResourceServer extends ProcessorImpl {
 
     public static final String LOGGING_CATEGORY = "resources";
     private static final Logger logger = LoggerFactory.createLogger(XFormsResourceServer.class);
-    private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
     public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.resources.dynamic.";
     public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
@@ -197,7 +197,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             // Set Last-Modified, required for caching and conditional get
             if (URLRewriterUtils.isResourcesVersioned()) {
                 // Use expiration far in the future
-                response.setResourceCaching(combinedLastModified, combinedLastModified + ONE_YEAR_IN_MILLISECONDS);
+                response.setResourceCaching(combinedLastModified, combinedLastModified + ResourceServer.ONE_YEAR_IN_MILLISECONDS);
             } else {
                 // Use standard expiration policy
                 response.setResourceCaching(combinedLastModified, 0);
@@ -217,7 +217,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = cacheResources(resources, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
@@ -230,13 +230,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
                                 indentedLogger.logDebug("resources", "caching requested but not possible, serving directly", "request path", requestPath);
-                            XFormsResourceRewriter.generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                            XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "caching not requested, serving directly", "request path", requestPath);
-                        XFormsResourceRewriter.generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                        XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {
@@ -276,7 +276,6 @@ public class XFormsResourceServer extends ProcessorImpl {
      * Try to cache the combined resources on disk.
      *
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param propertyContext       current PipelineContext (used for rewriting and matchers)
      * @param resourcePath          path to store the cached resource to
      * @param combinedLastModified  last modification date of the resources to combine
      * @param isCSS                 whether to generate CSS or JavaScript resources
@@ -284,7 +283,7 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
     public static File cacheResources(List<XFormsFeatures.ResourceConfig> resources,
-                                      PropertyContext propertyContext, String resourcePath, long combinedLastModified,
+                                      String resourcePath, long combinedLastModified,
                                       boolean isCSS, boolean isMinimal) {
         try {
             final IndentedLogger indentedLogger = getIndentedLogger();
@@ -303,7 +302,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        XFormsResourceRewriter.generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
+                        XFormsResourceRewriter.generate(indentedLogger, resources, fos, isCSS, isMinimal);
                     } else {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
@@ -315,7 +314,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    XFormsResourceRewriter.generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
+                    XFormsResourceRewriter.generate(indentedLogger, resources, fos, isCSS, isMinimal);
                 }
             } else {
                 if (isDebugEnabled)

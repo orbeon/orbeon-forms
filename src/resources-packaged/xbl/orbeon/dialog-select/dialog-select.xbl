@@ -196,9 +196,9 @@
             </xxforms:dialog>
         </xxbl:global>
 
-        <xbl:template>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <!-- Outer group -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
                 <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
 
                 <!-- Stop all events dispatched to outer group -->
@@ -239,24 +239,26 @@
                         <xxforms:variable name="selected" select="tokenize($binding, '\s+')" as="xs:string*"/>
 
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
-                        <xxforms:variable name="separator" xbl:attr="xbl:text=separator" as="xs:string">ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8</xxforms:variable>
-                        <xforms:group ref=".[$separator != 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']" id="joined-group">
-                            <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
-                                 This isn't done by default, but can be done by the application, as is the case in the test-dialog-select.xthml -->
-                            <xforms:output value="string-join($items[value = $selected]/label, $separator)" tabindex="-1" id="joined"/>
-                        </xforms:group>
-                        <xforms:group ref=".[$separator = 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']" id="list-group">
-                            <xhtml:ul>
-                                <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
-                                     repeat nodeset recalculations -->
-                                <xforms:repeat nodeset="$items[value = $selected]/value/string()" id="list">
-                                    <xhtml:li>
-                                        <xforms:output value="$items[value = context()]/label" id="item"/>
-                                    </xhtml:li>
-                                </xforms:repeat>
-                            </xhtml:ul>
-                        </xforms:group>
-
+                        <xsl:variable name="separator" select="/fr:dialog-select/@separator"/>
+                        <xsl:choose>
+                            <xsl:when test="exists($separator)">
+                                <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
+                                     This isn't done by default, but can be done by the application, as is the case in the test-dialog-select.xthml -->
+                                <xxforms:variable name="separator" xbl:attr="xbl:text=separator" as="xs:string"/>
+                                <xforms:output value="string-join($items[value = $selected]/label, $separator)" tabindex="-1" id="joined"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xhtml:ul>
+                                    <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
+                                         repeat nodeset recalculations -->
+                                    <xforms:repeat nodeset="$items[value = $selected]/value/string()" id="list">
+                                        <xhtml:li>
+                                            <xforms:output value="$items[value = context()]/label" id="item"/>
+                                        </xhtml:li>
+                                    </xforms:repeat>
+                                </xhtml:ul>
+                            </xsl:otherwise>
+                        </xsl:choose>
                         <!-- Select button -->
                         <xforms:trigger id="select" ref="$binding">
                             <xforms:label>…</xforms:label>

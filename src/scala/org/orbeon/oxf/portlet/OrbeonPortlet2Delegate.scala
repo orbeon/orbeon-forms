@@ -195,13 +195,8 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
         }
 
     private def writeResponseAsResource(responseWithParameters: ResponseWithParameters, request: ResourceRequest, response: ResourceResponse) = {
-        val pipelineContext = new PipelineContext
-        try {
-            response.setContentType("text/html")
-            write(response, responseWithParameters.responseData, responseWithParameters.contentType)
-        } finally {
-            pipelineContext.destroy(true)
-        }
+        response.setContentType("text/html")
+        write(response, responseWithParameters.responseData, responseWithParameters.contentType)
     }
 
     private def serveContentAsync(request: ResourceRequest, response: ResourceResponse): Unit =

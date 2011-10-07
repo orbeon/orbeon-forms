@@ -223,13 +223,19 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     width: 9.5em; *width: 9em
 }
 
-/* Special sizing for expand/collapse buttons */
+/* Special sizing for expand/collapse/refresh buttons */
 .fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger, .fr-buttons #fr-refresh-button .xforms-trigger,
     .fr-buttons #fr-collapse-all-button .xforms-trigger button, .fr-buttons #fr-expand-all-button .xforms-trigger button, .fr-buttons #fr-refresh-button .xforms-trigger button {
-
     min-width: 2em;
     width: 2em;
     padding: 0;
+}
+
+/* Special sizing for new expand/collapse/refresh buttons */
+.fr-buttons #fr-collapse-all-button.xforms-trigger button, .fr-buttons #fr-expand-all-button.xforms-trigger button, .fr-buttons #fr-refresh-button.xforms-trigger button {
+    min-width: 2em;
+    width: 2em;
+    padding: 3px;
 }
 
 .fr-buttons #fr-collapse-all-button img, .fr-buttons #fr-expand-all-button img, .fr-buttons #fr-refresh-button img {

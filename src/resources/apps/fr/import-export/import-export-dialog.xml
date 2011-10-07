@@ -7,7 +7,8 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:ev="http://www.w3.org/2001/xml-events">
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:saxon="http://saxon.sf.net/">
     <xforms:label ref="$fr-resources/import-export/dialog-title"/>
     <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/import-export/dialog-body/*, 'xml')"/>
     <xhtml:div class="fr-dialog-buttons">

@@ -44,11 +44,11 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
     private val FutureResponseSessionKey = "org.orbeon.oxf.future-response"
     private val IFrameContentResourceId = "orbeon-iframe-content"
 
-    private def isAjaxPortlet = XFormsProperties.isAjaxPortlet
+    private def isAsyncPortletLoad = XFormsProperties.isAsyncPortletLoad
     private def isMinimal = XFormsProperties.isMinimalResources
 
-    private def renderFunction = if (isAjaxPortlet) doRenderAsync(_: RenderRequest, _: RenderResponse, renderDiv _) else doRenderDirectly _
-    private def serveContentFunction = if (isAjaxPortlet) Some(serveContentAsync _) else None
+    private def renderFunction = if (isAsyncPortletLoad) doRenderAsync(_: RenderRequest, _: RenderResponse, renderDiv _) else doRenderDirectly _
+    private def serveContentFunction = if (isAsyncPortletLoad) Some(serveContentAsync _) else None
 
     // Portlet action
     override def processAction(request: ActionRequest, response: ActionResponse) =
@@ -133,7 +133,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             def rewrite(path: String) =
                 rewriter.rewriteResourceURL(path, Response.REWRITE_MODE_ABSOLUTE_PATH) // NOTE: mode is ignored
 
-            val resources = LinkedHashSet(XFormsFeatures.getAjaxPortletScripts map (_.getResourcePath(isMinimal)): _*)
+            val resources = LinkedHashSet(XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)): _*)
             ResourcesAggregator.aggregate(resources, false, path ⇒ WSRP2Utils.write(response, rewrite(path), shortIdNamespace(response), false))
 
             writer.write(""""></script>""")

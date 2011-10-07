@@ -194,7 +194,7 @@ public class XFormsFeatures {
         }
         return result;
     }
-    private static final ResourceConfig[] ajaxPortletScripts = {
+    private static final ResourceConfig[] asyncPortletLoadScripts = {
             new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),
@@ -206,7 +206,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/util/DeferredPortletLoader.js", "/ops/javascript/orbeon/util/DeferredPortletLoader-min.js")
     };
     
-    public static ResourceConfig[] getAjaxPortletScripts() {
-        return ajaxPortletScripts;
+    public static ResourceConfig[] getAsyncPortletLoadScripts() {
+        return asyncPortletLoadScripts;
     }
 }

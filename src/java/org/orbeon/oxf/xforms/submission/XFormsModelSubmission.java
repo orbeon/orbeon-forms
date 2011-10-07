@@ -811,8 +811,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             final String method = NetUtils.getExternalContext().getRequest().getMethod();
 
             isNoscript = containingDocument.getStaticState().isNoscript();
-            isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet()
-                    && !(method != null && method.equalsIgnoreCase("get"));
+            isAllowDeferredSubmission = !isNoscript && !(method != null && method.equalsIgnoreCase("get"));
 
             isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll && !containingDocument.isInitializing());
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;

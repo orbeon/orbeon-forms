@@ -77,9 +77,9 @@ class ResourcesAggregator extends ProcessorImpl {
                         val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(NetUtils.getExternalContext.getRequest)
 
                         // In this mode, resources are described in JSON within a <div>
-                        val isAjaxPortlet = NetUtils.getExternalContext.getRequest.getContainerType == "portlet" && XFormsProperties.isAjaxPortlet
+                        val isAsyncPortletLoad = NetUtils.getExternalContext.getRequest.getContainerType == "portlet" && XFormsProperties.isAsyncPortletLoad
                         val isMinimal = XFormsProperties.isMinimalResources
-                        val ajaxPortletScripts = if (isAjaxPortlet) XFormsFeatures.getAjaxPortletScripts map (_.getResourcePath(isMinimal)) else Array.empty[String]
+                        val asyncPortletLoadScripts = if (isAsyncPortletLoad) XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)) else Array.empty[String]
 
                         // Whether a path is a user resource in separate deployment
                         def isSeparatePath(path: String) = isSeparateDeployment && ! URLRewriterUtils.isPlatformPath(path)
@@ -176,8 +176,8 @@ class ResourcesAggregator extends ProcessorImpl {
 //                                outputStuff(baselineJS, supplementalJS, preservedJS, false, appendJS, appendPreservedElement)
 
                                 builder append
-                                    (aggregate(baselineJS -- ajaxPortletScripts, false, appendJS) ++
-                                        aggregate(supplementalJS -- baselineJS -- ajaxPortletScripts, false, appendJS) ++
+                                    (aggregate(baselineJS -- asyncPortletLoadScripts, false, appendJS) ++
+                                        aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, false, appendJS) ++
                                             (preservedJS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
                                 
                                 builder append """],"styles":["""
@@ -203,14 +203,14 @@ class ResourcesAggregator extends ProcessorImpl {
 
                             def outputJS() = {
                                 val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script") _
-                                aggregate(baselineJS -- ajaxPortletScripts, false, outputJSElement)
-                                aggregate(supplementalJS -- baselineJS -- ajaxPortletScripts, false, outputJSElement)
+                                aggregate(baselineJS -- asyncPortletLoadScripts, false, outputJSElement)
+                                aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, false, outputJSElement)
                                 preservedJS foreach (outputPreservedElement(_))
                             }
 
                             if (level == 2 && localname == "head") {
 
-                                if (! isAjaxPortlet) {
+                                if (! isAsyncPortletLoad) {
                                     // 1. Combined and inline CSS
                                     outputCSS()
 
@@ -226,7 +226,7 @@ class ResourcesAggregator extends ProcessorImpl {
                             } else if (level == 2 && localname == "body") {
 
                                 // Place info about scripts and CSS just before the end of the body
-                                if (isAjaxPortlet)
+                                if (isAsyncPortletLoad)
                                     outputScriptCSSAsJSON()
 
                                 // Close body element
@@ -235,7 +235,7 @@ class ResourcesAggregator extends ProcessorImpl {
                                 // Combined and inline JS
                                 // Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
                                 // performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom
-                                if (! isAjaxPortlet && XFormsProperties.isJavaScriptAtBottom)
+                                if (! isAsyncPortletLoad && XFormsProperties.isJavaScriptAtBottom)
                                     outputJS()
 
                             } else if (filter && level == 3 && inHead) {

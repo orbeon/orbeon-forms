@@ -76,8 +76,7 @@ public class InitUtils {
             }
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }
-        // Make the static context available
-        StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
+
         boolean success = false;
         try {
             // Set cache size
@@ -119,8 +118,6 @@ public class InitUtils {
                 throw new OXFException(e);
             }
         } finally {
-            // Free context
-            StaticExternalContext.removeStaticContext();
 
             if (logger.isInfoEnabled()) {
                 // Add timing

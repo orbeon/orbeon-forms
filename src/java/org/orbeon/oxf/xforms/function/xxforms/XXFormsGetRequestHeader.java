@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -42,14 +41,8 @@ public class XXFormsGetRequestHeader extends XFormsFunction {
             final Expression headerNameExpression = argument[0];
             final String headerName = headerNameExpression.evaluateAsString(xpathContext).toString();
 
-            // Get header value
-
-            // This function is always called from controls so ExternalContext should be present
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            final ExternalContext externalContext = staticContext.getExternalContext();
-
             // Get all header values
-            final String[] headerValues = externalContext.getRequest().getHeaderValuesMap().get(headerName.toLowerCase());
+            final String[] headerValues = NetUtils.getExternalContext().getRequest().getHeaderValuesMap().get(headerName.toLowerCase());
 
             if (headerValues != null && headerValues.length > 0) {
                 final List<StringValue> result = new ArrayList<StringValue>(headerValues.length);

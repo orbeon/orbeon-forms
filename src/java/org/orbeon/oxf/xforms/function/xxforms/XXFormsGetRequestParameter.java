@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -43,12 +42,7 @@ public class XXFormsGetRequestParameter extends XFormsFunction {
             final String parameterName = parameterNameExpression.evaluateAsString(xpathContext).toString();
 
             // Get parameter value
-
-            // This function is always called from controls so ExternalContext should be present
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            final ExternalContext externalContext = staticContext.getExternalContext();
-
-            final Object[] parameterValues = externalContext.getRequest().getParameterMap().get(parameterName);
+            final Object[] parameterValues = NetUtils.getExternalContext().getRequest().getParameterMap().get(parameterName);
             if (parameterValues != null) {
                 final List<StringValue> result = new ArrayList<StringValue>(parameterValues.length);
                 for (final Object currentValue: parameterValues) {

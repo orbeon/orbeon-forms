@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -44,12 +44,7 @@ public class XXFormsGetSessionAttribute extends XXFormsGetScopeAttribute {
         }
 
         // Get attribute value
-
-        // This function is always called from controls so ExternalContext should be present
-        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-        final ExternalContext externalContext = staticContext.getExternalContext();
-
-        final ExternalContext.Session session = externalContext.getSession(false);// do not force session creation
+        final ExternalContext.Session session = NetUtils.getExternalContext().getSession(false);// do not force session creation
         if (session != null) {
             // Found session
             final Object attributeObject = session.getAttributesMap().get(attributeName);

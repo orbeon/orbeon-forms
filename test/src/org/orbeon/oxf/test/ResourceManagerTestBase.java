@@ -17,14 +17,15 @@ import org.dom4j.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public abstract class ResourceManagerTestBase {
@@ -75,8 +76,6 @@ public abstract class ResourceManagerTestBase {
         final Document requestDocument = ProcessorUtils.createDocumentFromURL(requestURL, null);
         final ExternalContext externalContext = new ExtendedTestExternalContext(pipelineContext, requestDocument);
         pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
-
-        StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
 
         return pipelineContext;
     }

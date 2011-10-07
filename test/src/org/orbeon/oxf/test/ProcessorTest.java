@@ -14,29 +14,38 @@
 package org.orbeon.oxf.test;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.processor.XMLProcessorRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.fail;
 
@@ -293,57 +302,47 @@ public class ProcessorTest extends ResourceManagerTestBase {
                     final PipelineContext pipelineContext = StringUtils.isNotEmpty(requestURL) ? createPipelineContextWithExternalContext(requestURL) : createPipelineContextWithExternalContext();
                     pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
-                    // Get ExternalContext
-                    final ExternalContext externalContext = NetUtils.getExternalContext();
+                    processor.reset(pipelineContext);
+                    if (domSerializers.size() == 0) {
+                        // Processor with no output: just run it
+                        processor.start(pipelineContext);
+                    } else {
+                        // Get output and compare to expected result
+                        final Iterator<DOMSerializer> domSerializersIterator = domSerializers.iterator();
+                        final Iterator<Document> expectedNodesIterator = expectedDocuments.iterator();
+                        while (domSerializersIterator.hasNext()) {
 
-                    StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
-//                    pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+                            // Get expected
+                            final DOMSerializer domSerializer = domSerializersIterator.next();
+                            final Document expectedData = expectedNodesIterator.next();
+                            // TODO: we want to remove that (avernet 2004-12-14)
+                            removeUnusedNamespaceDeclarations(expectedData.getRootElement());
 
-                    try {
-                        processor.reset(pipelineContext);
-                        if (domSerializers.size() == 0) {
-                            // Processor with no output: just run it
-                            processor.start(pipelineContext);
-                        } else {
-                            // Get output and compare to expected result
-                            final Iterator<DOMSerializer> domSerializersIterator = domSerializers.iterator();
-                            final Iterator<Document> expectedNodesIterator = expectedDocuments.iterator();
-                            while (domSerializersIterator.hasNext()) {
+                            // Run serializer
+                            domSerializer.start(pipelineContext);
 
-                                // Get expected
-                                final DOMSerializer domSerializer = domSerializersIterator.next();
-                                final Document expectedData = expectedNodesIterator.next();
-                                // TODO: we want to remove that (avernet 2004-12-14)
-                                removeUnusedNamespaceDeclarations(expectedData.getRootElement());
+                            // Get actual data
+                            final Document actualData = domSerializer.getDocument(pipelineContext);
+                            // TODO: we want to remove that (avernet 2004-12-14)
+                            removeUnusedNamespaceDeclarations(actualData.getRootElement());
 
-                                // Run serializer
-                                domSerializer.start(pipelineContext);
+                            // Compare converting to strings
+                            expectedDataString = Dom4jUtils.domToCompactString(expectedData);
+                            actualDataString = Dom4jUtils.domToCompactString(actualData);
+                            final boolean outputPassed = expectedDataString.equals(actualDataString);
 
-                                // Get actual data
-                                final Document actualData = domSerializer.getDocument(pipelineContext);
-                                // TODO: we want to remove that (avernet 2004-12-14)
-                                removeUnusedNamespaceDeclarations(actualData.getRootElement());
-
-                                // Compare converting to strings
-                                expectedDataString = Dom4jUtils.domToCompactString(expectedData);
-                                actualDataString = Dom4jUtils.domToCompactString(actualData);
-                                final boolean outputPassed = expectedDataString.equals(actualDataString);
-
-                                // Display if test not passed
-                                if (!outputPassed) {
-                                    expectedEqualsActual = false;
-                                    // Store pretty strings
-                                    expectedDataStringFormatted = Dom4jUtils.domToPrettyString(expectedData);
-                                    actualDataStringFormatted = Dom4jUtils.domToPrettyString(actualData);
-                                    break;
-                                }
-                            }
-                            // Don't bother repeating the test if it failed
-                            if (!expectedEqualsActual)
+                            // Display if test not passed
+                            if (!outputPassed) {
+                                expectedEqualsActual = false;
+                                // Store pretty strings
+                                expectedDataStringFormatted = Dom4jUtils.domToPrettyString(expectedData);
+                                actualDataStringFormatted = Dom4jUtils.domToPrettyString(actualData);
                                 break;
+                            }
                         }
-                    } finally {
-                        StaticExternalContext.removeStaticContext();
+                        // Don't bother repeating the test if it failed
+                        if (!expectedEqualsActual)
+                            break;
                     }
                 }
             } catch (Throwable e) {

@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -47,12 +46,7 @@ public class XXFormsGetRequestAttribute extends XXFormsGetScopeAttribute {
             }
 
             // Get attribute value
-
-            // This function is always called from controls so ExternalContext should be present
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            final ExternalContext externalContext = staticContext.getExternalContext();
-
-            final Object attributeObject = externalContext.getRequest().getAttributesMap().get(attributeName);
+            final Object attributeObject = NetUtils.getExternalContext().getRequest().getAttributesMap().get(attributeName);
             return convertAttributeValue(xpathContext, attributeObject, contentType, attributeName);
         } else {
             throw new OXFException("xxforms:get-request-attribute() can only be called during XForms initialization.");

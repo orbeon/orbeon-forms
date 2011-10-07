@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -31,16 +30,11 @@ import org.orbeon.saxon.value.BooleanValue;
 public class XXFormsIsUserInRole extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
-
-        // Get ExternalContext
-        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-        final ExternalContext externalContext = staticContext.getExternalContext();
-
         // Get role property
         final Expression propertyNameExpression = argument[0];
         final String role = propertyNameExpression.evaluateAsString(xpathContext).toString();
 
         return SingletonIterator.makeIterator(
-                externalContext.getRequest().isUserInRole(role) ? BooleanValue.TRUE : BooleanValue.FALSE);
+                NetUtils.getExternalContext().getRequest().isUserInRole(role) ? BooleanValue.TRUE : BooleanValue.FALSE);
     }
 }

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -39,12 +39,8 @@ public class XXFormsSetSessionAttribute extends XXFormsSetScopeAttribute {
         final Expression valueExpression = argument[1];
         final Item item = valueExpression.evaluateItem(xpathContext);
 
-        // This function is always called from controls so ExternalContext should be present
-        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-        final ExternalContext externalContext = staticContext.getExternalContext();
-
         // Store value
-        final ExternalContext.Session session = externalContext.getSession(true);// DO force session creation
+        final ExternalContext.Session session = NetUtils.getExternalContext().getSession(true);// DO force session creation
         storeAttribute(session.getAttributesMap(), attributeName, item);
 
         // Return empty sequence

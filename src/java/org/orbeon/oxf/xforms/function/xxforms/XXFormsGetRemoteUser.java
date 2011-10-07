@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -31,13 +30,8 @@ import org.orbeon.saxon.value.StringValue;
 public class XXFormsGetRemoteUser extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
-
-        // Get ExternalContext
-        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-        final ExternalContext externalContext = staticContext.getExternalContext();
-
         // Return user name
-        final String remoteUser= externalContext.getRequest().getRemoteUser();
+        final String remoteUser= NetUtils.getExternalContext().getRequest().getRemoteUser();
         if (remoteUser == null) {
             return EmptyIterator.getInstance();
         } else {

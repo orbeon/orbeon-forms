@@ -18,6 +18,7 @@ import org.orbeon.oxf.processor.pipeline.functions.DecodeResourceURI;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteResourceURI;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteServiceURI;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsGetRequestAttribute;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsGetRequestPath;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsPropertiesStartsWith;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.saxon.expr.Expression;
@@ -115,6 +116,9 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}decode-resource-uri", DecodeResourceURI.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 1, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
+
+        // p:get-request-path()
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}get-request-path", XXFormsGetRequestPath.class, 0, 0, 0, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ONE);
 
         // === XSLT 2.0 function
         e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);

@@ -30,38 +30,41 @@
     <p:param type="output" name="data"/>
 
     <!-- Call up persistence layer to obtain XHTML+XForms -->
-    <p:processor name="oxf:xforms-to-xhtml">
-        <p:input name="annotated-document" transform="oxf:xinclude" href="aggregate('dummy')">
-            <xhtml:html>
-                <xhtml:head>
-                    <xhtml:title/>
-                    <xforms:model xxforms:optimize-get-all="false">
-                        <xxforms:variable name="app" select="instance('fr-parameters-instance')/app"/>
-                        <xxforms:variable name="form" select="instance('fr-parameters-instance')/form"/>
-                        <xforms:instance id="fr-parameters-instance" src="input:instance"/>
-                        <xforms:submission id="get-source-form-submission" method="get" serialization="none"
-                                resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml{
-                                    if (instance('fr-parameters-instance')/document != '') then concat('?document=', instance('fr-parameters-instance')/document) else ''}"
-                                replace="all" xxforms:xinclude="true">
-                            <!-- HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way -->
-                            <xforms:action ev:event="xforms-submit-error" type="xpath">
-                                if (not(matches(xxforms:get-request-path(), '/fr/service/custom/orbeon/(new)?builder/toolbox')))
-                                then form-runner:sendError((event('response-status-code'), 500)[1])
-                                else ()
-                            </xforms:action>
-                        </xforms:submission>
-                        <xforms:send ev:event="xforms-model-construct-done" submission="get-source-form-submission"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body/>
-            </xhtml:html>
+    <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
+         oxf:url-generator again as it is much faster and is enough now that the persistence proxy is in place. -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#instance">
+            <config xsl:version="2.0">
+
+                <!-- /*/document is available e.g. when editing or viewing a document -->
+                <xsl:variable name="document" select="/*/document" as="xs:string"/>
+
+                <!-- Create URI to persistence layer -->
+                <xsl:variable name="resource" select="concat('/fr/service/persistence/crud/', /*/app, '/', /*/form, '/form/form.xhtml', if ($document != '') then concat('?document=', $document) else '')"/>
+                <url>
+                    <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
+                </url>
+                <!-- Forward the same headers that the XForms engine forwards -->
+                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                <!-- Produce binary so we do our own XML parsing -->
+                <mode>binary</mode>
+            </config>
         </p:input>
-        <p:input name="data"><null xsi:nil="true"/></p:input>
-        <p:input name="instance" href="#instance"/>
-        <p:output name="document" id="binary-document"/>
+        <p:output name="data" id="binary-document"/>
     </p:processor>
 
     <p:choose href="#binary-document">
+        <!-- HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way -->
+        <p:when test="if (not(matches(p:get-request-path(), '/fr/service/custom/orbeon/(new)?builder/toolbox'))
+                          and (for $c in /*/@status-code return $c castable as xs:integer and not(xs:integer($c) ge 200 and xs:integer($c) lt 300)))
+                      then form-runner:sendError(/*/@status-code)
+                      else false()">
+            <!-- Null document to keep XPL happy. The error has already been sent in the XPath expression above. -->
+            <p:processor name="oxf:identity">
+                <p:input name="data"><null xsi:nil="true"/></p:input>
+                <p:output name="data" ref="data"/>
+            </p:processor>
+        </p:when>
         <p:when test="contains(/*/@content-type, 'xml')">
             <!-- Convert binary document to XML -->
             <p:processor name="oxf:to-xml-converter">

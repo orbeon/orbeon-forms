@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
@@ -33,12 +32,7 @@ public class XXFormsGetRequestPath extends XXFormsGetScopeAttribute {
 
         final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
         if (containingDocument == null || containingDocument.isInitializing()) { // support null for use outside of XForms
-
-            // This function is always called from controls so ExternalContext should be present
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            final ExternalContext externalContext = staticContext.getExternalContext();
-
-            return StringValue.makeStringValue(externalContext.getRequest().getRequestPath());
+            return StringValue.makeStringValue(NetUtils.getExternalContext().getRequest().getRequestPath());
         } else {
             throw new OXFException("xxforms:get-request-path() can only be called during XForms initialization.");
         }

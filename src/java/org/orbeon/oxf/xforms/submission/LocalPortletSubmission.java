@@ -112,7 +112,7 @@ public class LocalPortletSubmission extends BaseSubmission {
         final String submissionEffectiveId = submission.getEffectiveId();
 
         // If async, use a "safe" copy of the context
-        final OrbeonPortlet2Delegate currentPortlet = (OrbeonPortlet2Delegate) OrbeonPortlet2Delegate.currentPortlet().value();
+        final OrbeonPortlet2Delegate currentPortlet = (OrbeonPortlet2Delegate) OrbeonPortlet2Delegate.currentPortlet().value().get();
 
         final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : NetUtils.getExternalContext().getResponse();
         final ExternalContext asyncExternalContext = p2.isAsynchronous

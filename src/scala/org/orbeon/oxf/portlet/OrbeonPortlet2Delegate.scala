@@ -14,7 +14,6 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet._
-import util.DynamicVariable
 import org.orbeon.oxf.common.OXFException
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
@@ -29,9 +28,9 @@ import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.{ResourcesAggregator, XFormsFeatures}
 import collection.mutable.LinkedHashSet
 import org.orbeon.oxf.externalcontext.{WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
-import org.orbeon.oxf.util.{URLRewriterUtils, NetUtils}
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import OrbeonPortlet2Delegate._
+import org.orbeon.oxf.util.{DynamicVariable, URLRewriterUtils, NetUtils}
 
 /**
  * Orbeon portlet.
@@ -337,7 +336,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 
 object OrbeonPortlet2Delegate {
 
-    val currentPortlet = new DynamicVariable[OrbeonPortlet2Delegate](null)
+    val currentPortlet = new DynamicVariable[OrbeonPortlet2Delegate]
 
     // Immutable portletNamespace → idNamespace information stored in the portlet context
     private object NamespaceMappings {
@@ -357,7 +356,7 @@ object OrbeonPortlet2Delegate {
         // PLT.10.1: "There is one instance of the PortletContext interface associated with each portlet application
         // deployed into a portlet container." In order for multiple Orbeon portlets to not walk on each other, we
         // synchronize.
-        val portletContext = currentPortlet.value.getPortletContext
+        val portletContext = currentPortlet.value.get.getPortletContext
         portletContext.synchronized {
 
             val IdNamespacesSessionKey = "org.orbeon.oxf.id-namespaces"

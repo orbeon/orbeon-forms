@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.action
 
 import actions.{XFormsDeleteAction, XFormsInsertAction, XFormsSetvalueAction}
-import util.DynamicVariable
 import collection.JavaConverters._
 import org.orbeon.saxon.om._
 import java.util.{List => JList}
@@ -24,11 +23,12 @@ import java.lang.IllegalStateException
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEvent}
 import org.dom4j.{Element, QName}
+import org.orbeon.oxf.util.DynamicVariable
 
 object XFormsAPI {
 
     // Dynamically set action context
-    val actionContext = new DynamicVariable[Option[XFormsActionInterpreter]](None)
+    val actionContext = new DynamicVariable[XFormsActionInterpreter]
 
     // Helper for Java side of things
     def scalaActionJava(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent, eventObserver: XFormsEventObserver, eventHandlerElement: Element) =
@@ -38,7 +38,7 @@ object XFormsAPI {
 
     // Every block of action must be run within this
     def scalaAction(actionInterpreter: XFormsActionInterpreter)(body: => Any) {
-        actionContext.withValue(Some(actionInterpreter)) {
+        actionContext.withValue(actionInterpreter) {
             body
         }
     }

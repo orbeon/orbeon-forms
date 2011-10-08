@@ -17,10 +17,10 @@
          xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
-    <xsl:variable name="has-version" select="pipeline:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
-    <xsl:variable name="css-uri" select="tokenize(normalize-space(pipeline:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="has-version" select="xpl:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
+    <xsl:variable name="css-uri" select="tokenize(normalize-space(xpl:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
 
     <xh:head>
         <xh:title>Not Found</xh:title>

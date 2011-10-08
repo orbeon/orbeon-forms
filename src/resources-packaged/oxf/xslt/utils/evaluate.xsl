@@ -18,7 +18,7 @@
     xmlns:evaluator="java:org.orbeon.saxon.sxpath.XPathEvaluator"
     xmlns:context="java:org.orbeon.saxon.sxpath.IndependentContext"
     xmlns:expression="java:org.orbeon.saxon.sxpath.XPathExpression"
-    xmlns:external-context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
+    xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
     xmlns:saxon="http://saxon.sf.net/">
 
     <!-- Evaluates an XPath expression with prefixes based on a context node.
@@ -34,7 +34,7 @@
         <xsl:param name="namespaces" as="node()*"/>
 
         <!-- Use custom constructor instead of just new XPathEvaluator() so we can pass a Configuration -->
-        <xsl:variable name="evaluator" select="external-context:newEvaluator($node)"/>
+        <xsl:variable name="evaluator" select="xpl:newEvaluator($node)"/>
 
         <xsl:variable name="independent-context" select="evaluator:get-static-context($evaluator)"/>
         <xsl:for-each select="$namespaces">

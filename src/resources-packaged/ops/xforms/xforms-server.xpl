@@ -176,7 +176,7 @@
                         <!-- Encode them -->
                         <xxforms:action>
                             <xxforms:server-events delay="0">
-                                <xsl:value-of select="context:encodeXML($events)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
+                                <xsl:value-of select="xpl:encodeXML($events)" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
                             </xxforms:server-events>
                         </xxforms:action>
 

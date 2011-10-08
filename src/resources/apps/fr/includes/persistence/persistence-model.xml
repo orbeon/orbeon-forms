@@ -25,7 +25,7 @@
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
               xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner"
-              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+              xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
     <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
@@ -576,7 +576,7 @@
                     <!-- Send PDF data if requested -->
                     <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
                         <!-- Get URI of PDF data -->
-                        <xxforms:variable name="pdf-uri" select="pipeline:rewriteServiceURI(instance('fr-workflow-send-instance'), true())" as="xs:anyURI"/>
+                        <xxforms:variable name="pdf-uri" select="xpl:rewriteServiceURI(instance('fr-workflow-send-instance'), true())" as="xs:anyURI"/>
 
                         <!-- Send everything to Alfresco -->
                         <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">

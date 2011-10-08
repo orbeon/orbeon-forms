@@ -24,8 +24,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:script src="/xbl/orbeon/accordion/accordion-menu-v2.js"/>
     <xbl:script src="/xbl/orbeon/accordion/accordion.js"/>

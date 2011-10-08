@@ -14,9 +14,12 @@
 package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.processor.pipeline.functions.DecodeResourceURI;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteResourceURI;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteServiceURI;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsGetRequestAttribute;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsGetRequestPath;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsPropertiesStartsWith;
@@ -26,8 +29,10 @@ import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.NamespaceConstant;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.StandardNames;
 import org.orbeon.saxon.om.StructuredQName;
+import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.ItemType;
@@ -73,6 +78,30 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
     }
 
     // Functions are exposed statically below for access through XSLT
+    public static String setTitle(String title) {
+        NetUtils.getExternalContext().getResponse().setTitle(title);
+        return null;
+    }
+
+    public static org.dom4j.Document decodeXML(String encodedXML) {
+        return XFormsUtils.decodeXML(encodedXML);
+    }
+
+    public static String encodeXML(org.w3c.dom.Node node) {
+        return XFormsUtils.encodeXMLAsDOM(node);
+    }
+
+    public static XPathEvaluator newEvaluator(NodeInfo context) {
+        return new XPathEvaluator(context.getConfiguration());
+    }
+
+    public static boolean isPE() {
+        return Version.isPE();
+    }
+
+    public static boolean isPortlet() {
+        return "portlet".equals(NetUtils.getExternalContext().getRequest().getContainerType());
+    }
 
     public static AtomicValue property(String name) {
         return XXFormsProperty.property(name);
@@ -82,12 +111,12 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         return XXFormsPropertiesStartsWith.propertiesStartsWith(name);
     }
 
-    public static String rewriteResourceURI(String uri, boolean absolute) {
-        return RewriteResourceURI.rewriteResourceURI(uri, absolute);
-    }
-
     public static String rewriteServiceURI(String uri, boolean absolute) {
         return RewriteServiceURI.rewriteServiceURI(uri, absolute);
+    }
+
+    public static String rewriteResourceURI(String uri, boolean absolute) {
+        return RewriteResourceURI.rewriteResourceURI(uri, absolute);
     }
 
     static {

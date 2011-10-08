@@ -22,7 +22,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <p:param type="input" name="instance"/>
 

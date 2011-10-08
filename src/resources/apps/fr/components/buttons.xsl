@@ -22,8 +22,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
     <xsl:template match="fr:refresh-button">
         <!-- Display a "refresh" button only in noscript mode -->

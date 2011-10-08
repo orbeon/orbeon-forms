@@ -22,8 +22,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <xsl:template match="xhtml:body//fr:section | xbl:binding/xbl:template//fr:section">

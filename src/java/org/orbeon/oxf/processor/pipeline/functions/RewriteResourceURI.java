@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.functions;
 
-import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.XPathContext;
@@ -51,6 +51,6 @@ public class RewriteResourceURI extends SystemFunction {
     }
 
     public static String rewriteResourceURI(String uri, boolean absolute) {
-        return StaticExternalContext.rewriteResourceURL(uri, absolute);
+        return NetUtils.getExternalContext().getResponse().rewriteResourceURL(uri, absolute);
     }
 }

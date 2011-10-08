@@ -21,7 +21,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
         xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- Parameters (app, form, document, and mode) -->
@@ -42,10 +42,10 @@
                 <!-- Create URI to persistence layer -->
                 <xsl:variable name="resource" select="concat('/fr/service/persistence/crud/', /*/app, '/', /*/form, '/form/form.xhtml', if ($document != '') then concat('?document=', $document) else '')"/>
                 <url>
-                    <xsl:value-of select="pipeline:rewriteServiceURI($resource, true())"/>
+                    <xsl:value-of select="xpl:rewriteServiceURI($resource, true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                 <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
             </config>

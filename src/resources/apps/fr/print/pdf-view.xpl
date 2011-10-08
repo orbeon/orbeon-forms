@@ -19,8 +19,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>

@@ -19,7 +19,7 @@
           xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:saxon="http://saxon.sf.net/"
-          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+          xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <!-- fr-form-instance -->
     <p:param type="input" name="instance"/>
@@ -54,10 +54,10 @@
         <p:input name="config" transform="oxf:unsafe-xslt" href="#parameters">
             <config xsl:version="2.0">
                 <url>
-                    <xsl:value-of select="pipeline:rewriteServiceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
+                    <xsl:value-of select="xpl:rewriteServiceURI(concat('/fr/service/i18n/fr-resources/', /*/app, '/', /*/form), true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
-                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
             </config>
         </p:input>
         <p:output name="data" id="fr-resources"/>
@@ -106,7 +106,7 @@
                             <xsl:variable name="uri" select="normalize-space()" as="xs:string"/>
                             <attachment filename="{@filename}" mediatype="{@mediatype}">
                                 <!-- URL may be absolute or already point to persistence layer -->
-                                <xsl:value-of select="pipeline:rewriteServiceURI($uri, true())"/>
+                                <xsl:value-of select="xpl:rewriteServiceURI($uri, true())"/>
                             </attachment>
                         </xsl:for-each>
 
@@ -169,21 +169,21 @@
 
                 <!-- SMTP outgoing server settings -->
                 <smtp-host>
-                    <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
+                    <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
                 </smtp-host>
                 <credentials>
                     <username>
-                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
+                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>
                     </username>
                     <password>
-                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
+                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.credentials', $app, $form), '.'))"/>
                     </password>
                 </credentials>
 
                 <!-- Sender -->
                 <from>
                     <email>
-                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.from', $app, $form), '.'))"/>
+                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.from', $app, $form), '.'))"/>
                     </email>
                 </from>
                 <!-- Recipients -->
@@ -196,7 +196,7 @@
                 </xsl:for-each>
                 <to>
                     <email>
-                        <xsl:value-of select="pipeline:property(string-join(('oxf.fr.email.to', $app, $form), '.'))"/>
+                        <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.to', $app, $form), '.'))"/>
                     </email>
                 </to>
                 <!-- Subject -->
@@ -219,11 +219,11 @@
                         <xsl:value-of select="$fr-resources/resource[@xml:lang = $request-language]/email/body"/>
                     </part>
                     <!-- XML attachment if needed -->
-                    <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
+                    <xsl:if test="xpl:property(string-join(('oxf.fr.email.attach-xml', $app, $form), '.'))">
                         <part name="form-xml" content-type="application/xml" content-disposition="attachment; filename=&quot;form.xml&quot;" src="input:form-xml"/>
                     </xsl:if>
                     <!-- PDF attachment if needed -->
-                    <xsl:if test="pipeline:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
+                    <xsl:if test="xpl:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.'))">
                         <part name="form-pdf" content-type="application/pdf" content-disposition="attachment; filename=&quot;form.pdf&quot;" src="input:form-pdf"/>
                     </xsl:if>
                     <!-- Other attachments if needed -->
@@ -282,7 +282,7 @@
                                 <content-type>application/octet-stream</content-type>
                                 <force-content-type>true</force-content-type>
                                 <!-- Forward the same headers that the XForms engine forwards -->
-                                <forward-headers><xsl:value-of select="pipeline:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
+                                <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                             </config>
                         </p:input>
                         <p:output name="data" id="attachment-{position()}"/>

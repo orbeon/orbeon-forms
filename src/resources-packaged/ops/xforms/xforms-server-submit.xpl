@@ -80,7 +80,7 @@
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
-                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <xxforms:uuid>
                             <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
                         </xxforms:uuid>

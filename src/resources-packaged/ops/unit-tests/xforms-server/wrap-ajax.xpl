@@ -34,7 +34,7 @@
                 <xsl:output method="xml" name="xml"/>
                 <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
                 <xsl:template match="/">
-                    <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                    <xxforms:event-request xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:sequence>1</xxforms:sequence>
                         <xxforms:static-state>
@@ -53,7 +53,7 @@
                                     </static-state>
                                 </xsl:document>
                             </xsl:variable>
-                            <xsl:value-of select="context:encodeXML($static-state)"/>
+                            <xsl:value-of select="xpl:encodeXML($static-state)"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
                             <xsl:if test="doc('input:instances')/instances/instance">
@@ -71,7 +71,7 @@
                                         </dynamic-state>
                                     </xsl:document>
                                 </xsl:variable>
-                                <xsl:value-of select="context:encodeXML($dynamic-state)"/>
+                                <xsl:value-of select="xpl:encodeXML($dynamic-state)"/>
                             </xsl:if>
                         </xxforms:dynamic-state>
                         <xxforms:action>

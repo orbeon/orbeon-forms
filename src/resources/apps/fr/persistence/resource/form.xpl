@@ -22,8 +22,7 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
-        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <p:param name="data" type="output"/>
 

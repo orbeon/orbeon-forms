@@ -17,8 +17,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- Empty, or current form data -->
     <p:param type="input" name="instance"/>

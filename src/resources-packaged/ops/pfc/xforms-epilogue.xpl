@@ -23,18 +23,6 @@
     <p:param type="input" name="instance"/>
     <p:param type="output" name="xformed-data"/>
 
-    <!-- Get request information -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config>
-                <include>/request/container-type</include>
-                <include>/request/request-path</include>
-                <include>/request/context-path</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request-info"/>
-    </p:processor>
-
     <!-- Annotate XForms elements and generate XHTML if necessary -->
     <!-- TODO: put here processor detecting XForms model -->
     <p:choose href="#data">

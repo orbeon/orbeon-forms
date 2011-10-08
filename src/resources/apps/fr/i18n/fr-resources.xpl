@@ -21,7 +21,7 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:saxon="http://saxon.sf.net/"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <!-- app/form (request-parameters.xml) -->
     <p:param type="input" name="instance"/>
@@ -41,7 +41,7 @@
                 <xsl:variable name="form" as="xs:string" select="$instance/form"/>
 
                 <!-- The property names that are overridden -->
-                <xsl:variable name="property-names" as="xs:string*" select="pipeline:propertiesStartsWith(concat('oxf.fr.resource.', $app, '.', $form))"/>
+                <xsl:variable name="property-names" as="xs:string*" select="xpl:propertiesStartsWith(concat('oxf.fr.resource.', $app, '.', $form))"/>
 
                 <!-- Get ID of nodes we override followed by their new value -->
                 <xsl:variable name="overridden-elements-and-values" as="xs:string*">
@@ -60,7 +60,7 @@
                                     <xsl:message>Cannot find for resource for property '<xsl:value-of select="$name"/>'</xsl:message>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:sequence select="(generate-id($node), pipeline:property($name))"/>
+                                    <xsl:sequence select="(generate-id($node), xpl:property($name))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:for-each>

@@ -23,7 +23,6 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
         xmlns:f="http//www.orbeon.com/function">
 
     <!--

@@ -36,7 +36,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms">
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <p:param name="submission" type="input"/>
     <p:param name="request" type="input"/>
@@ -79,8 +80,8 @@
                                     </xsl:if>
                                 </xforms:submission>
                             </xforms:model>
-                            <properties xxforms:state-handling="client" xxforms:noscript="false" xxforms:forward-submission-headers="{pipeline:property('oxf.xforms.forward-submission-headers')}"
-                                        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"/>
+                            <properties xxforms:state-handling="client" xxforms:noscript="false" xxforms:forward-submission-headers="{xpl:property('oxf.xforms.forward-submission-headers')}"
+                                        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
                             <last-id id="1000"/>
                         </static-state>
                     </xsl:document>
@@ -130,10 +131,10 @@
                         <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:sequence>1</xxforms:sequence>
                         <xxforms:static-state>
-                            <xsl:value-of select="context:encodeXML($annotated-static-state)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
+                            <xsl:value-of select="xpl:encodeXML($annotated-static-state)" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
                         </xxforms:static-state>
                         <xxforms:dynamic-state>
-                            <xsl:value-of select="context:encodeXML($dynamic-state)" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"/>
+                            <xsl:value-of select="xpl:encodeXML($dynamic-state)" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
                         </xxforms:dynamic-state>
                         <xxforms:action>
                             <xxforms:event name="DOMActivate" source-control-id="fr-trigger"/>
@@ -155,10 +156,10 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#encoded-response"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+            <xsl:stylesheet version="2.0" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="/">
-                    <xsl:variable name="dynamic-state" select="context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))" as="document-node()"/>
+                    <xsl:variable name="dynamic-state" select="xpl:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))" as="document-node()"/>
 
                     <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
                     <!-- Remove it here so as to not grow the session each time a submission is called. -->

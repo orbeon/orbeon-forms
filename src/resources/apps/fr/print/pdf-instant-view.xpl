@@ -20,8 +20,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <!-- PDF document in binary form -->
     <p:param type="output" name="data"/>

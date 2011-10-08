@@ -24,8 +24,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-        xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 

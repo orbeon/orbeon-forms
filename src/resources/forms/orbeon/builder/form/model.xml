@@ -24,7 +24,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
-      xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
+      xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
 
       xxforms:external-events="show-fb-test-dialog"
       xxforms:noscript-support="false"
@@ -36,7 +36,7 @@
     <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
     <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
 
-    <xxforms:variable name="is-pe" select="context:isPE()" as="xs:boolean"/>
+    <xxforms:variable name="is-pe" select="xpl:isPE()" as="xs:boolean"/>
 
     <!-- Other variables -->
     <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>

@@ -19,7 +19,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+    xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xsl:template match="/">
         <xhtml:div class="orbeon-portlet-div">
@@ -34,7 +34,7 @@
             </xsl:for-each>
             <!-- Try to get a title and set it on the portlet -->
             <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
-                <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
+                <xsl:value-of select="xpl:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
             </xsl:if>
             <!-- Handle head scripts if present -->
             <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>

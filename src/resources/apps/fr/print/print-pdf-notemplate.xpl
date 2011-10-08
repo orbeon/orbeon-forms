@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -77,9 +76,16 @@
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
+    <!-- Rewriting -->
+    <p:processor name="oxf:xhtml-rewrite">
+        <p:input name="rewrite-in" href="#xhtml-data"/>
+        <p:output name="rewrite-out" id="rewritten-data"/>
+    </p:processor>
+
     <!-- Serialize HTML to PDF -->
     <p:processor name="oxf:xhtml-to-pdf">
-        <p:input name="data" href="#xhtml-data"/>
+        <!--<p:input name="data" href="#xhtml-data" debug="xxx"/>-->
+        <p:input name="data" href="#rewritten-data" debug="xxx"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

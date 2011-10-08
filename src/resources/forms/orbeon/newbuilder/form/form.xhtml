@@ -215,7 +215,7 @@
                             </fr:link-select1>
 
                             <!-- Add/remove language -->
-                            <xf:group class="fb-language-triggers" ref=".[context:isPE()]" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                            <xf:group class="fb-language-triggers" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                                 <xf:trigger appearance="minimal">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/add.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/>

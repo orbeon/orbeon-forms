@@ -18,8 +18,7 @@
           xmlns:xhtml="http://www.w3.org/1999/xhtml"
           xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:saxon="http://saxon.sf.net/"
-          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+          xmlns:saxon="http://saxon.sf.net/">
 
     <!-- fr-form-instance -->
     <p:param type="input" name="instance"/>

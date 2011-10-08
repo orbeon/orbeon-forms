@@ -130,9 +130,9 @@
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-info"/>
                 <p:input name="config">
-                    <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                    <xsl:stylesheet version="2.0" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                         <xsl:template match="/">
-                            <xsl:copy-of select="context:decodeXML(normalize-space(/*/parameters/parameter[name = '$instance']/value))"/>
+                            <xsl:copy-of select="xpl:decodeXML(normalize-space(/*/parameters/parameter[name = '$instance']/value))"/>
                         </xsl:template>
                     </xsl:stylesheet>
                 </p:input>

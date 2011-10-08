@@ -23,8 +23,7 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 

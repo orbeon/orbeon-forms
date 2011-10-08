@@ -24,7 +24,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:saxon="http://saxon.sf.net/"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
         xmlns:map="java:java.util.Map"
         xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
@@ -93,7 +93,7 @@
             <!-- Barcode -->
             <!-- NOTE: Code 39 only take uppercase letters, hence we upper-case(…) -->
             <xsl:variable name="barcode-value" select="upper-case($parameters/document)" as="xs:string?"/>
-            <xsl:if test="normalize-space($barcode-value) != '' and pipeline:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
+            <xsl:if test="normalize-space($barcode-value) != '' and xpl:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
                 <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
                     <barcode left="50" top="780" height="15" value="'{$barcode-value}'"/>
                 </group>
@@ -136,7 +136,7 @@
                         <xsl:choose>
                             <xsl:when test="$classes = $attachment-classes">
                                 <!-- Handle URL rewriting for image attachments -->
-                                <image acro-field-name="'{$effective-id}'" href="{pipeline:rewriteResourceURI($value, true())}"/>
+                                <image acro-field-name="'{$effective-id}'" href="{xpl:rewriteResourceURI($value, true())}"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <field acro-field-name="'{$effective-id}'" value="'{replace($value, '''', '''''')}'"/>

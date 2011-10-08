@@ -28,8 +28,8 @@
     </head>
     <body>
         <div class="examples">
-            <xsl:variable xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
-                          name="is-portlet" select="context:isPortlet()"/>
+            <xsl:variable xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+                          name="is-portlet" select="xpl:isPortlet()"/>
             <xsl:for-each select="/*/example[not($is-portlet and @portlet-exclude = 'true')]">
                 <div class="example{if (position() = last()) then ' last' else ''}">
                     <xsl:if test="@title">

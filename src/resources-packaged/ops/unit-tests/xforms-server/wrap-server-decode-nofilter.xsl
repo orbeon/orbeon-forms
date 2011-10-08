@@ -15,12 +15,12 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                 xmlns:saxon="http://saxon.sf.net/"
-                xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
         <xsl:copy>
-            <xsl:apply-templates select="context:decodeXML(normalize-space(.))"/>
+            <xsl:apply-templates select="xpl:decodeXML(normalize-space(.))"/>
         </xsl:copy>
     </xsl:template>
     <xsl:template match="instances/instance">

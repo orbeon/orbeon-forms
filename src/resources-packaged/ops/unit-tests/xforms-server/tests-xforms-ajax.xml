@@ -458,7 +458,7 @@
 
                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="config">
-                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                             <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
                             <xxforms:sequence>1</xxforms:sequence>
                             <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
@@ -477,7 +477,7 @@
                                             </xxforms:server-events>
                                         </xsl:document>
                                     </xsl:variable>
-                                    <xsl:value-of select="context:encodeXML($server-events)"/>
+                                    <xsl:value-of select="xpl:encodeXML($server-events)"/>
                                 </xxforms:event>
                                 <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">4</xxforms:event>
                                 <xxforms:event name="DOMActivate" source-control-id="trigger3"/>
@@ -491,7 +491,7 @@
                                             </xxforms:server-events>
                                         </xsl:document>
                                     </xsl:variable>
-                                    <xsl:value-of select="context:encodeXML($server-events)"/>
+                                    <xsl:value-of select="xpl:encodeXML($server-events)"/>
                                 </xxforms:event>
                                 <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">7</xxforms:event>
                                 <xxforms:event name="DOMActivate" source-control-id="trigger5"/>

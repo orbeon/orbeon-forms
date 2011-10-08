@@ -15,12 +15,12 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <!-- Automatic inspector inclusion if configured so -->
     <xsl:variable name="has-inspector" as="xs:boolean" select="exists(//fr:xforms-inspector | //widget:xforms-instance-inspector)"/>
 
-    <xsl:template match="xhtml:body[pipeline:property('oxf.epilogue.xforms.inspector') and not($has-inspector)]">
+    <xsl:template match="xhtml:body[xpl:property('oxf.epilogue.xforms.inspector') and not($has-inspector)]">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
             <fr:xforms-inspector id="orbeon-xforms-inspector"/>

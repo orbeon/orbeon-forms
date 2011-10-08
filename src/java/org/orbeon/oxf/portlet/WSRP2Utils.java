@@ -123,7 +123,9 @@ public class WSRP2Utils {
                     if (acceptAmp && name.startsWith("amp;"))
                         name = name.substring("amp;".length());
 
-                    StringConversions.addValueToStringArrayMap(result, name, value);
+                    // NOTE: Replace spaces with '+'. This is an artifact of the fact that URLEncoder/URLDecoder
+                    // are not fully reversible.	
+                    StringConversions.addValueToStringArrayMap(result, name, value.replace(' ', '+'));
                 } catch (UnsupportedEncodingException e) {
                     // Should not happen as we are using a required encoding
                     throw new OXFException(e);

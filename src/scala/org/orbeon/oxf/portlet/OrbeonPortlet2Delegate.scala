@@ -133,7 +133,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
                 rewriter.rewriteResourceURL(path, Response.REWRITE_MODE_ABSOLUTE_PATH) // NOTE: mode is ignored
 
             val resources = LinkedHashSet(XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)): _*)
-            ResourcesAggregator.aggregate(resources, false, path ⇒ WSRP2Utils.write(response, rewrite(path), shortIdNamespace(response), false))
+            ResourcesAggregator.aggregate(resources, false, path ⇒ WSRP2Utils.write(response, rewrite(path), shortIdNamespace(response, getPortletContext), false))
 
             writer.write(""""></script>""")
 
@@ -288,10 +288,10 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
                 // Text/JSON/XML content type: rewrite response content
                 data match {
                     case Left(string) ⇒
-                        WSRP2Utils.write(response, string, shortIdNamespace(response), XMLUtils.isXMLMediatype(contentType))
+                        WSRP2Utils.write(response, string, shortIdNamespace(response, getPortletContext), XMLUtils.isXMLMediatype(contentType))
                     case Right(bytes) ⇒
                         val encoding = Option(NetUtils.getContentTypeCharset(contentType)) getOrElse CachedSerializer.DEFAULT_ENCODING
-                        WSRP2Utils.write(response, new String(bytes, 0, bytes.length, encoding), shortIdNamespace(response), XMLUtils.isXMLMediatype(contentType))
+                        WSRP2Utils.write(response, new String(bytes, 0, bytes.length, encoding), shortIdNamespace(response, getPortletContext), XMLUtils.isXMLMediatype(contentType))
                 }
             case _ ⇒
                 // All other types: just output
@@ -352,11 +352,10 @@ object OrbeonPortlet2Delegate {
     // and since the XForms engine produces lots of ids, the DOM size increases a lot. All we want really are unique ids
     // in the DOM, so we make up our own short prefixes, hope they don't conflict within anything, and we map the portal
     // namespaces to our short ids.
-    def shortIdNamespace(response: MimeResponse) = {
+    def shortIdNamespace(response: MimeResponse, portletContext: PortletContext) =
         // PLT.10.1: "There is one instance of the PortletContext interface associated with each portlet application
         // deployed into a portlet container." In order for multiple Orbeon portlets to not walk on each other, we
         // synchronize.
-        val portletContext = currentPortlet.value.get.getPortletContext
         portletContext.synchronized {
 
             val IdNamespacesSessionKey = "org.orbeon.oxf.id-namespaces"
@@ -376,5 +375,4 @@ object OrbeonPortlet2Delegate {
                 newMappings.map(portletNamespace)
             }
         }
-    }
 }

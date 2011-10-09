@@ -21,7 +21,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.XPathProcessor;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
@@ -277,7 +276,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                                 // Document is read entirely in memory for XPath processing
                                 final DocumentInfo document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(), source, false);
                                 final List result = XPathCache.evaluate(document, xpath, new NamespaceMapping(getPrefixMappings()),
-                                        Collections.<String, ValueRepresentation>emptyMap(), PipelineFunctionLibrary.instance(), null, source.getSystemId(), null);
+                                        Collections.<String, ValueRepresentation>emptyMap(), org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), null, source.getSystemId(), null);
 
                                 // Each resulting object is output through the next level of processing
                                 for (final Object o : result) {

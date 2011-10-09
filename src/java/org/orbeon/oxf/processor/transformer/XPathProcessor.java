@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
-import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
@@ -84,7 +83,7 @@ public class XPathProcessor extends ProcessorImpl {
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
                     xpath = XPathCache.getXPathExpression(documentInfo.getConfiguration(), documentInfo,
-                            config.getExpression(), config.getNamespaces(), null, PipelineFunctionLibrary.instance(), baseURI, locationData);
+                            config.getExpression(), config.getNamespaces(), null, org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), baseURI, locationData);
                     List results = xpath.evaluate();
                     xmlReceiver.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because

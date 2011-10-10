@@ -31,15 +31,15 @@ object ScalaUtils {
 
     // Copy a stream, with optional progress callback
     // This fails at runtime due to: https://lampsvn.epfl.ch/trac/scala/ticket/2672
-    def genericCopyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: Long => Unit = _ => ()) = {
+    def genericCopyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)
         require(out ne null)
 
-        useAndClose(in) { in =>
-            useAndClose(out) { out =>
+        useAndClose(in) { in ⇒
+            useAndClose(out) { out ⇒
                 val buffer = new Array[T](COPY_BUFFER_SIZE)
-                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
+                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read ⇒
                     progress(read)
                     out.write(buffer, 0, read)
                 }
@@ -47,15 +47,15 @@ object ScalaUtils {
         }
     }
 
-    def copyStream(in: Readable[Byte], out: Writable[Byte], progress: Long => Unit = _ => ()) = {
+    def copyStream(in: Readable[Byte], out: Writable[Byte], progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)
         require(out ne null)
 
-        useAndClose(in) { in =>
-            useAndClose(out) { out =>
+        useAndClose(in) { in ⇒
+            useAndClose(out) { out ⇒
                 val buffer = new Array[Byte](COPY_BUFFER_SIZE)
-                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
+                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read ⇒
                     progress(read)
                     out.write(buffer, 0, read)
                 }
@@ -63,15 +63,15 @@ object ScalaUtils {
         }
     }
 
-    def copyReader(in: Readable[Char], out: Writable[Char], progress: Long => Unit = _ => ()) = {
+    def copyReader(in: Readable[Char], out: Writable[Char], progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)
         require(out ne null)
 
-        useAndClose(in) { in =>
-            useAndClose(out) { out =>
+        useAndClose(in) { in ⇒
+            useAndClose(out) { out ⇒
                 val buffer = new Array[Char](COPY_BUFFER_SIZE)
-                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
+                Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read ⇒
                     progress(read)
                     out.write(buffer, 0, read)
                 }
@@ -80,26 +80,24 @@ object ScalaUtils {
     }
 
     // Use a closable item and make sure an attempt to close it is done after use
-    def useAndClose[T <: {def close()}](closable: T)(block: T => Unit) =
-        try {
-            block(closable)
-        } finally {
+    def useAndClose[T <: {def close()}](closable: T)(block: T ⇒ Unit) =
+        try block(closable)
+        finally {
             if (closable ne null)
                 runQuietly(closable.close())
         }
 
     // Run a block and swallow any exception. Use only for things like close().
-    def runQuietly(block: => Unit) =
-        try {
-            block
-        } catch {
-            case _ => // NOP
+    def runQuietly(block: ⇒ Unit) =
+        try block
+        catch {
+            case _ ⇒ // NOP
         }
 
     def digest(algorithm: String, data: Traversable[String]) = {
         // Create and update digest
         val messageDigest = MessageDigest.getInstance(algorithm)
-        data foreach (s => messageDigest.update(s.getBytes("utf-8")))
+        data foreach (s ⇒ messageDigest.update(s.getBytes("utf-8")))
 
         // Format result
         SecureUtils.byteArrayToHex(messageDigest.digest())
@@ -109,5 +107,10 @@ object ScalaUtils {
     def dropStartingSlash(s: String) = if (s.isEmpty || s.head != '/') s else s.tail
     def capitalizeHeader(s: String) = s split '-' map (_.capitalize) mkString "-"
 
-    def NIY = throw new RuntimeException("NIY")
+    // Shortcut for "not implemented yet" (something like this is planned for Scala post-2.9.1)
+    def ??? = throw new RuntimeException("NIY")
+
+    // Semi-standard pipe operator
+    class PipeOps[A](a: A) { def |>[B](f: A ⇒ B) = f(a) }
+    implicit def anyToPipeOps[A](a: A) = new PipeOps(a)
 }

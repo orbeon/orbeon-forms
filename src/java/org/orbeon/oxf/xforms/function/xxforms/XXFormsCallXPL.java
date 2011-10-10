@@ -26,7 +26,6 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -150,52 +149,37 @@ public class XXFormsCallXPL extends XFormsFunction {
             }
 
             // Try to obtain an existing PipelineContext, otherwise create a new one
-            PipelineContext pipelineContext = PipelineContext.get();
-            final boolean newPipelineContext = pipelineContext == null;
-            if (newPipelineContext) {
-                XFormsContainingDocument.logWarningStatic("xxforms:call-xpl()", "Cannot find pipeline context from static context. Creating new pipeline context.");
-                pipelineContext = new PipelineContext();
-            }
+            final PipelineContext pipelineContext = PipelineContext.get();
+            processor.reset(pipelineContext);
 
-            boolean success = false;
-            try {
-                processor.reset(pipelineContext);
-
-                if (outputNames.size() == 0) {
-                    // Just run the processor
-                    processor.start(pipelineContext);
-                    success = true;
-                    return EmptyIterator.getInstance();
-                } else {
-                    // Create all outputs to read
-                    List<ProcessorOutput> outputs = new ArrayList<ProcessorOutput>(outputNames.size());
-                    for (String outputName: outputNames) {
-                        ProcessorOutput output = processor.createOutput(outputName);
-                        outputs.add(output);
-                    }
-
-                    // Connect all DOM serializers
-                    List<DOMSerializer> domSerializers = new ArrayList<DOMSerializer>(outputNames.size());
-                    for (ProcessorOutput output: outputs) {
-                        DOMSerializer domSerializer = new DOMSerializer();
-                        PipelineUtils.connect(processor, output.getName(), domSerializer, "data");
-                        domSerializers.add(domSerializer);
-                    }
-
-                    // Read all outputs in sequence
-                    List<DocumentWrapper> results = new ArrayList<DocumentWrapper>(outputNames.size());
-                    for (DOMSerializer domSerializer: domSerializers) {
-                        domSerializer.start(pipelineContext);
-                        results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null,
-                                xpathContext.getConfiguration()));
-                    }
-
-                    success = true;
-                    return new ListIterator(results);
+            if (outputNames.size() == 0) {
+                // Just run the processor
+                processor.start(pipelineContext);
+                return EmptyIterator.getInstance();
+            } else {
+                // Create all outputs to read
+                List<ProcessorOutput> outputs = new ArrayList<ProcessorOutput>(outputNames.size());
+                for (String outputName: outputNames) {
+                    ProcessorOutput output = processor.createOutput(outputName);
+                    outputs.add(output);
                 }
-            } finally {
-                if (newPipelineContext)
-                    pipelineContext.destroy(success);
+
+                // Connect all DOM serializers
+                List<DOMSerializer> domSerializers = new ArrayList<DOMSerializer>(outputNames.size());
+                for (ProcessorOutput output: outputs) {
+                    DOMSerializer domSerializer = new DOMSerializer();
+                    PipelineUtils.connect(processor, output.getName(), domSerializer, "data");
+                    domSerializers.add(domSerializer);
+                }
+
+                // Read all outputs in sequence
+                List<DocumentWrapper> results = new ArrayList<DocumentWrapper>(outputNames.size());
+                for (DOMSerializer domSerializer: domSerializers) {
+                    domSerializer.start(pipelineContext);
+                    results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null,
+                            xpathContext.getConfiguration()));
+                }
+                return new ListIterator(results);
             }
         } catch (XPathException e) {
             throw e;

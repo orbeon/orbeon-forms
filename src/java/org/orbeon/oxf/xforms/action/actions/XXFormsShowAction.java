@@ -40,11 +40,11 @@ public class XXFormsShowAction extends XFormsAction {
 
         // Resolve all attributes as AVTs
         final String dialogStaticOrEffectiveId = actionInterpreter.resolveAVT(actionElement, "dialog");
-        final String effectiveNeighborId;
+        final String neighborEffectiveId;
         {
-            final String neighborStaticId = actionInterpreter.resolveAVT(actionElement, "neighbor");
-            final XFormsControl effectiveNeighbor = (XFormsControl) ((neighborStaticId != null) ? actionInterpreter.resolveEffectiveControl(actionElement, neighborStaticId) : null);
-            effectiveNeighborId = (effectiveNeighbor != null) ? effectiveNeighbor.getEffectiveId() : null;
+            final String neighborStaticOrEffectiveId = actionInterpreter.resolveAVT(actionElement, "neighbor");
+            final XFormsControl neighbor = (XFormsControl) ((neighborStaticOrEffectiveId != null) ? actionInterpreter.resolveOrFindByEffectiveId(actionElement, neighborStaticOrEffectiveId) : null);
+            neighborEffectiveId = (neighbor != null) ? neighbor.getEffectiveId() : null;
         }
         final boolean constrainToViewport;
         {
@@ -61,7 +61,7 @@ public class XXFormsShowAction extends XFormsAction {
                 // Remove focus if any
                 containingDocument.setClientFocusEffectiveControlId(null);
 
-                final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, targetDialog, effectiveNeighborId, constrainToViewport);
+                final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, targetDialog, neighborEffectiveId, constrainToViewport);
                 addContextAttributes(actionInterpreter, actionElement, newEvent);
                 targetDialog.getXBLContainer(containingDocument).dispatchEvent(newEvent);
 

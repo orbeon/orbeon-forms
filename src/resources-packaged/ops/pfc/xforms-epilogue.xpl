@@ -68,45 +68,9 @@
                 </p:otherwise>
             </p:choose>
 
-            <!-- Apply XForms widgets if needed -->
-            <p:choose href="aggregate('null')"><!-- dummy test input -->
-                <p:when test="p:property('oxf.epilogue.xforms.widgets') = true()">
-
-                    <!-- Get widgets URI from property -->
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="aggregate('config', aggregate('null')#xpointer(p:property('oxf.epilogue.xforms.widgets.uri')))"/>
-                        <p:output name="data" id="widgets-config"/>
-                    </p:processor>
-
-                    <p:processor name="oxf:url-generator">
-                        <p:input name="config" href="#widgets-config"/>
-                        <p:output name="data" id="aggregate"/>
-                    </p:processor>
-
-                    <!-- Apply widgets -->
-                    <p:processor name="oxf:unsafe-xslt">
-                        <!--<p:input name="data" href="#data2"/>-->
-                        <p:input name="data" href="#preprocessed-view"/>
-                        <p:input name="config" href="#aggregate"/>
-                        <p:output name="data" id="widgeted-view"/>
-                        <!-- This is here just so that we can reload the form when the properties or the resources change -->
-                        <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <!-- No widgets -->
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="#preprocessed-view"/>
-                        <p:output name="data" id="widgeted-view"/>
-                        <!-- This is here just so that we can reload the form when the properties or the resources change -->
-                        <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
-
             <!-- Native XForms Initialization -->
             <p:processor name="oxf:xforms-to-xhtml">
-                <p:input name="annotated-document" href="#widgeted-view"/>
+                <p:input name="annotated-document" href="#preprocessed-view"/>
                 <!--<p:input name="annotated-document" href="#widgeted-view" schema-href="oxf:/ops/xforms/schema/orbeon.rng"/>-->
                 <p:input name="data" href="#model-data"/>
                 <p:input name="instance" href="#instance"/>

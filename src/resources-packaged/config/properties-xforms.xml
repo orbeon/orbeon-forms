@@ -162,9 +162,6 @@
 
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                            value="false"/>
-    <property as="xs:anyURI"  name="oxf.epilogue.xforms.widgets.uri"                        value="oxf:/config/xforms-widgets.xsl"/>
-    <property as="xs:boolean" name="oxf.epilogue.xforms.widgets.auto-include-fr-widgets"    value="true"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service"                value="https://www.google.com/tbproxy/spell?lang=en&amp;hl=en"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.datatable.init-in-viewport"           value="false"/>

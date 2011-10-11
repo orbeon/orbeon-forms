@@ -16,11 +16,18 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
@@ -384,6 +391,28 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             if ("head".equals(localname)) {
                 // Exiting head
                 inHead = false;
+            } else if ("body".equals(localname)) {
+                // Exiting body
+
+                // Add fr:xforms-inspector if requested by property AND if not already present
+                final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
+                final String frURI = "http://orbeon.org/oxf/xml/form-runner";
+                final String inspectorLocal = "xforms-inspector";
+                if (propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isXBLBinding(frURI, inspectorLocal)) {
+
+                    // This registers the binding
+                    metadata.isXBLBindingCheckAutomaticBindings(frURI, inspectorLocal);
+
+                    final String inspectorPrefix = "fr";
+                    final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
+                    
+                    startPrefixMapping(true, inspectorPrefix, frURI);
+                    reusableAttributes.clear();
+                    final Attributes newAttributes = getAttributesGatherNamespaces(inspectorQName, reusableAttributes, reusableStringArray, -1);
+                    startElement(true, frURI, inspectorLocal, inspectorQName, newAttributes);
+                    endElement(true, frURI, inspectorLocal, inspectorQName);
+                    endPrefixMapping(true, inspectorPrefix);
+                }
             }
         } else if (level == 2) {
             if ("title".equals(localname)) {
@@ -477,7 +506,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         return documentLocator;
     }
 
-    private Attributes getAttributesGatherNamespaces(String qName, Attributes attributes, String[] newIdAttribute, final int idIndex) {
+    private Attributes getAttributesGatherNamespaces(String qNameForDebug, Attributes attributes, String[] newIdAttribute, final int idIndex) {
         if (isGenerateIds) {
             // Process ids
             if (idIndex == -1) {
@@ -495,7 +524,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             // TODO: create Element to provide more location info?
             if (metadata.idGenerator().isDuplicate(newIdAttribute[0]))
                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttribute[0],
-                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));
+                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qNameForDebug, attributes), "id", newIdAttribute[0]));
 
             // TODO: Make sure we can test on the presence of "$" without breaking ids produced by XBLBindings
 //            else if (newIdAttribute[0].contains("$"))

@@ -32,7 +32,8 @@ import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
 import java.util.{List => JList, Map => JMap}
 import collection.mutable.{ArrayBuffer, LinkedHashSet, LinkedHashMap}
-import net.sf.ehcache.{Element => EhElement }
+import net.sf.ehcache.{Element => EhElement}
+
 class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata, inlineXBLDocuments: JList[Document])
     extends XBLBindingsBase(partAnalysis, metadata) {
 

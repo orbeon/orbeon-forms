@@ -235,7 +235,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <!-- Test button -->
-            <fr:button ref="$instance/save-test-trigger[false()]">
+            <xforms:trigger ref="$instance/save-test-trigger[false()]">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/dialog-actions/test/label"/></xhtml:span>
@@ -245,9 +245,9 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- TODO-->
                 </xforms:action>
-            </fr:button>
+            </xforms:trigger>
             <!-- Save button -->
-            <fr:button ref="$instance/save-test-trigger">
+            <xforms:trigger ref="$instance/save-test-trigger">
 
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
@@ -266,15 +266,15 @@
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-action-dialog"/>
                 </xforms:action>
-            </fr:button>
-            <fr:button>
+            </xforms:trigger>
+            <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-action-dialog"/>
-            </fr:button>
+            </xforms:trigger>
         </xforms:group>
     </xhtml:div>
 
@@ -328,7 +328,7 @@
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
             <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>
-            
+
             <xforms:bind nodeset="xforms:action">
                 <!-- Action id -->
                 <xforms:bind nodeset="@id" calculate="concat(../../name, '-binding')"/>

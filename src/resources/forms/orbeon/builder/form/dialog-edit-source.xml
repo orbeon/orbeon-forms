@@ -35,7 +35,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span>
-            <fr:button class="fr-inplace-rename" ref="save-trigger">
+            <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <xforms:action ev:event="DOMActivate">
                     <!-- Parse the XML and insert it -->
@@ -43,7 +43,7 @@
                     <!-- Saxon serialization adds an extra meta element -->
                     <xforms:delete nodeset="xxforms:instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
                 </xforms:action>
-            </fr:button>
+            </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                 <xforms:label ref="$form-resources/cancel/label"/>

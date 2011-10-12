@@ -72,15 +72,15 @@
                 </fr:body>
             </fr:repeat>
         </xforms:group>
-        
+
         <xhtml:div class="fr-dialog-buttons">
-            <fr:button class="fr-inplace-rename">
+            <xforms:trigger class="fr-inplace-rename">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-itemset-editor-dialog">
                     <xxforms:context name="fb:save" select="true()"/>
                 </xforms:dispatch>
-            </fr:button>
+            </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                 <xforms:label ref="$form-resources/cancel/label"/>

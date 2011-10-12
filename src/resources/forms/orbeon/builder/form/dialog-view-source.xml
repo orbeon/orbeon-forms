@@ -32,14 +32,14 @@
         <xforms:output mediatype="text/html" value="$variables/xml-view"/>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
-        <fr:button>
+        <xforms:trigger>
             <xforms:label>
                 <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                 <xforms:output value="$form-resources/close/label"/>
             </xforms:label>
             <!-- Hide dialog -->
             <xxforms:hide ev:event="DOMActivate" dialog="fb-xml-dialog"/>
-        </fr:button>
+        </xforms:trigger>
     </xhtml:div>
     <!-- Serialize XML when the dialog opens-->
     <xforms:setvalue ev:event="xxforms-dialog-open" ref="$variables/xml-view"
@@ -48,4 +48,3 @@
     <!-- Clear XML when the dialog closes-->
     <xforms:setvalue ev:event="xxforms-dialog-close" ref="$variables/xml-view"/>
 </xxforms:dialog>
-        

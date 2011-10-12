@@ -28,12 +28,12 @@
     <xforms:label ref="$form-resources/dialog-test/dialog-title"/>
 
     <xhtml:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"></xhtml:iframe>
-    <fr:button class="">
+    <xforms:trigger class="">
         <xforms:label>
             <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
             <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
         </xforms:label>
         <xxforms:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
-    </fr:button>
+    </xforms:trigger>
 
 </xxforms:dialog>

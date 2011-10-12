@@ -182,7 +182,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <!-- Test button -->
-            <fr:button ref="$instance/save-test-trigger">
+            <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/dialog-http-services/test/label"/></xhtml:span>
@@ -221,9 +221,9 @@
                         <xforms:setvalue ref="error-type" value="event('error-type')"/>
                     </xforms:action>
                 </xforms:action>
-            </fr:button>
+            </xforms:trigger>
             <!-- Save button -->
-            <fr:button ref="$instance/save-test-trigger">
+            <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/dialog-http-services/save/label"/></xhtml:span>
@@ -278,15 +278,15 @@
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-service-dialog"/>
                 </xforms:action>
-            </fr:button>
-            <fr:button>
+            </xforms:trigger>
+            <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-service-dialog"/>
-            </fr:button>
+            </xforms:trigger>
         </xforms:group>
     </xhtml:div>
 
@@ -312,7 +312,7 @@
         <xforms:action if="$submission-name">
             <xforms:setvalue ref="$instance/id" value="$submission-name"/>
             <xforms:setvalue ref="$instance/initial-id" value="$submission-name"/>
-            
+
             <xxforms:variable name="submission" select="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
             <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
             <xforms:setvalue ref="$instance/request/serialization" value="$submission/@serialization"/>
@@ -330,7 +330,7 @@
 
             <xforms:setvalue ref="$instance/request/is-soap" value="$is-soap"/>
             <xforms:setvalue if="$is-soap" ref="$instance/request/soap-action" value="normalize-space(tokenize($soap-action, '=')[2])"/>
-            
+
             <xforms:setvalue ref="$instance/request/is-auth" value="exists($submission/@xxforms:username | $submission/@xxforms:password)"/>
             <xforms:setvalue ref="$instance/request/username" value="$submission/@xxforms:username"/>
             <xforms:setvalue ref="$instance/request/password" value="$submission/@xxforms:password"/>

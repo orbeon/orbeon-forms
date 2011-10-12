@@ -23,7 +23,7 @@
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-confirmation-dialog" level="modal" close="false" draggable="true" model="fb-confirmation-model">
-    
+
     <xforms:label ref="$form-resources/dialog-confirmation/dialog-title"/>
 
     <xhtml:div>
@@ -34,20 +34,20 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
-            <fr:button>
+            <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/delete/label"/></xhtml:span>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{confirmation-target}"/>
-            </fr:button>
-            <fr:button id="fb-confirmation-dialog-cancel-trigger">
+            </xforms:trigger>
+            <xforms:trigger id="fb-confirmation-dialog-cancel-trigger">
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{confirmation-target}"/>
-            </fr:button>
+            </xforms:trigger>
         </xforms:group>
     </xhtml:div>
 

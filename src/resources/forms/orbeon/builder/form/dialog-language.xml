@@ -50,7 +50,7 @@
                 </xhtml:div>
             </xforms:group>
             <xhtml:span>
-                <fr:button class="fr-inplace-rename" ref="$variables/new-language-trigger">
+                <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
                     <xforms:label ref="$form-resources/add/label"/>
                     <xforms:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->
@@ -70,9 +70,9 @@
                         <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
                         <xforms:rebuild model="fr-form-model"/>
                         <xforms:recalculate model="fr-form-model"/>
-                        <xforms:revalidate model="fr-form-model"/> 
+                        <xforms:revalidate model="fr-form-model"/>
                     </xforms:action>
-                </fr:button>
+                </xforms:trigger>
                 <xforms:output value="$form-resources/or/label"/>
                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                     <xforms:label ref="$form-resources/cancel/label"/>

@@ -102,7 +102,7 @@
 
                         <!-- Test form -->
                         <xforms:group model="fr-error-summary-model" ref="instance('fr-error-summary-instance')/trigger" id="fb-test-button-group">
-                            <fr:button id="fb-test-button">
+                            <xforms:trigger id="fb-test-button">
                                 <xforms:label>
                                     <xhtml:img src="/apps/fr/style/images/pixelmixer/gear_16.png" alt=""/>
                                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>
@@ -127,7 +127,7 @@
                                         ORBEON.xforms.Document.dispatchEvent("fb-test-button-group", "show-fb-test-dialog");
                                     </xxforms:script>
                                 </xforms:action>
-                            </fr:button>
+                            </xforms:trigger>
                             <xforms:action ev:event="show-fb-test-dialog">
                                 <xxforms:show dialog="fb-test-dialog"/>
                                 <xforms:send submission="fb-test-form-submission"/>
@@ -136,7 +136,7 @@
 
                         <!-- Publish form -->
                         <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
-                            <fr:button id="fb-publish-button" ref=".">
+                            <xforms:trigger id="fb-publish-button" ref=".">
                                 <xforms:label>
                                     <xhtml:img src="/apps/fr/style/images/pixelmixer/globe_16.png" alt=""/>
                                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/publish"/></xhtml:span>
@@ -144,14 +144,14 @@
                                 <xforms:action ev:event="DOMActivate">
                                     <xxforms:show dialog="fb-publish-dialog"/>
                                 </xforms:action>
-                            </fr:button>
+                            </xforms:trigger>
                         </xforms:group>
 
                         <!-- "Save" from Form Runner -->
                         <fr:save-button/>
 
                         <!-- Save as -->
-                        <fr:button id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
+                        <xforms:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
                             <xforms:label>
                                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>
                                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-as-document"/></xhtml:span>
@@ -164,7 +164,7 @@
                                 <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'save-as'"/>
                                 <xxforms:show dialog="fb-editor-metadata-dialog"/>
                             </xforms:action>
-                        </fr:button>
+                        </xforms:trigger>
 
                     </xhtml:div>
 
@@ -401,7 +401,7 @@
                                                 <xforms:label ref="$section-resource/label"/>
                                                 <xforms:alert ref="$form-resources/section-name/alert"/>
                                                 <xforms:hint ref="$form-resources/section-name/hint"/>
-                                                <fr:buttons>
+                                                <xforms:triggers>
                                                     <xforms:trigger appearance="minimal">
                                                         <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/delete-section-icon/label}" title="{$form-resources/delete-section-icon/label}"/></xforms:label>
                                                         <!-- Show confirmation dialog -->
@@ -452,7 +452,7 @@
                                                             </xxforms:show>
                                                         </xforms:action>
                                                     </xforms:trigger>
-                                                </fr:buttons>
+                                                </xforms:triggers>
 
                                                 <!-- Section content -->
 

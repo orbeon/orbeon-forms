@@ -68,13 +68,13 @@
         </xhtml:div>
 
         <xhtml:div class="fr-dialog-buttons">
-            <fr:button ref="save-trigger">
+            <xforms:trigger ref="save-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <!-- Close and save upon DOMActivate -->
                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-section-details-dialog">
                     <xxforms:context name="fb:save" select="true()"/>
                 </xforms:dispatch>
-            </fr:button>
+            </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal">
                 <xforms:label ref="$form-resources/cancel/label"/>

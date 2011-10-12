@@ -16,8 +16,6 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xml.TransformerUtils
-
 /**
  * Form Builder functions.
  *
@@ -93,7 +91,7 @@ object FormBuilderFunctions {
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) {
-        println(message)
-        println(TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot))
+//        println(message)
+//        println(TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot))
     }
 }

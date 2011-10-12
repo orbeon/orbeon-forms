@@ -3737,8 +3737,8 @@ ORBEON.xforms.Events = {
      */
     dialogMinimalBodyClick: function(event, yuiDialog) {
         // If this dialog is visible
-        if (yuiDialog.element.style.display == "block") {
-            // Abord if one of the parents is drop-down dialog
+        if (yuiDialog.element.style.visibility != "hidden") {
+            // Abort if one of the parents is drop-down dialog
             var current = YAHOO.util.Event.getTarget(event);
             var foundDropDownParent = false;
             while (current != null && current != document) {
@@ -4670,7 +4670,7 @@ ORBEON.xforms.Init = {
             // Create minimal dialog
             yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
                 modal: isModal,
-                close: false,
+                close: hasClose,
                 visible: false,
                 draggable: false,
                 fixedcenter: false,
@@ -4694,10 +4694,10 @@ ORBEON.xforms.Init = {
                 usearia: ORBEON.util.Properties.useARIA.get(),
                 role: "" // See bug 315634 http://goo.gl/54vzd
             });
-			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);
-            // Register listener for when the dialog is closed by a click on the "x"
-            yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         }
+        yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);
+        // Register listener for when the dialog is closed by a click on the "x"
+        yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
 
         // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
         var dialogDiv = YAHOO.util.Dom.getElementsByClassName("xforms-dialog", "div", yuiDialog.element)[0];

@@ -384,7 +384,7 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 .xforms-trigger.xforms-readonly button,
 .xforms-trigger.xforms-readonly button:hover {
     background: #DDD url(../../ops/yui/assets/skins/sam/sprite.png) repeat-x 0 0;
-    background-position: 0 -1500px;
+    background-position: 0 -1501px;         /* Lighter grey when readonly */
     border-color: #CCC;
     cursor: default;
     color: #AAA!important;

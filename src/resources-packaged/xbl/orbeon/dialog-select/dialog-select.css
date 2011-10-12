@@ -20,10 +20,38 @@
     width: auto;
 }
 
-.fr-dialog-select-dialog td { vertical-align: top; padding: .5em }
-.fr-dialog-select-dialog select { height: 10em; width: 15em }
-.fr-dialog-select-dialog table .xbl-fr-button { display: block; margin: .5em }
-.fr-dialog-select-dialog .xforms-label { display: block; font-weight: bold }
-.fr-dialog-select-dialog .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
-.fr-dialog-select-dialog .xbl-fr-button .fr-add-button button { background: url(../../../apps/fr/style/images/pixelmixer/right_16.png) no-repeat 5px 3px; width: 25px; text-indent: -9999px; *text-indent: 0; *padding-left: 100px; *overflow: hidden }
-.fr-dialog-select-dialog .xbl-fr-button .fr-remove-button button { background: url(../../../apps/fr/style/images/pixelmixer/left_16.png) no-repeat 5px 3px; width: 25px; text-indent: -9999px; *text-indent: 0; *padding-left: 100px; *overflow: hidden }
+.fr-dialog-select-double-list-dialog td { vertical-align: top; padding: .5em }
+.fr-dialog-select-double-list-dialog select { height: 10em; width: 15em }
+.fr-dialog-select-double-list-dialog table .xbl-fr-button { display: block; margin: .5em }
+.fr-dialog-select-double-list-dialog .xforms-label { display: block; font-weight: bold }
+.fr-dialog-select-double-list-dialog .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
+
+.fr-dialog-select-double-list-dialog td {
+    vertical-align: middle;
+}
+
+.fr-dialog-select-double-list-dialog .fr-add-button,
+.fr-dialog-select-double-list-dialog .fr-remove-button {
+    display: block; /* So button show one below the other, rather than next to each other */
+    margin: 1em 0;  /* Add spacing between buttons */
+}
+
+.fr-dialog-select-double-list-dialog .fr-add-button button span     { background: url(../../../apps/fr/style/images/pixelmixer/right_16.png) no-repeat 5px 3px  }
+.fr-dialog-select-double-list-dialog .fr-remove-button button  span { background: url(../../../apps/fr/style/images/pixelmixer/left_16.png)  no-repeat 5px 3px; }
+
+.fr-dialog-select-double-list-dialog .fr-add-button button span,
+.fr-dialog-select-double-list-dialog .fr-remove-button button span {
+    width: 25px; height: 20px;  /* Size button to correspond to icon size */
+    text-indent: -9999px;       /* Move the text so it isn't visible */
+    display: block;             /* Without which text-indent has no effect; inline-block would be OK too, but isn't supported by IE7 */
+}
+
+.fr-dialog-select-single-list-dialog .xforms-selected,
+.fr-dialog-select-single-list-dialog .xforms-deselected {
+    display: block;             /* Checkboxes and radio button to show vertically */
+}
+
+.fr-dialog-select-single-list-dialog .xforms-select {
+    margin-top: 1em;            /* Leave space for the close icon */
+    display: block;
+}

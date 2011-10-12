@@ -61,7 +61,7 @@
     <xhtml:body>
 
         <xhtml:h2>No separator (generates a list)</xhtml:h2>
-        <fr:dialog-select ref="value1" id="dialog-select-1">
+        <fr:dialog-select ref="value1" id="dialog-select-1" appearance="double-list">
             <xforms:label>Selection 1:</xforms:label>
             <xforms:itemset nodeset="instance('items')/item">
                 <xforms:label ref="@label"/>
@@ -71,7 +71,7 @@
 
         <xhtml:div class="with-comma">
             <xhtml:h2>Separator set to comma</xhtml:h2>
-            <fr:dialog-select ref="value2" id="dialog-select-2" separator=", " close="false">
+            <fr:dialog-select ref="value2" id="dialog-select-2" separator=", " appearance="single-list">
                 <xforms:label>Selection 2:</xforms:label>
                 <xforms:itemset nodeset="instance('items')/item">
                     <xforms:label ref="@label"/>

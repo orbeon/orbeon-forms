@@ -65,12 +65,11 @@
         </xbl:implementation>
 
         <xxbl:global>
-            <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
-                 clearly two choices: confirm the selection or cancel -->
-            <xxforms:dialog id="fr-dialog-select-dialog" xbl:attr="close" appearance="full" level="modal" class="fr-dialog-select-dialog" model="fr-dialog-editor-model">
-                <!--<xforms:label value="$resources/title"/>-->
-                <xforms:model id="fr-dialog-editor-model">
-                    <xforms:instance id="fr-dialog-editor-instance">
+            <xxforms:dialog id="fr-dialog-select-double-list-dialog" level="modal" class="fr-dialog-select-double-list-dialog" model="fr-dialog-editor-double-list-model">
+                <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
+                     clearly two choices: confirm the selection or cancel -->
+                <xforms:model id="fr-dialog-editor-double-list-model">
+                    <xforms:instance id="fr-dialog-editor-double-list-instance">
                         <instance>
                             <items/>
                             <available-itemset/>
@@ -99,8 +98,8 @@
                     <xforms:setvalue ref="available"/>
                     <xforms:setvalue ref="selected"/>
                     <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
-                    <xxforms:show dialog="fr-dialog-select-dialog"/>
-                    <xforms:setfocus control="fr-dialog-select-dialog"/>
+                    <xxforms:show dialog="fr-dialog-select-double-list-dialog"/>
+                    <xforms:setfocus control="fr-dialog-select-double-list-dialog"/>
                 </xforms:action>
 
                 <xxforms:variable name="resources" select="instance('resources')/resource[@xml:lang = 'en']" as="element()?"/>
@@ -123,9 +122,11 @@
                         <xhtml:td>
                             <xforms:trigger ref="add-trigger" class="fr-add-button" id="add">
                                 <xforms:label>
-                                    <xforms:output value="$resources/add"/>
+                                    <xhtml:span>
+                                        <xforms:output value="$resources/add"/>
+                                    </xhtml:span>
                                 </xforms:label>
-                                <xforms:action ev:event="DOMActivate" >
+                                <xforms:action ev:event="DOMActivate">
                                     <xxforms:variable name="selection" select="tokenize(../available, '\s+')" as="xs:string*"/>
                                     <xforms:setvalue ref="../selected-itemset"
                                                      value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
@@ -138,9 +139,11 @@
 
                             <xforms:trigger ref="remove-trigger" class="fr-remove-button" id="remove">
                                 <xforms:label>
-                                    <xforms:output value="$resources/remove"/>
+                                    <xhtml:span>
+                                        <xforms:output value="$resources/remove"/>
+                                    </xhtml:span>
                                 </xforms:label>
-                                <xforms:action ev:event="DOMActivate" >
+                                <xforms:action ev:event="DOMActivate">
                                     <xxforms:variable name="selection" select="tokenize(../selected, '\s+')" as="xs:string*"/>
                                     <xforms:setvalue ref="../available-itemset"
                                                      value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
@@ -153,7 +156,7 @@
                         </xhtml:td>
                         <xhtml:td>
                             <!-- List of selected items -->
-                            <xforms:select ref="selected" id="selected-list">
+                            <xforms:select ref="selected">
                                 <xforms:label value="$resources/selected"/>
                                 <xforms:itemset nodeset="$items[value = $selected-values]">
                                     <xforms:label ref="label"/>
@@ -177,7 +180,7 @@
                                 <xxforms:context name="fr-new-values" select="for $selected-itemset in instance()/selected-itemset
                                     return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
                             </xforms:dispatch>
-                            <xxforms:hide dialog="fr-dialog-select-dialog"/>
+                            <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
                         </xforms:action>
                     </xforms:trigger>
                     <!-- Cancel button -->
@@ -188,12 +191,42 @@
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <!-- Just close -->
-                            <xxforms:hide dialog="fr-dialog-select-dialog"/>
+                            <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
                         </xforms:action>
                     </xforms:trigger>
                 </xhtml:div>
-
             </xxforms:dialog>
+            <xxforms:dialog id="fr-dialog-select-single-list-dialog" appearance="minimal" close="true" level="modal" class="fr-dialog-select-single-list-dialog" model="fr-dialog-editor-single-list-model">
+                <xforms:label/>
+                <xforms:model id="fr-dialog-editor-single-list-model">
+                    <xforms:instance id="fr-dialog-editor-single-list-instance">
+                        <instance>
+                            <selected/>
+                            <items/>
+                            <callback-id/>
+                        </instance>
+                    </xforms:instance>
+                </xforms:model>
+                <xforms:action ev:event="fr-edit">
+                    <xforms:setvalue ref="selected" value="event('fr-binding')"/>
+                    <xforms:delete ref="items/*"/>
+                    <xforms:insert context="items" origin="event('fr-items')"/>
+                    <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
+                    <xforms:setfocus control="fr-dialog-select-dialog"/>
+                    <xxforms:show dialog="fr-dialog-select-single-list-dialog" neighbor="{event('fr-callback-id')}"/>
+                </xforms:action>
+                <xforms:action ev:event="xxforms-dialog-close">
+                    <xforms:dispatch name="fr-edit-done" target="{callback-id}">
+                        <xxforms:context name="fr-new-values" select="selected"/>
+                    </xforms:dispatch>
+                </xforms:action>
+                <xforms:select ref="instance()/selected" appearance="full">
+                    <xforms:itemset nodeset="instance()/items/item">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="value"/>
+                    </xforms:itemset>
+                </xforms:select>
+            </xxforms:dialog> 
         </xxbl:global>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -262,8 +295,9 @@
                         <!-- Select button -->
                         <xforms:trigger id="select" ref="$binding">
                             <xforms:label>…</xforms:label>
-                            <!--<xforms:label value="$resources/select"/>-->
-                            <xforms:dispatch ev:event="DOMActivate" target="fr-dialog-select-dialog" name="fr-edit" xxbl:scope="outer">
+                            <xsl:variable name="appearance" select="/fr:dialog-select/@appearance"/>
+                            <xforms:dispatch ev:event="DOMActivate" name="fr-edit" xxbl:scope="outer"
+                                            target="fr-dialog-select-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
                                 <xxforms:context name="fr-binding" select="$binding" xxbl:scope="inner"/>
                                 <xxforms:context name="fr-items" select="$items" xxbl:scope="inner"/>
                                 <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>

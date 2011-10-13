@@ -462,9 +462,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         {
             final Item.Label itemLabel = item.getLabel();
             final boolean labelNonEmpty = itemLabel != null && itemLabel.getLabel().length() != 0;// empty only for xforms|input:xxforms-type(xs:boolean)
+            final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
             if (labelNonEmpty) {
                 reusableAttributes.clear();
-                outputLabelForStart(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", false);
+                outputLabelForStart(handlerContext, reusableAttributes, itemNamespacedId, itemNamespacedId, LHHAC.LABEL, "label", false);
             }
 
             {
@@ -472,7 +473,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId));
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemNamespacedId);
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
 
                 // Get group name from selection control if possible, otherwise use effective id

@@ -294,15 +294,15 @@
                                 <xforms:output value="$joined" tabindex="-1" id="joined" class="{{if ($joined = '') then '' else 'fr-non-empty'}}"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xhtml:ul>
-                                    <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
-                                         repeat nodeset recalculations -->
-                                    <xforms:repeat nodeset="$items[value = $selected]/value/string()" id="list">
-                                        <xhtml:li>
-                                            <xforms:output value="$items[value = context()]/label" id="item"/>
-                                        </xhtml:li>
-                                    </xforms:repeat>
-                                </xhtml:ul>
+                                <!-- We generate the markup and use an output instead of using a repeat to avoid repeat template on the browser -->
+                                <xforms:output id="ul" mediatype="text/html" value="concat(
+                                    '&lt;ul>',
+                                    string-join(
+                                        for $item in $items[value = $selected] return
+                                        concat('&lt;li>', replace($item/label, '&lt;', '&amp;lt;'), '&lt;/li>')
+                                        , ''),
+                                    '&lt;/ul>'
+                                )"/>
                             </xsl:otherwise>
                         </xsl:choose>
                         <!-- Select button -->

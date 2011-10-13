@@ -66,11 +66,14 @@
 
         <xxbl:global>
             <xxforms:dialog id="fr-dialog-select-double-list-dialog" level="modal" class="fr-dialog-select-double-list-dialog" model="fr-dialog-editor-double-list-model">
+                <xforms:label ref="label"/>
+
                 <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
                      clearly two choices: confirm the selection or cancel -->
                 <xforms:model id="fr-dialog-editor-double-list-model">
                     <xforms:instance id="fr-dialog-editor-double-list-instance">
                         <instance>
+                            <label/>
                             <items/>
                             <available-itemset/>
                             <selected-itemset/>
@@ -86,9 +89,9 @@
                     <xforms:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
                                      xxforms:readonly="true" xxforms:cache="true"/>
                 </xforms:model>
-
                 <xforms:action ev:event="fr-edit">
                     <!-- When dialog open, get list of available and selected items -->
+                    <xforms:setvalue ref="label" value="event('fr-label')"/>
                     <xxforms:variable name="binding" select="tokenize(event('fr-binding'), '\s+')"/>
                     <xxforms:variable name="items" select="event('fr-items')"/>
                     <xforms:delete ref="items/*"/>
@@ -197,10 +200,11 @@
                 </xhtml:div>
             </xxforms:dialog>
             <xxforms:dialog id="fr-dialog-select-single-list-dialog" appearance="minimal" close="true" level="modal" class="fr-dialog-select-single-list-dialog" model="fr-dialog-editor-single-list-model">
-                <xforms:label/>
+                <xforms:label ref="label"/>
                 <xforms:model id="fr-dialog-editor-single-list-model">
                     <xforms:instance id="fr-dialog-editor-single-list-instance">
                         <instance>
+                            <label/>
                             <selected/>
                             <items/>
                             <callback-id/>
@@ -208,6 +212,7 @@
                     </xforms:instance>
                 </xforms:model>
                 <xforms:action ev:event="fr-edit">
+                    <xforms:setvalue ref="label" value="event('fr-label')"/>
                     <xforms:setvalue ref="selected" value="event('fr-binding')"/>
                     <xforms:delete ref="items/*"/>
                     <xforms:insert context="items" origin="event('fr-items')"/>
@@ -245,6 +250,15 @@
                     <!-- Variable pointing to external single-node binding -->
                     <xxforms:variable name="binding" id="binding-var" as="node()?">
                         <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
+
+                    <!-- Variable containing the label, so we can pass it to the dialog -->
+                    <xxforms:variable name="label">
+                        <xxforms:sequence xxbl:scope="outer">
+                            <xsl:variable name="label" select="/fr:dialog-select/xforms:label"/>
+                            <xsl:if test="$label/@ref"><xsl:attribute name="select" select="$label/@ref"/></xsl:if>
+                            <xsl:value-of select="$label"/>
+                        </xxforms:sequence> 
                     </xxforms:variable>
 
                     <!-- Internal selection control providing access to the itemset -->
@@ -296,12 +310,15 @@
                         <xforms:trigger id="select" ref="$binding">
                             <xforms:label>…</xforms:label>
                             <xsl:variable name="appearance" select="/fr:dialog-select/@appearance"/>
-                            <xforms:dispatch ev:event="DOMActivate" name="fr-edit" xxbl:scope="outer"
-                                            target="fr-dialog-select-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
-                                <xxforms:context name="fr-binding" select="$binding" xxbl:scope="inner"/>
-                                <xxforms:context name="fr-items" select="$items" xxbl:scope="inner"/>
-                                <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>
-                            </xforms:dispatch>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:dispatch name="fr-edit" xxbl:scope="outer"
+                                                target="fr-dialog-select-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
+                                    <xxforms:context name="fr-label" select="$label" xxbl:scope="inner"/>
+                                    <xxforms:context name="fr-binding" select="$binding" xxbl:scope="inner"/>
+                                    <xxforms:context name="fr-items" select="$items" xxbl:scope="inner"/>
+                                    <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>
+                                </xforms:dispatch>
+                            </xforms:action>
                             <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-new-values')"/>
                         </xforms:trigger>
                     </xforms:group>

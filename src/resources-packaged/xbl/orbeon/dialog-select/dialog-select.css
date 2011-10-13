@@ -52,6 +52,5 @@
 }
 
 .fr-dialog-select-single-list-dialog .xforms-select {
-    margin-top: 1em;            /* Leave space for the close icon */
-    display: block;
+    white-space: nowrap;        /* Prevent text from wrapping below the checkbox on IE because a scrollbar is added */
 }

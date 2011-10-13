@@ -3591,7 +3591,9 @@ ORBEON.xforms.Events = {
         var maxHeight =
             YAHOO.util.Dom.getViewportHeight()
             - (yuiDialog.element.clientHeight - yuiDialog.body.clientHeight)
-            - 40;
+            // Don't use the whole height of the viewport, leaving some space at the top of the page,
+            // which could be used by a navigation bar, as in Liferay
+            - 80;
 
         yuiDialog.body.style.maxHeight = maxHeight + "px";
     },

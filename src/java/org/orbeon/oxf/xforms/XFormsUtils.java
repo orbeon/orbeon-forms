@@ -673,7 +673,6 @@ public class XFormsUtils {
 
         if (currentTypeLocalName.equals("base64Binary")) {
             // Convert from xs:base64Binary or xforms:base64Binary to xs:anyURI or xforms:anyURI
-            // TODO: remove cast to PipelineContext
             return NetUtils.base64BinaryToAnyURI(value, NetUtils.REQUEST_SCOPE);
         } else {
             // Convert from xs:anyURI or xforms:anyURI to xs:base64Binary or xforms:base64Binary

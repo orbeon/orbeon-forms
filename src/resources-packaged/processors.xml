@@ -593,6 +593,10 @@
         </instantiation>
     </processor>
 
+    <processor name="oxf:cache">
+        <class name="org.orbeon.oxf.processor.CacheProcessor"/>
+    </processor>
+
     <!-- Temporary hack to get rid of the config input -->
     <processor name="oxf:pdf-template">
         <instantiation name="oxf:pdf-template-base">

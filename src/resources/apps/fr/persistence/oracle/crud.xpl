@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -177,7 +176,7 @@
                                 </xsl:template>
                             </xsl:stylesheet>
                         </p:input>
-                        <p:output name="data" id="converted"/>
+                        <p:output name="data" id="sql-out-converted"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>
@@ -189,25 +188,85 @@
                                 <xsl:value-of select="/sql-out/data"/>
                             </document>
                         </p:input>
-                        <p:output name="data" id="converted"/>
+                        <p:output name="data" id="sql-out-converted"/>
                     </p:processor>
                 </p:otherwise>
             </p:choose>
 
+            <!-- TODO: Remove code duplication with above -->
+            <p:processor name="oxf:unsafe-xslt">
+                <p:input name="data" href="#request-description"/>
+                <p:input name="config">
+                    <sql:config xsl:version="2.0">
+                        <last-modified>
+                            <sql:connection>
+                                <xsl:copy-of select="/request/sql:datasource"/>
+
+                                <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
+                                <xsl:variable name="table-name" as="xs:string" select="concat(
+                                    if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition',
+                                    if ($is-attachment) then '_attach' else '')"/>
+
+                                <sql:execute>
+                                    <sql:query>
+                                        select
+                                            last_modified
+                                        from <xsl:value-of select="$table-name"/> t
+                                            where app = <sql:param type="xs:string" select="/request/app"/>
+                                            and form = <sql:param type="xs:string" select="/request/form"/>
+                                            <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                            <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                            and last_modified = (
+                                                select max(last_modified) from <xsl:value-of select="$table-name"/>
+                                                where app = <sql:param type="xs:string" select="/request/app"/>
+                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                            )
+                                            <!-- This will prevent request for document that have been deleted to return a delete doc -->
+                                            and deleted = 'N'
+                                    </sql:query>
+                                    <sql:result-set>
+                                        <sql:row-iterator>
+                                            <sql:get-column-value column="last_modified" type="xs:dateTime"/>
+                                        </sql:row-iterator>
+                                    </sql:result-set>
+                                </sql:execute>
+                            </sql:connection>
+                        </last-modified>
+                    </sql:config>
+                </p:input>
+                <p:output name="data" id="sql-validity-config"/>
+            </p:processor>
+
+            <p:processor name="oxf:sql">
+                <p:input name="data" href="#request-description"/>
+                <p:input name="config" href="#sql-validity-config"/>
+                <p:output name="data" id="sql-validity-out"/>
+            </p:processor>
+
+            <!--
+                Cache processor:
+
+                - validity is retrieved from the database
+                - key is the request
+             -->
+            <p:processor name="oxf:cache">
+                <p:input name="data" href="#sql-out-converted"/>
+                <p:input name="key" href="#request"/>
+                <p:input name="validity" href="#sql-validity-out"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+
             <!-- Serialize out as is -->
             <p:processor name="oxf:http-serializer">
-                <p:input name="config" transform="oxf:unsafe-xslt" href="#sql-out">
-                    <config xsl:version="2.0">
+                <p:input name="config">
+                    <config>
                         <cache-control>
                             <use-local-cache>false</use-local-cache>
                         </cache-control>
-                        <header>
-                            <name>Last-Modified</name>
-                            <value>
-                                <!-- Format the date -->
-                                <xsl:value-of select="format-dateTime(xs:dateTime(/sql-out/last-modified), '[FNn,*-3], [D] [MNn,*-3] [Y] [H01]:[m01]:[s01] GMT', 'en', (), ()) "/>
-                            </value>
-                        </header>
+                        <!-- NOTE: No need to output Last-Modified header as oxf:cache is providing validity that is used by the serializer -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

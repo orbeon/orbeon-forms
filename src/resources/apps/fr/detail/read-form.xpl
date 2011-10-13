@@ -48,6 +48,9 @@
                 <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>
                 <!-- Produce binary so we do our own XML parsing -->
                 <mode>binary</mode>
+                <!-- Enable conditional GET -->
+                <handle-xinclude>false</handle-xinclude>
+                <cache-control><conditional-get>true</conditional-get></cache-control>
             </config>
         </p:input>
         <p:output name="data" id="binary-document"/>
@@ -56,7 +59,7 @@
     <p:choose href="#binary-document">
         <!-- HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way -->
         <p:when test="if (not(matches(p:get-request-path(), '/fr/service/custom/orbeon/(new)?builder/toolbox'))
-                          and (for $c in /*/@status-code return $c castable as xs:integer and not(xs:integer($c) ge 200 and xs:integer($c) lt 300)))
+                          and (for $c in /*/@status-code return $c castable as xs:integer and (not((xs:integer($c) ge 200 and xs:integer($c) lt 300) or xs:integer($c) = 304))))
                       then form-runner:sendError(/*/@status-code)
                       else false()">
             <!-- Null document to keep XPL happy. The error has already been sent in the XPath expression above. -->

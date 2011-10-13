@@ -22,12 +22,15 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModelBinds;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -168,4 +171,78 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     protected QName getAppearance(Attributes controlAttributes) {
         return handlerContext.getController().getAttributeQNameValue(controlAttributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName()));
     }
+    
+    protected Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames) {
+		final String staticId = handlerContext.getId(attributes);
+        final String prefixedId = handlerContext.getIdPrefix() + staticId;
+
+        if (staticId != null) {
+            final boolean hasAVT = containingDocument.getStaticOps().hasAttributeControl(prefixedId);
+            final String effectiveId = handlerContext.getEffectiveId(attributes);
+            boolean found = false;
+            if (hasAVT) {
+                // This element has at least one AVT so process its attributes
+
+                final int attributesCount = attributes.getLength();
+                for (int i = 0; i < attributesCount; i++) {
+                    final String attributeValue = attributes.getValue(i);
+                    if (XFormsUtils.maybeAVT(attributeValue)) {
+                        // This is an AVT most likely
+                        found = true;
+
+                        final String attributeLocalName = attributes.getLocalName(i);
+                        final String attributeQName = attributes.getQName(i);// use qualified name so we match on "xml:lang"
+
+                        // Control analysis
+                        final AttributeControl controlAnalysis = containingDocument.getStaticOps().getAttributeControl(prefixedId, attributeQName);
+
+                        // Get static id of attribute control associated with this particular attribute
+                        final String attributeControlStaticId = controlAnalysis.element().attributeValue(XFormsConstants.ID_QNAME);
+
+                        // Find concrete control if possible
+                        final XXFormsAttributeControl attributeControl;
+                        if (handlerContext.isTemplate()) {
+                            attributeControl = null;
+                        } else if (attributeControlStaticId != null) {
+                            final String attributeControlEffectiveId = XFormsUtils.getRelatedEffectiveId(effectiveId, attributeControlStaticId);
+                            attributeControl = (XXFormsAttributeControl) containingDocument.getControls().getObjectByEffectiveId(attributeControlEffectiveId);
+                        } else {
+                            // This should not happen
+                            attributeControl = null;
+                        }
+
+                        // Determine attribute value
+                        // NOTE: This also handles dummy images for the xhtml:img/@src case
+                        final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValue(attributeControl, controlAnalysis);
+
+                        // Set the value of the attribute
+                        attributes = XMLUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),
+                                XMLUtils.prefixFromQName(attributeQName), attributeLocalName, effectiveAttributeValue);
+                    }
+                }
+
+                if (found) {
+                    // Update the value of the id attribute
+                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
+                }
+            }
+
+            if (!found) {
+                // Id was not replaced as part of AVT processing
+
+                // Update the value of the id attribute
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", XFormsUtils.namespaceId(containingDocument, effectiveId));
+            }
+        }
+
+        // Check @for attribute
+        for(String refIdAttributeName : refIdAttributeNames)
+        {
+            final String forAttribute = attributes.getValue(refIdAttributeName);
+            if (forAttribute != null) {
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", refIdAttributeName, handlerContext.getIdPrefix() + forAttribute + handlerContext.getIdPostfix());
+            }
+        }
+		return attributes;
+	}
 }

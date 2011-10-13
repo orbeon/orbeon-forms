@@ -49,6 +49,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XXFormsAttributeHandler;
+import org.orbeon.oxf.xforms.processor.handlers.xml.ElementHandlerXML;
 import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsCaseHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsDefaultControlHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsGroupHandler;
@@ -506,7 +507,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
                 if (hostLanguageAVTs) {
                     controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
-                    controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
+                    if (isHTMLDocument)
+                    {
+                    	controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
+                    }
+                    
+                    for(String additionalAvtElementNamespace: XFormsProperties.getAdditionalAvtElementNamespaces()) {
+                    	controller.registerHandler(ElementHandlerXML.class.getName(), additionalAvtElementNamespace);
+                    }
                 }
 
             	if (isHTMLDocument) {

@@ -11,38 +11,37 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor.handlers.xhtml;
+package org.orbeon.oxf.xforms.processor.handlers.xml;
 
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * Handle xhtml:* for handling AVTs as well as rewriting @id and @for.
+ * Handle element for handling AVTs.
  */
-public class XHTMLElementHandler extends XFormsBaseHandlerXHTML {
-    /**
-	 * 
-	 */
-	private static final String[] REF_ID_ATTRIBUTE_NAMES = new String[] { "for" };
-
-	public XHTMLElementHandler() {
+public class ElementHandlerXML extends XFormsBaseHandlerXML {
+	private String[] refIdAttributeNames;
+	
+    public ElementHandlerXML() {
         super(false, true);
+        
+        this.refIdAttributeNames = XFormsProperties.getAdditionalRefIdAttributeNames();
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        // Start xhtml:* element
+        // Start element
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        
-        attributes = handleAVTsAndIDs(attributes, REF_ID_ATTRIBUTE_NAMES);
+
+        attributes = handleAVTsAndIDs(attributes, refIdAttributeNames);
 
         contentHandler.startElement(uri, localname, qName, attributes);
     }
 
-	
     public void end(String uri, String localname, String qName) throws SAXException {
-        // Close xhtml:*
+        // Close element
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(uri, localname, qName);
     }

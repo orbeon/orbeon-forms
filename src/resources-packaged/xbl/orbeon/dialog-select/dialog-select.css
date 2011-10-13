@@ -53,6 +53,11 @@
     display: block;             /* Checkboxes and radio button to show vertically */
 }
 
+.fr-dialog-select-single-list-dialog .bd,
+.fr-dialog-select1-single-list-dialog .bd {
+    position: relative;
+}
+
 .xbl-fr-dialog-select .fr-non-empty,
 .xbl-fr-dialog-select1 .fr-non-empty {
     padding-right: 1em;         /* Space between values and button */

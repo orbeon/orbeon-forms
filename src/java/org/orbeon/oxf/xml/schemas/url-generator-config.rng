@@ -113,14 +113,24 @@
                     </optional>
                     <optional>
                         <element name="cache-control">
-                            <optional>
-                                <element name="use-local-cache">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
-                                </element>
-                            </optional>
+                            <interleave>
+                                <optional>
+                                    <element name="use-local-cache">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="conditional-get">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </element>
+                                </optional>
+                            </interleave>
                         </element>
                     </optional>
                     <optional>

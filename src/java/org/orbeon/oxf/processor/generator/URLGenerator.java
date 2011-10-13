@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.*;
@@ -26,10 +25,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
-import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -71,6 +67,7 @@ public class URLGenerator extends ProcessorImpl {
     private static final boolean DEFAULT_IGNORE_CONNECTION_ENCODING = false;
 
     private static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;
+    private static final boolean DEFAULT_ENABLE_CONDITIONAL_GET = false;
 
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
@@ -120,11 +117,12 @@ public class URLGenerator extends ProcessorImpl {
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration, boolean handleLexical,
-                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache) {
+                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache,
+                      boolean enableConditionalGET) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
                 forceEncoding, ignoreConnectionEncoding, parserConfiguration, handleLexical, mode,
                 headerNameValues, forwardHeaders,
-                cacheUseLocalCache, new TidyConfig(null)));
+                cacheUseLocalCache, enableConditionalGET, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -143,6 +141,7 @@ public class URLGenerator extends ProcessorImpl {
         private String mode;
 
         private boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
+        private boolean enableConditionalGET = DEFAULT_ENABLE_CONDITIONAL_GET;
 
         private TidyConfig tidyConfig;
 
@@ -169,7 +168,7 @@ public class URLGenerator extends ProcessorImpl {
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration,
                       boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
-                      boolean cacheUseLocalCache, TidyConfig tidyConfig) {
+                      boolean cacheUseLocalCache, boolean enableConditionalGET, TidyConfig tidyConfig) {
 
             this.url = url;
             this.contentType = contentType;
@@ -184,7 +183,14 @@ public class URLGenerator extends ProcessorImpl {
 
             this.mode = mode;
 
-            this.cacheUseLocalCache = cacheUseLocalCache;
+            // Local cache required for conditional GET
+            this.cacheUseLocalCache = cacheUseLocalCache || enableConditionalGET;
+
+            // NOTE: Hard to handle this if XInclude is enabled as we would need to conditional-GET all dependencies,
+            // and then cache all individually-included documents. Or, store the non-XInclude-processed document in
+            // cache. Either way, it's complicated. So we disable conditional GET if XInclude is enabled for now. This
+            // could be easier if we had a real HTTP client document cache.
+            this.enableConditionalGET = enableConditionalGET && ! parserConfiguration.handleXInclude;
 
             this.tidyConfig = tidyConfig;
         }
@@ -239,6 +245,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public boolean isCacheUseLocalCache() {
             return cacheUseLocalCache;
+        }
+
+        public boolean isEnableConditionalGET() {
+            return enableConditionalGET;
         }
 
         @Override
@@ -345,6 +355,7 @@ public class URLGenerator extends ProcessorImpl {
 
                                 // Cache control
                                 final boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
+                                final boolean enableConditionalGET = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/conditional-get", DEFAULT_ENABLE_CONDITIONAL_GET);
 
                                 // Get Tidy config (will only apply if content-type is text/html)
                                 final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
@@ -363,7 +374,7 @@ public class URLGenerator extends ProcessorImpl {
                                     final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
                                             ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
                                             headerNameValues, forwardHeaders,
-                                            cacheUseLocalCache, tidyConfig);
+                                            cacheUseLocalCache, enableConditionalGET, tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
                                     return new ConfigURIReferences(config);
@@ -376,7 +387,8 @@ public class URLGenerator extends ProcessorImpl {
                     // Never accept a null URL
                     if (configURIReferences.config.getURL() == null)
                         throw new OXFException("Missing configuration.");
-                    // Create unique key and validity for the document
+
+                    // We use the same validity as for the output
                     final boolean isUseLocalCache = configURIReferences.config.isCacheUseLocalCache();
                     final CacheKey localCacheKey;
                     final Object localCacheValidity;
@@ -389,89 +401,92 @@ public class URLGenerator extends ProcessorImpl {
                     }
 
                     // Decide whether to use read from the special oxf: handler or the generic URL handler
-                    ResourceHandler handler = null;
-                    try {
-                        // We use the same validity as for the output
+                    final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
+                    if (state.getDocument() != null) {
+                        // Document was found when retrieving validity in conditional get
+                        // NOTE: This only happens if isCacheUseLocalCache() == true
+                        // NOTE: Document was re-added to cache in getValidityImpl()
+                        state.getDocument().replay(xmlReceiver);
+                    } else {
                         final Object cachedResource = (localCacheKey == null) ? null : ObjectCache.instance().findValid(localCacheKey, localCacheValidity);
                         if (cachedResource != null) {
                             // Just replay the cached resource
                             ((SAXStore) cachedResource).replay(xmlReceiver);
                         } else {
-                            // We need to read the resource
+                            final ResourceHandler handler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
+                            try {
+                                // We need to read the resource
 
-                            final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
-                            handler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
-
-                            // Find content-type to use. If the config says to force the
-                            // content-type, we use the content-type provided by the user.
-                            // Otherwise, we give the priority to the content-type provided by
-                            // the connection, then the content-type provided by the user, then
-                            // we use the default content-type (XML). The user will have to
-                            // provide a content-type for example to read HTML documents with
-                            // the file: protocol.
-                            String contentType;
-                            if (configURIReferences.config.isForceContentType()) {
-                                contentType = configURIReferences.config.getContentType();
-                            } else {
-                                contentType = handler.getResourceMediaType();
-                                if (contentType == null)
+                                // Find content-type to use. If the config says to force the
+                                // content-type, we use the content-type provided by the user.
+                                // Otherwise, we give the priority to the content-type provided by
+                                // the connection, then the content-type provided by the user, then
+                                // we use the default content-type (XML). The user will have to
+                                // provide a content-type for example to read HTML documents with
+                                // the file: protocol.
+                                String contentType;
+                                if (configURIReferences.config.isForceContentType()) {
                                     contentType = configURIReferences.config.getContentType();
-                                if (contentType == null)
-                                    contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
-                            }
+                                } else {
+                                    contentType = handler.getResourceMediaType();
+                                    if (contentType == null)
+                                        contentType = configURIReferences.config.getContentType();
+                                    if (contentType == null)
+                                        contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
+                                }
 
-                            // Get and cache validity as the handler is open, as validity is likely to be used later
-                            // again for caching reasons
-                            final Long validity = (Long) getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), handler);
+                                // Get and cache validity as the handler is open, as validity is likely to be used later
+                                // again for caching reasons
+                                final Long validity = (Long) getHandlerValidity(pipelineContext, configURIReferences.config, configURIReferences.config.getURL(), handler);
 
-                            // Create store for caching if necessary
-                            final XMLReceiver output = isUseLocalCache ? new SAXStore(xmlReceiver) : xmlReceiver;
+                                // Create store for caching if necessary
+                                final XMLReceiver output = isUseLocalCache ? new SAXStore(xmlReceiver) : xmlReceiver;
 
-                            // Handle mode
-                            String mode = configURIReferences.config.getMode();
-                            if (mode == null) {
-                                // Mode is inferred from content-type
-                                if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType))
-                                    mode = "html";
-                                else if (XMLUtils.isXMLMediatype(contentType))
-                                    mode = "xml";
-                                else if (XMLUtils.isTextOrJSONContentType(contentType))
-                                    mode = "text";
-                                else
-                                    mode = "binary";
-                            }
+                                // Handle mode
+                                String mode = configURIReferences.config.getMode();
+                                if (mode == null) {
+                                    // Mode is inferred from content-type
+                                    if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType))
+                                        mode = "html";
+                                    else if (XMLUtils.isXMLMediatype(contentType))
+                                        mode = "xml";
+                                    else if (XMLUtils.isTextOrJSONContentType(contentType))
+                                        mode = "text";
+                                    else
+                                        mode = "binary";
+                                }
 
-                            // Read resource
-                            if (mode.equals("html")) {
-                                // HTML mode
-                                handler.readHTML(output);
-                                configURIReferences.uriReferences = null;
-                            } else if (mode.equals("xml")) {
-                                // XML mode
-                                final URIProcessorOutputImpl.URIReferences uriReferences = new URIProcessorOutputImpl.URIReferences();
-                                handler.readXML(pipelineContext, output, uriReferences);
-                                configURIReferences.uriReferences = uriReferences.getReferences();
-                            } else if (mode.equals("text")) {
-                                // Text mode
-                                handler.readText(output, contentType, validity);
-                                configURIReferences.uriReferences = null;
-                            } else {
-                                // Binary mode
-                                handler.readBinary(output, contentType, validity);
-                                configURIReferences.uriReferences = null;
-                            }
+                                // Read resource
+                                if (mode.equals("html")) {
+                                    // HTML mode
+                                    handler.readHTML(output);
+                                    configURIReferences.uriReferences = null;
+                                } else if (mode.equals("xml")) {
+                                    // XML mode
+                                    final URIProcessorOutputImpl.URIReferences uriReferences = new URIProcessorOutputImpl.URIReferences();
+                                    handler.readXML(pipelineContext, output, uriReferences);
+                                    configURIReferences.uriReferences = uriReferences.getReferences();
+                                } else if (mode.equals("text")) {
+                                    // Text mode
+                                    handler.readText(output, contentType, validity);
+                                    configURIReferences.uriReferences = null;
+                                } else {
+                                    // Binary mode
+                                    handler.readBinary(output, contentType, validity);
+                                    configURIReferences.uriReferences = null;
+                                }
 
-                            // Cache the resource if requested
-                            if (isUseLocalCache) {
-                                // Make sure SAXStore loses its reference on its output so that we don't clutter the cache
-                                ((SAXStore) output).setXMLReceiver(null);
-                                // Add to cache
-                                ObjectCache.instance().add(localCacheKey, localCacheValidity, output);
+                                // Cache the resource if requested
+                                if (isUseLocalCache) {
+                                    // Make sure SAXStore loses its reference on its output so that we don't clutter the cache
+                                    ((SAXStore) output).setXMLReceiver(null);
+                                    // Add to cache
+                                    ObjectCache.instance().add(localCacheKey, localCacheValidity, output);
+                                }
+                            } finally {
+                                handler.destroy();
                             }
                         }
-                    } finally {
-                        if (handler != null)
-                            handler.destroy();
                     }
                 } catch (SAXParseException spe) {
                     throw new ValidationException(spe.getMessage(), new LocationData(spe));
@@ -542,14 +557,16 @@ public class URLGenerator extends ProcessorImpl {
                             return null;
                         validities.add(configKeyValidity.validity);
                     }
+
                     // Handle main document and config
                     final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
                     final ResourceHandler resourceHandler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
-                    validities.add(getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), resourceHandler));
+                    validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, configURIReferences.config.getURL(), resourceHandler));
+
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
                         for (URIProcessorOutputImpl.URIReference uriReference: configURIReferences.uriReferences) {
-                            validities.add(getHandlerValidity(pipelineContext, URLFactory.createURL(uriReference.context, uriReference.spec), null));
+                            validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, URLFactory.createURL(uriReference.context, uriReference.spec), null));
                         }
                     }
                     return validities;
@@ -558,7 +575,7 @@ public class URLGenerator extends ProcessorImpl {
                 }
             }
 
-            private Object getHandlerValidity(PipelineContext pipelineContext, URL url, ResourceHandler handler) {
+            private Long getHandlerValidity(PipelineContext pipelineContext, Config config, URL url, ResourceHandler handler) {
                 final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
                 final String urlString = url.toExternalForm();
                 if (state.isLastModifiedSet(urlString)) {
@@ -567,28 +584,61 @@ public class URLGenerator extends ProcessorImpl {
                 } else {
                     // Get value and cache it in state
                     try {
-                        final boolean mustDestroyHandler;
+                        final Long validity;
                         if (handler == null) {
-                            // This should happen only for dependencies
+                            // Dependency
+                            
+                            // Create handler right here
                             handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
                                 ? new OXFResourceHandler(new Config(url)) // Should use full config so that headers are forwarded?
                                 : new URLResourceHandler(pipelineContext, new Config(url));// Should use full config so that headers are forwarded?
 
-                            mustDestroyHandler = true;
-                        } else {
-                            mustDestroyHandler = false;
-                        }
-                        try {
-                            // FIXME: this can potentially be very slow with some URLs like HTTP URLs. We try to
-                            // optimized this by keeping the URLConnection for the main document, but dependencies may
-                            // cause multiple requests to the same URL.
-                            final Object validity = handler.getValidity();
-                            state.setLastModified(urlString, (Long) validity);
-                            return validity;
-                        } finally {
-                            if (mustDestroyHandler)
+                            try {
+                                // FIXME: this can potentially be very slow with some URLs like HTTP URLs. We try to
+                                // optimized this by keeping the URLConnection for the main document, but dependencies may
+                                // cause multiple requests to the same URL.
+                                validity = handler.getValidity();
+                            } finally {
+                                // Destroy handler
                                 handler.destroy();
+                            }
+                        } else {
+                            // Main handler
+                            
+                            // Try to see what we have in cache
+                            final CacheEntry cacheEntry;
+                            if (config.isEnableConditionalGET()) {
+                                // NOTE: This *could* be transparently handled by HttpClient cache if configured properly:
+                                // http://hc.apache.org/httpcomponents-client-ga/httpclient-cache/apidocs/org/apache/http/impl/client/cache/CachingHttpClient.html
+                                // Although, this would only cache the bytes, and probably not provide us with a
+                                // readily-parsed SAXStore.
+                                final CacheKey localCacheKey = new InternalCacheKey(URLGenerator.this, "urlDocument", config.toString());
+                                cacheEntry = ObjectCache.instance().findAny(localCacheKey);
+                            } else {
+                                cacheEntry = null;
+                            }
+                            
+                            if (cacheEntry != null) {
+                                // Found some entry in cache for the key
+                                final long lastModified = findLastModified(cacheEntry.validity);
+                                // This returns the validity and, possibly, stores the document in the state
+                                validity = handler.getConditional(lastModified);
+                                if (handler.getConnectionStatusCode() == 304) {
+                                    // The server responded that the resource hasn't changed
+                                    
+                                    // Update the entry in cache
+                                    ObjectCache.instance().add(cacheEntry.key, lastModified, cacheEntry.cacheable);
+                                    
+                                    // Remember the document for the rest of this request
+                                    state.setDocument((SAXStore) cacheEntry.cacheable);
+                                }
+                            } else {
+                                validity = handler.getValidity();
+                            }
                         }
+                        state.setLastModified(urlString, validity);
+                        return validity;
+                        
                     } catch (Exception e) {
                         // If the file no longer exists, for example, we don't want to throw, just to invalidate
                         // An exception will be thrown if necessary when the document is actually read
@@ -624,7 +674,8 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     private interface ResourceHandler {
-        Object getValidity() throws IOException;
+        Long getValidity() throws IOException;
+        Long getConditional(Long lastModified) throws IOException;
         String getResourceMediaType() throws IOException;
         String getConnectionEncoding() throws IOException;
         int getConnectionStatusCode() throws IOException;
@@ -661,7 +712,7 @@ public class URLGenerator extends ProcessorImpl {
             return -1;
         }
 
-        public Object getValidity() throws IOException {
+        public Long getValidity() throws IOException {
             getKey();
             if (logger.isDebugEnabled())
                 logger.debug("OXF Protocol: Using ResourceManager for key " + getKey());
@@ -669,6 +720,10 @@ public class URLGenerator extends ProcessorImpl {
             long result = ResourceManagerWrapper.instance().lastModified(getKey(), false);
             // Zero and negative values often have a special meaning, make sure to normalize here
             return (result <= 0) ? null : result;
+        }
+
+        public Long getConditional(Long lastModified) throws IOException {
+            return getValidity();
         }
 
         public void destroy() throws IOException {
@@ -766,8 +821,13 @@ public class URLGenerator extends ProcessorImpl {
             return connectionResult.statusCode;
         }
 
-        public Object getValidity() throws IOException {
+        public Long getValidity() throws IOException {
             openConnection();
+            return connectionResult.getLastModified();
+        }
+
+        public Long getConditional(Long lastModified) throws IOException {
+            openConnection(lastModified);
             return connectionResult.getLastModified();
         }
 
@@ -786,14 +846,31 @@ public class URLGenerator extends ProcessorImpl {
             connectionResult = null;
             inputStream = null;
         }
-
+        
         private void openConnection() throws IOException {
+            openConnection(null);
+        }
+
+        private void openConnection(Long lastModified) throws IOException {
             if (connectionResult == null) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
+                
+                final Map<String, String[]> newHeaders;
+                if (lastModified != null) {
+                    // A conditional GET is requested
+                    newHeaders = new HashMap<String, String[]>();
+                    if (config.getHeaderNameValues() != null)
+                        newHeaders.putAll(config.getHeaderNameValues());
+                    newHeaders.put("If-Modified-Since", new String[] { ISODateUtils.getRFC1123Date(lastModified) });
+                } else {
+                    // Regular GET
+                    newHeaders = config.getHeaderNameValues();
+                }
+                
                 connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
-                        config.getURL(), null, null, null, null, null, config.getHeaderNameValues(), config.getForwardHeaders());
-                inputStream = connectionResult.getResponseInputStream();
+                        config.getURL(), null, null, null, null, null, newHeaders, config.getForwardHeaders());
+                inputStream = connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
             }
         }
 
@@ -884,6 +961,7 @@ public class URLGenerator extends ProcessorImpl {
 
         private ResourceHandler mainResourceHandler;
         private Map<String, Object> map;
+        private SAXStore document;
 
         public void setLastModified(String urlString, Long lastModified) {
             if (map == null)
@@ -918,6 +996,14 @@ public class URLGenerator extends ProcessorImpl {
                 });
             }
             return mainResourceHandler;
+        }
+
+        public void setDocument(SAXStore document) {
+            this.document = document;
+        }
+
+        public SAXStore getDocument() {
+            return document;
         }
     }
 

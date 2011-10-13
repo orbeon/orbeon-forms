@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.resources.handler;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
@@ -41,13 +38,13 @@ import org.apache.http.params.HttpConnectionParamBean;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
 
-import javax.net.ssl.SSLContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +53,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class HTTPURLConnection extends URLConnection {
@@ -260,7 +256,16 @@ public class HTTPURLConnection extends URLConnection {
 
     public InputStream getInputStream() throws IOException {
         if (!connected) connect();
-        return httpResponse.getEntity().getContent();
+        final HttpEntity entity = httpResponse.getEntity();
+        if (entity != null)
+            return entity.getContent();
+        else
+            return new InputStream() {
+                @Override
+                public int read() throws IOException {
+                    return -1;
+                }
+            };
     }
 
     public void setRequestBody(byte[] requestBody) throws IOException {
@@ -338,9 +343,9 @@ public class HTTPURLConnection extends URLConnection {
 
     public void disconnect() {
         try {
-            // According to the HTTP Client tutorial, calling consumeContent() is the easiest way to ensure that all
-            // content has been fully consumed, so that the connection could be safely returned to the connection pool.
-            httpResponse.getEntity().consumeContent();
+            // "As of version 4.1 one should be using EntityUtils#consume() instead."
+            // http://mail-archives.apache.org/mod_mbox/hc-httpclient-users/201012.mbox/%3C1291222613.3781.68.camel@ubuntu%3E
+            EntityUtils.consume(httpResponse.getEntity());
         } catch (IOException e) {
             throw new OXFException(e);
         }

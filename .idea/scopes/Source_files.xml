@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Source files" pattern="(file[Orbeon Forms]:test/src//*||file[Orbeon Forms]:src//*)&amp;&amp;!file[Orbeon Forms]:src/resources/apps/xforms-sandbox/samples//*&amp;&amp;!file[Orbeon Forms]:src/resources-packaged/ops/xforms/schema/*" />
+</component>

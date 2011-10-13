@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Samples" pattern="file[Orbeon Forms]:src/resources/apps/xforms-sandbox/samples/*" />
+</component>

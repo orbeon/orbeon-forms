@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="IntelliJ project files" pattern="file[Orbeon Forms]:.idea//*" />
+</component>

@@ -27,19 +27,19 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0" >
 
-    <xbl:binding id="fr-dialog-select-binding" element="fr|dialog-select">
+    <xbl:binding id="fr-dialog-select1-binding" element="fr|dialog-select1">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Dialog Multi Selector</display-name>
-            <display-name lang="fr">Dialogue liste multiple</display-name>
-            <display-name lang="ru">диалог Один из списка</display-name>
+            <display-name lang="en">Dialog Single Selector</display-name>
+            <display-name lang="fr">Dialogue liste simple</display-name>
+            <display-name lang="ru">диалог  Один из списка</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
             <template>
-                 <fr:dialog-select separator=", ">
+                 <fr:dialog-select1 separator=", ">
                      <xforms:label ref=""/>
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
@@ -48,7 +48,7 @@
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
-                </fr:dialog-select>
+                </fr:dialog-select1>
             </template>
         </metadata>
 
@@ -65,13 +65,13 @@
         </xbl:implementation>
 
         <xxbl:global>
-            <xxforms:dialog id="fr-dialog-select-double-list-dialog" level="modal" class="fr-dialog-select-double-list-dialog" model="fr-dialog-editor-double-list-model">
+            <xxforms:dialog id="fr-dialog-select1-double-list-dialog" level="modal" class="fr-dialog-select1-double-list-dialog" model="fr-dialog-select1-editor-double-list-model">
                 <xforms:label ref="label"/>
 
                 <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
                      clearly two choices: confirm the selection or cancel -->
-                <xforms:model id="fr-dialog-editor-double-list-model">
-                    <xforms:instance id="fr-dialog-editor-double-list-instance">
+                <xforms:model id="fr-dialog-select1-editor-double-list-model">
+                    <xforms:instance id="fr-dialog-select1-editor-double-list-instance">
                         <instance>
                             <label/>
                             <items/>
@@ -86,7 +86,7 @@
                     </xforms:instance>
                     <xforms:bind nodeset="add-trigger" readonly="normalize-space(../available) = ''"/>
                     <xforms:bind nodeset="remove-trigger" readonly="normalize-space(../selected) = ''"/>
-                    <xforms:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+                    <xforms:instance id="fr-dialog-select1-double-list-resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
                                      xxforms:readonly="true" xxforms:cache="true"/>
                 </xforms:model>
                 <xforms:action ev:event="fr-edit">
@@ -101,11 +101,11 @@
                     <xforms:setvalue ref="available"/>
                     <xforms:setvalue ref="selected"/>
                     <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
-                    <xxforms:show dialog="fr-dialog-select-double-list-dialog"/>
-                    <xforms:setfocus control="fr-dialog-select-double-list-dialog"/>
+                    <xxforms:show dialog="fr-dialog-select1-double-list-dialog"/>
+                    <xforms:setfocus control="fr-dialog-select1-double-list-dialog"/>
                 </xforms:action>
 
-                <xxforms:variable name="resources" select="instance('resources')/resource[@xml:lang = 'en']" as="element()?"/>
+                <xxforms:variable name="resources" select="instance('fr-dialog-select1-double-list-resources')/resource[@xml:lang = 'en']" as="element()?"/>
                 <xxforms:variable name="available-values" select="tokenize(available-itemset, '\s+')" as="xs:string*"/>
                 <xxforms:variable name="selected-values" select="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
                 <xxforms:variable name="items" select="items/item"/>
@@ -114,7 +114,7 @@
                     <xhtml:tr>
                         <xhtml:td>
                             <!-- List of available items -->
-                            <xforms:select ref="available" id="available-list">
+                            <xforms:select ref="available">
                                 <xforms:label value="$resources/available"/>
                                 <xforms:itemset nodeset="$items[value = $available-values]">
                                     <xforms:label ref="label"/>
@@ -123,7 +123,7 @@
                             </xforms:select>
                         </xhtml:td>
                         <xhtml:td>
-                            <xforms:trigger ref="add-trigger" class="fr-add-button" id="add">
+                            <xforms:trigger ref="add-trigger" class="fr-add-button">
                                 <xforms:label>
                                     <xhtml:span>
                                         <xforms:output value="$resources/add"/>
@@ -140,7 +140,7 @@
                                 </xforms:action>
                             </xforms:trigger>
 
-                            <xforms:trigger ref="remove-trigger" class="fr-remove-button" id="remove">
+                            <xforms:trigger ref="remove-trigger" class="fr-remove-button">
                                 <xforms:label>
                                     <xhtml:span>
                                         <xforms:output value="$resources/remove"/>
@@ -159,20 +159,20 @@
                         </xhtml:td>
                         <xhtml:td>
                             <!-- List of selected items -->
-                            <xforms:select ref="selected">
+                            <xforms:select1 ref="selected">
                                 <xforms:label value="$resources/selected"/>
                                 <xforms:itemset nodeset="$items[value = $selected-values]">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
                                 </xforms:itemset>
-                            </xforms:select>
+                            </xforms:select1>
                         </xhtml:td>
                     </xhtml:tr>
                 </xhtml:table>
 
                 <xhtml:div class="fr-dialog-buttons">
                     <!-- Confirm button -->
-                    <xforms:trigger id="confirm">
+                    <xforms:trigger>
                         <xforms:label>
                             <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
                             <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
@@ -183,26 +183,26 @@
                                 <xxforms:context name="fr-new-values" select="for $selected-itemset in instance()/selected-itemset
                                     return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
                             </xforms:dispatch>
-                            <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
+                            <xxforms:hide dialog="fr-dialog-select1-double-list-dialog"/>
                         </xforms:action>
                     </xforms:trigger>
                     <!-- Cancel button -->
-                    <xforms:trigger id="cancel">
+                    <xforms:trigger>
                         <xforms:label>
                             <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
                             <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <!-- Just close -->
-                            <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
+                            <xxforms:hide dialog="fr-dialog-select1-double-list-dialog"/>
                         </xforms:action>
                     </xforms:trigger>
                 </xhtml:div>
             </xxforms:dialog>
-            <xxforms:dialog id="fr-dialog-select-single-list-dialog" appearance="minimal" close="true" level="modeless" class="fr-dialog-select-single-list-dialog" model="fr-dialog-editor-single-list-model">
+            <xxforms:dialog id="fr-dialog-select1-single-list-dialog" appearance="minimal" close="true" level="modeless" class="fr-dialog-select1-single-list-dialog" model="fr-dialog-select1-editor-single-list-model">
                 <xforms:label>&#160;</xforms:label>
-                <xforms:model id="fr-dialog-editor-single-list-model">
-                    <xforms:instance id="fr-dialog-editor-single-list-instance">
+                <xforms:model id="fr-dialog-select1-editor-single-list-model">
+                    <xforms:instance>
                         <instance>
                             <selected/>
                             <items/>
@@ -215,20 +215,20 @@
                     <xforms:delete ref="items/*"/>
                     <xforms:insert context="items" origin="event('fr-items')"/>
                     <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
-                    <xforms:setfocus control="fr-dialog-select-dialog"/>
-                    <xxforms:show dialog="fr-dialog-select-single-list-dialog" neighbor="{event('fr-callback-id')}"/>
+                    <xforms:setfocus control="fr-dialog-select1-dialog"/>
+                    <xxforms:show dialog="fr-dialog-select1-single-list-dialog" neighbor="{event('fr-callback-id')}"/>
                 </xforms:action>
                 <xforms:action ev:event="xxforms-dialog-close">
                     <xforms:dispatch name="fr-edit-done" target="{callback-id}">
                         <xxforms:context name="fr-new-values" select="selected"/>
                     </xforms:dispatch>
                 </xforms:action>
-                <xforms:select ref="instance()/selected" appearance="full">
+                <xforms:select1 ref="instance()/selected" appearance="full">
                     <xforms:itemset nodeset="instance()/items/item">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
-                </xforms:select>
+                </xforms:select1>
             </xxforms:dialog> 
         </xxbl:global>
 
@@ -253,7 +253,7 @@
                     <!-- Variable containing the label, so we can pass it to the dialog -->
                     <xxforms:variable name="label">
                         <xxforms:sequence xxbl:scope="outer">
-                            <xsl:variable name="label" select="/fr:dialog-select/xforms:label"/>
+                            <xsl:variable name="label" select="/fr:dialog-select1/xforms:label"/>
                             <xsl:if test="$label/@ref"><xsl:attribute name="select" select="$label/@ref"/></xsl:if>
                             <xsl:value-of select="$label"/>
                         </xxforms:sequence> 
@@ -284,7 +284,7 @@
                         <xxforms:variable name="selected" select="tokenize($binding, '\s+')" as="xs:string*"/>
 
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
-                        <xsl:variable name="separator" select="/fr:dialog-select/@separator"/>
+                        <xsl:variable name="separator" select="/fr:dialog-select1/@separator"/>
                         <xsl:choose>
                             <xsl:when test="exists($separator)">
                                 <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
@@ -310,10 +310,10 @@
                             <xforms:label>
                                 <xhtml:img src="/ops/yui/menu/assets/menu_down_arrow.png" alt="Select"/>
                             </xforms:label>
-                            <xsl:variable name="appearance" select="/fr:dialog-select/@appearance"/>
+                            <xsl:variable name="appearance" select="/fr:dialog-select1/@appearance"/>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:dispatch name="fr-edit" xxbl:scope="outer"
-                                                target="fr-dialog-select-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
+                                                target="fr-dialog-select1-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
                                     <xxforms:context name="fr-label" select="$label" xxbl:scope="inner"/>
                                     <xxforms:context name="fr-binding" select="$binding" xxbl:scope="inner"/>
                                     <xxforms:context name="fr-items" select="$items" xxbl:scope="inner"/>

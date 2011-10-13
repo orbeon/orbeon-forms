@@ -33,6 +33,8 @@
                                                                                             oxf:/xbl/orbeon/link-select1/link-select1.xbl
                                                                                             oxf:/xbl/orbeon/box-select/box-select.xbl
                                                                                             oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
+                                                                                            oxf:/xbl/orbeon/dialog-select1/dialog-select1.xbl
+                                                                                            oxf:/xbl/orbeon/dialog-select/dialog-select.xbl
                                                                                             oxf:/xbl/orbeon/autocomplete/autocomplete.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.other.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/other-controls.xbl"/>
 

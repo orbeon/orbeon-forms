@@ -23,11 +23,14 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
+        <xhtml:title>Dialog select unittest</xhtml:title>
         <xforms:model>
             <xforms:instance id="instance">
-                <instance>
-                    <value1>1 2 4 8</value1>
-                    <value2>1 2 4 5</value2>
+                <instance label="Single one">
+                    <double-multiple>1 2 4 8</double-multiple>
+                    <double-one>4</double-one>
+                    <single-multiple>1 2 4 8</single-multiple>
+                    <single-one>4</single-one>
                 </instance>
             </xforms:instance>
             <xforms:instance id="items">
@@ -48,36 +51,50 @@
                     <item label="Fourteen" value="14"/>
                 </items>
             </xforms:instance>
+            <xxforms:variable name="label" select="instance()/@label"/>
         </xforms:model>
-        <xhtml:style type="text/css">
-            .with-comma .xbl-fr-dialog-select .xforms-label { vertical-align: top }
-            .with-comma .xbl-fr-dialog-select .xbl-fr-button { vertical-align: top }
-            .with-comma .xbl-fr-dialog-select .xforms-output-output {
-                border: 1px solid #999; padding: 2px; display: inline-block;
-                margin: 0 .5em 0 1em; overflow-y: scroll; width: 10em; height: 5em;
-                background-color: #eee }
-        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
-        <xhtml:h2>No separator (generates a list)</xhtml:h2>
-        <fr:dialog-select ref="value1" id="dialog-select-1" appearance="double-list">
-            <xforms:label>Selection 1:</xforms:label>
-            <xforms:itemset nodeset="instance('items')/item">
-                <xforms:label ref="@label"/>
-                <xforms:value ref="@value"/>
-            </xforms:itemset>
-        </fr:dialog-select>
-
-        <xhtml:div class="with-comma">
-            <xhtml:h2>Separator set to comma</xhtml:h2>
-            <fr:dialog-select ref="value2" id="dialog-select-2" separator=", " appearance="single-list">
-                <xforms:label>Selection 2:</xforms:label>
+        <xhtml:div>
+            <fr:dialog-select ref="double-multiple" id="double-multiple" separator=", " appearance="double-list">
+                <xforms:label>Double multiple</xforms:label>
                 <xforms:itemset nodeset="instance('items')/item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
             </fr:dialog-select>
+        </xhtml:div>
+
+        <xhtml:div>
+            <fr:dialog-select1 ref="double-one" id="double-one" separator=", " appearance="double-list">
+                <xforms:label>Double one</xforms:label>
+                <xforms:itemset nodeset="instance('items')/item">
+                    <xforms:label ref="@label"/>
+                    <xforms:value ref="@value"/>
+                </xforms:itemset>
+            </fr:dialog-select1>
+        </xhtml:div>
+
+        <xhtml:div>
+            <fr:dialog-select ref="single-multiple" id="single-multiple" separator=", " appearance="single-list">
+                <xforms:label>Single multiple</xforms:label>
+                <xforms:itemset nodeset="instance('items')/item">
+                    <xforms:label ref="@label"/>
+                    <xforms:value ref="@value"/>
+                </xforms:itemset>
+            </fr:dialog-select>
+        </xhtml:div>
+
+        <xhtml:div>
+            <fr:dialog-select1 ref="single-one" id="single-one" separator=", " appearance="single-list">
+                <!--<xforms:label>Single one</xforms:label>-->
+                <xforms:label ref="$label"/>
+                <xforms:itemset nodeset="instance('items')/item">
+                    <xforms:label ref="@label"/>
+                    <xforms:value ref="@value"/>
+                </xforms:itemset>
+            </fr:dialog-select1>
         </xhtml:div>
 
     </xhtml:body>

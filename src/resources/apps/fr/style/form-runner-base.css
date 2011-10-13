@@ -94,7 +94,9 @@
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
 button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
-button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
+/* Space between the image and the text in a button, only for the buttons bar
+   (not other buttons in the form which might contain just an image) */
+.fr-buttons button.xforms-trigger img, .fr-buttons .xforms-trigger button img { margin-right: 10px }
 
 /* Make the button look like a link for noscript mode */
 /* TODO: add *zoom: 1 for IE? */
@@ -302,9 +304,6 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
 #fr-submission-result-dialog { width: 800px }
-
-/* Hide header bar or minimal appearance dialogs as YUI adds one to panels */
-.xforms-dialog-appearance-minimal .hd { display: none }
 
 /* ***** Sections *************************************************************************************************** */
 

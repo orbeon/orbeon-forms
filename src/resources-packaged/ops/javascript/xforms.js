@@ -3577,13 +3577,23 @@ ORBEON.xforms.Events = {
      * Event listener on dialogs called by YUI when the dialog is shown.
      */
 	dialogShow: function(type, args, me) {
+        var dialogId = me;
+
 		if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
             // On IE6, when the dialog is opened for the second time, part of the dialog are not visible.
             // Setting the class again on the dialog gives notch to IE and is hack to get around this issue.
-            var dialogId = me;
-			var dialog = ORBEON.util.Dom.get(dialogId);
-			dialog.className = dialog.className;
+            var dialogElement = ORBEON.util.Dom.get(dialogId);
+			dialogElement.className = dialogElement.className;
 		}
+
+        // Set a max-height on the dialog body, so the dialog doesn't get larger than the viewport
+        var yuiDialog = ORBEON.xforms.Globals.dialogs[dialogId];
+        var maxHeight =
+            YAHOO.util.Dom.getViewportHeight()
+            - (yuiDialog.element.clientHeight - yuiDialog.body.clientHeight)
+            - 40;
+
+        yuiDialog.body.style.maxHeight = maxHeight + "px";
     },
 
     /**

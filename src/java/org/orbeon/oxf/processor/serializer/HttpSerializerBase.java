@@ -78,102 +78,108 @@ public abstract class HttpSerializerBase extends CachedSerializer {
             ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ExternalContext.Response response = externalContext.getResponse();
 
-            // Compute headers
-            if (externalContext != null) {
+            try {
+                // Compute headers
+                if (externalContext != null) {
 
-                // Send an error if needed and return immediately
-                int errorCode = config.errorCode;
-                if (errorCode != DEFAULT_ERROR_CODE) { 
-                    response.sendError(errorCode);
-                    return;
-                }
-
-                // Get last modification date and compute last modified if possible
-                // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
-                // and use oxf:request-generator default validity".
-                final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
-
-                // Set caching headers and force revalidation
-                response.setCaching(lastModified, true, true);
-
-                // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified. 
-                final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());
-                if (!isForward) {
-                    // Check If-Modified-Since (conditional GET) and don't return content if condition is met
-                    if (!response.checkIfModifiedSince(lastModified, true)) {
-                        response.setStatus(ExternalContext.SC_NOT_MODIFIED);
-                        if (logger.isDebugEnabled())
-                            logger.debug("Sending SC_NOT_MODIFIED");
+                    // Send an error if needed and return immediately
+                    int errorCode = config.errorCode;
+                    if (errorCode != DEFAULT_ERROR_CODE) {
+                        response.sendError(errorCode);
                         return;
                     }
-                }
 
-                // Set status code
-                // STATUS CODE: Processing instruction can override this when the input is being read
-                response.setStatus(config.statusCode);
+                    // Get last modification date and compute last modified if possible
+                    // NOTE: It is not clear if this is right! We had a discussion to "remove serializer last modified,
+                    // and use oxf:request-generator default validity".
+                    final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
 
-                // Set custom headers
-                if (config.headers != null) {
-                    for (Iterator<String> i = config.headers.iterator(); i.hasNext();) {
-                        String name = i.next();
-                        String value = i.next();
-                        response.setHeader(name, value);
-                    }
-                }
-            }
+                    // Set caching headers and force revalidation
+                    response.setCaching(lastModified, true, true);
 
-            // If we have an empty body, return w/o reading the data input
-            if (config.empty)
-                return;
-
-            final OutputStream httpOutputStream = response.getOutputStream();
-
-            if (config.cacheUseLocalCache) {
-                // If local caching of the data is enabled, use the caching API
-                // We return a ResultStore
-                final boolean[] read = new boolean[1];
-                final ExtendedResultStoreOutputStream resultStore = (ExtendedResultStoreOutputStream) readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader() {
-                    public Object read(PipelineContext pipelineContext, ProcessorInput input) {
-                        read[0] = true;
-                        if (logger.isDebugEnabled())
-                            logger.debug("Output not cached");
-                        try {
-                            final ExtendedResultStoreOutputStream resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream);
-                            // NOTE: readInput will call response.setContentType(), so we intercept and save the set contentType
-                            // Other headers are set above 
-                            readInput(pipelineContext, new ResponseWrapper(response) {
-                                public void setContentType(String contentType) {
-                                    resultStoreOutputStream.setContentType(contentType);
-                                    super.setContentType(contentType);
-                                }
-                            }, input, config, resultStoreOutputStream);
-                            resultStoreOutputStream.close();
-                            return resultStoreOutputStream;
-                        } catch (IOException e) {
-                            throw new OXFException(e);
+                    // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
+                    final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());
+                    if (!isForward) {
+                        // Check If-Modified-Since (conditional GET) and don't return content if condition is met
+                        if (!response.checkIfModifiedSince(lastModified, true)) {
+                            response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                            if (logger.isDebugEnabled())
+                                logger.debug("Sending SC_NOT_MODIFIED");
+                            return;
                         }
                     }
-                });
 
-                // If the output was obtained from the cache, just write it
-                if (!read[0]) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Serializer output cached");
-                    if (externalContext != null) {
-                        // Set saved content type
-                        final String contentType = resultStore.getContentType();
-                        if (contentType != null)
-                            response.setContentType(contentType);
-                        // Set length since we know it
-                        response.setContentLength(resultStore.length(pipelineContext));
+                    // Set status code
+                    // STATUS CODE: Processing instruction can override this when the input is being read
+                    response.setStatus(config.statusCode);
+
+                    // Set custom headers
+                    if (config.headers != null) {
+                        for (Iterator<String> i = config.headers.iterator(); i.hasNext();) {
+                            String name = i.next();
+                            String value = i.next();
+                            response.setHeader(name, value);
+                        }
                     }
-                    // Replay content
-                    resultStore.replay(pipelineContext);
                 }
-            } else {
-                // Local caching is not enabled, just read the input
-                readInput(pipelineContext, response, dataInput, config, httpOutputStream);
-                httpOutputStream.close();
+
+                // If we have an empty body, return w/o reading the data input
+                if (config.empty)
+                    return;
+
+                final OutputStream httpOutputStream = response.getOutputStream();
+
+                if (config.cacheUseLocalCache) {
+                    // If local caching of the data is enabled, use the caching API
+                    // We return a ResultStore
+                    final boolean[] read = new boolean[1];
+                    final ExtendedResultStoreOutputStream resultStore = (ExtendedResultStoreOutputStream) readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader() {
+                        public Object read(PipelineContext pipelineContext, ProcessorInput input) {
+                            read[0] = true;
+                            if (logger.isDebugEnabled())
+                                logger.debug("Output not cached");
+                            try {
+                                final ExtendedResultStoreOutputStream resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream);
+                                // NOTE: readInput will call response.setContentType(), so we intercept and save the set contentType
+                                // Other headers are set above
+                                readInput(pipelineContext, new ResponseWrapper(response) {
+                                    public void setContentType(String contentType) {
+                                        resultStoreOutputStream.setContentType(contentType);
+                                        super.setContentType(contentType);
+                                    }
+                                }, input, config, resultStoreOutputStream);
+                                resultStoreOutputStream.close();
+                                return resultStoreOutputStream;
+                            } catch (IOException e) {
+                                throw new OXFException(e);
+                            }
+                        }
+                    });
+
+                    // If the output was obtained from the cache, just write it
+                    if (!read[0]) {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Serializer output cached");
+                        if (externalContext != null) {
+                            // Set saved content type
+                            final String contentType = resultStore.getContentType();
+                            if (contentType != null)
+                                response.setContentType(contentType);
+                            // Set length since we know it
+                            response.setContentLength(resultStore.length(pipelineContext));
+                        }
+                        // Replay content
+                        resultStore.replay(pipelineContext);
+                    }
+                } else {
+                    // Local caching is not enabled, just read the input
+                    readInput(pipelineContext, response, dataInput, config, httpOutputStream);
+                    httpOutputStream.close();
+                }
+            } catch (java.net.SocketException e) {
+                // In general there is no point doing much with such exceptions. They are thrown in particular when the
+                // client has closed the connection.
+                logger.info("SocketException in serializer");
             }
         } catch (Exception e) {
             throw new OXFException(e);

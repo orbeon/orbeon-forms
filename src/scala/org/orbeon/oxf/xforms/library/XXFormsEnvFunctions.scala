@@ -78,6 +78,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("type", classOf[XXFormsType], 0, 0, 1, QNAME, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
+
+        // xxforms:custom-mip
+        Fun("custom-mip", classOf[XXFormsCustomMIP], 0, 2, 2, STRING, ALLOWS_ZERO_OR_ONE,
+            Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(STRING, EXACTLY_ONE)
+        )
     
         // xxforms:get-request-parameter()
         Fun("invalid-binds", classOf[XXFormsInvalidBinds], 0, 0, 1, STRING, ALLOWS_ZERO_OR_MORE,

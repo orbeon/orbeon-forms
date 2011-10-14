@@ -28,13 +28,14 @@ import xml.{NodeSeq, Node, XML}
 
  Supports:
 
- * storing and retrieving XML data
- * storing and retrieving data attachments
- * searching: all, keyword, and structured
+ - storing and retrieving XML data
+ - storing and retrieving data attachments
+ - searching: all, keyword, and structured
 
  Known issues:
 
- * reusing connection to MongoDB (opens/closes at each request)
+ - reusing connection to MongoDB (opens/closes at each request)
+
 */
 class MongoDBPersistence extends HttpServlet {
 

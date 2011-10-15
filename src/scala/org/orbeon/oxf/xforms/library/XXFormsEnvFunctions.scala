@@ -29,99 +29,99 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Namespace(XFormsConstants.XXFORMS_NAMESPACE_URI) {
     
         // xxforms:event()
-        Fun("event", classOf[XXFormsEvent], 0, 1, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("event", classOf[XXFormsEvent], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
-        Fun("case", classOf[XXFormsCase], 0, 1, 1, STRING, EXACTLY_ONE,
+        Fun("case", classOf[XXFormsCase], 0, 1, STRING, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:repeat-current
-        Fun("repeat-current", classOf[XXFormsRepeatCurrent], 0, 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("repeat-current", classOf[XXFormsRepeatCurrent], 0, 0, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:repeat-position
-        Fun("repeat-position", classOf[XXFormsRepeatPosition], 0, 0, 1, INTEGER, EXACTLY_ONE,
+        Fun("repeat-position", classOf[XXFormsRepeatPosition], 0, 0, INTEGER, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:context
-        Fun("context", classOf[XXFormsContext], 0, 1, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+        Fun("context", classOf[XXFormsContext], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:repeat-nodeset
-        Fun("repeat-nodeset", classOf[XXFormsRepeatNodeset], 0, 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("repeat-nodeset", classOf[XXFormsRepeatNodeset], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:bind
-        Fun("bind", classOf[XXFormsBind], 0, 1, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("bind", classOf[XXFormsBind], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:bind-property
-        Fun("evaluate-bind-property", classOf[XXFormsEvaluateBindProperty], 0, 2, 2, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+        Fun("evaluate-bind-property", classOf[XXFormsEvaluateBindProperty], 0, 2, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(ANY_ATOMIC, EXACTLY_ONE) // QName or String
         )
     
         // xxforms:valid
-        Fun("valid", classOf[XXFormsValid], 0, 0, 3, BOOLEAN, EXACTLY_ONE,
+        Fun("valid", classOf[XXFormsValid], 0, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
     
         // xxforms:type
-        Fun("type", classOf[XXFormsType], 0, 0, 1, QNAME, ALLOWS_ZERO_OR_MORE,
+        Fun("type", classOf[XXFormsType], 0, 0, QNAME, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
 
         // xxforms:custom-mip
-        Fun("custom-mip", classOf[XXFormsCustomMIP], 0, 2, 2, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("custom-mip", classOf[XXFormsCustomMIP], 0, 2, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:get-request-parameter()
-        Fun("invalid-binds", classOf[XXFormsInvalidBinds], 0, 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
+        Fun("invalid-binds", classOf[XXFormsInvalidBinds], 0, 0, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // xxforms:if
-        Fun("if", classOf[If], 0, 3, 3, STRING, EXACTLY_ONE,
+        Fun("if", classOf[If], 0, 3, STRING, EXACTLY_ONE,
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:element
-        Fun("element", classOf[XXFormsElement], 0, 1, 2, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("element", classOf[XXFormsElement], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE),
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // xxforms:attribute
-        Fun("attribute", classOf[XXFormsAttribute], 0, 1, 2, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("attribute", classOf[XXFormsAttribute], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE),
             Arg(ANY_ATOMIC, EXACTLY_ONE)
         )
     
         // xxforms:binding
-        Fun("binding", classOf[XXFormsBinding], 0, 1, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("binding", classOf[XXFormsBinding], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:mutable
-        Fun("mutable-document", classOf[XXFormsMutableDocument], 0, 1, 1, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("mutable-document", classOf[XXFormsMutableDocument], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, EXACTLY_ONE)
         )
     
         // xxforms:component-context
-        Fun("component-context", classOf[XXFormsComponentContext], 0, 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+        Fun("component-context", classOf[XXFormsComponentContext], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     
         // xxforms:sort
         // TODO: Support XSLT 2.0 enhancements and multiple sort keys
@@ -133,95 +133,95 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         //        Arg(STRING, ALLOWS_ZERO_OR_ONE)
     
         // xxforms:instance
-        Fun("instance", classOf[XXFormsInstance], 0, 1, 2, Type.NODE_TYPE, EXACTLY_ONE,
+        Fun("instance", classOf[XXFormsInstance], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
     
         // xxforms:index
-        Fun("index", classOf[XXFormsIndex], 0, 0, 1, INTEGER, EXACTLY_ONE,
+        Fun("index", classOf[XXFormsIndex], 0, 0, INTEGER, EXACTLY_ONE,
             Arg(STRING, ALLOWS_ZERO_OR_ONE)
         )
     
         // xxforms:list-models
-        Fun("list-models", classOf[XXFormsListModels], 0, 0, 0, STRING, ALLOWS_ZERO_OR_MORE)
+        Fun("list-models", classOf[XXFormsListModels], 0, 0, STRING, ALLOWS_ZERO_OR_MORE)
     
         // xxforms:list-instances
-        Fun("list-instances", classOf[XXFormsListInstances], 0, 1, 1, STRING, ALLOWS_ZERO_OR_MORE,
+        Fun("list-instances", classOf[XXFormsListInstances], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:list-variables
-        Fun("list-variables", classOf[XXFormsListVariables], 0, 1, 1, STRING, ALLOWS_ZERO_OR_MORE,
+        Fun("list-variables", classOf[XXFormsListVariables], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:get-variable
-        Fun("get-variable", classOf[XXFormsGetVariable], 0, 2, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("get-variable", classOf[XXFormsGetVariable], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:itemset()
-        Fun("itemset", classOf[XXFormsItemset], 0, 2, 3, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("itemset", classOf[XXFormsItemset], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
     
         // xxforms:format-message()
-        Fun("format-message", classOf[XXFormsFormatMessage], 0, 2, 2, STRING, EXACTLY_ONE,
+        Fun("format-message", classOf[XXFormsFormatMessage], 0, 2, STRING, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // xxforms:lang()
-        Fun("lang", classOf[XXFormsLang], 0, 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("lang", classOf[XXFormsLang], 0, 0, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:pending-uploads()
-        Fun("pending-uploads", classOf[XXFormsPendingUploads], 0, 0, 0, INTEGER, EXACTLY_ONE)
+        Fun("pending-uploads", classOf[XXFormsPendingUploads], 0, 0, INTEGER, EXACTLY_ONE)
     
         // xxforms:document-id()
-        Fun("document-id", classOf[XXFormsDocumentId], 0, 0, 0, STRING, EXACTLY_ONE)
+        Fun("document-id", classOf[XXFormsDocumentId], 0, 0, STRING, EXACTLY_ONE)
     
         // xxforms:document
-        Fun("create-document", classOf[XXFormsCreateDocument], 0, 0, 0, Type.NODE_TYPE, EXACTLY_ONE)
+        Fun("create-document", classOf[XXFormsCreateDocument], 0, 0, Type.NODE_TYPE, EXACTLY_ONE)
     
         // xxforms:label, xxforms:help, xxforms:hint, xxforms:alert
-        Fun("label", classOf[XXFormsLHHA], 0, 1, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("label", classOf[XXFormsLHHA], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-        Fun("help", classOf[XXFormsLHHA], 1, 1, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("help", classOf[XXFormsLHHA], 1, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-        Fun("hint", classOf[XXFormsLHHA], 2, 1, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("hint", classOf[XXFormsLHHA], 2, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
-        Fun("alert", classOf[XXFormsLHHA], 3, 1, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("alert", classOf[XXFormsLHHA], 3, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:effective-id
-        Fun("effective-id", classOf[XXFormsEffectiveId], 0, 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
+        Fun("effective-id", classOf[XXFormsEffectiveId], 0, 0, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
     
         // xxforms:control-element
-        Fun("control-element", classOf[XXFormsControlElement], 0, 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+        Fun("control-element", classOf[XXFormsControlElement], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // xxforms:extract-document
-        Fun("extract-document", classOf[XXFormsExtractDocument], 0, 1, 3, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+        Fun("extract-document", classOf[XXFormsExtractDocument], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
             Arg(Type.NODE_TYPE, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
     
         // xxforms:sort()
-        Fun("sort", classOf[XXFormsSort], 0, 2, 5, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("sort", classOf[XXFormsSort], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(Type.ITEM_TYPE, EXACTLY_ONE),
             Arg(STRING, ALLOWS_ZERO_OR_ONE),

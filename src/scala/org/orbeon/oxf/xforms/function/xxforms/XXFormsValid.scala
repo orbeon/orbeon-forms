@@ -66,4 +66,3 @@ class XXFormsValid extends XXFormsMIPFunction {
         }
     }
 }
-

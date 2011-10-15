@@ -28,22 +28,22 @@ trait EXFormsFunctions extends OrbeonFunctionLibrary {
     Namespace(XFormsConstants.EXFORMS_NAMESPACE_URI) {
         
         // exf:relevant()
-        Fun("relevant", classOf[EXFormsRelevant], 0, 0, 1, BOOLEAN, EXACTLY_ONE,
+        Fun("relevant", classOf[EXFormsRelevant], 0, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // exf:readonly()
-        Fun("readonly", classOf[EXFormsReadonly], 0, 0, 1, BOOLEAN, EXACTLY_ONE,
+        Fun("readonly", classOf[EXFormsReadonly], 0, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // exf:required()
-        Fun("required", classOf[EXFormsRequired], 0, 0, 1, BOOLEAN, EXACTLY_ONE,
+        Fun("required", classOf[EXFormsRequired], 0, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // exf:sort()
-        Fun("sort", classOf[EXFormsSort], 0, 2, 5, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("sort", classOf[EXFormsSort], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, ALLOWS_ZERO_OR_ONE),

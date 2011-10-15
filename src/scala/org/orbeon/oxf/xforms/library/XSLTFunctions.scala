@@ -24,7 +24,7 @@ import org.orbeon.saxon.om.StandardNames
  */
 trait XSLTFunctions extends OrbeonFunctionLibrary {
 
-    Fun("format-date", classOf[FormatDate], StandardNames.XS_DATE, 2, 5, STRING, EXACTLY_ONE,
+    Fun("format-date", classOf[FormatDate], StandardNames.XS_DATE, 2, STRING, EXACTLY_ONE,
         Arg(DATE, ALLOWS_ZERO_OR_ONE),
         Arg(STRING, EXACTLY_ONE),
         Arg(STRING, ALLOWS_ZERO_OR_ONE),
@@ -32,7 +32,7 @@ trait XSLTFunctions extends OrbeonFunctionLibrary {
         Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
-    Fun("format-dateTime", classOf[FormatDate], StandardNames.XS_DATE_TIME, 2, 5, STRING, EXACTLY_ONE,
+    Fun("format-dateTime", classOf[FormatDate], StandardNames.XS_DATE_TIME, 2, STRING, EXACTLY_ONE,
         Arg(DATE_TIME, ALLOWS_ZERO_OR_ONE),
         Arg(STRING, EXACTLY_ONE),
         Arg(STRING, ALLOWS_ZERO_OR_ONE),
@@ -40,13 +40,13 @@ trait XSLTFunctions extends OrbeonFunctionLibrary {
         Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
-    Fun("format-number", classOf[FormatNumber], 0, 2, 3, STRING, EXACTLY_ONE,
+    Fun("format-number", classOf[FormatNumber], 0, 2, STRING, EXACTLY_ONE,
         Arg(NUMERIC, ALLOWS_ZERO_OR_ONE),
         Arg(STRING, EXACTLY_ONE),
         Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("format-time", classOf[FormatDate], StandardNames.XS_TIME, 2, 5, STRING, EXACTLY_ONE,
+    Fun("format-time", classOf[FormatDate], StandardNames.XS_TIME, 2, STRING, EXACTLY_ONE,
         Arg(TIME, ALLOWS_ZERO_OR_ONE),
         Arg(STRING, EXACTLY_ONE),
         Arg(STRING, ALLOWS_ZERO_OR_ONE),

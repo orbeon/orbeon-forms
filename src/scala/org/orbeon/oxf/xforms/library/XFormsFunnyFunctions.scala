@@ -17,24 +17,25 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.oxf.xforms.function.{Power, CountNonEmpty, IsCardNumber, BooleanFromString}
+
 /**
  * XForms functions that are a bit funny.
  */
 trait XFormsFunnyFunctions extends OrbeonFunctionLibrary {
     
-    Fun("boolean-from-string", classOf[BooleanFromString], 0, 1, 1, BOOLEAN, EXACTLY_ONE,
+    Fun("boolean-from-string", classOf[BooleanFromString], 0, 1, BOOLEAN, EXACTLY_ONE,
         Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("is-card-number", classOf[IsCardNumber], 0, 1, 1, BOOLEAN, EXACTLY_ONE,
+    Fun("is-card-number", classOf[IsCardNumber], 0, 1, BOOLEAN, EXACTLY_ONE,
         Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("count-non-empty", classOf[CountNonEmpty], 0, 1, 1, INTEGER, EXACTLY_ONE,
+    Fun("count-non-empty", classOf[CountNonEmpty], 0, 1, INTEGER, EXACTLY_ONE,
         Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
     )
 
-    Fun("power", classOf[Power], 0, 2, 2, NUMERIC, EXACTLY_ONE,
+    Fun("power", classOf[Power], 0, 2, NUMERIC, EXACTLY_ONE,
         Arg(NUMERIC, EXACTLY_ONE),
         Arg(NUMERIC, EXACTLY_ONE)
     )

@@ -18,28 +18,29 @@ import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.oxf.xforms.function._
+
 /**
  * XForms functions that depend on the XForms environment.
  */
 trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
-    Fun("index", classOf[Index], 0, 1, 1, INTEGER, EXACTLY_ONE,
+    Fun("index", classOf[Index], 0, 1, INTEGER, EXACTLY_ONE,
         Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("property", classOf[Property], 0, 1, 1, STRING, EXACTLY_ONE,
+    Fun("property", classOf[Property], 0, 1, STRING, EXACTLY_ONE,
         Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("instance", classOf[Instance], 0, 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+    Fun("instance", classOf[Instance], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
         Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("current", classOf[Current], 0, 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    Fun("current", classOf[Current], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
 
-    Fun("context", classOf[Context], 0, 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    Fun("context", classOf[Context], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
 
-    Fun("event", classOf[Event], 0, 1, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+    Fun("event", classOf[Event], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
         Arg(STRING, EXACTLY_ONE)
     )
 }

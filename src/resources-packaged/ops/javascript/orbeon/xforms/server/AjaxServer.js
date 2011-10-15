@@ -1208,11 +1208,11 @@
                                             { type: "time",     schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}time", "{http://www.w3.org/2002/xforms}time" ], className: "xforms-type-time" },
                                             { type: "dateTime", schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}dateTime", "{http://www.w3.org/2002/xforms}dateTime" ], className: "xforms-type-dateTime" },
                                             { type: "boolean",  schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}boolean", "{http://www.w3.org/2002/xforms}boolean" ], className: "xforms-type-boolean" },
-                                            { type: "string",   schemaTypes: null, className: null }
+                                            { type: "string",   schemaTypes: null, className: "xforms-type-string" }
                                         ];
 
-                                        /** @type {Object} */ var existingType = _.detect(INPUT_TYPES, function(type) { return type.className == null || YAHOO.util.Dom.hasClass(documentElement, type.className); });
-                                        /** @type {Object} */ var newType = _.detect(INPUT_TYPES, function(type) { return type.schemaTypes == null || _.include(type.schemaTypes, newSchemaType); });
+                                        var existingType = _.detect(INPUT_TYPES, function(type) { return type.schemaTypes == null || YAHOO.util.Dom.hasClass(documentElement, type.className); });
+                                        var newType =      _.detect(INPUT_TYPES, function(type) { return type.schemaTypes == null || _.include(type.schemaTypes, newSchemaType); });
                                         if (newType != existingType) {
 
                                             // Remember that this input has be recreated which means we need to update its value
@@ -1223,36 +1223,42 @@
                                             // Minimal control content can be different
                                             var isMinimal = YAHOO.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
 
-                                            // Find the position of the last label before the control "actual content"
-                                            // and remove all elements that are not labels
-                                            var lastLabelPosition = -1;
-                                            var childElements = YAHOO.util.Dom.getChildren(documentElement);
-                                            for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
-                                                var childElement = childElements[childIndex];
-                                                if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
-                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
-                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
-                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
-                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
-                                                    documentElement.removeChild(childElement);
-                                                    if (lastLabelPosition == -1)
-                                                        lastLabelPosition = childIndex - 1;
+                                            // Find the position of the last label before the control "actual content" and remove all elements that are not labels
+                                            // A value of -1 means that the content came before any label
+                                            var lastLabelPosition = null;
+                                            (function() {
+                                                var childElements = YAHOO.util.Dom.getChildren(documentElement);
+                                                for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
+                                                    var childElement = childElements[childIndex];
+                                                    if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
+                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
+                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
+                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
+                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
+                                                        documentElement.removeChild(childElement);
+                                                        if (lastLabelPosition == null)
+                                                            lastLabelPosition = childIndex - 1;
+                                                    }
                                                 }
-                                            }
+                                            })();
 
                                             function insertIntoDocument(nodes) {
                                                 if (ORBEON.util.Utils.isNewXHTMLLayout()) {
+                                                    var childElements = YAHOO.util.Dom.getChildren(documentElement);
                                                     // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                    if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
+                                                    if (childElements.length == 0) {
                                                         for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                             documentElement.appendChild(nodes[nodeIndex]);
                                                     } else if (lastLabelPosition == -1) {
-                                                        var firstChild = YAHOO.util.Dom.getFirstChild(documentElement);
-                                                        for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
+                                                        // Insert before everything else
+                                                        var firstChild = childElements[0];
+                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                             YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
                                                     } else {
-                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                            YAHOO.util.Dom.insertAfter(nodes[nodeIndex], childElements[lastLabelPosition]);
+                                                        // Insert after a LHHA
+                                                        var lhha = childElements[lastLabelPosition];
+                                                        for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
+                                                            YAHOO.util.Dom.insertAfter(nodes[nodeIndex], lhha);
                                                     }
                                                 } else {
                                                     // Old markup: insert in container, which will be empty

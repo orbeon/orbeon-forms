@@ -72,12 +72,9 @@ public class XFormsSubmissionUtils {
      * @param indentedLogger        logger
      * @param startNode             node to check
      * @param recurse               whether to recurse into attributes and descendant nodes
-     * @param checkValid            whether to check validity
-     * @param checkRequired         whether to check required
      * @return                      true iif the sub-tree passes the checks
      */
-    public static boolean isSatisfiesValidRequired(final IndentedLogger indentedLogger, final Node startNode, boolean recurse,
-                                                   final boolean checkValid, final boolean checkRequired) {
+    public static boolean isSatisfiesValid(final IndentedLogger indentedLogger, final Node startNode, boolean recurse) {
 
         if (recurse) {
             // Recurse into attributes and descendant nodes
@@ -107,58 +104,14 @@ public class XFormsSubmissionUtils {
                 }
 
                 private boolean checkInstanceData(Node node) {
-                    // Check "valid" MIP
-                    if (checkValid && !InstanceData.getValid(node)) return false;
-                    // TODO: should remove the code below, as required-but-empty is now included in notion of validity
-                    // Check "required" MIP
-                    if (checkRequired) {
-                        final boolean isRequired = InstanceData.getRequired(node);
-                        if (isRequired) {
-                            final String value = XFormsInstance.getValueForNode(node);
-                            if (value.length() == 0) {
-                                // Required and empty
-                                return false;
-                            }
-                        }
-                    }
-                    return true;
+                    return InstanceData.getValid(node);
                 }
             });
             return instanceSatisfiesValidRequired[0];
         } else {
             // Just check the current node
-            // Check "valid" MIP
-            if (checkValid && !InstanceData.getValid(startNode)) return false;
-            // Check "required" MIP
-            if (checkRequired) {
-                final boolean isRequired = InstanceData.getRequired(startNode);
-                if (isRequired) {
-                    final String value = XFormsInstance.getValueForNode(startNode);
-                    if (value.length() == 0) {
-                        // Required and empty
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return InstanceData.getValid(startNode);
         }
-    }
-
-    public static boolean isSatisfiesValidRequired(NodeInfo nodeInfo, boolean checkValid, boolean checkRequired) {
-        // Check "valid" MIP
-        if (checkValid && !InstanceData.getValid(nodeInfo)) return false;
-        // Check "required" MIP
-        if (checkRequired) {
-            final boolean isRequired = InstanceData.getRequired(nodeInfo);
-            if (isRequired) {
-                final String value = XFormsInstance.getValueForNodeInfo(nodeInfo);
-                if (value.length() == 0) {
-                    // Required and empty
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     /**

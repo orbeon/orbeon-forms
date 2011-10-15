@@ -217,8 +217,8 @@ object XML {
         def stringValue = nodeInfo.getStringValue
 
         private def find(axisNumber: Byte, test: Test) = {
-            // We know the result contains only NodeInfo
-            val iterator: Iterator[NodeInfo] = nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))
+            // We know the result contains only NodeInfo, but ouch, this is a cast!
+            val iterator = asScalaIterator(nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))).asInstanceOf[Iterator[NodeInfo]]
             // Be lazy: a good idea?
             iterator.toStream
         }
@@ -295,18 +295,18 @@ object XML {
 
     implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
 
-    implicit def saxonIteratorToScalaIterator[T <: Item](i: SequenceIterator): Iterator[T] = new Iterator[T] {
+    implicit def asScalaIterator(i: SequenceIterator): Iterator[Item] = new Iterator[Item] {
 
         private var current = i.next()
 
         def next() = {
             val result = current
             current = i.next()
-            result.asInstanceOf[T]
+            result
         }
 
         def hasNext = current ne null
     }
 
-    implicit def saxonIteratorToScalaSeq[T <: Item](i: SequenceIterator): Seq[T] = saxonIteratorToScalaIterator[T](i).toSeq
+    implicit def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).toSeq
 }

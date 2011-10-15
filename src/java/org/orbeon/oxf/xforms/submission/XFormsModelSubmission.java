@@ -1186,7 +1186,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean instanceSatisfiesValidRequired
                 = (currentInstance != null && currentInstance.isReadOnly())
                 || !resolvedValidate
-                || XFormsSubmissionUtils.isSatisfiesValidRequired(indentedLogger, documentToSubmit, true, true, true);
+                || XFormsSubmissionUtils.isSatisfiesValid(indentedLogger, documentToSubmit, true);
         if (!instanceSatisfiesValidRequired) {
             if (indentedLogger.isDebugEnabled()) {
                 final String documentString = TransformerUtils.tinyTreeToString(currentNodeInfo);

@@ -69,8 +69,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
     
         // xxforms:valid
-        Fun("valid", classOf[XXFormsValid], 0, 0, 2, BOOLEAN, EXACTLY_ONE,
-            Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE),
+        Fun("valid", classOf[XXFormsValid], 0, 0, 3, BOOLEAN, EXACTLY_ONE,
+            Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(BOOLEAN, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
     

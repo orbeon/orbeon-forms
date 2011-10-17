@@ -2190,118 +2190,185 @@
     </test>
 
     <test description="xxforms:valid()" name="oxf:pipeline">
-            <input name="config" href="wrap-xforms-state.xpl"/>
-            <input name="document">
-                <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                    <head>
-                        <xforms:model id="model">
-                            <xforms:instance id="instance">
-                                <instance xmlns="">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <items>
+                                    <element><valid-relevant/></element>
+                                    <element><invalid-relevant/></element>
+                                    <element><valid-non-relevant/></element>
+                                    <element><invalid-non-relevant/></element>
+                                </items>
+                                <valid-attribute my-att=""/>
+                                <valid-descendant><my-element/></valid-descendant>
+                                <invalid-attribute my-att=""/>
+                                <invalid-descendant><my-element/></invalid-descendant>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind ref="items">
+                            <xforms:bind ref="element/valid-relevant"/>
+                            <xforms:bind ref="element/invalid-relevant" constraint="false()"/>
+                            <xforms:bind ref="element/valid-non-relevant" relevant="false()"/>
+                            <xforms:bind ref="element/invalid-non-relevant" constraint="false()" relevant="false()"/>
+                        </xforms:bind>
+                        <xforms:bind ref="invalid-attribute/@my-att" constraint="false()"/>
+                        <xforms:bind ref="invalid-descendant/my-element" constraint="false()"/>
+                    </xforms:model>
+                </head>
+                <body>
+                    <xforms:repeat ref="1 to count(items/*)">
+                        <xxforms:var name="e" value="instance()/items/element[xxforms:repeat-position()]"/>
+                        <xforms:output id="o1" value="xxforms:valid($e/*)"/>
+                        <xforms:output id="o2" value="xxforms:valid($e/*, false(), true())"/>
+                        <xforms:output id="o3" value="xxforms:valid($e, true())"/>
+                        <xforms:output id="o4" value="xxforms:valid($e, true(), true())"/>
+                    </xforms:repeat>
+
+                    <xforms:output id="valid-attribute" value="xxforms:valid(valid-attribute, true())"/>
+                    <xforms:output id="valid-descendant" value="xxforms:valid(valid-descendant, true())"/>
+                    <xforms:output id="invalid-attribute" value="xxforms:valid(invalid-attribute, true())"/>
+                    <xforms:output id="invalid-descendant" value="xxforms:valid(invalid-descendant, true())"/>
+                    <xforms:output id="valid-atomic" value="xxforms:valid(42)"/>
+                    <xforms:output id="valid-empty" value="xxforms:valid(())"/>
+                </body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
                                     <items>
-                                        <element><valid-relevant/></element>
-                                        <element><invalid-relevant/></element>
-                                        <element><valid-non-relevant/></element>
-                                        <element><invalid-non-relevant/></element>
+                                        <element>
+                                            <valid-relevant/>
+                                        </element>
+                                        <element>
+                                            <invalid-relevant/>
+                                        </element>
+                                        <element>
+                                            <valid-non-relevant/>
+                                        </element>
+                                        <element>
+                                            <invalid-non-relevant/>
+                                        </element>
                                     </items>
                                     <valid-attribute my-att=""/>
-                                    <valid-descendant><my-element/></valid-descendant>
+                                    <valid-descendant>
+                                        <my-element/>
+                                    </valid-descendant>
                                     <invalid-attribute my-att=""/>
-                                    <invalid-descendant><my-element/></invalid-descendant>
+                                    <invalid-descendant>
+                                        <my-element/>
+                                    </invalid-descendant>
                                 </instance>
-                            </xforms:instance>
-                            <xforms:bind ref="items">
-                                <xforms:bind ref="element/valid-relevant"/>
-                                <xforms:bind ref="element/invalid-relevant" constraint="false()"/>
-                                <xforms:bind ref="element/valid-non-relevant" relevant="false()"/>
-                                <xforms:bind ref="element/invalid-non-relevant" constraint="false()" relevant="false()"/>
-                            </xforms:bind>
-                            <xforms:bind ref="invalid-attribute/@my-att" constraint="false()"/>
-                            <xforms:bind ref="invalid-descendant/my-element" constraint="false()"/>
-                        </xforms:model>
-                    </head>
-                    <body>
-                        <xforms:repeat ref="1 to count(items/*)">
-                            <xxforms:var name="e" value="instance()/items/element[xxforms:repeat-position()]"/>
-                            <xforms:output id="o1" value="xxforms:valid($e/*)"/>
-                            <xforms:output id="o2" value="xxforms:valid($e/*, false(), true())"/>
-                            <xforms:output id="o3" value="xxforms:valid($e, true())"/>
-                            <xforms:output id="o4" value="xxforms:valid($e, true(), true())"/>
-                        </xforms:repeat>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-8" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="o1·1">true</xxf:control>
+                        <xxf:control id="o2·1">true</xxf:control>
+                        <xxf:control id="o3·1">true</xxf:control>
+                        <xxf:control id="o4·1">true</xxf:control>
+                        <xxf:control id="o1·2">false</xxf:control>
+                        <xxf:control id="o2·2">false</xxf:control>
+                        <xxf:control id="o3·2">false</xxf:control>
+                        <xxf:control id="o4·2">false</xxf:control>
+                        <xxf:control id="o1·3">true</xxf:control>
+                        <xxf:control id="o2·3">true</xxf:control>
+                        <xxf:control id="o3·3">true</xxf:control>
+                        <xxf:control id="o4·3">true</xxf:control>
+                        <xxf:control id="o1·4">false</xxf:control>
+                        <xxf:control id="o2·4">true</xxf:control>
+                        <xxf:control id="o3·4">false</xxf:control>
+                        <xxf:control id="o4·4">true</xxf:control>
+                        <xxf:control id="valid-attribute">true</xxf:control>
+                        <xxf:control id="valid-descendant">true</xxf:control>
+                        <xxf:control id="invalid-attribute">false</xxf:control>
+                        <xxf:control id="invalid-descendant">false</xxf:control>
+                        <xxf:control id="valid-atomic">true</xxf:control>
+                        <xxf:control id="valid-empty">true</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
-                        <xforms:output id="valid-attribute" value="xxforms:valid(valid-attribute, true())"/>
-                        <xforms:output id="valid-descendant" value="xxforms:valid(valid-descendant, true())"/>
-                        <xforms:output id="invalid-attribute" value="xxforms:valid(invalid-attribute, true())"/>
-                        <xforms:output id="invalid-descendant" value="xxforms:valid(invalid-descendant, true())"/>
-                        <xforms:output id="valid-atomic" value="xxforms:valid(42)"/>
-                        <xforms:output id="valid-empty" value="xxforms:valid(())"/>
-                    </body>
-                </xhtml:html>
-            </input>
-            <output name="response">
-                <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                    <xxf:dynamic-state>
-                        <dynamic-state>
-                            <instances>
-                                <instance id="instance" model-id="model">
-                                    <instance>
-                                        <items>
-                                            <element>
-                                                <valid-relevant/>
-                                            </element>
-                                            <element>
-                                                <invalid-relevant/>
-                                            </element>
-                                            <element>
-                                                <valid-non-relevant/>
-                                            </element>
-                                            <element>
-                                                <invalid-non-relevant/>
-                                            </element>
-                                        </items>
-                                        <valid-attribute my-att=""/>
-                                        <valid-descendant>
-                                            <my-element/>
-                                        </valid-descendant>
-                                        <invalid-attribute my-att=""/>
-                                        <invalid-descendant>
-                                            <my-element/>
-                                        </invalid-descendant>
-                                    </instance>
-                                </instance>
-                            </instances>
-                            <controls>
-                                <control effective-id="xf-8" index="1"/>
-                            </controls>
-                        </dynamic-state>
-                    </xxf:dynamic-state>
-                    <xxf:action>
-                        <xxf:control-values>
-                            <xxf:control id="o1·1">true</xxf:control>
-                            <xxf:control id="o2·1">true</xxf:control>
-                            <xxf:control id="o3·1">true</xxf:control>
-                            <xxf:control id="o4·1">true</xxf:control>
-                            <xxf:control id="o1·2">false</xxf:control>
-                            <xxf:control id="o2·2">false</xxf:control>
-                            <xxf:control id="o3·2">false</xxf:control>
-                            <xxf:control id="o4·2">false</xxf:control>
-                            <xxf:control id="o1·3">true</xxf:control>
-                            <xxf:control id="o2·3">true</xxf:control>
-                            <xxf:control id="o3·3">true</xxf:control>
-                            <xxf:control id="o4·3">true</xxf:control>
-                            <xxf:control id="o1·4">false</xxf:control>
-                            <xxf:control id="o2·4">true</xxf:control>
-                            <xxf:control id="o3·4">false</xxf:control>
-                            <xxf:control id="o4·4">true</xxf:control>
-                            <xxf:control id="valid-attribute">true</xxf:control>
-                            <xxf:control id="valid-descendant">true</xxf:control>
-                            <xxf:control id="invalid-attribute">false</xxf:control>
-                            <xxf:control id="invalid-descendant">false</xxf:control>
-                            <xxf:control id="valid-atomic">true</xxf:control>
-                            <xxf:control id="valid-empty">true</xxf:control>
-                        </xxf:control-values>
-                    </xxf:action>
-                </xxf:event-response>
-            </output>
-        </test>
+    <test description="xxforms:custom-mip()" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:foo="http://orbeon.org/oxf/xml/foo">
+                <xhtml:head>
+                    <xforms:model id="my-model">
+                        <xforms:instance id="my-instance">
+                            <fruits>
+                                <orange>bloody</orange>
+                                <orange>valencia</orange>
+                                <apple>green</apple>
+                                <apple>red</apple>
+                                <apple>iPod</apple>
+                                <pear>green</pear>
+                                <pear>williams</pear>
+                                <pear>yellow</pear>
+                            </fruits>
+                        </xforms:instance>
+                        <xforms:bind ref="*" foo:bar="if (starts-with(., 'g')) then 'is-g' else 'is-not-g'"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat id="my-repeat" ref="*">
+                        <xforms:output id="my-output" value="xxforms:custom-mip(., 'foo:bar')"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="my-instance" model-id="my-model">
+                                <fruits>
+                                    <orange>bloody</orange>
+                                    <orange>valencia</orange>
+                                    <apple>green</apple>
+                                    <apple>red</apple>
+                                    <apple>iPod</apple>
+                                    <pear>green</pear>
+                                    <pear>williams</pear>
+                                    <pear>yellow</pear>
+                                </fruits>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output·1">is-not-g</xxf:control>
+                        <xxf:control id="my-output·2">is-not-g</xxf:control>
+                        <xxf:control id="my-output·3">is-g</xxf:control>
+                        <xxf:control id="my-output·4">is-not-g</xxf:control>
+                        <xxf:control id="my-output·5">is-not-g</xxf:control>
+                        <xxf:control id="my-output·6">is-g</xxf:control>
+                        <xxf:control id="my-output·7">is-not-g</xxf:control>
+                        <xxf:control id="my-output·8">is-not-g</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
 </group>

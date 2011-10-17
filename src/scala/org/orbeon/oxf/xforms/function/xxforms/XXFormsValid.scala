@@ -33,10 +33,7 @@ class XXFormsValid extends XXFormsMIPFunction {
         def effectiveBooleanValue(e: Expression) = ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
 
         // First item or context node if any
-        val item = argument.lift(0) match {
-            case Some(e: Expression) ⇒ Option(e.iterate(xpathContext).next())
-            case _ ⇒ Option(xpathContext.getContextItem)
-        }
+        val item = argument.lift(0) map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
         
         // Whether to recursively test the subtree
         val recurse = argument.lift(1) map (effectiveBooleanValue(_)) getOrElse false

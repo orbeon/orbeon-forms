@@ -123,15 +123,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         // xxforms:component-context
         Fun("component-context", classOf[XXFormsComponentContext], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     
-        // xxforms:sort
-        // TODO: Support XSLT 2.0 enhancements and multiple sort keys
-        //        FNFun("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}sort", classOf[EXFormsSort], 0, 5, 5, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        //        Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
-        //        Arg(STRING, ALLOWS_ONE)
-        //        Arg(STRING, ALLOWS_ZERO_OR_ONE)
-        //        Arg(STRING, ALLOWS_ZERO_OR_ONE)
-        //        Arg(STRING, ALLOWS_ZERO_OR_ONE)
-    
         // xxforms:instance
         Fun("instance", classOf[XXFormsInstance], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE),
@@ -221,6 +212,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
     
         // xxforms:sort()
+        // RFE: Support XSLT 2.0-features such as multiple sort keys
         Fun("sort", classOf[XXFormsSort], 0, 2, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(Type.ITEM_TYPE, EXACTLY_ONE),

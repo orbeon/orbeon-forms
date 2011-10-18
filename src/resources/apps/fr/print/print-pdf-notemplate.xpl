@@ -84,8 +84,7 @@
 
     <!-- Serialize HTML to PDF -->
     <p:processor name="oxf:xhtml-to-pdf">
-        <!--<p:input name="data" href="#xhtml-data" debug="xxx"/>-->
-        <p:input name="data" href="#rewritten-data" debug="xxx"/>
+        <p:input name="data" href="#rewritten-data"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

@@ -26,7 +26,9 @@ import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
@@ -754,16 +756,30 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         if (response == null) {
             response = new Response();
 
-            if (nativeRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE) != null) {
-                // If we are passed template URLs, then we use the template URL rewriter automatically
-                response.setURLRewriter(new TemplateURLRewriter(request));
-            } else if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
-                        "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
-                // Configuration asks to use portlet2/wsrp
+            // NOTE: This whole logic below could be used by ServletExternalContext and PortletExternalContext
+
+            // Check if there is an override of container type. This is currently used by the proxy portlet and by
+            // XHTMLToPDF, as both require a specific type of URL rewriting to take place. Using this header means that
+            // using a global property is not required anymore.
+            final String override = nativeRequest.getHeader("Orbeon-Container");
+            
+            if ("portlet".equals(override)) {
                 response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
-            } else {
-                // Default
+            } else if ("servlet".equals(override)) {
                 response.setURLRewriter(new ServletURLRewriter(getRequest()));
+            } else {
+                // No known override
+                if (nativeRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE) != null) {
+                    // If we are passed template URLs, then we use the template URL rewriter automatically
+                    response.setURLRewriter(new TemplateURLRewriter(request));
+                } else if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
+                            "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
+                    // Configuration asks to use portlet2/wsrp
+                    response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
+                } else {
+                    // Default
+                    response.setURLRewriter(new ServletURLRewriter(getRequest()));
+                }
             }
         }
         return response;

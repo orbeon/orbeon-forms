@@ -36,7 +36,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * XHTML to PDF converter using the Flying Saucer library.
@@ -57,7 +59,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
     protected void readInput(final PipelineContext pipelineContext, final ProcessorInput input, Config config, OutputStream outputStream) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = NetUtils.getExternalContext();
 
         // Read the input as a DOM
         final Document domDocument = readInputAsDOM(pipelineContext, input);
@@ -69,6 +71,8 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
         // Use servlet URL rewriter for resources, even in portlet mode, so that resources are served over HTTP by
         // the servlet and not looping back through the portal.
+        // NOTE: We could imagine loading resources through a local portlet submission. To do this, we need to properly
+        // abstract the xforms:submission code.
         final URLRewriter servletRewriter = new ServletURLRewriter(externalContext.getRequest());
 
         final ITextRenderer renderer = new ITextRenderer(DEFAULT_DOTS_PER_POINT, DEFAULT_DOTS_PER_PIXEL);
@@ -76,9 +80,14 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         // Embed fonts if needed, based on configuration properties
         embedFonts(renderer);
 
-
         try {
             final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
+                // Called for:
+                //
+                // - CSS URLs
+                // - image URLs
+                // - link clicked / form submission (not relevant for our usage)
+                // - resolveAndOpenStream below
                 public String resolveURI(String uri) {
                     // Our own resolver
 
@@ -92,13 +101,26 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     return externalContext.rewriteServiceURL(path, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
                 }
 
+                // Called by:
+                //
+                // - getCSSResource
+                // - getImageResource below
+                // - getBinaryResource (not sure when called)
+                // - getXMLResource (not sure when called)
                 protected InputStream resolveAndOpenStream(String uri) {
                     try {
                         final String resolvedURI = resolveURI(uri);
                         // TODO: Use xforms:submission code instead
+
+                        // Tell callee we are loading that we are a servlet environment, as in effect we act like
+                        // a browser retrieving resources directly, not like a portlet. This is the case also if we are
+                        // called by the proxy portlet or if we are directly within a portlet.
+                        final Map<String, String[]> headers = new HashMap<String, String[]>();
+                        headers.put("Orbeon-Container", new String[] { "servlet" });
+                        
                         final ConnectionResult connectionResult
                             = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                                new URL(resolvedURI), null, null, null, null, null, null, Connection.getForwardHeaders());
+                                new URL(resolvedURI), null, null, null, null, null, headers, Connection.getForwardHeaders());
 
                         if (connectionResult.statusCode != 200) {
                             connectionResult.close();

@@ -25,70 +25,46 @@
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript">
             <![CDATA[
-                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+                (function() {
+                    var Test = ORBEON.util.Test;
+                    var Assert = YAHOO.util.Assert;
+                    var Controls = ORBEON.xforms.Controls;
+                    var Page = ORBEON.xforms.Page;
 
-                    name: "Loading indicator",
+                    var YD = YAHOO.util.Dom;
 
-                    /**
-                     * [ #314235 ] Loading indicators' positions should be updated even when they are no longer visible
-                     * http://forge.ow2.org/tracker/index.php?func=detail&aid=314235&group_id=168&atid=350207
-                     *
-                     * This test is disabled for now, as it relies on JavaScript being able to resize the browser
-                     * window, which is often not allowed in modern browsers and doesn't work when this test is ran
-                     * inside an iframe. Instead we could run this inside an iframe which we resize.
-                     */
-                    disabled_testLoadingIndicatorPositionResize: function() {
-                        thiss = this;
-                        window.resizeBy(200, 0);
-                        xformsDisplayIndicator("loading", "test");  // set the loading indicator
-                        xformsDisplayIndicator("none");             // hide it
-                        var formId = "xforms-form";
-                        var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formId];
-                        var x0 = overlay.cfg.getProperty("x");      // store its location
-                        var y0 = overlay.cfg.getProperty("y");
-                        window.resizeBy(-200, 0);                   // resize the window
-                        thiss.wait(function() {
-                            var x1 = overlay.cfg.getProperty("x");      // get the new location
-                            var y1 = overlay.cfg.getProperty("y");
-                            YAHOO.util.Assert.areEqual(y0, y1);         // compare
-                            YAHOO.util.Assert.areEqual(x0, x1 + 200);
-                        }, 500);
-                    },
+                    YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-                    /**
-                     * [ #315495 ] Loading indicator is hidden after 2s even if the request lasts longer
-                     * http://forge.ow2.org/tracker/index.php?func=detail&aid=315495&group_id=168&atid=350207
-                     *
-                     * This is basic test for the loading indicator, checking that it is shown when a long request
-                     * runs and that it is hidden afterwards.
-                     */
-                    testLoadingIndicatorShown: function() {
-                        var loadingIndicatorOverlay;
-                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            // Run long submission
-                            var runLongSubmission = YAHOO.util.Dom.get("run-long-submission").getElementsByTagName("button")[0];
-                            YAHOO.util.UserAction.click(runLongSubmission);
-                            // After 5 seconds check the loading indicator is visible
-                            window.setTimeout(function() {
-                                loadingIndicatorOverlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[ORBEON.xforms.Globals.requestForm.id];
-                                YAHOO.util.Assert.isTrue(loadingIndicatorOverlay.cfg.getProperty("visible"), "loading indicator visible after 5 s");
-                            }, 5000);
-                        }, function() {
-                            // When done, indicator should be hidden
-                            YAHOO.util.Assert.isFalse(loadingIndicatorOverlay.cfg.getProperty("visible"), "loading indicator hidden after the request");
-                            YAHOO.util.Assert.areEqual("1", ORBEON.xforms.Document.getValue("counter"), "submission ran and counter was incremented");
-                       });
-                    }
-                }));
+                        name: "Loading indicator",
 
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                    if (parent && parent.TestManager) {
-                        parent.TestManager.load();
-                    } else {
-                        new YAHOO.tool.TestLogger();
-                        YAHOO.tool.TestRunner.run();
-                    }
-                });
+                        /**
+                         * [ #315495 ] Loading indicator is hidden after 2s even if the request lasts longer
+                         * http://forge.ow2.org/tracker/index.php?func=detail&aid=315495&group_id=168&atid=350207
+                         *
+                         * This is basic test for the loading indicator, checking that it is shown when a long request
+                         * runs and that it is hidden afterwards.
+                         */
+                        testLoadingIndicatorShown: function() {
+                            var loadingIndicatorOverlay;
+                            Test.executeCausingAjaxRequest(this, function() {
+                                // Run long submission
+                                Test.click("run-long-submission");
+                                // After 5 seconds check the loading indicator is visible
+                                window.setTimeout(function() {
+                                    var htmlForm = Controls.getForm(YD.get("run-long-submission"));
+                                    loadingIndicatorOverlay = Page.getForm(htmlForm.id).getLoadingIndicator().loadingOverlay;
+                                    Assert.isTrue(loadingIndicatorOverlay.cfg.getProperty("visible"), "loading indicator visible after 5 s");
+                                }, 5000);
+                            }, function() {
+                                // When done, indicator should be hidden
+                                Assert.isFalse(loadingIndicatorOverlay.cfg.getProperty("visible"), "loading indicator hidden after the request");
+                                Assert.areEqual("1", ORBEON.xforms.Document.getValue("counter"), "submission ran and counter was incremented");
+                           });
+                        }
+                    }));
+
+                    Test.onOrbeonLoadedRunTest();
+                })();
             ]]>
         </xhtml:script>
         <xforms:model id="model" xxforms:external-events="load-initial-data">
@@ -108,14 +84,14 @@
     <xhtml:body>
 
         <xhtml:div class="actions">
-            <fr:button id="run-long-submission">
+            <xforms:trigger id="run-long-submission">
                 <xforms:label>Run long submission</xforms:label>
                 <xforms:send ev:event="DOMActivate" submission="sleep"/>
-            </fr:button>
-            <fr:button id="go-to-slow-page">
+            </xforms:trigger>
+            <xforms:trigger id="go-to-slow-page">
                 <xforms:label>Go to slow page</xforms:label>
                 <xforms:send ev:event="DOMActivate" submission="slow-page"/>
-            </fr:button>
+            </xforms:trigger>
         </xhtml:div>
         <xhtml:div>
             <xforms:output ref="." id="counter">

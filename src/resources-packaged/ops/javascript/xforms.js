@@ -1382,7 +1382,9 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * @return {void}
              */
             click: function(id) {
-                OD.getElementByTagName(OD.get(id), "button").click();
+                var element = OD.get(id);
+                var button = element.tagName.toLowerCase() == "button" ? element : OD.getElementByTagName(element, "button");
+                button.click();
             },
 
             /**

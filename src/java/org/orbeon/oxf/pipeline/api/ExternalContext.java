@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.pipeline.api;
 
+import org.orbeon.oxf.externalcontext.URLRewriter;
+
 import java.io.*;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -86,18 +88,16 @@ public interface ExternalContext extends WebAppExternalContext {
         Object getNativeRequest();
     }
 
-    public interface Response {
+    public interface Rewriter extends URLRewriter {
+        String rewriteActionURL(String urlString);
+        String rewriteRenderURL(String urlString);
+        String rewriteActionURL(String urlString, String portletMode, String windowState);
+        String rewriteRenderURL(String urlString, String portletMode, String windowState);
+        String rewriteResourceURL(String urlString, int rewriteMode);
+        String getNamespacePrefix();
+    }
 
-        // Works as a bitset
-        // 1: whether to produce an absolute URL (starting with "http" or "https")
-        // 2: whether to leave the URL as is if it is does not start with "/"
-        // 4: whether to prevent insertion of a context at the start of the path
-        static final int REWRITE_MODE_ABSOLUTE = 1;
-        static final int REWRITE_MODE_ABSOLUTE_PATH = 0;
-        static final int REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 2;
-        static final int REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4;
-        static final int REWRITE_MODE_ABSOLUTE_NO_CONTEXT = 5;
-
+    public interface Response extends Rewriter {
         PrintWriter getWriter() throws IOException;
         OutputStream getOutputStream() throws IOException;
         boolean isCommitted();
@@ -129,13 +129,6 @@ public interface ExternalContext extends WebAppExternalContext {
 
         boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
 
-        String rewriteActionURL(String urlString);
-        String rewriteRenderURL(String urlString);
-        String rewriteActionURL(String urlString, String portletMode, String windowState);
-        String rewriteRenderURL(String urlString, String portletMode, String windowState);
-        String rewriteResourceURL(String urlString, boolean absolute);
-        String rewriteResourceURL(String urlString, int rewriteMode);
-        String getNamespacePrefix();
         void setTitle(String title);
 
         Object getNativeResponse();

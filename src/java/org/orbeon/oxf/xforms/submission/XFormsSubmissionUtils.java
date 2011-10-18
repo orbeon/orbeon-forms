@@ -398,10 +398,6 @@ class ResponseAdapter implements ExternalContext.Response {
         return response.rewriteRenderURL(urlString, portletMode, windowState);
     }
 
-    public String rewriteResourceURL(String urlString, boolean absolute) {
-        return response.rewriteResourceURL(urlString, absolute);
-    }
-
     public String rewriteResourceURL(String urlString, int rewriteMode) {
         return response.rewriteResourceURL(urlString, rewriteMode);
     }

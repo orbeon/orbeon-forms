@@ -419,6 +419,10 @@
         <class name="org.orbeon.oxf.processor.converter.XHTMLRewrite"/>
     </processor>
 
+    <processor name="oxf:xhtml-servlet-rewrite">
+        <class name="org.orbeon.oxf.processor.converter.XHTMLServletRewrite"/>
+    </processor>
+
     <processor name="oxf:html-rewrite">
         <class name="org.orbeon.oxf.processor.converter.HTMLRewrite"/>
     </processor>

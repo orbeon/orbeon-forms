@@ -37,8 +37,8 @@
     </p:processor>
     <!-- Rewrite all URLs in HTML and XHTML documents -->
     <p:processor name="oxf:xhtml-rewrite">
-        <p:input name="rewrite-in" href="#xformed-data"/>
-        <p:output name="rewrite-out" id="rewritten-data"/>
+        <p:input name="data" href="#xformed-data"/>
+        <p:output name="data" id="rewritten-data"/>
     </p:processor>
     <!-- Move from XHTML namespace to no namespace -->
     <p:processor name="oxf:qname-converter">

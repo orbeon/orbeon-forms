@@ -115,8 +115,8 @@
                 <p:when test="not(starts-with(/request/request-path, '/xforms-renderer') and not(p:property('oxf.epilogue.renderer-rewrite')))">
                     <!-- Rewriting -->
                     <p:processor name="oxf:xhtml-rewrite">
-                        <p:input name="rewrite-in" href="#themed-data"/>
-                        <p:output name="rewrite-out" id="rewritten-data"/>
+                        <p:input name="data" href="#themed-data"/>
+                        <p:output name="data" id="rewritten-data"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>

@@ -22,6 +22,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.common.Version
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
+import org.orbeon.oxf.externalcontext.URLRewriter
 
 object XFormsResourceRewriter {
     /**
@@ -92,7 +93,7 @@ object XFormsResourceRewriter {
         def rewriteURL(url: String) =
             try {
                 val resolvedURI = NetUtils.resolveURI(url, resourcePath)
-                val rewrittenURI = response.rewriteResourceURL(resolvedURI, false)
+                val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
                 "url(" + rewrittenURI + ")"
             } catch {
                 case _ =>

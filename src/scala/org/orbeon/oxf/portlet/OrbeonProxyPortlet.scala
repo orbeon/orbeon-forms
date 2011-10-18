@@ -36,11 +36,11 @@ class OrbeonProxyPortlet extends GenericPortlet {
 //    private val actions = Set("new", "summary")
 
     private val preferences = Map(
-        PreferenceName.FormRunnerURL -> "Form Runner URL",
-        PreferenceName.AppName -> "Form Runner app name",
-        PreferenceName.FormName -> "Form Runner form name",
-        PreferenceName.Action -> "Form Runner action",
-        PreferenceName.ReadOnly -> "Read-Only access"
+        PreferenceName.FormRunnerURL → "Form Runner URL",
+        PreferenceName.AppName → "Form Runner app name",
+        PreferenceName.FormName → "Form Runner form name",
+        PreferenceName.Action → "Form Runner action",
+        PreferenceName.ReadOnly → "Read-Only access"
     )
 
     // Return the value of the preference if set, otherwise the value of the initialization parameter
@@ -60,13 +60,13 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         val (appName, formName, action, documentId) = request.getParameter("orbeon.path") match {
             // Incoming path is Form Runner path without document id
-            case FormRunnerPath(appName, formName, action) => (appName, formName, filterAction(request, action), None)
+            case FormRunnerPath(appName, formName, action) ⇒ (appName, formName, filterAction(request, action), None)
             // Incoming path is Form Runner path with document id
-            case FormRunnerDocumentPath(appName, formName, action, documentId) => (appName, formName, filterAction(request, action), Some(documentId))
+            case FormRunnerDocumentPath(appName, formName, action, documentId) ⇒ (appName, formName, filterAction(request, action), Some(documentId))
             // No incoming path, use preferences
-            case null => (getPreference(request, PreferenceName.AppName), getPreference(request, PreferenceName.FormName), getPreference(request, PreferenceName.Action), None)
+            case null ⇒ (getPreference(request, PreferenceName.AppName), getPreference(request, PreferenceName.FormName), getPreference(request, PreferenceName.Action), None)
             // Unsupported path
-            case otherPath => throw new PortletException("Unsupported path: " + otherPath)
+            case otherPath ⇒ throw new PortletException("Unsupported path: " + otherPath)
         }
 
         val url = new URL(Util.buildFormRunnerURL(formRunnerURL, appName, formName, action, documentId))
@@ -75,12 +75,12 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         connection.setDoInput(true)
         connection.setRequestMethod("GET")
-        setRemoteSessionId(request, connection)
+        setOutgoingRemoteSessionIdAndHeaders(request, connection)
 
         connection.connect()
         try {
             propagateHeaders(response, connection)
-            getRemoteSessionId(request, connection)
+            handleRemoteSessionId(request, connection)
             readRewrite(response, connection, true, false)
         } finally {
             val is = connection.getInputStream
@@ -102,7 +102,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                 </style>
                 <form action={response.createActionURL.toString} method="post" class="orbeon-pref-form">
                     {
-                        for ((pref, label) <- preferences) yield
+                        for ((pref, label) ← preferences) yield
                             <label>{label}: <input name={pref.toString} value={getPreference(request, pref)}/></label>
                     }
                     <hr/>
@@ -118,14 +118,14 @@ class OrbeonProxyPortlet extends GenericPortlet {
     private def doEditAction(request: ActionRequest, response: ActionResponse) = {
 
         request.getParameter("save") match {
-            case "save" =>
+            case "save" ⇒
                 def setPreference(name: PreferenceName.Value, value: String) = request.getPreferences.setValue(name.toString, value)
 
-                for ((pref, label) <- preferences)
+                for ((pref, label) ← preferences)
                     setPreference(pref, request.getParameter(pref.toString))
 
                 request.getPreferences.store()
-            case _ =>
+            case _ ⇒
         }
 
         // Go back to view mode
@@ -139,17 +139,17 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         request.getMethod match {
             // GET of a resource, typically image, CSS, JavaScript, etc.
-            case "GET" =>
+            case "GET" ⇒
                 val connection = url.openConnection.asInstanceOf[HttpURLConnection]
 
                 connection.setDoInput(true)
                 connection.setRequestMethod("GET")
-                setRemoteSessionId(request, connection)
+                setOutgoingRemoteSessionIdAndHeaders(request, connection)
 
                 connection.connect()
                 try {
                     propagateHeaders(response, connection)
-                    getRemoteSessionId(request, connection)
+                    handleRemoteSessionId(request, connection)
 
                     readRewrite(response, connection, Net.getContentTypeMediaType(connection.getContentType) == "text/css", false)
                 } finally {
@@ -157,7 +157,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                     if (is ne null) is.close()
                 }
             // POST of a resource, used for Ajax requests, form posts, and uploads
-            case "POST" =>
+            case "POST" ⇒
 
                 val connection = url.openConnection.asInstanceOf[HttpURLConnection]
 
@@ -165,7 +165,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                 connection.setDoOutput(true)
                 connection.setRequestMethod("POST")
                 connection.setRequestProperty("Content-Type", request.getContentType)
-                setRemoteSessionId(request, connection)
+                setOutgoingRemoteSessionIdAndHeaders(request, connection)
                 
                 connection.connect()
                 try {
@@ -181,7 +181,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
                     }
 
                     propagateHeaders(response, connection)
-                    getRemoteSessionId(request, connection)
+                    handleRemoteSessionId(request, connection)
 
                     readRewrite(response, connection, Net.getContentTypeMediaType(connection.getContentType) == "application/xml", true)
                 } finally {
@@ -193,9 +193,9 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
     override def processAction(request: ActionRequest, response: ActionResponse) =
         request.getPortletMode match {
-            case PortletMode.VIEW => doViewAction(request, response)
-            case PortletMode.EDIT => doEditAction(request, response)
-            case _ => // NOP
+            case PortletMode.VIEW ⇒ doViewAction(request, response)
+            case PortletMode.EDIT ⇒ doEditAction(request, response)
+            case _ ⇒ // NOP
         }
 
     // Read a response and rewrite URLs within it
@@ -216,29 +216,35 @@ class OrbeonProxyPortlet extends GenericPortlet {
     // Propagate useful headers from Form Runner server to client
     private def propagateHeaders(response: MimeResponse, connection: HttpURLConnection): Unit =
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
-            (name => (name, connection.getHeaderField(name))) foreach {
-                case ("Content-Type", value: String) => response.setContentType(value)
-                case ("Content-Type", null) => getPortletContext.log("WARNING: Received null Content-Type for URL: " + connection.getURL.toString)
-                case (name, value: String) => response.setProperty(name, value)
+            (name ⇒ (name, connection.getHeaderField(name))) foreach {
+                case ("Content-Type", value: String) ⇒ response.setContentType(value)
+                case ("Content-Type", null) ⇒ getPortletContext.log("WARNING: Received null Content-Type for URL: " + connection.getURL.toString)
+                case (name, value: String) ⇒ response.setProperty(name, value)
             }
 
     // If we know about the remote session id, set it on the connection to Form Runner
-    private def setRemoteSessionId(request: PortletRequest, connection: HttpURLConnection): Unit =
+    private def setOutgoingRemoteSessionIdAndHeaders(request: PortletRequest, connection: HttpURLConnection): Unit = {
+        // Tell Orbeon Forms explicitly that we are in fact in a portlet environment. This causes the server to use
+        // WSRP URL rewriting for the resulting HTML and CSS.
+        connection.addRequestProperty("Orbeon-Container", "portlet")
+        // Set session cookie
         request.getPortletSession(true).getAttribute(REMOTE_SESSION_ID_KEY) match {
-            case remoteSessionCookie: String => connection.setRequestProperty("Cookie", remoteSessionCookie)
-            case _ =>
+            case remoteSessionCookie: String ⇒ connection.setRequestProperty("Cookie", remoteSessionCookie)
+            case _ ⇒
         }
+    }
 
     // If Form Runner sets a remote session id, remember it
-    private def getRemoteSessionId(request: PortletRequest, connection: HttpURLConnection): Unit =
+    private def handleRemoteSessionId(request: PortletRequest, connection: HttpURLConnection): Unit =
+        // Set session cookie
         connection.getHeaderField("Set-Cookie") match {
-            case setCookieHeader: String if setCookieHeader contains "JSESSIONID" =>
+            case setCookieHeader: String if setCookieHeader contains "JSESSIONID" ⇒
                 setCookieHeader split ';' find (_ contains "JSESSIONID") match {
-                    case Some(remoteSessionCookie) =>
+                    case Some(remoteSessionCookie) ⇒
                         request.getPortletSession(true).setAttribute(REMOTE_SESSION_ID_KEY, remoteSessionCookie.trim)
-                    case _ =>
+                    case _ ⇒
                 }
-            case _ =>
+            case _ ⇒
         }
 
     private object Util {
@@ -250,8 +256,8 @@ class OrbeonProxyPortlet extends GenericPortlet {
             removeTrailingSlash(baseURL) + resourceId
 
         def removeTrailingSlash(path: String) = path match {
-            case path if path.last == '/' => path.init
-            case _ => path
+            case path if path.last == '/' ⇒ path.init
+            case _ ⇒ path
         }
     }
 
@@ -280,9 +286,9 @@ class OrbeonProxyPortlet extends GenericPortlet {
         }
 
         def getContentTypeMediaType(contentType: String) = contentType match {
-            case null => null
-            case value: String if value.trim.isEmpty => null
-            case _ => (contentType split ';' head).trim
+            case null ⇒ null
+            case value: String if value.trim.isEmpty ⇒ null
+            case _ ⇒ (contentType split ';' head).trim
         }
     }
 }

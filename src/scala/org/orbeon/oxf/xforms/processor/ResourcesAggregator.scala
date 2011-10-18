@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms._
 import org.dom4j.QName
 import org.apache.commons.lang.StringUtils
 import ResourcesAggregator._
+import org.orbeon.oxf.externalcontext.URLRewriter
 
 /**
  * Aggregate CSS and JS resources under <head>.
@@ -155,7 +156,9 @@ class ResourcesAggregator extends ProcessorImpl {
                             
                             def outputScriptCSSAsJSON() = {
 
-                                def rewritePath(path: String) = NetUtils.getExternalContext.getResponse.rewriteResourceURL(path, false)
+                                // NOTE: oxf:xhtml-rewrite usually takes care of URL rewriting, but not in JSON content.
+                                // So we rewrite here.
+                                def rewritePath(path: String) = NetUtils.getExternalContext.getResponse.rewriteResourceURL(path, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
                                 def appendJS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
                                 def appendCSS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""

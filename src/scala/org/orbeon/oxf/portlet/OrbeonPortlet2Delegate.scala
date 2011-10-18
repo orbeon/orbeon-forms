@@ -27,10 +27,9 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.{ResourcesAggregator, XFormsFeatures}
 import collection.mutable.LinkedHashSet
-import org.orbeon.oxf.externalcontext.{WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
-import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import OrbeonPortlet2Delegate._
 import org.orbeon.oxf.util.{DynamicVariable, URLRewriterUtils, NetUtils}
+import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
 
 /**
  * Orbeon portlet.
@@ -130,7 +129,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             writer.write("""<script type="text/javascript" src="""")
 
             def rewrite(path: String) =
-                rewriter.rewriteResourceURL(path, Response.REWRITE_MODE_ABSOLUTE_PATH) // NOTE: mode is ignored
+                rewriter.rewriteResourceURL(path, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH) // NOTE: mode is ignored
 
             val resources = LinkedHashSet(XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)): _*)
             ResourcesAggregator.aggregate(resources, false, path ⇒ WSRP2Utils.write(response, rewrite(path), shortIdNamespace(response, getPortletContext), false))

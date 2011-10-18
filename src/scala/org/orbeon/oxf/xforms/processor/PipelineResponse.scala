@@ -67,9 +67,6 @@ object PipelineResponse {
                 override def rewriteResourceURL(urlString: String, rewriteMode: Int) =
                     originalResponse.rewriteResourceURL(urlString, rewriteMode)
 
-                override def rewriteResourceURL(urlString: String, absolute: Boolean) =
-                    originalResponse.rewriteResourceURL(urlString, absolute)
-
                 override def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =
                     originalResponse.rewriteRenderURL(urlString, portletMode, windowState)
 

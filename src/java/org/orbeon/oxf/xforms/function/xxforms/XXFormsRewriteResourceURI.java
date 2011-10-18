@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionVisitor;
@@ -51,6 +52,6 @@ public class XXFormsRewriteResourceURI extends SystemFunction {
     }
 
     public static String rewriteResourceURI(String uri, boolean absolute) {
-        return NetUtils.getExternalContext().getResponse().rewriteResourceURL(uri, absolute);
+        return NetUtils.getExternalContext().getResponse().rewriteResourceURL(uri, absolute ? URLRewriter.REWRITE_MODE_ABSOLUTE : URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
     }
 }

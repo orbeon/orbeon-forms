@@ -197,11 +197,12 @@ public abstract class ProcessorImpl implements Processor {
         throw new ValidationException("Outputs are not supported", getLocationData());
     }
 
-    public void addOutput(String name, ProcessorOutput output) {
+    public ProcessorOutput addOutput(String name, ProcessorOutput output) {
         // NOTE: One exception to the rule that we only have one output with a given name is the TeeProcessor, which
         // adds multiple outputs called "data".
         outputMap.put(name, output);
         outputCount++;
+        return output;
     }
 
     public int getOutputCount() {

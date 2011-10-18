@@ -17,8 +17,10 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
@@ -674,7 +676,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Rewrite URLs
             final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(new ForwardingXMLReceiver() {
+            final ExternalContext.Rewriter rewriter = NetUtils.getExternalContext().getResponse();
+            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver() {
 
                 private boolean isStartElement;
 

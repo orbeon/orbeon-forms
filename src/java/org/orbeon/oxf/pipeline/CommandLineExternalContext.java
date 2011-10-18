@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.pipeline;
 
+import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.io.*;
@@ -61,23 +62,23 @@ public class CommandLineExternalContext extends SimpleExternalContext {
         }
 
         public String rewriteActionURL(String urlString) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteRenderURL(String urlString) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteResourceURL(String urlString) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {

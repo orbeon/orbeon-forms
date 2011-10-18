@@ -54,8 +54,8 @@
 
     <!-- Rewrite all URLs in XHTML documents -->
     <p:processor name="oxf:xhtml-rewrite">
-        <p:input name="rewrite-in" href="#themed"/>
-        <p:output name="rewrite-out" id="rewritten-data"/>
+        <p:input name="data" href="#themed"/>
+        <p:output name="data" id="rewritten-data"/>
     </p:processor>
 
     <!-- Convert to HTML -->

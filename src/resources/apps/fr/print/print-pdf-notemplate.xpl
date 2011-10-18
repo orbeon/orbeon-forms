@@ -48,11 +48,13 @@
         <p:input name="config">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <!-- Remove portlet namespace from ids if present. Do this because in a portlet environment, the CSS
-                     retrieved by oxf:xhtml-to-pdf doesn't know about the namespace. Not doing so, the CSS won't apply
-                     and also this can cause a ClassCastException in Flying Saucer. -->
-                <xsl:template match="@id">
-                    <xsl:attribute name="id" select="substring-after(., doc('input:request')/*/container-namespace)"/>
+                <!--
+                    Remove portlet namespace from ids if present. Do this because in a portlet environment, the CSS
+                    retrieved by oxf:xhtml-to-pdf doesn't know about the namespace. Not doing so, the CSS won't apply
+                    and also this can cause a ClassCastException in Flying Saucer.
+                 -->
+                <xsl:template match="@id | @for">
+                    <xsl:attribute name="{name()}" select="substring-after(., doc('input:request')/*/container-namespace)"/>
                 </xsl:template>
                 <!-- While we are at it filter out scripts as they won't be used -->
                 <xsl:template match="*:script | *:noscript"/>
@@ -76,10 +78,14 @@
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
-    <!-- Rewriting -->
-    <p:processor name="oxf:xhtml-rewrite">
-        <p:input name="rewrite-in" href="#xhtml-data"/>
-        <p:output name="rewrite-out" id="rewritten-data"/>
+    <!--
+        Rewrite using servlet strategy. The idea is that even in a portlet environment, URLs produced by the XForms
+        engine and epilogue are entirely expected to be rewritten further down the pipeline. There might be small
+        exceptions, such as URLs in JSON and the like, but JavaScript is not relevant to PDF production so that
+        is not expected to be an issue.  -->
+    <p:processor name="oxf:xhtml-servlet-rewrite">
+        <p:input name="data" href="#xhtml-data"/>
+        <p:output name="data" id="rewritten-data"/>
     </p:processor>
 
     <!-- Serialize HTML to PDF -->

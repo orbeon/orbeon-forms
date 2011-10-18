@@ -16,7 +16,7 @@
     <!-- TODO: Portlet URL rewriting testing; need a way to specify to the test what -->
     <!-- pseudo-External Context to use -->
     <test description="xhtml-rewrite" name="oxf:xhtml-rewrite" >
-        <input name="rewrite-in" href="oxf:/ops/unit-tests/url-rewrite/input-data.xml"/>
-        <output name="rewrite-out" href="oxf:/ops/unit-tests/url-rewrite/output-data.xml"/>
+        <input name="data" href="oxf:/ops/unit-tests/url-rewrite/input-data.xml"/>
+        <output name="data" href="oxf:/ops/unit-tests/url-rewrite/output-data.xml"/>
     </test>
 </group> 

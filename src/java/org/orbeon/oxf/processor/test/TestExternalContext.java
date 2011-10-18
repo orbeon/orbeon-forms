@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.EmailProcessor;
@@ -392,19 +393,19 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public String rewriteActionURL(String urlString) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteRenderURL(String urlString) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteActionURL(String urlString, String portletMode, String windowState) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
-            return rewriteResourceURL(urlString, false);
+            return rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         }
 
         public String rewriteResourceURL(String urlString, boolean absolute) {

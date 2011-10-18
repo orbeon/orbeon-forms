@@ -28,7 +28,7 @@ class LoadingIndicator
         @loadingSpan = _.detect @form.childNodes, (node) -> YD.hasClass node, "xforms-loading-loading"
         @loadingSpan.style.display = "none"
 
-        # Differ creation of the overlay to the first time we need it,
+        # Differ creation of the overlay to the first time we need it
         @loadingOverlay = null
         # On scroll or resize, move the overlay so it stays visible
         Overlay.windowScrollEvent.subscribe => @_updateLoadingPosition()

@@ -24,7 +24,7 @@
     <xhtml:body background="/orbeon/images/body-background1.png">
         <!-- Simple rewrites -->
         <xhtml:div>
-            <xhtml:form action="/orbeon/my-action">
+            <xhtml:form action="/orbeon/my-action" method="post">
                 <xhtml:a href="/orbeon/path">Click Here!</xhtml:a>
                 <xhtml:img src="/orbeon/my-image1.png"/>
                 <xhtml:a href="path">Click Here!</xhtml:a>

@@ -89,17 +89,17 @@
             <xhtml:div class="fr-separator"/>
             <xhtml:div class="fb-editor-metadata-dialog-buttons">
                 <xhtml:div class="fr-buttons">
-                    <fr:button id="fb-metadata-continue-trigger" tabindex="3">
+                    <xforms:trigger id="fb-metadata-continue-trigger" tabindex="3">
                         <xforms:label value="$form-resources/continue/label"/>
-                    </fr:button>
-                    <fr:button tabindex="4">
+                    </xforms:trigger>
+                    <xforms:trigger tabindex="4">
                         <xforms:label value="$form-resources/cancel/label"/>
                         <!-- Hide this dialog or go to the summary page -->
                         <xforms:action ev:event="DOMActivate">
                             <xforms:load if="$is-new-form" resource="summary"/>
                             <xxforms:hide if="not($is-new-form)" ev:event="DOMActivate" dialog="fb-editor-metadata-dialog"/>
                         </xforms:action>
-                    </fr:button>
+                    </xforms:trigger>
                 </xhtml:div>
                 <xhtml:div class="fr-clear"/>
             </xhtml:div>

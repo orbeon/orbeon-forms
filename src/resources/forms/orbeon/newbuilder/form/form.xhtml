@@ -103,7 +103,7 @@
 
                         <!-- Test form -->
                         <xf:group model="fr-error-summary-model" ref="instance('fr-error-summary-instance')/trigger" id="fb-test-button-group">
-                            <fr:button id="fb-test-button">
+                            <xf:trigger id="fb-test-button">
                                 <xf:label>
                                     <xh:img src="/apps/fr/style/images/pixelmixer/gear_16.png" alt=""/>
                                     <xh:span><xf:output value="$fr-resources/detail/labels/test"/></xh:span>
@@ -128,7 +128,7 @@
                                         ORBEON.xforms.Document.dispatchEvent("fb-test-button-group", "show-fb-test-dialog");
                                     </xxf:script>
                                 </xf:action>
-                            </fr:button>
+                            </xf:trigger>
                             <xf:action ev:event="show-fb-test-dialog">
                                 <xxf:show dialog="fb-test-dialog"/>
                                 <xf:send submission="fb-test-form-submission"/>
@@ -137,7 +137,7 @@
 
                         <!-- Publish form -->
                         <xf:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
-                            <fr:button id="fb-publish-button" ref=".">
+                            <xf:trigger id="fb-publish-button" ref=".">
                                 <xf:label>
                                     <xh:img src="/apps/fr/style/images/pixelmixer/globe_16.png" alt=""/>
                                     <xh:span><xf:output value="$fr-resources/detail/labels/publish"/></xh:span>
@@ -145,14 +145,14 @@
                                 <xf:action ev:event="DOMActivate">
                                     <xxf:show dialog="fb-publish-dialog"/>
                                 </xf:action>
-                            </fr:button>
+                            </xf:trigger>
                         </xf:group>
 
                         <!-- "Save" from Form Runner -->
                         <fr:save-button/>
 
                         <!-- Save as -->
-                        <fr:button id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
+                        <xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
                             <xf:label>
                                 <xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>
                                 <xh:span><xf:output value="$fr-resources/detail/labels/save-as-document"/></xh:span>
@@ -165,7 +165,7 @@
                                 <xf:setvalue ref="instance('fb-metadata-instance')/mode" value="'save-as'"/>
                                 <xxf:show dialog="fb-editor-metadata-dialog"/>
                             </xf:action>
-                        </fr:button>
+                        </xf:trigger>
                     </xh:div>
 
                     <div class="fr-clear"/>

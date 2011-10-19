@@ -76,7 +76,7 @@
                     <xhtml:div class="fb-tools">
                         <!-- Add new section -->
                         <xhtml:div class="fb-tool">
-                            <fr:button id="insert-new-section-trigger">
+                            <xforms:trigger id="insert-new-section-trigger">
                                 <xforms:label>
                                     <xhtml:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
                                     <xhtml:span><xforms:output value="$form-resources/new-section/label"/></xhtml:span>
@@ -84,12 +84,12 @@
                                 <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
                                     toolboxOps:insertNewSection($model)
                                 </xforms:action>
-                            </fr:button>
+                            </xforms:trigger>
                         </xhtml:div>
                         <!-- Add grids -->
                         <xforms:group ref="instance('fb-variables')/grids-triggers" appearance="xxforms:internal">
                             <xhtml:div class="fb-tool">
-                                <fr:button appearance="full" id="insert-new-grid-trigger">
+                                <xforms:trigger appearance="full" id="insert-new-grid-trigger">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
                                         <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>
@@ -97,10 +97,10 @@
                                     <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
                                         toolboxOps:insertNewGrid($model)
                                     </xforms:action>
-                                </fr:button>
+                                </xforms:trigger>
                             </xhtml:div>
                             <xhtml:div class="fb-tool">
-                                <fr:button appearance="full" id="insert-new-repeat-trigger">
+                                <xforms:trigger appearance="full" id="insert-new-repeat-trigger">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
                                         <!-- TODO: i18n <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>-->
@@ -109,7 +109,7 @@
                                     <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
                                         toolboxOps:insertNewRepeat($model)
                                     </xforms:action>
-                                </fr:button>
+                                </xforms:trigger>
                             </xhtml:div>
                         </xforms:group>
                     </xhtml:div>
@@ -128,7 +128,7 @@
                                     <xxforms:variable name="is-section-component" value="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
 
                                     <xhtml:div class="fb-tool">
-                                        <fr:button id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">
+                                        <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">
                                             <xforms:label>
                                                 <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                                 <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
@@ -166,7 +166,7 @@
                                             <xforms:action type="xpath" ev:event="DOMActivate" if="not($is-section-component)" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
                                                 toolboxOps:insertNewControl($model, $binding)
                                             </xforms:action>
--                                        </fr:button>
+-                                        </xforms:trigger>
                                     </xhtml:div>
                                 </xforms:repeat>
                             </xforms:group>
@@ -230,7 +230,7 @@
                         <xhtml:div class="fb-tool">
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/schema">
                                 <!-- Upload XML Schema -->
-                                <fr:button>
+                                <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/forms/orbeon/newbuilder/images/schema.gif" alt=""/>
                                         <xhtml:span>
@@ -239,11 +239,11 @@
                                     </xforms:label>
                                     <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
                                     <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/css">
                                 <!-- Upload CSS -->
-                                <fr:button>
+                                <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/css.png" alt=""/>
                                         <xhtml:span>
@@ -251,11 +251,11 @@
                                         </xhtml:span>
                                     </xforms:label>
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/pdf">
                                 <!-- Upload PDF Template -->
-                                <fr:button>
+                                <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
                                         <xhtml:span>
@@ -264,40 +264,40 @@
                                     </xforms:label>
                                     <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
                                     <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
                                 <!-- Edit Source -->
-                                <fr:button>
+                                <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$form-resources/edit-source/label"/></xhtml:span>
                                     </xforms:label>
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
                                 <!-- Custom XML -->
                                 <fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>
-                                <fr:button>
+                                <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/permissions">
                                 <!-- Permissions -->
                                 <fb:permissions id="fb-permissions" resources-ref="$form-resources"
                                     metadata-ref="instance('fr-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata"/>
-                                <fr:button>
+                                <xforms:trigger>
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$form-resources/permissions/label"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-permissions"/>
-                                </fr:button>
+                                </xforms:trigger>
                             </xforms:group>
                         </xhtml:div>
                     </xhtml:div>

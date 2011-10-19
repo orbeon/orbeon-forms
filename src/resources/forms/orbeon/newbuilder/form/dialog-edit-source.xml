@@ -34,7 +34,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span>
-            <fr:button class="fr-inplace-rename" ref="save-trigger">
+            <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <xforms:action ev:event="DOMActivate">
                     <!-- Parse the XML, annotate and save it -->
@@ -42,7 +42,7 @@
                         <xxforms:context name="data" value="saxon:parse(instance('fb-source-editor-instance')/source)"/>
                     </xforms:dispatch>
                 </xforms:action>
-            </fr:button>
+            </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                 <xforms:label ref="$form-resources/cancel/label"/>

@@ -70,7 +70,7 @@
                 <xhtml:div class="fb-dialog-section">
 
                     <!-- Delete schema button -->
-                    <fr:button ref=".[not($is-new-schema) and $model/xs:schema]">
+                    <xforms:trigger ref=".[not($is-new-schema) and $model/xs:schema]">
                         <xforms:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
 
                         <xforms:action ev:event="DOMActivate">
@@ -80,7 +80,7 @@
                             <!-- TODO: Check and adjust types that could be in use -->
                         </xforms:action>
 
-                    </fr:button>
+                    </xforms:trigger>
 
                     <!-- Upload a schema -->
                     <xforms:upload ref="$instance/schema-uri">
@@ -129,7 +129,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group appearance="xxforms:internal">
-            <fr:button class="fr-inplace-rename" id="fb-edit-schema-trigger">
+            <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
 
                 <xforms:action ev:event="DOMActivate">
@@ -142,7 +142,7 @@
                     <xforms:insert context="$model" origin="$instance/schema/*"/>
                 </xforms:action>
 
-            </fr:button>
+            </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                 <xforms:label ref="$form-resources/cancel/label"/>

@@ -76,9 +76,9 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
-            <fr:button xxforms:modal="true">
+            <xforms:trigger xxforms:modal="true">
                 <xforms:label ref="$form-resources/apply/label"/>
-            </fr:button>
+            </xforms:trigger>
         </xforms:group>
     </xhtml:div>
     <!-- Hide dialog -->

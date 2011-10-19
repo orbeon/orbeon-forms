@@ -572,6 +572,7 @@
             <xsl:choose>
                 <!-- Use user-provided buttons -->
                 <xsl:when test="fr:buttons">
+                    <!-- Copy all the content -->
                     <xsl:apply-templates select="fr:buttons/node()"/>
                 </xsl:when>
                 <!-- Test mode -->

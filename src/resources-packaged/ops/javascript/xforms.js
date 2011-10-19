@@ -3442,8 +3442,6 @@ ORBEON.xforms.Events = {
             // Send value change to server
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, nodeInfo.value, "xxforms-value-change-with-focus-change");
             ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
-            // Close the menu
-            ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help-image")) {
             // Help image
 

@@ -21,7 +21,6 @@ pages = [
     "test-output-update"
     "test-repeat"
     "test-repeat-setvalue"
-    "test-setbasepaths"
     "test-trigger-modal"
     "test-underscore"
     "test-update-full"

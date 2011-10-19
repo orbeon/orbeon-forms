@@ -66,8 +66,6 @@ h1.fr-form-title {
     font-size: 85%;                                                                 /* Smaller text next icon */
 }
 #fb-toolbox .fb-tools .xforms-label             { display: block; margin: 1em 0 .5em 0; font-size: 93% }
-
-#fb-toolbox .yui-button .first-child { *width: 100% } /* IE hack otherwise button border appears incorrectly */
 #fb-toolbox button.xforms-trigger img { margin-right: .2em }
 
 /* Cut / Copy / Paste */

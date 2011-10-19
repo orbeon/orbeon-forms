@@ -119,7 +119,7 @@
                                 <xxforms:variable name="test-position" select="position()"/>
                                 <!-- Page -->
                                 <xhtml:td>
-                                    <xforms:output value="$report/@page"/>
+                                    <xforms:output value="substring-before($report/@page, '?orbeon-theme=plain')"/>
                                 </xhtml:td>
                                 <!-- Test case -->
                                 <xhtml:td>

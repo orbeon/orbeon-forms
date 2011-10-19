@@ -346,31 +346,31 @@
 
     <!-- JARs -->
     <target name="jars" depends="classes, transform, orbeon-minify-js">
-      <jar destfile="${jar.file}" compress="false">
-          <fileset dir="${java-src.dir}">
-              <include name="**/*.xml"/>
-              <include name="**/*.rng"/>
-              <include name="**/*.css"/>
-              <include name="**/*.xsd"/>
-              <include name="**/*.properties"/>
-          </fileset>
-          <fileset dir="${scala-src.dir}">
-              <include name="**/*.js"/>
-          </fileset>
-          <fileset dir="${build.classes.dir}">
-              <include name="**/*.class"/>
-              <include name="**/*.xsd"/>
-              <!-- This goes into a separate JAR -->
-              <exclude name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
-              <exclude name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
-              <exclude name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
-              <exclude name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
-              <exclude name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
-          </fileset>
-          <fileset dir="${resources-packaged.dir}">
-              <include name="config/*-processors.xml"/>
-              <include name="*.xml"/>
-          </fileset>
+        <jar destfile="${jar.file}" compress="false">
+            <fileset dir="${java-src.dir}">
+                <include name="**/*.xml"/>
+                <include name="**/*.rng"/>
+                <include name="**/*.css"/>
+                <include name="**/*.xsd"/>
+                <include name="**/*.properties"/>
+            </fileset>
+            <fileset dir="${scala-src.dir}">
+                <include name="**/*.js"/>
+            </fileset>
+            <fileset dir="${build.classes.dir}">
+                <include name="**/*.class"/>
+                <include name="**/*.xsd"/>
+                <!-- This goes into a separate JAR -->
+                <exclude name="org/orbeon/oxf/servlet/OrbeonXFormsFilter*.class"/>
+                <exclude name="org/orbeon/oxf/portlet/OrbeonPortletXFormsFilter*.class"/>
+                <exclude name="org/orbeon/oxf/portlet/OrbeonTrampolineServlet*.class"/>
+                <exclude name="org/orbeon/oxf/portlet/OrbeonPortletFilterSample*.class"/>
+                <exclude name="org/orbeon/oxf/portlet/OrbeonProxyPortlet*.class"/>
+            </fileset>
+            <fileset dir="${resources-packaged.dir}">
+                <include name="config/*-processors.xml"/>
+                <include name="*.xml"/>
+            </fileset>
         </jar>
 
         <jar destfile="${xforms-filter.jar.file}" compress="false">

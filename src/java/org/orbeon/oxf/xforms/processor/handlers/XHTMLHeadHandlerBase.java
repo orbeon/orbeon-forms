@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.collections.map.CompositeMap;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
@@ -349,10 +350,17 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandler {
                 sb.append("\"paths\":{");
 
                 sb.append("\"xforms-server\": \"");
-                sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/xforms-server", false));
+                sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/xforms-server", ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE));
 
-                sb.append("\",\"resources-base\": \"");
-                sb.append(handlerContext.getExternalContext().getResponse().rewriteResourceURL("/", false));
+                // NOTE: This is to handle the minimal date picker. Because the client must re-generate markup when
+                // the control becomes relevant or changes type, it needs the image URL, and that URL must be rewritten
+                // for use in portlets. This should ideally be handled by a template and/or the server should provide
+                // the markup directly when needed.
+                final String calendarImage = "/ops/images/xforms/calendar.png";
+                final String rewrittenCalendarImage = handlerContext.getExternalContext().getResponse().rewriteResourceURL(calendarImage, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+
+                sb.append("\",\"calendar-image\": \"");
+                sb.append(rewrittenCalendarImage);
                 sb.append('"');
 
                 sb.append('}');

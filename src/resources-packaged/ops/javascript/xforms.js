@@ -4102,8 +4102,8 @@ ORBEON.xforms.Init = {
              * just registering the event handler on the window object.
              */
             ns: {},                              // Namespace of ids (for portlets)
-            resourcesBaseURL: {},                // Base URL for resources e.g. /context[/version]
             xformsServerURL: {},                 // XForms Server URL
+            calendarImageURL: {},                // calendar.png image URL (should be ideally handled by a template)
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
             discardableTimerIds: {},             // Maps form id to array of discardable events (which are used by the server as a form of polling)
@@ -4538,10 +4538,8 @@ ORBEON.xforms.Init = {
     },
 
     _setBasePaths: function(formID, scripts, versioned) {
-        // NOTE: The server provides us with a base URL, but we must use a client-side value to support proxying
-
-        var resourcesBaseURL = null;
         var xformsServerURL = null;
+        var calendarImageURL = null;
 
         if (!(window.orbeonInitData === undefined)) {
             // NOTE: We switched back and forth between trusting the client or the server on this. Starting 2010-08-27
@@ -4551,13 +4549,14 @@ ORBEON.xforms.Init = {
             // server values it is.
             var formInitData = window.orbeonInitData[formID];
             if (formInitData && formInitData["paths"]) {
-                resourcesBaseURL = formInitData["paths"]["resources-base"];
                 xformsServerURL = formInitData["paths"]["xforms-server"];
+                calendarImageURL = formInitData["paths"]["calendar-image"];
             }
         }
 
-        ORBEON.xforms.Globals.resourcesBaseURL[formID] = resourcesBaseURL;
+
         ORBEON.xforms.Globals.xformsServerURL[formID] = xformsServerURL;
+        ORBEON.xforms.Globals.calendarImageURL[formID] = calendarImageURL;
     },
 
     _widetextArea: function(textarea) {

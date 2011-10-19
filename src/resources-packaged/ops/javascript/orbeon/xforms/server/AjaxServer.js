@@ -1294,7 +1294,7 @@
                                             } else if (newType.type == "date" && isMinimal) {
                                                 // Create image element
                                                 var image = document.createElement("img");
-                                                image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL[formID] + "/ops/images/xforms/calendar.png");
+                                                image.setAttribute("src", ORBEON.xforms.Globals.calendarImageURL[formID]);
                                                 image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
                                                 insertIntoDocument([image]);
                                                 YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");

@@ -486,3 +486,7 @@ a.ygtvlabel { cursor: pointer; }
 #xforms-form .xforms-width-15em input.xforms-input-input,
     #xforms-form input.xforms-width-15em,
     #xforms-form select.xforms-width-15em, #xforms-form .xforms-width-15em select { width: 15em }
+
+@media print {
+    .xforms-form .xforms-loading-loading { display: none }
+}

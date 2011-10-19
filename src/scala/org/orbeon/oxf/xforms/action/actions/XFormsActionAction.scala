@@ -78,7 +78,7 @@ class XFormsActionAction extends XFormsAction {
                 contextStack.popBinding()
         } else {
             // Delegate to xxf:script
-            XFormsActions.getAction(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsActions.XXFORMS_SCRIPT_ACTION)
+            XFormsActions.getScriptAction
                 .execute(actionInterpreter, event, eventObserver, actionElement, actionScope, hasOverriddenContext, overriddenContext)
         }
     }

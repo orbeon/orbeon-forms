@@ -93,7 +93,7 @@ public class TextReplacer extends BaseReplacer {
 
         // Set value into the instance
         // NOTE: Here we decided to use the actions logger, by compatibility with xforms:setvalue. Anything we would like to log in "submission" mode?
-        XFormsSetvalueAction.doSetValue(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY), submission, destinationNodeInfo, responseBody, null, "submission", false);
+        XFormsSetvalueAction.doSetValue(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY()), submission, destinationNodeInfo, responseBody, null, "submission", false);
 
         // Dispatch xforms-submit-done
         return dispatchSubmitDone(connectionResult);

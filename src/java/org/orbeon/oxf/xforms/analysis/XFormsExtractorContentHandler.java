@@ -340,7 +340,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 // TODO: Just warn?
                 if (isXXForms) {
                     // Check that we are getting a valid xxforms:* element
-                    if (!XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.contains(localname) && !XFormsActions.isActionName(XFormsConstants.XXFORMS_NAMESPACE_URI, localname))
+                    if (!XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.contains(localname) && !XFormsActions.isAction(QName.get(localname, XFormsConstants.XXFORMS_NAMESPACE)))
                         throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
                 } else if (isEXForms) {
                     // Check that we are getting a valid exforms:* element

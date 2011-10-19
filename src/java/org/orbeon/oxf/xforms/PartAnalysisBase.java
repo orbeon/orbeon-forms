@@ -563,7 +563,7 @@ public abstract class PartAnalysisBase implements PartAnalysis {
             if (currentNodeInfo instanceof NodeWrapper) {
                 final Element actionElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                if (XFormsActions.isActionName(actionElement.getNamespaceURI(), actionElement.getName())) {
+                if (XFormsActions.isAction(actionElement.getQName())) {
                     // This is a known action name
 
                     final Element newActionElement;

@@ -89,7 +89,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         registerLogger(XFormsModelSubmission.logger, globalLogger, debugConfig, XFormsModelSubmission.LOGGING_CATEGORY);
         registerLogger(XFormsControls.logger, globalLogger, debugConfig, XFormsControls.LOGGING_CATEGORY);
         registerLogger(XFormsEvents.logger, globalLogger, debugConfig, XFormsEvents.LOGGING_CATEGORY);
-        registerLogger(XFormsActions.logger, globalLogger, debugConfig, XFormsActions.LOGGING_CATEGORY);
+        registerLogger(XFormsActions.logger(), globalLogger, debugConfig, XFormsActions.LOGGING_CATEGORY());
     }
 
     private void registerLogger(Logger localLogger, Logger globalLogger, Set<String> debugConfig, String category) {
@@ -999,7 +999,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
             // Log error
             final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
-            getIndentedLogger(XFormsActions.LOGGING_CATEGORY).logError("action", "exception while running action", ev.toStringArray());
+            getIndentedLogger(XFormsActions.LOGGING_CATEGORY()).logError("action", "exception while running action", ev.toStringArray());
         } else {
             super.performDefaultAction(event);
         }

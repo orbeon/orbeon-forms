@@ -824,7 +824,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
             // Log error
             final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY());
             indentedLogger.logError("action", "exception while running action", ev.toStringArray());
         }
     }

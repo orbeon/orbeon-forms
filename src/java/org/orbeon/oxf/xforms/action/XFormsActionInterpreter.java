@@ -59,7 +59,7 @@ public class XFormsActionInterpreter {
         this.container = container;
         this.containingDocument = container.getContainingDocument();
 
-        this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
+        this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY());
 
         this.xformsControls = containingDocument.getControls();
 
@@ -167,12 +167,11 @@ public class XFormsActionInterpreter {
     public void runAction(XFormsEvent event, XFormsEventObserver eventObserver, Element actionElement) {
 
         // Check that we understand the action element
-        final String actionNamespaceURI = actionElement.getNamespaceURI();
-        final String actionName = actionElement.getName();
-        if (!XFormsActions.isActionName(actionNamespaceURI, actionName)) {
-            throw new ValidationException("Invalid action: " + XMLUtils.buildExplodedQName(actionNamespaceURI, actionName),
+        final QName actionQName = actionElement.getQName();
+        if (!XFormsActions.isAction(actionQName)) {
+            throw new ValidationException("Invalid action: " + actionQName.getQualifiedName(),
                     new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                            "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName)));
+                            "action name", actionQName.getQualifiedName()));
         }
 
         try {
@@ -241,8 +240,8 @@ public class XFormsActionInterpreter {
                         actionBlockContextStack.pushBinding(refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope);
 
                         final Item overriddenContextNodeInfo = currentNodeset.get(index - 1);
-                        runSingleIteration(event, eventObserver, actionElement, actionNamespaceURI,
-                                actionName, actionScope, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
+                        runSingleIteration(event, eventObserver, actionElement, actionQName,
+                                actionScope, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
                         // Restore context
                         actionBlockContextStack.popBinding();
@@ -256,17 +255,17 @@ public class XFormsActionInterpreter {
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
 
-                runSingleIteration(event, eventObserver, actionElement, actionNamespaceURI,
-                        actionName, actionScope, ifConditionAttribute, whileIterationAttribute, actionBlockContextStack.hasOverriddenContext(), actionBlockContextStack.getContextItem());
+                runSingleIteration(event, eventObserver, actionElement, actionQName,
+                        actionScope, ifConditionAttribute, whileIterationAttribute, actionBlockContextStack.hasOverriddenContext(), actionBlockContextStack.getContextItem());
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                    "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName)));
+                    "action name", actionQName.getQualifiedName()));
         }
     }
 
     private void runSingleIteration(XFormsEvent event, XFormsEventObserver eventObserver,
-                                    Element actionElement, String actionNamespaceURI, String actionName, XBLBindingsBase.Scope actionScope,
+                                    Element actionElement, QName actionQName, XBLBindingsBase.Scope actionScope,
                                     String ifConditionAttribute, String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
         // The context is now the overridden context
@@ -274,13 +273,13 @@ public class XFormsActionInterpreter {
         while (true) {
             // Check if the conditionAttribute attribute exists and stop if false
             if (ifConditionAttribute != null) {
-                boolean result = evaluateCondition(actionElement, actionName, ifConditionAttribute, "if", contextItem);
+                boolean result = evaluateCondition(actionElement, actionQName.getQualifiedName(), ifConditionAttribute, "if", contextItem);
                 if (!result)
                     break;
             }
             // Check if the iterationAttribute attribute exists and stop if false
             if (whileIterationAttribute != null) {
-                boolean result = evaluateCondition(actionElement, actionName, whileIterationAttribute, "while", contextItem);
+                boolean result = evaluateCondition(actionElement, actionQName.getQualifiedName(), whileIterationAttribute, "while", contextItem);
                 if (!result)
                     break;
             }
@@ -288,20 +287,20 @@ public class XFormsActionInterpreter {
             // We are executing the action
             if (indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionName);
+                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName());
                 else
-                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionName, "while iteration", Integer.toString(whileIteration));
+                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
             }
 
             // Get action and execute it
-            final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
+            final XFormsAction xformsAction = XFormsActions.getAction(actionQName);
             xformsAction.execute(this, event, eventObserver, actionElement, actionScope, hasOverriddenContext, contextItem);
 
             if (indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    indentedLogger.endHandleOperation("action name", actionName);
+                    indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName());
                 else
-                    indentedLogger.endHandleOperation("action name", actionName, "while iteration", Integer.toString(whileIteration));
+                    indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
             }
 
             // Stop if there is no iteration

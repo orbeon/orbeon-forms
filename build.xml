@@ -629,6 +629,9 @@
         <coffee-script fromdir="${resources-packaged.dir}" todir="${build.dir}/js">
             <include name="**/*.coffee"/>
         </coffee-script>
+        <coffee-script fromdir="${resources.dir}" todir="${build.dir}/js">
+            <include name="**/*.coffee"/>
+        </coffee-script>
 
         <!-- Copy non-minimized CoffeeScript resources -->
         <copy todir="${war.dir}/WEB-INF/resources">

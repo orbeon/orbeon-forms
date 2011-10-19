@@ -3428,20 +3428,24 @@ ORBEON.xforms.Events = {
                 }
                 currentParent = currentParent.parentNode;
             }
-            positions = positions.reverse();
 
-            // Find value for this item
-            var currentChildren = ORBEON.xforms.Globals.menuItemsets[target.id];
-            var nodeInfo = null;
-            for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
-                var position = positions[positionIndex];
-                nodeInfo = currentChildren[position];
-                currentChildren = nodeInfo.children;
+            // We might have clicked in the menu area, but not on a menu item
+            if (positions.length != 0) {
+                positions = positions.reverse();
+
+                // Find value for this item
+                var currentChildren = ORBEON.xforms.Globals.menuItemsets[target.id];
+                var nodeInfo = null;
+                for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
+                    var position = positions[positionIndex];
+                    nodeInfo = currentChildren[position];
+                    currentChildren = nodeInfo.children;
+                }
+
+                // Send value change to server
+                var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, nodeInfo.value, "xxforms-value-change-with-focus-change");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
             }
-
-            // Send value change to server
-            var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, nodeInfo.value, "xxforms-value-change-with-focus-change");
-            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help-image")) {
             // Help image
 
@@ -4633,6 +4637,14 @@ ORBEON.xforms.Init = {
         });
         yuiMenu.render();
         ORBEON.xforms.Globals.menuYui[menu.id] = yuiMenu;
+
+        // For iOS, on touch outside of the menu, close it
+        // NOTE: This unfortunately also closes the menu on scroll, zoom, and other gestures. http://goo.gl/V3CEZ
+        YAHOO.util.Event.addListener(document.body, "touchstart", function(event) {
+            var target = YAHOO.util.Event.getTarget(event);
+            var menu = YAHOO.util.Dom.getAncestorByClassName(target, "xforms-select1-appearance-xxforms-menu");
+            if (menu == null) yuiMenu.clearActiveItem();
+        });
     },
 
     /**

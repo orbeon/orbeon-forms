@@ -73,9 +73,6 @@
                 <!-- Matches the bound element -->
                 <xsl:template match="/*">
 
-                    <!-- 2011-07-22: Temporary attribute to allow FB to disable the use of fr:button until script issues are fixed -->
-                        <xsl:variable name="button-qname" select="if (@button-element) then @button-element else 'fr:button'"/>
-
                     <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
                     <xforms:switch xxbl:scope="outer" xbl:attr="model context ref bind">
                         <xsl:attribute name="class" select="string-join(('fr-component-group', @class), ' ')"/>
@@ -134,15 +131,14 @@
                                     </xforms:action>
                                 </xforms:input>
                                 <xhtml:span class="fr-inplace-buttons">
-                                    <xsl:element name="{$button-qname}">
-                                        <xsl:attribute name="class">fr-inplace-rename</xsl:attribute>
+                                    <xforms:trigger class="fr-inplace-rename">
                                         <!-- TODO: i18n -->
                                         <xforms:label>Apply</xforms:label>
                                         <xforms:action ev:event="DOMActivate">
                                             <!-- Write value back -->
                                             <xforms:setvalue ref="$result" value="context()"/>
                                         </xforms:action>
-                                    </xsl:element>
+                                    </xforms:trigger>
                                     or
                                     <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                                         <!-- TODO: i18n -->

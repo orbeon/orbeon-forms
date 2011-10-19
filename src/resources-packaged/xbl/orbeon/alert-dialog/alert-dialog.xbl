@@ -108,28 +108,28 @@
 
                 <xsl:template match="fr:positive-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-positive">
-                        <xsl:copy-of select="fr:button(*, 'Yes', 'positive')"/>
+                        <xsl:copy-of select="xforms:trigger(*, 'Yes', 'positive')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:template match="fr:negative-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-negative">
-                        <xsl:copy-of select="fr:button(*, 'No', 'negative')"/>
+                        <xsl:copy-of select="xforms:trigger(*, 'No', 'negative')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:template match="fr:neutral-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-neutral">
-                        <xsl:copy-of select="fr:button(*, 'OK', 'neutral')"/>
+                        <xsl:copy-of select="xforms:trigger(*, 'OK', 'neutral')"/>
                     </xhtml:span>
                 </xsl:template>
 
-                <xsl:function name="fr:button">
+                <xsl:function name="xforms:trigger">
                     <xsl:param name="content" as="element()*"/>
                     <xsl:param name="default" as="xs:string"/>
                     <xsl:param name="handler" as="xs:string"/>
                     <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
-                    <fr:button ref="." xxbl:scope="outer">
+                    <xforms:trigger ref="." xxbl:scope="outer">
                         <xforms:label>
                             <xsl:choose>
                                 <xsl:when test="exists($fr-label)">
@@ -144,7 +144,7 @@
                         <!-- If a custom target is provided, dispatch to it -->
                         <!-- NOTE: For now target must be an effective id -->
                         <xforms:dispatch ev:event="DOMActivate" if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner"/>
-                    </fr:button>
+                    </xforms:trigger>
                 </xsl:function>
 
                 <xsl:template match="@*|node()" priority="-100"/>

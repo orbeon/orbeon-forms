@@ -107,7 +107,7 @@
 
                                     <!-- Editable section title -->
                                     <xsl:variable name="input" as="element(fr:inplace-input)">
-                                        <fr:inplace-input ref="{xforms:label/@ref}" xxbl:scope="outer" button-element="xforms:trigger"><!-- 2011-07-22: Temporary disable fr:button -->
+                                        <fr:inplace-input ref="{xforms:label/@ref}" xxbl:scope="outer" button-element="xforms:trigger"><!-- 2011-07-22: Temporary disable xforms:trigger -->
                                             <xsl:apply-templates select="xforms:hint | xforms:alert"/>
                                             <!-- Put a hidden label for the error summary -->
                                             <xforms:label class="fr-hidden" ref="$fb-resources/components/labels/section-name"/>
@@ -192,7 +192,7 @@
                                 <xforms:case id="case-open" selected="{$open}" class="xxforms-animate">
                                     <xforms:group class="fr-section-content" xxbl:scope="outer">
                                         <!-- Section content except label, event handlers, and buttons -->
-                                        <xsl:apply-templates select="* except (xforms:label, xforms:help, fr:buttons)"/>
+                                        <xsl:apply-templates select="* except (xforms:label, xforms:help, xforms:triggers)"/>
                                     </xforms:group>
                                 </xforms:case>
                             </xforms:switch>

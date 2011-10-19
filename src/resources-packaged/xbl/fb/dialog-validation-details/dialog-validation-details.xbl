@@ -280,13 +280,13 @@
                         </xhtml:div>
 
                         <xhtml:div class="fr-dialog-buttons">
-                            <fr:button ref="save-trigger" class="fr-inplace-rename">
+                            <xforms:trigger ref="save-trigger" class="fr-inplace-rename">
                                 <xforms:label ref="$resources/apply/label"/>
                                 <!-- Close and save upon DOMActivate -->
                                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
                                     <xxforms:context name="fb:save" value="true()"/>
                                 </xforms:dispatch>
-                            </fr:button>
+                            </xforms:trigger>
                             <xforms:output value="$resources/or/label"/>
                             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                                 <xforms:label ref="$resources/cancel/label"/>

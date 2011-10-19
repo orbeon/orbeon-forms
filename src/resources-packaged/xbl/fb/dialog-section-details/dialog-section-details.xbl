@@ -160,9 +160,9 @@
                         </xh:div>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <fr:button class="fr-inplace-rename" ref="save-trigger" id="save-trigger">
+                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger">
                                     <xf:label ref="$resources/apply/label"/>
-                                </fr:button>
+                                </xf:trigger>
                                 <xf:output value="$resources/or/label"/>
                                 <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
                                     <xf:label ref="$resources/cancel/label"/>

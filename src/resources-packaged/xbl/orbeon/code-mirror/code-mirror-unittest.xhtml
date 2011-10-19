@@ -39,13 +39,13 @@
         <fr:code-mirror ref="code">
             <xforms:alert>You think you can away without coding?</xforms:alert>
         </fr:code-mirror>
-        <fr:button>
+        <xforms:trigger>
             <xforms:label>Reset</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="code" value="saxon:serialize(instance('xbl'), 'xml')"/>
-        </fr:button>
-        <fr:button>
+        </xforms:trigger>
+        <xforms:trigger>
             <xforms:label>Toggle readonly</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="code/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
-        </fr:button>
+        </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

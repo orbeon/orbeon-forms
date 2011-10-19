@@ -146,9 +146,9 @@
                     <xhtml:div class="fr-dialog-buttons">
                         <xforms:group appearance="xxforms:internal" id="triggers">
                             <xhtml:span>
-                                <fr:button class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger">
+                                <xforms:trigger class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger">
                                     <xforms:label ref="$resources/apply/label"/>
-                                </fr:button>
+                                </xforms:trigger>
                                 <xforms:output value="$resources/or/label"/>
                                 <xforms:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
                                     <xforms:label ref="$resources/cancel/label"/>

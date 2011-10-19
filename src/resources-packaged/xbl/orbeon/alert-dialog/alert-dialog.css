@@ -10,6 +10,7 @@
 .xbl-fr-alert-dialog-message { background-repeat: no-repeat; background-position: 5px; padding: 0 10px 0 90px; min-height: 80px; *height: 80px; }
 .xbl-fr-alert-dialog-message label { position: relative; top: 1em; }
 .xbl-fr-alert-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
-.xbl-fr-alert-dialog-buttons button img { margin-right: .5em; }
-.xbl-fr-alert-dialog-positive .xbl-fr-button .yui-button button { background: url(../../../apps/fr/style/images/silk/tick.png) no-repeat 5px; padding: 0 10px 0 25px;}
-.xbl-fr-alert-dialog-negative .xbl-fr-button .yui-button button { background: url(../../../apps/fr/style/images/silk/cross.png) no-repeat 5px; padding: 0 10px 0 25px;}
+.xbl-fr-alert-dialog-buttons .xforms-trigger button img { margin-right: .5em; }
+.xbl-fr-alert-dialog-buttons .xforms-trigger button { padding-left: 25px; margin-left: 4px }
+.xbl-fr-alert-dialog-positive .xforms-trigger button { background: url(../../../apps/fr/style/images/silk/tick.png) no-repeat 5px }
+.xbl-fr-alert-dialog-negative .xforms-trigger button { background: url(../../../apps/fr/style/images/silk/cross.png) no-repeat 5px }

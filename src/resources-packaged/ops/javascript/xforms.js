@@ -4141,7 +4141,7 @@ ORBEON.xforms.Init = {
             treeYui: {},                         // Maps tree id to the YUI object for that tree
             sliderYui: {},                       // Maps slider id to the YUI object for that slider
             isReloading: false,                  // Whether the form is being reloaded from the server
-            lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
+            lastDialogZIndex: 100,               // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
             // Data relative to a form is stored in an array indexed by form id.
             formErrorPanel: {},                  // YUI panel used to report errors
             formHelpPanel: {},                   // Help dialog: YUI panel

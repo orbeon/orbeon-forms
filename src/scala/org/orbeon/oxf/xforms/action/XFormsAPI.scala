@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import actions.{XFormsDeleteAction, XFormsInsertAction, XFormsSetvalueAction}
+import actions.{XFormsSetindexAction, XFormsDeleteAction, XFormsInsertAction, XFormsSetvalueAction}
 import collection.JavaConverters._
 import org.orbeon.saxon.om._
 import java.util.{List => JList}
@@ -53,6 +53,13 @@ object XFormsAPI {
             Some(ref.head)
         } else
             None
+    }
+
+    // Setindex
+    def setindex(repeatStaticId: String, index: Int) {
+        actionContext.value foreach { action =>
+            XFormsSetindexAction.executeSetindexAction(action, action.outerActionElement, repeatStaticId, Integer.toString(index))
+        }
     }
 
     // Insert

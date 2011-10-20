@@ -352,43 +352,6 @@
         <!-- TODO: anything here? -->
     </xforms:action>
 
-    <!-- Ensure there is an empty xhtml:td to place a new control (may fail) -->
-    <xforms:action ev:event="fb-ensure-empty-td">
-
-        <xforms:action context="$current-td">
-            <xforms:action if="not(exists(*))">
-                <!-- There is no  element in the current td, don't change anything -->
-            </xforms:action>
-            <xforms:action if="exists(*)">
-                <!-- There is an element in the current td, figure out what to do -->
-                <xxforms:variable name="is-next-td-available" select="following-sibling::*:td[1][not(*)]"/>
-                <xforms:action if="$is-next-td-available">
-                    <!-- Next cell is empty, move to that one -->
-                    <xforms:setindex repeat="fb-section-content-grid-td-repeat" index="index('fb-section-content-grid-td-repeat') + 1"/>
-                </xforms:action>
-                <xforms:action if="not($is-next-td-available) and following-sibling::*:td">
-                    <!-- TODO: Not sure we have a plan here -->
-                </xforms:action>
-                <xforms:action if="not($is-next-td-available) and not(following-sibling::*:td)">
-                    <xxforms:variable name="is-insert-new-row"
-                                      select="exists(../following-sibling::*:tr[1]/*:td[1]/*) or not(exists(../following-sibling::*:tr[1]))"/>
-                    <!-- We are the last cell of the row -->
-                    <xforms:action if="$is-insert-new-row">
-                        <!-- The first cell of the next row is occupied, or there is no next row: insert new row -->
-                        <xforms:dispatch name="DOMActivate" target="fb-insert-row-below-trigger"/>
-                        <!-- Make sure the first cell is selected -->
-                        <xforms:setindex repeat="fb-section-content-grid-td-repeat" index="1"/>
-                    </xforms:action>
-                    <xforms:action if="not($is-insert-new-row)">
-                        <!-- There is a next row, and its first cell is empty, move to that one -->
-                        <xforms:setindex repeat="fb-section-content-grid-tr-repeat" index="index('fb-section-content-grid-tr-repeat') + 1"/>
-                        <xforms:setindex repeat="fb-section-content-grid-td-repeat" index="1"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:action>
-        </xforms:action>
-    </xforms:action>
-
     <!-- Insert instance and resource holders -->
     <xforms:action ev:event="fb-insert-holders">
         <xxforms:variable name="current-td" select="event('current-td')"/>

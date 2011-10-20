@@ -276,8 +276,15 @@ object GridOps {
     // Make the given grid td selected
     def selectTd(newTd: NodeInfo) = selectedCellId match {
         case Some(selectedCell) =>
+            // New FB
             setvalue(selectedCell, newTd \@ "id" stringValue)
-        case _ => // legacy FB
+        case _ =>
+            // Legacy FB
+            val allRowCells = getAllRowCells(getContainingGridOrRepeat(newTd))
+            val (posx, posy) = getTdPosition(newTd, allRowCells)
+
+            setindex("fb-section-content-grid-tr-repeat", posy + 1)
+            setindex("fb-section-content-grid-td-repeat", posx + 1)
     }
 
     // Try to ensure that there is an empty td after the current location, inserting a new row if possible

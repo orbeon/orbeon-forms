@@ -50,6 +50,7 @@ public class XFormsActionInterpreter {
     private final XFormsControls xformsControls;
     private final XFormsContextStack actionBlockContextStack;
 
+    public final Element outerActionElement;
     private final String outerActionElementEffectiveId;
 
     public XFormsActionInterpreter(XBLContainer container, XFormsEventObserver eventObserver,
@@ -61,6 +62,8 @@ public class XFormsActionInterpreter {
         this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
 
         this.xformsControls = containingDocument.getControls();
+
+        this.outerActionElement = outerActionElement;
 
         if (isXBLHandler) {
             // Get the effective id of the <xbl:handler> element as source

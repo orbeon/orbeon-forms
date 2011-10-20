@@ -60,8 +60,8 @@ public class XFormsSetindexAction extends XFormsAction {
         executeSetindexAction(actionInterpreter, actionElement, repeatStaticId, indexString);
     }
 
-    private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, Element actionElement,
-                                              String repeatStaticId, String indexString) {
+    public static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                                             String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
             return;

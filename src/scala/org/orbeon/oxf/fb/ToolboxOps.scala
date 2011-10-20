@@ -105,11 +105,6 @@ object ToolboxOps {
 
                 debugDumpDocument("insert new control", doc)
 
-                // Open label editor for newly inserted control -->
-                // TODO
-//                <xforms:toggle case="fr-inplace-fb-control-label-control-edit"/>
-//                <xforms:setfocus control="fr-inplace-fb-control-label-control-input"/>
-
             case _ => // no empty td found/created so NOP
         }
     }

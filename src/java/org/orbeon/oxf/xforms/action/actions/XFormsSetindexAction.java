@@ -60,11 +60,11 @@ public class XFormsSetindexAction extends XFormsAction {
         executeSetindexAction(actionInterpreter, actionElement, repeatStaticId, indexString);
     }
 
-    public static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, Element actionElement,
+    public static int executeSetindexAction(XFormsActionInterpreter actionInterpreter, Element actionElement,
                                              String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
-            return;
+            return -1;
         }
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
@@ -89,12 +89,14 @@ public class XFormsSetindexAction extends XFormsAction {
                 // Set index on control
                 repeatControl.setIndex(newRepeatIndex);
             }
+            return repeatControl.getIndex();
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:setindex", "index does not refer to an existing xforms:repeat element, ignoring action",
                         "repeat id", repeatStaticId);
+            return -1;
         }
     }
 }

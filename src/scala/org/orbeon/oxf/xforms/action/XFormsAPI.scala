@@ -56,11 +56,18 @@ object XFormsAPI {
     }
 
     // Setindex
-    def setindex(repeatStaticId: String, index: Int) {
-        actionContext.value foreach { action =>
-            XFormsSetindexAction.executeSetindexAction(action, action.outerActionElement, repeatStaticId, Integer.toString(index))
+    // @return:
+    //
+    // - None        if the control is not found
+    // - Some(0)     if the control is non-relevant or doesn't have any iterations
+    // - Some(index) otherwise, where index is the control's new index
+    def setindex(repeatStaticId: String, index: Int) =
+        actionContext.value flatMap { action =>
+            XFormsSetindexAction.executeSetindexAction(action, action.outerActionElement, repeatStaticId, Integer.toString(index)) match {
+                case -1 => None
+                case newIndex => Some(newIndex)
+            }
         }
-    }
 
     // Insert
     // @return the inserted nodes

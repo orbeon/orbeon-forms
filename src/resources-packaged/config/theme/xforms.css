@@ -335,6 +335,11 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 	width: 25px;
 }
 
+.yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
+    border: 0;                                  /* Override border set in YUI's menu.css, which creates a thicker border around the menu bar titles on iOS */
+    padding-top: 2px; padding-bottom: 2px;      /* Compensate for the lost border by adding some padding */
+}
+
 /* ***** Repeats **************************************************************************************************** */
 
 .xforms-repeat-selected-item-1 {

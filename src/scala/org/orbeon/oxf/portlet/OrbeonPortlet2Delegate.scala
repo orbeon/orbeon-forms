@@ -34,7 +34,14 @@ import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncReques
 /**
  * Orbeon portlet.
  *
- * TODO: Support writing render/resource directly without buffering.
+ * Ideas for improvements:
+ *
+ * - support writing render/resource directly without buffering when possible (not action or async load)
+ * - warning message if user is re-rendering a page which is the result of an action
+ * - implement async loading for processAction
+ * - implement improved caching of page with replay of XForms events, see:
+ *   http://wiki.orbeon.com/forms/projects/xforms-improved-portlet-support#TOC-XForms-aware-caching-of-portlet-out
+ * - merge front-end with proxy portlet, as some of the logic is the same
  */
 class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 
@@ -80,7 +87,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
         }
 
     // Immutable response content which can safely be stored and passed around
-    case class ResponseWithParameters(
+    private case class ResponseWithParameters(
         responseData: String Either Array[Byte],
         contentType: Option[String],
         title: Option[String],
@@ -90,7 +97,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             this(getResponseData(response), Option(response.getContentType), Option(response.getTitle), parameters)
     }
 
-    def tryStoringRenderResponse = Properties.instance.getPropertySet.getBoolean("test.store-render", false)
+    private def tryStoringRenderResponse = Properties.instance.getPropertySet.getBoolean("test.store-render", false)
 
     private def writeResponseWithParameters(request: RenderRequest, response: RenderResponse, responseWithParameters: ResponseWithParameters) {
         // Set title and content type
@@ -237,7 +244,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
         }
 
-    def doProcessAction(request: ActionRequest, response: ActionResponse): Unit =
+    private def doProcessAction(request: ActionRequest, response: ActionResponse): Unit =
         try {
             // Make sure the previously cached output is cleared, if there is any. We keep the result of only one action.
             clearResponseWithParameters(request)
@@ -310,10 +317,6 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
         else
             throw new IllegalStateException("Processor execution did not return content.")
 
-    // Convert to immutable String → List[String] so that map equality works as expected
-    def toScalaMap(m: JMap[String, Array[String]]) =
-        m.asScala map { case (k, v) ⇒ k → v.toList } toMap
-
     private def getResponseWithParameters(request: PortletRequest) =
         Option(request.getPortletSession.getAttribute(ResponseSessionKey).asInstanceOf[ResponseWithParameters])
 
@@ -336,6 +339,10 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 object OrbeonPortlet2Delegate {
 
     val currentPortlet = new DynamicVariable[OrbeonPortlet2Delegate]
+
+    // Convert to immutable String → List[String] so that map equality works as expected
+    def toScalaMap(m: JMap[String, Array[String]]) =
+        m.asScala map { case (k, v) ⇒ k → v.toList } toMap
 
     // Immutable portletNamespace → idNamespace information stored in the portlet context
     private object NamespaceMappings {

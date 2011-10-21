@@ -59,14 +59,17 @@ ORBEON.widgets.YUICalendar = function() {
 
     // Hide calendar div and do some cleanup of private variables
     function closeCalendar() {
-        // Reset state
-        control = null;
-        inputField = null;
-        mouseOverCalendar = false;
-        // Hide calendar
-        yuiOverlay.cfg.setProperty("visible", false);
-        // Unsubscribe to global click
-        ORBEON.xforms.Events.clickEvent.unsubscribe(clickAnywhere);
+        // Nothing to do if the calendar was never opened
+        if (yuiOverlay != null) {
+            // Reset state
+            control = null;
+            inputField = null;
+            mouseOverCalendar = false;
+            // Hide calendar
+            yuiOverlay.cfg.setProperty("visible", false);
+            // Unsubscribe to global click
+            ORBEON.xforms.Events.clickEvent.unsubscribe(clickAnywhere);
+        }
     }
 
     // Listener on a click anywhere on the page, so we can close the calendar when we get a click on the background

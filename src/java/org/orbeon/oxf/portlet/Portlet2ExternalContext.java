@@ -187,7 +187,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public String getMethod() {
-            return (clientDataRequest != null) ? clientDataRequest.getMethod() : null;
+            return (clientDataRequest != null) ? clientDataRequest.getMethod() : "get";
         }
 
         public synchronized Map<String, Object[]> getParameterMap() {

@@ -31,7 +31,7 @@
         </xsl:for-each>
     </xh:head>
     <xh:body>
-        <xh:div id="fr-view">
+        <xh:div id="fr-view" class="fr-view">
             <xh:div id="doc4">
                 <xh:div class="fr-header">
                     <!-- Logo -->

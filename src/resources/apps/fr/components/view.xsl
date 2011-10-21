@@ -29,7 +29,7 @@
         <xsl:for-each select="$view">
             <!-- Just to set the context -->
 
-            <xforms:group id="fr-view">
+            <xforms:group id="fr-view" class="fr-view">
                 <xhtml:div
                     id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
                     class="{if (fr:left) then 'yui-t2 ' else ''}{concat(' fr-mode-', $mode)}">

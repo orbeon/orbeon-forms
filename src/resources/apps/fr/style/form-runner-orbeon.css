@@ -207,20 +207,17 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
 .fr-toc a { text-decoration: none }
 
 /* Error summary */
-.xbl-fr-error-summary .fr-error-title {
+.fr-view .xbl-fr-error-summary .fr-error-title {
     font-size: smaller;
     font-weight: bold;
     background-color: #DF731B;
     color: white;
     border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
 }
-.xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
-.xbl-fr-error-summary .fr-error-alert { color: #DF731B }
+.fr-view .xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
+.fr-view .xbl-fr-error-summary .fr-error-alert { color: #DF731B } /* override default of XBL component */
 
 /* Section */
-
-
-
 .fr-section-title { border-bottom: 1px solid #004B92 }
 .fr-section-title a { text-decoration: none }
 .fr-section-title .fr-section-open-close { border-bottom: white }

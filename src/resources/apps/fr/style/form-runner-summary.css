@@ -64,8 +64,7 @@
 .fr-summary-search .xforms-label { font-weight: normal; }
 
 .fr-paging-buttons { padding: .5em 0 1em 0 }
-.fr-paging-buttons button { vertical-align: middle }
-.fr-paging-buttons button img { margin: 0 } /* as other buttons set an img margin */
+.fr-paging-buttons img { vertical-align: middle }
 .fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
 
 .fr-search-input input {

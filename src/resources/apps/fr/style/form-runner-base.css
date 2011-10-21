@@ -442,7 +442,8 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 }
 
 .fr-grid .xforms-upload input { width: auto } /* The upload field responds to 100% width on IE, which gives strange result */
-.fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: 6em }
+.fr-grid select.xforms-select1-appearance-compact, .fr-grid select.xforms-select-appearance-compact,
+    .fr-grid .xforms-select1-appearance-compact select, .fr-grid .xforms-select-appearance-compact select { height: 6em }
 
 /* Image output */
 .fr-grid .xforms-mediatype-image { width: 100%; overflow: auto; display: block }

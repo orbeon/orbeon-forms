@@ -274,12 +274,16 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
                 }
             } else if (bufferedResponse.hasContent) {
                 // Content was written, keep it in the session for subsequent render requests with the current action parameters
-                val updatedRenderParameters = request.getParameterMap.asScala.toMap + ("orbeon.method" → Array("post")) asJava
-                
-                response.setRenderParameters(updatedRenderParameters)
+
+                // NOTE: Don't use the action parameters, as in the case of a form POST there can be dozens of those
+                // or more, and anyway those don't make sense as subsequent render parameters. Instead, we just use
+                // the path and a method indicator. Later we should either indicate an error, or handle XForms Ajax
+                // updates properly.
+                val newRenderParameters = Map(PathParameter → Array(request.getParameter(PathParameter)), MethodParameter → Array("post")).asJava
+                response.setRenderParameters(newRenderParameters)
 
                 // Store response
-                setResponseWithParameters(request, new ResponseWithParameters(bufferedResponse, toScalaMap(updatedRenderParameters)))
+                setResponseWithParameters(request, new ResponseWithParameters(bufferedResponse, toScalaMap(newRenderParameters)))
             } else {
                 // Nothing happened, throw an exception (or should we just ignore?)
                 throw new IllegalStateException("Processor execution did not return content or issue a redirect.")
@@ -337,6 +341,9 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 }
 
 object OrbeonPortlet2Delegate {
+
+    val PathParameter = "orbeon.path"
+    val MethodParameter = "orbeon.method"
 
     val currentPortlet = new DynamicVariable[OrbeonPortlet2Delegate]
 

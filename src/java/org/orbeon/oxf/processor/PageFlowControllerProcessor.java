@@ -84,7 +84,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         final Map<String, String> mapping = new HashMap<String, String>();
         mapping.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-        mapping.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE);
+        mapping.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE_URI);
 
         NAMESPACES_WITH_XSI_AND_XSLT = new NamespaceMapping(mapping);
     }

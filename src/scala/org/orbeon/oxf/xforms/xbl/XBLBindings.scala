@@ -28,11 +28,15 @@ import collection.JavaConversions._
 import java.lang.IllegalStateException
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
 import java.util.{List => JList, Map => JMap}
 import collection.mutable.{ArrayBuffer, LinkedHashSet, LinkedHashMap}
 import net.sf.ehcache.{Element => EhElement}
+import org.orbeon.scaxon.XML
+import org.orbeon.oxf.processor.pipeline.{PipelineProcessor, PipelineReader}
+import org.orbeon.oxf.util.{PipelineUtils, XPathCache, IndentedLogger}
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
+import org.orbeon.oxf.processor.DOMSerializer
+import org.orbeon.oxf.pipeline.api.PipelineContext
 
 class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata, inlineXBLDocuments: JList[Document])
     extends XBLBindingsBase(partAnalysis, metadata) {
@@ -208,13 +212,80 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         result
     }
 
-    def readXBLResource(include: String) = {
+    def readXBLResource(path: String) = {
         // Update last modified so that dependencies on external XBL files can be handled
-        val lastModified = ResourceManagerWrapper.instance.lastModified(include, false)
+        val lastModified = ResourceManagerWrapper.instance.lastModified(path, false)
         metadata.updateBindingsLastModified(lastModified)
 
-        // Read and return document with last modified
-        (ResourceManagerWrapper.instance.getContentAsDOM4J(include, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false), lastModified)
+        // Read content
+        val content = ResourceManagerWrapper.instance.getContentAsDOM4J(path, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false)
+
+        // Support /xsl:* or /*[@xsl:version = '2.0']
+        val isXSLT = {
+            val rootElement = content.getRootElement
+            rootElement.getNamespaceURI == XMLConstants.XSLT_NAMESPACE_URI || rootElement.attributeValue(XMLConstants.XSLT_VERSION_QNAME) == "2.0"
+        }
+
+        if (isXSLT) {
+            // Consider the XBL file to be an XSLT transformation and run it
+
+            // Create pipeline config
+            val pipelineConfig = {
+                val pipeline = XML.elemToDom4j(
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                              xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+                        <p:param type="input" name="transform"/>
+                        <p:param type="output" name="data"/>
+
+                        <p:processor name="oxf:unsafe-xslt">
+                            <p:input name="config" href="#transform"/>
+                            <p:input name="data"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
+                            <p:output name="data" ref="data"/>
+                        </p:processor>
+
+                    </p:config>)
+
+                val ast = PipelineReader.readPipeline(pipeline, lastModified)
+                PipelineProcessor.createConfigFromAST(ast)
+            }
+
+            // Create transform generator
+            val domGeneratorConfig = PipelineUtils.createDOMGenerator(
+                content,
+                "xbl-transform-config",
+                lastModified,
+                path
+            )
+
+            // Create pipeline and connect transform input
+            val pipeline = new PipelineProcessor(pipelineConfig)
+            PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
+
+            // Connect a DOM serializer to the processor data output
+            val domSerializerData = new DOMSerializer
+            PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
+
+            // Run the transformation
+            val newPipelineContext = new PipelineContext
+            var success = false
+            val generatedDocument =
+                try {
+                    pipeline.reset(newPipelineContext)
+                    domSerializerData.start(newPipelineContext)
+
+                    // Get the result, move its root element into a xbl:template and return it
+                    val result = domSerializerData.getDocument(newPipelineContext)
+                    success = true
+                    result
+                } finally
+                    newPipelineContext.destroy(success)
+
+            // NOTE: We don't handle XSLT last modified dependencies at all at this time. Could we?
+            (generatedDocument, lastModified)
+        } else
+            // Return plain XML document
+            (content, lastModified)
     }
 
     def createConcreteBinding(indentedLogger: IndentedLogger, controlElement: Element, boundControlPrefixedId: String, locationData: LocationData,

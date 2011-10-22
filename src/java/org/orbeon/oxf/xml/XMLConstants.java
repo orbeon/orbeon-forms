@@ -118,7 +118,9 @@ public class XMLConstants {
     public static final QName XSI_NIL_QNAME = new QName(XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
 
     public static final String XSLT_PREFIX = "xsl";
-    public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";
+    public static final String XSLT_NAMESPACE_URI = "http://www.w3.org/1999/XSL/Transform";
+    public static final Namespace XSLT_NAMESPACE = new Namespace("xsl", XSLT_NAMESPACE_URI);
+    public static final QName XSLT_VERSION_QNAME = new QName("version", XSLT_NAMESPACE);
 
     public static final String XHTML_PREFIX = "xhtml";
     public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";

@@ -121,9 +121,8 @@ case class AbstractBinding(
                     val result = domSerializerData.getDocument(newPipelineContext)
                     success = true
                     result
-                } finally {
+                } finally
                     newPipelineContext.destroy(success)
-                }
 
             val generatedRootElement = generatedDocument.getRootElement.detach.asInstanceOf[Element]
             generatedDocument.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"))

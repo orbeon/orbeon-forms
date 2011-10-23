@@ -30,7 +30,6 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import scala.collection.JavaConverters._
 import java.util.{List => JList, Map => JMap}
 import collection.mutable.{ArrayBuffer, LinkedHashSet, LinkedHashMap}
-import net.sf.ehcache.{Element => EhElement}
 import org.orbeon.scaxon.XML
 import org.orbeon.oxf.processor.pipeline.{PipelineProcessor, PipelineReader}
 import org.orbeon.oxf.util.{PipelineUtils, XPathCache, IndentedLogger}
@@ -78,21 +77,31 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                         qName = Dom4jUtils.extractTextValueQName(baselineProperty.namespaces, token, true)
                     } yield
                         if (metadata.isXBLBinding(qName.getNamespaceURI, qName.getName)) {
+                            // Binding is in use by this document
                             val binding = abstractBindings(qName)
                             (binding.scripts, binding.styles)
                         } else {
-                            // Load XBL document
-                            val xblDocument = readXBLResource(metadata.getAutomaticXBLMappingPath(qName.getNamespaceURI, qName.getName))._1
+                            val path = metadata.getAutomaticXBLMappingPath(qName.getNamespaceURI, qName.getName)
+                            BindingCache.get(path, qName, 0) match {
+                                case Some(binding) =>
+                                    // Binding is in cache
+                                    (binding.scripts, binding.styles)
+                                case None =>
+                                    // Load XBL document
+                                    // TODO: Would be nice to read and cache, so that if several forms have the same
+                                    // baseline for unused mappings, those are not re-read every time.
+                                    val xblDocument = readXBLResource(path)._1
 
-                            // Extract xbl:xbl/xbl:script
-                            val scripts = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
+                                    // Extract xbl:xbl/xbl:script
+                                    val scripts = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
 
-                            // Try to find binding
-                            (Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME) map
-                                (e => AbstractBinding(e, 0, scripts, partAnalysis.getNamespaceMapping("", e), null)) find
-                                    (_.qNameMatch == qName)) match {
-                                case Some(binding) => (binding.scripts, binding.styles)
-                                case None => (Seq[Element](), Seq[Element]())
+                                    // Try to find binding
+                                    (Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME) map
+                                        (e => AbstractBinding(e, 0, scripts, partAnalysis.getNamespaceMapping("", e))) find
+                                            (_.qNameMatch == qName)) match {
+                                        case Some(binding) => (binding.scripts, binding.styles)
+                                        case None => (Seq[Element](), Seq[Element]())
+                                    }
                             }
                         }) unzip
 
@@ -122,28 +131,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             (createConcreteBinding(indentedLogger, controlElement, boundControlPrefixedId, locationData, containerScope, abstractBinding, _, newPrefix))
     }
 
-    // Cache binding key -> AbstractBinding
-    object BindingCache {
-
-        private val cache = Caches.xblCache
-
-        def put(key: String, lastModified: Long, abstractBinding: AbstractBinding) =
-            cache.put(new EhElement(key, abstractBinding, lastModified))
-
-        def get(key: String, lastModified: Long): Option[AbstractBinding] =
-            Option(cache.get(key)) flatMap { element =>
-                // NOTE: As of Ehcache 2.4.0, the version attribute is entirely handled by the caller. See:
-                // http://jira.terracotta.org/jira/browse/EHC-666
-                val cacheLastModified = element.getVersion
-                if (lastModified <= cacheLastModified) {
-                    Some(element.getValue.asInstanceOf[AbstractBinding])
-                } else {
-                    cache.remove(key)
-                    None
-                }
-            }
-    }
-
+    // path == None in case of inline XBL 
     private def extractXBLBindings(path: Option[String], xblDocumentLastModified: (Document, Long), partAnalysis: PartAnalysis): Int = {
 
         val (xblDocument, lastModified) = xblDocumentLastModified
@@ -152,8 +140,6 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         // TODO: should do this differently, in order to include only the scripts and resources actually used
         val scriptElements = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
         allScripts ++= scriptElements
-
-        def createCacheKey(qNameMatch: QName) = path map (_ + '#' + qNameMatch.getQualifiedName)
 
         // Find abstract bindings
         val resultingBindings =
@@ -164,10 +150,10 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 if (currentElementAttribute ne null)
                 namespaceMapping = partAnalysis.getNamespaceMapping("", bindingElement)
                 qNameMatch = AbstractBinding.qNameMatch(bindingElement, namespaceMapping)
-                // Try cached binding first, otherwise create new AbstractBinding
-                cachedBinding = createCacheKey(qNameMatch) flatMap (BindingCache.get(_, lastModified))
+                // Try cached binding first if we have a path, otherwise create new AbstractBinding
+                cachedBinding = path flatMap (BindingCache.get(_, qNameMatch, lastModified))
                 abstractBinding = cachedBinding getOrElse
-                    AbstractBinding(bindingElement, lastModified, scriptElements, namespaceMapping, metadata.idGenerator)
+                    AbstractBinding(bindingElement, lastModified, scriptElements, namespaceMapping)
             } yield {
                 // Create and remember factory for this QName
                 xblComponentsFactories += abstractBinding.qNameMatch -> new XFormsControlFactory.Factory {
@@ -179,8 +165,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 abstractBindings += abstractBinding.qNameMatch -> abstractBinding
 
                 // Cache binding
-                createCacheKey(qNameMatch) foreach
-                    (BindingCache.put(_, lastModified, abstractBinding))
+                path foreach (BindingCache.put(_, qNameMatch, lastModified, abstractBinding))
 
                 abstractBinding
             }

@@ -17,7 +17,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import analysis.IdGenerator
 import collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xml.NamespaceMapping
@@ -136,7 +135,7 @@ case class AbstractBinding(
 
 object AbstractBinding {
     // Construct an AbstractBinding
-    def apply(bindingElement: Element, lastModified: Long, scripts: Seq[Element], namespaceMapping: NamespaceMapping, idGenerator: IdGenerator) = {
+    def apply(bindingElement: Element, lastModified: Long, scripts: Seq[Element], namespaceMapping: NamespaceMapping) = {
 
         assert(bindingElement ne null)
 
@@ -144,10 +143,7 @@ object AbstractBinding {
             Dom4jUtils.elements(parentElement, XFORMS_MODEL_QNAME).asScala map
                 (Dom4jUtils.createDocumentCopyParentNamespaces(_, detach))
 
-        val bindingId = {
-            val existingBindingId = XFormsUtils.getElementStaticId(bindingElement)
-            Option(existingBindingId) orElse (Option(idGenerator) map (_.getNextId))
-        }
+        val bindingId = Option(XFormsUtils.getElementStaticId(bindingElement))
 
         val styles =
             for {

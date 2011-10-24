@@ -20,7 +20,7 @@ import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase.Scope
 import org.orbeon.oxf.xforms._
 import analysis.{PartAnalysisImpl, Metadata}
-import control.{XFormsControl, XFormsControlFactory, XFormsComponentControl}
+import control.XFormsControlFactory
 import processor.handlers.XHTMLHeadHandler
 import org.orbeon.oxf.properties.PropertySet
 import org.apache.commons.lang.StringUtils
@@ -32,6 +32,7 @@ import java.util.{List => JList, Map => JMap}
 import collection.mutable.{ArrayBuffer, LinkedHashSet, LinkedHashMap}
 import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
 import org.orbeon.oxf.xml.XMLUtils
+import XBLBindings._
 
 class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata, inlineXBLDocuments: JList[Document])
     extends XBLBindingsBase(partAnalysis, metadata) {
@@ -46,16 +47,20 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     val allGlobals = LinkedHashMap[QName, XBLBindingsBase.Global]()
 
     // Inline <xbl:xbl> and automatically-included XBL documents
-    val xblDocuments = (inlineXBLDocuments.asScala map ((_, 0L))) ++
+    private val xblDocuments = (inlineXBLDocuments.asScala map ((_, 0L))) ++
         (metadata.getBingingIncludes.asScala map (readXBLResource(_)))
 
     // Process <xbl:xbl>
     if (xblDocuments.nonEmpty) {
         indentedLogger.startHandleOperation("", "extracting top-level XBL documents")
 
-        val xblBindingCount = xblDocuments.foldLeft(0)(_ + extractXBLBindings(None, _, partAnalysis))
+        val bindingCounts = xblDocuments map { case (document, lastModified) =>
+            val bindingsForDoc = extractXBLBindings(None, document, lastModified, partAnalysis)
+            registerXBLBindings(bindingsForDoc)
+            bindingsForDoc.size
+        }
 
-        indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(xblDocuments.size), "xbl:binding count", Integer.toString(xblBindingCount))
+        indentedLogger.endHandleOperation("xbl:xbl count", xblDocuments.size.toString, "xbl:binding count", bindingCounts.sum.toString)
     }
 
     lazy val baselineResources = {
@@ -130,46 +135,17 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             (createConcreteBinding(indentedLogger, controlElement, boundControlPrefixedId, locationData, containerScope, abstractBinding, _, newPrefix))
     }
 
-    // path == None in case of inline XBL 
-    private def extractXBLBindings(path: Option[String], xblDocumentLastModified: (Document, Long), partAnalysis: PartAnalysis): Int = {
+    private def registerXBLBindings(bindings: Seq[AbstractBinding]) {
 
-        val (xblDocument, lastModified) = xblDocumentLastModified
+        // All bindings are expected to have the same scripts, so just add scripts for the first binding received
+        allScripts ++= bindings.headOption.toSeq flatMap (_.scripts)
 
-        // Extract xbl:xbl/xbl:script
-        // TODO: should do this differently, in order to include only the scripts and resources actually used
-        val scriptElements = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
-        allScripts ++= scriptElements
-
-        // Find abstract bindings
-        val resultingBindings =
-            for {
-                // Find xbl:binding/@element
-                bindingElement <- Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME)
-                currentElementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME)
-                if (currentElementAttribute ne null)
-                namespaceMapping = partAnalysis.getNamespaceMapping("", bindingElement)
-                qNameMatch = AbstractBinding.qNameMatch(bindingElement, namespaceMapping)
-                // Try cached binding first if we have a path, otherwise create new AbstractBinding
-                cachedBinding = path flatMap (BindingCache.get(_, qNameMatch, lastModified))
-                abstractBinding = cachedBinding getOrElse
-                    AbstractBinding(bindingElement, lastModified, scriptElements, namespaceMapping)
-            } yield {
-                // Create and remember factory for this QName
-                xblComponentsFactories += abstractBinding.qNameMatch -> new XFormsControlFactory.Factory {
-                    def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element]) =
-                        new XFormsComponentControl(container, parent, element, name, effectiveId)
-                }
-
-                allStyles ++= abstractBinding.styles
-                abstractBindings += abstractBinding.qNameMatch -> abstractBinding
-
-                // Cache binding
-                path foreach (BindingCache.put(_, qNameMatch, lastModified, abstractBinding))
-
-                abstractBinding
-            }
-
-        resultingBindings.size
+        // Register each individual binding
+        bindings foreach { binding =>
+            xblComponentsFactories += binding.qNameMatch -> binding.createFactory
+            allStyles ++= binding.styles
+            abstractBindings += binding.qNameMatch -> binding
+        }
     }
 
     private def withProcessAutomaticXBL[T](body: => T) = {
@@ -183,13 +159,22 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         val finalIncludesCount = metadata.bindingIncludes.size
         if (finalIncludesCount > initialIncludesCount) {
             indentedLogger.startHandleOperation("", "adding XBL bindings")
-            val xblBindingCount =
-                (metadata.bindingIncludes.view(initialIncludesCount, finalIncludesCount) map
-                    (r => extractXBLBindings(Some(r), readXBLResource(r), partAnalysis))).foldLeft(0)(_ + _)
+
+            // Get new paths
+            val newPaths = metadata.bindingIncludes.view(initialIncludesCount, finalIncludesCount)
+
+            // Extract and register new bindings
+            val bindingCounts =
+                newPaths map { path =>
+                    val (document, lastModified) = readXBLResource(path)
+                    val bindingsForDoc = extractXBLBindings(Some(path), document, lastModified, partAnalysis)
+                    registerXBLBindings(bindingsForDoc)
+                    bindingsForDoc.size
+                }
 
             indentedLogger.endHandleOperation(
                 "xbl:xbl count", finalIncludesCount - initialIncludesCount toString,
-                "xbl:binding count", xblBindingCount.toString,
+                "xbl:binding count", bindingCounts.sum.toString,
                 "total xbl:binding count", abstractBindings.size.toString)
         }
 
@@ -430,4 +415,27 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     def hasBinding(controlPrefixedId: String) = Option(getBinding(controlPrefixedId)).isDefined
 
     def getBinding(controlPrefixedId: String) = concreteBindings.get(controlPrefixedId).orNull
+}
+
+object XBLBindings {
+    // path == None in case of inline XBL
+    private def extractXBLBindings(path: Option[String], xblDocument: Document, lastModified: Long, partAnalysis: PartAnalysis) = {
+
+        // Extract xbl:xbl/xbl:script
+        // TODO: should do this differently, in order to include only the scripts and resources actually used
+        val scriptElements = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
+
+        // Find abstract bindings
+        val resultingBindings =
+            for {
+                // Find xbl:binding/@element
+                bindingElement <- Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME)
+                currentElementAttribute = bindingElement.attributeValue(XFormsConstants.ELEMENT_QNAME)
+                if currentElementAttribute ne null
+                namespaceMapping = partAnalysis.getNamespaceMapping("", bindingElement)
+            } yield
+                AbstractBinding.findOrCreate(path, bindingElement, lastModified, scriptElements, namespaceMapping)
+
+        resultingBindings
+    }
 }

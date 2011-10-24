@@ -16,11 +16,14 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
+import control.{XFormsComponentControl, XFormsControl, XFormsControlFactory}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.common.OXFException
+import java.util.{Map => JMap}
+
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
     qNameMatch: QName,
@@ -66,6 +69,12 @@ case class AbstractBinding(
 
             generatedDocument
     }
+    
+    def createFactory =
+        new XFormsControlFactory.Factory {
+            def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element]) =
+                new XFormsComponentControl(container, parent, element, name, effectiveId)
+        }
 }
 
 object AbstractBinding {
@@ -107,8 +116,25 @@ object AbstractBinding {
         new AbstractBinding(qNameMatch(bindingElement, namespaceMapping), bindingElement, lastModified, bindingId, scripts, styles, handlers, implementations, global)
     }
 
-    def qNameMatch(bindingElement: Element, namespaceMapping: NamespaceMapping) = {
+    private def qNameMatch(bindingElement: Element, namespaceMapping: NamespaceMapping) = {
         val elementAttribute = bindingElement.attributeValue(ELEMENT_QNAME)
         Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementAttribute.replace('|', ':'), true)
+    }
+
+    // Find a cached abstract binding or create and cache a new one
+    def findOrCreate(path: Option[String], bindingElement: Element, lastModified: Long, scripts: Seq[Element], namespaceMapping: NamespaceMapping) = {
+
+        val qName = qNameMatch(bindingElement, namespaceMapping)
+
+        path flatMap (BindingCache.get(_, qName, lastModified)) match {
+            case Some(cachedBinding) =>
+                // Found in cache
+                cachedBinding
+            case None =>
+                val newBinding = AbstractBinding(bindingElement, lastModified, scripts, namespaceMapping)
+                // Cache binding
+                path foreach (BindingCache.put(_, qName, lastModified, newBinding))
+                newBinding
+        }
     }
 }

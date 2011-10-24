@@ -81,11 +81,9 @@ class Metadata(val idGenerator: IdGenerator) {
 
     // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
     def getAutomaticXBLMappingPath(uri: String, localname: String) =
-        automaticMappings.get(uri) match {
-            case Some(prefix) =>
-                val path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl"
-                if (ResourceManagerWrapper.instance.exists(path)) path else null
-            case None => null
+        automaticMappings.get(uri) flatMap { prefix =>
+            val path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl"
+            if (ResourceManagerWrapper.instance.exists(path)) Some(path) else None
         }
 
     def isXBLBindingCheckAutomaticBindings(uri: String, localname: String): Boolean = {
@@ -96,11 +94,12 @@ class Metadata(val idGenerator: IdGenerator) {
 
         // If not, check if it exists as automatic binding
         getAutomaticXBLMappingPath(uri, localname) match {
-            case path: String =>
+            case Some(path) =>
                 storeXBLBinding(uri, localname)
                 bindingIncludes.add(path)
                 true
-            case _ => false
+            case _ =>
+                false
         }
     }
 

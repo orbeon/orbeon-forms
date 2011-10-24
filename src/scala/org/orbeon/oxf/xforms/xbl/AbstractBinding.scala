@@ -20,14 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.scaxon.XML
-import org.orbeon.oxf.processor.pipeline.{PipelineProcessor, PipelineReader}
-import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.processor.generator.DOMGenerator
-import org.orbeon.oxf.processor.DOMSerializer
-import org.orbeon.oxf.pipeline.api.PipelineContext
-
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
     qNameMatch: QName,
@@ -55,74 +48,16 @@ case class AbstractBinding(
         for {
             transformQName <- transformQNameOption
             templateRoot <- templateRootOption
-        } yield {
-            // Create reusable pipeline config
-            val pipelineConfig = {
-                val pipeline = XML.elemToDom4j(
-                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                              xmlns:oxf="http://www.orbeon.com/oxf/processors">
-
-                        <p:param type="input" name="transform"/>
-                        <p:param type="input" name="data"/>
-                        <p:param type="output" name="data"/>
-
-                        <p:processor name={transformQName.getQualifiedName}><!-- namespace for QName might not be in scope! -->
-                            <p:input name="config" href="#transform"/>
-                            <p:input name="data" href="#data"/>
-                            <p:output name="data" ref="data"/>
-                        </p:processor>
-
-                    </p:config>)
-
-                val ast = PipelineReader.readPipeline(pipeline, lastModified)
-                PipelineProcessor.createConfigFromAST(ast)
-            }
-
-            // Create transform input separately to help with namespaces (easier with a separate document)
-            val domGeneratorConfig = PipelineUtils.createDOMGenerator(
-                Dom4jUtils.createDocumentCopyParentNamespaces(templateRoot),
-                "xbl-transform-config",
-                lastModified,
-                Dom4jUtils.makeSystemId(templateRoot)
-            )
-
-            (pipelineConfig, domGeneratorConfig)
-        }
+        } yield
+            Transform.createTransformConfig(transformQName, templateRoot, lastModified)
 
     // A transform cannot be reused, so this creates a new one when called, based on the config
     def newTransform(boundElement: Element) = transformConfig map {
         case (pipelineConfig, domGeneratorConfig) =>
-            val pipeline = new PipelineProcessor(pipelineConfig)
-            PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
-
-            // Connect the bound element to the processor data input
-            val domGeneratorData = PipelineUtils.createDOMGenerator(
-                Dom4jUtils.createDocumentCopyParentNamespaces(boundElement),
-                "xbl-transform-data",
-                DOMGenerator.ZeroValidity,
-                Dom4jUtils.makeSystemId(boundElement)
-            )
-            PipelineUtils.connect(domGeneratorData, "data", pipeline, "data")
-
-            // Connect a DOM serializer to the processor data output
-            val domSerializerData = new DOMSerializer
-            PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
-
             // Run the transformation
-            val newPipelineContext = new PipelineContext
-            var success = false
-            val generatedDocument =
-                try {
-                    pipeline.reset(newPipelineContext)
-                    domSerializerData.start(newPipelineContext)
+            val generatedDocument = Transform.transformBoundElement(pipelineConfig, domGeneratorConfig, boundElement)
 
-                    // Get the result, move its root element into a xbl:template and return it
-                    val result = domSerializerData.getDocument(newPipelineContext)
-                    success = true
-                    result
-                } finally
-                    newPipelineContext.destroy(success)
-
+            // Repackage the result
             val generatedRootElement = generatedDocument.getRootElement.detach.asInstanceOf[Element]
             generatedDocument.addElement(new QName("template", XFormsConstants.XBL_NAMESPACE, "xbl:template"))
             val newRoot = generatedDocument.getRootElement

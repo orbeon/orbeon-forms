@@ -30,12 +30,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import scala.collection.JavaConverters._
 import java.util.{List => JList, Map => JMap}
 import collection.mutable.{ArrayBuffer, LinkedHashSet, LinkedHashMap}
-import org.orbeon.scaxon.XML
-import org.orbeon.oxf.processor.pipeline.{PipelineProcessor, PipelineReader}
-import org.orbeon.oxf.util.{PipelineUtils, XPathCache, IndentedLogger}
-import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
-import org.orbeon.oxf.processor.DOMSerializer
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
+import org.orbeon.oxf.xml.XMLUtils
 
 class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata, inlineXBLDocuments: JList[Document])
     extends XBLBindingsBase(partAnalysis, metadata) {
@@ -81,27 +77,30 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                             val binding = abstractBindings(qName)
                             (binding.scripts, binding.styles)
                         } else {
-                            val path = metadata.getAutomaticXBLMappingPath(qName.getNamespaceURI, qName.getName)
-                            BindingCache.get(path, qName, 0) match {
-                                case Some(binding) =>
-                                    // Binding is in cache
-                                    (binding.scripts, binding.styles)
-                                case None =>
-                                    // Load XBL document
-                                    // TODO: Would be nice to read and cache, so that if several forms have the same
-                                    // baseline for unused mappings, those are not re-read every time.
-                                    val xblDocument = readXBLResource(path)._1
+                            metadata.getAutomaticXBLMappingPath(qName.getNamespaceURI, qName.getName) match {
+                                case Some(path) =>
+                                    BindingCache.get(path, qName, 0) match {
+                                        case Some(binding) =>
+                                            // Binding is in cache
+                                            (binding.scripts, binding.styles)
+                                        case None =>
+                                            // Load XBL document
+                                            // TODO: Would be nice to read and cache, so that if several forms have the same
+                                            // baseline for unused mappings, those are not re-read every time.
+                                            val xblDocument = readXBLResource(path)._1
 
-                                    // Extract xbl:xbl/xbl:script
-                                    val scripts = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
+                                            // Extract xbl:xbl/xbl:script
+                                            val scripts = Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_SCRIPT_QNAME).asScala
 
-                                    // Try to find binding
-                                    (Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME) map
-                                        (e => AbstractBinding(e, 0, scripts, partAnalysis.getNamespaceMapping("", e))) find
-                                            (_.qNameMatch == qName)) match {
-                                        case Some(binding) => (binding.scripts, binding.styles)
-                                        case None => (Seq[Element](), Seq[Element]())
+                                            // Try to find binding
+                                            (Dom4jUtils.elements(xblDocument.getRootElement, XFormsConstants.XBL_BINDING_QNAME) map
+                                                (e => AbstractBinding(e, 0, scripts, partAnalysis.getNamespaceMapping("", e))) find
+                                                    (_.qNameMatch == qName)) match {
+                                                case Some(binding) => (binding.scripts, binding.styles)
+                                                case None => (Seq[Element](), Seq[Element]())
+                                            }
                                     }
+                                case None => (Seq[Element](), Seq[Element]())
                             }
                         }) unzip
 
@@ -203,74 +202,9 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         metadata.updateBindingsLastModified(lastModified)
 
         // Read content
-        val content = ResourceManagerWrapper.instance.getContentAsDOM4J(path, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false)
+        val sourceXBL = ResourceManagerWrapper.instance.getContentAsDOM4J(path, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, false)
 
-        // Support /xsl:* or /*[@xsl:version = '2.0']
-        val isXSLT = {
-            val rootElement = content.getRootElement
-            rootElement.getNamespaceURI == XMLConstants.XSLT_NAMESPACE_URI || rootElement.attributeValue(XMLConstants.XSLT_VERSION_QNAME) == "2.0"
-        }
-
-        if (isXSLT) {
-            // Consider the XBL file to be an XSLT transformation and run it
-
-            // Create pipeline config
-            val pipelineConfig = {
-                val pipeline = XML.elemToDom4j(
-                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                              xmlns:oxf="http://www.orbeon.com/oxf/processors">
-
-                        <p:param type="input" name="transform"/>
-                        <p:param type="output" name="data"/>
-
-                        <p:processor name="oxf:unsafe-xslt">
-                            <p:input name="config" href="#transform"/>
-                            <p:input name="data"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
-                            <p:output name="data" ref="data"/>
-                        </p:processor>
-
-                    </p:config>)
-
-                val ast = PipelineReader.readPipeline(pipeline, lastModified)
-                PipelineProcessor.createConfigFromAST(ast)
-            }
-
-            // Create transform generator
-            val domGeneratorConfig = PipelineUtils.createDOMGenerator(
-                content,
-                "xbl-transform-config",
-                lastModified,
-                path
-            )
-
-            // Create pipeline and connect transform input
-            val pipeline = new PipelineProcessor(pipelineConfig)
-            PipelineUtils.connect(domGeneratorConfig, "data", pipeline, "transform")
-
-            // Connect a DOM serializer to the processor data output
-            val domSerializerData = new DOMSerializer
-            PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
-
-            // Run the transformation
-            val newPipelineContext = new PipelineContext
-            var success = false
-            val generatedDocument =
-                try {
-                    pipeline.reset(newPipelineContext)
-                    domSerializerData.start(newPipelineContext)
-
-                    // Get the result, move its root element into a xbl:template and return it
-                    val result = domSerializerData.getDocument(newPipelineContext)
-                    success = true
-                    result
-                } finally
-                    newPipelineContext.destroy(success)
-
-            // NOTE: We don't handle XSLT last modified dependencies at all at this time. Could we?
-            (generatedDocument, lastModified)
-        } else
-            // Return plain XML document
-            (content, lastModified)
+        (Transform.transformXBLDocumentIfNeeded(path,sourceXBL, lastModified), lastModified)
     }
 
     def createConcreteBinding(indentedLogger: IndentedLogger, controlElement: Element, boundControlPrefixedId: String, locationData: LocationData,

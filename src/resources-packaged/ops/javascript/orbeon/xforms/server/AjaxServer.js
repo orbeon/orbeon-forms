@@ -1407,15 +1407,18 @@
                                                 currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
                                                 newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
 
-                                                var isInput = YAHOO.util.Dom.hasClass(documentElement, "xforms-input");
-                                                var inputSize = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "size") : null;
-                                                var inputLength = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
-                                                var inputAutocomplete = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "autocomplete") : null;
+                                                var isInputOrSecret = YAHOO.util.Dom.hasClass(documentElement, "xforms-input")
+                                                    || YAHOO.util.Dom.hasClass(documentElement, "xforms-secret");
+
+                                                var inputSize = isInputOrSecret ? ORBEON.util.Dom.getAttribute(controlElement, "size") : null;
+                                                var inputAutocomplete = isInputOrSecret ? ORBEON.util.Dom.getAttribute(controlElement, "autocomplete") : null;
 
                                                 var isTextarea = YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea");
-                                                var textareaMaxlength = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+
                                                 var textareaCols = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "cols") : null;
                                                 var textareaRows = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "rows") : null;
+
+                                                var maxlength = (isInputOrSecret || isTextarea) ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
 
                                                 var doUpdate =
                                                         // If this was an input that was recreated because of a type change, we always set its value
@@ -1430,18 +1433,18 @@
                                                             && (previousServerValue == null || currentValue == previousServerValue)
                                                         ) ||
                                                         // Special xforms:input attributes
-                                                        (isInput && (inputSize != null || inputLength != null || inputAutocomplete != null)) ||
+                                                        (isInputOrSecret && (inputSize != null || maxlength != null || inputAutocomplete != null)) ||
                                                         // Special xforms:textarea attributes
-                                                        (isTextarea && (textareaMaxlength != null || textareaCols != null || textareaRows != null));
+                                                        (isTextarea && (maxlength != null || textareaCols != null || textareaRows != null));
                                                 if (doUpdate) {
-                                                    if (isInput) {
+                                                    if (isInputOrSecret) {
                                                         // Additional attributes for xforms:input
-                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputLength, inputAutocomplete);
+                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, maxlength, inputAutocomplete);
                                                     } else if (isTextarea && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                         ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                                     } else if (isTextarea) {
                                                         // Additional attributes for xforms:textarea
-                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, textareaMaxlength, textareaCols, textareaRows);
+                                                        ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, maxlength, textareaCols, textareaRows);
                                                     } else {
                                                         // Other control just have a new value
                                                         ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);

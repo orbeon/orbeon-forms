@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 
 class CoreControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope)

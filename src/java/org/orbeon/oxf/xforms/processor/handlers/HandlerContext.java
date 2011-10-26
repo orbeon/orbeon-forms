@@ -56,6 +56,7 @@ public class HandlerContext {
     private boolean isRenderingEngineIE6OrEarlier;
 
     // Context information
+    private final Stack<PartAnalysis> partAnalysisStack;
     private Stack<String> componentContextStack;
     private Stack<RepeatContext> repeatContextStack;
     private Stack<Boolean> caseContextStack;
@@ -79,6 +80,22 @@ public class HandlerContext {
 
         this.isNoscript = containingDocument.getStaticState().isNoscript();
         this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
+
+        // Top-level part is containing document
+        this.partAnalysisStack = new Stack<PartAnalysis>();
+        this.partAnalysisStack.push(containingDocument.getStaticState().topLevelPart());
+    }
+
+    public void pushPartAnalysis(PartAnalysis partAnalysis) {
+        partAnalysisStack.push(partAnalysis);
+    }
+
+    public void popPartAnalysis() {
+        partAnalysisStack.pop();
+    }
+
+    public PartAnalysis getPartAnalysis() {
+        return partAnalysisStack.peek();
     }
 
     final public ElementHandlerController getController() {

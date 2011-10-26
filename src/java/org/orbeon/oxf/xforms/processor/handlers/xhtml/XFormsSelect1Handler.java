@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -36,8 +37,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handle xforms:select and xforms:select1.
@@ -49,7 +52,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private boolean isMultiple;
     private boolean isOpenSelection;
 
-    private QName effectiveAppearance;
+    private Set<QName> effectiveAppearances;
     private boolean isFull;
     private boolean isCompact;
     private boolean isTree;
@@ -60,42 +63,44 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        super.init(uri, localname, qName, attributes);
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+        super.init(uri, localname, qName, attributes, matched);
 
         isMultiple = localname.equals("select");
         isOpenSelection = "open".equals(attributes.getValue("selection"));
 
         // Compute effective appearance
         {
-            final QName plainAppearance = super.getAppearance(attributes);
-            final QName effectiveAppearance;
-            if (plainAppearance != null) {
-                if (isMultiple && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(plainAppearance)) {
+            final Set<QName> plainAppearances = new HashSet<QName>(super.getAppearances()); // TODO: move appearance handling to SelectionControl
+            if (plainAppearances.size() > 0) {
+                if (isMultiple && plainAppearances.contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)) {
                     // For now, a select with minimal appearance is handled as a compact appearance
-                    effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;
-                } else if (isMultiple && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(plainAppearance)) {
+                    plainAppearances.remove(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);
+                    plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);
+                } else if (isMultiple && plainAppearances.contains(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME)) {
                     // We don't support autocompletion with xforms:select for now, only with xforms:select1
-                    effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+                    plainAppearances.remove(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
+                    plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);// default for xforms:select
                     isOpenSelection = false;
-                } else if (isOpenSelection && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(plainAppearance)) {
-                    effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+                } else if (isOpenSelection && plainAppearances.contains(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME)) {
+                    plainAppearances.remove(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
+                    plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);// default for xforms:select
                     isOpenSelection = false;
                 } else {
-                    effectiveAppearance = plainAppearance;
+                    // keep as is
                 }
             } else if (isMultiple) {
-                effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+                plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);// default for xforms:select
             } else {
-                effectiveAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
+                plainAppearances.add(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);// default for xforms:select1
             }
-            this.effectiveAppearance = effectiveAppearance;
+            this.effectiveAppearances = plainAppearances;
         }
 
-        isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(effectiveAppearance);
-        isCompact = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME.equals(effectiveAppearance);
-        isTree = XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME.equals(effectiveAppearance);
-        isMenu = XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME.equals(effectiveAppearance);
+        isFull = this.effectiveAppearances.contains(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME);
+        isCompact = this.effectiveAppearances.contains(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);
+        isTree = this.effectiveAppearances.contains(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
+        isMenu = this.effectiveAppearances.contains(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
     }
 
     @Override
@@ -113,8 +118,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected QName getAppearance(Attributes attributes) {
-        return effectiveAppearance;
+    protected Set<QName> getAppearances() {
+        return effectiveAppearances;
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {

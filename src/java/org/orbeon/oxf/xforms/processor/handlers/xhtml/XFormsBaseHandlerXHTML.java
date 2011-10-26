@@ -35,6 +35,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.Set;
+
 
 /**
  * Base class for all XHTML and XForms element handlers.
@@ -134,12 +136,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         }
     }
 
-    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control) {
-        return getInitialClasses(controlURI, controlName, controlAttributes, control, null, false);
-    }
-
-    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control, QName appearance, boolean incrementalDefault) {
-
+    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control, boolean incrementalDefault) {
+        
         final StringBuilder sb = new StringBuilder(50);
         // User-defined classes go first
         appendControlUserClasses(controlAttributes, control, sb);
@@ -169,11 +167,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             }
         }
         {
-            // Class for appearance
-            if (appearance == null)
-                appearance = getAppearance(controlAttributes);
-
-            if (appearance != null) {
+            // Classes for appearances
+            for (final QName appearance : getAppearances()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-");

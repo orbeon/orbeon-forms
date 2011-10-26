@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -131,6 +132,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public ElementAnalysis getElementAnalysis() {
+        // TODO: Control must point to this directly
         return getXBLContainer().getPartAnalysis().getControlAnalysis(getPrefixedId());
     }
 
@@ -435,15 +437,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Return the control's appearance as an exploded QName.
+     * Return the control's appearances as a set of QNames.
      */
-    public String getAppearance() {
-        if (appearance == null) {
-            final QName qName = Dom4jUtils.extractTextValueQName(container.getNamespaceMappings(controlElement).mapping,
-                    controlElement.attributeValue(XFormsConstants.APPEARANCE_QNAME.getName()), true);
-            appearance = Dom4jUtils.qNameToExplodedQName(qName);
-        }
-        return appearance;
+    public Set<QName> getAppearances() {
+        return getAppearances(getElementAnalysis());
     }
 
     /**
@@ -1602,5 +1599,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public List<org.orbeon.oxf.xforms.event.EventListener> getListeners(String eventName) {
         return null;
+    }
+
+    public static Set<QName> getAppearances(ElementAnalysis elementAnalysis) {
+        if (elementAnalysis instanceof AppearanceTrait) {
+            return ((AppearanceTrait) elementAnalysis).jAppearances();
+        } else {
+            return Collections.emptySet();
+        }
     }
 }

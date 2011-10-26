@@ -32,8 +32,6 @@ import java.util.Map;
  */
 public class XFormsTextareaControl extends XFormsValueControl {
 
-    private static final String AUTOSIZE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
-
     // List of attributes to handle as AVTs
     private static final QName[] EXTENSION_ATTRIBUTES = {
             XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
@@ -52,7 +50,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
 
     @Override
     public boolean hasJavaScriptInitialization() {
-        return "text/html".equals(getMediatype()) || AUTOSIZE_APPEARANCE.equals(getAppearance());
+        return "text/html".equals(getMediatype()) || getAppearances().contains(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
     }
 
     // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented in JavaScript

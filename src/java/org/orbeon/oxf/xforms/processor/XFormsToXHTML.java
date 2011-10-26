@@ -487,28 +487,26 @@ public class XFormsToXHTML extends ProcessorImpl {
 				if (isHTMLDocument) {
 	                controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
 	                controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
-            	}
-            	else {
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
-            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
-            		controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
-            		controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
-            		controller.registerHandler(XFormsGroupHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
-            		controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
-            		controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
+            	} else {
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsDefaultControlHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsGroupHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case", XHTMLBodyHandler.ANY_MATCHER);
+            		controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat", XHTMLBodyHandler.ANY_MATCHER);
             	}
 
                 // Register a handler for AVTs on HTML elements
                 final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
                 if (hostLanguageAVTs) {
                     controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
-                    if (isHTMLDocument)
-                    {
+                    if (isHTMLDocument) {
                     	controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
                     }
                     

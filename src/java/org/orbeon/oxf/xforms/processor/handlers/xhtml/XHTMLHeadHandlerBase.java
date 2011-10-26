@@ -52,7 +52,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
         // Register control handlers on controller
         {
             final ElementHandlerController controller = handlerContext.getController();
-            controller.registerHandler(XXFormsTextHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "text");
+            controller.registerHandler(XXFormsTextHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "text", XHTMLBodyHandler.ANY_MATCHER);
         }
 
         // Declare xmlns:f

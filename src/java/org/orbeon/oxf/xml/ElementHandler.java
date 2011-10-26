@@ -26,13 +26,15 @@ public abstract class ElementHandler {
     /**
      * Override this to detect that the element is being initialized.
      *
+     *
      * @param uri           element namespace URI
      * @param localname     element local name
      * @param qName         element qualified name
      * @param attributes    element attributes
+     * @param matched       object returned by the matcher
      * @throws SAXException
      */
-    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
     }
 
     /**

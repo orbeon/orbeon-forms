@@ -62,8 +62,12 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandlerXHTML {
             // We can't get a control
             xformsControl = null;
         }
-
+        
         // Find control element so we know which handler to use
+        // NOTE: This is funky. We do this because for some controls, @for does not point to the standard foo$bar$$c.1-2-3
+        // id, but to another id. So we try to guess which handler is being used. However, this will not produce the
+        // correct result all the time as matching is not only based on QName! A much better solution would be to always
+        // use the foo$bar$$c.1-2-3 scheme for the @for id of a control. Also note that some controls don't support @for.
         final Element controlElement = containingDocument.getStaticOps().getControlElement(controlPrefixedId);
         if (controlElement != null) {
             // Get handler
@@ -79,7 +83,7 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandlerXHTML {
                 final String controlLocalname = controlElement.getName();
                 xformsHandler.init(controlNamespaceURI, controlLocalname,
                         XMLUtils.buildQName(controlPrefix, controlLocalname),
-                        XMLUtils.getSAXAttributes(controlElement));
+                        XMLUtils.getSAXAttributes(controlElement), null); // NOTE: null passed here for ElementAnalysis, might be incorrect
 
                 final String forEffectiveId = xformsHandler.getForEffectiveId();
                 handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LHHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate, true);

@@ -19,10 +19,10 @@ import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
-import xbl.{XBLBindingsBase, XBLBindings}
+import xbl.XBLBindingsBase
 
 abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) {
+        extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) with AppearanceTrait {
 
     require(parent ne null)
 

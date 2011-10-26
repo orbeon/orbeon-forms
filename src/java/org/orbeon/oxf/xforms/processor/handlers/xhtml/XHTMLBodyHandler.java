@@ -19,11 +19,19 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
-import org.orbeon.oxf.xml.*;
-import org.xml.sax.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import scala.collection.Seq;
 
 import java.util.Map;
@@ -215,140 +223,170 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             });
         }
     }
+    
+    private abstract static class Matcher extends ElementHandlerController.Matcher {
+        
+        public ElementAnalysis getElementAnalysis(Attributes attributes, Object handlerContext) {
+            final HandlerContext hc = (HandlerContext) handlerContext;
+            final String staticId = hc.getId(attributes);
+            if (staticId != null) {
+                final String prefixedId = hc.getIdPrefix() + staticId;
+                return hc.getPartAnalysis().getControlAnalysis(prefixedId);
+            } else {
+                return null;
+            }
+        }
+        
+        public boolean hasAppearance(ElementAnalysis elementAnalysis, QName appearance) {
+            if (elementAnalysis instanceof AppearanceTrait) {
+                return ((AppearanceTrait) elementAnalysis).jAppearances().contains(appearance);
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    private static class AppearanceMatcher extends Matcher {
+        private final QName appearance;
+        public AppearanceMatcher(QName appearance) {
+            this.appearance = appearance;
+        }
+
+        public Object match(Attributes attributes, Object handlerContext) {
+            final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
+            return hasAppearance(elementAnalysis, appearance) ? elementAnalysis : null;
+        }
+    }
+
+    private static class AnyMatcher extends Matcher {
+        public Object match(Attributes attributes, Object handlerContext) {
+            return getElementAnalysis(attributes, handlerContext);
+        }
+    }
+
+    public static final Matcher ANY_MATCHER = new AnyMatcher();
 
     public static void registerHandlers(final ElementHandlerController controller, final XFormsContainingDocument containingDocument) {
 
         // xforms:input
-        controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
+        controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input", ANY_MATCHER);
 
         // xforms:output
-        controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(controller.getAttributeQNameValue(attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName())));
-            }
-        });
-        controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes));
-            }
-        });
-        controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
+        controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME));
+        controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME));
+        controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", new Matcher() {
+            public Object match(Attributes attributes, Object handlerContext) {
+                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
+                // TODO: aks ElementAnalysis for its mediatype
                 final String mediatypeValue = attributes.getValue("mediatype");
-                return mediatypeValue != null && mediatypeValue.startsWith("image/");
+                return mediatypeValue != null && mediatypeValue.startsWith("image/") ? elementAnalysis : null;
             }
         });
-        controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
+        controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", new Matcher() {
+            public Object match(Attributes attributes, Object handlerContext) {
+                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
+                // TODO: aks ElementAnalysis for its mediatype
                 final String mediatypeValue = attributes.getValue("mediatype");
-                return mediatypeValue != null && mediatypeValue.equals("text/html");
+                return mediatypeValue != null && mediatypeValue.equals("text/html") ? elementAnalysis : null;
             }
         });
-        controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
+        controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", ANY_MATCHER);
 
         // xforms:trigger
-        final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                final QName appearance = getAppearance(attributes);
-                return appearance != null && !containingDocument.getStaticState().isNoscript() // is noscript mode, use the full appearance
-                        && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
-                            || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
+        final Matcher triggerSubmitMinimalMatcher = new Matcher() {
+            public ElementAnalysis match(Attributes attributes, Object handlerContext) {
+                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
+                return elementAnalysis != null && !containingDocument.getStaticState().isNoscript()             // in noscript mode, use the full appearance
+                        && (hasAppearance(elementAnalysis, XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)     // minimal appearance
+                            || hasAppearance(elementAnalysis, XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME))   // legacy appearance
+                       ? elementAnalysis : null;
             }
         };
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
-        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
+        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", ANY_MATCHER);
 
         // xforms:submit
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", triggerSubmitMinimalMatcher);
-        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", ANY_MATCHER);
 
         // xforms:group
-        controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
-            }
-        });
-        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
-            }
-        });
-        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                // XFormsAnnotatorContentHandler adds this appearance if needed
+        controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
+        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME));
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", new Matcher() {
+            public Object match(Attributes attributes, Object handlerContext) {
+                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
 
+                // XFormsAnnotatorContentHandler adds this appearance if needed
                 // NOTE: we just check on the attribute value instead of resolving the QName, so that XFormsAnnotatorContentHandler
                 // doesn't have to declare the xxforms:* prefix.
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue) ? elementAnalysis : null;
             }
         });
-        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
+        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", ANY_MATCHER);
 
         // xforms:switch
         // NOTE: We use the same handlers for switch as we do for group
-        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                // XFormsAnnotatorContentHandler adds this appearance if needed
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", new Matcher() {
+            public Object match(Attributes attributes, Object handlerContext) {
+                final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
 
+                // XFormsAnnotatorContentHandler adds this appearance if needed
                 // NOTE: we just check on the attribute value instead of resolving the QName, so that XFormsAnnotatorContentHandler
                 // doesn't have to declare the xxforms:* prefix.
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
-                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue) ? elementAnalysis : null;
             }
         });
-        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
-        controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
+        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", ANY_MATCHER);
+        controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case", ANY_MATCHER);
 
         // xforms:repeat
-        controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
+        controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat", ANY_MATCHER);
 
         // xforms:secret
-        controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
+        controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret", ANY_MATCHER);
 
         // xforms:upload
-        controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
+        controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload", ANY_MATCHER);
 
         // xforms:range
-        controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+        controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range", ANY_MATCHER);
 
         // Other controls
-        controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+        controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea", ANY_MATCHER);
         if (!containingDocument.getStaticState().isNoscript())
-            controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
+            controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
         else
-            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
+            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
 
         // xforms:select and xforms:select1
-        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
-            }
-        });
-        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1", controller.new Matcher() {
-            public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
-            }
-        });
-        controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
-        controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
+        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
+        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1",
+                new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
+        controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select", ANY_MATCHER);
+        controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1", ANY_MATCHER);
 
         // Add handlers for LHHA elements
-        // TODO: check w/ XFStaticState if there are any standalone LHHA elements
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label");
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help");
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint");
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label", ANY_MATCHER);
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help", ANY_MATCHER);
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint", ANY_MATCHER);
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert", ANY_MATCHER);
 
         // Add handlers for custom components
         final Seq<QName> componentBindings = containingDocument.getStaticOps().getBindingQNames();
         for (final scala.collection.Iterator<QName> i = componentBindings.iterator(); i.hasNext();) {
             final QName currentQName = i.next();
-            controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
+            controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName(), ANY_MATCHER);
         }
 
         // xxf:dynamic
-        controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic");
+        controller.registerHandler(XXFormsDynamicHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic", ANY_MATCHER);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

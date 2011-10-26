@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls.RepeatControl
-import org.dom4j.Element
-import org.orbeon.oxf.xml.dom4j.{LocationData, ExtendedLocationData}
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
-import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
+import org.dom4j.{QName, Element}
+import org.orbeon.oxf.xml.{XMLUtils, NamespaceMapping, ContentHandlerHelper}
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -223,4 +223,19 @@ object ElementAnalysis {
 
     def createLocationData(element: Element): ExtendedLocationData =
         if (element ne null) new ExtendedLocationData(element.getData.asInstanceOf[LocationData], "gathering static information", element) else null
+
+    /**
+     * Get the value of an attribute containing a space-separated list of tokens as a set.
+     */
+    def attSet(element: Element, qName: QName) =
+        Option(element.attributeValue(qName)) match {
+            case Some(list) => list split """\s+""" toSet
+            case None => Set[String]()
+        }
+
+    /**
+     * Get the value of an attribute containing a space-separated list of QNames as a set.
+     */
+    def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping) =
+        attSet(element, qName) map (Dom4jUtils.extractTextValueQName(namespaces.mapping, _, true))
 }

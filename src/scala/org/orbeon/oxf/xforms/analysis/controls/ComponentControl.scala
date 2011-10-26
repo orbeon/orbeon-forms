@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 
 class ComponentControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
         extends ContainerControl(staticStateContext, element, parent, preceding, scope) {

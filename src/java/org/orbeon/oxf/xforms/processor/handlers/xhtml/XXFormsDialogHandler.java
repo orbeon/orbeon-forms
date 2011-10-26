@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -43,7 +42,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
         // NOTE: attributes logic duplicated in XXFormsDialogControl
         // Get values statically so we can handle the case of the repeat template
-        final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
+        final StringBuilder classes = getInitialClasses(uri, localname, attributes, null, false);
         {
             classes.append(" xforms-initially-hidden");
             classes.append(" xforms-dialog-");
@@ -51,8 +50,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
             final String level; {
                 final String explicitLevel = attributes.getValue("level");
                 if (explicitLevel == null) {
-                    final QName appearance = getAppearance(attributes);
-                    level = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) ? "modeless" : "modal";
+                    level = getAppearances().contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) ? "modeless" : "modal";
                 } else {
                     level = explicitLevel;
                 }

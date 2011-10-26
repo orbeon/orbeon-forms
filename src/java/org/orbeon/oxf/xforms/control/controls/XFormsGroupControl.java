@@ -50,8 +50,6 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
             return null;
     }
 
-    public static final String INTERNAL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
-
     public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
         super(container, parent, element, name, id);
 
@@ -68,7 +66,7 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
 
     @Override
     public boolean supportAjaxUpdates() {
-        return !INTERNAL_APPEARANCE.equals(getAppearance());
+        return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
     }
 
     // Allow DOMActivate on group

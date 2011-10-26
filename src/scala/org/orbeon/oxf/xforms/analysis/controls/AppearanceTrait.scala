@@ -13,18 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import scala.collection.JavaConverters._
 
 /**
- * Handle aspects of an element that are specific to the view.
+ * Trait for all elements that have an appearance.
  */
-trait ViewTrait extends SimpleElementAnalysis with AppearanceTrait {
-
-    // Index of the element in the view
-    val index: Int = staticStateContext.index
-
-    // In the view, in-scope model variables are always first in scope
-    override protected def getRootVariables =
-        scopeModel.containingModel match { case Some(model) => model.variablesMap; case None => Map.empty }
-        // NOTE: we could maybe optimize this to avoid prepending model variables every time, in case the previous element is in the same model
+trait AppearanceTrait extends SimpleElementAnalysis {
+    val appearances = attQNameSet(element, XFormsConstants.APPEARANCE_QNAME, namespaceMapping)
+    def jAppearances = appearances.asJava
 }

@@ -69,7 +69,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         this.level = element.attributeValue("level");
         if (this.level == null) {
             // Default is "modeless" for "minimal" appearance, "modal" otherwise
-            this.level = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.getName().equals(getAppearance()) ? "modeless" : "modal";
+            this.level = getAppearances().contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME) ? "modeless" : "modal";
         }
         this.close = !"false".equals(element.attributeValue("close"));
         this.draggable = !"false".equals(element.attributeValue("draggable"));

@@ -313,7 +313,7 @@ public class ControlsComparator {
                 // TODO: this should be obtained per document, but we only know about this in the extractor
                 final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
                 if (hostLanguageAVTs) {
-                    controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
+                    controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", XHTMLBodyHandler.ANY_MATCHER);
                     controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
                 }
 

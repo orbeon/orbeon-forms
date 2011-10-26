@@ -14,12 +14,9 @@
 package org.orbeon.oxf.xml;
 
 import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -156,25 +153,24 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 // Look for a new handler
                 final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
 
-                final ElementHandler elementHandler = getHandler(uri, explodedQName, attributes);
+                final HandlerInfo handlerInfo = getHandler(uri, explodedQName, attributes);
 
-                if (elementHandler != null) {
+                if (handlerInfo != null) {
                     // New handler found
+                    final ElementHandler elementHandler = handlerInfo.elementHandler;
                     elementHandler.setContext(elementHandlerContext);
+
+                    // Push current handler
+                    currentHandlerInfo = handlerInfo;
+                    handlerInfos.push(currentHandlerInfo);
 
                     if (elementHandler.isRepeating()) {
                         // Repeating handler will process its body later
-                        currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler, attributes, this.locator);
                         isFillingUpSAXStore = true;
-                        // Push current handler
-                        handlerInfos.push(currentHandlerInfo);
                     } else {
                         // Non-repeating handler processes its body immediately
-                        currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler);
-                        // Push current handler
-                        handlerInfos.push(currentHandlerInfo);
                         // Signal init/start to current handler
-                        elementHandler.init(uri, localname, qName, attributes);
+                        elementHandler.init(uri, localname, qName, attributes, handlerInfo.matched);
                         elementHandler.start(uri, localname, qName, attributes);
                     }
                 } else {
@@ -197,7 +193,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                     // Was filling-up SAXStore
                     isFillingUpSAXStore = false;
                     // Process body once
-                    currentHandlerInfo.elementHandler.init(uri, localname, qName, currentHandlerInfo.attributes);
+                    currentHandlerInfo.elementHandler.init(uri, localname, qName, currentHandlerInfo.attributes, currentHandlerInfo.matched);
                     currentHandlerInfo.elementHandler.start(uri, localname, qName, currentHandlerInfo.attributes);
                     currentHandlerInfo.elementHandler.end(uri, localname, qName);
                 } else {
@@ -519,20 +515,25 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
      * @return          handler if found
      */
     public ElementHandler getHandler(Element element) {
-        return getHandler(element.getNamespaceURI(),
+        final HandlerInfo handlerInfo = 
+        getHandler(element.getNamespaceURI(),
                 XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
                 XMLUtils.getSAXAttributes(element));
+        
+        return (handlerInfo != null) ? handlerInfo.elementHandler : null;
     }
 
-    private ElementHandler getHandler(String uri, String explodedQName, Attributes attributes) {
+    private HandlerInfo getHandler(String uri, String explodedQName, Attributes attributes) {
         // 1: Try full matchers
         final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(explodedQName);
         if (handlerMatchers != null) {
             // Try matchers in order
             for (HandlerMatcher handlerMatcher: handlerMatchers) {
                 // Run matcher
-                if (handlerMatcher.matcher.match(attributes)) {
-                    return getHandlerByClassName(handlerMatcher.handlerClassName);
+                final Object matched = handlerMatcher.matcher.match(attributes, elementHandlerContext);
+                if (matched != null) {
+                    final ElementHandler elementHandler = getHandlerByClassName(handlerMatcher.handlerClassName);
+                    return new HandlerInfo(level, explodedQName, elementHandler, attributes, matched, this.locator);
                 }
             }
         }
@@ -540,27 +541,11 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         // 2: Try URI-based handler
         final String uriHandlerClassName = uriHandlers.get(uri);
         if (uriHandlerClassName != null) {
-            return getHandlerByClassName(uriHandlerClassName);
+            final ElementHandler elementHandler = getHandlerByClassName(uriHandlerClassName);
+            return new HandlerInfo(level, explodedQName, elementHandler, attributes, null, this.locator);
         } else {
             return null;
         }
-    }
-
-    /**
-     * Return a QName from an attribute value. The QName is resolved against namespaces in scope.
-     *
-     * @param attributeValue    value of the QName attribute, can be null
-     * @return                  QName or null if attributeValue is null
-     */
-    public QName getAttributeQNameValue(String attributeValue) {
-        if (attributeValue == null)
-            return null;
-
-        final String localname = XMLUtils.localNameFromQName(attributeValue);
-        final String prefix = XMLUtils.prefixFromQName(attributeValue);
-        final String uri = XMLUtils.uriFromQName(attributeValue, namespaceSupport);
-
-        return new QName(localname, new Namespace(prefix, uri));
     }
 
     @SuppressWarnings("unchecked")
@@ -586,42 +571,34 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
         public final String explodedQName;
         public final ElementHandler elementHandler;
         public final Attributes attributes;
+        public final Object matched;
 
         public final SAXStore saxStore;
-
-        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler) {
+        
+        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Attributes attributes, Object matched, Locator locator) {
             this.level = level;
             this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
-            this.attributes = null;
-            this.saxStore = null;
-        }
+            this.attributes = elementHandler.isRepeating() ? new AttributesImpl(attributes) : null; // NOTE: could keep attributes if needed
+            this.matched = matched;
 
-        public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Attributes attributes, Locator locator) {
-            this.level = level;
-            this.explodedQName = explodedQName;
-            this.elementHandler = elementHandler;
-            this.attributes = new AttributesImpl(attributes);
+            this.saxStore = elementHandler.isRepeating() ? new SAXStore() : null;
 
-            this.saxStore = new SAXStore();
             // Set initial locator so that SAXStore can obtain location data if any
-            if (locator != null)
+            if (this.saxStore != null && locator != null)
                 this.saxStore.setDocumentLocator(locator);
         }
     }
 
-    public abstract class Matcher {
-        public abstract boolean match(Attributes attributes);
-
-        protected QName getAppearance(Attributes attributes) {
-            return getAttributeQNameValue(attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName()));
-        }
+    public static abstract class Matcher {
+        public abstract Object match(Attributes attributes, Object handlerContext);
     }
 
     private final Matcher ALL_MATCHER = new Matcher() {
         @Override
-        public boolean match(Attributes attributes) {
-            return true;
+        public Object match(Attributes attributes, Object handlerContext) {
+            // Just return something
+            return Boolean.TRUE;
         }
     };
 

@@ -53,8 +53,11 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                         control.newScripts = Seq.empty
                     }
                     // Output new markup
-                    control.nested foreach
-                        (n => processShadowTree(controller, n.template))
+                    control.nested foreach { nested =>
+                        handlerContext.pushPartAnalysis(nested.partAnalysis)
+                        processShadowTree(controller, nested.template)
+                        handlerContext.popPartAnalysis()
+                    }
 
                 case _ =>
             }

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -23,6 +24,8 @@ import org.orbeon.oxf.xml.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.Collections;
+import java.util.Set;
 /**
  * Handle xforms:input.
  *
@@ -30,7 +33,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
-    private String appearance;
+    private Set<QName> appearances;
     private boolean isDateTime;
     private boolean isDateMinimal;
     private boolean isBoolean;
@@ -40,8 +43,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        super.init(uri, localname, qName, attributes);
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+        super.init(uri, localname, qName, attributes, matched);
 
         // Handle appearance
         if (!handlerContext.isTemplate()) {
@@ -60,8 +63,17 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 isDateMinimal = false;
                 isBoolean = false;
             }
+        final XFormsInputControl control = (XFormsInputControl) getControl();
+        if (control != null && control.isRelevant()) {
+
+            appearances = control.getAppearances();
+
+            final String controlTypeName = control.getBuiltinTypeName();
+            isDateTime = "dateTime".equals(controlTypeName);
+            isDateMinimal = "date".equals(controlTypeName) && appearances.contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);
+            isBoolean = "boolean".equals(controlTypeName);
         } else {
-            appearance = null;
+            appearances = Collections.emptySet();
             isDateTime = false;
             isDateMinimal = false;
             isBoolean = false;
@@ -106,7 +118,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                     }
                 };
                 select1Handler.setContext(getContext());
-                select1Handler.init(uri, localname, qName, attributes);
+                select1Handler.init(uri, localname, qName, attributes, elementAnalysis);
                 select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true);
             } else {
                 // Output static read-only value
@@ -174,7 +186,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                     inputClasses.append(" xforms-type-");
                                     inputClasses.append(firstType);
                                 }
-                                if (appearance != null) {
+                                for (final QName appearance : appearances) {
                                     inputClasses.append(" xforms-input-appearance-");
                                     inputClasses.append(appearance);
                                 }

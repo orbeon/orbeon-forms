@@ -16,7 +16,7 @@ import org.dom4j._
 import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import xbl.{XBLBindingsBase, XBLBindings}
+import xbl.XBLBindingsBase
 
 /**
  * Represent an LHHA element with a "for" attribute. Behaves like a control from the point of view of static analysis.

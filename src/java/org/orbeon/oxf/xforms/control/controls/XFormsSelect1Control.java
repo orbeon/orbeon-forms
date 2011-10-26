@@ -40,15 +40,12 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents an xforms:select1 control.
  */
 public class XFormsSelect1Control extends XFormsValueControl {
-
-    public static final String FULL_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME);
-    public static final String TREE_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
-    public static final String MENU_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
 
     // List of attributes to handle as AVTs for select1 with appearance="full"
     private static final QName[] EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL = {
@@ -110,9 +107,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
     @Override
     public boolean hasJavaScriptInitialization() {
-        final String appearance = getAppearance();
-        return appearance != null
-                && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || "compact".equals(appearance));
+        final Set<QName> appearances = getAppearances();
+        return appearances.contains(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME)
+                || appearances.contains(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME)
+                || appearances.contains(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);
     }
 
     @Override
@@ -129,7 +127,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @return true iif appearance is "full"
      */
     public boolean isFullAppearance() {
-        return FULL_APPEARANCE.equals(getAppearance());
+        return getAppearances().contains(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME);
     }
 
     /**
@@ -384,12 +382,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
     @Override
     public boolean setFocus() {
         // Don't accept focus if we have the internal appearance
-        return !XFormsGroupControl.INTERNAL_APPEARANCE.equals(getAppearance()) && super.setFocus();
+        return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.setFocus();
     }
 
     @Override
     public boolean supportAjaxUpdates() {
-        return !XFormsGroupControl.INTERNAL_APPEARANCE.equals(getAppearance());
+        return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
     }
 
     // Work in progress for in-bounds/out-of-bounds

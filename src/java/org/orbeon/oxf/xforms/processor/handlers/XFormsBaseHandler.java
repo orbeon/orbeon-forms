@@ -13,15 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.dom4j.QName;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsModelBinds;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -32,7 +26,12 @@ import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base XForms handler used as base class in both the xml and xhtml handlers.
@@ -59,6 +58,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     
     protected HandlerContext handlerContext;
 
+    protected ElementAnalysis elementAnalysis;
     protected XFormsContainingDocument containingDocument;
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
@@ -67,7 +67,14 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         this.repeating = repeating;
         this.forwarding = forwarding;
     }
-    
+
+    @Override
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+        // All elements corresponding to XForms controls must cause elementAnalysis to be available
+        if (matched instanceof ElementAnalysis)
+            this.elementAnalysis = (ElementAnalysis) matched;
+    }
+
     public void setContext(Object context) {
         this.handlerContext = (HandlerContext) context;
 
@@ -83,7 +90,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     public boolean isForwarding() {
         return forwarding;
     }
-    
 
     /**
      * Whether the control is disabled in the resulting HTML. Occurs when:
@@ -167,10 +173,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
         return XFormsUtils.namespaceId(containingDocument, XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix));
     }
-
-    protected QName getAppearance(Attributes controlAttributes) {
-        return handlerContext.getController().getAttributeQNameValue(controlAttributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName()));
-    }
     
     protected Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames) {
 		final String staticId = handlerContext.getId(attributes);
@@ -245,4 +247,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
 		return attributes;
 	}
+
+    protected Set<QName> getAppearances() {
+        return XFormsControl.getAppearances(elementAnalysis);
+    }
 }

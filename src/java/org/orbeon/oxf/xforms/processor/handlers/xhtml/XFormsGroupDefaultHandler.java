@@ -30,8 +30,8 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     private String elementQName;
 
     @Override
-    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        super.init(uri, localname, qName, attributes);
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+        super.init(uri, localname, qName, attributes, matched);
 
         // Use explicit container element name if present, otherwise use default
         final QName explicitQName = ((ContainerControl) containingDocument.getStaticOps().getControlAnalysis(getPrefixedId())).elementQName();

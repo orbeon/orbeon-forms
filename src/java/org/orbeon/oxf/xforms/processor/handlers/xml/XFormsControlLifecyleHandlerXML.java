@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -69,8 +68,8 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
 
     @Override
-    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+        super.init(uri, localname, qName, attributes, matched);
     	xFormsControlLifecycleHandlerDelegate = new XFormsControlLifecycleHandlerDelegate(handlerContext, containingDocument, attributes);
     }
 

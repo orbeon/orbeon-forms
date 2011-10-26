@@ -23,6 +23,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Handle xforms:trigger and xforms:submit.
  */
@@ -65,8 +68,8 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        super.init(uri, localname, qName, attributes);
+    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
+        super.init(uri, localname, qName, attributes, matched);
         
         final String modalAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "modal");
         this.isModal = "true".equals(modalAttribute);
@@ -81,12 +84,16 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    protected QName getAppearance(Attributes controlAttributes) {
+    protected Set<QName> getAppearances() {
         // Override appearance in noscript mode
-        final QName originalAppearance = super.getAppearance(controlAttributes);
-        if (handlerContext.isNoScript() && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
-            return XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME;
-        else
+        // TODO: move appearance handling to ElementAnalysis
+        final Set<QName> originalAppearance = super.getAppearances();
+        if (handlerContext.isNoScript() && originalAppearance.contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)) {
+            final HashSet<QName> newAppearances = new HashSet<QName>(originalAppearance);
+            newAppearances.remove(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);
+            newAppearances.add(XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME);
+            return newAppearances;
+        } else
             return originalAppearance;
     }
 

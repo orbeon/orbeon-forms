@@ -25,7 +25,7 @@ import org.dom4j.{QName, Text, Element}
 import org.orbeon.oxf.xforms._
 import collection.JavaConverters._
 
-trait SelectionControl extends SimpleElementAnalysis {
+trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
@@ -38,7 +38,7 @@ trait SelectionControl extends SimpleElementAnalysis {
     val isMultiple = element.getName == "select"
     val isOpenSelection = element.attributeValue("selection") == "open"
     val isNorefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME) == "false"
-    val isFull = element.attributeValue(XFormsConstants.APPEARANCE_QNAME) == "full"
+    val isFull = appearances(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME)
 
     val isEncryptValues = {
         val localEncryptItemValues = element.attributeValue(XFormsConstants.ENCRYPT_ITEM_VALUES)

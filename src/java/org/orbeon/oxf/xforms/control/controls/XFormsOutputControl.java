@@ -48,8 +48,6 @@ public class XFormsOutputControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_TARGET_QNAME
     };
 
-    private static final String DOWNLOAD_APPEARANCE = Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME);
-
     // Optional display format
     private final String format;
 
@@ -78,7 +76,7 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     @Override
     protected QName[] getExtensionAttributes() {
-        if (DOWNLOAD_APPEARANCE.equals(getAppearance()))
+        if (getAppearances().contains(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME))
             return DOWNLOAD_APPEARANCE_EXTENSION_ATTRIBUTES;
         else
             return null;
@@ -123,7 +121,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         assert internalValue != null;
 
         final String updatedValue;
-        if (DOWNLOAD_APPEARANCE.equals(getAppearance())) {
+        if (getAppearances().contains(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
             // Download appearance
             final String dynamicMediatype = fileInfo.getFileMediatype();
             // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
@@ -200,7 +198,7 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     @Override
     public String getEscapedExternalValue() {
-        if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
+        if (getAppearances().contains(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String externalValue = getExternalValue();
             if (StringUtils.isNotBlank(externalValue)) {
                 // External value is not blank, rewrite as absolute path. Two cases:

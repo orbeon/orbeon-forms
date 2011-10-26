@@ -1836,6 +1836,7 @@ ORBEON.xforms.Controls = {
      * @param attribute4        Optional
      */
     setCurrentValue: function(control, newControlValue, attribute1, attribute2, attribute3, attribute4) {
+        ORBEON.xforms.Events.beforeValueChange.fire({ target: control });
         var isStaticReadonly = YAHOO.util.Dom.hasClass(control, "xforms-static");
         var formElement = ORBEON.xforms.Controls.getForm(control);
         if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
@@ -2031,6 +2032,8 @@ ORBEON.xforms.Controls = {
             control.value = newControlValue;
             control.previousValue = newControlValue;
         }
+
+        ORBEON.xforms.Events.afterValueChange.fire({ target: control });
     },
 
     _setRadioCheckboxClasses: function(target) {
@@ -3828,7 +3831,9 @@ ORBEON.xforms.Events = {
     ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
     clickEvent: new YAHOO.util.CustomEvent("clickEvent"),
     errorEvent: new YAHOO.util.CustomEvent("errorEvent"),
-    yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
+    yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated"),
+    beforeValueChange: new YAHOO.util.CustomEvent("beforeValueChanged"),
+    afterValueChange: new YAHOO.util.CustomEvent("afterValueChanged")
 };
 
 (function() {

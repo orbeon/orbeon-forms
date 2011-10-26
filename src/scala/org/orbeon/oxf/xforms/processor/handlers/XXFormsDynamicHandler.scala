@@ -16,7 +16,9 @@ package org.orbeon.oxf.xforms.processor.handlers
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler
 import java.lang.String
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandler
 
 class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
 

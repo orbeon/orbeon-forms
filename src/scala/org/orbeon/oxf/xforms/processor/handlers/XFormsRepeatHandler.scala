@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsControlLifecyleHandler
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes

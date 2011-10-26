@@ -20,8 +20,8 @@ import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase.Scope
 import org.orbeon.oxf.xforms._
 import analysis.{PartAnalysisImpl, Metadata}
-import control.XFormsControlFactory
-import processor.handlers.XHTMLHeadHandler
+import control.{XFormsControl, XFormsControlFactory, XFormsComponentControl}
+import processor.handlers.xhtml.XHTMLHeadHandler
 import org.orbeon.oxf.properties.PropertySet
 import org.apache.commons.lang.StringUtils
 import collection.JavaConversions._

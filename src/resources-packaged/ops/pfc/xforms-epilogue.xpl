@@ -29,7 +29,7 @@
     <p:choose href="#data">
         <!-- ========== Test for NG XForms engine ========== -->
         <!-- NOTE: in the future, we may want to support "XForms within XML" so this test will have to be modified -->
-        <p:when test="/xhtml:html/xhtml:head/xforms:model | /fo:root/fo:declarations/xforms:model "><!-- TODO: test on result of processor above -->
+        <p:when test="exists(/xhtml:html/xhtml:head/xforms:model) or not(p:property('oxf.epilogue.process-xslfo')) and exists(/fo:root/fo:declarations/xforms:model)"><!-- TODO: test on result of processor above -->
             <!-- Handle widgets -->
 
             <!--<p:processor name="oxf:sax-logger">-->

@@ -254,9 +254,6 @@ object XFormsStaticStateImpl {
         def isClientStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
         def isServerStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_SERVER_VALUE
         
-        val isHTMLDocument  = staticStateElement.attributeValue("is-html") match {
-            case isHTML: String => isHTML.equals("true")
-            case _ => false
-        }
+        val isHTMLDocument  = Option(staticStateElement.attributeValue("is-html")) exists (_ == "true")
     }
 }

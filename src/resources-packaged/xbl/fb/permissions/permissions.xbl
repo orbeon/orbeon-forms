@@ -90,8 +90,7 @@
                         <xxforms:variable name="roles" select="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
                         <xforms:action xxforms:iterate="$roles">
                             <!-- Current role -->
-                            <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xxforms:variable name="role" select="replace(., '%20', ' ')"/>
+                            <xxforms:variable name="role" select="."/>
                             <!-- Permissions for the current role -->
                             <xxforms:variable name="permissions" select="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
                             <!-- Operations for the current role -->
@@ -101,7 +100,8 @@
                             <!-- Insert new permission in UI, and populate it -->
                             <xforms:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xxforms:variable name="new-permission" select="$ui/permissions/permission[last()]"/>
-                            <xforms:setvalue if="$role != ''"  ref="$new-permission/role" value="$role"/>
+                            <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
+                            <xforms:setvalue if="$role != ''"  ref="$new-permission/role" value="replace($role, '%20', ' ')"/>
                             <xforms:setvalue ref="$new-permission/operations" value="string-join($operations-read-update, ' ')"/>
                         </xforms:action>
                     </xforms:action>
@@ -115,6 +115,8 @@
                         <xforms:insert context="$metadata" ref="*" origin="xxforms:element('permissions')"/>
                         <!-- In UI replace "read-update" by "read update" -->
                         <xforms:setvalue xxforms:iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
+                        <!-- In UI replace space in role by %20 -->
+                        <xforms:setvalue xxforms:iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
                         <!-- Add "anyone" permission -->
                         <xxforms:variable name="anyone-operations" select="$ui/permissions/permission[1]/operations"/>
                         <xforms:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxforms:element('permission', xxforms:attribute('operations', $anyone-operations))"/>
@@ -122,8 +124,7 @@
                         <xxforms:variable name="permissions" select="$ui/permissions/permission[position() > 1]"/>
                         <xforms:action xxforms:iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
                             <xxforms:variable name="operation" select="."/>
-                            <!-- NOTE: Escape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role/replace(normalize-space(.), ' ', '%20')), ' ')"/>
+                            <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
                             <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
                                 xxforms:attribute('operations', $operation),
                                 xxforms:element('user-role', xxforms:attribute('any-of', $roles))))"/>

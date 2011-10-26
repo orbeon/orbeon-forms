@@ -11,14 +11,11 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor.handlers
+package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLHeadHandler
-import java.lang.String
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandler
 
 class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
 

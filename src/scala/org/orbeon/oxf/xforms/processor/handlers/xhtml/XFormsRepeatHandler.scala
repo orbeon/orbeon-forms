@@ -11,18 +11,18 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor.handlers
+package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
-import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsControlLifecyleHandler
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes
 import java.lang.{StringBuilder => JStringBuilder}
+import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 
 /**
  * Handle xforms:repeat.

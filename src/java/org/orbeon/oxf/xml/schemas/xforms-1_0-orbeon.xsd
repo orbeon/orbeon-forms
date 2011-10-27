@@ -304,6 +304,7 @@
             <xsd:attribute name="for" type="xsd:string" use="optional"/>
             <xsd:attribute name="value" type="xsd:string" use="optional"/>
             <xsd:attribute name="lang" type="xsd:string" use="optional"/>
+            <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>
@@ -314,6 +315,7 @@
             <xsd:group ref="xforms:UI.Inline"/>
             <xsd:attribute name="for" type="xsd:string" use="optional"/>
             <xsd:attribute name="lang" type="xsd:string" use="optional"/>
+            <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
 

@@ -17,15 +17,20 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
+import org.orbeon.oxf.xforms.PartAnalysis;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
+import scala.Tuple3;
 
 import java.util.*;
 
@@ -70,6 +75,21 @@ public class XFormsInputControl extends XFormsValueControl {
 
     public String getAutocomplete() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME);
+    }
+
+    @Override
+    public Tuple3<String, String, String> getJavaScriptInitialization() {
+        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo(getXBLContainer().getPartAnalysis(), getElementAnalysis(), this);
+        if (placeHolderInfo != null) {
+            // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
+            // have the placeholder appearance, and those are not really controls.
+            return new Tuple3<String, String, String>(
+                    placeHolderInfo.isLabelPlaceholder ? "label" : "hint",
+                    Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME),
+                    getEffectiveId());
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -520,5 +540,55 @@ public class XFormsInputControl extends XFormsValueControl {
     public static String testParseDate(String value) {
         final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
         return parse(matcher, XFormsInputControl.DATE_PARSE_PATTERNS, value);
+    }
+    
+    public static class PlaceHolderInfo {
+        public final boolean isLabelPlaceholder;
+        public final boolean isHintPlaceholder;
+        public final String placeholder; // null if no placeholder, "" if placeholder and non-concrete control, placeholder value otherwise
+
+        public PlaceHolderInfo(boolean isLabelPlaceholder, boolean isHintPlaceholder, String placeholder) {
+            this.isLabelPlaceholder = isLabelPlaceholder;
+            this.isHintPlaceholder = isHintPlaceholder;
+            this.placeholder = placeholder;
+        }
+    }
+    
+    public static PlaceHolderInfo getPlaceholderInfo(PartAnalysis partAnalysis, ElementAnalysis elementAnalysis, XFormsControl control) {
+        // Handle placeholder
+        
+        final boolean isLabelPlaceholder;
+        final boolean isHintPlaceholder;
+                
+        final LHHAAnalysis labelAnalysis = partAnalysis.getLabel(elementAnalysis.prefixedId());
+        if (labelAnalysis != null && labelAnalysis.appearances().contains(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)) {
+            isLabelPlaceholder = true;
+            isHintPlaceholder = false;
+        } else {
+            final LHHAAnalysis hintAnalysis = partAnalysis.getHint(elementAnalysis.prefixedId());
+            if (hintAnalysis != null && hintAnalysis.appearances().contains(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)) {
+                isLabelPlaceholder = false;
+                isHintPlaceholder = true;
+            } else {
+                isLabelPlaceholder = false;
+                isHintPlaceholder = false;
+            }
+        }
+        
+        if (isLabelPlaceholder || isHintPlaceholder) {
+            final String placeholderValue; // null if no placeholder, "" if placeholder and non-concrete control, placeholder value otherwise
+            if (control != null && control.isRelevant()) {
+                if (isLabelPlaceholder)
+                    placeholderValue = control.getLabel();
+                else
+                    placeholderValue = control.getHint();
+            } else {
+                placeholderValue = "";
+            }
+
+            return new PlaceHolderInfo(isLabelPlaceholder, isHintPlaceholder, placeholderValue);
+        } else {
+            return null;
+        }
     }
 }

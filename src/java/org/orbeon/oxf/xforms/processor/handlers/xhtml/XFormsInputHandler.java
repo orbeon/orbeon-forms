@@ -34,6 +34,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
+    private XFormsInputControl.PlaceHolderInfo placeHolderInfo;
 
     public XFormsInputHandler() {
         super(false);
@@ -43,6 +44,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
         super.init(uri, localname, qName, attributes, matched);
 
+        this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(handlerContext.getPartAnalysis(), elementAnalysis, getControl());
     }
     
     private boolean isDateTime() {
@@ -181,6 +183,10 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
                             }
 
+                            // Add attribute even if the control is not concrete
+                            if (placeHolderInfo != null && placeHolderInfo.placeholder != null)
+                                reusableAttributes.addAttribute("", "placeholder", "placeholder", ContentHandlerHelper.CDATA, placeHolderInfo.placeholder);
+
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
                             // Handle accessibility attributes
@@ -291,5 +297,17 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         } else {
             return getFirstInputEffectiveId(getEffectiveId());
         }
+    }
+
+    @Override
+    protected void handleLabel() throws SAXException {
+        if (!(placeHolderInfo != null && placeHolderInfo.isLabelPlaceholder))
+            super.handleLabel();
+    }
+
+    @Override
+    protected void handleHint() throws SAXException {
+        if (!(placeHolderInfo != null && placeHolderInfo.isHintPlaceholder))
+            super.handleHint();
     }
 }

@@ -70,9 +70,9 @@
         <xxforms:variable name="operations" select="tokenize(instance('fr-authorized-operations'), '\s')"/>
         <xxforms:variable name="unauthorized-access" select="
             ($mode = 'summary' and not($operations = ('*', 'read', 'update', 'delete'))) or
-            ($mode = 'new' and not($operations = ('*', 'create'))) or
+            ($mode = ('new', 'import') and not($operations = ('*', 'create'))) or
             ($mode = 'edit' and not($operations = ('*', 'update'))) or
-            ($mode = 'view' and not($operations = ('*', 'read')))"/>
+            ($mode = ('view', 'pdf') and not($operations = ('*', 'read')))"/>
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xforms:action if="$unauthorized-access" type="xpath">form-runner:sendError(401)</xforms:action>
 

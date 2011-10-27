@@ -111,6 +111,7 @@
                 <xforms:bind nodeset="new" relevant="$operations = ('*', 'create')"/>
                 <xforms:bind nodeset="view | pdf" readonly="not(property('xxforms:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) != 1" relevant="$operations = ('*', 'read')"/>
                 <xforms:bind nodeset="delete" readonly="not(property('xxforms:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) = 0" relevant="$operations = ('*', 'delete')"/>
+                <xforms:bind nodeset="import" relevant="$operations = ('*', 'create')"/>
             </xforms:bind>
 
             <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>

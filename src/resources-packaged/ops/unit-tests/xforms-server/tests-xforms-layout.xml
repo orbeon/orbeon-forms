@@ -205,7 +205,7 @@
                 <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-old-input$$a·1">My alert</xhtml:span>
                 <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-input$$t·1">My hint</xhtml:span>
                 <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-boolean-input$$l·1" for="my-old-boolean-input$$e0·1">My label</xhtml:label>
-                <xhtml:span id="my-old-boolean-input·1" class="xforms-control xforms-input xforms-incremental xforms-input-appearance-minimal xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
+                <xhtml:span id="my-old-boolean-input·1" class="xforms-control xforms-input xforms-incremental xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
                     <xhtml:span class="xforms-selected">
                         <xhtml:input id="my-old-boolean-input$$e0·1" type="checkbox" name="my-old-boolean-input·1" value="true" checked="checked"/>
                     </xhtml:span>
@@ -224,7 +224,7 @@
                 <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-old-input-2$$a·1">My alert</xhtml:span>
                 <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$l·1" for="my-old-boolean-input-2$$e0·1">My label</xhtml:label>
                 <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$t·1">My hint</xhtml:span>
-                <xhtml:span id="my-old-boolean-input-2·1" class="xforms-control xforms-input xforms-incremental xforms-input-appearance-minimal xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
+                <xhtml:span id="my-old-boolean-input-2·1" class="xforms-control xforms-input xforms-incremental xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
                     <xhtml:span class="xforms-selected">
                         <xhtml:input id="my-old-boolean-input-2$$e0·1" type="checkbox" name="my-old-boolean-input-2·1" value="true" checked="checked"/>
                     </xhtml:span>

@@ -15,15 +15,17 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
     
 import org.orbeon.oxf.xforms._
+import control.XFormsControl
 import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.XMLConstants
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConversions._
-import java.util.{List => JList}
+import scala.collection.JavaConverters._
+import java.util.{List => JList, Map => JMap}
 import org.dom4j.Element
-import collection.mutable.LinkedHashSet
+import collection.mutable.{Buffer, HashMap, LinkedHashSet}
 
 /**
  * Handler for <xhtml:head>. Outputs CSS and JS.
@@ -111,5 +113,34 @@ object XHTMLHeadHandler {
                 helper.text("}\n")
             }
         }
+    }
+
+    def gatherJavascriptControls(containingDocument: XFormsContainingDocument): JMap[String, JMap[String, JList[String]]] = {
+
+        // control name → appearance or mediatype → ids
+        val javaScriptControlsAppearancesMap = HashMap[String, HashMap[String, Buffer[String]]]()
+        val xformsControls = containingDocument.getControls
+        
+        xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter {
+            override def startVisitControl(control: XFormsControl): Boolean = {
+
+                
+                // Don't run JavaScript initialization if the control is static readonly (could change in the
+                // future if some static readonly controls require JS initialization)
+                if (! control.isStaticReadonly)
+                    Option(control.getJavaScriptInitialization) foreach { init =>
+
+                        val appearanceToId = javaScriptControlsAppearancesMap.getOrElseUpdate(init._1, HashMap[String, Buffer[String]]())
+                        val ids = appearanceToId.getOrElseUpdate(init._2, Buffer[String]())
+
+                        ids += XFormsUtils.namespaceId(containingDocument, init._3)
+                    }
+                
+                true
+            }
+        })
+
+        // Get rid of this series of conversions as soon as possible!
+        javaScriptControlsAppearancesMap mapValues (_ mapValues (_.asJava) asJava) asJava
     }
 }

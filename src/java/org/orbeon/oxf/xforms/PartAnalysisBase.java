@@ -22,10 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.*;
-import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
-import org.orbeon.oxf.xforms.analysis.controls.ExternalLHHAAnalysis;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
-import org.orbeon.oxf.xforms.analysis.controls.RootControl;
+import org.orbeon.oxf.xforms.analysis.controls.*;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
@@ -787,13 +784,17 @@ public abstract class PartAnalysisBase implements PartAnalysis {
                         appearances = new HashSet<QName>();
                         controlAppearances.put(controlName, appearances);
                     }
-                    final QName appearance = Dom4jUtils.extractAttributeValueQName(elementAnalysis.element(), XFormsConstants.APPEARANCE_QNAME);
-                    if ("textarea".equals(controlName) && "text/html".equals(elementAnalysis.element().attributeValue(XFormsConstants.MEDIATYPE_QNAME))) {
-                        // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxforms:richtext
-                        // appearance had been set, so that we can decide on feature usage based on appearance only.
-                        appearances.add(XFormsConstants.XXFORMS_RICH_TEXT_APPEARANCE_QNAME);
-                    } else if (appearance != null) {
-                        appearances.add(appearance);
+                    if (elementAnalysis instanceof AppearanceTrait) {
+                        // Control has appearances
+                        final Set<QName> controlAppearances = ((AppearanceTrait) elementAnalysis).jAppearances();
+
+                        if ("textarea".equals(controlName) && "text/html".equals(elementAnalysis.element().attributeValue(XFormsConstants.MEDIATYPE_QNAME))) {
+                            // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxforms:richtext
+                            // appearance had been set, so that we can decide on feature usage based on appearance only.
+                            appearances.add(XFormsConstants.XXFORMS_RICH_TEXT_APPEARANCE_QNAME);
+                        }
+
+                        appearances.addAll(controlAppearances);
                     }
                 }
 

@@ -33,7 +33,7 @@ object ControlAnalysisFactory {
             case XFORMS_INPUT_QNAME | XFORMS_SECRET_QNAME | XFORMS_TEXTAREA_QNAME | XFORMS_OUTPUT_QNAME | XFORMS_UPLOAD_QNAME | XFORMS_RANGE_QNAME | XXFORMS_TEXT_QNAME =>
                 new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ValueTrait
             case XFORMS_TRIGGER_QNAME | XFORMS_SUBMIT_QNAME =>
-                new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope)
+                new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with TriggerAppearanceTrait
             case XFORMS_SELECT_QNAME | XFORMS_SELECT1_QNAME =>
                 new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ValueTrait with SelectionControl
             case XXFORMS_VARIABLE_QNAME | XXFORMS_VAR_QNAME | XFORMS_VARIABLE_QNAME | XFORMS_VAR_QNAME | EXFORMS_VARIABLE_QNAME =>

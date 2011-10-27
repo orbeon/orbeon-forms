@@ -73,22 +73,24 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandlerXHTML {
             // Get handler
             final ElementHandler handler = handlerContext.getController().getHandler(controlElement);
             if (handler instanceof XFormsControlLifecyleHandler) {
-                final XFormsControlLifecyleHandler xformsHandler = (XFormsControlLifecyleHandler) handler;
+                final String forEffectiveId; {
+                    final XFormsControlLifecyleHandler xformsHandler = (XFormsControlLifecyleHandler) handler;
 
-                // Perform minimal handler initialization because we just want to use it to get the effective id
-                xformsHandler.setContext(handlerContext);
+                    // Perform minimal handler initialization because we just want to use it to get the effective id
+                    xformsHandler.setContext(handlerContext);
 
-                final String controlNamespaceURI = controlElement.getNamespaceURI();
-                final String controlPrefix = controlElement.getNamespacePrefix();
-                final String controlLocalname = controlElement.getName();
-                xformsHandler.init(controlNamespaceURI, controlLocalname,
-                        XMLUtils.buildQName(controlPrefix, controlLocalname),
-                        XMLUtils.getSAXAttributes(controlElement), null); // NOTE: null passed here for ElementAnalysis, might be incorrect
+                    final String controlNamespaceURI = controlElement.getNamespaceURI();
+                    final String controlPrefix = controlElement.getNamespacePrefix();
+                    final String controlLocalname = controlElement.getName();
+                    xformsHandler.init(controlNamespaceURI, controlLocalname,
+                            XMLUtils.buildQName(controlPrefix, controlLocalname),
+                            XMLUtils.getSAXAttributes(controlElement),
+                            handlerContext.getPartAnalysis().getControlAnalysis(controlPrefixedId));
 
-                final String forEffectiveId = xformsHandler.getForEffectiveId();
+                    forEffectiveId = xformsHandler.getForEffectiveId();
+                }
                 handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LHHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate, true);
             }
         }
     }
 }
-    

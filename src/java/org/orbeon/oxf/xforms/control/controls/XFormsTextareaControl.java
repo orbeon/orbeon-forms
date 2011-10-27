@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import scala.Tuple3;
 
 import java.util.Map;
 
@@ -49,8 +50,10 @@ public class XFormsTextareaControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean hasJavaScriptInitialization() {
-        return "text/html".equals(getMediatype()) || getAppearances().contains(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
+    public Tuple3<String, String, String> getJavaScriptInitialization() {
+        final boolean hasInitialization = "text/html".equals(getMediatype()) || getAppearances().contains(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
+
+        return hasInitialization ? getCommonJavaScriptInitialization() : null;
     }
 
     // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented in JavaScript

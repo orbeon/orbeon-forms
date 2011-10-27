@@ -36,6 +36,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Tuple3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,11 +107,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public boolean hasJavaScriptInitialization() {
+    public Tuple3<String, String, String> getJavaScriptInitialization() {
         final Set<QName> appearances = getAppearances();
-        return appearances.contains(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME)
+        final boolean hasInitialization =
+            appearances.contains(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME)
                 || appearances.contains(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME)
                 || appearances.contains(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);
+        return hasInitialization ? getCommonJavaScriptInitialization() : null;
     }
 
     @Override
@@ -194,10 +197,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
         final SelectionControl analysis = containingDocument.getStaticOps().getSelect1Analysis(prefixedId);
         return analysis.hasStaticItemset();
-    }
-
-    public boolean isOpenSelection() {
-        return getSelectionControl().isOpenSelection();
     }
 
     public boolean isEncryptItemValues() {
@@ -290,7 +289,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 }
             }
 
-            if (hasSelectedItem || isOpenSelection()) {
+            if (hasSelectedItem) {
                 // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
                 // we are a closed selection then we do NOT store the value in instance.
                 super.storeExternalValue(value, type);

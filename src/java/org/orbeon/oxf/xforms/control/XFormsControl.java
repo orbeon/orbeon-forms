@@ -49,6 +49,7 @@ import org.orbeon.saxon.om.ValueRepresentation;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Tuple3;
 
 import java.util.*;
 
@@ -73,7 +74,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private final String prefixedId;
     private final String name;
 
-    private String appearance;// could become more dynamic in the future
     private String mediatype;// could become more dynamic in the future
 
     // Semi-dynamic information (depends on the tree of controls, but does not change over time)
@@ -452,11 +452,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return mediatype;
     }
 
-    /**
-     * Return true if the control, with its current appearance, requires JavaScript initialization.
-     */
-    public boolean hasJavaScriptInitialization() {
-        return false;
+    public Tuple3<String, String, String> getJavaScriptInitialization() {
+        return null;
+    }
+    
+    protected Tuple3<String, String, String> getCommonJavaScriptInitialization() {
+        final Set<QName> appearances = getAppearances();
+        final String appearance = (appearances.size() > 0) ? Dom4jUtils.qNameToExplodedQName(appearances.iterator().next()) : null;
+        return new Tuple3<String, String, String>(getName(), appearance != null ? appearance : getMediatype(), getEffectiveId());
     }
 
     /**

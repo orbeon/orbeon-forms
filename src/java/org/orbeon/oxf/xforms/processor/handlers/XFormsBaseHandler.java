@@ -100,10 +100,9 @@ public abstract class XFormsBaseHandler extends ElementHandler {
      * @return          whether the control is to be marked as disabled
      */
     public boolean isHTMLDisabled(XFormsControl control) {
-        return
-//                control == null || !control.isRelevant() ||
-//                !handlerContext.getCaseVisibility() || // no longer do this as it is better handled with CSS
-                (control instanceof XFormsSingleNodeControl) && ((XFormsSingleNodeControl) control).isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
+        return (control instanceof XFormsSingleNodeControl)
+            && ((XFormsSingleNodeControl) control).isReadonly()
+            && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
     }
 
     protected boolean isEmpty(XFormsControl control) {
@@ -119,10 +118,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 // Try the the XHTML attribute
                 value = srcAttributes.getValue("tabindex");
             }
-//            if (value == null) {
-//                // Use automatically generated index
-//                value = Integer.toString(handlerContext.nextTabIndex());
-//            }
 
             if (value != null)
                 destAttributes.addAttribute("", "tabindex", "tabindex", ContentHandlerHelper.CDATA, value);

@@ -14,12 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.SelectAppearanceTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
@@ -31,16 +30,13 @@ import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Handle xforms:select and xforms:select1.
@@ -49,65 +45,14 @@ import java.util.Set;
  */
 public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
-    private boolean isMultiple;
-    private boolean isOpenSelection;
-
-    private Set<QName> effectiveAppearances;
-    private boolean isFull;
-    private boolean isCompact;
-    private boolean isTree;
-    private boolean isMenu;
-
     public XFormsSelect1Handler() {
         super(false);
     }
 
     @Override
-    public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
-        super.init(uri, localname, qName, attributes, matched);
-
-        isMultiple = localname.equals("select");
-        isOpenSelection = "open".equals(attributes.getValue("selection"));
-
-        // Compute effective appearance
-        {
-            final Set<QName> plainAppearances = new HashSet<QName>(super.getAppearances()); // TODO: move appearance handling to SelectionControl
-            if (plainAppearances.size() > 0) {
-                if (isMultiple && plainAppearances.contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)) {
-                    // For now, a select with minimal appearance is handled as a compact appearance
-                    plainAppearances.remove(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);
-                    plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);
-                } else if (isMultiple && plainAppearances.contains(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME)) {
-                    // We don't support autocompletion with xforms:select for now, only with xforms:select1
-                    plainAppearances.remove(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
-                    plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);// default for xforms:select
-                    isOpenSelection = false;
-                } else if (isOpenSelection && plainAppearances.contains(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME)) {
-                    plainAppearances.remove(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
-                    plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);// default for xforms:select
-                    isOpenSelection = false;
-                } else {
-                    // keep as is
-                }
-            } else if (isMultiple) {
-                plainAppearances.add(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);// default for xforms:select
-            } else {
-                plainAppearances.add(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME);// default for xforms:select1
-            }
-            this.effectiveAppearances = plainAppearances;
-        }
-
-        isFull = this.effectiveAppearances.contains(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME);
-        isCompact = this.effectiveAppearances.contains(XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME);
-        isTree = this.effectiveAppearances.contains(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
-        isMenu = this.effectiveAppearances.contains(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
-    }
-
-    @Override
     protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
-        if (isOpenSelection)
-            classes.append(" xforms-select1-open");
-        if (isTree)
+        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
+        if (appearanceTrait != null && appearanceTrait.isTree())
             classes.append(" xforms-initially-hidden");
     }
 
@@ -117,9 +62,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         return true;
     }
 
-    @Override
-    protected Set<QName> getAppearances() {
-        return effectiveAppearances;
+    protected SelectAppearanceTrait getAppearanceTrait() {
+        if (elementAnalysis instanceof SelectAppearanceTrait) {
+            return (SelectAppearanceTrait) elementAnalysis;
+        } else {
+            return null;
+        }
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
@@ -131,7 +79,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // 2. The control exists and is relevant
         final Itemset itemset = XFormsSelect1Control.getInitialItemset(containingDocument, xformsSelect1Control, getPrefixedId());
 
-        outputContent(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, isMultiple, isFull, false);
+        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
+        outputContent(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, appearanceTrait != null && appearanceTrait.isMultiple(), appearanceTrait != null && appearanceTrait.isFull(), false);
     }
 
     public void outputContent(String uri, String localname, Attributes attributes, String effectiveId,
@@ -143,18 +92,13 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsSelect1Control, !isFull);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         if (!isStaticReadonly(xformsSelect1Control)) {
             if (isFull) {
                 // Full appearance
                 outputFull(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, isMultiple, isBooleanInput);
             } else {
-
-                if (isOpenSelection) {
-                    // We do not support other appearances or regular open selection for now
-                    throw new ValidationException("Open selection currently not supported.",
-                            new ExtendedLocationData(handlerContext.getLocationData(), "producing markup for xforms:" + localname + " control",
-                                    (xformsSelect1Control != null) ? xformsSelect1Control.getControlElement() : null));
-                } else if (isTree) {
+                if (appearanceTrait != null && appearanceTrait.isTree()) {
                     // xxforms:tree appearance
 
                     // Create xhtml:div with tree info
@@ -168,7 +112,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     }
                     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
-                } else if (isMenu) {
+                } else if (appearanceTrait != null && appearanceTrait.isMenu()) {
                     // xxforms:menu appearance
 
                     // Create enclosing xhtml:div
@@ -270,7 +214,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
                     containerAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// necessary for noscript mode
 
-                    if (isCompact)
+                    if (appearanceTrait != null && appearanceTrait.isCompact())
                         containerAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
                     // Handle accessibility attributes
@@ -284,14 +228,6 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                         final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
                         if (itemset != null) {
-
-    // Work in progress for in-bounds/out-of-bounds
-    //                        if (!((XFormsSelect1Control) xformsControl).isInBounds(items)) {
-    //                            // Control is out of bounds so add first item with out of bound value to handle this
-    //                            handleItemCompact(contentHandler, optionQName, xformsControl, isMultiple,
-    //                                    new XFormsItemUtils.Item(XFormsProperties.isEncryptItemValues(containingDocument),
-    //                                            Collections.EMPTY_LIST, "", xformsControl.getValue(pipelineContext), 1));
-    //                        }
 
                             itemset.visit(xmlReceiver, new ItemsetListener() {
 
@@ -363,7 +299,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private void outputFull(String uri, String localname, Attributes attributes, String effectiveId,
                             XFormsValueControl xformsControl, Itemset itemset, boolean isMultiple, boolean isBooleanInput) throws SAXException {
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !isFull);
+        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !(appearanceTrait != null && appearanceTrait.isFull()));
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";
@@ -583,12 +520,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     @Override
     public String getForEffectiveId() {
         // For full appearance we don't put a @for attribute so that selecting the main label doesn't select the item
-        return isFull ? null : super.getForEffectiveId();
+        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
+        return appearanceTrait != null && appearanceTrait.isFull() ? null : super.getForEffectiveId();
     }
 
     @Override
     protected void handleLabel() throws SAXException {
-        if (isStaticReadonly(getControl()) || !isFull || !handlerContext.isNoScript()) {
+        final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
+        if (isStaticReadonly(getControl()) || !(appearanceTrait != null && appearanceTrait.isFull()) || !handlerContext.isNoScript()) {
             // In noscript mode for full items, this is handled by fieldset/legend
             super.handleLabel();
         }

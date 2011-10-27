@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import scala.Tuple3;
 
 import java.util.*;
 
@@ -80,11 +81,11 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final String startIndexString = element.attributeValue("startindex");
         this.startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
     }
-    
+
     @Override
-    public boolean hasJavaScriptInitialization() {
+    public Tuple3<String, String, String> getJavaScriptInitialization() {
         // If there is DnD, must tell the client to perform initialization
-        return isDnD();
+        return isDnD() ? getCommonJavaScriptInitialization() : null;
     }
 
     @Override

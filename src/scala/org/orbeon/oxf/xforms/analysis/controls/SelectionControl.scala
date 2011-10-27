@@ -23,9 +23,10 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAna
 import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
 import org.dom4j.{QName, Text, Element}
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
 
-trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
+trait SelectionControl extends SelectAppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
@@ -34,17 +35,14 @@ trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
             "exists((xforms:choices | xforms:item | xforms:itemset)/(., .//xforms:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
-    // Remember information
-    val isMultiple = element.getName == "select"
-    val isOpenSelection = element.attributeValue("selection") == "open"
-    val isNorefresh = element.attributeValue(XFormsConstants.XXFORMS_REFRESH_ITEMS_QNAME) == "false"
-    val isFull = appearances(XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME)
+    val isNorefresh = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
 
-    val isEncryptValues = {
-        val localEncryptItemValues = element.attributeValue(XFormsConstants.ENCRYPT_ITEM_VALUES)
-        !isOpenSelection && (if (localEncryptItemValues ne null)
-            localEncryptItemValues.toBoolean else staticStateContext.partAnalysis.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY))
-    }
+    if  (element.attributeValue("selection") == "open")
+        throw new ValidationException("Open selection is currently not supported.", locationData)
+
+    val isEncryptValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map
+        (_.toBoolean) getOrElse
+            staticStateContext.partAnalysis.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY)
 
     private var itemsetAnalysis: Option[XPathAnalysis] = None
     private var itemsetAnalyzed = false
@@ -85,29 +83,29 @@ trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
 
                 element.getQName match {
 
-                    case XFormsConstants.ITEM_QNAME | XFormsConstants.ITEMSET_QNAME =>
+                    case ITEM_QNAME | ITEMSET_QNAME ⇒
 
                         itemElementAnalysis.analyzeXPath()
 
-                        processElement(XFormsConstants.LABEL_QNAME, true)
-                        processElement(XFormsConstants.XFORMS_VALUE_QNAME, true)
+                        processElement(LABEL_QNAME, true)
+                        processElement(XFORMS_VALUE_QNAME, true)
 
-                    case XFormsConstants.CHOICES_QNAME =>
+                    case CHOICES_QNAME ⇒
 
                         itemElementAnalysis.analyzeXPath()
 
-                        processElement(XFormsConstants.LABEL_QNAME, false) // label is optional on xf:choices
+                        processElement(LABEL_QNAME, false) // label is optional on xf:choices
 
                         // Always push the container
                         stack push itemElementAnalysis
 
-                    case _ => // ignore
+                    case _ ⇒ // ignore
                 }
             }
 
             def endElement(element: Element): Unit =
-                if (element == XFormsConstants.CHOICES_QNAME)
-                    stack pop
+                if (element == CHOICES_QNAME)
+                    stack pop()
 
             def text(text: Text) = ()
         })
@@ -115,24 +113,24 @@ trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
         Some(combinedAnalysis)
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
         super.toXML(helper, attributes) {
             // Optional content
             content
 
             // Itemset details
             getItemsetAnalysis match {
-                case Some(analysis) =>
+                case Some(analysis) ⇒
                     helper.startElement("itemset")
                     analysis.toXML(helper)
                     helper.endElement()
-                case _ => // NOP
+                case _ ⇒ // NOP
             }
         }
     }
 
     override def freeTransientState() = {
-        super.freeTransientState
+        super.freeTransientState()
         if (itemsetAnalyzed && getItemsetAnalysis.isDefined)
             getItemsetAnalysis.get.freeTransientState()
     }
@@ -154,15 +152,15 @@ trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
 
                 element.getQName match {
 
-                    case XFormsConstants.ITEM_QNAME => // xforms:item
+                    case ITEM_QNAME ⇒ // xforms:item
 
-                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                        val labelElement = element.element(LABEL_QNAME)
                         if (labelElement eq null)
                             throw new ValidationException("xforms:item must contain an xforms:label element.", ElementAnalysis.createLocationData(element))
                         val containsHTML = Array(false)
                         val label = XFormsUtils.getStaticChildElementValue(labelElement, isFull, containsHTML)
 
-                        val valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME)
+                        val valueElement = element.element(XFORMS_VALUE_QNAME)
                         if (valueElement eq null)
                             throw new ValidationException("xforms:item must contain an xforms:value element.", ElementAnalysis.createLocationData(element))
                         val value = XFormsUtils.getStaticChildElementValue(valueElement, false, null)
@@ -170,13 +168,13 @@ trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
                         val attributes = SelectionControlUtil.getAttributes(element)
                         currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
 
-                    case XFormsConstants.ITEMSET_QNAME => // xforms:itemset
+                    case ITEMSET_QNAME ⇒ // xforms:itemset
 
                         throw new ValidationException("xforms:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
 
-                    case XFormsConstants.CHOICES_QNAME => // xforms:choices
+                    case CHOICES_QNAME ⇒ // xforms:choices
 
-                        val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                        val labelElement = element.element(LABEL_QNAME)
                         if (labelElement ne null) {
                             val label = XFormsUtils.getStaticChildElementValue(labelElement, false, null)
 
@@ -188,14 +186,14 @@ trait SelectionControl extends SimpleElementAnalysis with AppearanceTrait {
                             currentContainer = newContainer
                         }
 
-                    case _ => // ignore
+                    case _ ⇒ // ignore
                 }
             }
 
             def endElement(element: Element): Unit =
-                if (element == XFormsConstants.CHOICES_QNAME) {
+                if (element == CHOICES_QNAME) {
                     // xforms:choices
-                    val labelElement = element.element(XFormsConstants.LABEL_QNAME)
+                    val labelElement = element.element(LABEL_QNAME)
                     if (labelElement ne null)
                         currentContainer = currentContainer.getParent
                 }
@@ -213,11 +211,11 @@ object SelectionControlUtil {
     def getAttributes(itemChoiceItemset: Element) = {
         val tuples =
             for {
-                attributeName <- attributesToPropagate
+                attributeName ← attributesToPropagate
                 attributeValue = itemChoiceItemset.attributeValue(attributeName)
                 if attributeValue ne null
             } yield
-                attributeName -> attributeValue
+                attributeName → attributeValue
 
         tuples.toMap.asJava
     }

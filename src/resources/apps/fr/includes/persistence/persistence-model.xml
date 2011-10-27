@@ -423,10 +423,13 @@
         <form xmlns=""/>
     </xforms:instance>
 
+    <!-- NOTE: use xxforms:cache="false" otherwise updates to the form won't work in the summary page -->
+    <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
+         improve submissions to handle conditional GET as well when using caching. -->
     <xforms:submission id="get-source-form-submission"
             method="get" serialization="none"
             resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
-            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="true"/>
+            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="false" xxforms:xinclude="true"/>
 
     <!-- Which operations the user can perform -->
     <xforms:instance id="fr-authorized-operations">

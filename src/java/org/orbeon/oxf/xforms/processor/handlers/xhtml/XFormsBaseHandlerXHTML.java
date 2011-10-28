@@ -257,7 +257,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
+    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
 
         // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
         final boolean isHint = lhhaType == LHHAC.HINT;

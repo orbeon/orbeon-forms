@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
 
-trait SelectionControl extends SelectAppearanceTrait {
+trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we

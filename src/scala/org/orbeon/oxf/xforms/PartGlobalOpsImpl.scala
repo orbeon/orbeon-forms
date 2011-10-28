@@ -53,8 +53,9 @@ trait PartGlobalOpsImpl extends PartGlobalOps {
 
     def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))
 
-    private def getLHHA(prefixedId: String, lhha: String) = getControlAnalysisOption(prefixedId) match {
-        case Some(lhhaTrait: LHHATrait) => lhhaTrait.getLHHA(lhha)
-        case _ => null
-    }
+    private def getLHHA(prefixedId: String, lhha: String) =
+        getControlAnalysisOption(prefixedId) match {
+            case Some(lhhaTrait: LHHATrait) => lhhaTrait.getLHHA(lhha).orNull
+            case _ => null
+        }
 }

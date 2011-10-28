@@ -21,10 +21,8 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -32,11 +30,10 @@ import org.orbeon.saxon.om.Item;
  */
 public class XFormsSetfocusAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String controlIdAttributeValue = actionElement.attributeValue("control");
         if (controlIdAttributeValue == null)
@@ -69,7 +66,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-            final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+            final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:setfocus", "control does not refer to an existing control element, ignoring action",
                         "control id", resolvedControlStaticOrEffectiveId);

@@ -17,7 +17,9 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.Variable;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
+import org.orbeon.oxf.xforms.analysis.controls.VariableControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -36,7 +38,7 @@ import java.util.Map;
 public class XXFormsVariableControl extends XFormsSingleNodeControl {
 
     // Actual variable name/value representation
-    private Variable variable;
+    private final Variable variable;
 
     private ValueRepresentation value;
     // Previous value for refresh
@@ -44,7 +46,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
 
     public XXFormsVariableControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
         super(container, parent, element, name, effectiveId);
-        variable = new Variable(container, container.getContextStack(), element);
+        variable = new Variable((VariableAnalysisTrait) getElementAnalysis(), container.getContextStack());
     }
 
     @Override

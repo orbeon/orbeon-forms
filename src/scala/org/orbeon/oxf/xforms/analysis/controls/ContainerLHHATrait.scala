@@ -13,17 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.dom4j.{Element, QName}
+import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants
 
 trait ContainerLHHATrait extends LHHATrait {
 
     override protected def findNestedLHHAElement(qName: QName) =
-        // For e.g. <xforms:group>, consider only nested element without @for attribute
+        // For <xf:group>, <xf:switch>, <xf:case>, <xxf:dialog>, consider only nested element without @for attribute
         // NOTE: Should probably be child::xforms:label[not(exists(@for))] to get first such element, but e.g. group
         // label if any should probably be first anyway.
-        element.element(qName) match {
-            case lhhaElement: Element if lhhaElement.attribute(XFormsConstants.FOR_QNAME) eq null => Some(lhhaElement)
-            case _ => None
-        }
+        Option(element.element(qName)) collect
+            { case lhhaElement if lhhaElement.attribute(XFormsConstants.FOR_QNAME) eq null ⇒ lhhaElement }
 }

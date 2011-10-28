@@ -21,10 +21,8 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -39,13 +37,12 @@ public class XFormsDeleteAction extends XFormsAction {
 
     public static final String CANNOT_DELETE_READONLY_MESSAGE = "Cannot perform deletion in read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
-        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
+        final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
+        final XFormsContextStack contextStack = actionInterpreter.actionXPathContext();
 
         final String atAttribute = actionElement.attributeValue("at");
         final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);

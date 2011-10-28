@@ -19,12 +19,13 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -264,6 +265,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return XFormsUtils.getPrefixedId(getEffectiveId());
     }
 
+    public Scope getScope(XFormsContainingDocument containingDocument) {
+        return getModel(containingDocument).getStaticModel().scope();
+    }
+
     public String getEffectiveId() {
         return XFormsUtils.getRelatedEffectiveId(modelEffectiveId, getId());
     }
@@ -473,7 +478,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
 
-            final XBLBindingsBase.Scope instanceScope = getXBLContainer(controls.getContainingDocument()).getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
+            final Scope instanceScope = getXBLContainer(controls.getContainingDocument()).getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
 
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
             final List<XFormsControl> repeatControls = new ArrayList<XFormsControl>(repeatControlsMap.values());

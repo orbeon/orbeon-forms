@@ -14,46 +14,96 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls._
-import org.dom4j.Element
+import model.{Model, Submission}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
+import org.dom4j.{QName, Element}
+import org.orbeon.oxf.xforms.action.XFormsActions
+import scala.PartialFunction
+import org.orbeon.oxf.xforms.xbl.Scope
 
 object ControlAnalysisFactory {
 
-    def create(staticStateContext: StaticStateContext, parent: ContainerTrait, preceding: ElementAnalysis,
-               scope: XBLBindingsBase.Scope, controlElement: Element): ElementAnalysis = {
+    // Control factories
+    type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
+
+    // NOTE: Not all controls need separate classes, so for now we use generic ones like e.g. CoreControl instead of InputControl
+    private val valueControlFactory: ControlFactory =     (new CoreControl(_, _, _, _, _) with ValueTrait with ActionChildrenBuilder)
+    private val triggerControlFactory: ControlFactory =   (new CoreControl(_, _, _, _, _) with TriggerAppearanceTrait with ActionChildrenBuilder)
+    private val selectionControlFactory: ControlFactory = (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ActionChildrenBuilder)
+    private val variableControlFactory: ControlFactory =  (new VariableControl(_, _, _, _, _) with ActionChildrenBuilder)
+    private val containerControlFactory: ControlFactory = (new ContainerControl(_, _, _, _, _) with ContainerLHHATrait with ContainerChildrenBuilder) // NOTE: no LHHA in spec yet, but will make sense
+    private val lhhaControlFactory: ControlFactory =      (new ExternalLHHAAnalysis(_, _, _, _, _))
+
+    // Variable factories indexed by QName
+    // NOTE: We have all these QNames for historical reasons
+    private val variableFactory =
+        Seq(XXFORMS_VARIABLE_QNAME, XXFORMS_VAR_QNAME, XFORMS_VARIABLE_QNAME, XFORMS_VAR_QNAME, EXFORMS_VARIABLE_QNAME) map
+            (qName ⇒ qName → variableControlFactory) toMap
+
+    // Other factories indexed by QName
+    private val byQNameFactory = Map[QName, ControlFactory](
+        // Core value controls
+        XFORMS_INPUT_QNAME            → valueControlFactory,
+        XFORMS_SECRET_QNAME           → valueControlFactory,
+        XFORMS_TEXTAREA_QNAME         → valueControlFactory,
+        XFORMS_OUTPUT_QNAME           → valueControlFactory,
+        XFORMS_UPLOAD_QNAME           → valueControlFactory,
+        XFORMS_RANGE_QNAME            → valueControlFactory,
+        XXFORMS_TEXT_QNAME            → valueControlFactory,
+        // Core controls
+        XFORMS_TRIGGER_QNAME          → triggerControlFactory,
+        XFORMS_SUBMIT_QNAME           → triggerControlFactory,
+        // Selection controls
+        XFORMS_SELECT_QNAME           → selectionControlFactory,
+        XFORMS_SELECT1_QNAME          → selectionControlFactory,
+        // Attributes
+        XXFORMS_ATTRIBUTE_QNAME       → (new AttributeControl(_, _, _, _, _)),
+        // Container controls
+        XFORMS_GROUP_QNAME            → containerControlFactory,
+        XFORMS_SWITCH_QNAME           → containerControlFactory,
+        XFORMS_CASE_QNAME             → containerControlFactory,
+        XXFORMS_DIALOG_QNAME          → containerControlFactory,
+        // Dynamic control
+        XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _)),
+        // Repeat control
+        XFORMS_REPEAT_QNAME           → (new RepeatControl(_, _, _, _, _) with ContainerChildrenBuilder),
+        XFORMS_REPEAT_ITERATION_QNAME → (new RepeatIterationControl(_, _, _, _, _) with ContainerChildrenBuilder),
+        // LHHA
+        LABEL_QNAME                   → lhhaControlFactory,
+        HELP_QNAME                    → lhhaControlFactory,
+        HINT_QNAME                    → lhhaControlFactory,
+        ALERT_QNAME                   → lhhaControlFactory,
+        // Model
+        XFORMS_MODEL_QNAME            → (new Model(_, _, _, _, _)),
+        XFORMS_SUBMISSION_QNAME       → (new Submission(_, _, _, _, _))
+    ) ++ variableFactory
+
+    private val controlFactory: PartialFunction[Element, ControlFactory] =
+        { case e: Element if byQNameFactory.isDefinedAt(e.getQName) ⇒ byQNameFactory(e.getQName) }
+
+    def create(
+          context: StaticStateContext,
+          controlElement: Element,
+          parent: Option[ElementAnalysis],
+          preceding: Option[ElementAnalysis],
+          scope: Scope): Option[ElementAnalysis] = {
 
         // Tell whether the current element has an XBL binding
-        def hasXBLBinding = staticStateContext.partAnalysis.getXBLBindings.hasBinding(scope.getPrefixedIdForStaticId(XFormsUtils.getElementStaticId(controlElement)))
+        def hasXBLBinding(e: Element) = context.partAnalysis.xblBindings.hasBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementStaticId(e)))
 
-        // NOTE: Not all controls need separate classes, so for now we use generic ones like e.g. ValueCoreControl instead of InputControl
-        controlElement.getQName match {
-            case XFORMS_INPUT_QNAME | XFORMS_SECRET_QNAME | XFORMS_TEXTAREA_QNAME | XFORMS_OUTPUT_QNAME | XFORMS_UPLOAD_QNAME | XFORMS_RANGE_QNAME | XXFORMS_TEXT_QNAME =>
-                new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ValueTrait
-            case XFORMS_TRIGGER_QNAME | XFORMS_SUBMIT_QNAME =>
-                new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with TriggerAppearanceTrait
-            case XFORMS_SELECT_QNAME | XFORMS_SELECT1_QNAME =>
-                new CoreControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ValueTrait with SelectionControl
-            case XXFORMS_VARIABLE_QNAME | XXFORMS_VAR_QNAME | XFORMS_VARIABLE_QNAME | XFORMS_VAR_QNAME | EXFORMS_VARIABLE_QNAME =>
-                new VariableControl(staticStateContext, controlElement, parent, Option(preceding), scope)
-            case XXFORMS_ATTRIBUTE_QNAME =>
-                new AttributeControl(staticStateContext, controlElement, parent, Option(preceding), scope)
-            case XFORMS_GROUP_QNAME | XFORMS_SWITCH_QNAME | XFORMS_CASE_QNAME | XXFORMS_DIALOG_QNAME => // no LHHA in spec yet, but will make sense
-                new ContainerControl(staticStateContext, controlElement, parent, Option(preceding), scope) with ContainerLHHATrait
-            case  XXFORMS_DYNAMIC_QNAME =>
-                new ContainerControl(staticStateContext, controlElement, parent, Option(preceding), scope)
-            case XFORMS_REPEAT_QNAME =>
-                new RepeatControl(staticStateContext, controlElement, parent, Option(preceding), scope)
-            case qName if hasXBLBinding =>
-                new ComponentControl(staticStateContext, controlElement, parent, Option(preceding), scope)
-            case LABEL_QNAME | HELP_QNAME | HINT_QNAME | ALERT_QNAME =>
-                new ExternalLHHAAnalysis(staticStateContext, controlElement, parent, Option(preceding), scope)
-            case qName =>
-                throw new OXFException("Invalid control name: " + qName.getQualifiedName)
-        }
+        // Not all factories are simply indexed by QName, so compose those with factories for components and actions
+        val componentFactory: PartialFunction[Element, ControlFactory] =
+            { case e if hasXBLBinding(e) ⇒ (new ComponentControl(_, _, _, _, _) with ShadowChildrenBuilder) }
+
+        val f = controlFactory orElse componentFactory orElse XFormsActions.factory
+
+        // Create the ElementAnalysis if possible
+        f.lift(controlElement) map
+            (_(context, controlElement, parent, preceding, scope))
     }
+
+    def isVariable(qName: QName) = variableFactory.contains(qName)
 
     /*
         The hierarchy looks like this:

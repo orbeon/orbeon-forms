@@ -15,23 +15,23 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.action.{XFormsActionInterpreter, XFormsAction}
-import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEvent}
-import org.dom4j.Element
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
-import org.orbeon.saxon.om.{NodeInfo, Item}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 
 /**
  * 10.1.9 The setvalue Element
  */
 class XFormsSetvalueAction extends XFormsAction {
-    def execute(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent, eventObserver: XFormsEventObserver,
-                actionElement: Element, actionScope: XBLBindingsBase.Scope, hasOverriddenContext: Boolean, overriddenContext: Item): Unit = {
-        
-        val indentedLogger = actionInterpreter.getIndentedLogger
-        val containingDocument = actionInterpreter.getContainingDocument
-        val contextStack = actionInterpreter.getContextStack
+
+    override def execute(actionContext: DynamicActionContext) {
+
+        val actionInterpreter = actionContext.interpreter
+        val actionElement = actionContext.element
+
+        val indentedLogger = actionInterpreter.indentedLogger
+        val containingDocument = actionInterpreter.containingDocument
+        val contextStack = actionInterpreter.actionXPathContext
         
         val valueExpression = Option(actionElement.attributeValue(XFormsConstants.VALUE_QNAME))
 

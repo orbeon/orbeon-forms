@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.expr.XPathContext;
@@ -42,8 +42,8 @@ public class XXFormsLang extends XFormsFunction {
             element = getSourceElement(xpathContext);
         } else {
             // Do a bit more work to find current scope first
-            final XBLBindingsBase.Scope scope = container.getPartAnalysis().getResolutionScopeByPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId(xpathContext)));
-            final String elementPrefixedId = scope.getPrefixedIdForStaticId(elementId);
+            final Scope scope = container.getPartAnalysis().getResolutionScopeByPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId(xpathContext)));
+            final String elementPrefixedId = scope.prefixedIdForStaticId(elementId);
 
             element = container.getPartAnalysis().getControlElement(elementPrefixedId);
         }

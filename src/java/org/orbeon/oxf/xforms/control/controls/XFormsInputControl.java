@@ -47,6 +47,7 @@ public class XFormsInputControl extends XFormsValueControl {
     };
 
     // Optional display format
+    // TODO: Use static information in FormatTrait instead
     private final String format;
     private final String unformat;
 

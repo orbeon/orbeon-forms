@@ -17,7 +17,7 @@ import analysis.controls.RepeatControl
 import org.dom4j.QName
 import collection.mutable.LinkedHashSet
 import collection.JavaConverters._
-import java.util.{List => JList, Map => JMap}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl {
@@ -25,29 +25,28 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
     // Start with top-level part only
     private var parts = topLevelPart :: Nil
 
+    // Add part to the list
     def addPart(part: PartAnalysis) =
         parts = part :: parts
 
+    // Remove part from list
     def removePart(part: PartAnalysis) =
         parts = parts filterNot (_ eq part)
 
     // Find in all parts
-    private def findInParts[T <: AnyRef](get: PartAnalysis => T) =
-        parts map (part => get(part)) filter (_ ne null) headOption
-
-    private def findInPartsOption[T](get: PartAnalysis => Option[T]) =
-        parts flatMap (part => get(part)) headOption
+    private def findInParts[T <: AnyRef](get: PartAnalysis ⇒ T) =
+        parts map (part ⇒ get(part)) filter (_ ne null) headOption
 
     // Exists in all parts
-    private def existsInParts(p: PartAnalysis => Boolean) =
+    private def existsInParts(p: PartAnalysis ⇒ Boolean) =
         parts exists (p(_))
 
     // Collect in all parts
-    private def collectInPartsJ[T](get: PartAnalysis => java.util.Collection[T]) =
-        parts flatMap (part => get(part).asScala)
+    private def collectInPartsJ[T](get: PartAnalysis ⇒ java.util.Collection[T]) =
+        parts flatMap (part ⇒ get(part).asScala)
 
-    private def collectInParts[T](get: PartAnalysis => Traversable[T]) =
-        parts flatMap (part => get(part))
+    private def collectInParts[T](get: PartAnalysis ⇒ Traversable[T]) =
+        parts flatMap (part ⇒ get(part))
 
     def getInstances(modelPrefixedId: String) = collectInPartsJ(_.getInstances(modelPrefixedId)).asJava
 
@@ -61,8 +60,6 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
     def getElementMark(prefixedId: String) = findInParts(_.getElementMark(prefixedId)).orNull
 
     def getControlAnalysis(prefixedId: String) = findInParts(_.getControlAnalysis(prefixedId)).orNull
-    def getAncestorControlForAction(prefixedId: String) = findInPartsOption(_.getAncestorControlForAction(prefixedId))
-    def getComponentFactory(qName: QName) = findInParts(_.getComponentFactory(qName)) orNull
 
     def hasControlByName(controlName: String) = existsInParts(_.hasControlByName(controlName))
     def hasControlAppearance(controlName: String, appearance: QName) = existsInParts(_.hasControlAppearance(controlName, appearance))
@@ -74,7 +71,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
     def addMissingRepeatIndexes(repeatPrefixedIdToIndex: JMap[String, java.lang.Integer]) =
         parts foreach (_.addMissingRepeatIndexes(repeatPrefixedIdToIndex))
 
-    def getRepeatHierarchyString = parts map(_.getRepeatHierarchyString) mkString "," // just concat the repeat strings from all parts
+    def getRepeatHierarchyString = parts map (_.getRepeatHierarchyString) mkString "," // just concat the repeat strings from all parts
 
     def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))
     def getAttributeControl(prefixedForAttribute: String, attributeName: String) = findInParts(_.getAttributeControl(prefixedForAttribute, attributeName)).orNull
@@ -83,7 +80,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
 
     def getGlobals = collectInParts(_.getGlobals) toMap
 
-    def getScripts = parts flatMap (_.getScripts) toMap
+    def scripts = parts flatMap (_.scripts) toMap
     def getXBLStyles = collectInParts(_.getXBLStyles)
     def getXBLScripts = collectInParts(_.getXBLScripts)
 
@@ -93,7 +90,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
         val allStyles = LinkedHashSet[String]()
 
         parts map (_.baselineResources) foreach {
-            case (scripts, styles) =>
+            case (scripts, styles) ⇒
                 allScripts ++= scripts
                 allStyles ++= styles
         }
@@ -113,22 +110,20 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
      * @param endPrefixedId     prefixed id of end repeat
      * @return                  Seq of prefixed id from leaf to root, or empty
      */
-    def getAncestorRepeats(startPrefixedId: String, endPrefixedId: Option[String]): Seq[String] = {
-        // Try control analysis first, then action ancestor
-        val elementAnalysis = getControlAnalysisOption(startPrefixedId) orElse {
-            getAncestorControlForAction(startPrefixedId) flatMap
-                (getControlAnalysisOption(_))
-        }
-
+    def getAncestorRepeats(startPrefixedId: String, endPrefixedId: Option[String] = None): Seq[String] =
         // If element analysis is found, find all its ancestor repeats until the root or until the end prefixed id is
-        elementAnalysis.toSeq flatMap
-            (RepeatControl.getAllAncestorRepeatAcrossParts(_)) takeWhile
-                (a => Some(a.prefixedId) != endPrefixedId) map
+        getControlAnalysisOption(startPrefixedId).toSeq flatMap
+            (RepeatControl.getAllAncestorRepeatsAcrossParts(_)) takeWhile
+                (a ⇒ Some(a.prefixedId) != endPrefixedId) map
                     (_.prefixedId)
-    }
+
+    def getAncestorOrSelfRepeats(startPrefixedId: String): Seq[String] =
+        (getControlAnalysisOption(startPrefixedId).toSeq collect
+            { case r: RepeatControl ⇒ r.prefixedId }) ++ getAncestorRepeats(startPrefixedId, None)
 
     /**
-     * Find the closest common ancestor repeat given two prefixed ids.
+     * Find the closest common ancestor repeat given two prefixed ids. If the prefixed ids denote repeats, include them
+     * as well (as if they were referring to repeat iterations rather than repeats).
      *
      * @param prefixedId1   first control prefixed id
      * @param prefixedId2   second control prefixed id
@@ -136,13 +131,10 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
      */
     def findClosestCommonAncestorRepeat(prefixedId1: String, prefixedId2: String): Option[String] = {
 
-        def ancestorsFromRoot(prefixedId: String) =
-            getAncestorRepeats(prefixedId, None).reverse
-
         // Starting from the root, find the couples of repeats with identical ids
-        val longestPrefix = ancestorsFromRoot(prefixedId1) zip
-            (ancestorsFromRoot(prefixedId2)) takeWhile
-                (z => z._1 == z._2)
+        val longestPrefix = getAncestorRepeats(prefixedId1).reverse zip
+            (getAncestorRepeats(prefixedId2).reverse) takeWhile
+                { case (left, right) ⇒ left == right }
 
         // Return the id of the last element found
         longestPrefix.lastOption map (_._1)

@@ -14,27 +14,58 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls.RepeatControl
+import model.Model
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 import org.dom4j.{QName, Element}
-import org.orbeon.oxf.xml.{XMLUtils, NamespaceMapping, ContentHandlerHelper}
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
+import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xforms.xbl.Scope
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */
-abstract class ElementAnalysis(val element: Element, val parent: Option[ContainerTrait], val preceding: Option[ElementAnalysis]) {
+abstract class ElementAnalysis(val element: Element, val parent: Option[ElementAnalysis], val preceding: Option[ElementAnalysis]) {
+
+    self ⇒
 
     require(element ne null)
 
+    val namespaceMapping: NamespaceMapping
+
+    // Element local name
+    def localName = element.getName
+
     // Scope and model
-    val scopeModel: ScopeModel
+    val scope: Scope
+    val model: Option[Model]
+    
     // In-scope variables (for XPath analysis)
     val inScopeVariables: Map[String, VariableTrait]
 
+    lazy val treeInScopeVariables: Map[String, VariableTrait] = {
+
+        def findPreceding(element: ElementAnalysis): Option[ElementAnalysis] = element.preceding match {
+            case Some(preceding) if preceding.scope == self.scope ⇒ Some(preceding)
+            case Some(preceding) ⇒ findPreceding(preceding)
+            case None ⇒ element.parent match {
+                case Some(parent: Model) ⇒
+                    None // models are not allowed to see outside variables for now (could lift this restriction later)
+                case Some(parent) ⇒ findPreceding(parent)
+                case _ ⇒ None
+            }
+        }
+
+        findPreceding(self) match {
+            case Some(preceding: VariableAnalysisTrait) ⇒ preceding.treeInScopeVariables + (preceding.name → preceding)
+            case Some(preceding) ⇒ preceding.treeInScopeVariables
+            case None ⇒ Map.empty
+        }
+    }
+
     // Ids
     val staticId = XFormsUtils.getElementStaticId(element)
-    lazy val prefixedId = scopeModel.scope.getPrefixedIdForStaticId(staticId) // lazy so that we don't use uninitialized scopeModel
+    val prefixedId = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
 
     // Location
     val locationData = ElementAnalysis.createLocationData(element)
@@ -85,54 +116,43 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
      */
     def getChildrenContext: Option[XPathAnalysis] = if (hasNodeBinding) getBindingAnalysis else getContextAnalysis
 
-    /**
-     * Return the closest ancestor repeat if any.
-     */
-    val closestInScopeRepeat: Option[RepeatControl] = parent match {
-        case Some(repeat: RepeatControl) => Some(repeat)
-        case Some(container: SimpleElementAnalysis) => container.closestInScopeRepeat
-        case _ => None
-    }
+    val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
 
-    /**
-     * Whether this is within a repeat.
-     */
-    def isWithinRepeat = closestInScopeRepeat.isDefined
+    // Whether this is within a repeat
+    // NOTE: it's not ideal that this is known by ElementAnalysis
+    val isWithinRepeat = RepeatControl.getAncestorRepeat(self).isDefined
 
-    // API for Java
-    def javaToXML(helper: ContentHandlerHelper) = toXML(helper, List())({})
+    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
 
-    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+        def getModelPrefixedId = model map (_.prefixedId)
 
-        def getModelPrefixedId = scopeModel.containingModel map (_.prefixedId)
-
-        helper.startElement(element.getName,
+        helper.startElement(localName,
             attributes match {
-                case Nil => Array( // default attributes
-                        "scope", scopeModel.scope.scopeId,
+                case Nil ⇒ Array( // default attributes
+                        "scope", scope.scopeId,
                         "prefixed-id", prefixedId,
                         "model-prefixed-id", getModelPrefixedId.orNull,
                         "binding", hasNodeBinding.toString,
                         "value", canHoldValue.toString,
                         "name", element.attributeValue("name") // e.g. variables
                     )
-                case _ => Array(attributes: _*)
+                case _ ⇒ Array(attributes: _*)
             })
 
         // Control binding and value analysis
         getBindingAnalysis match {
-            case Some(bindingAnalysis) if hasNodeBinding => // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
+            case Some(bindingAnalysis) if hasNodeBinding ⇒ // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
                 helper.startElement("binding")
                 bindingAnalysis.toXML(helper)
                 helper.endElement()
-            case _ => // NOP
+            case _ ⇒ // NOP
         }
         getValueAnalysis match {
-            case Some(valueAnalysis) =>
+            case Some(valueAnalysis) ⇒
                 helper.startElement("value")
                 valueAnalysis.toXML(helper)
                 helper.endElement()
-            case _ => // NOP
+            case _ ⇒ // NOP
         }
 
         // Optional content
@@ -154,84 +174,81 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
 object ElementAnalysis {
 
     /**
-     * Return a list of preceding elements in the same scope, from root to leaf.
-     */
-    def getPrecedingInScope(element: ElementAnalysis)(scope: XBLBindingsBase.Scope = element.scopeModel.scope): List[ElementAnalysis] = element.preceding match {
-        case Some(preceding) if preceding.scopeModel.scope == scope => preceding :: getPrecedingInScope(preceding)(scope)
-        case Some(preceding) => getPrecedingInScope(preceding)(scope)
-        case None => element.parent match {
-            case Some(parent: ElementAnalysis) => getPrecedingInScope(parent)(scope)
-            case _ => Nil
-        }
-    }
-
-    /**
      * Return the closest preceding element in the same scope.
+     *
+     * NOTE: As in XPath, this does not include ancestors of the element.
      */
-    def getClosestPrecedingInScope(element: ElementAnalysis)(scope: XBLBindingsBase.Scope = element.scopeModel.scope): Option[ElementAnalysis] = element.preceding match {
-        case Some(preceding) if preceding.scopeModel.scope == scope => Some(preceding)
-        case Some(preceding) => getClosestPrecedingInScope(preceding)(scope)
-        case None => element.parent match {
-            case Some(parent: ElementAnalysis) => getClosestPrecedingInScope(parent)(scope)
-            case _ => None
+    def getClosestPrecedingInScope(element: ElementAnalysis)(scope: Scope = element.scope): Option[ElementAnalysis] = element.preceding match {
+        case Some(preceding) if preceding.scope == scope ⇒ Some(preceding)
+        case Some(preceding) ⇒ getClosestPrecedingInScope(preceding)(scope)
+        case None ⇒ element.parent match {
+            case Some(parent) ⇒ getClosestPrecedingInScope(parent)(scope)
+            case _ ⇒ None
         }
     }
 
     /**
-     * Return a list of ancestors from leaf to root.
+     * Return an iterator over all the element's ancestors.
      */
-    def getAllAncestors(container: Option[ContainerTrait]): List[ElementAnalysis] = container match {
-        case Some(container: ElementAnalysis) => container :: getAllAncestors(container.parent)
-        case _ => Nil
+    def ancestorsIterator(start: ElementAnalysis) = new Iterator[ElementAnalysis] {
+
+        private var theNext = start.parent
+
+        def hasNext = theNext.isDefined
+        def next() = {
+            val newResult = theNext.get
+            theNext = newResult.parent
+            newResult
+        }
     }
 
     /**
      * Return a list of ancestors in the same scope from leaf to root.
      */
-    def getAllAncestorsInScope(parent: Option[ContainerTrait], scope: XBLBindingsBase.Scope): List[ElementAnalysis] =
-        getAllAncestors(parent) filter (_.scopeModel.scope == scope)
+    def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope): List[ElementAnalysis] =
+        ancestorsIterator(start) filter (_.scope == scope) toList
 
     /**
      * Return a list of ancestor-or-self in the same scope from leaf to root.
      */
-
-    def getAllAncestorsOrSelfInScope(elementAnalysis: ElementAnalysis): List[ElementAnalysis] =
-        elementAnalysis :: getAllAncestorsInScope(elementAnalysis.parent, elementAnalysis.scopeModel.scope)
+    def getAllAncestorsOrSelfInScope(start: ElementAnalysis): List[ElementAnalysis] =
+        start :: getAllAncestorsInScope(start, start.scope)
 
     /**
      * Get the closest ancestor in the same scope.
      */
-    def getClosestAncestorInScope(parent: Option[ContainerTrait], scope: XBLBindingsBase.Scope): Option[ElementAnalysis] =
-        getAllAncestorsInScope(parent, scope) match {
-            case Nil => None
-            case ancestorsList => Some(ancestorsList.head)
-        }
+    def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope) =
+        ancestorsIterator(start) find (_.scope == scope)
 
     /**
      * Return the first ancestor with a binding analysis that is in the same scope/model.
      */
-    def getClosestAncestorInScopeModel(parent: Option[ContainerTrait], scopeModel: ScopeModel): Option[ElementAnalysis] =
-        getAllAncestors(parent) find (_.scopeModel == scopeModel)
+    def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel) =
+        ancestorsIterator(start) find (e ⇒ ScopeModel(e.scope, e.model) == scopeModel)
 
     /**
      * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.
      */
-    def getBindingExpression(element: Element): Option[String] = {
-        val ref = element.attributeValue(XFormsConstants.REF_QNAME)
-        Option(if (ref ne null) ref else element.attributeValue(XFormsConstants.NODESET_QNAME))
-    }
+    def getBindingExpression(element: Element): Option[String] =
+        Option(element.attributeValue(XFormsConstants.REF_QNAME)) orElse
+            Option(element.attributeValue(XFormsConstants.NODESET_QNAME))
 
     def createLocationData(element: Element): ExtendedLocationData =
         if (element ne null) new ExtendedLocationData(element.getData.asInstanceOf[LocationData], "gathering static information", element) else null
 
+    private def stringToSet(s: Option[String]) = s match {
+        case Some(list) ⇒ list split """\s+""" toSet
+        case None ⇒ Set[String]()
+    }
+    
     /**
      * Get the value of an attribute containing a space-separated list of tokens as a set.
      */
     def attSet(element: Element, qName: QName) =
-        Option(element.attributeValue(qName)) match {
-            case Some(list) => list split """\s+""" toSet
-            case None => Set[String]()
-        }
+        stringToSet(Option(element.attributeValue(qName)))
+    
+    def attSet(element: Element, name: String) =
+        stringToSet(Option(element.attributeValue(name)))
 
     /**
      * Get the value of an attribute containing a space-separated list of QNames as a set.

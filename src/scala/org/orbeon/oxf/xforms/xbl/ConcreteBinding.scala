@@ -14,29 +14,22 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.dom4j.Document
 import org.orbeon.oxf.xforms._
-import analysis.model.Model
+import org.dom4j.{Element, Document}
 
 case class ConcreteBinding(
-    innerScope: XBLBindingsBase.Scope,  // each binding defines a new scope
+    abstractBinding: AbstractBinding,
+    innerScope: Scope,                  // each binding defines a new scope
+    outerScope: Scope,                  // this binding's outer scope
+    handlers: Seq[Element],             // annotated event handler elements
+    models: Seq[Element],               // annotated implementation model elements
     fullShadowTree: Document,           // with full content, e.g. XHTML
-    compactShadowTree: Document,        // without full content, only the XForms controls
-    models: Seq[Model],                 // all the models
-    bindingId: String,
-    containerElementName: String        // "div" by default
-)
+    compactShadowTree: Document         // without full content, only the XForms controls
+) {
+    require(abstractBinding.bindingId.isDefined, "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement))
 
-object ConcreteBinding {
-    // Construct a ConcreteBinding
-    def apply(abstractBinding: AbstractBinding, innerScope: XBLBindingsBase.Scope, fullShadowTree: Document, compactShadowTree: Document, models: Seq[Model]) = {
-
-        assert(abstractBinding.bindingId.isDefined, "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement))
-
-        val containerElementName =
-            Option(abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME)) getOrElse
-                "div"
-
-        new ConcreteBinding(innerScope, fullShadowTree, compactShadowTree, models, abstractBinding.bindingId.get, containerElementName)
-    }
+    val bindingId = abstractBinding.bindingId.get
+    val containerElementName =          // "div" by default
+        Option(abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME)) getOrElse
+            "div"
 }

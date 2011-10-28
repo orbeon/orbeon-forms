@@ -108,6 +108,7 @@ public class XFormsConstants {
     // XForms controls
     public static final QName XFORMS_GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
     public static final QName XFORMS_REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
+    public static final QName XFORMS_REPEAT_ITERATION_QNAME = new QName("repeat-iteration", XFORMS_NAMESPACE); // NOTE: Supposed to be xxforms:repeat-iteration
     public static final String REPEAT_NAME = XFORMS_REPEAT_QNAME.getName();
     public static final QName XFORMS_SWITCH_QNAME = new QName("switch", XFORMS_NAMESPACE);
     public static final QName XFORMS_CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
@@ -332,6 +333,9 @@ public class XFormsConstants {
     public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_REPEAT_INDEXES_QNAME = new QName("repeat-indexes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DND_QNAME = new QName("dnd", XXFORMS_NAMESPACE);
+
+    public static final QName XXFORMS_FORMAT_QNAME = new QName("format", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_UNFORMAT_QNAME = new QName("unformat", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_UPDATE_QNAME = new QName("update", XXFORMS_NAMESPACE);
     public static final String XFORMS_FULL_UPDATE = "full";

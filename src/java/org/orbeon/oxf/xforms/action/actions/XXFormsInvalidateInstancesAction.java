@@ -21,19 +21,18 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
  * Extension xxforms:invalidate-instances action.
  */
 public class XXFormsInvalidateInstancesAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
-        final IndentedLogger indentedLogger = actionInterpreter.getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
+        final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
         XFormsServerSharedInstancesCache.instance().removeAll(indentedLogger);
     }
 }

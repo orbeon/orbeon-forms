@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -31,16 +32,15 @@ import java.util.Set;
 /**
  * Represents xforms:repeat iteration information.
  *
- * This is not really a control, but an abstraction for xforms:repeat branches.
+ * This is not really a control, but an abstraction for xforms:repeat iterations.
  *
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
 public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerControl implements XFormsPseudoControl {
     private int iterationIndex;
     public XFormsRepeatIterationControl(XBLContainer container, XFormsRepeatControl parent, int iterationIndex) {
-        // NOTE: Associate this control with the repeat element. This is so that even targets get a proper id
-        // NOTE: Effective id of an iteration is parentRepeatId·iteration
-        super(container, parent, parent.getControlElement(), "xxforms-repeat-iteration", XFormsUtils.getIterationEffectiveId(parent.getEffectiveId(), iterationIndex));
+        super(container, parent, parent.getElementAnalysis().iterationElement(), parent.getElementAnalysis().iterationElement().getName(),
+              XFormsUtils.getIterationEffectiveId(parent.getEffectiveId(), iterationIndex));
         this.iterationIndex = iterationIndex;
     }
 
@@ -118,6 +118,17 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
                 currentControl.updateEffectiveId();
             }
         }
+    }
+
+    @Override
+    public void performDefaultAction(XFormsEvent event) {
+        // For now (2011-12-15), all events reach the repeat iteration instead of the repeat container, except
+        // xforms-enabled/xforms-disabled. This might not be the final design, see also:
+        // http://wiki.orbeon.com/forms/projects/xforms-repeat-events
+        if (XFormsEvents.XXFORMS_DND.equals(event.getName())) {
+            ((XFormsRepeatControl) getParent()).doDnD(event);
+        }
+        super.performDefaultAction(event);
     }
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();

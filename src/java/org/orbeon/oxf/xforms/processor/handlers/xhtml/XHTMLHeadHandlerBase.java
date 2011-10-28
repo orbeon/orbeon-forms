@@ -20,12 +20,10 @@ import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
-import org.orbeon.oxf.xforms.event.XFormsEventHandler;
+import org.orbeon.oxf.xforms.event.EventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -123,11 +121,11 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
 
     private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
 
-        if (containingDocument.getStaticOps().getScripts().size() > 0 || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
+        if (containingDocument.getStaticOps().scripts().size() > 0 || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript"});
 
-            XHTMLHeadHandler.outputScripts(helper, containingDocument.getStaticOps().getScripts().values());
+            XHTMLHeadHandler.outputScripts(helper, containingDocument.getStaticOps().scripts().values());
 
             final List<XFormsContainingDocument.Script> scriptsToRun = containingDocument.getScriptsToRun();
 
@@ -138,11 +136,11 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
                 if (scriptsToRun != null) {
                     for (final XFormsContainingDocument.Script script: scriptsToRun) {
                         sb.append("ORBEON.xforms.server.Server.callUserScript(\"");
-                        sb.append(script.getFunctionName());
+                        sb.append(script.functionName);
                         sb.append("\",\"");
-                        sb.append(XFormsUtils.namespaceId(containingDocument, script.getEvent().getTargetObject().getEffectiveId()));
+                        sb.append(XFormsUtils.namespaceId(containingDocument, script.targetEffectiveId));
                         sb.append("\",\"");
-                        sb.append(XFormsUtils.namespaceId(containingDocument, script.getEventObserver().getEffectiveId()));
+                        sb.append(XFormsUtils.namespaceId(containingDocument, script.observerEffectiveId));
                         sb.append("\");");
                     }
                 }
@@ -295,11 +293,11 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
                 sb.append("\"keylisteners\":[");
 
                 boolean first = true;
-                for (XFormsEventHandler handler: containingDocument.getStaticOps().getKeyHandlers()) {
+                for (EventHandler handler: containingDocument.getStaticOps().getKeyHandlers()) {
                     if (!first)
                         sb.append(',');
 
-                    for (final String observer: handler.getObserversStaticIds()) {// TODO: should we use prefixed ids?
+                    for (final String observer: handler.jObserversPrefixedIds()) {
                         sb.append('{');
                         sb.append("\"observer\":\"");
                         sb.append(observer);

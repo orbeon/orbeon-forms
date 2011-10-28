@@ -158,14 +158,14 @@
                         <xforms:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxforms:repeat-indexes="1 1"/>
                     </xforms:group>
                     <xforms:repeat nodeset="company/department" id="id123">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert nodeset="../department" at="2" position="after"/>
+                        <xforms:action id="my-action-1" ev:event="DOMActivate">
+                            <xforms:insert id="my-insert-1" nodeset="../department" at="2" position="after"/>
                         </xforms:action>
                         <xforms:repeat nodeset="employee" id="id124" startindex="2">
                             <xforms:trigger id="id127">
                                 <xforms:label>Insert</xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
+                                <xforms:action id="my-action-2" ev:event="DOMActivate">
+                                    <xforms:insert id="my-insert-2" nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
                                 </xforms:action>
                             </xforms:trigger>
                             <xforms:output ref="@first" id="id125"/>
@@ -975,7 +975,6 @@
                             </instance>
                             <instance id="events" model-id="xf-2">
                                 <events>
-                                    <event type="xforms-enabled" target="my-repeat" indexes=""/>
                                     <event type="xforms-enabled" target="my-input" indexes="1"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
@@ -1625,39 +1624,37 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:group id="my-group">
-                        <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
-                        <xforms:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
-                                       context="instance('events')" nodeset="*"
-                                       origin="xxforms:element('event',
-                                                (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid')),
-                                                 xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+                    <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
+                    <xforms:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
-                        <!-- Outer repeat -->
-                        <xforms:repeat id="my-outer-repeat" nodeset="outer">
-                            <!-- This receives the event on xforms-ready -->
-                            <xforms:input id="my-outer-input" ref="value">
-                                <xforms:action ev:event="my-event-1">
-                                    <!-- Dispatch to inner control following indexes -->
-                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
-                                    <!-- Move inner index -->
-                                    <xforms:setindex repeat="my-inner-repeat" index="2"/>
-                                    <!-- Event must reach new index -->
-                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
-                                    <!-- Dispatch to next control -->
-                                    <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
-                                </xforms:action>
-                            </xforms:input>
-                            <xforms:output id="my-outer-output" ref="value"/>
+                    <!-- Outer repeat -->
+                    <xforms:repeat id="my-outer-repeat" nodeset="outer">
+                        <!-- This receives the event on xforms-ready -->
+                        <xforms:input id="my-outer-input" ref="value">
+                            <xforms:action ev:event="my-event-1">
+                                <!-- Dispatch to inner control following indexes -->
+                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <!-- Move inner index -->
+                                <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                <!-- Event must reach new index -->
+                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <!-- Dispatch to next control -->
+                                <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                            </xforms:action>
+                        </xforms:input>
+                        <xforms:output id="my-outer-output" ref="value"/>
 
-                            <!-- Inner repeat -->
-                            <xforms:repeat id="my-inner-repeat" nodeset="inner">
-                                <xforms:input id="my-inner-input" ref="value"/>
-                                <xforms:output id="my-inner-output" ref="value"/>
-                            </xforms:repeat>
+                        <!-- Inner repeat -->
+                        <xforms:repeat id="my-inner-repeat" nodeset="inner">
+                            <xforms:input id="my-inner-input" ref="value"/>
+                            <xforms:output id="my-inner-output" ref="value"/>
                         </xforms:repeat>
-                    </xforms:group>
+                    </xforms:repeat>
                 </xhtml:body>
             </xhtml:html>
         </input>
@@ -2047,7 +2044,7 @@
         </output>
     </test>
 
-    <test description="xxforms:index() function" name="oxf:pipeline">
+    <test description="xxforms:index() function" name="oxf:pipeline" only="false">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -2096,7 +2093,7 @@
                             <xforms:output id="department-output-3" value="$department-index-3"/>
 
                             <!-- Make sure the function work from within an action as well -->
-                            <xforms:action ev:event="xforms-enabled">
+                            <xforms:action ev:event="xforms-enabled" ev:target="department-output-3">
                                 <xxforms:variable name="test-nodeset" select="xxforms:index()"/>
                                 <xforms:setvalue ref="." value="$test-nodeset"/>
                             </xforms:action>
@@ -2413,13 +2410,6 @@
                             <events/>
                         </xforms:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <!--<xforms:setindex repeat="my-repeat" index="2"/>-->
-                            <!--<xforms:insert nodeset="value" origin="(xxforms:element('value', 5), xxforms:element('value', 6))"/>-->
-                            <!--<xforms:delete nodeset="value" at="6"/>-->
-                            <!--<xforms:delete nodeset="value"/>-->
-                        </xforms:action>
-
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
@@ -2427,21 +2417,28 @@
                         <xforms:insert ev:event="xforms-enabled"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                (xxforms:attribute('observer', 'my-group'),
+                                                 xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
 
+                        <!-- Repeat has iterations so is relevant -->
                         <xforms:repeat nodeset="value" id="my-repeat-1a"/>
+                        <!-- Repeat has no iteration so is not relevant -->
                         <xforms:repeat nodeset="()" id="my-repeat-1b"/>
+                        <!-- Repeat has no iteration so is not relevant -->
                         <xforms:repeat nodeset="instance('instance-2')/value" id="my-repeat-2"/>
+                        <!-- Repeat has one relevant iteration so is relevant -->
                         <xforms:repeat nodeset="instance('instance-3')/value" id="my-repeat-3">
                             <!-- Test handler with ev:target="#observer" -->
+                            <!-- NOTE: Observer here is the repeat iteration! And xforms-enabled is currently not dispatched
+                                 to repeat iterations. -->
                             <xforms:insert ev:event="xforms-enabled" ev:target="#observer" ev:propagate="stop"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid')),
-                                                 xxforms:attribute('index', xxforms:index())
+                                                (xxforms:attribute('observer', 'my-repeat-3~iteration'),
+                                                 xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
                         </xforms:repeat>
 
@@ -2449,11 +2446,12 @@
                         <xforms:insert ev:event="xforms-enabled" ev:observer="my-repeat-3" ev:target="my-repeat-3"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid')),
-                                                 xxforms:attribute('index', index('my-repeat-3'))
+                                                (xxforms:attribute('observer', 'my-repeat-3'),
+                                                 xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
 
+                        <!-- Group and nested repeat are non-relevant -->
                         <xforms:group id="my-group-2" ref="()">
                             <xforms:repeat nodeset="instance('instance-1')/value" id="my-repeat-4"/>
                         </xforms:group>
@@ -2492,10 +2490,10 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event type="xforms-enabled" target="my-group"/>
-                                    <event type="xforms-enabled" target="my-repeat-1a"/>
-                                    <event type="xforms-enabled" target="my-repeat-3" index="1"/>
-                                    <event type="xforms-enabled" target="my-repeat-3" index="1"/>
+                                    <event observer="my-group" type="xforms-enabled" target="my-group"/>
+                                    <event observer="my-group" type="xforms-enabled" target="my-repeat-1a"/>
+                                    <event observer="my-repeat-3" type="xforms-enabled" target="my-repeat-3"/>
+                                    <event observer="my-group" type="xforms-enabled" target="my-repeat-3"/>
                                 </events>
                             </instance>
                         </instances>

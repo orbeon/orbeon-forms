@@ -20,8 +20,6 @@ import org.orbeon.oxf.xml.TransformerUtils
 
 /**
  * Form Builder functions.
- *
- * For now everything is in this object, but that should be split out over time.
  */
 object FormBuilderFunctions {
 

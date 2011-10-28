@@ -15,23 +15,30 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 import java.lang.IllegalArgumentException
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.XFormsConstants._
 
-class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
-        extends ContainerControl(staticStateContext, element, parent, preceding, scope) {
+class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+    extends ContainerControl(staticStateContext, element, parent, preceding, scope) {
     // TODO: add repeat hierarchy information
+    
+    val iterationElement = element.element(XFORMS_REPEAT_ITERATION_QNAME)
+
+    require(iterationElement ne null)
 }
 
 object RepeatControl {
-    /**
-     * Find the closest ancestor repeat if any.
-     */
+
+    // Find the closest ancestor repeat if any.
     def getAncestorRepeat(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
-        ElementAnalysis.getAllAncestors(elementAnalysis.parent) find (_.isInstanceOf[RepeatControl]) match {
-            case Some(repeatControl: RepeatControl) => Some(repeatControl)
-            case _ => None
-        }
+        ElementAnalysis.ancestorsIterator(elementAnalysis) collectFirst
+            { case repeatControl: RepeatControl ⇒ repeatControl }
+
+    // Find the closest ancestor repeat in the same scope, if any.
+    def getAncestorRepeatInScope(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
+        ElementAnalysis.ancestorsIterator(elementAnalysis) collectFirst
+            { case repeatControl: RepeatControl if repeatControl.scope == elementAnalysis.scope ⇒ repeatControl }
 
     // Get the first ancestor repeats across parts
     def getAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): Option[RepeatControl] = elementAnalysis match {
@@ -40,15 +47,15 @@ object RepeatControl {
             // First search ancestor local to this part, or else try the ancestor repeat associated with the parent part if any
             getAncestorRepeat(simpleElementAnalysis) orElse
                 (currentPart.parent map
-                    (_.getControlAnalysis(currentPart.startScope.getFullPrefix.init)) // .init removes the trailing '$'
+                    (_.getControlAnalysis(currentPart.startScope.fullPrefix.init)) // .init removes the trailing '$'
                         flatMap (getAncestorRepeatAcrossParts(_))) // recursively search ancestor parts
         case _ => throw new IllegalArgumentException
     }
 
     // Get all ancestor repeats across parts, from leaf to root
-    def getAllAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] =
+    def getAllAncestorRepeatsAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] =
         getAncestorRepeatAcrossParts(elementAnalysis) match {
-            case Some(ancestor) => ancestor :: getAllAncestorRepeatAcrossParts(ancestor)
+            case Some(ancestor) => ancestor :: getAllAncestorRepeatsAcrossParts(ancestor)
             case None => Nil
         }
 }

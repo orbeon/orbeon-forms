@@ -276,7 +276,7 @@ public abstract class XFormsEvent implements Cloneable {
      * @param handler   event handler to check
      * @return          true iif the event matches the filter
      */
-    public boolean matches(XFormsEventHandler handler) {
+    public boolean matches(EventHandler handler) {
         // By default, all events match and only very specific events have special matching rules (keypress)
         return true;
     }

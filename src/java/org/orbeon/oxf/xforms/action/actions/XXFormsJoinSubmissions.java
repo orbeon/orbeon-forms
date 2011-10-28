@@ -21,17 +21,17 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 public class XXFormsJoinSubmissions extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement, XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter,
+                        Element actionElement, Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Process all pending async submissions. The action will block until the method returns.
         if (Version.isPE()) {
             // Only supported in PE version
-            final AsynchronousSubmissionManager manager = actionInterpreter.getContainingDocument().getAsynchronousSubmissionManager(false);
+            final AsynchronousSubmissionManager manager = actionInterpreter.containingDocument().getAsynchronousSubmissionManager(false);
             if (manager != null)
                 manager.processAllAsynchronousSubmissions();
         } else {

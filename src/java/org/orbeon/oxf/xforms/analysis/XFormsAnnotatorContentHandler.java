@@ -206,6 +206,14 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(), XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 startElement(true, uri, localname, qName, attributes);
+            } else if (isXForms && "repeat".equals(localname)) {
+                // Leave element untouched (except for the id attribute)
+                startElement(true, uri, localname, qName, attributes);
+                // Use xforms:repeat-iteration instead of xxforms:iteration so we don't have to deal with a new namespace
+                reusableAttributes.clear();
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, attributes.getValue("id") + "~iteration");
+                getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, 0);
+                startElement(true, uri, localname + "-iteration", qName + "-iteration", reusableAttributes);
             } else {
                 // Leave element untouched (except for the id attribute)
                 startElement(true, uri, localname, qName, attributes);
@@ -382,9 +390,19 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             inPreserve = false;
             inLHHA = false;
             inXBL = false;
-        } if (inXForms && level == xformsLevel) {
-            // Leaving model or controls
-            inXForms = false;
+        }
+
+        if (inXForms) {
+
+            if (!inPreserve && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && "repeat".equals(localname)) {
+                // Close xforms:repeat-iteration
+                endElement(true, uri, localname + "-iteration", qName + "-iteration");
+            }
+
+            if (level == xformsLevel) {
+                // Leaving model or controls
+                inXForms = false;
+            }
         }
 
         if (level == 1) {

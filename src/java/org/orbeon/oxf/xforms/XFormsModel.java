@@ -23,15 +23,19 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.action.actions.XFormsMessageAction;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
+import org.orbeon.oxf.xforms.analysis.model.Submission;
 import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
+import org.orbeon.oxf.xforms.model.XFormsModelAction;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -65,8 +69,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private final List<XFormsInstance> instances;
     private final Map<String, XFormsInstance> instancesMap;
 
-    // Submissions
+    // Submissions and actions
     private final Map<String, XFormsModelSubmission> submissions;
+    private final Map<String, XFormsModelAction> actions = new HashMap<String, XFormsModelAction>();
 
     // Variables
 //    private Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
@@ -123,21 +128,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
         }
 
-        // Get <xforms:submission> elements (may be missing)
+        // Get submissions
         {
-            final List<Element> submissionElements = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_SUBMISSION_QNAME);
-            if (submissionElements.isEmpty()) {
+            final List<Submission> staticSubmissions = staticModel.jSubmissions();
+            if (staticSubmissions.isEmpty()) {
                 // No submission in this model
                 submissions = Collections.emptyMap();
             } else {
                 // At least one submission in this model
                 submissions = new HashMap<String, XFormsModelSubmission>();
-                for (Element submissionElement: submissionElements) {
-                    final String submissionId = XFormsUtils.getElementStaticId(submissionElement);
-                    submissions.put(submissionId, new XFormsModelSubmission(this.container, submissionId, submissionElement, this));
-                }
+                for (final Submission staticSubmission : staticSubmissions)
+                    submissions.put(staticSubmission.staticId(), new XFormsModelSubmission(this.container, staticSubmission, this));
             }
         }
+
+        // Get event handlers
+        for (final EventHandlerImpl staticEventHandler : staticModel.jEventHandlers())
+            actions.put(staticEventHandler.staticId(), new XFormsModelAction(XFormsModel.this, staticEventHandler));
 
         // Create binds object
         binds = XFormsModelBinds.create(this);
@@ -258,6 +265,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 return resultSubmission;
         }
 
+        // Search actions
+        {
+            final XFormsModelAction action = actions.get(targetStaticId);
+            if (action != null)
+                return action;
+        }
+
         // Search binds
         if (binds != null) {
             final XFormsModelBinds.Bind bind = binds.resolveBind(targetStaticId, contextItem);
@@ -369,7 +383,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return effectiveId;
     }
 
-    public XBLBindingsBase.Scope getResolutionScope() {
+    public Scope getScope(XFormsContainingDocument containingDocument) {
+        return staticModel.scope();
+    }
+
+    public Scope getResolutionScope() {
         return container.getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
@@ -1154,6 +1172,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return null;
     }
 
+    // TODO: This is does not have the same semantic as getBindingContext() on controls, does it?
     public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
         contextStack.resetBindingContext(this);
         return contextStack.getCurrentBindingContext();

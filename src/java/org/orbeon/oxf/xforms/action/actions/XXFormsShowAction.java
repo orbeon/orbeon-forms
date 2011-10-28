@@ -21,10 +21,9 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -32,11 +31,10 @@ import org.orbeon.saxon.om.Item;
  */
 public class XXFormsShowAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         // Resolve all attributes as AVTs
         final String dialogStaticOrEffectiveId = actionInterpreter.resolveAVT(actionElement, "dialog");
@@ -71,7 +69,7 @@ public class XXFormsShowAction extends XFormsAction {
                     targetDialog.getXBLContainer().dispatchEvent(new XFormsFocusEvent(containingDocument, targetDialog));
 
             } else {
-                final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+                final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
                             "dialog id", dialogStaticOrEffectiveId);

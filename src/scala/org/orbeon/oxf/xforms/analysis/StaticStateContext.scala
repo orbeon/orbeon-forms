@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xforms.PartAnalysis
 
-class StaticStateContext(val partAnalysis: PartAnalysis, val controlsDocument: DocumentWrapper, val index: Int)
+case class StaticStateContext(partAnalysis: PartAnalysis, index: Int)

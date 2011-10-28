@@ -716,26 +716,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public static class Script {
-        private String functionName;
-        private final XFormsEvent event;
-        private final XFormsEventObserver eventObserver;
+        public final String functionName;
+        public final String targetEffectiveId;
+        public final String observerEffectiveId;
 
         public Script(String functionName, XFormsEvent event, XFormsEventObserver eventObserver) {
             this.functionName = functionName;
-            this.event = event;
-            this.eventObserver = eventObserver;
-        }
-
-        public String getFunctionName() {
-            return functionName;
-        }
-
-        public XFormsEvent getEvent() {
-            return event;
-        }
-
-        public XFormsEventObserver getEventObserver() {
-            return eventObserver;
+            this.targetEffectiveId = event.getTargetObject().getEffectiveId();
+            this.observerEffectiveId = eventObserver.getEffectiveId();
         }
     }
 

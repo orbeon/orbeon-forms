@@ -35,6 +35,7 @@
         <p:input name="instances" href="#instances"/>
         <p:input name="config">
             <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
                 <xsl:output method="xml" name="xml"/>
                 <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
                 <xsl:template match="/">
@@ -47,8 +48,10 @@
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
                                     <static-state xmlns="">
-                                        <xsl:copy-of select="doc('input:controls')/*/*"/>
-                                        <xsl:copy-of select="doc('input:models')/*/*"/>
+                                        <root id="#document">
+                                            <xsl:copy-of select="doc('input:models')/*/*"/>
+                                            <xsl:apply-templates select="doc('input:controls')/*/*" mode="controls"/>
+                                        </root>
                                         <properties xxforms:state-handling="client">
                                             <!-- Add properties on models, as XFormsExtractorContentHandler does -->
                                             <xsl:for-each select="doc('input:models')/*/*/@xxforms:*">
@@ -84,6 +87,16 @@
                             <xsl:copy-of select="doc('input:action')/*/*"/>
                         </xxforms:action>
                     </xxforms:event-request>
+                </xsl:template>
+                <!-- Add xforms:repeat-iteration element within xforms:repeat -->
+                <xsl:template match="xforms:repeat" mode="controls">
+                    <xsl:copy>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:element name="{name()}-iteration">
+                            <xsl:attribute name="id" select="concat(@id, '~iteration')"/>
+                            <xsl:apply-templates mode="controls"/>
+                        </xsl:element>
+                    </xsl:copy>
                 </xsl:template>
             </xsl:transform>
         </p:input>

@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -24,13 +24,23 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
  * XFormsEventTarget is implemented by classes that support dispatching of events.
  */
 public interface XFormsEventTarget {
+
+    // TODO: when possible remove unneeded containingDocument parameters, which are used only by XFormsInstance
+
+    Scope getScope(XFormsContainingDocument containingDocument);
     String getId();
+    String getPrefixedId();
     String getEffectiveId();
-    XBLContainer getXBLContainer(XFormsContainingDocument containingDocument);
+
     LocationData getLocationData();
+
+    XBLContainer getXBLContainer(XFormsContainingDocument containingDocument);
+    XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument);
+
     XFormsEventObserver getParentEventObserver(XBLContainer container);
+
     void performTargetAction(XBLContainer container, XFormsEvent event);
     void performDefaultAction(XFormsEvent event);
-    XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument);
+
     boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName);
 }

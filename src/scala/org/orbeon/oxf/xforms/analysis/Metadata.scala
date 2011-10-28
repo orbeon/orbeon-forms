@@ -21,9 +21,9 @@ import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import collection.immutable.Stream._
 import java.util.{Map => JMap, Set => JSet}
 
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 import org.orbeon.oxf.resources.{ResourceNotFoundException, ResourceManagerWrapper}
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.xforms.xbl.XBLBindings
 
 /**
  * Container for element metadata gathered during document annotation/extraction:
@@ -49,8 +49,8 @@ class Metadata(val idGenerator: IdGenerator) {
     private lazy val automaticMappings = {
         val propertySet = Properties.instance.getPropertySet
         for {
-            propertyName <- propertySet.getPropertiesStartsWith(XBLBindingsBase.XBL_MAPPING_PROPERTY_PREFIX)
-            prefix = propertyName.substring(XBLBindingsBase.XBL_MAPPING_PROPERTY_PREFIX.length)
+            propertyName <- propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX)
+            prefix = propertyName.substring(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX.length)
         } yield
             (propertySet.getString(propertyName), prefix)
     } toMap
@@ -64,12 +64,12 @@ class Metadata(val idGenerator: IdGenerator) {
         // Retrieve or create mapping object
         val namespaceMapping = hashes.getOrElseUpdate(hexHash, {
             val newNamespaceMapping = new NamespaceMapping(hexHash, sorted)
-            hashes += (hexHash -> newNamespaceMapping)
+            hashes += (hexHash → newNamespaceMapping)
             newNamespaceMapping
         })
 
         // Remember that id has this mapping
-        namespaceMappings += (prefixedId -> namespaceMapping)
+        namespaceMappings += prefixedId → namespaceMapping
     }
 
     def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
@@ -114,7 +114,7 @@ class Metadata(val idGenerator: IdGenerator) {
             case None => false
         }
 
-    def getBingingIncludes: JSet[String] = bindingIncludes
+    def getBindingIncludes: JSet[String] = bindingIncludes
 
     def updateBindingsLastModified(lastModified: Long) {
         this.lastModified = math.max(this.lastModified, lastModified)

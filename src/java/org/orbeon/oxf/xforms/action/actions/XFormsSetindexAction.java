@@ -21,20 +21,17 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 9.3.7 The setindex Element
  */
 public class XFormsSetindexAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
+        final XFormsContextStack contextStack = actionInterpreter.actionXPathContext();
 
         // Check presence of attribute
         final String repeatAttribute = actionElement.attributeValue("repeat");
@@ -42,7 +39,7 @@ public class XFormsSetindexAction extends XFormsAction {
             throw new OXFException("Missing mandatory 'repeat' attribute on xforms:setindex element.");
 
         // Can't evaluate index XPath if no context
-        final Item currentSingleNode = actionInterpreter.getContextStack().getCurrentSingleItem();
+        final Item currentSingleNode = contextStack.getCurrentSingleItem();
         if (currentSingleNode == null)
             return;
 
@@ -54,7 +51,7 @@ public class XFormsSetindexAction extends XFormsAction {
         final String indexString = actionInterpreter.evaluateStringExpression(actionElement,
                 contextStack.getCurrentNodeset(), contextStack.getCurrentPosition(), "number(" + indexXPath + ")");
 
-        actionInterpreter.getIndentedLogger().logDebug("xforms:setindex", "setting index", "index", indexString);
+        actionInterpreter.indentedLogger().logDebug("xforms:setindex", "setting index", "index", indexString);
 
         // Execute
         executeSetindexAction(actionInterpreter, actionElement, repeatStaticId, indexString);
@@ -67,10 +64,10 @@ public class XFormsSetindexAction extends XFormsAction {
             return -1;
         }
 
-        final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+        final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
 
         // "This XForms Action begins by invoking the deferred update behavior."
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
         containingDocument.synchronizeAndRefresh();
 
         // Find repeat control

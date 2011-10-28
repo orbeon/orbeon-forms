@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -520,13 +519,13 @@ Inserting error information into error list:
                                                  <xhtml:a href="#{{$effective-id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                             </xforms:group>
                                             <!-- Otherwise use trigger -->
+                                            <!-- Make sure variable is in outer scope so that id resolution works if id is a top-level id -->
+                                            <xxforms:variable name="effective-id-outer" as="xs:string" xxbl:scope="outer">
+                                                <xxforms:sequence select="$effective-id" xxbl:scope="inner"/>
+                                            </xxforms:variable>
                                             <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" appearance="minimal" class="fr-error-label">
                                                 <xforms:label value="normalize-space($error/@label)"/>
                                                 <!-- Set focus to control using effective id -->
-                                                <!-- Make sure variable is in outer scope so that id resolution works if id is a top-level id -->
-                                                <xxforms:variable name="effective-id-outer" as="xs:string" xxbl:scope="outer">
-                                                    <xxforms:sequence select="$effective-id" xxbl:scope="inner"/>
-                                                </xxforms:variable>
                                                 <xforms:setfocus ev:event="DOMActivate" control="{{$effective-id-outer}}" xxbl:scope="outer"/>
                                             </xforms:trigger>
                                             <!-- Repeat indexes -->

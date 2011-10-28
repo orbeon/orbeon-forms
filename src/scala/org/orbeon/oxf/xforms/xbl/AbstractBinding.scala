@@ -16,13 +16,10 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
-import control.{XFormsComponentControl, XFormsControl, XFormsControlFactory}
 import org.orbeon.oxf.xforms.XFormsConstants._
-import collection.JavaConversions._
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.common.OXFException
-import java.util.{Map => JMap}
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
@@ -33,15 +30,15 @@ case class AbstractBinding(
     scripts: Seq[Element],
     styles: Seq[Element],
     handlers: Seq[Element],
-    implementations: Seq[Document],
+    implementations: Seq[Element],
     global: Option[Document]
 ) {
     def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
 
     private def transformQNameOption = templateElement flatMap
-        (e => Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
+        (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
 
-    private def templateRootOption = templateElement map { e =>
+    private def templateRootOption = templateElement map { e ⇒
         if (e.elements.size != 1)
             throw new OXFException("xxbl:transform requires a single child element.")
         e.elements.get(0).asInstanceOf[Element]
@@ -49,14 +46,14 @@ case class AbstractBinding(
 
     private lazy val transformConfig =
         for {
-            transformQName <- transformQNameOption
-            templateRoot <- templateRootOption
+            transformQName ← transformQNameOption
+            templateRoot ← templateRootOption
         } yield
             Transform.createTransformConfig(transformQName, templateRoot, lastModified)
 
     // A transform cannot be reused, so this creates a new one when called, based on the config
     def newTransform(boundElement: Element) = transformConfig map {
-        case (pipelineConfig, domGeneratorConfig) =>
+        case (pipelineConfig, domGeneratorConfig) ⇒
             // Run the transformation
             val generatedDocument = Transform.transformBoundElement(pipelineConfig, domGeneratorConfig, boundElement)
 
@@ -69,12 +66,6 @@ case class AbstractBinding(
 
             generatedDocument
     }
-    
-    def createFactory =
-        new XFormsControlFactory.Factory {
-            def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element]) =
-                new XFormsComponentControl(container, parent, element, name, effectiveId)
-        }
 }
 
 object AbstractBinding {
@@ -83,32 +74,28 @@ object AbstractBinding {
 
         assert(bindingElement ne null)
 
-        def extractChildrenModels(parentElement: Element, detach: Boolean): Seq[Document] =
-            Dom4jUtils.elements(parentElement, XFORMS_MODEL_QNAME).asScala map
-                (Dom4jUtils.createDocumentCopyParentNamespaces(_, detach))
-
         val bindingId = Option(XFormsUtils.getElementStaticId(bindingElement))
 
         val styles =
             for {
-                resourcesElement <- Dom4jUtils.elements(bindingElement, XBL_RESOURCES_QNAME)
-                styleElement <- Dom4jUtils.elements(resourcesElement, XBL_STYLE_QNAME)
+                resourcesElement ← Dom4jUtils.elements(bindingElement, XBL_RESOURCES_QNAME).asScala
+                styleElement ← Dom4jUtils.elements(resourcesElement, XBL_STYLE_QNAME).asScala
             } yield
                 styleElement
 
         val handlers =
             for {
-                handlersElement <- Option(bindingElement.element(XBL_HANDLERS_QNAME)).toSeq
-                handlerElement <- Dom4jUtils.elements(handlersElement, XBL_HANDLER_QNAME)
+                handlersElement ← Option(bindingElement.element(XBL_HANDLERS_QNAME)).toSeq
+                handlerElement ← Dom4jUtils.elements(handlersElement, XBL_HANDLER_QNAME).asScala
             } yield
                 handlerElement
 
         val implementations =
             for {
-                implementationElement <- Option(bindingElement.element(XBL_IMPLEMENTATION_QNAME)).toSeq
-                modelDocument <- extractChildrenModels(implementationElement, true)
+                implementationElement ← Option(bindingElement.element(XBL_IMPLEMENTATION_QNAME)).toSeq
+                modelElement ← Dom4jUtils.elements(implementationElement, XFORMS_MODEL_QNAME).asScala
             } yield
-                modelDocument
+                modelElement
 
         val global = Option(bindingElement.element(XXBL_GLOBAL_QNAME)) map
             (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
@@ -127,10 +114,10 @@ object AbstractBinding {
         val qName = qNameMatch(bindingElement, namespaceMapping)
 
         path flatMap (BindingCache.get(_, qName, lastModified)) match {
-            case Some(cachedBinding) =>
+            case Some(cachedBinding) ⇒
                 // Found in cache
                 cachedBinding
-            case None =>
+            case None ⇒
                 val newBinding = AbstractBinding(bindingElement, lastModified, scripts, namespaceMapping)
                 // Cache binding
                 path foreach (BindingCache.put(_, qName, lastModified, newBinding))

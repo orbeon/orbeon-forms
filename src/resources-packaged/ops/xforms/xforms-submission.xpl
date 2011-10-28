@@ -58,28 +58,30 @@
                 <xsl:variable name="static-state" as="document-node()">
                     <xsl:document>
                         <static-state>
-                            <xforms:trigger id="fr-trigger">
-                                <xforms:send id="fr-send" submission="fr-default-submission" ev:event="DOMActivate"/>
-                            </xforms:trigger>
-                            <xforms:model id="fr-model">
-                                <xforms:instance id="fr-instance">
-                                    <dummy/>
-                                </xforms:instance>
-                                <xsl:if test="$is-shared-result">
-                                    <xforms:instance id="fr-result-instance">
+                            <root id="#document">
+                                <xforms:model id="fr-model">
+                                    <xforms:instance id="fr-instance">
                                         <dummy/>
                                     </xforms:instance>
-                                </xsl:if>
-                                <xforms:submission id="fr-default-submission" replace="instance">
-                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id']"/>
-                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
-                                    <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
-                                    <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
                                     <xsl:if test="$is-shared-result">
-                                        <xforms:insert ev:event="xforms-submit-done" origin="instance('fr-instance')" nodeset="instance('fr-result-instance')"/>
+                                        <xforms:instance id="fr-result-instance">
+                                            <dummy/>
+                                        </xforms:instance>
                                     </xsl:if>
-                                </xforms:submission>
-                            </xforms:model>
+                                    <xforms:submission id="fr-default-submission" replace="instance">
+                                        <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id']"/>
+                                        <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
+                                        <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
+                                        <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
+                                        <xsl:if test="$is-shared-result">
+                                            <xforms:insert ev:event="xforms-submit-done" origin="instance('fr-instance')" nodeset="instance('fr-result-instance')"/>
+                                        </xsl:if>
+                                    </xforms:submission>
+                                </xforms:model>
+                                <xforms:trigger id="fr-trigger">
+                                    <xforms:send id="fr-send" submission="fr-default-submission" ev:event="DOMActivate"/>
+                                </xforms:trigger>
+                            </root>
                             <properties xxforms:state-handling="client" xxforms:noscript="false" xxforms:forward-submission-headers="{xpl:property('oxf.xforms.forward-submission-headers')}"
                                         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
                             <last-id id="1000"/>
@@ -102,7 +104,7 @@
                     </xsl:document>
                 </xsl:variable>
 
-                <xsl:template match="/*/xforms:model/xforms:submission//*[not(exists(@id))]" mode="update-ids">
+                <xsl:template match="/*/root/xforms:model/xforms:submission//*[not(exists(@id))]" mode="update-ids">
                     <xsl:copy>
                         <xsl:attribute name="id" select="concat('xf-', count(preceding::*) + 1)"/>
                         <xsl:apply-templates select="@*|node()" mode="#current"/>

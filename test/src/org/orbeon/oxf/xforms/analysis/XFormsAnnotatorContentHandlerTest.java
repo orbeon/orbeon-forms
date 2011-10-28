@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,7 +80,7 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
 
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", XMLUtils.ParserConfiguration.PLAIN);
         final Metadata metadata = new Metadata();
-        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata, Collections.<Document>emptyList())
+        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata)
                 .annotateShadowTree(document, "", false);
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 

@@ -23,10 +23,8 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.model.DataModel;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 
@@ -34,11 +32,10 @@ import org.orbeon.saxon.om.Item;
  * 10.1.8 The load Element
  */
 public class XFormsLoadAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String resourceAttributeValue = actionElement.attributeValue(XFormsConstants.RESOURCE_QNAME);
 
@@ -56,7 +53,7 @@ public class XFormsLoadAction extends XFormsAction {
         final boolean isShowProgress = !"false".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
         // "If both are present, the action has no effect."
-        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
+        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.actionXPathContext().getCurrentBindingContext();
         if (bindingContext.isNewBind() && resourceAttributeValue != null)
             return;
 

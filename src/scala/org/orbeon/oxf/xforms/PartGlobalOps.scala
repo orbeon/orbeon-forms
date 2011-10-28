@@ -16,13 +16,11 @@ package org.orbeon.oxf.xforms
 import analysis.controls._
 import analysis.ElementAnalysis
 import analysis.model.Instance
-import control.XFormsControlFactory
-import event.XFormsEventHandler
-import xbl.XBLBindingsBase.Global
+import event.EventHandler
 import org.dom4j.{Element, QName}
 import java.util.{List => JList, Map => JMap}
 import org.orbeon.oxf.xml.SAXStore
-import xbl.{ConcreteBinding, XBLBindingsBase}
+import xbl.{Scope, XBLBindings, ConcreteBinding}
 
 trait PartGlobalOps {
 
@@ -34,7 +32,6 @@ trait PartGlobalOps {
 
     // Controls
     def getControlAnalysis(prefixedId: String): ElementAnalysis                                     // SA|GRUN
-    def getAncestorControlForAction(prefixedId: String): Option[String]
     def hasControlByName(controlName: String): Boolean                                              // GRUN
     def hasControlAppearance(controlName: String, appearance: QName): Boolean                       // GRUN
     def hasInputPlaceholder: Boolean
@@ -42,17 +39,16 @@ trait PartGlobalOps {
     // Events
     def hasHandlerForEvent(eventName: String): Boolean                                              // GRUN
     def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean                   // GRUN
-    def getKeyHandlers: JList[XFormsEventHandler]                                                   // GRUN
+    def getKeyHandlers: JList[EventHandler]                                                         // GRUN
 
     // XBL
-    def getComponentFactory(qName: QName): XFormsControlFactory.Factory                             // GRUN
     def isComponent(binding: QName): Boolean                                                        // GRUN
     def getBinding(prefixedId: String): ConcreteBinding                                             // GRUN
     def getBindingId(prefixedId: String): String                                                    // GRUN
     def getBindingQNames: Seq[QName]                                                                // GRUN
-    def getGlobals: collection.Map[QName, Global]                                                   // GRUN
-    def getResolutionScopeByPrefix(prefix: String): XBLBindingsBase.Scope                           // GRUN
-    def getResolutionScopeByPrefixedId(prefixedId: String): XBLBindingsBase.Scope                   // SA|GRUN
+    def getGlobals: collection.Map[QName, XBLBindings#Global]                                       // GRUN
+    def getResolutionScopeByPrefix(prefix: String): Scope                               // GRUN
+    def getResolutionScopeByPrefixedId(prefixedId: String): Scope                       // SA|GRUN
 
     // Repeats
     def addMissingRepeatIndexes(repeatIdToIndex: JMap[String, java.lang.Integer])                   // GRUN
@@ -63,7 +59,7 @@ trait PartGlobalOps {
     def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl  // GRUN
 
     // Client-side resources
-    def getScripts: collection.Map[String, Script]                                                  // GRUN
+    def scripts: collection.Map[String, Script]                                                     // GRUN
     def getXBLStyles: Seq[Element]                                                                  // GRUN
     def getXBLScripts: Seq[Element]                                                                 // GRUN
     def baselineResources: (collection.Set[String], collection.Set[String])                         // GRUN

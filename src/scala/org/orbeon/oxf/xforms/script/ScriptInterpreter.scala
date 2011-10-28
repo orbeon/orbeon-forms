@@ -49,7 +49,7 @@ class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
 
     def runScript(scriptId: String): Unit = {
         // 1. Get compiled script
-        val compiledScript = containingDocument.getStaticOps.getScripts.get(scriptId).asInstanceOf[ServerScript].compiledScript
+        val compiledScript = containingDocument.getStaticOps.scripts.get(scriptId).asInstanceOf[ServerScript].compiledScript
 
         // 2. Execute script
         val result = {

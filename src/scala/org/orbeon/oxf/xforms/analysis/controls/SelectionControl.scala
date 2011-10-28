@@ -25,13 +25,14 @@ import org.dom4j.{QName, Text, Element}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
+import org.orbeon.saxon.dom4j.DocumentWrapper
 
 trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
-    val hasStaticItemset = !XPathCache.evaluateSingle(staticStateContext.controlsDocument.wrap(element),
+    val hasStaticItemset = !XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration).wrap(element),
             "exists((xforms:choices | xforms:item | xforms:itemset)/(., .//xforms:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
@@ -75,7 +76,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
                         require(nestedElement ne null)
 
                     if (nestedElement ne null) {
-                        val nestedAnalysis = new LocalLHHAAnalysis(staticStateContext, nestedElement, itemElementAnalysis, None, itemElementAnalysis.getChildElementScope(nestedElement))
+                        val nestedAnalysis = new LocalLHHAAnalysis(staticStateContext, nestedElement, Some(itemElementAnalysis), None, itemElementAnalysis.getChildElementScope(nestedElement))
                         nestedAnalysis.analyzeXPath()
                         combinedAnalysis = combinedAnalysis combine nestedAnalysis.getValueAnalysis.get
                     }

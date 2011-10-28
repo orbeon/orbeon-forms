@@ -23,7 +23,7 @@ public class IdGenerator {
 
     private boolean isCheckDuplicates = true;
     private int currentId = 1;
-    private final Set<String> ids;
+    public final Set<String> ids;
 
     public IdGenerator() {
         this.ids = new HashSet<String>();
@@ -55,10 +55,6 @@ public class IdGenerator {
         currentId++;
 
         return newId;
-    }
-
-    public Iterator<String> iterator() {
-        return ids.iterator();
     }
 
     public int getCurrentId() {

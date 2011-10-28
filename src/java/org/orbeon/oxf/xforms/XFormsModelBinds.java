@@ -907,7 +907,7 @@ public class XFormsModelBinds {
                 if (nodesetSize > 0) {
                     // Only then does it make sense to create BindNodes
                     
-                    final List<Model.Bind> childrenStaticBinds = staticBind.childrenJava();
+                    final List<Model.Bind> childrenStaticBinds = staticBind.jChildren();
                     if (childrenStaticBinds.size() > 0) {
                         // There are children binds (and maybe MIPs)
                         bindNodes = new ArrayList<BindNode>(nodesetSize);

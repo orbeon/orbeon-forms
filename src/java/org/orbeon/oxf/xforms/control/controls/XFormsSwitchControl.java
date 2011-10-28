@@ -82,7 +82,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     @Override
     public void childrenAdded() {
-
+        // TODO: Do this during static analysis and remove childrenAdded() as it's no longer used as of 2011-11
         if (getSize() == 0) {
             throw new OXFException("xforms:switch does not contain at least one xforms:case for switch id: " + getEffectiveId());
         }

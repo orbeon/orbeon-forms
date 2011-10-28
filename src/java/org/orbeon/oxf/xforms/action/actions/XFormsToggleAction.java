@@ -22,21 +22,18 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 9.2.3 The toggle Element
  */
 public class XFormsToggleAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
-        final XFormsContextStack contextStack = actionInterpreter.getContextStack();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
+        final XFormsContextStack contextStack = actionInterpreter.actionXPathContext();
         final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
 
         final String caseAttribute = actionElement.attributeValue("case");
@@ -69,7 +66,7 @@ public class XFormsToggleAction extends XFormsAction {
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-            final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+            final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:toggle", "case does not refer to an existing xforms:case element, ignoring action",
                         "case id", caseStaticId);

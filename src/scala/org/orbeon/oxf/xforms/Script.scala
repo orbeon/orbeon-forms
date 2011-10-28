@@ -11,18 +11,6 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms;
+package org.orbeon.oxf.xforms
 
-public class Script {
-    public String prefixedId;
-    public boolean isClient;
-    public String type;
-    public String body;
-
-    public Script(String prefixedId, boolean isClient, String type, String body) {
-        this.prefixedId = prefixedId;
-        this.isClient = isClient;
-        this.type = type;
-        this.body = body;
-    }
-}
+class Script(val prefixedId: String, val isClient: Boolean, val scriptType: String, val body: String)

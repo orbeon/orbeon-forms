@@ -15,25 +15,25 @@ package org.orbeon.oxf.xforms
 
 import analysis.ElementAnalysis
 import analysis.model.Model
-import xbl.XBLBindingsBase
 import java.util.{List => JList}
 import org.dom4j.Element
 import org.orbeon.oxf.xml.NamespaceMapping
+import xbl.Scope
 
 // Operations on a part that are used during static analysis
 trait PartStaticAnalysisOps {
 
-    def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping                     // SA(to handle XBL resources)|GRUN
+    def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping     // SA(to handle XBL resources)|GRUN
 
-    def getModel(prefixedId: String): Model                                                         // SA
-    def getDefaultModelForScope(scope: XBLBindingsBase.Scope): Model                                // SA
-    def getModelByInstancePrefixedId(prefixedId: String): Model                                     // SA
-    def getModelByScopeAndBind(scope: XBLBindingsBase.Scope, bindStaticId: String): Model           // SA
-    def findInstancePrefixedId(startScope: XBLBindingsBase.Scope, instanceStaticId: String): String // SA
+    def getModel(prefixedId: String): Model                                         // SA
+    def getDefaultModelForScope(scope: Scope): Model                                // SA
+    def getModelByInstancePrefixedId(prefixedId: String): Model                     // SA
+    def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model           // SA
+    def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String // SA
 
-    def getModelsForScope(scope: XBLBindingsBase.Scope): JList[Model]                               // SA|RUN
+    def getModelsForScope(scope: Scope): JList[Model]                               // SA|RUN
     
-    def getControlAnalysis(prefixedId: String): ElementAnalysis                                     // SA|GRUN
-    def getResolutionScopeByPrefixedId(prefixedId: String): XBLBindingsBase.Scope                   // SA|GRUN
-    def searchResolutionScopeByPrefixedId(prefixedId: String): XBLBindingsBase.Scope                // SA
+    def getControlAnalysis(prefixedId: String): ElementAnalysis                     // SA|GRUN
+    def getResolutionScopeByPrefixedId(prefixedId: String): Scope                   // SA|GRUN
+    def searchResolutionScopeByPrefixedId(prefixedId: String): Scope                // SA
 }

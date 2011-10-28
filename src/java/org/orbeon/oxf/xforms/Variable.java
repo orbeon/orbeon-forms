@@ -17,10 +17,12 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
+import org.orbeon.oxf.xforms.analysis.controls.VariableControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
@@ -42,7 +44,7 @@ import java.util.List;
  */
 public class Variable {
 
-    private final XBLContainer container;
+    private final VariableAnalysisTrait staticVariable;
     private final XFormsContextStack contextStack;
 
     private final Element variableElement;
@@ -54,10 +56,10 @@ public class Variable {
     private boolean evaluated;
     private ValueRepresentation variableValue;
 
-    public Variable(XBLContainer container, XFormsContextStack contextStack, Element variableElement) {
-        this.container = container;
+    public Variable(VariableAnalysisTrait staticVariable, XFormsContextStack contextStack) {
+        this.staticVariable = staticVariable;
         this.contextStack = contextStack;
-        this.variableElement = variableElement;
+        this.variableElement = ((ElementAnalysis) staticVariable).element();
 
         this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
         if (variableName == null)
@@ -81,11 +83,10 @@ public class Variable {
         } else {
             // There is a select attribute
 
-            final boolean pushContext = pushOuterContext || variableElement != valueElement;
+            final boolean pushContext = pushOuterContext || staticVariable.hasSequence();
             if (pushContext) {
                 // Push binding for evaluation, so that @context and @model are evaluated
-                final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue(XFormsConstants.ID_QNAME);
-                final XBLBindingsBase.Scope variableValueScope = container.getPartAnalysis().getResolutionScopeByPrefixedId(variableValuePrefixedId);
+                final Scope variableValueScope = staticVariable.valueScope();
                 contextStack.pushBinding(valueElement, sourceEffectiveId, variableValueScope);
             }
             {
@@ -98,13 +99,13 @@ public class Variable {
                     try {
                         variableValue = XPathCache.evaluateAsExtent(
                                 currentNodeset, bindingContext.getPosition(),
-                                selectAttribute, container.getNamespaceMappings(valueElement), bindingContext.getInScopeVariables(),
+                                selectAttribute, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(),
                                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
                     } catch (Exception e) {
                         if (handleNonFatal) {
                             // Don't consider this as fatal
                             // Default value is the empty sequence
-                            XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
+                            XFormsError.handleNonFatalXPathError(contextStack.containingDocument, e);
                             variableValue = EmptySequence.getInstance();
                         } else {
                             throw new OXFException(e);

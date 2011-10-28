@@ -18,10 +18,9 @@ import org.dom4j.QName
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import collection.JavaConverters._
 
-private object LHHA {
-    val LHHAQNames = List(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
+object LHHA {
+    val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
 }
 
 /**
@@ -29,7 +28,7 @@ private object LHHA {
  */
 trait LHHATrait extends SimpleElementAnalysis {
 
-    self =>
+    self ⇒
 
     // All LHHA, nested or external
     private val lhha = LinkedHashMap.empty[String, LHHAAnalysis]
@@ -37,20 +36,19 @@ trait LHHATrait extends SimpleElementAnalysis {
     // Process nested LHHA
     lhha ++= (
         for {
-            qName <- LHHA.LHHAQNames
-            lhhaElement <- findNestedLHHAElement(qName)
+            qName ← LHHA.LHHAQNames
+            lhhaElement ← findNestedLHHAElement(qName)
         } yield
-            lhhaElement.getName -> new LocalLHHAAnalysis(staticStateContext, lhhaElement, self, None, getChildElementScope(lhhaElement))
+            lhhaElement.getName → new LocalLHHAAnalysis(staticStateContext, lhhaElement, Some(self), None, getChildElementScope(lhhaElement))
     )
 
     protected def findNestedLHHAElement(qName: QName) = Option(element.element(qName))
 
     // Set external LHHA
     def setExternalLHHA(lhhaAnalysis: LHHAAnalysis): Unit =
-        lhha += lhhaAnalysis.element.getName -> lhhaAnalysis
+        lhha += lhhaAnalysis.localName → lhhaAnalysis
 
-    // Java API (allowed to return null)
-    def getLHHA(lhhaType: String): LHHAAnalysis = lhha.get(lhhaType).orNull
+    def getLHHA(lhhaType: String) = lhha.get(lhhaType)
 
     def getLHHAValueAnalysis(lhhaType: String) = lhha.get(lhhaType) flatMap (_.getValueAnalysis)
 
@@ -60,10 +58,10 @@ trait LHHATrait extends SimpleElementAnalysis {
         getAllLHHA filter (_.isLocal) foreach (_.analyzeXPath())
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
         super.toXML(helper, attributes) {
-            for (analysis <- getAllLHHA) {
-                helper.startElement(analysis.element.getName)
+            for (analysis ← getAllLHHA) {
+                helper.startElement(analysis.localName)
                 if (analysis.getValueAnalysis.isDefined)
                     analysis.getValueAnalysis.get.toXML(helper)
                 helper.endElement()
@@ -79,5 +77,4 @@ trait LHHATrait extends SimpleElementAnalysis {
     }
 
     private def getAllLHHA = lhha.values
-    def jGetAllLHHA = lhha.values.asJava
 }

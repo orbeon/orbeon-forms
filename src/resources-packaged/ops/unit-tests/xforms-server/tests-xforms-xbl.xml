@@ -21,15 +21,17 @@
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="Event handler observing XBL bound element" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -114,13 +116,13 @@
 
     <test description="XBL Component in Repeat: Events Upon New Iteration" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
                                 <xforms:model id="main-model" xxforms:encrypt-item-values="false">
                                     <xforms:instance id="main-instance">
@@ -442,13 +444,13 @@
 
     <test description="XBL component with local model variables" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:exforms="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:exforms="http://www.exforms.org/exf/1-0">
                             <xhtml:head>
                                 <xforms:model id="main-model">
                                     <xforms:instance id="main-instance">
@@ -572,7 +574,7 @@
 
     <test description="Dispatch event to model within XBL" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -633,7 +635,7 @@
 
     <test description="Namespace in attribute in XBL" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -682,7 +684,7 @@
 
     <test description="Send submission upon xforms-model-construct-done within XBL" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -764,13 +766,13 @@
 
     <test description="Prefixing of @id and @for on HTML elements within XBL and repeats" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="instance">
@@ -814,37 +816,37 @@
             </p:config>
         </input>
         <output name="response">
-<xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-    <xxf:dynamic-state>
-        <dynamic-state>
-            <instances>
-                <instance id="instance" model-id="model">
-                    <values>
-                        <value1>color: red</value1>
-                        <value2>font-weight: bold</value2>
-                    </values>
-                </instance>
-            </instances>
-            <controls>
-                <control effective-id="repeat" index="1"/>
-            </controls>
-        </dynamic-state>
-    </xxf:dynamic-state>
-    <xxf:action>
-        <xxf:control-values>
-            <xxf:attribute id="fr-super-control-1$xf-6" for="fr-super-control-1$xf-5" name="style">color: red</xxf:attribute>
-            <xxf:attribute id="fr-super-control-2$xf-10" for="fr-super-control-2$xf-9" name="style">font-weight: bold</xxf:attribute>
-            <xxf:attribute id="fr-super-control-3$xf-14·1" for="fr-super-control-3$xf-13·1" name="style">color: red</xxf:attribute>
-            <xxf:attribute id="fr-super-control-3$xf-14·2" for="fr-super-control-3$xf-13·2" name="style">font-weight: bold</xxf:attribute>
-        </xxf:control-values>
-    </xxf:action>
-</xxf:event-response>
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value1>color: red</value1>
+                                    <value2>font-weight: bold</value2>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="fr-super-control-1$xf-6" for="fr-super-control-1$xf-5" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-2$xf-10" for="fr-super-control-2$xf-9" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-14·1" for="fr-super-control-3$xf-13·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-14·2" for="fr-super-control-3$xf-13·2" name="style">font-weight: bold</xxf:attribute>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
         </output>
     </test>
 
     <test description="XBL event retargeting and dispatch to bound node" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -872,33 +874,35 @@
                                                 <!-- React to creation of group -->
                                                 <xforms:action ev:event="xforms-enabled" ev:target="internal-group">
                                                     <!-- Simulate user click on all triggers -->
-                                                    <xforms:dispatch name="DOMActivate" target="internal-trigger-1"/>
-                                                    <xforms:dispatch name="DOMActivate" target="internal-trigger-2"/>
-                                                    <xforms:dispatch name="DOMActivate" target="internal-trigger-3"/>
+                                                    <xforms:dispatch name="DOMActivate" targetid="internal-trigger-1"/>
+                                                    <xforms:dispatch name="DOMActivate" targetid="internal-trigger-2"/>
+                                                    <xforms:dispatch name="DOMActivate" targetid="internal-trigger-3"/>
                                                 </xforms:action>
 
                                                 <xforms:trigger id="internal-trigger-1">
                                                     <xforms:label>Dispatch outside</xforms:label>
                                                     <!-- Dispatch to bound node -->
-                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="foobar-component">
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="foobar-component">
                                                         <xxforms:context name="fr:my-context" select="42"/>
                                                     </xforms:dispatch>
                                                 </xforms:trigger>
                                                 <xforms:trigger id="internal-trigger-2">
                                                     <xforms:label>Dispatch inside group</xforms:label>
                                                     <!-- Dispatch to local group -->
-                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-group">
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="internal-group">
                                                         <xxforms:context name="fr:my-context" select="43"/>
                                                     </xforms:dispatch>
                                                 </xforms:trigger>
                                                 <xforms:trigger id="internal-trigger-3">
                                                     <xforms:label>Dispatch inside model</xforms:label>
                                                     <!-- Dispatch to local model -->
-                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-model">
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="internal-model">
                                                         <xxforms:context name="fr:my-context" select="44"/>
                                                     </xforms:dispatch>
                                                 </xforms:trigger>
                                             </xforms:group>
+                                            <!-- Copy event handlers -->
+                                            <xbl:content includes="xforms|message"/>
                                         </xbl:template>
                                     </xbl:binding>
                                 </xbl:xbl>
@@ -982,13 +986,13 @@
 
     <test description="XBL namespace mapping clashes" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="instance">
@@ -1065,7 +1069,7 @@
 
     <test description="Insert yields correct repeat index in XBL" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1181,13 +1185,13 @@
 
     <test description="Repeat index updates through user interaction inside and outside XBL" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="instance">
@@ -1312,13 +1316,13 @@
     <!-- NOTE: This was testing for id clash, but it is no longer possible use the same static id within a given scope. Remove? -->
     <!--<test description="Id clash between repeat in XBL with same id as non-repeat control outside XBL" name="oxf:pipeline">-->
         <!--<input name="config">-->
-            <!--<p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">-->
+            <!--<p:config>-->
                 <!--<p:param name="response" type="output"/>-->
 
                 <!--<p:processor name="oxf:pipeline">-->
                     <!--<p:input name="config" href="wrap-xforms-state.xpl"/>-->
                     <!--<p:input name="document">-->
-                        <!--<xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">-->
+                        <!--<xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">-->
                             <!--<xhtml:head>-->
                                 <!--<xforms:model id="model">-->
                                     <!--<xforms:instance id="instance">-->
@@ -1379,13 +1383,13 @@
 
     <test description="XBL xxforms:instance() scoping" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="global-instance-1">
@@ -1475,7 +1479,7 @@
 
     <test description="XBL xbl:implementation and xbl:handler" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1618,9 +1622,9 @@
         </output>
     </test>
 
-    <test description="XBL nested XBL references" name="oxf:pipeline">
+    <test description="Nested XBL references" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1703,13 +1707,13 @@
 
     <test description="XBL events through xbl:handler" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:dispatch ev:event="xforms-ready" name="up-value1" targetid="level1-component">
@@ -1756,9 +1760,8 @@
                                         </xbl:handlers>
                                         <xbl:template>
                                             <xforms:repeat id="level1-repeat" nodeset="level1" xxbl:scope="outer">
-                                                <fr:level2 id="level2-component">
-                                                    <xforms:dispatch ev:event="down-2" name="down-1" targetid="fr-level1-binding" xxbl:scope="inner"/>
-                                                </fr:level2>
+                                                <xforms:dispatch ev:event="down-2" name="down-1" targetid="fr-level1-binding" xxbl:scope="inner"/>
+                                                <fr:level2 id="level2-component"/>
                                             </xforms:repeat>
                                         </xbl:template>
                                     </xbl:binding>
@@ -1778,16 +1781,15 @@
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
-                                                <xforms:dispatch name="up-value3" targetid="level3-component">
+                                                <xforms:dispatch id="xxx" name="up-value3" targetid="level3-component">
                                                     <xxforms:context name="title-value3" select="event('title-value2')"/>
                                                 </xforms:dispatch>
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
                                             <xforms:repeat id="level2-repeat" nodeset="level2" xxbl:scope="outer">
-                                                <fr:level3 id="level3-component">
-                                                    <xforms:dispatch ev:event="down-3" name="down-2" targetid="fr-level2-binding" xxbl:scope="inner"/>
-                                                </fr:level3>
+                                                <xforms:dispatch ev:event="down-3" name="down-2" targetid="fr-level2-binding" xxbl:scope="inner"/>
+                                                <fr:level3 id="level3-component"/>
                                             </xforms:repeat>
                                         </xbl:template>
                                     </xbl:binding>
@@ -1918,7 +1920,7 @@
     <test description="Simple toggle to XBL outer scope" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -1974,8 +1976,7 @@
     <test description="Toggle through two levels of XBL outer scope" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2041,8 +2042,7 @@
     <test description="Automatic generation of unique id through outer scope" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2105,8 +2105,7 @@
     <test description="Separation of inner/outer scope for id resolution" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2194,8 +2193,7 @@
     <test description="xforms:setindex causes outer model to be recalculated/revalidated" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2264,8 +2262,7 @@
     <test description="Event handler observing XBL bound element" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2287,7 +2284,7 @@
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
-                                <xbl:content includes="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
+                                <xbl:content includes="* > *" xmlns:xforms="http://www.w3.org/2002/xforms"/>
                             </xbl:template>
                         </xbl:binding>
                     </xbl:xbl>
@@ -2349,8 +2346,7 @@
     <test description="Simple variable/sequence inner/outer scoping" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2417,8 +2413,7 @@
     <test description="Copied items have access to outer scope" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="instance">
@@ -2531,8 +2526,7 @@
     <test description="Variable scoping doesn't affect following controls scoping" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2603,8 +2597,7 @@
     <test description="Scoping of model variables upon model change" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -2709,8 +2702,7 @@
     <test description="XBL outer group binding attributes" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -2811,8 +2803,7 @@
     <test description="Event handler in component observes object in outer scope" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -2867,12 +2858,11 @@
         </output>
     </test>
 
-    <!-- THIS TEST DOESN'T WORK, BUT IT SHOULD! -->
-    <test description="Event handler outside component observes object within component" name="oxf:pipeline" exclude="true">
+    <test description="#314476: Event handler outside component observes object within component" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=314476&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -2931,8 +2921,7 @@
     <test description="Event handler child of bound node" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -2945,6 +2934,7 @@
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
+                                <xbl:content/>
                                 <xhtml:div/>
                             </xbl:template>
                         </xbl:binding>
@@ -2982,8 +2972,7 @@
     <test description="Event handler with @ev:observer and child of bound node" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -2996,6 +2985,7 @@
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
+                                <xbl:content/>
                                 <xhtml:div/>
                             </xbl:template>
                         </xbl:binding>
@@ -3037,8 +3027,7 @@
     <test description="Nested action with different resolution scope than outer action" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3091,8 +3080,7 @@
     <test description="Use of context-sensitive XPath function in @if attribute within repeat with different scopes" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3153,8 +3141,7 @@
     <test description="Use of context-sensitive XPath function on xxforms:context within repeat with different scopes" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3232,8 +3219,7 @@
     <test description="Separate LHHA element in XBL content" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3286,8 +3272,7 @@
     <test description="Separate LHHA element in XBL content in inner-scoped group" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3345,8 +3330,7 @@
     <test description="Separate LHHA element with LHHA element outside copied XBL content" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3469,7 +3453,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3514,7 +3498,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -3588,7 +3572,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model"/>
                     <xbl:xbl>
@@ -3628,7 +3612,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model"/>
                     <xbl:xbl>
@@ -3667,7 +3651,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance>
@@ -3699,7 +3683,7 @@
         <input name="document">
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
                      xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                 xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                 xmlns:xbl="http://www.w3.org/ns/xbl">
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
@@ -3745,7 +3729,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model"/>
                     <xbl:xbl>
@@ -3767,7 +3751,7 @@
         </input>
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:div xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" class="xxforms-test-preserve-content">
+                <xhtml:div class="xxforms-test-preserve-content">
                     <xhtml:a id="my-foo$outer-a" href="/outer/1" xxbl:scope="outer"/>
                     <xhtml:a id="my-foo$inner-a" href="/inner/1"/>
                 </xhtml:div>
@@ -3781,7 +3765,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model"/>
                     <xbl:xbl>
@@ -3829,7 +3813,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                       >
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-submit"/>
@@ -3885,7 +3869,7 @@
                     xmlns:ev="http://www.w3.org/2001/xml-events"
                     xmlns:xs="http://www.w3.org/2001/XMLSchema"
                     xmlns:xbl="http://www.w3.org/ns/xbl"
-                    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                   
                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
                 <xhtml:head>

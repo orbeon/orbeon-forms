@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.itemset.Item.Label;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -241,7 +241,7 @@ public class XFormsItemUtils {
             private String getValueValue(Element valueElement) {
                 if (valueElement == null)
                     throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:value element.", select1Control.getLocationData());
-                final XBLBindings.Scope elementScope = select1Control.getChildElementScope(valueElement);
+                final Scope elementScope = select1Control.getChildElementScope(valueElement);
                 final String elementEffectiveId = getElementEffectiveId(valueElement);
                 return XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, valueElement, false, null);
             }
@@ -249,7 +249,7 @@ public class XFormsItemUtils {
             private Label getLabelValue(Element labelElement) {
                 if (labelElement == null)
                     throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:label element.", select1Control.getLocationData());
-                final XBLBindings.Scope elementScope = select1Control.getChildElementScope(labelElement);
+                final Scope elementScope = select1Control.getChildElementScope(labelElement);
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
                 final boolean supportsHTML = select1Control.isFullAppearance(); // Only support HTML when appearance is "full"
                 final boolean[] containsHTML = new boolean[] { false }; 

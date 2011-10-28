@@ -22,9 +22,11 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
+import org.orbeon.oxf.xforms.processor.handlers.NullContentHandler;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -343,6 +345,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // xforms:repeat
         controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat", ANY_MATCHER);
+        controller.registerHandler(NullContentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat-iteration", ANY_MATCHER);
 
         // xforms:secret
         controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret", ANY_MATCHER);
@@ -388,9 +391,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         // Add global top-level XBL markup
-        final scala.collection.Iterator<XBLBindingsBase.Global> i = containingDocument.getStaticOps().getGlobals().values().iterator();
+        final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.getStaticOps().getGlobals().values().iterator();
         while (i.hasNext())
-            XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().fullShadowTree);
+            XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().fullShadowTree());
 
         // Close xhtml:form
         helper.endElement();

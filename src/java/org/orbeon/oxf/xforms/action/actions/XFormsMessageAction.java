@@ -22,9 +22,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -54,11 +52,10 @@ public class XFormsMessageAction extends XFormsAction {
         SUPPORTED_APPEARANCES.putAll(LOG_APPEARANCES);
     }
 
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         {
             final String levelAttribute;
@@ -77,8 +74,8 @@ public class XFormsMessageAction extends XFormsAction {
 
             // Get message value
             final String messageValue; {
-                final String elementValue = XFormsUtils.getElementValue(actionInterpreter.getXBLContainer(),
-                    actionInterpreter.getContextStack(), actionInterpreter.getSourceEffectiveId(actionElement), actionElement, false, null);
+                final String elementValue = XFormsUtils.getElementValue(actionInterpreter.container(),
+                    actionInterpreter.actionXPathContext(), actionInterpreter.getSourceEffectiveId(actionElement), actionElement, false, null);
 
                 // If we got a null consider the message to be an empty string
                 messageValue = elementValue != null ? elementValue : "";

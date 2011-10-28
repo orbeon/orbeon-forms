@@ -13,42 +13,37 @@
  */
 package org.orbeon.oxf.xforms
 
-import event.{XFormsEventHandler, XFormsEventHandlerImpl}
+import analysis.Metadata
+import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xml.dom4j.LocationData
 import java.util.{List => JList}
 import org.orbeon.oxf.xml.{ContentHandlerHelper, XMLUtils}
-import analysis.Metadata
-import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.oxf.util.IndentedLogger
-import xbl.{XBLBindingsBase, XBLBindings}
 import org.dom4j.Element
+import xbl.{Scope, XBLBindings}
 
 trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtils.DebugXML {
+
+    def locationData: LocationData
+    def getIndentedLogger: IndentedLogger
 
     val parent: Option[PartAnalysis]
 
     def ancestors: Stream[PartAnalysis]
     def ancestorOrSelf: Stream[PartAnalysis]
 
-    def startScope: XBLBindingsBase.Scope
+    def startScope: Scope
 
-    def getEventHandlers(observerPrefixedId: String): JList[XFormsEventHandler]
+    def getEventHandlers(observerPrefixedId: String): JList[EventHandler]
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
 
     def hasControls: Boolean
     def getTopLevelControlElements: JList[Element]
 
     def staticState: XFormsStaticState
-    def locationData: LocationData
-    def getIndentedLogger: IndentedLogger
 
     def metadata: Metadata
-    def getXBLBindings: XBLBindings
-
-    // TODO: These two methods should probably not be part of this trait
-    def extractXFormsScripts(documentInfo: DocumentWrapper, prefix: String)
-    def extractEventHandlers(documentInfo: DocumentInfo, innerScope: XBLBindingsBase.Scope, isControls: Boolean): JList[XFormsEventHandlerImpl]
+    def xblBindings: XBLBindings
 
     def dumpAnalysis()
     def toXML(helper: ContentHandlerHelper)

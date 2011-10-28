@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 
 trait SelectAppearanceTrait extends AppearanceTrait {
 
-    val isMultiple = element.getName == "select"
+    val isMultiple = localName == "select"
 
     // Normalize appearances
     override val appearances = {

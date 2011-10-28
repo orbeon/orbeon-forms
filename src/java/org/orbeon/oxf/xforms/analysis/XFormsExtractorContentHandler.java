@@ -18,7 +18,9 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -43,32 +45,33 @@ import java.util.*;
  *
  * o The content of inline XForms instances (xforms:instance)
  * o The content of inline XML Schemas (xs:schema)
+ * o The content of inline XBL definitions (xbl:xbl)
  * o The content of xforms:label, xforms:hint, xforms:help, xforms:alert (as they can contain XHTML)
  *
  * Notes:
  *
  * o xml:base attributes are added on the models and root control elements.
- * o XForms controls and AVTs are also extracted outside the HTML body.
- *
- * We try to keep this ContentHandler simple. Nested models and script elements are extracted by XFormsStaticState.
+ * o XForms controls and AVTs outside the HTML body are also extracted.
  *
  * Structure:
  *
  * <static-state xmlns:xxforms="..." system-id="..." is-html="..." ...>
- *   <!-- E.g. AVT on xhtml:html -->
- *   <xxforms:attribute .../>
- *   <!-- E.g. xforms:output within xhtml:title -->
- *   <xforms:output .../>
- *   <!-- E.g. XBL component definitions -->
- *   <xbl:xbl .../>
- *   <xbl:xbl .../>
- *   <!-- Top-level models -->
- *   <xforms:model ...>
- *   <xforms:model ...>
- *   <!-- Controls including XBL-bound controls -->
- *   <xforms:group ...>
- *   <xforms:input ...>
- *   <foo:bar ...>
+ *   <root id="#document">
+ *     <!-- E.g. AVT on xhtml:html -->
+ *     <xxforms:attribute .../>
+ *     <!-- E.g. xforms:output within xhtml:title -->
+ *     <xforms:output .../>
+ *     <!-- E.g. XBL component definitions -->
+ *     <xbl:xbl .../>
+ *     <xbl:xbl .../>
+ *     <!-- Top-level models -->
+ *     <xforms:model ...>
+ *     <xforms:model ...>
+ *     <!-- Top-level controls including XBL-bound controls -->
+ *     <xforms:group ...>
+ *     <xforms:input ...>
+ *     <foo:bar ...>
+ *   </root>
  *   <!-- Global properties -->
  *   <properties xxforms:noscript="true" .../>
  *   <!-- Last id used (for id generation in XBL after deserialization) -->
@@ -94,19 +97,23 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private final Metadata metadata;
     private final boolean ignoreRootElement;
 
-    private static class XMLBaseLang {
+    private static class XMLElementDetails {
         public final String id;
         public final URI xmlBase;
         public final String xmlLang;
+        public final String xmlLangAvtId;
+        public final XFormsConstants.XXBLScope scope;
 
-        private XMLBaseLang(String id, URI xmlBase, String xmlLang) {
+        private XMLElementDetails(String id, URI xmlBase, String xmlLang, String xmlLangAvtId, XFormsConstants.XXBLScope scope) {
             this.id = id;
             this.xmlBase = xmlBase;
             this.xmlLang = xmlLang;
+            this.xmlLangAvtId = xmlLangAvtId;
+            this.scope = scope;
         }
     }
 
-    private Stack<XMLBaseLang> xmlBaseLangStack = new Stack<XMLBaseLang>();
+    private Stack<XMLElementDetails> elementStack = new Stack<XMLElementDetails>();
 
     private boolean inXFormsOrExtension;       // whether we are in a model
     private int xformsLevel;
@@ -130,7 +137,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
         // Create xml:base stack
         try {
-            xmlBaseLangStack.push(new XMLBaseLang(null, new URI(null, null, ".", null), null));
+            elementStack.push(new XMLElementDetails(null, new URI(null, null, ".", null), null, null, XFormsConstants.XXBLScope.inner));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }
@@ -154,7 +161,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
         try {
             assert baseURI != null;
-            xmlBaseLangStack.push(new XMLBaseLang(null, new URI(null, null, baseURI, null), null));
+            elementStack.push(new XMLElementDetails(null, new URI(null, null, baseURI, null), null, null, XFormsConstants.XXBLScope.inner));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }
@@ -179,6 +186,10 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             attributesImpl.addAttribute("", "is-html", "is-html", ContentHandlerHelper.CDATA, isHTMLDocument?"true":"false");
 
             super.startElement("", "static-state", "static-state", attributesImpl);
+
+            attributesImpl.clear();
+            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "#document");
+            super.startElement("", "root", "root", attributesImpl);
             mustOutputFirstElement = false;
         }
     }
@@ -186,6 +197,8 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     public void endDocument() throws SAXException {
 
         outputFirstElementIfNeeded();
+        super.endElement("", "root", "root");
+
         // Output non-default properties
         {
             final PropertySet propertySet = Properties.instance().getPropertySet();
@@ -265,35 +278,49 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
 
         // Handle outer xml:base and xml:lang
-        if (!inXFormsOrExtension) {
+        if (!inPreserve) {
             final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
             final String xmlLangAttribute = attributes.getValue(XMLConstants.XML_URI, "lang");
-            if (xmlBaseAttribute == null && xmlLangAttribute == null) {
-                xmlBaseLangStack.push(xmlBaseLangStack.peek());
-            } else {
-                final XMLBaseLang currentXMLBaseLang = xmlBaseLangStack.peek();
+            final String xblScopeAttribute = attributes.getValue(XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI(), XFormsConstants.XXBL_SCOPE_QNAME.getName());
+            {
+                final XMLElementDetails currentXMLElementDetails = elementStack.peek();
+                final String id = attributes.getValue("", "id");
 
+                // Extract xbl:base
                 final URI newBase;
                 if (xmlBaseAttribute != null) {
                     try {
                         // Resolve
-                        newBase = currentXMLBaseLang.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize();// normalize to remove "..", etc.
+                        newBase = currentXMLElementDetails.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize();// normalize to remove "..", etc.
                     } catch (URISyntaxException e) {
-                        throw new ValidationException("Error creating URI from: '" + xmlBaseLangStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                        throw new ValidationException("Error creating URI from: '" + elementStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
                     }
                 } else {
-                    newBase = currentXMLBaseLang.xmlBase;
+                    newBase = currentXMLElementDetails.xmlBase;
                 }
 
+                // Extract xml:lang
                 final String newLang;
+                final String xmlLangAvtId;
                 if (xmlLangAttribute != null) {
-                    // Override
                     newLang = xmlLangAttribute;
+                    if (XFormsUtils.maybeAVT(newLang))
+                        xmlLangAvtId = id;
+                    else
+                        xmlLangAvtId = currentXMLElementDetails.xmlLangAvtId;
                 } else {
-                    newLang = currentXMLBaseLang.xmlLang;
+                    newLang = currentXMLElementDetails.xmlLang;
+                    xmlLangAvtId =  currentXMLElementDetails.xmlLangAvtId;
+                }
+                
+                final XFormsConstants.XXBLScope newScope;
+                if (xblScopeAttribute != null) {
+                    newScope = XFormsConstants.XXBLScope.valueOf(xblScopeAttribute);
+                } else {
+                    newScope = currentXMLElementDetails.scope;
                 }
 
-                xmlBaseLangStack.push(new XMLBaseLang(attributes.getValue("", "id"), newBase, newLang));
+                elementStack.push(new XMLElementDetails(id, newBase, newLang, xmlLangAvtId, newScope));
             }
         }
 
@@ -325,13 +352,14 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
 
                 // Add xml:lang on element if found
-                final String xmlLang = xmlBaseLangStack.peek().xmlLang;
+                final String xmlLang = elementStack.peek().xmlLang;
                 if (xmlLang != null) {
                     final String newXMLLang;
-                    if (XFormsUtils.maybeAVT(xmlLang)) {
-                        // In this case there is a control representing the AVT
-                        // Put a special value for xml:lang so we know where to find the dynamic value
-                        newXMLLang = "#" + xmlBaseLangStack.peek().id;
+                    final String xmlLangAvtId = elementStack.peek().xmlLangAvtId;
+                    if (XFormsUtils.maybeAVT(xmlLang) && xmlLangAvtId != null) {
+                        // In this case the latest xml:lang on the stack might be an AVT and we set a special value for
+                        // xml:lang containing the id of the control that evaluates the runtime value.
+                        newXMLLang = "#" + xmlLangAvtId;
                     } else {
                         // No AVT
                         newXMLLang = xmlLang;
@@ -377,7 +405,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 // Callback for elements of interest
                 if (isXFormsOrExtension || inLHHA) {
                     // NOTE: We call this also for HTML elements within LHHA so we can gather scope information for AVTs
-                    startXFormsOrExtension(uri, localname, qName, attributes);
+                    startXFormsOrExtension(uri, localname, qName, attributes, elementStack.peek().scope);
                 }
             }
 
@@ -396,7 +424,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     }
 
     private String getCurrentBaseURI() {
-        final URI currentXMLBaseURI = xmlBaseLangStack.peek().xmlBase;
+        final URI currentXMLBaseURI = elementStack.peek().xmlBase;
         return currentXMLBaseURI.toString();
     }
 
@@ -461,8 +489,8 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             sendEndPrefixMappings();
         }
 
-        if (!inXFormsOrExtension) {
-            xmlBaseLangStack.pop();
+        if (!inPreserve) {
+            elementStack.pop();
         }
 
         namespaceSupport.endElement();
@@ -496,7 +524,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         super.setDocumentLocator(locator);
     }
 
-    protected void startXFormsOrExtension(String uri, String localname, String qName, Attributes attributes) {
+    protected void startXFormsOrExtension(String uri, String localname, String qName, Attributes attributes, XFormsConstants.XXBLScope scope) {
         // NOP
     }
 

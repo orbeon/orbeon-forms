@@ -20,19 +20,17 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsVariableControl;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
+import scala.Option;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,109 +40,53 @@ import java.util.List;
  */
 public class XFormsActionInterpreter {
 
-    private final XBLContainer container;
-    private final XFormsContainingDocument containingDocument;
+    private final IndentedLogger _indentedLogger;
 
-    private final IndentedLogger indentedLogger;
+    private final XBLContainer _container;
+    private final XFormsContainingDocument _containingDocument;
 
     private final XFormsControls xformsControls;
-    private final XFormsContextStack actionBlockContextStack;
+
+    private final XFormsContextStack _actionXPathContext;
 
     public final Element outerActionElement;
-    private final String outerActionElementEffectiveId;
+    private final String handlerEffectiveId;
 
-    public XFormsActionInterpreter(XBLContainer container, XFormsEventObserver eventObserver,
-                                   Element outerActionElement, String ancestorObserverStaticId, boolean isXBLHandler) {
+    public final XFormsEvent event;
+    public final XFormsEventObserver eventObserver;
 
-        this.container = container;
-        this.containingDocument = container.getContainingDocument();
+    public XFormsActionInterpreter(XBLContainer container, XFormsContextStack actionXPathContext, Element outerActionElement,
+                                   String handlerEffectiveId, XFormsEvent event, XFormsEventObserver eventObserver) {
 
-        this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY());
+        this._container = container;
+        this._containingDocument = container.getContainingDocument();
 
-        this.xformsControls = containingDocument.getControls();
+        this._indentedLogger = _containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY());
 
+        this.xformsControls = _containingDocument.getControls();
+
+        this._actionXPathContext = actionXPathContext;
         this.outerActionElement = outerActionElement;
+        this.handlerEffectiveId = handlerEffectiveId;
 
-        if (isXBLHandler) {
-            // Get the effective id of the <xbl:handler> element as source
-            outerActionElementEffectiveId = container.getFullPrefix() + getActionStaticId(outerActionElement) + XFormsUtils.getEffectiveIdSuffixWithSeparator(container.getEffectiveId());
-
-            // Initialize context stack based on container context (based on local models if any)
-            container.getContextStack().resetBindingContext();
-            actionBlockContextStack = new XFormsContextStack(container, container.getContextStack().getCurrentBindingContext());
-        } else if (containingDocument.getEffectiveId().equals(ancestorObserverStaticId)) {
-            // Ancestor is the containing document itself
-
-            // Since we are at the top-level, the effective id of the action is the same as its static id
-            outerActionElementEffectiveId = getActionStaticId(outerActionElement);
-
-            // Start with default model as context
-            actionBlockContextStack = new XFormsContextStack(container, containingDocument.getDefaultModel().getBindingContext(containingDocument));
-
-            // TODO: Does sourceEffectiveId work
-            scopeVariables(containingDocument, outerActionElement, outerActionElement.getParent(), containingDocument.getDefaultModel().getEffectiveId());
-
-        } else {
-            // Set XPath context based on lexical location
-            final XFormsEventObserver xpathContextObserver;
-            if (eventObserver.getId().equals(ancestorObserverStaticId)) {
-                // Observer is parent of action, so we have easily access to the effective context
-                xpathContextObserver = eventObserver;
-            } else {
-                // Observer is not parent of action, must resolve effective id of parent
-                xpathContextObserver = (XFormsEventObserver) container.resolveObjectByIdInScope(eventObserver.getEffectiveId(), ancestorObserverStaticId, null);
-            }
-
-            // Effective id of the XPath observer, which must be a control or model object
-            outerActionElementEffectiveId = XFormsUtils.getRelatedEffectiveId(xpathContextObserver.getEffectiveId(), getActionStaticId(outerActionElement));
-
-            actionBlockContextStack = new XFormsContextStack(container, xpathContextObserver.getBindingContext(containingDocument));
-
-            // Check variables in scope for action handlers within controls
-            if (xpathContextObserver instanceof XXFormsVariableControl) {
-                // Special case of a listener within a variable control
-                final XXFormsVariableControl variable = (XXFormsVariableControl) xpathContextObserver;
-                actionBlockContextStack.pushVariable(variable.getControlElement(), variable.getVariableName(), variable.getValue(), variable.getResolutionScope());
-            } else if (xpathContextObserver instanceof XFormsControl) {
-                // NOTE: This is not right, as variable values are re-evaluated and may have values different from the ones
-                // used by the controls during refresh. Contemplate handling this differently, e.g. see
-                // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Representation-of-outer-action-hand
-                // TODO: here we can scope variables by actually asking the preceding XXFormsVariableControl
-                scopeVariables(container, outerActionElement, ((XFormsControl) xpathContextObserver).getControlElement(), xpathContextObserver.getEffectiveId());
-            }
-        }
-
-        // Push binding for outermost action
-        actionBlockContextStack.pushBinding(outerActionElement, getSourceEffectiveId(outerActionElement), getActionScope(outerActionElement), false);
+        this.event = event;
+        this.eventObserver = eventObserver;
     }
 
-    private void scopeVariables(XBLContainer container, Element outerActionElement, Element ancestorElement, String sourceEffectiveId) {
-        final List<Element> actionPrecedingElements = Dom4jUtils.findPrecedingElements(outerActionElement, ancestorElement);
-        if (actionPrecedingElements.size() > 0) {
-            Collections.reverse(actionPrecedingElements);
-            final List<XFormsContextStack.BindingContext.VariableInfo> variableInfos
-                    = actionBlockContextStack.addAndScopeVariables(container, actionPrecedingElements, sourceEffectiveId, false);
-            if (variableInfos != null && variableInfos.size() > 0 && indentedLogger.isDebugEnabled()) {
-                indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
-                        "count", Integer.toString(variableInfos.size()));
-            }
-        }
+    public IndentedLogger indentedLogger() {
+        return _indentedLogger;
     }
 
-    public XBLContainer getXBLContainer() {
-        return container;
+    public XBLContainer container() {
+        return _container;
     }
 
-    public XFormsContainingDocument getContainingDocument() {
-        return containingDocument;
+    public XFormsContainingDocument containingDocument() {
+        return _containingDocument;
     }
 
-    public IndentedLogger getIndentedLogger() {
-        return indentedLogger;
-    }
-
-    public XFormsContextStack getContextStack() {
-        return actionBlockContextStack;
+    public XFormsContextStack actionXPathContext() {
+        return _actionXPathContext;
     }
 
     /**
@@ -154,18 +96,16 @@ public class XFormsActionInterpreter {
      * @return              mapping
      */
     public NamespaceMapping getNamespaceMappings(Element actionElement) {
-        return container.getNamespaceMappings(actionElement);
+        return _container.getNamespaceMappings(actionElement);
     }
 
     /**
      * Execute an XForms action.
-     *
-     * @param event                 event causing the action
-     * @param eventObserver         event observer
-     * @param actionElement         Element specifying the action to execute
      */
-    public void runAction(XFormsEvent event, XFormsEventObserver eventObserver, Element actionElement) {
+    public void runAction(ElementAnalysis actionAnalysis) {
 
+        final Element actionElement = actionAnalysis.element();
+        
         // Check that we understand the action element
         final QName actionQName = actionElement.getQName();
         if (!XFormsActions.isAction(actionQName)) {
@@ -175,8 +115,6 @@ public class XFormsActionInterpreter {
         }
 
         try {
-            // Get action scope
-            final XBLBindingsBase.Scope actionScope = getActionScope(actionElement);
 
             // Extract conditional action (@if / @exf:if)
             final String ifConditionAttribute;
@@ -215,48 +153,48 @@ public class XFormsActionInterpreter {
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
                 // NOTE: It's not 100% how @context and @xxforms:iterate should interact here. Right now @xxforms:iterate overrides @context,
                 // i.e. @context is evaluated first, and @xxforms:iterate sets a new context for each iteration
-                final XFormsContextStack.BindingContext actionBindingContext = actionBlockContextStack.popBinding();
-                final NamespaceMapping namespaceMapping = container.getNamespaceMappings(actionElement);
+                final XFormsContextStack.BindingContext actionBindingContext = _actionXPathContext.popBinding();
+                final NamespaceMapping namespaceMapping = _container.getNamespaceMappings(actionElement);
                 {
                     final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
                     final String modelAttribute = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
                     // TODO: function context
-                    actionBlockContextStack.pushBinding(null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope, false);
+                    _actionXPathContext.pushBinding(null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionAnalysis.scope(), false);
                 }
                 {
                     final String refAttribute = actionElement.attributeValue(XFormsConstants.REF_QNAME);
                     final String nodesetAttribute = actionElement.attributeValue(XFormsConstants.NODESET_QNAME);
                     final String bindAttribute = actionElement.attributeValue(XFormsConstants.BIND_QNAME);
 
-                    final List<Item> currentNodeset = actionBlockContextStack.getCurrentNodeset();
+                    final List<Item> currentNodeset = _actionXPathContext.getCurrentNodeset();
                     final int iterationCount = currentNodeset.size();
                     for (int index = 1; index <= iterationCount; index++) {
 
                         // Push iteration
-                        actionBlockContextStack.pushIteration(index);
+                        _actionXPathContext.pushIteration(index);
 
                         // Then we also need to push back binding attributes, excluding @context and @model
                         // TODO: function context
-                        actionBlockContextStack.pushBinding(refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope, false);
+                        _actionXPathContext.pushBinding(refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionAnalysis.scope(), false);
 
                         final Item overriddenContextNodeInfo = currentNodeset.get(index - 1);
-                        runSingleIteration(event, eventObserver, actionElement, actionQName,
-                                actionScope, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
+                        runSingleIteration(actionAnalysis, actionQName,
+                                ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
                         // Restore context
-                        actionBlockContextStack.popBinding();
-                        actionBlockContextStack.popBinding();
+                        _actionXPathContext.popBinding();
+                        _actionXPathContext.popBinding();
                     }
 
                 }
                 // Restore context stack
-                actionBlockContextStack.popBinding();
-                actionBlockContextStack.restoreBinding(actionBindingContext);
+                _actionXPathContext.popBinding();
+                _actionXPathContext.restoreBinding(actionBindingContext);
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
 
-                runSingleIteration(event, eventObserver, actionElement, actionQName,
-                        actionScope, ifConditionAttribute, whileIterationAttribute, actionBlockContextStack.hasOverriddenContext(), actionBlockContextStack.getContextItem());
+                runSingleIteration(actionAnalysis, actionQName,
+                        ifConditionAttribute, whileIterationAttribute, _actionXPathContext.hasOverriddenContext(), _actionXPathContext.getContextItem());
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
@@ -264,8 +202,7 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void runSingleIteration(XFormsEvent event, XFormsEventObserver eventObserver,
-                                    Element actionElement, QName actionQName, XBLBindingsBase.Scope actionScope,
+    private void runSingleIteration(ElementAnalysis actionAnalysis, QName actionQName,
                                     String ifConditionAttribute, String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
         // The context is now the overridden context
@@ -273,34 +210,36 @@ public class XFormsActionInterpreter {
         while (true) {
             // Check if the conditionAttribute attribute exists and stop if false
             if (ifConditionAttribute != null) {
-                boolean result = evaluateCondition(actionElement, actionQName.getQualifiedName(), ifConditionAttribute, "if", contextItem);
+                boolean result = evaluateCondition(actionAnalysis.element(), actionQName.getQualifiedName(), ifConditionAttribute, "if", contextItem);
                 if (!result)
                     break;
             }
             // Check if the iterationAttribute attribute exists and stop if false
             if (whileIterationAttribute != null) {
-                boolean result = evaluateCondition(actionElement, actionQName.getQualifiedName(), whileIterationAttribute, "while", contextItem);
+                boolean result = evaluateCondition(actionAnalysis.element(), actionQName.getQualifiedName(), whileIterationAttribute, "while", contextItem);
                 if (!result)
                     break;
             }
 
             // We are executing the action
-            if (indentedLogger.isDebugEnabled()) {
+            if (_indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName());
+                    _indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName());
                 else
-                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
+                    _indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
             }
 
             // Get action and execute it
-            final XFormsAction xformsAction = XFormsActions.getAction(actionQName);
-            xformsAction.execute(this, event, eventObserver, actionElement, actionScope, hasOverriddenContext, contextItem);
+            final DynamicActionContext dynamicActionContext =
+                    new DynamicActionContext(this, actionAnalysis, hasOverriddenContext ? Option.apply(contextItem) : Option.apply((Item) null));
+            
+            XFormsActions.getAction(actionQName).execute(dynamicActionContext);
 
-            if (indentedLogger.isDebugEnabled()) {
+            if (_indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName());
+                    _indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName());
                 else
-                    indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
+                    _indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
             }
 
             // Stop if there is no iteration
@@ -312,8 +251,8 @@ public class XFormsActionInterpreter {
             //   <xforms:delete nodeset="/*/foo[1]" while="/*/foo"/>
             // In that case, in the second iteration, xforms:repeat must find an up-to-date nodeset
             // NOTE: There is still the possibility that parent bindings will be out of date. What should be done there?
-            actionBlockContextStack.popBinding();
-            actionBlockContextStack.pushBinding(actionElement, getSourceEffectiveId(actionElement), actionScope, false);
+            _actionXPathContext.popBinding();
+            _actionXPathContext.pushBinding(actionAnalysis.element(), getSourceEffectiveId(actionAnalysis.element()), actionAnalysis.scope(), false);
 
             whileIteration++;
         }
@@ -341,8 +280,8 @@ public class XFormsActionInterpreter {
         // Don't evaluate the condition if the context has gone missing
         {
             if (contextNodeset.size() == 0) {//  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "missing context");
+                if (_indentedLogger.isDebugEnabled())
+                    _indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "missing context");
                 return false;
             }
         }
@@ -352,8 +291,8 @@ public class XFormsActionInterpreter {
         if (!(Boolean) conditionResult.get(0)) {
             // Don't execute action
 
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "condition evaluated to 'false'", "condition", conditionAttribute);
+            if (_indentedLogger.isDebugEnabled())
+                _indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "condition evaluated to 'false'", "condition", conditionAttribute);
 
             return false;
         } else {
@@ -369,7 +308,7 @@ public class XFormsActionInterpreter {
      * @return  effective id of source
      */
     public String getSourceEffectiveId(Element actionElement) {
-        return XFormsUtils.getRelatedEffectiveId(outerActionElementEffectiveId, getActionStaticId(actionElement));
+        return XFormsUtils.getRelatedEffectiveId(handlerEffectiveId, getActionStaticId(actionElement));
     }
 
     /**
@@ -379,17 +318,17 @@ public class XFormsActionInterpreter {
                                            List<Item> nodeset, int position, String xpathExpression) {
 
         // Setup function context
-        final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId(actionElement));
+        final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
         final String result = XPathCache.evaluateAsString(
                 nodeset, position,
-                xpathExpression, getNamespaceMappings(actionElement), actionBlockContextStack.getCurrentVariables(),
+                xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
                 (LocationData) actionElement.getData());
 
         // Restore function context
-        actionBlockContextStack.returnFunctionContext();
+        _actionXPathContext.returnFunctionContext();
 
         return result != null ? result : "";
     }
@@ -399,17 +338,17 @@ public class XFormsActionInterpreter {
 
 
         // Setup function context
-        final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId(actionElement));
+        final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
         final List result = XPathCache.evaluate(
                 nodeset, position,
-            xpathExpression, getNamespaceMappings(actionElement), actionBlockContextStack.getCurrentVariables(),
-            XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
-            (LocationData) actionElement.getData());
+                xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
+                XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
+                (LocationData) actionElement.getData());
 
         // Restore function context
-        actionBlockContextStack.returnFunctionContext();
+        _actionXPathContext.returnFunctionContext();
 
         return result;
     }
@@ -430,7 +369,7 @@ public class XFormsActionInterpreter {
         final String resolvedAVTValue;
         if (XFormsUtils.maybeAVT(attributeValue)) {
             // We have to go through AVT evaluation
-            final XFormsContextStack.BindingContext bindingContext = actionBlockContextStack.getCurrentBindingContext();
+            final XFormsContextStack.BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
 
             // We don't have an evaluation context so return
             // CHECK: In the future we want to allow an empty evaluation context so do we really want this check?
@@ -441,14 +380,14 @@ public class XFormsActionInterpreter {
             final LocationData locationData = (LocationData) actionElement.getData();
 
             // Setup function context
-            final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId(actionElement));
+            final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
             resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(bindingContext.getNodeset(),
-                        bindingContext.getPosition(), actionBlockContextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                        bindingContext.getPosition(), _actionXPathContext.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                         functionContext, namespaceMapping, locationData, attributeValue);
 
             // Restore function context
-            actionBlockContextStack.returnFunctionContext();
+            _actionXPathContext.returnFunctionContext();
         } else {
             // We optimize as this doesn't need AVT evaluation
             resolvedAVTValue = attributeValue;
@@ -522,20 +461,20 @@ public class XFormsActionInterpreter {
     }
 
     public String getActionPrefixedId(Element actionElement) {
-        return container.getFullPrefix() + getActionStaticId(actionElement);
+        return _container.getFullPrefix() + getActionStaticId(actionElement);
     }
 
     public String getActionStaticId(Element actionElement) {
         assert actionElement.attributeValue(XFormsConstants.ID_QNAME) != null;
-        return actionElement.attributeValue(XFormsConstants.ID_QNAME);
+        return XFormsUtils.getElementStaticId(actionElement);
     }
 
-    public XBLBindingsBase.Scope getActionScope(Element actionElement) {
-        return container.getPartAnalysis().getResolutionScopeByPrefixedId(getActionPrefixedId(actionElement));
+    public Scope getActionScope(Element actionElement) {
+        return _container.getPartAnalysis().getResolutionScopeByPrefixedId(getActionPrefixedId(actionElement));
     }
 
     private XBLContainer findResolutionScopeContainer(Element actionElement) {
-        return container.findResolutionScope(getActionPrefixedId(actionElement));
+        return _container.findResolutionScope(getActionPrefixedId(actionElement));
     }
 
     /**
@@ -575,7 +514,7 @@ public class XFormsActionInterpreter {
             model = (XFormsModel) o;
         } else {
             // Id is not specified
-            model = actionBlockContextStack.getCurrentModel();
+            model = _actionXPathContext.getCurrentModel();
         }
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
@@ -589,13 +528,9 @@ public class XFormsActionInterpreter {
         if (staticOrEffectiveId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
             || staticOrEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
             // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
-            return containingDocument.getObjectByEffectiveId(staticOrEffectiveId);
+            return _containingDocument.getObjectByEffectiveId(staticOrEffectiveId);
         } else {
             return resolveEffectiveObject(actionElement, staticOrEffectiveId);
         }
-    }
-
-    public XFormsFunction.Context getOuterFunctionContext() {
-        return actionBlockContextStack.getFunctionContext(outerActionElementEffectiveId);
     }
 }

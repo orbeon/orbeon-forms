@@ -17,12 +17,12 @@ import org.mozilla.javascript.Context
 import org.orbeon.oxf.xforms.Script
 
 
-class ServerScript(prefixedId: String, isClient: Boolean, scriptType: String, scriptBody: String)
-    extends Script(prefixedId, isClient, scriptType, scriptBody) {
+class ServerScript(prefixedId: String, isClient: Boolean, scriptType: String, body: String)
+    extends Script(prefixedId, isClient, scriptType, body) {
 
     private def getJavaScriptSource = scriptType match {
-        case "text/coffeescript" => CoffeeScriptCompiler.compile(scriptBody, prefixedId, 1)// TODO: location information if available
-        case _ => scriptBody
+        case "text/coffeescript" => CoffeeScriptCompiler.compile(body, prefixedId, 1)// TODO: location information if available
+        case _ => body
     }
 
     lazy val compiledScript = synchronized { // synchronized might or might not be needed

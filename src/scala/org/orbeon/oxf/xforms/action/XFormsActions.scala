@@ -17,6 +17,10 @@ import actions._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.LoggerFactory
 import org.dom4j.{Element, QName}
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
+import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, ActionChildrenBuilder}
 
 object XFormsActions {
     val LOGGING_CATEGORY = "action"
@@ -56,16 +60,36 @@ object XFormsActions {
         XBL_HANDLER_QNAME                       → new XFormsActionAction
     )
 
+    // Return a factory for action analysis
+    val factory = {
+
+        def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
+
+        val actionFactory: PartialFunction[Element, ControlFactory] = {
+            case e if isContainerAction(e.getQName) && isEventHandler(e) ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ActionChildrenBuilder)
+            case e if isContainerAction(e.getQName)                      ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ActionChildrenBuilder)
+            case e if isAction(e.getQName) && isEventHandler(e)          ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait)
+            case e if isAction(e.getQName)                               ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait)
+        }
+
+        actionFactory
+    }
+
     // Return the action with the QName, null if there is no such action
     def getAction(qName: QName) = Actions.get(qName) orNull
 
     // Whether the given action exists
     def isAction(qName: QName) = Actions.contains(qName)
 
+    // Whether the QName is xforms:action
+    def isContainerAction(qName: QName) = Set(xformsQName("action"), XBL_HANDLER_QNAME)(qName)
+
     // Whether the element is xforms:action
-    def isActionAction(element: Element) =
-        element.getNamespaceURI == XFORMS_NAMESPACE_URI && element.getName == "action"
+    def isDispatchAction(qName: QName) =
+        qName.getNamespaceURI == XFORMS_NAMESPACE_URI && qName.getName == "dispatch"
+
+    val scriptQName = xxformsQName("script")
 
     // Return the xxforms:script action
-    def getScriptAction = Actions(xxformsQName("script"))
+    def getScriptAction = Actions(scriptQName)
 }

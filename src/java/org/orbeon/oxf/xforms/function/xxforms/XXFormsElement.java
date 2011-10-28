@@ -80,6 +80,9 @@ public class XXFormsElement extends XFormsFunction {
 
     public static boolean addItem(Element element, Item item) {
         boolean hasNewText = false;
+
+        // TODO: use more complete insert code from insert action to achieve this
+
         if (item instanceof AtomicValue) {
             // Insert as text
             element.addText(item.getStringValue());

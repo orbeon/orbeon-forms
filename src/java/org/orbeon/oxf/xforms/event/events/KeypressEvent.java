@@ -14,13 +14,8 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.apache.commons.lang.StringUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventHandler;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.event.*;
 
 import java.util.Map;
 
@@ -48,14 +43,14 @@ public class KeypressEvent extends XFormsEvent {
     }
 
     @Override
-    public boolean matches(XFormsEventHandler handler) {
+    public boolean matches(EventHandler handler) {
 
         final String handlerKeyModifiers = handler.getKeyModifiers();
         final String handlerKeyText = handler.getKeyText();
 
         // NOTE: We check on an exact match for modifiers, should be smarter
         return (handlerKeyModifiers == null || XFormsUtils.compareStrings(getKeyModifiers(), handlerKeyModifiers))
-                && (handlerKeyText ==null || XFormsUtils.compareStrings(getKeyText(), handlerKeyText));
+                && (handlerKeyText == null || XFormsUtils.compareStrings(getKeyText(), handlerKeyText));
     }
 
     private String getKeyModifiers() {

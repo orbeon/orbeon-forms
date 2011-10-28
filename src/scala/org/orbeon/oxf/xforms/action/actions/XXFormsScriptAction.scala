@@ -13,41 +13,37 @@
  */
 package org.orbeon.oxf.xforms.action.actions;
 
-import org.dom4j.Element
-import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEventObserver
-import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms._
-import action.{XFormsAction, XFormsActionInterpreter}
+import action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.common.OXFException
-import xbl.XBLBindingsBase
 
 /**
  * Extension xxforms:script action.
  */
 class XXFormsScriptAction extends XFormsAction {
 
-    def execute(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent,
-                eventObserver: XFormsEventObserver, actionElement: Element,
-                actionScope: XBLBindingsBase.Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
+    override def execute(actionContext: DynamicActionContext) {
+
+        val actionInterpreter = actionContext.interpreter
+        val actionElement = actionContext.element
 
         val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
         mediatype match {
             case "javascript" | "text/javascript" | "application/javascript" | null =>
                 // Get prefixed id of the xxforms:script element based on its location
-                val actionPrefixedId = actionInterpreter.getXBLContainer.getFullPrefix + actionElement.attributeValue(XFormsConstants.ID_QNAME)
-                val containingDocument = actionInterpreter.getContainingDocument
+                val actionPrefixedId = actionInterpreter.getActionPrefixedId(actionElement)
+                val containingDocument = actionInterpreter.containingDocument
 
                 // Run Script on server or client
                 actionElement.attributeValue("runat") match {
                     case "server" =>
                         containingDocument.getScriptInterpreter.runScript(actionPrefixedId)
                     case _ =>
-                        containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver)
+                        containingDocument.addScriptToRun(actionPrefixedId, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
                 }
             case "xpath" | "text/xpath" | "application/xpath" => // "unofficial" type
                 // Evaluate XPath expression for its side effects only
-                val bindingContext = actionInterpreter.getContextStack.getCurrentBindingContext
+                val bindingContext = actionInterpreter.actionXPathContext.getCurrentBindingContext
                 actionInterpreter.evaluateExpression(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
             case other =>
                 throw new OXFException("Unsupported script type: " + other)

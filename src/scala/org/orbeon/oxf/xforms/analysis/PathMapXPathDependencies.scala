@@ -57,7 +57,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                 def processNode(n: NodeInfo) {
                     val path = PathMapXPathDependencies.createFingerprintedPath(n)
 
-                    val instancePath = (instancePrefixedId -> path)
+                    val instancePath = instancePrefixedId -> path
 
                     // Update model and view changesets
                     recalculateChangeset += instancePath
@@ -138,7 +138,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             case Some(modelState) => modelState
             case None =>
                 val modelState = new ModelState(modelPrefixedId)
-                modelStates += (modelPrefixedId -> modelState)
+                modelStates += modelPrefixedId -> modelState
                 modelState
         }
 
@@ -307,7 +307,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     def setModifiedPathTest(instance: String, namespaces: JMap[String, String], path: String) {
         assert(RefreshState.changeset.isEmpty)
 
-        RefreshState.changeset += (instance -> PathMapXPathAnalysis.getInternalPath(namespaces, path))
+        RefreshState.changeset += instance -> PathMapXPathAnalysis.getInternalPath(namespaces, path)
     }
 
     private class UpdateResult(val requireUpdate: Boolean, val savedEvaluations: Int)
@@ -341,7 +341,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                                 Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedBindingCache += (controlPrefixedId -> tempResult)
+                        RefreshState.modifiedBindingCache += controlPrefixedId -> tempResult
                     tempResult
                 }
             }
@@ -383,7 +383,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedValueCache += (controlPrefixedId -> tempUpdateResult)
+                        RefreshState.modifiedValueCache += controlPrefixedId -> tempUpdateResult
                     (tempUpdateResult, tempValueAnalysis)
                 }
             }
@@ -417,7 +417,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                             case None => throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhhaName)
                         }
                         if (control.isWithinRepeat)
-                            RefreshState.modifiedLHHACache += (controlPrefixedId -> result)
+                            RefreshState.modifiedLHHACache += controlPrefixedId -> result
                         result
                     case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
                 }
@@ -445,7 +445,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                             case None => throw new IllegalStateException("Itemset not analyzed")
                         }
                         if (control.isWithinRepeat)
-                            RefreshState.modifiedItemsetCache += (controlPrefixedId -> result)
+                            RefreshState.modifiedItemsetCache += controlPrefixedId -> result
                         result
                     case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
                 }

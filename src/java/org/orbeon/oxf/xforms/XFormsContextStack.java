@@ -18,11 +18,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -69,8 +70,9 @@ public class XFormsContextStack {
 //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
     private static final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) DUMMY_CONTEXT);
 
-    private XBLContainer container;
-    private XFormsContainingDocument containingDocument;
+    public final XBLContainer container;
+    public final XFormsContainingDocument containingDocument;
+
     private XFormsFunction.Context functionContext;
     private BindingContext parentBindingContext;
 
@@ -152,69 +154,63 @@ public class XFormsContextStack {
 
         // Add model variables for default model
         if (xformsModel != null) {
-            addModelVariables(xformsModel);
+            scopeModelVariables(xformsModel);
         }
     }
 
-    private void addModelVariables(XFormsModel xformsModel) {
+    private void scopeModelVariables(XFormsModel xformsModel) {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
+        // TODO: This only scopes top-level model variables, but not binds-as-variables.
+
         // All variables in the model are in scope for the nested binds and actions.
-        final List<Element> elements = xformsModel.getStaticModel().variableElements();
-        final List<BindingContext.VariableInfo> variableInfos
-                = addAndScopeVariables(xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId(), true);
-
-        if (variableInfos != null && variableInfos.size() > 0) {
-            // Some variables added
-
+        final List<VariableAnalysisTrait> variables = xformsModel.getStaticModel().jVariablesSeq();
+        if (variables.size() > 0) {
+            
+            final List<BindingContext.VariableInfo> variableInfos = new ArrayList<BindingContext.VariableInfo>();
+            
+            for (final VariableAnalysisTrait variable : variables)
+                variableInfos.add(scopeVariable(variable, xformsModel.getEffectiveId(), true));
+            
             final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("", "evaluated model variables", "count", Integer.toString(variableInfos.size()));
             }
-
-            // Remove extra bindings added
+            
+            // Remove extra bindings added and set all variables on the current binding context so that things are cleaner
             for (int i = 0; i < variableInfos.size(); i++) {
                 popBinding();
             }
-
+            
             getCurrentBindingContext().setVariables(variableInfos);
         }
     }
 
-    public List<BindingContext.VariableInfo> addAndScopeVariables(XBLContainer container, List<Element> elements, String sourceEffectiveId, boolean handleNonFatal) {
-        List<BindingContext.VariableInfo> variableInfos = null;
-        for (Element currentElement : elements) {
-            if (VariableAnalysis.isVariableElement(currentElement)) {
-                // Create variable object
-                final Variable variable = new Variable(container, this, currentElement);
+    public BindingContext.VariableInfo scopeVariable(VariableAnalysisTrait staticVariable, String sourceEffectiveId, boolean handleNonFatal) {
+        
+        // Create variable object
+        final Variable variable = new Variable(staticVariable, this);
 
-                // Find variable scope
-                final XBLBindingsBase.Scope newScope = container.getPartAnalysis().getResolutionScopeByPrefixedId(container.getFullPrefix() + currentElement.attributeValue(XFormsConstants.ID_QNAME));
+        // Find variable scope
+        final Scope newScope = ((ElementAnalysis) staticVariable).scope();
 
-                // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the
-                // following controls and variables.
+        // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the
+        // following controls and variables.
 
-                // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation
-                // in the future.
+        // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation
+        // in the future.
 
-                // NOTE: We used to simply add variables to the current bindingContext, but this could cause issues
-                // because getVariableValue() can itself use variables declared previously. This would work at first,
-                // but because BindingContext caches variables in scope, after a first request for in-scope variables,
-                // further variables values could not be added. The method below temporarily adds more elements on the
-                // stack but it is safer.
-                getFunctionContext(sourceEffectiveId);
-                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true, handleNonFatal), newScope);
-                returnFunctionContext();
+        // NOTE: We used to simply add variables to the current bindingContext, but this could cause issues
+        // because getVariableValue() can itself use variables declared previously. This would work at first,
+        // but because BindingContext caches variables in scope, after a first request for in-scope variables,
+        // further variables values could not be added. The method below temporarily adds more elements on the
+        // stack but it is safer.
+        getFunctionContext(sourceEffectiveId);
+        pushVariable(((ElementAnalysis) staticVariable).element(), variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true, handleNonFatal), newScope);
+        returnFunctionContext();
 
-                // Add VariableInfo created during above pushVariable(). There must be only one!
-                if (variableInfos == null)
-                    variableInfos = new ArrayList<BindingContext.VariableInfo>();
-
-                assert getCurrentBindingContext().getVariables().size() == 1;
-                variableInfos.addAll(getCurrentBindingContext().getVariables());
-            }
-        }
-        return variableInfos;
+        assert getCurrentBindingContext().getVariables().size() == 1;
+        return getCurrentBindingContext().getVariables().get(0);
     }
 
     /**
@@ -260,11 +256,11 @@ public class XFormsContextStack {
      * @param sourceEffectiveId effective id of source control for id resolution of models and binds
      * @param scope             XBL scope
      */
-    public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindingsBase.Scope scope) {
+    public void pushBinding(Element bindingElement, String sourceEffectiveId, Scope scope) {
         pushBinding(bindingElement, sourceEffectiveId, scope, true);
     }
     
-    public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindingsBase.Scope scope, boolean handleNonFatal) {
+    public void pushBinding(Element bindingElement, String sourceEffectiveId, Scope scope, boolean handleNonFatal) {
         // TODO: move away from element and use static analysis information
         final String ref = bindingElement.attributeValue(XFormsConstants.REF_QNAME);
         final String context = bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
@@ -276,7 +272,7 @@ public class XFormsContextStack {
         pushBinding(ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
     }
 
-    private BindingContext getBindingContext(XBLBindingsBase.Scope scope) {
+    private BindingContext getBindingContext(Scope scope) {
         final BindingContext currentBindingContext = getCurrentBindingContext();
         if (scope == null) {
             // Keep existing scope
@@ -295,7 +291,7 @@ public class XFormsContextStack {
     }
 
     public void pushBinding(String ref, String context, String nodeset, String modelId, String bindId,
-                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindingsBase.Scope scope, boolean handleNonFatal) {
+                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, Scope scope, boolean handleNonFatal) {
 
         // Get location data for error reporting
         final LocationData locationData = (bindingElement == null)
@@ -309,7 +305,7 @@ public class XFormsContextStack {
             // Handle scope
             // The new binding evaluates against a base binding context which must be in the same scope
             final BindingContext baseBindingContext = getBindingContext(scope);
-            final XBLBindingsBase.Scope newScope;
+            final Scope newScope;
             if (scope == null) {
                 // Keep existing scope
                 // TODO: remove this once no caller can pass a null scope
@@ -606,7 +602,7 @@ public class XFormsContextStack {
                 getCurrentBindingContext().setVariables(variableInfo);
             } else if (isPushModelVariables) {
                 // In this case, only the model just changed and so we gather the variables in scope for the new model
-                addModelVariables(newModel);
+                scopeModelVariables(newModel);
             }
 
             // Restore context
@@ -664,7 +660,7 @@ public class XFormsContextStack {
      * @param value             variable value
      * @param scope             XBL scope of the variable visibility
      */
-    public void pushVariable(Element variableElement, String name, ValueRepresentation value, XBLBindingsBase.Scope scope) {
+    public void pushVariable(Element variableElement, String name, ValueRepresentation value, Scope scope) {
         final LocationData locationData = new ExtendedLocationData((LocationData) variableElement.getData(), "pushing variable binding", variableElement);
         contextStack.push(new BindingContext(getCurrentBindingContext(), getBindingContext(scope), variableElement, locationData, name, value, scope));
     }
@@ -868,13 +864,13 @@ public class XFormsContextStack {
         public final LocationData locationData;
         public final boolean hasOverriddenContext;
         public final Item contextItem;
-        public final XBLBindingsBase.Scope scope;
+        public final Scope scope;
 
         private List<VariableInfo> variables;
 
         public BindingContext(BindingContext parent, XFormsModel model, List<Item> nodeSet, int position, String elementId,
                               boolean newBind, Element controlElement, LocationData locationData, boolean hasOverriddenContext,
-                              Item contextItem, XBLBindingsBase.Scope scope) {
+                              Item contextItem, Scope scope) {
 
             assert scope != null;
 
@@ -907,7 +903,7 @@ public class XFormsContextStack {
         }
 
         public BindingContext(BindingContext parent, BindingContext base, Element controlElement, LocationData locationData, String variableName,
-                              ValueRepresentation variableValue, XBLBindingsBase.Scope scope) {
+                              ValueRepresentation variableValue, Scope scope) {
             this(parent, base.model, base.getNodeset(), base.getPosition(), base.elementId, false,
                     controlElement, locationData, false, base.getContextItem(), scope);
 

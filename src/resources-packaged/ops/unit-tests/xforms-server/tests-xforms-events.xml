@@ -2219,8 +2219,7 @@
         </output>
     </test>
 
-    <!-- TODO: make this pass once bug is fixed -->
-    <test description="[ #315922 ] Event handler nested within bound node causes errors" name="oxf:pipeline" exclude="true">
+    <test description="[ #315922 ] Event handler nested within bound node causes errors" name="oxf:pipeline" only="false">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315922&group_id=168&atid=350207 -->
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -2231,12 +2230,13 @@
                     <p:input name="document">
                         <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
-                                <xforms:model id="my-model">
-                                    <xforms:dispatch ev:event="xforms-model-construct-done" name="DOMActivate" targetid="my-button"/>
+                                <xforms:model id="model">
+                                    <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-button"/>
                                 </xforms:model>
                                 <xbl:xbl>
                                     <xbl:binding element="fr|foo">
                                         <xbl:template>
+                                            <!-- Copy all the content -->
                                             <xbl:content/>
                                         </xbl:template>
                                     </xbl:binding>
@@ -2247,7 +2247,7 @@
                                     <xhtml:div>
                                         <!-- Handler is nested in XBL bound node and its parent XForms control doesn't have an id -->
                                         <xforms:group>
-                                            <xforms:message ev:event="DOMActivate" ev:observer="my-button"/>
+                                            <xforms:message ev:event="DOMActivate" ev:observer="my-button">I observed the outer event!</xforms:message>
                                         </xforms:group>
                                     </xhtml:div>
                                 </fr:foo>
@@ -2268,17 +2268,65 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">I observed the outer event!</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+    
+    <test description="Nested event handler with and without ev:observer" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values>
+                                <value>41</value>
+                                <value>40</value>
+                            </values>
+                        </xforms:instance>
+
+                        <!-- setvalue must run only once, as child of the outer handler. The nested ev:event attribute
+                             is ignored. -->
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:setvalue ev:event="xforms-model-construct-done"
+                                             ref="value[1]" value="xs:integer(.) + 1"/>
+                        </xforms:action>
+
+                        <!-- setvalue must run twice: once as child of the outer handler, and once independently. -->
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:setvalue ev:event="xforms-model-construct-done" ev:observer="model"
+                                             ref="value[2]" value="xs:integer(.) + 1"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
                         <instances>
-                            <instance id="my-instance" model-id="my-model">
-                                <instance>new</instance>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>42</value>
+                                    <value>42</value>
+                                </values>
                             </instance>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-input" label="My Data">new</xxf:control>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

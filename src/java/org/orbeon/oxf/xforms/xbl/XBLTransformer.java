@@ -34,7 +34,9 @@ public class XBLTransformer {
     /**
      * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
      */
-    public static void transform(final DocumentWrapper documentWrapper, final Document shadowTreeDocument, final Element boundElement) {
+    public static void transform(final Document shadowTreeDocument, final Element boundElement) {
+
+        final DocumentWrapper documentWrapper = new DocumentWrapper(boundElement.getDocument(), null, XPathCache.getGlobalConfiguration());
 
         Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
 

@@ -22,10 +22,12 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -59,11 +61,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     public static final String LOGGING_CATEGORY = "submission";
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
+    private final org.orbeon.oxf.xforms.analysis.model.Submission staticSubmission;
+    private final String id;
+    private final Element submissionElement;
+    
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
-    private final String id;
+
     private final XFormsModel model;
-    private final Element submissionElement;
     private boolean submissionElementExtracted = false;
 
     private String avtActionOrResource; // required unless there is a nested xforms:resource element;
@@ -111,11 +116,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     // All the submission types in the order they must be checked
     private final Submission[] submissions;
 
-    public XFormsModelSubmission(XBLContainer container, String id, Element submissionElement, XFormsModel model) {
+    public XFormsModelSubmission(XBLContainer container, org.orbeon.oxf.xforms.analysis.model.Submission staticSubmission, XFormsModel model) {
+        this.staticSubmission = staticSubmission;
+
+        this.id = staticSubmission.staticId();
+        this.submissionElement = staticSubmission.element();
+
         this.container = container;
         this.containingDocument = container.getContainingDocument();
-        this.id = id;
-        this.submissionElement = submissionElement;
+
         this.model = model;
 
         this.submissions = new Submission[] {
@@ -246,6 +255,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     public String getId() {
         return id;
+    }
+
+    public String getPrefixedId() {
+        return XFormsUtils.getPrefixedId(getEffectiveId());
+    }
+
+    public Scope getScope(XFormsContainingDocument containingDocument) {
+        return staticSubmission.scope();
     }
 
     public String getEffectiveId() {

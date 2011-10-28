@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.control.controls.XFormsActionControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -36,7 +37,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
@@ -70,15 +71,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public final XFormsContainingDocument containingDocument;
 
     // Static information (never changes for the lifetime of the containing document)
-    private final Element controlElement;
-    private final String id;
-    private final String prefixedId;
-    private final String name;
+    private final Element element;  // this shouldn't be here as we have ElementAnalysis, but e.g. LHHA doesn't pass ElementAnalysis
+    private final String prefixedId;// this shouldn't be here as we have ElementAnalysis, but e.g. LHHA doesn't pass ElementAnalysis
+    private final ElementAnalysis staticControl;
 
     private String mediatype;// could become more dynamic in the future
 
     // Semi-dynamic information (depends on the tree of controls, but does not change over time)
     private XFormsControl parent;
+    private List<XFormsActionControl> childrenActions;
 
     // Dynamic information (changes depending on the content of XForms instances)
     private String previousEffectiveId;
@@ -97,8 +98,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     // Label, help, hint and alert (evaluated lazily)
     private Map<XFormsConstants.LHHA, LHHA> lhha = new HashMap<XFormsConstants.LHHA, LHHA>(XFormsConstants.LHHA.values().length);
 
-    final boolean[] tempContainsHTML = new boolean[1];// temporary holder
-
     private XFormsControlLocal initialLocal;
     private XFormsControlLocal currentLocal;
 
@@ -113,28 +112,39 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public XFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+
+        final String prefixedId = XFormsUtils.getPrefixedId(effectiveId);
+        this.staticControl = container != null ? container.getPartAnalysis().getControlAnalysis(prefixedId) : null;
+
+        if (staticControl != null) {
+            this.element =  staticControl.element();
+            this.prefixedId = staticControl.prefixedId();
+        } else {
+            this.element = element;
+            this.prefixedId = XFormsUtils.getPrefixedId(effectiveId);
+        }
+        
         this.container = container;
         this.containingDocument = (container != null) ? container.getContainingDocument() : null;// some special cases pass null (bad, we know...)
         this.parent = parent;
-        this.controlElement = element;
-        this.name = name;
-
-        this.id = (element != null) ? element.attributeValue(XFormsConstants.ID_QNAME) : null;
-        this.prefixedId = XFormsUtils.getPrefixedId(effectiveId);
+        
         this.effectiveId = effectiveId;
     }
 
     public final String getId() {
-        return id;
+        return staticControl.staticId();
     }
 
     public final String getPrefixedId() {
      return prefixedId;
     }
 
+    public Scope getScope(XFormsContainingDocument containingDocument) {
+        return staticControl.scope();
+    }
+
     public ElementAnalysis getElementAnalysis() {
-        // TODO: Control must point to this directly
-        return getXBLContainer().getPartAnalysis().getControlAnalysis(getPrefixedId());
+        return staticControl;
     }
 
     public final XBLContainer getXBLContainer() {
@@ -161,11 +171,25 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // NOP, can be overridden
     }
 
-    public final XBLBindingsBase.Scope getResolutionScope() {
+    // NOTE: This is different from listeners. As of 2011-11-22, this is only here so that effective ids of nested
+    // actions can be updated when iterations are moved around. Ideally anyway, iterations should not have require
+    // effective id changes. An iteration tree should probably have a uuid, and updating it should be done in constant
+    // time.
+    public void addChildAction(XFormsActionControl actionControl) {
+        if (childrenActions == null)
+            childrenActions = new LinkedList<XFormsActionControl>();
+        childrenActions.add(actionControl);
+    }
+
+    public List<XFormsActionControl> getChildrenActions() {
+        return childrenActions != null ? childrenActions : Collections.<XFormsActionControl>emptyList();
+    }
+
+    public final Scope getResolutionScope() {
         return container.getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
-    public XBLBindingsBase.Scope getChildElementScope(Element element) {
+    public Scope getChildElementScope(Element element) {
         return container.getPartAnalysis().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue(XFormsConstants.ID_QNAME));
     }
 
@@ -173,14 +197,17 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * Update this control's effective id based on the parent's effective id.
      */
     public void updateEffectiveId() {
-        final String parentEffectiveId = getParent().getEffectiveId();
-        final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId);
-
-        if (!parentSuffix.equals("")) {
+        if (staticControl.isWithinRepeat()) {
             // Update effective id
+            final String parentEffectiveId = getParent().getEffectiveId();
+            final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId);
+    
             effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
-        } else {
-            // Nothing to do as we are not in repeated content
+            
+            if (childrenActions != null) {
+                for (final XFormsActionControl actionControl : childrenActions)
+                    actionControl.updateEffectiveId();
+            }
         }
     }
 
@@ -188,12 +215,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return effectiveId;
     }
 
+    // Used by repeat iterations
     protected void setEffectiveId(String effectiveId) {
         this.effectiveId = effectiveId;
     }
 
     public LocationData getLocationData() {
-        return (controlElement != null) ? (LocationData) controlElement.getData() : null;
+        return (staticControl != null) ? staticControl.locationData() : (element != null) ? (LocationData) element.getData() : null;
     }
 
     /**
@@ -374,7 +402,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public final String getName() {
-        return name;
+        return staticControl.localName();
     }
 
     public final XFormsControl getParent() {
@@ -390,7 +418,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public final Element getControlElement() {
-        return controlElement;
+        return element;
     }
 
     /**
@@ -449,7 +477,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public String getMediatype() {
         if (mediatype == null)
-            mediatype = controlElement.attributeValue(XFormsConstants.MEDIATYPE_QNAME);
+            mediatype = getControlElement().attributeValue(XFormsConstants.MEDIATYPE_QNAME);
         return mediatype;
     }
 
@@ -851,7 +879,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return              mapping
      */
     public NamespaceMapping getNamespaceMappings() {
-        return container.getNamespaceMappings(controlElement);
+        return (staticControl != null) ? staticControl.namespaceMapping() : container.getNamespaceMappings(element);
     }
 
     public String getExtensionAttributeValue(QName attributeName) {
@@ -1200,7 +1228,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         @Override
         protected String evaluateValue() {
-            final String result = doEvaluateValue();
+            final boolean[] tempContainsHTML = new boolean[1];// temporary holder
+            final String result = doEvaluateValue(tempContainsHTML);
             isHTML = result != null && tempContainsHTML[0];
             return result;
         }
@@ -1246,7 +1275,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
          *
          * @return                      string containing the result of the evaluation, null if evaluation failed
          */
-        private String doEvaluateValue() {
+        private String doEvaluateValue(boolean[] tempContainsHTML) {
 
             final XFormsControl control = XFormsControl.this;
 
@@ -1256,7 +1285,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 // LHHA is direct child of control, evaluate within context
                 contextStack.setBinding(control);
                 contextStack.pushBinding(lhhaElement, control.effectiveId, control.getChildElementScope(lhhaElement));
-                value = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
+                value = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, tempContainsHTML);
                 contextStack.popBinding();
             } else {
                 // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
@@ -1265,8 +1294,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 final Element contextElement = lhhaElement.getParent();
                 final String contextStaticId = contextElement.attributeValue(XFormsConstants.ID_QNAME);
                 final String contextEffectiveId;
-                if (contextStaticId == null) {
+                if (contextStaticId == null || contextStaticId.equals("#document")) {
                     // Assume we are at the top-level
+                    // TODO: should never be null; also, should resolve using findAncestorContextControl
                     contextStack.resetBindingContext();
                     contextEffectiveId = control.container.getFirstControlEffectiveId();
                 } else {
@@ -1283,7 +1313,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 if (contextEffectiveId != null) {
                     // Push binding relative to context established above and evaluate
                     contextStack.pushBinding(lhhaElement, contextEffectiveId, control.getResolutionScope());
-                    value = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
+                    value = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, tempContainsHTML);
                     contextStack.popBinding();
                 } else {
                     // Do as if there was no LHHA
@@ -1298,8 +1328,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final XFormsControl control = XFormsControl.this;
 
             // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
-            final XBLBindingsBase.Scope lhhaScope = control.getResolutionScope();
-            final String lhhaPrefixedId = lhhaScope.getPrefixedIdForStaticId(lhhaStaticId);
+            final Scope lhhaScope = control.getResolutionScope();
+            final String lhhaPrefixedId = lhhaScope.prefixedIdForStaticId(lhhaStaticId);
 
             // Assume that LHHA element is within same repeat iteration as its related control
             final String contextPrefixedId = XFormsUtils.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId);

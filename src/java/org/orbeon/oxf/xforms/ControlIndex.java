@@ -15,10 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.controls.*;
 
 import java.util.*;
 
@@ -44,9 +41,13 @@ public class ControlIndex {
      * @param control           control to index
      */
     public void indexControl(XFormsControl control) {
-        // Remember by effective id
 
+        // Remember by effective id
         effectiveIdsToControls.put(control.getEffectiveId(), control);
+
+        // Also index children actions
+        for (final XFormsActionControl actionControl : control.getChildrenActions())
+            effectiveIdsToControls.put(actionControl.getEffectiveId(), actionControl);
 
         // Remember by control type (for certain controls we know we need)
         if (mustMapControl(control)) {
@@ -67,9 +68,13 @@ public class ControlIndex {
      */
     public void deindexControl(XFormsControl control) {
 
-        // Remove by effective id
         if (effectiveIdsToControls != null) {
+            // Remove by effective id
             effectiveIdsToControls.remove(control.getEffectiveId());
+
+            // Also remove children actions
+            for (final XFormsActionControl actionControl : control.getChildrenActions())
+                effectiveIdsToControls.remove(actionControl.getEffectiveId());
         }
 
         // Remove by control type (for certain controls we know we need)

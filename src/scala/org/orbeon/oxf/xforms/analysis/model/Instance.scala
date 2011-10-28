@@ -18,20 +18,16 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms._
+import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.dom4j.LocationData
 import org.dom4j.Element
-import xbl.{XBLBindingsBase, XBLBindings}
+import xbl.Scope
 
 /**
  * Static analysis of an XForms instance.
  */
-class Instance(val element: Element, val scope: XBLBindingsBase.Scope) {
-
-    val locationData = element.getData.asInstanceOf[LocationData]
-
-    val staticId = XFormsUtils.getElementStaticId(element)
-    val prefixedId = scope.getFullPrefix + staticId;;
+class Instance(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], scope: Scope)
+        extends SimpleElementAnalysis(staticStateContext, element, parent, None, scope) {
 
     val isReadonlyHint = XFormsInstance.isReadonlyHint(element)
     val isCacheHint = Version.instance.isPEFeatureEnabled(XFormsInstance.isCacheHint(element), "cached XForms instance")

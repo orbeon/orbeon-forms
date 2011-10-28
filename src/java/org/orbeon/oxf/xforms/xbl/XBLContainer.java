@@ -18,15 +18,17 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
-import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.EventListener;
+import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -77,7 +79,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     private XFormsContainingDocument containingDocument;
 
-    private XBLBindings xblBindings;
     private final XFormsContextStack contextStack;  // for controls under this container
 
     private List<XFormsModel> models = new ArrayList<XFormsModel>();
@@ -144,7 +145,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         this.associatedControl = associatedControl;
     }
 
-    public XBLBindingsBase.Scope getResolutionScope() {
+    public Scope getResolutionScope() {
         return containingDocument.getStaticOps().getResolutionScopeByPrefix(fullPrefix);
     }
 
@@ -270,10 +271,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public XBLContainer findResolutionScope(String prefixedId) {
         final String xblScopeIdFullPrefix; {
-            final XBLBindingsBase.Scope xblScope = getPartAnalysis().getResolutionScopeByPrefixedId(prefixedId);
+            final Scope xblScope = getPartAnalysis().getResolutionScopeByPrefixedId(prefixedId);
             if (xblScope == null)
                 throw new IllegalArgumentException("Prefixed id not found in current part: " + prefixedId);
-            xblScopeIdFullPrefix = xblScope.getFullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
+            xblScopeIdFullPrefix = xblScope.fullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
         }
 
         XBLContainer currentContainer = this;
@@ -287,7 +288,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         throw new OXFException("XBL resolution scope not found for id: " + prefixedId);
     }
 
-    public XBLContainer findResolutionScope(XBLBindingsBase.Scope scope) {
+    public XBLContainer findResolutionScope(Scope scope) {
         XBLContainer currentContainer = this;
         do {
             if (currentContainer.getResolutionScope() == scope)
@@ -296,7 +297,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             currentContainer = currentContainer.getParentXBLContainer();
         } while (currentContainer != null);
 
-        throw new OXFException("XBL resolution scope not found for scope id: " + scope.scopeId);
+        throw new OXFException("XBL resolution scope not found for scope id: " + scope.scopeId());
     }
 
     /**
@@ -441,15 +442,25 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @return                  repeat index, -1 if repeat is not found
      */
     public int getRepeatIndex(String sourceEffectiveId, String repeatStaticId) {
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId, null);
+        final XFormsRepeatControl repeatControl; {
+            final Object o = resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId, null);
+            if (o instanceof XFormsRepeatControl) {
+                repeatControl = (XFormsRepeatControl) o;
+            } else if (o instanceof XFormsRepeatIterationControl) {
+                repeatControl = (XFormsRepeatControl) ((XFormsRepeatIterationControl) o).getParent();
+            } else {
+                repeatControl = null;
+            }
+        }
+
         if (repeatControl != null) {
             // 1. Found concrete control
             return repeatControl.getIndex();
         } else {
 
             final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
-            final XBLBindingsBase.Scope scope = getPartAnalysis().getResolutionScopeByPrefixedId(sourcePrefixedId);
-            final String repeatPrefixedId = scope.getPrefixedIdForStaticId(repeatStaticId);
+            final Scope scope = getPartAnalysis().getResolutionScopeByPrefixedId(sourcePrefixedId);
+            final String repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId);
 
             if (containingDocument.getStaticOps().getControlPosition(repeatPrefixedId) >= 0) {
                 // 2. Found static control
@@ -494,6 +505,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 
         // 2. Search in directly contained models
+        // NOTE: As of 2011-11, models don't use sourceEffectiveId
         final Object resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticId, contextItem);
         if (resultModelObject != null)
             return resultModelObject;
@@ -562,17 +574,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
         return null;
     }
-
-//    private boolean isEffectiveIdWithinThisContainer(String effectiveId) {
-//        if (fullPrefix.equals("")) {
-//            // Case of root container
-//            return XFormsUtils.getEffectiveIdPrefixNoSeparator(effectiveId).equals("");
-//        } else {
-//            // Nested container
-//            // This matches elements within this container, but also the container itself
-//            return effectiveId.equals(this.effectiveId) ||  fullPrefix.equals(XFormsUtils.getEffectiveIdPrefix(effectiveId));
-//        }
-//    }
 
     private boolean isEffectiveIdResolvableByThisContainer(String effectiveId) {
         return this == findResolutionScope(XFormsUtils.getPrefixedId(effectiveId));
@@ -801,6 +802,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return locationData;
     }
 
+    public Scope getScope(XFormsContainingDocument containingDocument) {
+        return getResolutionScope();
+    }
+
     public void setLocationData(LocationData locationData) {
         this.locationData = locationData;
     }
@@ -837,10 +842,24 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
 
-        final XFormsEventTarget targetObject = originalEvent.getTargetObject();
+        if (originalEvent.getTargetObject() == null)
+            throw new ValidationException("Target object null for event: " + originalEvent.getName(), getLocationData());
+
+        // For now (2011-12-15), all events reach the repeat iteration instead of the repeat container, except
+        // xforms-enabled/xforms-disabled. This might not be the final design, see also:
+        // http://wiki.orbeon.com/forms/projects/xforms-repeat-events
+        final XFormsEventTarget targetObject; {
+            if (originalEvent.getTargetObject() instanceof XFormsRepeatControl && ! (originalEvent.getName().equals("xforms-enabled") || originalEvent.getName().equals("xforms-disabled"))) {
+                // Handle special case of repeat being the target: use repeat iteration instead
+                targetObject = ((XFormsRepeatControl) originalEvent.getTargetObject()).getIndexIteration();
+                // If no repeat iteration is found the dispatch is a NOP
+                if (targetObject == null)
+                    return;
+            } else
+                targetObject = originalEvent.getTargetObject();
+        }
+
         try {
-            if (targetObject == null)
-                throw new ValidationException("Target object null for event: " + originalEvent.getName(), getLocationData());
 
             // Find all event handler containers
             final List<XFormsEventObserver> boundaries = new ArrayList<XFormsEventObserver>();
@@ -900,21 +919,21 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // Capture phase
             for (XFormsEventObserver currentEventObserver: eventObservers) {
 
-                final List<XFormsEventHandler> currentEventHandlers =
+                final List<EventHandler> currentEventHandlers =
                         currentEventObserver.getXBLContainer(containingDocument).getPartAnalysis().getEventHandlers(XFormsUtils.getPrefixedId(currentEventObserver.getEffectiveId()));
                 if (currentEventHandlers != null) {
                     if (currentEventObserver != targetObject) {
                         // Event listeners on the target are handled separately
 
                         // Process event handlers
-                        for (final XFormsEventHandler eventHandler : currentEventHandlers) {
+                        for (final EventHandler eventHandler : currentEventHandlers) {
                             if (eventHandler.isCapturePhaseOnly() && eventHandler.isMatch(retargetedEvent)) {
                                 // Capture phase match on event name and target is specified
                                 indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     retargetedEvent.setCurrentPhase(XFormsEvent.Phase.capture);
-                                    eventHandler.handleEvent(currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
+                                    eventHandler.handleEvent(containingDocument, currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
                                     indentedLogger.endHandleOperation();
@@ -968,7 +987,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 }
 
                 for (XFormsEventObserver currentEventObserver: eventObservers) {
-                    final List<XFormsEventHandler> currentEventHandlers =
+                    final List<EventHandler> currentEventHandlers =
                             currentEventObserver.getXBLContainer(containingDocument).getPartAnalysis().getEventHandlers(XFormsUtils.getPrefixedId(currentEventObserver.getEffectiveId()));
 
                     // Handle event retargeting
@@ -1005,7 +1024,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
                     // Process event handlers
                     if (currentEventHandlers != null) {
-                        for (final XFormsEventHandler eventHandler : currentEventHandlers) {
+                        for (final EventHandler eventHandler : currentEventHandlers) {
                             if ((eventHandler.isTargetPhase() && isAtTarget || eventHandler.isBubblingPhase() && !isAtTarget && originalEvent.isBubbles())
                                     && eventHandler.isMatch(retargetedEvent)) {
                                 // Bubbling phase match on event name and target is specified
@@ -1013,7 +1032,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     retargetedEvent.setCurrentPhase(isAtTarget ? XFormsEvent.Phase.target : XFormsEvent.Phase.bubbling);
-                                    eventHandler.handleEvent(currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
+                                    eventHandler.handleEvent(containingDocument, currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
                                     indentedLogger.endHandleOperation();
@@ -1066,7 +1085,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    private XFormsEvent getRetargetedEvent(Map<String, XFormsEvent> eventsForBoundaries, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
+    private static XFormsEvent getRetargetedEvent(Map<String, XFormsEvent> eventsForBoundaries, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
         XFormsEvent retargetedEvent = eventsForBoundaries.get(newEventTarget.getEffectiveId());
 
         // Event already created, just return it

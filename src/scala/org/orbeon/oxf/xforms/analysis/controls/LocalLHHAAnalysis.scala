@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.dom4j._
 import org.orbeon.oxf.xforms._
 import analysis._
-import xbl.XBLBindingsBase
+import xbl.Scope
 
-class LocalLHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
+class LocalLHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends LHHAAnalysis(staticStateContext, element, parent, preceding, scope) {
 
     val isLocal = true

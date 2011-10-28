@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import org.orbeon.oxf.test.DocumentTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
+import org.orbeon.oxf.xforms.control.Controls
 
 class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -78,24 +79,24 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
         assert(getDocument.getStaticOps.getRepeatHierarchyString === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
 
         val repeatAncestors = Map(
-            "department" -> Seq(),
-            "employee"-> Seq("repeat-department"),
-            "office" -> Seq("repeat-department"),
-            "building" -> Seq()
+            "department" → Seq(),
+            "employee"   → Seq("repeat-department"),
+            "office"     → Seq("repeat-department"),
+            "building"   → Seq()
         )
 
         // Test ancestors of repeat controls
         for {
-            (name, ancestors) <- repeatAncestors
+            (name, ancestors) ← repeatAncestors
             id = "repeat-" + name
         } yield
-            assert(getDocument.getStaticOps.getAncestorRepeats(id, None) === ancestors)
+            assert(getDocument.getStaticOps.getAncestorRepeats(id) === ancestors)
 
         // Test ancestors of other controls and actions
         for {
-            id <- Seq("my-output", "action1", "action2")
+            id ← Seq("my-output", "action1", "action2")
         } yield
-            assert(getDocument.getStaticOps.getAncestorRepeats(id, None) === Seq("repeat-employee", "repeat-department"))
+            assert(getDocument.getStaticOps.getAncestorRepeats(id) === Seq("repeat-employee", "repeat-department"))
 
         // Test closest common ancestor
         assert(getDocument.getStaticOps.findClosestCommonAncestorRepeat("repeat-employee", "repeat-office") === Some("repeat-department"))

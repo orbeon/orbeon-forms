@@ -13,12 +13,20 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.ContainerTrait
+import org.dom4j.Element
+import org.orbeon.oxf.xforms.analysis.{ContainerChildrenBuilder, StaticStateContext, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.XFormsConstants.XBL_XBL_QNAME
 
 /**
  * Single root container for the entire controls hierarchy.
  */
-class RootControl extends ContainerTrait {
-    // Root has no parent
-    val parent = None
+class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
+    extends SimpleElementAnalysis(staticStateContext, element, None, None, scope)
+    with ContainerChildrenBuilder {
+
+    // Ignore xbl:xbl elements that can be at the top-level, as the static state document produced by the extractor
+    // might place them there.
+    override def findRelevantChildrenElements =
+        super.findRelevantChildrenElements filterNot (_.getQName == XBL_XBL_QNAME)
 }

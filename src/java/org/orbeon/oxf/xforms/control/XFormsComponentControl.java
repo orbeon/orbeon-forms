@@ -19,6 +19,8 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
+import java.util.Map;
+
 /**
  * Control that represents a custom components.
  *
@@ -32,7 +34,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 
     private XBLContainer nestedContainer;
 
-    public XFormsComponentControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+    public XFormsComponentControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
         super(container, parent, element, name, effectiveId);
 
         // Create container and nested models if any

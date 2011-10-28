@@ -695,9 +695,9 @@ public class XFormsServer extends ProcessorImpl {
         for (XFormsContainingDocument.Script script: scripts) {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
                     new String[]{
-                            "name", script.getFunctionName(),
-                            "target-id", XFormsUtils.namespaceId(containingDocument, script.getEvent().getTargetObject().getEffectiveId()),
-                            "observer-id", XFormsUtils.namespaceId(containingDocument, script.getEventObserver().getEffectiveId())
+                            "name", script.functionName,
+                            "target-id", XFormsUtils.namespaceId(containingDocument, script.targetEffectiveId),
+                            "observer-id", XFormsUtils.namespaceId(containingDocument, script.observerEffectiveId)
                     });
         }
     }

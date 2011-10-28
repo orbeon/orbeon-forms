@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2010 Orbeon, Inc.
+ *  Copyright (C) 2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,9 +11,14 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.analysis
+package org.orbeon.oxf.xforms.control.controls
 
-trait ContainerTrait {
-    // Parent container (everybody has one except the root)
-    val parent: Option[ContainerTrait]
-}
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.dom4j.Element
+import java.util.{Map => JMap}
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.XFormsEventHandler
+
+
+class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element])
+    extends XFormsControl(container, parent, element, name, effectiveId) with XFormsEventHandler

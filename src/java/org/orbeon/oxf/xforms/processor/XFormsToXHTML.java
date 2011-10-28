@@ -14,9 +14,6 @@
 package org.orbeon.oxf.xforms.processor;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -29,12 +26,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.CacheableInputReader;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.URIProcessorOutputImpl;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -68,11 +60,6 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.SAXException;
-
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -442,7 +429,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Set caching dependencies for XBL inclusions
         {
             final Metadata metadata = containingDocument.getStaticState().topLevelPart().metadata();
-            final Set<String> includes = metadata.getBingingIncludes();
+            final Set<String> includes = metadata.getBindingIncludes();
             for (final String include: includes) {
                 stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);
             }

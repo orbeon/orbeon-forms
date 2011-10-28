@@ -30,8 +30,8 @@ import xml._
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.saxon.Configuration
 import scala.collection.JavaConversions._
-import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLBindings}
 import org.orbeon.oxf.xforms._
+import xbl.Scope
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -105,7 +105,7 @@ object PathMapXPathAnalysis {
      */
     def apply(partAnalysis: PartAnalysis, xpathString: String, namespaceMapping: NamespaceMapping,
               baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
-              pathMapContext: AnyRef, scope: XBLBindingsBase.Scope, defaultInstancePrefixedId: Option[String],
+              pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
               locationData: LocationData, element: Element): XPathAnalysis = {
 
         try {
@@ -266,7 +266,7 @@ object PathMapXPathAnalysis {
         }
     }
 
-    private def extractInstancePrefixedId(partAnalysis: PartAnalysis, scope: XBLBindingsBase.Scope, expression: Expression,
+    private def extractInstancePrefixedId(partAnalysis: PartAnalysis, scope: Scope, expression: Expression,
                                           defaultInstancePrefixedId: Option[String]): String Either Option[String] = {
 
         // Local class used as marker for a rewritten StringLiteral in an expression
@@ -312,7 +312,7 @@ object PathMapXPathAnalysis {
                                     originalInstanceId // TODO: warn: could be a non-existing instance id
                                 else
                                     // Normal use of instance()
-                                    scope.getPrefixedIdForStaticId(originalInstanceId) // TODO: warn: could be a non-existing instance id
+                                    scope.prefixedIdForStaticId(originalInstanceId) // TODO: warn: could be a non-existing instance id
 
                             if (prefixedInstanceId ne null) {
                                 // Instance found

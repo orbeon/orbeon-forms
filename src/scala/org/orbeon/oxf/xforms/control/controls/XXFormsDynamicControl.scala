@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeContainerControl, XFormsControl}
 import org.orbeon.oxf.xforms.XFormsContextStack.BindingContext
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
-import org.orbeon.oxf.xforms.xbl.{XBLBindingsBase, XBLContainer}
+import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
@@ -30,7 +30,7 @@ import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, Navigator}
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.value.StringValue
-import java.util.{Collections => JCollections, Map => JMap, List => JList}
+import java.util.{Collections ⇒ JCollections, Map ⇒ JMap, List ⇒ JList}
 import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
 import java.lang.{IllegalStateException, IllegalArgumentException}
 import org.dom4j._
@@ -39,7 +39,7 @@ import org.orbeon.scaxon.XML.evalOne
 class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element])
     extends XFormsSingleNodeContainerControl(container, parent, element, name, effectiveId) {
 
-    implicit def toEventListener(f: XFormsEvent => Any) = new EventListener {
+    implicit def toEventListener(f: XFormsEvent ⇒ Any) = new EventListener {
         def handleEvent(event: XFormsEvent) { f(event) }
     }
 
@@ -62,7 +62,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     override def setBindingContext(bindingContext: XFormsContextStack.BindingContext) {
         super.setBindingContext(bindingContext)
 
-        nested foreach { n =>
+        nested foreach { n ⇒
             n.container.setBindingContext(bindingContext)
             n.container.getContextStack.resetBindingContext()
         }
@@ -70,8 +70,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     override def onCreate() {
         getBoundElement match {
-            case Some(node) => updateSubTree(node)
-            case _ => // don't create binding (maybe we could for a read-only instance)
+            case Some(node) ⇒ updateSubTree(node)
+            case _ ⇒ // don't create binding (maybe we could for a read-only instance)
                 nested = None
         }
     }
@@ -85,8 +85,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) {
         getBoundElement match {
-            case Some(node) => updateSubTree(node)
-            case _ =>
+            case Some(node) ⇒ updateSubTree(node)
+            case _ ⇒
         }
     }
 
@@ -109,7 +109,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 getChildren.clear()
             }
 
-            nested foreach { n =>
+            nested foreach { n ⇒
                 // Remove container and associated models
                 n.container.destroy()
                 // Remove part and associated scopes
@@ -117,7 +117,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 // Remove listeners we added to the outer instance (better do this or we will badly leak)
                 // WARNING: Make sure n.outerListener is the exact same object passed to addListener. There can be a
                 // conversion from a function to a listener, in which case identity won't be preserved!
-                for (eventName <- InstanceMirror.mutationEvents)
+                for (eventName ← InstanceMirror.mutationEvents)
                     outerInstance.removeListener(eventName, n.outerListener)
             }
 
@@ -144,19 +144,19 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             // Add listener to the single outer instance
             val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
             val outerListener: EventListener = InstanceMirror.mirrorListener(containingDocument, getIndentedLogger,
-                InstanceMirror.toInnerNode(docWrapper, partAnalysis, container), () => changeCount += 1) _
-            for (eventName <- InstanceMirror.mutationEvents)
+                InstanceMirror.toInnerNode(docWrapper, partAnalysis, container), () ⇒ changeCount += 1) _
+            for (eventName ← InstanceMirror.mutationEvents)
                 outerInstance.addListener(eventName, outerListener)
 
             // Add mutation listeners to all top-level inline instances, which upon value change propagate the value
             // change to the related node in the source
             val innerListener: EventListener = InstanceMirror.mirrorListener(containingDocument, getIndentedLogger,
-                InstanceMirror.toOuterNode(docWrapper, partAnalysis), () => ()) _
+                InstanceMirror.toOuterNode(docWrapper, partAnalysis), () ⇒ ()) _
 
             partAnalysis.getModelsForScope(partAnalysis.startScope).asScala foreach {
-                _.instances.values filter (_.src eq null) foreach { instance =>
+                _.instances.values filter (_.src eq null) foreach { instance ⇒
                     val innerInstance = container.findInstance(instance.staticId)
-                    for (eventName <- InstanceMirror.mutationEvents)
+                    for (eventName ← InstanceMirror.mutationEvents)
                         innerInstance.addListener(eventName, innerListener)
                 }
             }
@@ -171,15 +171,15 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     private def getBoundElement =
         getBindingContext.getSingleItem match {
-            case nodeWrapper: NodeWrapper if nodeWrapper.getNodeKind == ELEMENT_NODE => Some(nodeWrapper)
-            case _ => None
+            case nodeWrapper: NodeWrapper if nodeWrapper.getNodeKind == ELEMENT_NODE ⇒ Some(nodeWrapper)
+            case _ ⇒ None
         }
 
     private def createPartAnalysis(doc: Document, parent: PartAnalysis) = {
-        val newScope = new XBLBindingsBase.Scope(getResolutionScope, getPrefixedId)
-        val templateAndPart = XFormsStaticStateImpl.createPart(containingDocument.getStaticState, parent, doc, newScope)
-        containingDocument.getStaticOps.addPart(templateAndPart._2)
-        templateAndPart
+        val newScope = new Scope(getResolutionScope, getPrefixedId)
+        val (template, newPart) = XFormsStaticStateImpl.createPart(containingDocument.getStaticState, parent, doc, newScope)
+        containingDocument.getStaticOps.addPart(newPart)
+        (template, newPart)
     }
 
     override def getBackCopy = {
@@ -214,7 +214,7 @@ object InstanceMirror {
         val expr = "(" + axis + "::xforms:instance)[1]"
 
         evalOne(outerNode, expr) match {
-            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
+            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
                 // This is a change to an instance
 
                 // Find instance id
@@ -240,15 +240,15 @@ object InstanceMirror {
 
                 if (innerInstance ne null) { // may not be found if instance was just created
                     // Find destination path in instance
-                    val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.getFullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
+                    val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
                     evalOne(innerInstance.getDocumentInfo, innerPath, namespaces) match {
-                        case newNode: NodeWrapper => Some(newNode)
-                        case _ => throw new IllegalStateException
+                        case newNode: NodeWrapper ⇒ Some(newNode)
+                        case _ ⇒ throw new IllegalStateException
                     }
                 } else
                     None
 
-            case _ => None // ignore change as it is not within an instance
+            case _ ⇒ None // ignore change as it is not within an instance
         }
     }
 
@@ -260,94 +260,94 @@ object InstanceMirror {
 
         // Find instance in original doc
         evalOne(outerDoc, "//xforms:instance[@id = $sourceId]",
-                variables = Map("sourceId" -> StringValue.makeStringValue(sourceId))) match {
-            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] =>
+                variables = Map("sourceId" → StringValue.makeStringValue(sourceId))) match {
+            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
                 // Find destination node in inline instance in original doc
-                val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.getFullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
+                val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
                 evalOne(instanceWrapper, path, namespaces) match {
-                    case newNode: NodeWrapper => Some(newNode)
-                    case _ => throw new IllegalStateException
+                    case newNode: NodeWrapper ⇒ Some(newNode)
+                    case _ ⇒ throw new IllegalStateException
                 }
-            case _ => throw new IllegalStateException
+            case _ ⇒ throw new IllegalStateException
         }
     }
 
     // Listener that mirrors changes from one document to the other
     def mirrorListener(containingDocument: XFormsContainingDocument, indentedLogger: IndentedLogger,
-                       findMatchingNode: (NodeInfo, String, Boolean) => Option[NodeInfo],
-                       notifyOtherChange: () => Unit)(e: XFormsEvent) = e match {
+                       findMatchingNode: (NodeInfo, String, Boolean) ⇒ Option[NodeInfo],
+                       notifyOtherChange: () ⇒ Unit)(e: XFormsEvent) = e match {
 
-        case valueChanged: XXFormsValueChanged =>
+        case valueChanged: XXFormsValueChanged ⇒
             findMatchingNode(valueChanged.node, valueChanged.getTargetObject.getId, true) match {
-                case Some(newNode) =>
+                case Some(newNode) ⇒
                     DataModel.setValueIfChanged(newNode, valueChanged.newValue)
-                case None => // change not in an instance
+                case None ⇒ // change not in an instance
                     notifyOtherChange()
             }
-        case insert: XFormsInsertEvent =>
+        case insert: XFormsInsertEvent ⇒
             findMatchingNode(insert.getInsertLocationNodeInfo, insert.getTargetObject.getId, insert.getPosition == "into") match {
-                case Some(insertNode) =>
+                case Some(insertNode) ⇒
                     insert.getPosition match {
-                        case "into" =>
+                        case "into" ⇒
                             XFormsInsertAction.doInsert(containingDocument, indentedLogger, "after", null,
                                 insertNode, insert.getOriginItems, -1, doClone = true, doDispatch = false)
-                        case position @ ("before" | "after") =>
+                        case position @ ("before" | "after") ⇒
                             XFormsInsertAction.doInsert(containingDocument, indentedLogger, position, JCollections.singletonList(insertNode),
                                 null, insert.getOriginItems, 1, doClone = true, doDispatch = false)
-                        case _ => throw new IllegalStateException
+                        case _ ⇒ throw new IllegalStateException
                     }
-                case None => // change not in an instance
+                case None ⇒ // change not in an instance
                     notifyOtherChange()
 
             }
-        case delete: XFormsDeleteEvent =>
-            delete.deleteInfos.asScala foreach { deleteInfo => // more than one node might have been removed
+        case delete: XFormsDeleteEvent ⇒
+            delete.deleteInfos.asScala foreach { deleteInfo ⇒ // more than one node might have been removed
 
                 val removedNodeInfo = deleteInfo.nodeInfo
                 val removedNodeIndex = deleteInfo.index
 
                 // Find the corresponding parent of the removed node and run the body on it. The body returns Some(Node)
                 // if that node can be removed.
-                def withNewParent(body: Node => Option[Node]) {
+                def withNewParent(body: Node ⇒ Option[Node]) {
 
                     // If parent is available, find matching node and call body
                     Option(deleteInfo.parent) match {
-                        case Some(removedParentNodeInfo) =>
+                        case Some(removedParentNodeInfo) ⇒
                             findMatchingNode(removedParentNodeInfo, delete.getTargetObject.getId, true) match {
-                                case Some(newParentNodeInfo) =>
+                                case Some(newParentNodeInfo) ⇒
 
                                     val docWrapper = newParentNodeInfo.getDocumentRoot.asInstanceOf[DocumentWrapper]
                                     val newParentNode = XFormsUtils.getNodeFromNodeInfo(newParentNodeInfo, "")
 
                                     body(newParentNode) match {
-                                        case Some(nodeToRemove: Node) =>
+                                        case Some(nodeToRemove: Node) ⇒
                                             XFormsDeleteAction.doDelete(containingDocument, indentedLogger, JCollections.singletonList(docWrapper.wrap(nodeToRemove)), -1, doDispatch = false)
-                                        case _ => notifyOtherChange()
+                                        case _ ⇒ notifyOtherChange()
                                     }
-                                case _ => notifyOtherChange()
+                                case _ ⇒ notifyOtherChange()
                             }
-                        case _ => notifyOtherChange()
+                        case _ ⇒ notifyOtherChange()
                     }
                 }
 
                 // Handle removed node dpending on type
                 removedNodeInfo.getNodeKind match {
-                    case org.w3c.dom.Node.ATTRIBUTE_NODE =>
+                    case org.w3c.dom.Node.ATTRIBUTE_NODE ⇒
                         // An attribute was removed
                         withNewParent {
-                            case newParentElement: Element =>
+                            case newParentElement: Element ⇒
                                 // Find the attribute  by name (as attributes are unique for a given QName)
                                 val removedAttribute = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
                                 newParentElement.attribute(removedAttribute.getQName) match {
-                                    case newAttribute: Attribute => Some(newAttribute)
-                                    case _ => None // out of sync, so probably safer
+                                    case newAttribute: Attribute ⇒ Some(newAttribute)
+                                    case _ ⇒ None // out of sync, so probably safer
                                 }
-                            case _ => None
+                            case _ ⇒ None
                         }
-                    case org.w3c.dom.Node.ELEMENT_NODE =>
+                    case org.w3c.dom.Node.ELEMENT_NODE ⇒
                         // An element was removed
                         withNewParent {
-                            case newParentDocument: Document =>
+                            case newParentDocument: Document ⇒
                                 // Element removed was root element
                                 val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
                                 val newRootElement =  newParentDocument.getRootElement
@@ -357,7 +357,7 @@ object InstanceMirror {
                                 else
                                     None
 
-                            case newParentElement: Element =>
+                            case newParentElement: Element ⇒
                                 // Element removed had a parent element
                                 val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
 
@@ -365,19 +365,19 @@ object InstanceMirror {
                                 val content = newParentElement.content.asInstanceOf[JList[Node]]
                                 if (content.size > removedNodeIndex) {
                                     content.get(removedNodeIndex) match {
-                                        case newElement: Element if newElement.getQName == removedElement.getQName => Some(newElement)
-                                        case _ => None // out of sync, so probably safer
+                                        case newElement: Element if newElement.getQName == removedElement.getQName ⇒ Some(newElement)
+                                        case _ ⇒ None // out of sync, so probably safer
                                     }
                                 } else
                                     None // out of sync, so probably safer
-                            case _ => None
+                            case _ ⇒ None
                         }
-                    case org.w3c.dom.Node.TEXT_NODE =>
+                    case org.w3c.dom.Node.TEXT_NODE ⇒
                         // TODO
                         notifyOtherChange()
-                    case _ => notifyOtherChange() // we don't know how to propagate the change
+                    case _ ⇒ notifyOtherChange() // we don't know how to propagate the change
                 }
             }
-        case _ => throw new IllegalStateException
+        case _ ⇒ throw new IllegalStateException
     }
 }

@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
@@ -30,12 +30,11 @@ import org.orbeon.saxon.om.Item;
  * 10.1.3 The rebuild Element
  */
 public class XFormsRebuildAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, XFormsEvent event,
-                        XFormsEventObserver eventObserver, Element actionElement,
-                        XBLBindingsBase.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
+    public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
+                        Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XBLContainer container = actionInterpreter.getXBLContainer();
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        final XBLContainer container = actionInterpreter.container();
+        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
         final XFormsModel model = actionInterpreter.resolveModel(actionElement, modelId);

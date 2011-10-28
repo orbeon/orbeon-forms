@@ -19,27 +19,22 @@ import org.orbeon.saxon.om._
 import java.util.{List => JList}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
-import java.lang.IllegalStateException
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEvent}
-import org.dom4j.{Element, QName}
+
 import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.xforms.model.DataModel
+import org.dom4j.QName
+
+import org.orbeon.oxf.util.ScalaUtils._
 
 object XFormsAPI {
 
     // Dynamically set action context
-    val actionContext = new DynamicVariable[XFormsActionInterpreter]
-
-    // Helper for Java side of things
-    def scalaActionJava(actionInterpreter: XFormsActionInterpreter, event: XFormsEvent, eventObserver: XFormsEventObserver, eventHandlerElement: Element) =
-        scalaAction(actionInterpreter) {
-            actionInterpreter.runAction(event, eventObserver, eventHandlerElement)
-        }
+    val actionInterpreter = new DynamicVariable[XFormsActionInterpreter]
 
     // Every block of action must be run within this
-    def scalaAction(actionInterpreter: XFormsActionInterpreter)(body: => Any) {
-        actionContext.withValue(actionInterpreter) {
+    def scalaAction(interpreter: XFormsActionInterpreter)(body: => Any) {
+        actionInterpreter.withValue(interpreter) {
             body
         }
     }
@@ -52,9 +47,9 @@ object XFormsAPI {
 
             def onSuccess(oldValue: String): Unit =
                 for {
-                    action <- actionContext.value
-                    containingDocument = action.getContainingDocument
-                    indentedLogger = action.getIndentedLogger
+                    action <- actionInterpreter.value
+                    containingDocument = action.containingDocument
+                    indentedLogger = action.indentedLogger
                 } yield
                     DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "scala setvalue", nodeInfo, oldValue, value, false)
 
@@ -72,8 +67,8 @@ object XFormsAPI {
     // - Some(0)     if the control is non-relevant or doesn't have any iterations
     // - Some(index) otherwise, where index is the control's new index
     def setindex(repeatStaticId: String, index: Int) =
-        actionContext.value map
-            { action => XFormsSetindexAction.executeSetindexAction(action, action.outerActionElement, repeatStaticId, Integer.toString(index)) } collect
+        actionInterpreter.value map
+            { interpreter => XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, Integer.toString(index)) } collect
                 { case newIndex if newIndex >= 0 => newIndex }
 
     // Insert
@@ -81,7 +76,7 @@ object XFormsAPI {
     def insert[T](into: Seq[NodeInfo], origin: Seq[T], after: Seq[NodeInfo] = null, before: Seq[NodeInfo] = null): Seq[T] = {
 
         if (into.nonEmpty) {
-            val action = actionContext.value
+            val action = actionInterpreter.value
 
             val (positionAttribute, collectionToUpdate) =
                 if (before ne null)
@@ -91,7 +86,7 @@ object XFormsAPI {
                 else
                     ("after", Seq())
 
-            XFormsInsertAction.doInsert(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull, positionAttribute,
+            XFormsInsertAction.doInsert(action map(_.containingDocument) orNull, action map (_.indentedLogger) orNull, positionAttribute,
                 collectionToUpdate.asJava, into.headOption.orNull, origin.asJava, collectionToUpdate.size, doClone = true, doDispatch = true).asInstanceOf[JList[T]].asScala
         } else
             Seq()
@@ -100,9 +95,9 @@ object XFormsAPI {
     // Delete
     def delete(ref: Seq[NodeInfo]): Seq[NodeInfo] = {
 
-        val action = actionContext.value
+        val action = actionInterpreter.value
 
-        val deleteInfos = XFormsDeleteAction.doDelete(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull, ref.asJava, -1, doDispatch = true)
+        val deleteInfos = XFormsDeleteAction.doDelete(action map(_.containingDocument) orNull, action map (_.indentedLogger) orNull, ref.asJava, -1, doDispatch = true)
         deleteInfos.asScala map (_.nodeInfo)
     }
 
@@ -160,7 +155,7 @@ object XFormsAPI {
     // Return an instance's root element in the current action context
     def instanceRoot(staticId: String, searchAncestors: Boolean = false): Option[NodeInfo] = {
 
-        assert(actionContext.value.isDefined)
+        assert(actionInterpreter.value.isDefined)
 
         def ancestorXBLContainers = {
             def recurse(container: XBLContainer): List[XBLContainer] = container :: (container.getParentXBLContainer match {
@@ -168,11 +163,11 @@ object XFormsAPI {
                 case _ => Nil
             })
 
-            recurse(actionContext.value.get.getXBLContainer)
+            recurse(actionInterpreter.value.get.container)
         }
 
         val containersToSearch =
-            if (searchAncestors) ancestorXBLContainers else List(actionContext.value.get.getXBLContainer)
+            if (searchAncestors) ancestorXBLContainers else List(actionInterpreter.value.get.container)
 
         containersToSearch map
                 (_.findInstance(staticId)) find
@@ -187,14 +182,9 @@ object XFormsAPI {
         containingDocument.getModels.asScala.find(_.getId == modelId)
 
     // Return the containing document
-    def containingDocument = { assert(actionContext.value.isDefined); actionContext.value.get.getContainingDocument }
+    def containingDocument = { assert(actionInterpreter.value.isDefined); actionInterpreter.value.get.containingDocument }
     
-    def context[T](xpath: String)(body: => T): T =
-        throw new IllegalStateException("NIY")
-
-    def context[T](item: Item)(body: => T): T =
-        throw new IllegalStateException("NIY")
-
-    def event[T](attributeName: String): Seq[Item] =
-        throw new IllegalStateException("NIY")
+    def context[T](xpath: String)(body: => T): T = ???
+    def context[T](item: Item)(body: => T): T = ???
+    def event[T](attributeName: String): Seq[Item] = ???
 }   

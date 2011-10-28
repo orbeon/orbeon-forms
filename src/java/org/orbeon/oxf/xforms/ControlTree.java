@@ -18,13 +18,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.*;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
+import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import scala.Option;
@@ -431,7 +428,7 @@ public class ControlTree implements ExternalCopyable {
 
         // Create the subtree
         containingDocument.getControls().visitControlElementsHandleRepeat(dynamicControl,
-                new CreateControlsListener(index, (XFormsControl) dynamicControl, null));
+                new CreateControlsListener(index, dynamicControl, null));
 
         // Gather all control ids and controls
         final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
@@ -652,93 +649,6 @@ public class ControlTree implements ExternalCopyable {
     }
 
     /**
-     * Find an effective control id based on a source and a control static id, following XBL scoping and the repeat
-     * structure.
-     *
-     * @param sourceControlEffectiveId  reference to source control, e.g. "list$age.3"
-     * @param targetControlStaticId     reference to target control, e.g. "xf-10"
-     * @return                          effective control id, or null if not found
-     */
-    public String findEffectiveControlId(StaticStateGlobalOps staticStateGlobalOps, String sourceControlEffectiveId, String targetControlStaticId) {
-
-        // NOTE: The implementation tries to do a maximum using the static state. One reason is that the source
-        // control's effective id might not yet have an associated control during construction. E.g.:
-        //
-        // <xf:group id="my-group" ref="employee[index('employee-repeat')]">
-        //
-        // In that case, the XFormsGroupControl does not yet exist when its binding is evaluated. However, its
-        // effective id is known and passed as source, and can be used for resolving the id passed to the index()
-        // function.
-        //
-        // We trust the caller to pass a valid source effective id. That value is always internal, i.e. not created by a
-        // form author. On the other hand, the target id cannot be trusted as it is typically specified by the form
-        // author.
-
-        // Don't do anything if there are no controls
-        if (this.children == null)
-            return null;
-
-        // 1: Check preconditions
-        if (sourceControlEffectiveId == null)
-            throw new IllegalArgumentException("Source control effective id is required.");
-
-        // 2: Obtain target prefixed id
-        final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
-        final XBLBindingsBase.Scope scope = staticStateGlobalOps.getResolutionScopeByPrefixedId(sourcePrefixedId);
-        final String targetPrefixedId = scope.getPrefixedIdForStaticId(targetControlStaticId);
-
-        // 3: Implement XForms 1.1 "4.7.1 References to Elements within a repeat Element" algorithm
-
-        // Find closest common ancestor repeat
-
-        final StringBuilder targetIndexBuilder = new StringBuilder();
-
-        final Option<String> closestCommonAncestorRepeatPrefixedId = staticStateGlobalOps.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId);
-        if (closestCommonAncestorRepeatPrefixedId.isDefined()) {
-            // There is a common ancestor repeat, use the current iteration as starting point
-
-            final int ancestorCount = staticStateGlobalOps.getAncestorRepeatsJava(closestCommonAncestorRepeatPrefixedId.get(), null).size() + 1;
-            if (ancestorCount > 0) {
-                final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(sourceControlEffectiveId);
-                for (int i = 0; i < ancestorCount; i ++) {
-                    appendIterationToSuffix(targetIndexBuilder, parts[i]);
-                }
-            }
-        }
-
-        // Find list of ancestor repeats for destination WITHOUT including the closest ancestor repeat if any
-        // NOTE: make a copy because the source might be an immutable wrapped Scala collection which we can't reverse
-        final List<String> targetAncestorRepeats = new ArrayList(staticStateGlobalOps.getAncestorRepeatsJava(targetPrefixedId,
-                closestCommonAncestorRepeatPrefixedId.isDefined() ? closestCommonAncestorRepeatPrefixedId.get() : null));
-        Collections.reverse(targetAncestorRepeats); // go from trunk to leaf
-
-        // Follow repeat indexes towards target
-        for (final String repeatPrefixedId: targetAncestorRepeats) {
-            // Get repeat control
-            final XFormsRepeatControl repeatIterationControl = (XFormsRepeatControl) getControl(repeatPrefixedId + targetIndexBuilder);
-
-            // Controls might not exist
-            if (repeatIterationControl == null)
-                return null;
-
-            // Update iteration suffix
-            appendIterationToSuffix(targetIndexBuilder, repeatIterationControl.getIndex());
-        }
-
-        // Return target
-        return targetPrefixedId + targetIndexBuilder;
-    }
-
-    private void appendIterationToSuffix(StringBuilder suffix, int iteration) {
-        if (suffix.length() == 0)
-            suffix.append(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-        else if (suffix.length() != 1)
-            suffix.append(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
-
-        suffix.append(Integer.toString(iteration));
-    }
-
-    /**
      * Listener used to create a tree of controls from scratch. Used:
      *
      * o the first time controls are created
@@ -747,7 +657,7 @@ public class ControlTree implements ExternalCopyable {
      */
     private static class CreateControlsListener implements XFormsControls.ControlElementVisitorListener {
 
-        private XFormsControl currentControlsContainer;
+        private XFormsControl currentParent;
 
         private final Map<String, Element> serializedControls;
         private final ControlIndex controlIndex;
@@ -757,7 +667,7 @@ public class ControlTree implements ExternalCopyable {
 
         public CreateControlsListener(ControlIndex controlIndex, XFormsControl rootControl, Map<String, Element> serializedControls) {
 
-            this.currentControlsContainer = rootControl;
+            this.currentParent = rootControl;
 
             this.serializedControls = serializedControls;
             this.controlIndex = controlIndex;
@@ -768,7 +678,7 @@ public class ControlTree implements ExternalCopyable {
             updateCount++;
 
             // Create XFormsControl with basic information
-            final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentControlsContainer, controlElement, effectiveControlId, serializedControls);
+            final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentParent, controlElement, effectiveControlId, serializedControls);
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
@@ -779,37 +689,38 @@ public class ControlTree implements ExternalCopyable {
             // relevance was used in indexControl()
             controlIndex.indexControl(control);
 
-            // Add to current container control
-            ((XFormsContainerControl) currentControlsContainer).addChild(control);
+            // Add to current container control if present
+            if (currentParent instanceof XFormsContainerControl)
+                ((XFormsContainerControl) currentParent).addChild(control);
 
-            // Current grouping control becomes the current controls container
-            if (control instanceof XFormsContainerControl) {
-                currentControlsContainer = control;
-            }
+            // Add action as child, so that effective id updates work
+            if (control instanceof XFormsActionControl)
+                currentParent.addChildAction((XFormsActionControl) control);
+
+            // Current control becomes the new parent
+            currentParent = control;
 
             return control;
         }
 
         public void endVisitControl(Element controlElement, String effectiveControlId) {
             final XFormsControl control = controlIndex.getControl(effectiveControlId);
-            if (control instanceof XFormsContainerControl) {
-                // Notify container controls that all children have been added
-                final XFormsContainerControl containerControl = (XFormsContainerControl) control;
-                containerControl.childrenAdded();
+            // Notify container controls that all children have been added
+            if (control instanceof XFormsContainerControl)
+                ((XFormsContainerControl) control).childrenAdded();
 
-                // Go back up to parent
-                currentControlsContainer = currentControlsContainer.getParent();
-            }
+            // Go back up to parent
+            currentParent = currentParent.getParent();
         }
 
         public boolean startRepeatIteration(XBLContainer container, int iteration, String effectiveIterationId) {
 
             iterationCount++;
 
-            final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(container, (XFormsRepeatControl) currentControlsContainer, iteration);
+            final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(container, (XFormsRepeatControl) currentParent, iteration);
 
-            ((XFormsContainerControl) currentControlsContainer).addChild(repeatIterationControl);
-            currentControlsContainer = repeatIterationControl;
+            ((XFormsContainerControl) currentParent).addChild(repeatIterationControl);
+            currentParent = repeatIterationControl;
 
             // Set current binding for iteration
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
@@ -825,7 +736,7 @@ public class ControlTree implements ExternalCopyable {
         }
 
         public boolean pushBinding(XFormsContextStack currentContextStack, Element currentControlElement,
-                                   String controlPrefixedId, String controlEffectiveId, XBLBindingsBase.Scope newScope) {
+                                   String controlPrefixedId, String controlEffectiveId, Scope newScope) {
 
             // When creating controls, always evaluate the binding
             currentContextStack.pushBinding(currentControlElement, controlEffectiveId, newScope);
@@ -833,7 +744,7 @@ public class ControlTree implements ExternalCopyable {
         }
 
         public void endRepeatIteration(int iteration) {
-            currentControlsContainer = currentControlsContainer.getParent();
+            currentParent = currentParent.getParent();
         }
 
         public int getUpdateCount() {
@@ -951,7 +862,7 @@ public class ControlTree implements ExternalCopyable {
         }
 
         public boolean pushBinding(XFormsContextStack currentContextStack, Element currentControlElement,
-                                   String controlPrefixedId, String controlEffectiveId, XBLBindingsBase.Scope newScope) {
+                                   String controlPrefixedId, String controlEffectiveId, Scope newScope) {
 
             // Update is required if:
             //

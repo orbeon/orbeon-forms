@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xforms.xbl.Scope
 
-class ContainerControl(staticStateContext: StaticStateContext, element: Element, parent: ContainerTrait, preceding: Option[ElementAnalysis], scope: XBLBindingsBase.Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope)
-        with ViewTrait with ContainerTrait {
+class ContainerControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+    extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+    with ViewTrait {
 
     // For <xforms:group xxforms:element="xhtml:div">. Can be null.
     val elementQName = Dom4jUtils.extractAttributeValueQName(element, XFormsConstants.XXFORMS_ELEMENT_QNAME)

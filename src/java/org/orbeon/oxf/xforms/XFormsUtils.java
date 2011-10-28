@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -280,7 +280,7 @@ public class XFormsUtils {
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     public static String getChildElementValue(final XBLContainer container, final String sourceEffectiveId,
-                                              final XBLBindingsBase.Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
+                                              final Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
         if (childElement == null)
@@ -507,14 +507,6 @@ public class XFormsUtils {
         }
         return result.getDocument();
     }
-
-//    public static String decodeString(PipelineContext pipelineContext, String encoded) {
-//        try {
-//            return new String(decodeBytes(pipelineContext, encoded,  getEncryptionKey()), "utf-8");
-//        } catch (UnsupportedEncodingException e) {
-//            throw new OXFException(e);// won't happen
-//        }
-//    }
 
     public static byte[] decodeBytes(String encoded, String encryptionPassword) {
         // Get raw text
@@ -1263,7 +1255,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Return the suffix of an effective id, e.g. "" or "2-5-1". The suffix returned starts with a separator.
+     * Return the suffix of an effective id, e.g. "" or ".2-5-1". The suffix returned starts with a separator.
      *
      * @param effectiveId   effective id to check
      * @return              suffix if any, "" if none, null if effectiveId was null
@@ -1347,13 +1339,14 @@ public class XFormsUtils {
      * @return                      repeat iteration effective id
      */
     public static String getIterationEffectiveId(String repeatEffectiveId, int iterationIndex) {
-        final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(repeatEffectiveId);
+        final String parentSuffix = XFormsUtils.getEffectiveIdSuffixWithSeparator(repeatEffectiveId);
+        final String iterationPrefixedId = getPrefixedId(repeatEffectiveId) + "~iteration";
         if (parentSuffix.equals("")) {
-            // E.g. foobar => foobar.3
-            return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iterationIndex;
+            // E.g. foobar => foobar~iteration.3
+            return iterationPrefixedId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iterationIndex;
         } else {
-            // E.g. foobar.3-7 => foobar.3-7-2
-            return repeatEffectiveId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex;
+            // E.g. foobar.3-7 => foobar~iteration.3-7-2
+            return iterationPrefixedId + parentSuffix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex;
         }
     }
 

@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -55,6 +56,11 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         public int getIndex() {
             return index;
         }
+    }
+
+    @Override
+    public RepeatControl getElementAnalysis() {
+        return (RepeatControl) super.getElementAnalysis();
     }
 
     public XFormsRepeatControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
@@ -177,6 +183,15 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             return 0;
         }
     }
+
+    // Return the iteration corresponding to the current index if any, null otherwise
+    public XFormsRepeatIterationControl getIndexIteration() {
+        final List<XFormsControl> children = getChildren();
+        if (children == null || children.size() == 0 || getIndex() < 1)
+            return null;
+        else
+            return (XFormsRepeatIterationControl) children.get(getIndex() - 1);
+    }
     
     @Override
     public String getLabel() {
@@ -202,15 +217,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         return null;
     }
 
-    @Override
-    public void performDefaultAction(XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_DND.equals(event.getName())) {
-            doDnD(event);
-        }
-        super.performDefaultAction(event);
-    }
-
-    private void doDnD(XFormsEvent event) {
+    public void doDnD(XFormsEvent event) {
         // Only support this on DnD-enabled controls
         if (!isDnD())
             throw new ValidationException("Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId(), getLocationData());

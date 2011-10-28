@@ -33,7 +33,6 @@ public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
 		super(false);
 	}
 	
-	
 	@Override
 	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 		final XFormsSelect1Control select1Control = (XFormsSelect1Control) control;
@@ -46,17 +45,14 @@ public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
 			
     		itemset.visit(xmlReceiver, new ItemsetListener() {
 
-				@Override
 				public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {
 					// We don't have to do anything here. We handle depth by startItem and endItem
 				}
 
-				@Override
 				public void endLevel(ContentHandler contentHandler) throws SAXException {
 					// We don't have to do anything here. We handle depth by startItem and endItem
 				}
 
-				@Override
 				public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
 					reusableAttributes.clear();
 					assert !item.getLabel().isHTML(); // TODO Handle rich content in select labels
@@ -65,7 +61,6 @@ public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
 					xmlReceiver.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "item", XFormsConstants.XXFORMS_PREFIX + ":item", reusableAttributes);
 				}
 
-				@Override
 				 public void endItem(ContentHandler contentHandler, Item item) throws SAXException {
 					xmlReceiver.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "item", XFormsConstants.XXFORMS_PREFIX + ":item");
 				}

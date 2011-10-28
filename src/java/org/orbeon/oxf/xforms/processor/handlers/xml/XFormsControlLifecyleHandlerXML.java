@@ -66,11 +66,11 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 		return xFormsControlLifecycleHandlerDelegate.getStaticId();
 	}
 
-
     @Override
     public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
         super.init(uri, localname, qName, attributes, matched);
-    	xFormsControlLifecycleHandlerDelegate = new XFormsControlLifecycleHandlerDelegate(handlerContext, containingDocument, attributes);
+        this.attributes = new AttributesImpl(attributes);
+        this.xFormsControlLifecycleHandlerDelegate = new XFormsControlLifecycleHandlerDelegate(handlerContext, containingDocument, attributes);
     }
 
     @Override
@@ -133,11 +133,6 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
         return true;
     }
 
-    protected boolean isDefaultIncremental() {
-        // May be overridden by subclasses
-        return false;
-    }
-
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
         handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
@@ -180,7 +175,6 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
     	 contentHandler.endElement(uri, localname, qName);
     }
 
-
     /**
      * Return the effective id of the element to which label/@for, etc. must point to.
      *
@@ -189,5 +183,5 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
     public String getForEffectiveId() {
         return getEffectiveId();
     }
-    
+
 }

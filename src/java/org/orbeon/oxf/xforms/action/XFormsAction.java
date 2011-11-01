@@ -67,7 +67,7 @@ public abstract class XFormsAction {
 
                 // Set context on context element
                 final XBLBindingsBase.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
-                contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
+                contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope, false);
 
                 // Evaluate context parameter
                 value = XPathCache.evaluateAsExtent(

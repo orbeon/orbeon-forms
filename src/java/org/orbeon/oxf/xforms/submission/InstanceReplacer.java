@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -101,12 +100,13 @@ public class InstanceReplacer extends BaseReplacer {
             //
             // Not sure what's the right thing to do with 1.1, but this could be done
             // as part of the model's static analysis if the instance value is not
-            // obtained through AVT, and dynamically otherwise. However, in the dynamic
-            // case, I think that this should be a (currently non-specified by XForms)
-            // xforms-binding-error.
+            // obtained through AVT, and dynamically otherwise.
+            //
+            // Another option would be to dispatch, at runtime, an xxforms-binding-error event. xforms-submit-error is
+            // consistent with targetref, so might be better.
 
-            submission.getXBLContainer(containingDocument).dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, submission));
-            return null;
+            throw new XFormsSubmissionException(submission, "instance attribute doesn't point to an existing instance for replace=\"instance\".", "processing instance attribute",
+                new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
         } else {
 
             final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(

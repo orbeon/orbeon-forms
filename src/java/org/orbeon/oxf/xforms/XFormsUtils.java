@@ -41,6 +41,7 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.trans.*;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
@@ -423,14 +424,20 @@ public class XFormsUtils {
             if (hasValueAttribute) {
                 final List<Item> currentNodeset = currentBindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
-                    final String tempResult = XPathCache.evaluateAsString(
-                            currentNodeset, currentBindingContext.getPosition(),
-                            valueAttribute, container.getNamespaceMappings(childElement),
-                            contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                            contextStack.getFunctionContext(sourceEffectiveId), null,
-                            (LocationData) childElement.getData());
-
-                    contextStack.returnFunctionContext();
+                    String tempResult;
+                    try {
+                            tempResult = XPathCache.evaluateAsString(
+                                currentNodeset, currentBindingContext.getPosition(),
+                                valueAttribute, container.getNamespaceMappings(childElement),
+                                contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                contextStack.getFunctionContext(sourceEffectiveId), null,
+                                (LocationData) childElement.getData());
+                    } catch (Exception e) {
+                        XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                        tempResult = "";
+                    } finally {
+                        contextStack.returnFunctionContext();
+                    }
 
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
@@ -1626,5 +1633,28 @@ public class XFormsUtils {
      */
     public static String getElementStaticId(Element element) {
         return element.attributeValue(XFormsConstants.ID_QNAME);
+    }
+    
+    public static void handleNonFatalXPathException(XFormsContainingDocument containingDocument, Throwable t) {
+        // NOTE: For MIPs, this is called as the result of dispatching xforms-xpath-error.
+        if (containingDocument.isInitializing() || containingDocument.getStaticState().isNoscript()) {
+            // The error is non fatal only upon XForms updates
+            throw new OXFException(t);
+        } else {
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
+            indentedLogger.logWarning("", "exception while evaluating XPath expression", t);
+            containingDocument.addServerError(new XFormsContainingDocument.ServerError(t));
+        }
+    }
+
+    public static void handleNonFatalSetvalueError(XFormsContainingDocument containingDocument, String message) {
+        if (containingDocument.isInitializing() || containingDocument.getStaticState().isNoscript()) {
+            // The error is non fatal only upon XForms updates
+            throw new OXFException(message);
+        } else {
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
+            indentedLogger.logWarning("", message);
+            containingDocument.addServerError(new XFormsContainingDocument.ServerError(message));
+        }
     }
 }

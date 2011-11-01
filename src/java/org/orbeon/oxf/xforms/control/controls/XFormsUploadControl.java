@@ -20,7 +20,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.Multipart;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
@@ -139,12 +138,11 @@ public class XFormsUploadControl extends XFormsValueControl {
      *     </parameter>
      *   </xxforms:files>
      *
-     * @param propertyContext       current context
      * @param containingDocument    document
      * @param filesElement          <xxforms:files> element
      * @param handleTemporaryFiles  whether to set listeners for file deletion
      */
-    public static void handleUploadedFiles(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element filesElement, boolean handleTemporaryFiles) {
+    public static void handleUploadedFiles(XFormsContainingDocument containingDocument, Element filesElement, boolean handleTemporaryFiles) {
         if (filesElement != null) {
             for (final Element parameterElement: Dom4jUtils.elements(filesElement)) {
 

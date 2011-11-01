@@ -59,6 +59,9 @@ public class XFormsEvents {
     public static final String XXFORMS_INDEX_CHANGED = "xxforms-index-changed";
     public static final String XXFORMS_ITERATION_MOVED = "xxforms-iteration-moved";
 
+    public static final String XXFORMS_XPATH_ERROR = "xxforms-xpath-error";
+    public static final String XXFORMS_BINDING_ERROR = "xxforms-binding-error";
+
     // Standard XForms events
     public static final String XFORMS_MODEL_CONSTRUCT = "xforms-model-construct";
     public static final String XFORMS_MODEL_CONSTRUCT_DONE = "xforms-model-construct-done";

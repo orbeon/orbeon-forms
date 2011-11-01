@@ -18,11 +18,11 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
 
-class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, val t: Throwable)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, targetObject, bubbles = true, cancelable = false) with EventAttributes {
+class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, target: XFormsEventTarget, val throwable: Throwable)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, target, bubbles = true, cancelable = false) with EventAttributes {
 
-    private lazy val rootLocationData = ValidationException.getRootLocationData(t)
-    private def rootMessage = OXFException.getRootThrowable(t).getMessage
+    private lazy val rootLocationData = ValidationException.getRootLocationData(throwable)
+    private def rootMessage = OXFException.getRootThrowable(throwable).getMessage
 
     override val attributes = Map(
         "element" ->    (() => rootLocationData match {
@@ -33,6 +33,6 @@ class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targ
         "line" ->       (() => rootLocationData.getLine.toString),
         "column" ->     (() => rootLocationData.getCol.toString),
         "message" ->    (() => rootMessage),
-        "throwable" ->  (() => OXFException.throwableToString(t))
+        "throwable" ->  (() => OXFException.throwableToString(throwable))
     )
 }

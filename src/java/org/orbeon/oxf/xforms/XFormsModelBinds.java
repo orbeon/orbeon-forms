@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
-import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
@@ -370,8 +370,8 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms default bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getCalculate()));
 
-                container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                throw new IllegalStateException(); // event above throw an exception anyway
+                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                return null;
             }
         } else {
             return null;
@@ -383,7 +383,6 @@ public class XFormsModelBinds {
         final String stringResult = evaluateXXFormsDefaultBind(bind, position);
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
-            // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
             XFormsSetvalueAction.doSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
         }
@@ -393,7 +392,6 @@ public class XFormsModelBinds {
         final String stringResult = evaluateCalculateBind(bind, position);
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
-            // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
             XFormsSetvalueAction.doSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
         }
@@ -410,8 +408,8 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms calculate bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getCalculate()));
 
-                container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                throw new IllegalStateException(); // event above throw an exception anyway
+                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                return null;
             }
         } else {
             return null;
@@ -478,8 +476,8 @@ public class XFormsModelBinds {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms custom bind",
                             bind.staticBind.element(), "name", propertyName, "expression", expression));
 
-                    container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                    throw new IllegalStateException(); // event above throw an exception anyway
+                    container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                    return null;
                 }
             } else {
                 return null;
@@ -507,8 +505,8 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms required bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getRequired()));
 
-                container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                throw new IllegalStateException(); // event above throw an exception anyway
+                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                return null;
             }
         } else {
             return null;
@@ -557,8 +555,8 @@ public class XFormsModelBinds {
                         bind.staticBind.element(), "expression", bind.staticBind.getReadonly()));
 
 
-                container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                throw new IllegalStateException(); // event above throw an exception anyway
+                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                return null;
             }
         } else {
             return null;
@@ -582,8 +580,8 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms relevant bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getRelevant()));
 
-                container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                throw new IllegalStateException(); // event above throw an exception anyway
+                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                return null;
             }
         } else {
             return null;
@@ -596,14 +594,16 @@ public class XFormsModelBinds {
         // Setup function context
          // TODO: when binds are able to receive events, source should be bind id
         final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext(model.getEffectiveId());
-
-        final String result = XPathCache.evaluateAsString(nodeset, position, xpathExpression,
+        final String result;
+        try {
+            result = XPathCache.evaluateAsString(nodeset, position, xpathExpression,
                         bind.staticBind.namespaceMapping(), currentVariables,
                         XFormsContainingDocument.getFunctionLibrary(), functionContext,
                         bind.staticBind.locationData().getSystemID(), bind.staticBind.locationData());
-
-        // Restore function context
-        model.getContextStack().returnFunctionContext();
+        } finally {
+            // Restore function context
+            model.getContextStack().returnFunctionContext();
+        }
 
         return result;
     }
@@ -866,8 +866,8 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms constraint bind",
                         bind.staticBind.element(), "expression", bind.staticBind.getConstraint()));
 
-                container.dispatchEvent(new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                throw new IllegalStateException(); // event above throw an exception anyway
+                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                return null;
             }
         } else {
             return null;

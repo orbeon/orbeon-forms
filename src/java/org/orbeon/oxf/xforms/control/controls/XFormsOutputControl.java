@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -155,8 +156,13 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     private Map<String, String[]> evaluateHeaders() {
         getContextStack().setBinding(this); // evaluateHeaders() requires this (bad, but do this until we can pass BindingContext directly)
-        return Headers.evaluateHeaders(getXBLContainer(), getContextStack(),
+        try {
+            return Headers.evaluateHeaders(getXBLContainer(), getContextStack(),
                 getEffectiveId(), getElementAnalysis().element());
+        } catch (Exception e) {
+            XFormsUtils.handleNonFatalXPathException(containingDocument, e);
+            return Collections.emptyMap();
+        }
     }
 
     private String proxyValueIfNeeded(String internalValue, String defaultValue, String mediatype) {

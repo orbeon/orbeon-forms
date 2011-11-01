@@ -50,13 +50,13 @@ class XFormsActionAction extends XFormsAction {
 
                     // Push previous variables if any
                     if (currentVariableElements.nonEmpty) {
-                        contextStack.addAndScopeVariables(actionInterpreter.getXBLContainer, currentVariableElements, actionInterpreter.getSourceEffectiveId(actionElement))
+                        contextStack.addAndScopeVariables(actionInterpreter.getXBLContainer, currentVariableElements, actionInterpreter.getSourceEffectiveId(actionElement), false)
                         variablesCount += currentVariableElements.size
                     }
 
                     // Set context on action element
                     val currentActionScope = actionInterpreter.getActionScope(currentActionElement)
-                    contextStack.pushBinding(currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope)
+                    contextStack.pushBinding(currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope, false)
 
                     // Run action
                     actionInterpreter.runAction(event, eventObserver, currentActionElement)

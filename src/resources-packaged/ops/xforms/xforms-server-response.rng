@@ -374,21 +374,20 @@
                             <attribute name="control-id"/>
                         </element>
                     </optional>
-                    <optional>
-                        <element name="xxforms:offline">
-                            <optional><!-- Is not present when going offline in response to a request to going online, see XFormsServer.java -->
-                                <element name="xxforms:events">
-                                    <!-- Contains serialized form of all events to replay up to this response -->
-                                    <data type="string"/>
-                                </element>
-                                <element name="xxforms:mappings">
-                                    <!-- Contains mips and variable mappings for offline binds -->
-                                    <data type="string"/>
-                                </element>
-                            </optional>
-                        </element>
-                    </optional>
                 </element>
+                <optional>
+                    <element name="xxforms:errors">
+                        <zeroOrMore>
+                            <element name="xxforms:error">
+                                <optional><attribute name="exception"/></optional>
+                                <optional><attribute name="file"/></optional>
+                                <optional><attribute name="line"/></optional>
+                                <optional><attribute name="col"/></optional>
+                                <data type="string"/>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
             </optional>
         </element>
     </start>

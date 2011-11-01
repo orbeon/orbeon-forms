@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
@@ -67,18 +69,25 @@ public class TextReplacer extends BaseReplacer {
 
             if (destinationObject instanceof NodeInfo) {
                 destinationNodeInfo = (NodeInfo) destinationObject;
-                if (destinationNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && destinationNodeInfo.getNodeKind() != org.w3c.dom.Document.ATTRIBUTE_NODE) {
+                final int canSet = XFormsInstance.canSetValueForNodeInfo(destinationNodeInfo);
+                if (canSet != 0) {
                     // Throw target-error
 
                     // XForms 1.1: "If the processing of the targetref attribute fails,
                     // then submission processing ends after dispatching the event
                     // xforms-submit-error with an error-type of target-error."
-                    throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element or attribute for replace=\"text\".", "processing targetref attribute",
+                    final String message;
+                    if (canSet == 1)
+                        message = "targetref attribute doesn't point to an element without children or to an attribute for replace=\"text\".";
+                    else
+                        message = "targetref attribute points to a readonly node for replace=\"text\".";
+
+                    throw new XFormsSubmissionException(submission, message, "processing targetref attribute",
                             new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
+                
             } else {
                 // Throw target-error
-                // TODO: also do this for readonly situation
 
                 // XForms 1.1: "If the processing of the targetref attribute fails, then
                 // submission processing ends after dispatching the event
@@ -93,7 +102,9 @@ public class TextReplacer extends BaseReplacer {
 
         // Set value into the instance
         // NOTE: Here we decided to use the actions logger, by compatibility with xforms:setvalue. Anything we would like to log in "submission" mode?
-        XFormsSetvalueAction.doSetValue(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY()), submission, destinationNodeInfo, responseBody, null, "submission", false);
+        // NOTE: Based on the above checks, doSetValue should succeed and not dispatch an event. So we don't need to provide an event target.
+        XFormsSetvalueAction.doSetValue(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY()),
+                null, destinationNodeInfo, responseBody, null, "submission", false);
 
         // Dispatch xforms-submit-done
         return dispatchSubmitDone(connectionResult);

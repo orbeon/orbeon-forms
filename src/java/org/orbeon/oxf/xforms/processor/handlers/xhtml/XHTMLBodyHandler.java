@@ -184,13 +184,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             }
 
             // Ajax error panel
-            if (XFormsProperties.isAjaxShowErrors(containingDocument)) {
-                // XInclude dialog so users can configure it
-                helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
-                        "href", getIncludedResourcePath(requestPath, "error-dialog.xml"),
-                        "fixup-xml-base", "false"
-                });
-            }
+            // XInclude dialog so users can configure it
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
+                    "href", getIncludedResourcePath(requestPath, "error-dialog.xml"),
+                    "fixup-xml-base", "false"
+            });
 
             // Help panel
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {

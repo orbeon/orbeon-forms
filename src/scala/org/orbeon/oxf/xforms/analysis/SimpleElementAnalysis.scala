@@ -80,7 +80,10 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
         bind match {
             case Some(bindStaticId) =>
                 // Use @bind analysis directly from model
-                staticStateContext.partAnalysis.getModelByScopeAndBind(scopeModel.scope, bindStaticId).bindsById.get(bindStaticId).getBindingAnalysis
+                val model = staticStateContext.partAnalysis.getModelByScopeAndBind(scopeModel.scope, bindStaticId)
+                if (model eq null)
+                    throw new ValidationException("Reference to non-existing bind id: " + bindStaticId, ElementAnalysis.createLocationData(element))
+                model.bindsById.get(bindStaticId).getBindingAnalysis
             case None =>
                 // No @bind
                 ref match {
@@ -121,10 +124,10 @@ class SimpleElementAnalysis(val staticStateContext: StaticStateContext, element:
 
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String): XPathAnalysis = {
 
-        def getDefaultInstancePrefixedId = scopeModel.containingModel match { case Some(model) => model.defaultInstancePrefixedId; case None => None }
+        val defaultInstancePrefixedId = scopeModel.containingModel flatMap (_.defaultInstancePrefixedId)
 
         PathMapXPathAnalysis(staticStateContext.partAnalysis, xpathString, staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId),
-            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, getDefaultInstancePrefixedId, locationData, element)
+            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element)
     }
 
     class SimplePathMapContext {

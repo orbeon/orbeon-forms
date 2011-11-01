@@ -94,7 +94,6 @@
     <property as="xs:string"  name="oxf.xforms.forward-submission-headers"                  value=""/>
     <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="10000"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                            value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
 
@@ -117,6 +116,7 @@
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.show-recoverable-errors"                     value="true"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>

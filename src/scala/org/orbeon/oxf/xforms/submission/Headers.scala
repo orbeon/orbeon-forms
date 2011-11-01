@@ -33,7 +33,7 @@ object Headers {
     def evaluateHeaders(xblContainer: XBLContainer, contextStack: XFormsContextStack,
                         sourceEffectiveId: String, enclosingElement: Element) = {
 
-        val staticState = xblContainer.getContainingDocument.getStaticState
+
         val fullPrefix = xblContainer.getFullPrefix
 
         val headerElements = Dom4jUtils.elements(enclosingElement, XFormsConstants.XFORMS_HEADER_QNAME)

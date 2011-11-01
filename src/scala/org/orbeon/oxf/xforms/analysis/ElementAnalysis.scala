@@ -104,7 +104,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[Containe
 
     def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
 
-        def getModelPrefixedId = scopeModel.containingModel match { case Some(model) => Some(model.prefixedId); case None => None }
+        def getModelPrefixedId = scopeModel.containingModel map (_.prefixedId)
 
         helper.startElement(element.getName,
             attributes match {

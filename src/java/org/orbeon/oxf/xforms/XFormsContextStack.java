@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -163,7 +162,7 @@ public class XFormsContextStack {
         // All variables in the model are in scope for the nested binds and actions.
         final List<Element> elements = xformsModel.getStaticModel().variableElements();
         final List<BindingContext.VariableInfo> variableInfos
-                = addAndScopeVariables(xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
+                = addAndScopeVariables(xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId(), true);
 
         if (variableInfos != null && variableInfos.size() > 0) {
             // Some variables added
@@ -182,7 +181,7 @@ public class XFormsContextStack {
         }
     }
 
-    public List<BindingContext.VariableInfo> addAndScopeVariables(XBLContainer container, List<Element> elements, String sourceEffectiveId) {
+    public List<BindingContext.VariableInfo> addAndScopeVariables(XBLContainer container, List<Element> elements, String sourceEffectiveId, boolean handleNonFatal) {
         List<BindingContext.VariableInfo> variableInfos = null;
         for (Element currentElement : elements) {
             if (VariableAnalysis.isVariableElement(currentElement)) {
@@ -204,7 +203,7 @@ public class XFormsContextStack {
                 // further variables values could not be added. The method below temporarily adds more elements on the
                 // stack but it is safer.
                 getFunctionContext(sourceEffectiveId);
-                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true), newScope);
+                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true, handleNonFatal), newScope);
                 returnFunctionContext();
 
                 // Add VariableInfo created during above pushVariable(). There must be only one!
@@ -262,6 +261,10 @@ public class XFormsContextStack {
      * @param scope             XBL scope
      */
     public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindingsBase.Scope scope) {
+        pushBinding(bindingElement, sourceEffectiveId, scope, true);
+    }
+    
+    public void pushBinding(Element bindingElement, String sourceEffectiveId, XBLBindingsBase.Scope scope, boolean handleNonFatal) {
         // TODO: move away from element and use static analysis information
         final String ref = bindingElement.attributeValue(XFormsConstants.REF_QNAME);
         final String context = bindingElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
@@ -270,7 +273,7 @@ public class XFormsContextStack {
         final String bind = bindingElement.attributeValue(XFormsConstants.BIND_QNAME);
 
         final NamespaceMapping bindingElementNamespaceMapping = container.getNamespaceMappings(bindingElement);
-        pushBinding(ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope);
+        pushBinding(ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
     }
 
     private BindingContext getBindingContext(XBLBindingsBase.Scope scope) {
@@ -292,7 +295,7 @@ public class XFormsContextStack {
     }
 
     public void pushBinding(String ref, String context, String nodeset, String modelId, String bindId,
-                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindingsBase.Scope scope) {
+                            Element bindingElement, NamespaceMapping bindingElementNamespaceMapping, String sourceEffectiveId, XBLBindingsBase.Scope scope, boolean handleNonFatal) {
 
         // Get location data for error reporting
         final LocationData locationData = (bindingElement == null)
@@ -300,294 +303,317 @@ public class XFormsContextStack {
                 : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
 
         try {
-            try {
-                // Determine current context
-                final BindingContext currentBindingContext = getCurrentBindingContext();
+            // Determine current context
+            final BindingContext currentBindingContext = getCurrentBindingContext();
 
-                // Handle scope
-                // The new binding evaluates against a base binding context which must be in the same scope
-                final BindingContext baseBindingContext = getBindingContext(scope);
-                final XBLBindingsBase.Scope newScope;
-                if (scope == null) {
-                    // Keep existing scope
-                    // TODO: remove this once no caller can pass a null scope
-                    newScope = currentBindingContext.scope;
-                } else {
-                    // Use scope passed
-                    newScope = scope;
-                }
+            // Handle scope
+            // The new binding evaluates against a base binding context which must be in the same scope
+            final BindingContext baseBindingContext = getBindingContext(scope);
+            final XBLBindingsBase.Scope newScope;
+            if (scope == null) {
+                // Keep existing scope
+                // TODO: remove this once no caller can pass a null scope
+                newScope = currentBindingContext.scope;
+            } else {
+                // Use scope passed
+                newScope = scope;
+            }
 
-                // Set context
-                final String tempSourceEffectiveId = functionContext.getSourceEffectiveId();
-                if (sourceEffectiveId != null) {
-                    functionContext.setSourceEffectiveId(sourceEffectiveId);
-                }
+            // Set context
+            final String tempSourceEffectiveId = functionContext.getSourceEffectiveId();
+            if (sourceEffectiveId != null) {
+                functionContext.setSourceEffectiveId(sourceEffectiveId);
+            }
 
-                // Handle model
-                final XFormsModel newModel;
-                final boolean isNewModel;
-                if (modelId != null) {
-                    final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
-                    final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, null);
-                    if (!(o instanceof XFormsModel)) {
-                        // TODO: should be dispatched to element having the @model attribute
-                        // Invalid model id
-                        container.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, container));
-                    }
-                    newModel = (XFormsModel) o;
-                    isNewModel = newModel != baseBindingContext.model;// don't say it's a new model unless it has really changed
-                } else {
+            // Handle model
+            final XFormsModel newModel;
+            final boolean isNewModel;
+            if (modelId != null) {
+                final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
+                final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, null);
+                if (!(o instanceof XFormsModel)) {
+                    // Invalid model id
+
+                    // NOTE: We used to dispatch xforms-binding-exception, but we want to be able to recover
+                    if (!handleNonFatal)
+                        throw new ValidationException("Reference to non-existing model id: " + modelId, locationData);
+
+                    // Default to not changing the model
                     newModel = baseBindingContext.model;
                     isNewModel = false;
+                } else {
+                    newModel = (XFormsModel) o;
+                    isNewModel = newModel != baseBindingContext.model;// don't say it's a new model unless it has really changed
                 }
+            } else {
+                newModel = baseBindingContext.model;
+                isNewModel = false;
+            }
 
-                // Handle nodeset
-                final boolean isNewBind;
-                final int newPosition;
-                final List<Item> newNodeset;
-                final boolean hasOverriddenContext;
-                final Item contextItem;
-                final boolean isPushModelVariables;
-                final List<BindingContext.VariableInfo> variableInfo;
-                {
-                    if (bindId != null) {
-                        // Resolve the bind id to a nodeset
+            // Handle nodeset
+            final boolean isNewBind;
+            final int newPosition;
+            final List<Item> newNodeset;
+            final boolean hasOverriddenContext;
+            final Item contextItem;
+            final boolean isPushModelVariables;
+            final List<BindingContext.VariableInfo> variableInfo;
+            {
+                if (bindId != null) {
+                    // Resolve the bind id to a nodeset
 
-                        // NOTE: For now, only the top-level models in a resolution scope are considered
-                        final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
-                        final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
-                        if (o == null && resolutionScopeContainer.containsBind(bindId)) {
-                            // The bind attribute was valid for this scope, but no runtime object was found for the bind
-                            // This can happen e.g. if a nested bind is within a bind with an empty nodeset
+                    // NOTE: For now, only the top-level models in a resolution scope are considered
+                    final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
+                    final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
+                    if (o == null && resolutionScopeContainer.containsBind(bindId)) {
+                        // The bind attribute was valid for this scope, but no runtime object was found for the bind
+                        // This can happen e.g. if a nested bind is within a bind with an empty nodeset
 
-                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
-                            hasOverriddenContext = false;
-                            contextItem = null;
-                            isNewBind = true;
-                            newPosition = 0;
-                            isPushModelVariables = false;
-                            variableInfo = null;
-                        } else if (!(o instanceof XFormsModelBinds.Bind)) {
-                            // The bind attribute did not resolve to a bind: dispatch xforms-binding-exception
+                        newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                        hasOverriddenContext = false;
+                        contextItem = null;
+                        isNewBind = true;
+                        newPosition = 0;
+                        isPushModelVariables = false;
+                        variableInfo = null;
+                    } else if (!(o instanceof XFormsModelBinds.Bind)) {
+                        // The bind attribute did not resolve to a bind: dispatch xforms-binding-exception
 
-                            // TODO: should be dispatched to element having the @model attribute
-                            container.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, container));
+                        // NOTE: We used to dispatch xforms-binding-exception, but we want to be able to recover
+                        if (!handleNonFatal)
+                            throw new ValidationException("Reference to non-existing bind id: " + bindId, locationData);
 
-                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
-                            hasOverriddenContext = false;
-                            contextItem = null;
-                            isNewBind = true;
-                            newPosition = 0;
-                            isPushModelVariables = false;
-                            variableInfo = null;
+                        // Default to an empty binding
+                        newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                        hasOverriddenContext = false;
+                        contextItem = null;
+                        isNewBind = true;
+                        newPosition = 0;
+                        isPushModelVariables = false;
+                        variableInfo = null;
+                    } else {
+                        newNodeset = ((XFormsModelBinds.Bind) o).nodeset;
+                        hasOverriddenContext = false;
+                        contextItem = baseBindingContext.getSingleItem();
+                        isNewBind = true;
+                        newPosition = Math.min(newNodeset.size(), 1);
+                        isPushModelVariables = false;
+                        variableInfo = null;
+                    }
+                } else if (ref != null || nodeset != null) {
+
+                    // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
+                    final BindingContext evaluationContextBinding;
+                    if (context != null) {
+                        // Push model and context
+                        pushTemporaryContext(currentBindingContext, baseBindingContext, baseBindingContext.getSingleItem());// provide context information for the context() function
+                        pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
+                        hasOverriddenContext = true;
+                        final BindingContext newBindingContext = getCurrentBindingContext();
+                        contextItem = newBindingContext.getSingleItem();
+                        variableInfo = newBindingContext.getVariables();
+                        evaluationContextBinding = newBindingContext;
+                    } else if (isNewModel) {
+                        // Push model only
+                        pushBinding(null, null, null, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
+                        hasOverriddenContext = false;
+                        final BindingContext newBindingContext = getCurrentBindingContext();
+                        contextItem = newBindingContext.getSingleItem();
+                        variableInfo = newBindingContext.getVariables();
+                        evaluationContextBinding = newBindingContext;
+                    } else {
+                        hasOverriddenContext = false;
+                        contextItem = baseBindingContext.getSingleItem();
+                        variableInfo = null;
+                        evaluationContextBinding = baseBindingContext;
+                    }
+
+                    if (false) {
+                        // NOTE: This is an attempt at allowing evaluating a binding even if no context is present.
+                        // But this doesn't work properly. E.g.:
+                        //
+                        // <xf:group ref="()">
+                        //   <xf:input ref="."/>
+                        //
+                        // Above must end up with an empty binding for xf:input, while:
+                        //
+                        // <xf:group ref="()">
+                        //   <xf:input ref="instance('foobar')"/>
+                        //
+                        // Above must end up with a non-empty binding IF it was to be evaluated.
+                        //
+                        // Now the second condition above should not happen anyway, because the content of the group
+                        // is non-relevant anyway. But we do have cases now where this happens, so we can't enable
+                        // the code below naively.
+                        //
+                        // We could enable it if we knew statically that the expression did not depend on the
+                        // context though, but right now we don't.
+
+                        final boolean isDefaultContext;
+                        final List<Item> evaluationNodeset;
+                        final int evaluationPosition;
+                        if (evaluationContextBinding.getNodeset().size() > 0) {
+                            isDefaultContext = false;
+                            evaluationNodeset = evaluationContextBinding.getNodeset();
+                            evaluationPosition = evaluationContextBinding.getPosition();
                         } else {
-                            newNodeset = ((XFormsModelBinds.Bind) o).nodeset;
-                            hasOverriddenContext = false;
-                            contextItem = baseBindingContext.getSingleItem();
-                            isNewBind = true;
-                            newPosition = Math.min(newNodeset.size(), 1);
-                            isPushModelVariables = false;
-                            variableInfo = null;
-                        }
-                    } else if (ref != null || nodeset != null) {
-
-                        // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
-                        final BindingContext evaluationContextBinding;
-                        if (context != null) {
-                            // Push model and context
-                            pushTemporaryContext(currentBindingContext, baseBindingContext, baseBindingContext.getSingleItem());// provide context information for the context() function
-                            pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
-                            hasOverriddenContext = true;
-                            final BindingContext newBindingContext = getCurrentBindingContext();
-                            contextItem = newBindingContext.getSingleItem();
-                            variableInfo = newBindingContext.getVariables();
-                            evaluationContextBinding = newBindingContext;
-                        } else if (isNewModel) {
-                            // Push model only
-                            pushBinding(null, null, null, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
-                            hasOverriddenContext = false;
-                            final BindingContext newBindingContext = getCurrentBindingContext();
-                            contextItem = newBindingContext.getSingleItem();
-                            variableInfo = newBindingContext.getVariables();
-                            evaluationContextBinding = newBindingContext;
-                        } else {
-                            hasOverriddenContext = false;
-                            contextItem = baseBindingContext.getSingleItem();
-                            variableInfo = null;
-                            evaluationContextBinding = baseBindingContext;
+                            isDefaultContext = true;
+                            evaluationNodeset = DEFAULT_CONTEXT;
+                            evaluationPosition = 1;
                         }
 
-                        if (false) {
-                            // NOTE: This is an attempt at allowing evaluating a binding even if no context is present.
-                            // But this doesn't work properly. E.g.:
-                            //
-                            // <xf:group ref="()">
-                            //   <xf:input ref="."/>
-                            //
-                            // Above must end up with an empty binding for xf:input, while:
-                            //
-                            // <xf:group ref="()">
-                            //   <xf:input ref="instance('foobar')"/>
-                            //
-                            // Above must end up with a non-empty binding IF it was to be evaluated.
-                            //
-                            // Now the second condition above should not happen anyway, because the content of the group
-                            // is non-relevant anyway. But we do have cases now where this happens, so we can't enable
-                            // the code below naively.
-                            //
-                            // We could enable it if we knew statically that the expression did not depend on the
-                            // context though, but right now we don't.
+                        if (!isDefaultContext) {
+                            // Provide context information for the context() function
+                            pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());
+                        }
 
-                            final boolean isDefaultContext;
-                            final List<Item> evaluationNodeset;
-                            final int evaluationPosition;
-                            if (evaluationContextBinding.getNodeset().size() > 0) {
-                                isDefaultContext = false;
-                                evaluationNodeset = evaluationContextBinding.getNodeset();
-                                evaluationPosition = evaluationContextBinding.getPosition();
-                            } else {
-                                isDefaultContext = true;
-                                evaluationNodeset = DEFAULT_CONTEXT;
-                                evaluationPosition = 1;
-                            }
+                        // Use updated binding context to set model
+                        functionContext.setModel(evaluationContextBinding.model);
 
-                            if (!isDefaultContext) {
-                                // Provide context information for the context() function
-                                pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());
+                        List<Item> result;
+                            try {
+                                result = XPathCache.evaluateKeepItems(evaluationNodeset, evaluationPosition,
+                                        ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                        functionContext, null, locationData);
+                            } catch (Exception e) {
+                                if (handleNonFatal) {
+                                    XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                                    result = XFormsConstants.EMPTY_ITEM_LIST;
+                                } else {
+                                    throw e;
+                                }
                             }
+                        newNodeset = result;
+
+
+                        if (!isDefaultContext) {
+                            popBinding();
+                        }
+                    } else {
+                        if (evaluationContextBinding.getNodeset().size() > 0) {
+                            // Evaluate new XPath in context if the current context is not empty
+
+                            // TODO: in the future, we should allow null context for expressions that do not depend on the context
+                            // NOTE: We prevent evaluation if the context was empty. However there are cases where this
+                            // should be allowed, if the expression does not depend on the context. Ideally, we would know
+                            // statically whether an expression depends on the context or not, and take separate action if
+                            // that's the case. Currently, such an expression will produce an XPathException.
+
+                            // It might be the case that when we implement non-evaluation of relevant subtrees, this won't
+                            // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,
+                            // static analysis of expressions might provide enough information to handle the two situations.
+
+                            pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());// provide context information for the context() function
 
                             // Use updated binding context to set model
                             functionContext.setModel(evaluationContextBinding.model);
 
-                            newNodeset = XPathCache.evaluateKeepItems(evaluationNodeset, evaluationPosition,
-                                    ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                    functionContext, null, locationData);
+                            List<Item> result;
+                                try {
+                                    result = XPathCache.evaluateKeepItems(evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
+                                            ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                            functionContext, null, locationData);
+                                } catch (Exception e) {
+                                    if (handleNonFatal) {
+                                        XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                                        result = XFormsConstants.EMPTY_ITEM_LIST;
+                                    } else {
+                                        throw e;
+                                    }
 
-                            if (!isDefaultContext) {
-                                popBinding();
-                            }
-                        } else {
-                            if (evaluationContextBinding.getNodeset().size() > 0) {
-                                // Evaluate new XPath in context if the current context is not empty
+                                }
+                            newNodeset = result;
 
-                                // TODO: in the future, we should allow null context for expressions that do not depend on the context
-                                // NOTE: We prevent evaluation if the context was empty. However there are cases where this
-                                // should be allowed, if the expression does not depend on the context. Ideally, we would know
-                                // statically whether an expression depends on the context or not, and take separate action if
-                                // that's the case. Currently, such an expression will produce an XPathException.
-
-                                // It might be the case that when we implement non-evaluation of relevant subtrees, this won't
-                                // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,
-                                // static analysis of expressions might provide enough information to handle the two situations.
-
-                                pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());// provide context information for the context() function
-
-                                // Use updated binding context to set model
-                                functionContext.setModel(evaluationContextBinding.model);
-
-                                newNodeset = XPathCache.evaluateKeepItems(evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
-                                        ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                        functionContext, null, locationData);
-
-                                popBinding();
-                            } else {
-                                // Otherwise we consider we can't evaluate
-                                newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
-                            }
-                        }
-
-                        // Restore optional context
-                        if (context != null || isNewModel) {
                             popBinding();
-                            if (context != null)
-                                popBinding();
-                        }
-                        isNewBind = true;
-                        newPosition = 1;
-                        isPushModelVariables = false;
-                    } else if (isNewModel && context == null) {
-                        // Only the model has changed
-
-                        final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel);
-                        if (modelBindingContext != null) {
-                            newNodeset = modelBindingContext.getNodeset();
-                            newPosition = modelBindingContext.getPosition();
-                            isPushModelVariables = false;
                         } else {
-                            newNodeset = getCurrentNodeset(newModel);
-                            newPosition = 1;
-                            // Variables for this model are not yet on the stack
-                            isPushModelVariables = true;
+                            // Otherwise we consider we can't evaluate
+                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                         }
+                    }
 
-                        hasOverriddenContext = false;
-                        contextItem = baseBindingContext.getSingleItem();
-                        isNewBind = false;
-                        variableInfo = null;
-
-                    } else if (context != null) {
-                        // Only the context has changed, and possibly the model
-                        pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope);
-                        {
-                            newNodeset = getCurrentNodeset();
-                            newPosition = getCurrentPosition();
-                            isNewBind = false;
-                            hasOverriddenContext = true;
-                            contextItem = getCurrentSingleItem();
-                            isPushModelVariables = false;
-                            variableInfo = null;
-                        }
+                    // Restore optional context
+                    if (context != null || isNewModel) {
                         popBinding();
+                        if (context != null)
+                            popBinding();
+                    }
+                    isNewBind = true;
+                    newPosition = 1;
+                    isPushModelVariables = false;
+                } else if (isNewModel && context == null) {
+                    // Only the model has changed
 
+                    final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel);
+                    if (modelBindingContext != null) {
+                        newNodeset = modelBindingContext.getNodeset();
+                        newPosition = modelBindingContext.getPosition();
+                        isPushModelVariables = false;
                     } else {
-                        // No change to anything
+                        newNodeset = getCurrentNodeset(newModel);
+                        newPosition = 1;
+                        // Variables for this model are not yet on the stack
+                        isPushModelVariables = true;
+                    }
+
+                    hasOverriddenContext = false;
+                    contextItem = baseBindingContext.getSingleItem();
+                    isNewBind = false;
+                    variableInfo = null;
+
+                } else if (context != null) {
+                    // Only the context has changed, and possibly the model
+                    pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
+                    {
+                        newNodeset = getCurrentNodeset();
+                        newPosition = getCurrentPosition();
                         isNewBind = false;
-                        newNodeset = baseBindingContext.getNodeset();
-                        newPosition = baseBindingContext.getPosition();
+                        hasOverriddenContext = true;
+                        contextItem = getCurrentSingleItem();
                         isPushModelVariables = false;
                         variableInfo = null;
-
-                        // We set a new context item as the context into which other attributes must be evaluated. E.g.:
-                        //
-                        // <xforms:select1 ref="type">
-                        //   <xforms:action ev:event="xforms-value-changed" if="context() = 'foobar'">
-                        //
-                        // In this case, you expect context() to be updated as follows.
-                        //
-                        hasOverriddenContext = false;
-                        contextItem = baseBindingContext.getSingleItem();
                     }
+                    popBinding();
+
+                } else {
+                    // No change to anything
+                    isNewBind = false;
+                    newNodeset = baseBindingContext.getNodeset();
+                    newPosition = baseBindingContext.getPosition();
+                    isPushModelVariables = false;
+                    variableInfo = null;
+
+                    // We set a new context item as the context into which other attributes must be evaluated. E.g.:
+                    //
+                    // <xforms:select1 ref="type">
+                    //   <xforms:action ev:event="xforms-value-changed" if="context() = 'foobar'">
+                    //
+                    // In this case, you expect context() to be updated as follows.
+                    //
+                    hasOverriddenContext = false;
+                    contextItem = baseBindingContext.getSingleItem();
                 }
-
-                // Push new context
-                final String bindingElementStaticId = (bindingElement == null) ? null : bindingElement.attributeValue(XFormsConstants.ID_QNAME);
-                contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, bindingElementStaticId, isNewBind,
-                        bindingElement, locationData, hasOverriddenContext, contextItem, newScope));
-
-                // Add new model variables if needed
-                if (variableInfo != null) {
-                    // In this case, we did a temporary context push with the new model, and we already gathered the new
-                    // variables in scope. We have to set them to the newly pushed BindingContext.
-                    getCurrentBindingContext().setVariables(variableInfo);
-                } else if (isPushModelVariables) {
-                    // In this case, only the model just changed and so we gather the variables in scope for the new model
-                    addModelVariables(newModel);
-                }
-
-                // Restore context
-                if (sourceEffectiveId != null) {
-                    functionContext.setSourceEffectiveId(tempSourceEffectiveId);
-                }
-
-            } catch (ValidationException e) {
-                // Must be due to nested XFormsBindingExceptionEvent
-                throw e;
-            } catch (Throwable e) {
-                // TODO: should be dispatched to element having the @model attribute
-                // Any other exception occurring within
-                container.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, container, e));
             }
-        } catch (ValidationException e) {
+
+            // Push new context
+            final String bindingElementStaticId = (bindingElement == null) ? null : bindingElement.attributeValue(XFormsConstants.ID_QNAME);
+            contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, bindingElementStaticId, isNewBind,
+                    bindingElement, locationData, hasOverriddenContext, contextItem, newScope));
+
+            // Add new model variables if needed
+            if (variableInfo != null) {
+                // In this case, we did a temporary context push with the new model, and we already gathered the new
+                // variables in scope. We have to set them to the newly pushed BindingContext.
+                getCurrentBindingContext().setVariables(variableInfo);
+            } else if (isPushModelVariables) {
+                // In this case, only the model just changed and so we gather the variables in scope for the new model
+                addModelVariables(newModel);
+            }
+
+            // Restore context
+            if (sourceEffectiveId != null) {
+                functionContext.setSourceEffectiveId(tempSourceEffectiveId);
+            }
+        } catch (Exception e) {
             if (bindingElement != null) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression",
                     bindingElement, "element", Dom4jUtils.elementToDebugString(bindingElement)));

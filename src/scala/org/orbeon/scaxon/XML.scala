@@ -37,10 +37,10 @@ object XML {
 
     // Convenience methods for the XPath API
     def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null) =
-        XPathCache.evaluaSingleteKeepItems(Collections.singletonList(item), 1, expr, namespaces, if (variables == null) null else variables.asJava, null, null, null, null)
+        XPathCache.evaluaSingleteKeepItems(Collections.singletonList(item), 1, expr, namespaces, if (variables eq null) null else variables.asJava, null, null, null, null)
 
     def eval(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null) =
-        XPathCache.evaluate(item, expr, namespaces, if (variables == null) null else variables.asJava, null, null, null, null)
+        XPathCache.evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, null, null, null, null)
 
     // Runtime conversion to NodeInfo (can fail!)
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]
@@ -76,7 +76,7 @@ object XML {
     // Like XPath namespace-uri()
     def namespaceURI(nodeInfo: NodeInfo) = {
         val uri = nodeInfo.getURI
-        if (uri == null) "" else uri
+        if (uri eq null) "" else uri
     }
 
     private def parseQName(lexicalQName: String) = {

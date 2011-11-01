@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -57,13 +58,22 @@ public class XFormsSetvalueAction extends XFormsAction {
         // Set value on current node
         final Item currentItem = contextStack.getCurrentSingleItem();
         if ((currentItem instanceof NodeInfo) && valueToSet != null) {
-            // TODO: XForms 1.1: "Element nodes: If element child nodes are present, then an xforms-binding-exception
-            // occurs. Otherwise, regardless of how many child nodes the element has, the result is that the string
-            // becomes the new content of the element. In accord with the data model of [XPath 1.0], the element will
-            // have either a single non-empty text node child, or no children string was empty.
-
             // Node exists and value is not null, we can try to set the value
-            doSetValue(containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, "setvalue", false);
+
+            // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot be
+            // written to. But because of the way we now handle errors in actions, we throw an exception instead and
+            // action processing is interrupted.
+
+            final NodeInfo nodeInfo = (NodeInfo) currentItem;
+            switch (XFormsInstance.canSetValueForNodeInfo(nodeInfo)) {
+                case 0:
+                    doSetValue(containingDocument, indentedLogger, eventObserver, nodeInfo, valueToSet, null, "setvalue", false);
+                    break;
+                case 1:
+                    throw new OXFException("Unable to set value on complex content");
+                case 2:
+                    throw new OXFException("Unable to set value on read-only node");
+            }
         } else {
             // Node doesn't exist or value is null: NOP
             if (indentedLogger.isDebugEnabled()) {

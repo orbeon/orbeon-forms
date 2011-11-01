@@ -821,11 +821,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final XFormsBindingExceptionEvent bindingExceptionEvent = (XFormsBindingExceptionEvent) event;
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(),
                     bindingExceptionEvent.getThrowable(), event.getTargetObject().getLocationData());
-        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
-            // Log error
-            final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY());
-            indentedLogger.logError("action", "exception while running action", ev.toStringArray());
         }
     }
 

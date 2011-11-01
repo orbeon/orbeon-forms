@@ -22,9 +22,9 @@ import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -360,19 +360,41 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      */
     public static void setValueForNodeInfo(XFormsContainingDocument containingDocument,
                                            XFormsEventTarget eventTarget, NodeInfo nodeInfo, String newValue, String type) {
-        if (!(nodeInfo instanceof NodeWrapper))
-            throw new OXFException("Unable to set value of read-only instance.");
-
-        final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-        if (containingDocument != null && eventTarget != null) {
-            // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
-            // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
-            if (!Dom4jUtils.isSimpleContent(node)) {
-                containingDocument.dispatchEvent(new XFormsBindingExceptionEvent(containingDocument, eventTarget));
-                return;
-            }
+        switch (canSetValueForNodeInfo(nodeInfo)) {
+            case 0:
+                final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+                setValueForNode(node, newValue, type);
+                break;
+            case 1:
+                handleSetValueError(containingDocument, eventTarget, "Unable to set value on complex content");
+                break;
+            case 2:
+                handleSetValueError(containingDocument, eventTarget, "Unable to set value on read-only node");
+                break;
         }
-        setValueForNode(node, newValue, type);
+    }
+
+    public static int canSetValueForNodeInfo(NodeInfo nodeInfo) {
+        if (nodeInfo instanceof NodeWrapper) {
+            final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+            if (Dom4jUtils.isSimpleContent(node)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            return 2;
+        }
+    }
+    
+    private static void handleSetValueError(XFormsContainingDocument containingDocument, XFormsEventTarget eventTarget, String message) {
+
+        if (containingDocument != null)
+            XFormsUtils.handleNonFatalSetvalueError(containingDocument, message);
+
+        // NOTE: We allow passing a null document and target to prevent dispatching the event.
+        if (containingDocument != null && eventTarget != null)
+            containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, message));
     }
 
     /**
@@ -403,7 +425,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         if (node instanceof Element) {
             // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
             final Element elementNode = (Element) node;
-            elementNode.setText(newValue);
+            elementNode.setText(newValue);// NOTE: if there are already text nodes, dom4j removes them, and adds a new text node in the end
         } else if (node instanceof Attribute) {
             // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
             // value."
@@ -411,6 +433,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             attributeNode.setValue(newValue);
         } else if (node instanceof Text) {
             // "Text nodes: The text node is replaced with a new one corresponding to the new value."
+            // NOTE: As of 2011-11-03, this should not happen as the caller tests for isSimpleContent() which excludes text nodes.
             final Text textNode = (Text) node;
             textNode.setText(newValue);
         } else {

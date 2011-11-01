@@ -278,14 +278,20 @@ public class XFormsItemUtils {
                     final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                     final List<org.orbeon.saxon.om.Item> currentNodeset = currentBindingContext.getNodeset();
                     if (currentNodeset != null && currentNodeset.size() > 0) {
-                        final String tempResult = XPathCache.evaluateAsAvt(
-                                currentNodeset, currentBindingContext.getPosition(),
-                                attributeValue, container.getNamespaceMappings(itemChoiceItemsetElement),
-                                contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                contextStack.getFunctionContext(elementEffectiveId), null,
-                                (LocationData) itemChoiceItemsetElement.getData());
-
-                        contextStack.returnFunctionContext();
+                        String tempResult;
+                        try {
+                            tempResult = XPathCache.evaluateAsAvt(
+                                    currentNodeset, currentBindingContext.getPosition(),
+                                    attributeValue, container.getNamespaceMappings(itemChoiceItemsetElement),
+                                    contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                    contextStack.getFunctionContext(elementEffectiveId), null,
+                                    (LocationData) itemChoiceItemsetElement.getData());
+                        } catch (Exception e) {
+                            XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                            tempResult = "";
+                        } finally {
+                            contextStack.returnFunctionContext();
+                        }
 
                         result.put(attributeName, tempResult);
                     }

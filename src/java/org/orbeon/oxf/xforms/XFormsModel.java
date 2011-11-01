@@ -552,6 +552,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 throw (RuntimeException) throwable;
             else
                 throw new ValidationException("Received fatal error event: " + eventName, throwable, getLocationData());
+        } else if (XFormsEvents.XXFORMS_XPATH_ERROR.equals(eventName)) {
+            // Custom event for XPath errors
+            // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
+            // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
+            XFormsUtils.handleNonFatalXPathException(getContainingDocument(), ((XXFormsXPathErrorEvent) event).throwable());
         }
     }
 

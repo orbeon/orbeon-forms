@@ -756,10 +756,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), getFunctionContext(), null, getLocationData());
                 } catch (Exception e) {
                     // Don't consider this as fatal
-                    // TODO: must dispatch xforms-compute-error? Check if safe to do so.
-                    final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                    indentedLogger.logWarning("", "exception while evaluating XPath expression", e);
-
+                    XFormsUtils.handleNonFatalXPathException(containingDocument, e);
                     return null;
                 } finally {
                     // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -794,10 +791,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                     getFunctionContext(), null, getLocationData());
             } catch (Exception e) {
                 // Don't consider this as fatal
-                // TODO: must dispatch xforms-compute-error? Check if safe to do so.
-                final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                indentedLogger.logWarning("", "exception while evaluating XPath expression", e);
-
+                XFormsUtils.handleNonFatalXPathException(containingDocument, e);
                 return null;
             } finally {
                 // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -835,10 +829,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                 getFunctionContext(), null, getLocationData());
             } catch (Exception e) {
                 // Don't consider this as fatal
-                // TODO: must dispatch xforms-compute-error? Check if safe to do so.
-                final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                indentedLogger.logWarning("", "exception while evaluating XPath expression", e);
-
+                XFormsUtils.handleNonFatalXPathException(containingDocument, e);
                 return null;
             } finally {
                 // Restore function context to prevent leaks caused by context pointing to removed controls

@@ -57,8 +57,14 @@ public class ValidationException extends OXFException {
         LocationData locationData = null;
         while (true) {
             final List<LocationData> currentLocationData = getLocationData(throwable);
-            if (currentLocationData != null && currentLocationData.size() > 0)
-                locationData = currentLocationData.get(0);
+            if (currentLocationData != null && currentLocationData.size() > 0) {
+                final LocationData temp = currentLocationData.get(0);
+                // Only replace if it's "better" location data. Catches the case where deeper location data doesn't have
+                // a system id, for example in the case of certain XPath expression which have a line number but no
+                // file name (which probably shouldn't happen but does anyway).
+                if (temp.getSystemID() != null || locationData == null || locationData.getSystemID() == null)
+                    locationData = temp;
+            }
             final Throwable nested = OXFException.getNestedException(throwable);
             if (nested == null)
                 break;

@@ -48,8 +48,9 @@ object XFormsAPI {
     def setvalue(ref: Seq[NodeInfo], value: String) = {
         if (ref nonEmpty) {
             val action = actionContext.value
+            // NOTE: Event target is set to null for now. This is only used to dispatch xxforms-binding-error to a target.
             XFormsSetvalueAction.doSetValue(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull,
-                null /* TODO */, ref.head, value, null, "scala setvalue", false)
+                null, ref.head, value, null, "scala setvalue", false)
             Some(ref.head)
         } else
             None

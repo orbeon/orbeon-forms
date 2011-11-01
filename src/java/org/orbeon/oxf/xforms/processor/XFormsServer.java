@@ -191,7 +191,7 @@ public class XFormsServer extends ProcessorImpl {
                             // Handle uploaded files for noscript if any
                             if (hasFiles) {
                                 eventsIndentedLogger.logDebug("", "handling uploaded files");
-                                XFormsUploadControl.handleUploadedFiles(pipelineContext, containingDocument, filesElement, true);
+                                XFormsUploadControl.handleUploadedFiles(containingDocument, filesElement, true);
                             }
 
                             // Dispatch the events
@@ -591,6 +591,12 @@ public class XFormsServer extends ProcessorImpl {
                 ch.endElement();
             }
 
+            // Output errors
+            final List<XFormsContainingDocument.ServerError> errors = containingDocument.getServerErrors();
+            if (errors != null && errors.size() > 0) {
+                outputErrors(ch, errors);
+            }
+
             ch.endElement();
             xmlReceiver.endPrefixMapping("xxf");
             ch.endDocument();
@@ -705,5 +711,21 @@ public class XFormsServer extends ProcessorImpl {
     private static void outputHelpInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String helpControlEffectiveId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "help",
                 new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId)});
+    }
+
+    private static void outputErrors(ContentHandlerHelper ch, List<XFormsContainingDocument.ServerError> errors) {
+        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "errors");
+        for (XFormsContainingDocument.ServerError error: errors) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "error",
+                    new String[] {
+                        "exception", error.exceptionClass,
+                        "file", error.locationData != null ? error.locationData.getSystemID() : null,
+                        "line", error.locationData != null && error.locationData.getLine() != -1 ? Integer.toString(error.locationData.getLine()) : null,
+                        "col", error.locationData != null && error.locationData.getCol() != -1 ? Integer.toString(error.locationData.getCol()) : null
+                    });
+            ch.text(error.message);
+            ch.endElement();
+        }
+        ch.endElement();
     }
 }

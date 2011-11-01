@@ -115,7 +115,7 @@ public class XFormsActionInterpreter {
         }
 
         // Push binding for outermost action
-        actionBlockContextStack.pushBinding(outerActionElement, getSourceEffectiveId(outerActionElement), getActionScope(outerActionElement));
+        actionBlockContextStack.pushBinding(outerActionElement, getSourceEffectiveId(outerActionElement), getActionScope(outerActionElement), false);
     }
 
     private void scopeVariables(XBLContainer container, Element outerActionElement, Element ancestorElement, String sourceEffectiveId) {
@@ -123,7 +123,7 @@ public class XFormsActionInterpreter {
         if (actionPrecedingElements.size() > 0) {
             Collections.reverse(actionPrecedingElements);
             final List<XFormsContextStack.BindingContext.VariableInfo> variableInfos
-                    = actionBlockContextStack.addAndScopeVariables(container, actionPrecedingElements, sourceEffectiveId);
+                    = actionBlockContextStack.addAndScopeVariables(container, actionPrecedingElements, sourceEffectiveId, false);
             if (variableInfos != null && variableInfos.size() > 0 && indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
                         "count", Integer.toString(variableInfos.size()));
@@ -221,7 +221,7 @@ public class XFormsActionInterpreter {
                     final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
                     final String modelAttribute = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
                     // TODO: function context
-                    actionBlockContextStack.pushBinding(null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope);
+                    actionBlockContextStack.pushBinding(null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope, false);
                 }
                 {
                     final String refAttribute = actionElement.attributeValue(XFormsConstants.REF_QNAME);
@@ -237,7 +237,7 @@ public class XFormsActionInterpreter {
 
                         // Then we also need to push back binding attributes, excluding @context and @model
                         // TODO: function context
-                        actionBlockContextStack.pushBinding(refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope);
+                        actionBlockContextStack.pushBinding(refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionScope, false);
 
                         final Item overriddenContextNodeInfo = currentNodeset.get(index - 1);
                         runSingleIteration(event, eventObserver, actionElement, actionQName,
@@ -313,7 +313,7 @@ public class XFormsActionInterpreter {
             // In that case, in the second iteration, xforms:repeat must find an up-to-date nodeset
             // NOTE: There is still the possibility that parent bindings will be out of date. What should be done there?
             actionBlockContextStack.popBinding();
-            actionBlockContextStack.pushBinding(actionElement, getSourceEffectiveId(actionElement), actionScope);
+            actionBlockContextStack.pushBinding(actionElement, getSourceEffectiveId(actionElement), actionScope, false);
 
             whileIteration++;
         }

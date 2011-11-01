@@ -77,7 +77,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
         if (isRelevant()) {
             // Control is relevant
             getContextStack().setBinding(this);
-            value = variable.getVariableValue(getEffectiveId(), false);
+            value = variable.getVariableValue(getEffectiveId(), false, true);
         } else {
             // Control is not relevant
             // NOTE: Nobody should use this variable if it's non-relevant, but right now we still have possible uses

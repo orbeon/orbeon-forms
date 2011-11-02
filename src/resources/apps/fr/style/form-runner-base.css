@@ -413,10 +413,10 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 }
 
 /* Checkboxes and radio buttons */
-.xforms-select1-appearance-full span { display: block; clear: both }
+.xforms-select1-appearance-full span.xforms-deselected, .xforms-select1-appearance-full span.xforms-selected { display: block; clear: both }
 .xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
-.xforms-select-appearance-full span { display: block; clear: both }
+.xforms-select-appearance-full span.xforms-deselected, .xforms-select-appearance-full span.xforms-selected { display: block; clear: both }
 .xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 .xforms-select-appearance-full span label, .xforms-select1-appearance-full span label {

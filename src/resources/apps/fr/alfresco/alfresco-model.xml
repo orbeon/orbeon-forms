@@ -45,10 +45,12 @@
     <xxforms:variable name="alfresco-uri" select="xxforms:property(string-join(('oxf.fr.alfresco.uri', $app, $form), '.'))" as="xs:anyURI"/>
     <xxforms:variable name="alfresco-username" select="xxforms:property(string-join(('oxf.fr.alfresco.username', $app, $form), '.'))" as="xs:string"/>
     <xxforms:variable name="alfresco-credentials" select="xxforms:property(string-join(('oxf.fr.alfresco.credentials', $app, $form), '.'))" as="xs:string"/>
-    <!-- Make sure to encode path using ISO 9075-14:2003 -->
+    <!-- NOTE: Users have reported issues with encoding with ISO 9075-14:2003 (xxforms:encode-iso9075-14($p)), so we
+         don't encode anymore. It is not clear why this was done anyway. Success has been reported 2011-11 with Alfresco
+         4.0.a. -->
     <xxforms:variable name="alfresco-path"
-    	select="string-join(for $p in tokenize(xxforms:property(string-join(('oxf.fr.alfresco.path', $app, $form), '.')), '/')
-    				return xxforms:encode-iso9075-14($p), '/')" as="xs:string"/>
+          select="string-join(for $p in tokenize(xxforms:property(string-join(('oxf.fr.alfresco.path', $app, $form), '.')), '/')
+                    return $p, '/')" as="xs:string"/>
 
     <!-- ===== Public interface ==================================================================================== -->
 

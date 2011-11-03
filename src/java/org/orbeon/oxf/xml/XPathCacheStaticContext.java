@@ -34,6 +34,7 @@ public class XPathCacheStaticContext extends IndependentContext {
 
     private static final URIResolver URI_RESOLVER = new XPathCacheURIResolver();
 
+    // NOTE: 2011-11-03: since ExternalContext is now handled via ThreadLocal, this might be possible now.
     // NOTE: It would be nice to use TransformerURIResolver, but currently doing so will NPE because there is no
     // ExternalContext available.
 //    private static final URIResolver URI_RESOLVER = new TransformerURIResolver(false);
@@ -87,7 +88,7 @@ final class DeferredVariable implements VariableDeclaration, Binding {
 
     public DeferredVariable(StructuredQName qName) {
         this.qName = qName;
-    };
+    }
 
     public boolean isGlobal() {
         return true;

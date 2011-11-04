@@ -923,104 +923,113 @@
         </input>
         <output name="response">
             <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:body class="yui-skin-sam">
-                    <noscript xmlns="http://www.w3.org/1999/xhtml">
-                        <div class="xforms-noscript-panel">
-                            <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
-                            <ul>
-                                <li>Turn on JavaScript in your browser if it supports it.</li>
-                                <li>Use a browser that supports JavaScript.</li>
-                                <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
-                            </ul>
-                        </div>
-                    </noscript>
-                    <xhtml:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-layout-nospan" action="/doc/home-welcome" method="POST" onsubmit="return false">
-                        <xhtml:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
-                        <xhtml:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
-                        <xhtml:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
-                        <xhtml:input type="hidden" name="$server-events" value=""/>
-                        <xhtml:input type="text" name="$client-state" value="" class="xforms-initially-hidden"/>
-                        <xhtml:input type="hidden" name="$repeat-tree" value="xf-1"/>
-                        <xhtml:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
-                        <xhtml:span class="xforms-loading-loading">Loading...</xhtml:span>
-                        <xhtml:span class="xforms-loading-none"/>
-                        <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-panel xforms-initially-hidden">
-                            <div class="hd">An error has occurred</div>
-                            <div class="bd">
-                                <p>You may want to try one of the following:</p>
-                                <ul>
-                                    <li>
-                                        <a class="xforms-error-panel-close">Close this dialog</a>and continue to use this page.
-                                    </li>
-                                    <li>
-                                        <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
-                                    </li>
-                                    <li>
-                                        <p>If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
-                                        <ul>
-                                            <li>With Firefox: hold down the
-                                                <code>shift</code>key and click the Reload button in your browser toolbar.
-                                            </li>
-                                            <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
-                                            <li>With Internet Explorer: hold down the
-                                                <code>control</code>key and click the Reload button in your browser toolbar.
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>Return
-                                        <a href="/">home</a>.
-                                    </li>
-                                </ul>
-                                <div class="xforms-error-panel-details-hidden">
-                                    <p>
-                                        <a class="xforms-error-panel-show-details">
-                                            <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
-                                            <span>Show details</span>
-                                        </a>
-                                    </p>
-                                </div>
-                                <div class="xforms-error-panel-details-shown xforms-disabled">
-                                    <p>
-                                        <a class="xforms-error-panel-hide-details">
-                                            <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
-                                            <span>Hide details</span>
-                                        </a>
-                                    </p>
-                                    <div class="xforms-error-panel-details"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-help-panel xforms-initially-hidden">
-                            <div class="hd">Help</div>
-                            <div class="bd">
-                                <div class="xforms-help-panel-message"/>
-                                <div class="xforms-help-panel-close">
-                                    <button>Close</button>
-                                </div>
-                            </div>
-                        </div>
-                        <xhtml:span id="xforms-select-full-template" class="xforms-template">
-                            <xhtml:span class="xforms-deselected">
-                                <xhtml:label for="$xforms-item-effective-id$">
-                                    <xhtml:input id="$xforms-item-effective-id$" type="checkbox" name="$xforms-effective-id$" value="$xforms-template-value$"/>$xforms-template-label$
-                                </xhtml:label>
-                            </xhtml:span>
-                        </xhtml:span>
-                        <xhtml:span id="xforms-select1-full-template" class="xforms-template">
-                            <xhtml:span class="xforms-deselected">
-                                <xhtml:label for="$xforms-item-effective-id$">
-                                    <xhtml:input id="$xforms-item-effective-id$" type="radio" name="$xforms-effective-id$" value="$xforms-template-value$"/>$xforms-template-label$
-                                </xhtml:label>
-                            </xhtml:span>
-                        </xhtml:span>
-                        <xhtml:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
-                        <xhtml:span class="xforms-repeat-delimiter"/>
-                        <xhtml:span class="xforms-repeat-delimiter"/>
-                        <xhtml:span class="xforms-repeat-delimiter"/>
-                        <xhtml:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
-                    </xhtml:form>
-                </xhtml:body>
-            </xhtml:html>
+                 <xhtml:body class="yui-skin-sam">
+                     <noscript xmlns="http://www.w3.org/1999/xhtml">
+                         <div class="xforms-noscript-panel">
+                             <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
+                             <ul>
+                                 <li>Turn on JavaScript in your browser if it supports it.</li>
+                                 <li>Use a browser that supports JavaScript.</li>
+                                 <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
+                             </ul>
+                         </div>
+                     </noscript>
+                     <xhtml:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-layout-nospan" action="/doc/home-welcome" method="POST" onsubmit="return false">
+                         <xhtml:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
+                         <xhtml:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
+                         <xhtml:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
+                         <xhtml:input type="hidden" name="$server-events" value=""/>
+                         <xhtml:input type="text" name="$client-state" value="" class="xforms-initially-hidden"/>
+                         <xhtml:input type="hidden" name="$repeat-tree" value="xf-1"/>
+                         <xhtml:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
+                         <xhtml:span class="xforms-loading-loading">Loading...</xhtml:span>
+                         <xhtml:span class="xforms-loading-none"/>
+                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-panel xforms-initially-hidden">
+                             <div class="hd">Error</div>
+                             <div class="bd">
+                                 <p>A system error occurred. You can do one of the following:</p>
+                                 <ol>
+                                     <li>
+                                         <p>
+                                             <a class="xforms-error-panel-close">Close this dialog</a>and try to continue to use this page.
+                                         </p>
+                                     </li>
+                                     <li>
+                                         <p>
+                                             <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
+                                         </p>
+                                     </li>
+                                     <li>
+                                         <p>If the above link does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
+                                         <ul>
+                                             <li>With Internet Explorer: hold down the
+                                                 <code>control</code>key and click the Reload button in your browser toolbar.
+                                             </li>
+                                             <li>With Firefox: hold down the
+                                                 <code>shift</code>key and click the Reload button in your browser toolbar.
+                                             </li>
+                                             <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
+                                         </ul>
+                                     </li>
+                                     <li>
+                                         <p>Return
+                                             <a href="/">home</a>.
+                                         </p>
+                                     </li>
+                                     <li>
+                                         <p>Report this problem to your system administrator.</p>
+                                     </li>
+                                 </ol>
+                                 <div class="xforms-error-panel-details-hidden">
+                                     <p>
+                                         <a class="xforms-error-panel-show-details">
+                                             <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                                             <span>Show details</span>
+                                         </a>
+                                     </p>
+                                 </div>
+                                 <div class="xforms-error-panel-details-shown xforms-disabled">
+                                     <p>
+                                         <a class="xforms-error-panel-hide-details">
+                                             <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                                             <span>Hide details</span>
+                                         </a>
+                                     </p>
+                                     <div class="xforms-error-panel-details"/>
+                                 </div>
+                             </div>
+                         </div>
+                         <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-help-panel xforms-initially-hidden">
+                             <div class="hd">Help</div>
+                             <div class="bd">
+                                 <div class="xforms-help-panel-message"/>
+                                 <div class="xforms-help-panel-close">
+                                     <button>Close</button>
+                                 </div>
+                             </div>
+                         </div>
+                         <xhtml:span id="xforms-select-full-template" class="xforms-template">
+                             <xhtml:span class="xforms-deselected">
+                                 <xhtml:label for="$xforms-item-effective-id$">
+                                     <xhtml:input id="$xforms-item-effective-id$" type="checkbox" name="$xforms-effective-id$" value="$xforms-template-value$"/>$xforms-template-label$
+                                 </xhtml:label>
+                             </xhtml:span>
+                         </xhtml:span>
+                         <xhtml:span id="xforms-select1-full-template" class="xforms-template">
+                             <xhtml:span class="xforms-deselected">
+                                 <xhtml:label for="$xforms-item-effective-id$">
+                                     <xhtml:input id="$xforms-item-effective-id$" type="radio" name="$xforms-effective-id$" value="$xforms-template-value$"/>$xforms-template-label$
+                                 </xhtml:label>
+                             </xhtml:span>
+                         </xhtml:span>
+                         <xhtml:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
+                         <xhtml:span class="xforms-repeat-delimiter"/>
+                         <xhtml:span class="xforms-repeat-delimiter"/>
+                         <xhtml:span class="xforms-repeat-delimiter"/>
+                         <xhtml:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
+                     </xhtml:form>
+                 </xhtml:body>
+             </xhtml:html>
         </output>
     </test>
 

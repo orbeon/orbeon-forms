@@ -49,7 +49,6 @@ class LoadingIndicator
 
         # When an Ajax call ends, we might want to hide the indicator
         requestEnded = =>
-            console.log("request ended");
             # Defer hiding the indicator to give a chance to next request to start, so we don't flash the indicator
             _.defer =>
                 @shownCounter--

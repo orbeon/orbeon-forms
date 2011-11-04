@@ -1917,6 +1917,34 @@
                             }
                         }
                     }
+
+                } else if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "errors") {
+
+                    // <xxf:errors>
+                    var errorsElement = responseRoot.childNodes[i];
+                    var details = "<ul>";
+                    for (var errorIndex = 0; errorIndex < errorsElement.childNodes.length; errorIndex++) {
+
+                        // <xxf:error exception="org.orbeon.saxon.trans.XPathException" file="gaga.xhtml" line="24" col="12">
+                        //     Invalid date "foo" (Year is less than four digits)
+                        // </xxf:error>
+                        var errorElement = errorsElement.childNodes[errorIndex];
+                        var exception = ORBEON.util.Dom.getAttribute(errorElement, "exception");
+                        var file = ORBEON.util.Dom.getAttribute(errorElement, "file");
+                        var line = ORBEON.util.Dom.getAttribute(errorElement, "line");
+                        var col = ORBEON.util.Dom.getAttribute(errorElement, "col");
+                        var message = ORBEON.util.Dom.getStringValue(errorElement);
+
+                        // Create HTML with message
+                        details += "<li>" + message;
+                        if (file) details += " in " + ORBEON.util.String.escapeHTMLMinimal(file);
+                        if (line) details += " line " + ORBEON.util.String.escapeHTMLMinimal(line);
+                        if (col) details += " column " + ORBEON.util.String.escapeHTMLMinimal(col);
+                        if (exception) details += " (" + ORBEON.util.String.escapeHTMLMinimal(exception) + ")";
+                        details += "</li>";
+                    }
+                    details += "</ul>";
+                    AjaxServer.showError("Non-fatal error", details, formID);
                 }
             }
 

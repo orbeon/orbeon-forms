@@ -17,8 +17,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.CacheStatistics;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -48,9 +46,6 @@ public class InitUtils {
 
 
     private static final String CACHE_SIZE_PROPERTY = "oxf.cache.size";
-
-    private static final String CACHE_DISPLAY_STATISTICS_PROPERTY = "oxf.cache.display-statistics";
-    private static final String DEFAULT_CACHE_DISPLAY_STATISTICS = "cache.main";
 
     public static final String PROLOGUE_PROPERTY = "oxf.prologue";
     public static final String DEFAULT_PROLOGUE = "oxf:/processors.xml";
@@ -126,9 +121,6 @@ public class InitUtils {
                 sb.append(" - Timing: ");
                 sb.append(Long.toString(timing));
 
-                // Display cache statistics (not very useful anymore)
-//                appendCacheStatistics(sb);
-
                 logger.info(sb.toString());
             }
 
@@ -137,50 +129,6 @@ public class InitUtils {
             } catch (Throwable f) {
                 logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
             }
-        }
-    }
-
-    private static void appendCacheStatistics(StringBuilder sb) {
-        // Add cache statistics
-        final String cacheDisplayStatistics = Properties.instance().getPropertySet().getString(CACHE_DISPLAY_STATISTICS_PROPERTY, DEFAULT_CACHE_DISPLAY_STATISTICS);
-        if (cacheDisplayStatistics.indexOf(' ') == -1) {
-            // Single token
-            if (cacheDisplayStatistics.length() > 0)
-                appendCacheStatistics(ObjectCache.instanceIfExists(cacheDisplayStatistics), sb);
-        } else {
-            // Multiple tokens
-            final StringTokenizer st = new StringTokenizer(cacheDisplayStatistics, " ");
-            while (st.hasMoreTokens()) {
-                final String cacheName = st.nextToken().trim();
-                if (cacheName.length() > 0)
-                    appendCacheStatistics(ObjectCache.instanceIfExists(cacheName), sb);
-            }
-        }
-    }
-
-    private static void appendCacheStatistics(Cache cache, StringBuilder sb) {
-        if (cache != null) {
-            final CacheStatistics statistics = cache.getStatistics();
-            final int hitCount = statistics.getHitCount();
-            final int missCount = statistics.getMissCount();
-            final String successRate;
-            if (hitCount + missCount > 0)
-                successRate = hitCount * 100 / (hitCount + missCount) + "%";
-            else
-                successRate = "N/A";
-
-            sb.append(" - Cache hits for ");
-            sb.append(cache.getCacheName());
-            sb.append(": ");
-            sb.append(Integer.toString(hitCount));
-            sb.append(", fault: ");
-            sb.append(Integer.toString(missCount));
-            sb.append(", adds: ");
-            sb.append(Integer.toString(statistics.getAddCount()));
-            sb.append(", expirations: ");
-            sb.append(Integer.toString(statistics.getExpirationCount()));
-            sb.append(", success rate: ");
-            sb.append(successRate);
         }
     }
 

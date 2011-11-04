@@ -47,5 +47,5 @@
         testClientSideHideErrorDialogWithListenerNotRegistered: function() { this.doTest(7); }
     }));
 
-    Test.onOrbeonLoadedRunTest();
+//    Test.onOrbeonLoadedRunTest();
 })();

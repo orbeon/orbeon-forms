@@ -83,12 +83,23 @@
         <p:output name="data" id="response-message"/>
     </p:processor>
 
-    <!-- Generate response -->
-    <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="#response-message"/>
+    <!-- Serialize to XML -->
+    <p:processor name="oxf:xml-converter">
         <p:input name="config">
             <config/>
         </p:input>
+        <p:input name="data" href="#response-message"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
+    <!-- Send response -->
+    <p:processor name="oxf:http-serializer">
+        <p:input name="config">
+            <config>
+                <status-code>500</status-code>
+            </config>
+        </p:input>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 
 </p:pipeline>

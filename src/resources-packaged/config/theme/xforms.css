@@ -420,13 +420,19 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
 div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../../ops/images/xforms/processing.gif) }
 
-.xforms-error-panel .bd { overflow: auto; background-color: white }
+.xforms-error-panel .bd {
+    background-image: url(../../apps/fr/style/images/pixelmixer/warning_64.png);
+    background-position: 20px 20px;
+    background-repeat: no-repeat;
+    padding: 10px 20px 10px 110px !important; /* Override padding defined by YUI */
+    overflow: auto; background-color: white;
+}
 .xforms-error-panel .hd { background-color: #FF6600; }
 .xforms-error-panel-details-hidden, .xforms-error-panel-details-shown { vertical-align: middle; }
 .xforms-error-panel-show-details, .xforms-error-panel-hide-details { cursor: pointer; }
 .xforms-error-panel-close { cursor: pointer; }
 .xforms-error-panel-reload { cursor: pointer; }
-.xforms-error-panel { width: 700px }
+.xforms-error-panel { width: 500px }
 
 .xforms-help-panel { width: 300px; }
 .xforms-help-panel-close { text-align: right; }

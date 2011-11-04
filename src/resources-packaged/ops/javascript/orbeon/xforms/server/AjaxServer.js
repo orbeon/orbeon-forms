@@ -64,7 +64,6 @@
             if (formErrorPanel) {
                 // Render the dialog if needed
                 formErrorPanel.element.style.display = "block";
-                formErrorPanel.errorTitleDiv.innerHTML = title;
                 formErrorPanel.errorDetailsDiv.innerHTML = details;
                 formErrorPanel.show();
                 ORBEON.xforms.Globals.lastDialogZIndex += 2;
@@ -683,6 +682,8 @@
 
             } else {
                 // Consider this a failure
+                // As if the server returned an error code (5xx), in particular used by the loading indicator
+                YAHOO.util.Connect.failureEvent.fire();
                 AjaxServer.handleFailureAjax(o);
             }
         }

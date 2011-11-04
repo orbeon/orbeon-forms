@@ -20,7 +20,7 @@
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:pipeline-trace">
-        <p:output name="data" ref="data" debug="xxx"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

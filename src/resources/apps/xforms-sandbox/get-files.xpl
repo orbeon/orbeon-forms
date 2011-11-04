@@ -26,7 +26,7 @@
                 <case-sensitive>false</case-sensitive>
             </config>
         </p:input>
-        <p:output name="data" id="result" debug="xxx"/>
+        <p:output name="data" id="result"/>
     </p:processor>
 
     <!-- Sort -->

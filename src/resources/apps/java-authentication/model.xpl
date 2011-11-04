@@ -23,7 +23,7 @@
                 <role>orbeon-user</role>
             </config>
         </p:input>
-        <p:output name="data" ref="data" debug="xxxxx"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

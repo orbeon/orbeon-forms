@@ -549,7 +549,7 @@
                                     xmlns:ev="http://www.w3.org/2001/xml-events"
                                     xmlns:xs="http://www.w3.org/2001/XMLSchema">
                             <xhtml:head>
-                                <xforms:model id="model" xxforms:show-max-recoverable-errors="100">
+                                <xforms:model id="model" xxforms:show-recoverable-errors="100">
                                     <xforms:instance id="instance">
                                         <instance show="false">
                                             <date>2011-11-03</date>
@@ -657,5 +657,129 @@
             </xxf:errors>
         </output>
     </test>
+
+    <!-- Same test as above but with xxforms:ignore-dynamic-mip-xpath-errors="true" -->
+    <test description="Ignorable dynamic XPath errors on MIPs" name="oxf:pipeline"
+              request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
+
+            <input name="config">
+                <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                    <p:param name="response" type="output"/>
+
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
+                        <p:input name="document">
+                            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                                        xmlns:xforms="http://www.w3.org/2002/xforms"
+                                        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                                        xmlns:ev="http://www.w3.org/2001/xml-events"
+                                        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                                <xhtml:head>
+                                    <xforms:model id="model" xxforms:show-recoverable-errors="100" xxforms:ignore-dynamic-mip-xpath-errors="true">
+                                        <xforms:instance id="instance">
+                                            <instance show="false">
+                                                <date>2011-11-03</date>
+                                            </instance>
+                                        </xforms:instance>
+                                        <xforms:bind ref=".[@show = 'true']">
+                                            <xforms:bind ref="date[xs:date('error2') = xs:date('2011-11-04')]"/>            <!-- XPath error on ref -->
+                                            <xforms:bind ref="date" calculate="xs:date('error3')"/>                         <!-- XPath error on calculate value -->
+                                            <xforms:bind ref="date" required="xs:date('error4') = current-date()"/>         <!-- XPath error on boolean MIP -->
+                                        </xforms:bind>
+                                        <xxforms:variable ref=".[@show = 'true']" name="var1" select="xs:date('error5')"/>  <!-- XPath error on variable value -->
+                                    </xforms:model>
+                                </xhtml:head>
+                                <xhtml:body>
+                                    <xforms:trigger id="doit">
+                                        <xforms:label>Try</xforms:label>
+                                        <!-- 1. Run actions causing errors -->
+                                        <xforms:setvalue ev:event="DOMActivate" ref="date[xs:date('error1')]"/>             <!-- XPath error on ref -->
+                                        <xforms:action ev:event="DOMActivate" model="non-existing-model"/>                  <!-- non-existing model -->
+                                        <xforms:action ev:event="DOMActivate" bind="non-existing-bind"/>                    <!-- non-existing bind -->
+                                        <xforms:dispatch ev:event="DOMActivate"/>                                           <!-- missing mandatory attribute -->
+                                        <xforms:revalidate ev:event="DOMActivate" model="non-existing-model"/>              <!-- non-existing model -->
+                                        <xforms:setvalue ev:event="DOMActivate" ref="."/>                                   <!-- setvalue on complex content -->
+
+                                        <!-- 2. Show binds and controls to cause other errors -->
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="@show">true</xforms:setvalue>
+                                            <xforms:rebuild/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+
+                                    <xforms:group ref=".[@show = 'true']">
+                                        <xxforms:variable name="var2" select="xs:date('error6')"/>                          <!-- XPath error on variable value -->
+                                        <xforms:input ref=".[xs:date('error7') = current-date()]"/>                         <!-- XPath error on control binding -->
+                                        <xforms:output value="xs:date('error8')"/>                                          <!-- XPath error on control value -->
+                                        <xforms:select>
+                                            <xforms:itemset ref=".[1]">
+                                                <xforms:label value="xs:date('error9')"/>                                   <!-- XPath error on itemset label -->
+                                                <xforms:value/>
+                                            </xforms:itemset>
+                                        </xforms:select>
+                                    </xforms:group>
+                                </xhtml:body>
+                            </xhtml:html>
+                        </p:input>
+                        <p:output name="response" id="xhtml"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:xslt">
+                        <p:input name="config">
+                            <xxforms:event-request xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
+                                <xxforms:sequence>1</xxforms:sequence>
+                                <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                                <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
+                                <xxforms:action>
+                                    <xxforms:event name="DOMActivate" source-control-id="doit"/>
+                                </xxforms:action>
+                            </xxforms:event-request>
+                        </p:input>
+                        <p:input name="data" href="#xhtml"/>
+                        <p:output name="data" id="request"/>
+                    </p:processor>
+
+                    <!-- Run request -->
+                    <p:processor name="oxf:xforms-server">
+                        <p:input name="request" href="#request"/>
+                        <p:output name="response" id="response" schema-href="/ops/xforms/xforms-server-response.rng"/>
+                    </p:processor>
+
+                    <!-- Filter response -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#response" transform="oxf:unsafe-xslt">
+                            <xsl:transform version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                                <xsl:template match="/">
+                                    <xsl:copy-of select="//xxforms:errors"/>
+                                </xsl:template>
+                            </xsl:transform>
+                        </p:input>
+                        <p:output name="data" ref="response"/>
+                    </p:processor>
+
+                </p:config>
+            </input>
+            <output name="response">
+                <xxf:errors xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error1" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing model id: non-existing-model null, line -1, column -1: Reference to non-existing model id: non-existing-model</xxf:error>
+                    <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing bind id: non-existing-bind null, line -1, column -1: Reference to non-existing bind id: non-existing-bind</xxf:error>
+                    <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xforms:dispatch element.</xxf:error>
+                    <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing model id: non-existing-model null, line -1, column -1: Reference to non-existing model id: non-existing-model</xxf:error>
+                    <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on complex content</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error2" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error5" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error6" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error7" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error8" (Non-numeric year component)</xxf:error>
+                    <xxf:error exception="org.orbeon.saxon.trans.XPathException" line="1">Invalid date "error9" (Non-numeric year component)</xxf:error>
+                </xxf:errors>
+            </output>
+        </test>
 
 </group>

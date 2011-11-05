@@ -79,7 +79,7 @@ public class XFormsProperties {
     private static final String DATEPICKER_TWO_MONTHS_PROPERTY = "datepicker.two-months";
     private static final String SHOW_ERROR_DIALOG_PROPERTY = "show-error-dialog";
     private static final String SHOW_RECOVERABLE_ERRORS_PROPERTY = "show-recoverable-errors";
-    private static final String SHOW_MAX_RECOVERABLE_ERRORS_PROPERTY = "show-max-recoverable-errors";
+    private static final String IGNORE_DYNAMIC_MIP_XPATH_ERRORS_PROPERTY = "ignore-dynamic-mip-xpath-errors";
 
     private static final String CLIENT_EVENTS_MODE_PROPERTY = "client.events.mode";
     private static final String CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
@@ -215,8 +215,8 @@ public class XFormsProperties {
             new PropertyDefinition(LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
-            new PropertyDefinition(SHOW_RECOVERABLE_ERRORS_PROPERTY, true, false),
-            new PropertyDefinition(SHOW_MAX_RECOVERABLE_ERRORS_PROPERTY, 10, false),
+            new PropertyDefinition(SHOW_RECOVERABLE_ERRORS_PROPERTY, 10, false),
+            new PropertyDefinition(IGNORE_DYNAMIC_MIP_XPATH_ERRORS_PROPERTY, false, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -484,11 +484,11 @@ public class XFormsProperties {
     }
 
     public static int getShowMaxRecoverableErrors(XFormsContainingDocument containingDocument) {
-            return getIntegerProperty(containingDocument, SHOW_MAX_RECOVERABLE_ERRORS_PROPERTY);
-        }
+        return getIntegerProperty(containingDocument, SHOW_RECOVERABLE_ERRORS_PROPERTY);
+    }
 
-    public static boolean isShowRecoverableErrors(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, SHOW_RECOVERABLE_ERRORS_PROPERTY);
+    public static boolean isIgnoreDynamicMIPXPathErrors(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, IGNORE_DYNAMIC_MIP_XPATH_ERRORS_PROPERTY);
     }
 
     public static boolean isSpanHTMLLayout(XFormsContainingDocument containingDocument) {

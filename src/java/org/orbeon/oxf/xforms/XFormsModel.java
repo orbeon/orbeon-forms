@@ -556,8 +556,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // Custom event for XPath errors
             // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
             // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
-            XFormsUtils.handleNonFatalXPathException(getContainingDocument(), ((XXFormsXPathErrorEvent) event).throwable());
+            
+            final Throwable t = ((XXFormsXPathErrorEvent) event).throwable();
+
+            if (isIgnorableXPathError(t))
+                XFormsUtils.logNonFatalXPathExceptionAsDebug(getContainingDocument(), t);
+            else
+                XFormsUtils.handleNonFatalXPathException(getContainingDocument(), t);
         }
+    }
+    
+    private boolean isIgnorableXPathError(Throwable t) {
+        if (XFormsProperties.isIgnoreDynamicMIPXPathErrors(containingDocument)) {
+            final Throwable root = OXFException.getRootThrowable(t);
+            return (root instanceof XPathException) && ! ((XPathException) root).isStaticError();
+        } else
+            return false;
     }
 
     private void doReset() {

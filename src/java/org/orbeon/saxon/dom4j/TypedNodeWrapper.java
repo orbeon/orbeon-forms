@@ -16,7 +16,6 @@ package org.orbeon.saxon.dom4j;
 import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.Err;

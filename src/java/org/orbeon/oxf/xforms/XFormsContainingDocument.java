@@ -885,11 +885,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
     
     public void addServerError(ServerError serverError) {
-        if (XFormsProperties.isShowRecoverableErrors(this)) {
+        final int maxErrors = XFormsProperties.getShowMaxRecoverableErrors(this);
+        if (maxErrors > 0) {
             if (serverErrors == null)
                 serverErrors = new ArrayList<ServerError>();
 
-            if (serverErrors.size() < XFormsProperties.getShowMaxRecoverableErrors(this))
+            if (serverErrors.size() < maxErrors)
                 serverErrors.add(serverError);
         }
     }

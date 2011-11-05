@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
@@ -358,6 +359,13 @@ public class XFormsModelBinds {
             }
         }
     }
+    
+    private void handleMIPXPathException(Exception e, Bind bind, String expression, String message) {
+        final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
+            bind.staticBind.element(), "expression", expression));
+
+        container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+    }
 
     private String evaluateXXFormsDefaultBind(Bind bind, int position) {
         // Handle xxforms:default MIP
@@ -367,10 +375,7 @@ public class XFormsModelBinds {
                 final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
                 return evaluateStringExpression(bind.nodeset, position, bind, bind.staticBind.getInitialValue(), getVariables(currentNodeInfo));
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms default bind",
-                        bind.staticBind.element(), "expression", bind.staticBind.getCalculate()));
-
-                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                handleMIPXPathException(e, bind, bind.staticBind.getInitialValue(), "evaluating XForms default bind");
                 return null;
             }
         } else {
@@ -405,10 +410,7 @@ public class XFormsModelBinds {
                 final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
                 return evaluateStringExpression(bind.nodeset, position, bind, bind.staticBind.getCalculate(), getVariables(currentNodeInfo));
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms calculate bind",
-                        bind.staticBind.element(), "expression", bind.staticBind.getCalculate()));
-
-                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                handleMIPXPathException(e, bind, bind.staticBind.getCalculate(), "evaluating XForms calculate bind");
                 return null;
             }
         } else {
@@ -473,10 +475,7 @@ public class XFormsModelBinds {
                 try {
                     return evaluateStringExpression(bind.nodeset, position, bind, expression, currentVariables);
                 } catch (Exception e) {
-                    final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms custom bind",
-                            bind.staticBind.element(), "name", propertyName, "expression", expression));
-
-                    container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                    handleMIPXPathException(e, bind, bind.staticBind.getCalculate(), "evaluating XForms custom bind");// xxx "name", propertyName
                     return null;
                 }
             } else {
@@ -502,10 +501,7 @@ public class XFormsModelBinds {
                 // Get MIP value
                 return evaluateBooleanExpression1(bind.nodeset, position, bind, bind.staticBind.getRequired(), currentVariables);
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms required bind",
-                        bind.staticBind.element(), "expression", bind.staticBind.getRequired()));
-
-                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                handleMIPXPathException(e, bind, bind.staticBind.getRequired(), "evaluating XForms required bind");
                 return null;
             }
         } else {
@@ -519,7 +515,7 @@ public class XFormsModelBinds {
             // Mark node
             bind.setReadonly(position, readonly);
         } else if (bind.staticBind.getCalculate() != null) {
-            // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
+            // The bind doesn't have a readonly attribute, but has` a calculate: set readonly to true()
             bind.setReadonly(position, true);
         }
 //
@@ -551,11 +547,7 @@ public class XFormsModelBinds {
             try {
                 return evaluateBooleanExpression1(bind.nodeset, position, bind, bind.staticBind.getReadonly(), currentVariables);
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms readonly bind",
-                        bind.staticBind.element(), "expression", bind.staticBind.getReadonly()));
-
-
-                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                handleMIPXPathException(e, bind, bind.staticBind.getReadonly(), "evaluating XForms readonly bind");
                 return null;
             }
         } else {
@@ -577,10 +569,7 @@ public class XFormsModelBinds {
             try {
                 return evaluateBooleanExpression1(bind.nodeset, position, bind, bind.staticBind.getRelevant(), currentVariables);
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms relevant bind",
-                        bind.staticBind.element(), "expression", bind.staticBind.getRelevant()));
-
-                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                handleMIPXPathException(e, bind, bind.staticBind.getRelevant(), "evaluating XForms relevant bind");
                 return null;
             }
         } else {
@@ -863,10 +852,7 @@ public class XFormsModelBinds {
                 // Get MIP value
                 return evaluateBooleanExpression1(bind.nodeset, position, bind, bind.staticBind.getConstraint(), getVariables(currentNodeInfo));
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), "evaluating XForms constraint bind",
-                        bind.staticBind.element(), "expression", bind.staticBind.getConstraint()));
-
-                container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+                handleMIPXPathException(e, bind, bind.staticBind.getConstraint(), "evaluating XForms constraint bind");
                 return null;
             }
         } else {

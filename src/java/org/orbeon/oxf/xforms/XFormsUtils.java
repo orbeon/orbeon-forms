@@ -1560,9 +1560,20 @@ public class XFormsUtils {
             // The error is non fatal only upon XForms updates
             throw new OXFException(t);
         } else {
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
-            indentedLogger.logWarning("", "exception while evaluating XPath expression", t);
+            logNonFatalXPathException(containingDocument, t);
             containingDocument.addServerError(new XFormsContainingDocument.ServerError(t));
         }
+    }
+
+    public static void logNonFatalXPathException(XFormsContainingDocument containingDocument, Throwable t) {
+        // NOTE: For MIPs, this is called as the result of dispatching xforms-xpath-error.
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
+        indentedLogger.logWarning("", "exception while evaluating XPath expression", t);
+    }
+
+    public static void logNonFatalXPathExceptionAsDebug(XFormsContainingDocument containingDocument, Throwable t) {
+        // NOTE: For MIPs, this is called as the result of dispatching xforms-xpath-error.
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
+        indentedLogger.logDebug("", "exception while evaluating XPath expression", t);
     }
 }

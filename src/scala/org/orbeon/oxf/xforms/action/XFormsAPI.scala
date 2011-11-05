@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import actions.{XFormsSetindexAction, XFormsDeleteAction, XFormsInsertAction, XFormsSetvalueAction}
+import actions.{XFormsSetindexAction, XFormsDeleteAction, XFormsInsertAction}
 import collection.JavaConverters._
 import org.orbeon.saxon.om._
 import java.util.{List => JList}
@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.event.{XFormsEventObserver, XFormsEvent}
 import org.dom4j.{Element, QName}
 import org.orbeon.oxf.util.DynamicVariable
+import org.orbeon.oxf.xforms.model.DataModel
 
 object XFormsAPI {
 
@@ -48,9 +49,9 @@ object XFormsAPI {
     def setvalue(ref: Seq[NodeInfo], value: String) = {
         if (ref nonEmpty) {
             val action = actionContext.value
-            // NOTE: Event target is set to null for now. This is only used to dispatch xxforms-binding-error to a target.
-            XFormsSetvalueAction.doSetValue(action map(_.getContainingDocument) orNull, action map (_.getIndentedLogger) orNull,
-                null, ref.head, value, null, "scala setvalue", false)
+            // NOTE: Don't dispatch an event
+            DataModel.setValue(action map(_.getContainingDocument), action map (_.getIndentedLogger),
+                ref.head, value, None, "scala setvalue", false)
             Some(ref.head)
         } else
             None

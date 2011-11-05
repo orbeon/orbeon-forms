@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xforms.submission.Headers;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -104,7 +105,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
-            final String tempValue = XFormsUtils.getBoundItemValue(bindingContext.getSingleItem());
+            final String tempValue = DataModel.getBoundItemValue(bindingContext.getSingleItem());
             value = (tempValue != null) ? tempValue : "";
         } else {
             // Value comes from the XPath expression within the value attribute

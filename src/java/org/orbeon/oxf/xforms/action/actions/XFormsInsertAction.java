@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -89,7 +90,7 @@ public class XFormsInsertAction extends XFormsAction {
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
         // NOTE: In addition we support inserting into a context which is a document node
-        if (contextAttribute != null && isEmptyNodesetBinding && !XFormsUtils.isElement(insertContextItem) && !XFormsUtils.isDocument(insertContextItem)) {
+        if (contextAttribute != null && isEmptyNodesetBinding && !DataModel.isElement(insertContextItem) && !DataModel.isDocument(insertContextItem)) {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;

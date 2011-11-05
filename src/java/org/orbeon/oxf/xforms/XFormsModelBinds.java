@@ -19,11 +19,11 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -384,7 +384,7 @@ public class XFormsModelBinds {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            XFormsSetvalueAction.doSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
+            DataModel.jSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
         }
     }
 
@@ -393,7 +393,7 @@ public class XFormsModelBinds {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            XFormsSetvalueAction.doSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
+            DataModel.jSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
         }
     }
 
@@ -686,7 +686,7 @@ public class XFormsModelBinds {
         final boolean requiredValidity;
         if (isRequired) {
             // Required
-            final String nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
+            final String nodeValue = DataModel.getValueForNodeInfo(currentNodeInfo);
             requiredValidity = !isEmptyValue(nodeValue); // not valid if value is empty
         } else {
             // Not required, so any value passes including empty as far as required is
@@ -754,7 +754,7 @@ public class XFormsModelBinds {
 
             // Get value to validate if not already computed above
 
-            final String nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
+            final String nodeValue = DataModel.getValueForNodeInfo(currentNodeInfo);
 
             // TODO: "[...] these datatypes can be used in the type model item property without the addition of the
             // XForms namespace qualifier if the namespace context has the XForms namespace as the default

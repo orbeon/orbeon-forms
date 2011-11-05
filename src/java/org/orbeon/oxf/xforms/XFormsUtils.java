@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -41,7 +42,6 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.trans.*;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
@@ -68,16 +68,6 @@ public class XFormsUtils {
     public static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
     private static final int SRC_CONTENT_BUFFER_SIZE = NetUtils.COPY_BUFFER_SIZE / 2;
-
-    // Binary types supported for upload, images, etc.
-    private static final Map<String, String> SUPPORTED_BINARY_TYPES = new HashMap<String, String>();
-
-    static {
-        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
-        SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "anyURI");
-        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
-        SUPPORTED_BINARY_TYPES.put(XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, "anyURI");
-    }
 
     /**
      * Iterate through nodes of the instance document and call the walker on each of them.
@@ -406,7 +396,7 @@ public class XFormsUtils {
             final boolean hasSingleNodeBinding = currentBindingContext.isNewBind();
             if (hasSingleNodeBinding) {
                 final Item boundItem = currentBindingContext.getSingleItem();
-                final String tempResult = XFormsUtils.getBoundItemValue(boundItem);
+                final String tempResult = DataModel.getBoundItemValue(boundItem);
                 if (tempResult != null) {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
@@ -654,36 +644,6 @@ public class XFormsUtils {
             return value.toString();
         } finally {
             reader.close();
-        }
-    }
-
-    /**
-     * Convert a value used for xforms:upload depending on its type. If the local name of the current type and the new
-     * type are the same, return the value as passed. Otherwise, convert to or from anyURI and base64Binary.
-     *
-     * @param value             value to convert
-     * @param currentType       current type as exploded QName
-     * @param newType           new type as exploded QName
-     * @return                  converted value, or value passed
-     */
-    public static String convertUploadTypes(String value, String currentType, String newType) {
-
-        final String currentTypeLocalName = SUPPORTED_BINARY_TYPES.get(currentType);
-        if (currentTypeLocalName == null)
-            throw new UnsupportedOperationException("Unsupported type: " + currentType);
-        final String newTypeLocalName = SUPPORTED_BINARY_TYPES.get(newType);
-        if (newTypeLocalName == null)
-            throw new UnsupportedOperationException("Unsupported type: " + newType);
-
-        if (currentTypeLocalName.equals(newTypeLocalName))
-            return value;
-
-        if (currentTypeLocalName.equals("base64Binary")) {
-            // Convert from xs:base64Binary or xforms:base64Binary to xs:anyURI or xforms:anyURI
-            return NetUtils.base64BinaryToAnyURI(value, NetUtils.REQUEST_SCOPE);
-        } else {
-            // Convert from xs:anyURI or xforms:anyURI to xs:base64Binary or xforms:base64Binary
-            return NetUtils.anyURIToBase64Binary(value);
         }
     }
 
@@ -1536,47 +1496,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Check if an item is an element node.
-     *
-     * @param item  item to check
-     * @return      true iif the item is an element node
-     */
-    public static boolean isElement(Item item) {
-        return (item instanceof NodeInfo) && ((NodeInfo) item).getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE;
-    }
-
-    /**
-     * Check if an item is an document node.
-     *
-     * @param item  item to check
-     * @return      true iif the item is an document node
-     */
-    public static boolean isDocument(Item item) {
-        return (item instanceof NodeInfo) && ((NodeInfo) item).getNodeKind() == org.w3c.dom.Document.DOCUMENT_NODE;
-    }
-
-    /**
-     * Return the value of a bound item, whether a NodeInfo or an AtomicValue. If none of those, return null;
-     *
-     * @param boundItem item to get value
-     * @return          value or null
-     */
-    public static String getBoundItemValue(Item boundItem) {
-        if (XFormsUtils.isDocument(boundItem)) {
-            // As a special case, we sometimes allow binding to a document node, but consider the value is empty in this case
-            return null;
-        } else if (boundItem instanceof NodeInfo) {
-            // Bound to element or attribute
-            return XFormsInstance.getValueForNodeInfo((NodeInfo) boundItem);
-        } else if (boundItem instanceof AtomicValue) {
-            // Bound to an atomic value
-            return ((AtomicValue) boundItem).getStringValue();
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Return the id of the enclosing HTML <form> element.
      *
      * @param containingDocument    containing document
@@ -1644,17 +1563,6 @@ public class XFormsUtils {
             final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
             indentedLogger.logWarning("", "exception while evaluating XPath expression", t);
             containingDocument.addServerError(new XFormsContainingDocument.ServerError(t));
-        }
-    }
-
-    public static void handleNonFatalSetvalueError(XFormsContainingDocument containingDocument, String message) {
-        if (containingDocument.isInitializing() || containingDocument.getStaticState().isNoscript()) {
-            // The error is non fatal only upon XForms updates
-            throw new OXFException(message);
-        } else {
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
-            indentedLogger.logWarning("", message);
-            containingDocument.addServerError(new XFormsContainingDocument.ServerError(message));
         }
     }
 }

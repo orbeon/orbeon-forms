@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xml.XMLConstants;
 
 import java.util.HashMap;
@@ -91,57 +92,57 @@ public class NetUtilsTest extends ResourceManagerTestBase {
         final String testDataBase64 = "WW91IGhhdmUgdG8gbGV0IHBlb3BsZSBjaGFsbGVuZ2UgeW91ciBpZGVhcy4=";
 
         // anyURI -> base64
-        assertEquals(XFormsUtils.convertUploadTypes(testDataURI,
+        assertEquals(DataModel.convertUploadTypes(testDataURI,
                 XMLConstants.XS_ANYURI_EXPLODED_QNAME, XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME),
                 testDataBase64);
 
-        assertEquals(XFormsUtils.convertUploadTypes(testDataURI,
+        assertEquals(DataModel.convertUploadTypes(testDataURI,
                 XMLConstants.XS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME),
                 testDataBase64);
 
-        assertEquals(XFormsUtils.convertUploadTypes(testDataURI,
+        assertEquals(DataModel.convertUploadTypes(testDataURI,
                 XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME),
                 testDataBase64);
 
-        assertEquals(XFormsUtils.convertUploadTypes(testDataURI,
+        assertEquals(DataModel.convertUploadTypes(testDataURI,
                 XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME),
                 testDataBase64);
 
         // base64 -> anyURI
-        String result = XFormsUtils.convertUploadTypes(testDataBase64,
+        String result = DataModel.convertUploadTypes(testDataBase64,
                 XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, XMLConstants.XS_ANYURI_EXPLODED_QNAME);
         assertTrue(result.startsWith("file:/"));
         assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
 
-        result = XFormsUtils.convertUploadTypes(testDataBase64,
+        result = DataModel.convertUploadTypes(testDataBase64,
                 XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME);
         assertTrue(result.startsWith("file:/"));
         assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
 
-        result = XFormsUtils.convertUploadTypes(testDataBase64,
+        result = DataModel.convertUploadTypes(testDataBase64,
                 XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, XMLConstants.XS_ANYURI_EXPLODED_QNAME);
         assertTrue(result.startsWith("file:/"));
         assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
 
-        result = XFormsUtils.convertUploadTypes(testDataBase64,
+        result = DataModel.convertUploadTypes(testDataBase64,
                 XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME);
         assertTrue(result.startsWith("file:/"));
         assertEquals(testDataBase64, NetUtils.anyURIToBase64Binary(result));
 
         // All the following tests must not change the input
-        assertEquals(XFormsUtils.convertUploadTypes(testDataString,
+        assertEquals(DataModel.convertUploadTypes(testDataString,
                 XMLConstants.XS_ANYURI_EXPLODED_QNAME, XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME),
                 testDataString);
 
-        assertEquals(XFormsUtils.convertUploadTypes(testDataString,
+        assertEquals(DataModel.convertUploadTypes(testDataString,
                 XFormsConstants.XFORMS_ANYURI_EXPLODED_QNAME, XMLConstants.XS_ANYURI_EXPLODED_QNAME),
                 testDataString);
 
-        assertEquals(XFormsUtils.convertUploadTypes(testDataBase64,
+        assertEquals(DataModel.convertUploadTypes(testDataBase64,
                 XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME),
                 testDataBase64);
 
-        assertEquals(XFormsUtils.convertUploadTypes(testDataBase64,
+        assertEquals(DataModel.convertUploadTypes(testDataBase64,
                 XFormsConstants.XFORMS_BASE64BINARY_EXPLODED_QNAME, XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME),
                 testDataBase64);
     }

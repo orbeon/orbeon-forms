@@ -17,6 +17,7 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.Err;
 import org.orbeon.saxon.trans.XPathException;
@@ -140,7 +141,7 @@ public class TypedNodeWrapper extends NodeWrapper {
             } else {
                 // Return identified type
                 // NOTE: Return a type iif the value matches the type, because that's required by the XPath semantic.
-                final StringValue value = new StringValue(XFormsInstance.getValueForNode((Node) node));
+                final StringValue value = new StringValue(DataModel.getValueForNodeInfo(this));
 
                 try {
                     value.convert((AtomicType) BuiltInType.getSchemaType(requestedTypeFingerprint), getConfiguration().getConversionContext());

@@ -17,9 +17,9 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -96,7 +96,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     protected void evaluateValue() {
-        setValue(XFormsUtils.getBoundItemValue(getBoundItem()));
+        setValue(DataModel.getBoundItemValue(getBoundItem()));
     }
 
     protected void evaluateExternalValue() {
@@ -133,7 +133,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         final Item boundItem = getBoundItem();
         if (!(boundItem instanceof NodeInfo)) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        XFormsSetvalueAction.doSetValue(containingDocument, getIndentedLogger(), this, (NodeInfo) boundItem, value, type, "client", false);
+        DataModel.jSetValue(containingDocument, getIndentedLogger(), this, (NodeInfo) boundItem, value, type, "client", false);
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.

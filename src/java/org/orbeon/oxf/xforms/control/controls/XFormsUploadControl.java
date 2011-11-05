@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.ExternalCopyable;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -33,6 +32,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsUploadDoneEvent;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -602,7 +602,7 @@ class FileInfo implements ExternalCopyable {
     private String getInfoValue(Element element) {
         contextStack.setBinding(control);
         contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
-        final String tempValue = XFormsUtils.getBoundItemValue(contextStack.getCurrentSingleItem());
+        final String tempValue = DataModel.getBoundItemValue(contextStack.getCurrentSingleItem());
         contextStack.popBinding();
         return tempValue;
     }
@@ -634,7 +634,7 @@ class FileInfo implements ExternalCopyable {
         contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
-            XFormsSetvalueAction.doSetValue(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
+            DataModel.jSetValue(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
                     control, (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
             contextStack.popBinding();
         }

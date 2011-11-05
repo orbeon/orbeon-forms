@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -32,7 +31,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.dom4j.TypedDocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
@@ -347,129 +345,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public void setReplaced(boolean replaced) {
         this.replaced = replaced;
-    }
-
-    /**
-     * Set a value on the instance using a NodeInfo and a value.
-     *
-     * @param containingDocument    containing document (for event dispatch), null if no events requested
-     * @param eventTarget           event target (for event dispatch), null if no events requested
-     * @param nodeInfo              element or attribute NodeInfo to update
-     * @param newValue              value to set
-     * @param type                  type of the value to set (xs:anyURI or xs:base64Binary), null if none
-     */
-    public static void setValueForNodeInfo(XFormsContainingDocument containingDocument,
-                                           XFormsEventTarget eventTarget, NodeInfo nodeInfo, String newValue, String type) {
-        switch (canSetValueForNodeInfo(nodeInfo)) {
-            case 0:
-                final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-                setValueForNode(node, newValue, type);
-                break;
-            case 1:
-                handleSetValueError(containingDocument, eventTarget, "Unable to set value on complex content");
-                break;
-            case 2:
-                handleSetValueError(containingDocument, eventTarget, "Unable to set value on read-only node");
-                break;
-        }
-    }
-
-    public static int canSetValueForNodeInfo(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
-            final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-            if (Dom4jUtils.isSimpleContent(node)) {
-                return 0;
-            } else {
-                return 1;
-            }
-        } else {
-            return 2;
-        }
-    }
-    
-    private static void handleSetValueError(XFormsContainingDocument containingDocument, XFormsEventTarget eventTarget, String message) {
-
-        if (containingDocument != null)
-            XFormsUtils.handleNonFatalSetvalueError(containingDocument, message);
-
-        // NOTE: We allow passing a null document and target to prevent dispatching the event.
-        if (containingDocument != null && eventTarget != null)
-            containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, message));
-    }
-
-    /**
-     * Set a value on the instance using a Node and a value.
-     *
-     * @param node              element or attribute Node to update
-     * @param newValue          value to set
-     * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
-     */
-    private static void setValueForNode(Node node, String newValue, String type) {
-
-        // Convert value based on types if possible
-        if (type != null) {
-            final QName nodeTypeQName = InstanceData.getType(node);
-            final String nodeType = (nodeTypeQName == null) ? null : Dom4jUtils.qNameToExplodedQName(nodeTypeQName);
-
-            if (nodeType != null && !nodeType.equals(type)) {
-                // There is a different type already, do a conversion
-                newValue = XFormsUtils.convertUploadTypes(newValue, type, nodeType);
-            } else if (nodeType == null) {
-                // There is no type, convert to default type
-                if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    newValue = XFormsUtils.convertUploadTypes(newValue, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
-            }
-        }
-
-        // Set value
-        if (node instanceof Element) {
-            // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
-            final Element elementNode = (Element) node;
-            elementNode.setText(newValue);// NOTE: if there are already text nodes, dom4j removes them, and adds a new text node in the end
-        } else if (node instanceof Attribute) {
-            // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
-            // value."
-            final Attribute attributeNode = (Attribute) node;
-            attributeNode.setValue(newValue);
-        } else if (node instanceof Text) {
-            // "Text nodes: The text node is replaced with a new one corresponding to the new value."
-            // NOTE: As of 2011-11-03, this should not happen as the caller tests for isSimpleContent() which excludes text nodes.
-            final Text textNode = (Text) node;
-            textNode.setText(newValue);
-        } else {
-            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
-            throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName());
-        }
-    }
-
-    public static String getValueForNodeInfo(NodeInfo nodeInfo) {
-
-        if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE
-                || nodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE
-                || nodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
-
-            // NOTE: In XForms 1.1, all these node types return the string value. Note that previously, there was a
-            // "first text node rule" which ended up causing problems and was removed.
-            return nodeInfo.getStringValue();
-        } else {
-            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
-            throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + nodeInfo.getNodeKind());
-        }
-    }
-
-    public static String getValueForNode(Node node) {
-
-        if (node.getNodeType() == org.w3c.dom.Document.ELEMENT_NODE
-                || node.getNodeType() == org.w3c.dom.Document.ATTRIBUTE_NODE
-                || node.getNodeType() == org.w3c.dom.Document.TEXT_NODE) {
-
-            // NOTE: In XForms 1.1, all these node types return the string value. Note that previously, there was a
-            // "first text node rule" which ended up causing problems and was removed.
-            return node.getStringValue();
-        } else {
-            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
-            throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName());
-        }
     }
 
     /**

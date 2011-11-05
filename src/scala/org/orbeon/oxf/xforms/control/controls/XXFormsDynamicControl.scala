@@ -24,6 +24,7 @@ import action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import collection.JavaConverters._
 import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChanged}
 import event.{EventListener, XFormsEvent, XFormsEvents}
+import model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, Navigator}
@@ -279,7 +280,7 @@ object InstanceMirror {
         case valueChanged: XXFormsValueChanged =>
             findMatchingNode(valueChanged.node, valueChanged.getTargetObject.getId, true) match {
                 case Some(newNode) =>
-                    XFormsInstance.setValueForNodeInfo(null, null, newNode, valueChanged.newValue, null)
+                    DataModel.setValueForNodeInfo(newNode, valueChanged.newValue, None)
                 case None => // change not in an instance
                     notifyOtherChange()
             }

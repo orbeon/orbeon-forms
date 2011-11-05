@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -65,7 +66,7 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
         // Evaluate control values
         if (hasValue && isRelevant()) {
             // Control has value and is relevant
-            value = XFormsUtils.getBoundItemValue(getBoundItem());
+            value = DataModel.getBoundItemValue(getBoundItem());
         } else {
             // Control doesn't have value or is not relevant
             value = null;

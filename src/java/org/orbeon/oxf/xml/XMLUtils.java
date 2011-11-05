@@ -241,6 +241,10 @@ public class XMLUtils {
             return sb.toString();
         }
     }
+    
+    public static String buildExplodedQName(QName qName) {
+        return buildExplodedQName(qName.getNamespaceURI(), qName.getName());
+    }
 
     /**
      * Convert dom4j attributes to SAX attributes.

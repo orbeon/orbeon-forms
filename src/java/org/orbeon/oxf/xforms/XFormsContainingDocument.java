@@ -113,7 +113,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private static FunctionLibrary functionLibrary = XFormsFunctionLibrary.instance();
 
     // Whether this document is currently being initialized
-    private boolean isInitializing;
+    private boolean initializing;
 
     // Transient URI resolver for initialization
     private XFormsURIResolver uriResolver;
@@ -214,7 +214,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             // Remember parameters used during initialization
             this.uriResolver = uriResolver;
             this.response = response;
-            this.isInitializing = true;
+            this.initializing = true;
 
             // Initialize the containing document
             try {
@@ -341,7 +341,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     public boolean isInitializing() {
-        return isInitializing;
+        return initializing;
     }
 
     /**
@@ -351,7 +351,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @return  true iif the document must handle differences
      */
     public boolean isHandleDifferences() {
-        return !isInitializing;
+        return !initializing;
     }
 
     /**
@@ -488,7 +488,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     private void clearClientState() {
 
-        assert !isInitializing;
+        assert !initializing;
         assert response == null;
         assert uriResolver == null;
 
@@ -943,7 +943,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
         this.uriResolver = null;        // URI resolver is of no use after initialization and it may keep dangerous references (PipelineContext)
         this.response = null;           // same as above
-        this.isInitializing = false;
+        this.initializing = false;
 
         clearClientState(); // client state can contain e.g. focus information, etc. set during initialization
 

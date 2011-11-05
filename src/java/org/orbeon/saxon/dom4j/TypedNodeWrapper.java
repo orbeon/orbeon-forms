@@ -141,7 +141,7 @@ public class TypedNodeWrapper extends NodeWrapper {
             } else {
                 // Return identified type
                 // NOTE: Return a type iif the value matches the type, because that's required by the XPath semantic.
-                final StringValue value = new StringValue(DataModel.getValueForNodeInfo(this));
+                final StringValue value = new StringValue(DataModel.getValue(this));
 
                 try {
                     value.convert((AtomicType) BuiltInType.getSchemaType(requestedTypeFingerprint), getConfiguration().getConversionContext());

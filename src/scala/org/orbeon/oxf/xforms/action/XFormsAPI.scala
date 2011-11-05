@@ -48,11 +48,19 @@ object XFormsAPI {
     // @return the node whose value was set, if any
     def setvalue(ref: Seq[NodeInfo], value: String) = {
         if (ref nonEmpty) {
-            val action = actionContext.value
-            // NOTE: Don't dispatch an event
-            DataModel.setValue(action map(_.getContainingDocument), action map (_.getIndentedLogger),
-                ref.head, value, None, "scala setvalue", false)
-            Some(ref.head)
+            val nodeInfo = ref.head
+
+            def onSuccess(oldValue: String): Unit =
+                for {
+                    action <- actionContext.value
+                    containingDocument = action.getContainingDocument
+                    indentedLogger = action.getIndentedLogger
+                } yield
+                    DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "scala setvalue", nodeInfo, oldValue, value, false)
+
+            DataModel.setValueIfChanged(nodeInfo, value, None, onSuccess)
+
+            Some(nodeInfo)
         } else
             None
     }

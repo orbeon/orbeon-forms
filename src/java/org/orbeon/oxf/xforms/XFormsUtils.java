@@ -396,7 +396,7 @@ public class XFormsUtils {
             final boolean hasSingleNodeBinding = currentBindingContext.isNewBind();
             if (hasSingleNodeBinding) {
                 final Item boundItem = currentBindingContext.getSingleItem();
-                final String tempResult = DataModel.getBoundItemValue(boundItem);
+                final String tempResult = DataModel.getValue(boundItem);
                 if (tempResult != null) {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {

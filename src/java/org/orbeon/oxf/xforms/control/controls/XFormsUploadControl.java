@@ -602,7 +602,7 @@ class FileInfo implements ExternalCopyable {
     private String getInfoValue(Element element) {
         contextStack.setBinding(control);
         contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
-        final String tempValue = DataModel.getBoundItemValue(contextStack.getCurrentSingleItem());
+        final String tempValue = DataModel.getValue(contextStack.getCurrentSingleItem());
         contextStack.popBinding();
         return tempValue;
     }
@@ -634,7 +634,7 @@ class FileInfo implements ExternalCopyable {
         contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
-            DataModel.jSetValue(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
+            DataModel.jSetValueIfChanged(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
                     control, (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
             contextStack.popBinding();
         }

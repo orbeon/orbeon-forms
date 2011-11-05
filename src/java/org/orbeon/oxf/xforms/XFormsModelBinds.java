@@ -384,7 +384,7 @@ public class XFormsModelBinds {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            DataModel.jSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
+            DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
         }
     }
 
@@ -393,7 +393,7 @@ public class XFormsModelBinds {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            DataModel.jSetValue(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
+            DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
         }
     }
 
@@ -686,7 +686,7 @@ public class XFormsModelBinds {
         final boolean requiredValidity;
         if (isRequired) {
             // Required
-            final String nodeValue = DataModel.getValueForNodeInfo(currentNodeInfo);
+            final String nodeValue = DataModel.getValue(currentNodeInfo);
             requiredValidity = !isEmptyValue(nodeValue); // not valid if value is empty
         } else {
             // Not required, so any value passes including empty as far as required is
@@ -754,7 +754,7 @@ public class XFormsModelBinds {
 
             // Get value to validate if not already computed above
 
-            final String nodeValue = DataModel.getValueForNodeInfo(currentNodeInfo);
+            final String nodeValue = DataModel.getValue(currentNodeInfo);
 
             // TODO: "[...] these datatypes can be used in the type model item property without the addition of the
             // XForms namespace qualifier if the namespace context has the XForms namespace as the default

@@ -66,7 +66,7 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
         // Evaluate control values
         if (hasValue && isRelevant()) {
             // Control has value and is relevant
-            value = DataModel.getBoundItemValue(getBoundItem());
+            value = DataModel.getValue(getBoundItem());
         } else {
             // Control doesn't have value or is not relevant
             value = null;

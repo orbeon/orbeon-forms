@@ -32,7 +32,7 @@ public class IndentedLogger {
     private final Indentation indentation;
     private final String prefix;
 
-    private final boolean isDebugEnabled;
+    private final boolean debugEnabled;
 
     private Stack<Operation> stack = new Stack<Operation>();
 
@@ -48,9 +48,9 @@ public class IndentedLogger {
         this(logger, isDebugEnabled, new Indentation(), prefix);
     }
 
-    public IndentedLogger(Logger logger, boolean isDebugEnabled, Indentation indentation, String prefix) {
+    public IndentedLogger(Logger logger, boolean debugEnabled, Indentation indentation, String prefix) {
         this.logger = logger;
-        this.isDebugEnabled = isDebugEnabled;
+        this.debugEnabled = debugEnabled;
         this.indentation = indentation;
         this.prefix = prefix;
     }
@@ -75,7 +75,7 @@ public class IndentedLogger {
     }
 
     public final boolean isDebugEnabled() {
-        return isDebugEnabled;
+        return debugEnabled;
     }
 
     public final boolean isInfoEnabled() {
@@ -83,7 +83,7 @@ public class IndentedLogger {
     }
 
     public void startHandleOperation(String type, String message) {
-        if (isDebugEnabled) {
+        if (debugEnabled) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message);
             indentation.indentation++;
@@ -91,7 +91,7 @@ public class IndentedLogger {
     }
 
     public void startHandleOperation(String type, String message, String... parameters) {
-        if (isDebugEnabled) {
+        if (debugEnabled) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message, parameters);
             indentation.indentation++;
@@ -99,7 +99,7 @@ public class IndentedLogger {
     }
 
     public void endHandleOperation() {
-        if (isDebugEnabled) {
+        if (debugEnabled) {
             indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
@@ -109,7 +109,7 @@ public class IndentedLogger {
     }
 
     public void endHandleOperation(String... parameters) {
-        if (isDebugEnabled) {
+        if (debugEnabled) {
             indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
@@ -184,7 +184,7 @@ public class IndentedLogger {
     }
 
     private void log(Level level, int indentLevel, String type, String message, String... parameters) {
-        if (!(level == Level.DEBUG && !isDebugEnabled)) // handle DEBUG level locally, everything else goes through
+        if (!(level == Level.DEBUG && !debugEnabled)) // handle DEBUG level locally, everything else goes through
             log(logger, level, getActualIndentLevel(indentLevel), prefix, type, message, parameters);
     }
 

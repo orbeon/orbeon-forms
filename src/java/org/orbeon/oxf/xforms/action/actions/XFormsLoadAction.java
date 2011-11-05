@@ -62,7 +62,7 @@ public class XFormsLoadAction extends XFormsAction {
 
         if (bindingContext.isNewBind()) {
             // Use single-node binding
-            final String tempValue = DataModel.getBoundItemValue(bindingContext.getSingleItem());
+            final String tempValue = DataModel.getValue(bindingContext.getSingleItem());
             if (tempValue != null) {
                 final String encodedValue = NetUtils.encodeHRRI(tempValue, true);
                 resolveStoreLoadValue(containingDocument, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);

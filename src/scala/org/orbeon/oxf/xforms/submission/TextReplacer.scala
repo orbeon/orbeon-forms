@@ -61,14 +61,6 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
             throw new XFormsSubmissionException(submission, message, "processing targetref attribute",
                 new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult))
 
-        def handleSetValueError(reason: Reason) =
-            throwSubmissionException(
-                reason match {
-                    case ComplexContentReason ⇒ """targetref attribute doesn't point to an element without children or to an attribute for replace="text"."""
-                    case ReadonlyNodeReason   ⇒ """targetref attribute points to a readonly node for replace="text"."""
-                }
-            )
-
         // Find target location
         val destinationNodeInfo =
             if (submission.getTargetref ne null) {
@@ -83,10 +75,21 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
                 submission.findReplaceInstanceNoTargetref(p.refInstance).getInstanceRootElementInfo
             }
 
+        def handleSetValueSuccess(oldValue: String) =
+            DataModel.logAndNotifyValueChange(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY),
+                "submission", destinationNodeInfo, oldValue, responseBody, false)
+
+        def handleSetValueError(reason: Reason) =
+            throwSubmissionException(
+                reason match {
+                    case ComplexContentReason ⇒ """targetref attribute doesn't point to an element without children or to an attribute for replace="text"."""
+                    case ReadonlyNodeReason   ⇒ """targetref attribute points to a readonly node for replace="text"."""
+                }
+            )
+
         // Set value into the instance
         // NOTE: Here we decided to use the actions logger, by compatibility with xforms:setvalue. Anything we would like to log in "submission" mode?
-        DataModel.setValue(Some(containingDocument), Some(containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY)),
-            destinationNodeInfo, responseBody, None, "submission", false, handleSetValueError)
+        DataModel.setValueIfChanged(destinationNodeInfo, responseBody, None, handleSetValueSuccess, handleSetValueError)
 
         // Dispatch xforms-submit-done
         dispatchSubmitDone(connectionResult)
